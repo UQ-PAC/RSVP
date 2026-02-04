@@ -1,4 +1,4 @@
-package policygen;
+package policygen.entity;
 
 public class Group extends Entity {
     public String name;

@@ -1,4 +1,4 @@
-package policygen;
+package policygen.entity;
 
 public abstract class Entity {
     public Entity parent;

@@ -1,4 +1,4 @@
-package policygen;
+package policygen.entity;
 
 public class User extends Entity {
     public String name;

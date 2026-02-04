@@ -1,4 +1,4 @@
-package policygen;
+package policygen.entity;
 
 import java.util.UUID;
 

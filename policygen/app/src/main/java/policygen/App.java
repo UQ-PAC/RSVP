@@ -8,6 +8,12 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
+import policygen.entity.Entity;
+import policygen.entity.FileResource;
+import policygen.entity.Folder;
+import policygen.entity.Group;
+import policygen.entity.User;
+
 public class App {
 
     private static Random random = new Random();

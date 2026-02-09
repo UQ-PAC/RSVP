@@ -1,0 +1,242 @@
+[
+
+    {
+        "uid": { "type": "Role", "id": "User" },
+        "attrs": { },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Role", "id": "Admin" },
+        "attrs": { },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Visibility", "id": "Public" },
+        "attrs": { },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Visibility", "id": "Protected" },
+        "attrs": { },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Visibility", "id": "Private" },
+        "attrs": { },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Account", "id": "Alice" },
+        "attrs": {
+            "name" : "Alice",
+            "age" : 22,
+            "role" : { "type": "Role", "id": "User" },
+            "friends" : [
+                { "type": "Account", "id": "Bob" }
+            ],
+            "albums" : []
+        },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Account", "id": "Bob" },
+        "attrs": {
+            "name" : "Bob",
+            "age" : 25,
+            "role" : { "type": "Role", "id": "User" },
+            "friends" : [
+                { "type": "Account", "id": "Alice" },
+                { "type": "Account", "id": "Carl" }
+            ],
+            "albums" : []
+        },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Account", "id": "Carl" },
+        "attrs": {
+            "name" : "Carl",
+            "age" : 27,
+            "role" : { "type": "Role", "id": "User" },
+            "friends" : [
+                { "type": "Account", "id": "Bob" }
+            ],
+            "albums" : []
+        },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Account", "id": "Tim" },
+        "attrs": {
+            "name" : "Tim",
+            "age" : 34,
+            "role" : { "type": "Role", "id": "Admin" },
+            "friends" : [],
+            "albums" : []
+        },
+        "parents": []
+    },
+
+    {
+        "uid": { "type": "Album", "id": "AliceSceneries" },
+        "attrs": {
+            "owner" : { "type": "Account", "id": "Alice" },
+            "visibility" : { "type": "Visibility", "id": "Public" },
+            "contents" : []
+        },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Album", "id": "AliceVacation" },
+        "attrs": {
+            "owner" : { "type": "Account", "id": "Alice" },
+            "visibility" : { "type": "Visibility", "id": "Protected" },
+            "contents" : []
+        },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Album", "id": "AliceDocuments" },
+        "attrs": {
+            "owner" : { "type": "Account", "id": "Alice" },
+            "visibility" : { "type": "Visibility", "id": "Private" },
+            "contents" : []
+        },
+        "parents": []
+    },
+
+    {
+        "uid": { "type": "Album", "id": "BobSceneries" },
+        "attrs": {
+            "owner" : { "type": "Account", "id": "Bob" },
+            "visibility" : { "type": "Visibility", "id": "Public" },
+            "contents" : []
+        },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Album", "id": "BobVacation" },
+        "attrs": {
+            "owner" : { "type": "Account", "id": "Bob" },
+            "visibility" : { "type": "Visibility", "id": "Protected" },
+            "contents" : []
+        },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Album", "id": "BobDocuments" },
+        "attrs": {
+            "owner" : { "type": "Account", "id": "Bob" },
+            "visibility" : { "type": "Visibility", "id": "Private" },
+            "contents" : []
+        },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Album", "id": "CarlSceneries" },
+        "attrs": {
+            "owner" : { "type": "Account", "id": "Carl" },
+            "visibility" : { "type": "Visibility", "id": "Public" },
+            "contents" : []
+        },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Album", "id": "CarlVacation" },
+        "attrs": {
+            "owner" : { "type": "Account", "id": "Carl" },
+            "visibility" : { "type": "Visibility", "id": "Protected" },
+            "contents" : []
+        },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Album", "id": "CarlDocuments" },
+        "attrs": {
+            "owner" : { "type": "Account", "id": "Carl" },
+            "visibility" : { "type": "Visibility", "id": "Private" },
+            "contents" : []
+        },
+        "parents": []
+    },
+
+    {
+        "uid": { "type": "Photo", "id": "AliceMeadow" },
+        "attrs": {
+            "album" : { "type": "Album", "id": "AliceSceneries" },
+            "size" : 3,
+            "type" : "jpg"
+        },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Photo", "id": "AlicePassport" },
+        "attrs": {
+            "album" : { "type": "Album", "id": "AliceDocuments" },
+            "size" : 6,
+            "type" : "pdf"
+        },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Photo", "id": "AliceHotel" },
+        "attrs": {
+            "album" : { "type": "Album", "id": "AliceVacation" },
+            "size" : 6,
+            "type" : "jpg"
+        },
+        "parents": []
+    },
+
+    {
+        "uid": { "type": "Photo", "id": "BobMeadow" },
+        "attrs": {
+            "album" : { "type": "Album", "id": "BobSceneries" },
+            "size" : 3,
+            "type" : "jpg"
+        },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Photo", "id": "BobPassport" },
+        "attrs": {
+            "album" : { "type": "Album", "id": "BobDocuments" },
+            "size" : 6,
+            "type" : "pdf"
+        },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Photo", "id": "BobHotel" },
+        "attrs": {
+            "album" : { "type": "Album", "id": "BobVacation" },
+            "size" : 6,
+            "type" : "jpg"
+        },
+        "parents": []
+    },
+
+
+
+    {
+        "uid": { "type": "Action", "id": "uploadPhoto" },
+        "attrs": { },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Action", "id": "viewPhoto" },
+        "attrs": { },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Action", "id": "createAlbum" },
+        "attrs": { },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Action", "id": "removeAlbum" },
+        "attrs": { },
+        "parents": []
+    }
+
+]

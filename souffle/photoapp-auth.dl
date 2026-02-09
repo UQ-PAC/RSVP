@@ -1,0 +1,260 @@
+.decl Visibility(visibility: symbol)
+Visibility("Visibility::Public").
+Visibility("Visibility::Protected").
+Visibility("Visibility::Private").
+
+.decl Role(type: symbol)
+Role("Role::User").
+Role("Role::Admin").
+
+.decl Account(name: symbol)
+Account("Account::Alice").
+Account("Account::Bob").
+Account("Account::Carl").
+Account("Account::Tim").
+
+.decl AccountFriends(account: symbol, friend: symbol)
+AccountFriends("Account::Alice", "Account::Bob").
+AccountFriends("Account::Bob",   "Account::Alice").
+AccountFriends("Account::Bob",   "Account::Carl").
+AccountFriends("Account::Carl",  "Account::Bob").
+
+.decl AccountRole(account: symbol, role: symbol)
+AccountRole("Account::Alice", "Role::User").
+AccountRole("Account::Bob",   "Role::User").
+AccountRole("Account::Carl",  "Role::User").
+AccountRole("Account::Tim",   "Role::Admin").
+
+.decl AccountAge(accout: symbol, age: number)
+AccountAge("Account::Alice", 22).
+AccountAge("Account::Bob",   25).
+AccountAge("Account::Carl",  27).
+AccountAge("Account::Tim",   34).
+
+.decl Album(album: symbol)
+Album("Album::AliceSceneries").
+Album("Album::AliceVacation").
+Album("Album::AliceDocuments").
+Album("Album::BobSceneries").
+Album("Album::BobVacation").
+Album("Album::BobDocuments").
+Album("Album::CarlSceneries").
+Album("Album::CarlVacation").
+Album("Album::CarlDocuments").
+
+.decl AlbumOwner(account: symbol, owner: symbol)
+AlbumOwner("Album::AliceSceneries", "Account::Alice").
+AlbumOwner("Album::AliceVacation",  "Account::Alice").
+AlbumOwner("Album::AliceDocuments", "Account::Alice").
+AlbumOwner("Album::BobSceneries",   "Account::Bob").
+AlbumOwner("Album::BobVacation",    "Account::Bob").
+AlbumOwner("Album::BobDocuments",   "Account::Bob").
+AlbumOwner("Album::CarlSceneries",  "Account::Carl").
+AlbumOwner("Album::CarlVacation",   "Account::Carl").
+AlbumOwner("Album::CarlDocuments",  "Account::Carl").
+
+.decl AlbumVisibility(album: symbol, visibility: symbol)
+AlbumVisibility("Album::AliceSceneries", "Visibility::Public").
+AlbumVisibility("Album::AliceVacation",  "Visibility::Protected").
+AlbumVisibility("Album::AliceDocuments", "Visibility::Private").
+AlbumVisibility("Album::BobSceneries",   "Visibility::Public").
+AlbumVisibility("Album::BobVacation",    "Visibility::Protected").
+AlbumVisibility("Album::BobDocuments",   "Visibility::Private").
+AlbumVisibility("Album::CarlSceneries",  "Visibility::Public").
+AlbumVisibility("Album::CarlVacation",   "Visibility::Protected").
+AlbumVisibility("Album::CarlDocuments",  "Visibility::Private").
+
+.decl Photo(id: symbol)
+Photo("Photo::AliceMeadow").
+Photo("Photo::AlicePassport").
+Photo("Photo::AliceHotel").
+Photo("Photo::BobMeadow").
+Photo("Photo::BobPassport").
+Photo("Photo::BobHotel").
+
+.decl PhotoSize(id: symbol, size: number)
+PhotoSize("Photo::AliceMeadow", 3).
+PhotoSize("Photo::AlicePassport", 4).
+PhotoSize("Photo::AliceHotel", 7).
+PhotoSize("Photo::BobMeadow", 4).
+PhotoSize("Photo::BobPassport", 5).
+PhotoSize("Photo::BobHotel", 9).
+
+.decl PhotoInAlbum(photo: symbol, album: symbol)
+PhotoInAlbum("Photo::AliceMeadow",   "Album::AliceSceneries").
+PhotoInAlbum("Photo::AlicePassport", "Album::AliceDocuments").
+PhotoInAlbum("Photo::AliceHotel",    "Album::AliceVacation").
+PhotoInAlbum("Photo::BobMeadow",     "Album::BobSceneries").
+PhotoInAlbum("Photo::BobPassport",   "Album::BobDocuments").
+PhotoInAlbum("Photo::BobHotel",      "Album::BobVacation").
+
+.decl Action(action: symbol)
+Action("Action::viewPhoto").
+Action("Action::removeAlbum").
+Action("Action::removePhoto").
+Action("Action::uploadPhoto").
+Action("Action::createAlbum").
+
+.decl ActionResource(action: symbol, resource: symbol)
+ActionResource("Action::viewPhoto",   resource) :- Photo(resource).
+ActionResource("Action::removeAlbum", resource) :- Album(resource).
+ActionResource("Action::removePhoto", resource) :- Photo(resource).
+ActionResource("Action::uploadPhoto", resource) :- Photo(resource).
+ActionResource("Action::createAlbum", resource) :- Account(resource).
+
+.decl ActionPrincipal(action: symbol, resource: symbol)
+ActionPrincipal("Action::viewPhoto",   resource) :- Account(resource).
+ActionPrincipal("Action::removeAlbum", resource) :- Account(resource).
+ActionPrincipal("Action::removePhoto", resource) :- Account(resource).
+ActionPrincipal("Action::uploadPhoto", resource) :- Account(resource).
+ActionPrincipal("Action::createAlbum", resource) :- Account(resource).
+
+.decl PermitV1(action: symbol, principal: symbol, resource: symbol)
+.decl PermitV2(action: symbol, principal: symbol, resource: symbol)
+
+// Anyone can see public photos
+PermitV1(action, principal, resource) :-
+    action = "Action::viewPhoto",
+    Account(principal),
+    Photo(resource),
+    PhotoInAlbum(resource, album),
+    AlbumVisibility(album, "Visibility::Public").
+
+// Admins can see any photo
+PermitV1(action, principal, resource) :-
+    action = "Action::viewPhoto",
+    Account(principal),
+    Photo(resource),
+    AccountRole(principal, "Role::Admin").
+
+// Users can see their own photos
+PermitV1(action, principal, resource) :-
+    action = "Action::viewPhoto",
+    Account(principal),
+    Photo(resource),
+    PhotoInAlbum(resource, album),
+    AlbumOwner(album, principal).
+
+// Friends can see protected photos of their friends
+PermitV2(action, principal, resource) :-
+    action = "Action::viewPhoto",
+    Account(principal),
+    Photo(resource),
+    PhotoInAlbum(resource, album),
+    AlbumVisibility(album, "Visibility::Protected"),
+    AlbumOwner(album, owner),
+    AccountFriends(principal, owner).
+
+// Users can upload photos to their albums
+.decl PermitU1(action: symbol, principal: symbol, resource: symbol)
+PermitU1(action, principal, resource) :-
+    action = "Action::uploadPhoto",
+    Account(principal),
+    Album(resource),
+    AlbumOwner(resource, owner),
+    owner = principal.
+
+.decl PermitC1(action: symbol, principal: symbol, resource: symbol)
+// Users can create albums for their own accounts
+PermitC1(action, principal, resource) :-
+    action = "Action::createAlbum",
+    Account(principal),
+    Account(resource),
+    resource = principal.
+
+// Admins can create albums for anyone
+PermitC1(action, principal, resource) :-
+    action = "Action::createAlbum",
+    Account(principal),
+    Account(resource),
+    AccountRole(principal, "Role::Admin").
+
+.decl ForbidC1(action: symbol, principal: symbol, resource: symbol)
+// Admins cannot create albums for themselves
+ForbidC1(action, principal, resource) :-
+    action = "Action::createAlbum",
+    Account(principal),
+    Account(resource),
+    AccountRole(resource, "Role::Admin").
+
+.decl PermitR1(action: symbol, principal: symbol, resource: symbol)
+PermitR1(action, principal, resource) :-
+    action = "Action::removeAlbum",
+    Account(principal),
+    Album(resource),
+    AccountRole(principal, "Role::Admin").
+
+PermitR1(action, principal, resource) :-
+    action = "Action::removeAlbum",
+    Account(principal),
+    Album(resource),
+    AlbumOwner(resource, principal).
+
+.decl Permit(action: symbol, principal: symbol, resource: symbol)
+Permit(action, principal, resource) :-
+    PermitV1(action, principal, resource);
+    PermitV2(action, principal, resource);
+    PermitU1(action, principal, resource);
+    PermitC1(action, principal, resource);
+    PermitR1(action, principal, resource).
+
+.decl Forbid(action: symbol, principal: symbol, resource: symbol)
+Forbid(action, principal, resource) :-
+    ForbidC1(action, principal, resource).
+
+// All possible requests
+.decl AllRequests(x: symbol, y: symbol, z: symbol)
+AllRequests(action, principal, resource) :-
+    ActionResource(action, resource), ActionPrincipal(action, principal).
+
+// Requests allowed by the policy
+.decl PermittedRequests(action: symbol, principal: symbol, resource: symbol)
+PermittedRequests(action, principal, resource) :-
+    Permit(action, principal, resource), !Forbid(action, principal, resource).
+
+// Requests forbidden by the policy
+.decl ForbiddenRequests(action: symbol, principal: symbol, resource: symbol)
+ForbiddenRequests(action, principal, resource) :-
+    AllRequests(action, principal, resource), !PermittedRequests(action, principal, resource).
+
+.output AllRequests(filename="build/AllRequests.csv")
+.output PermittedRequests(filename="build/PermittedRequests.csv")
+.output ForbiddenRequests(filename="build/ForbiddenRequests.csv")
+.output PermittedRequests(IO=stdout)
+
+// Security Invariants / Boundaries
+
+// 1. There exists at least one admin in the system
+// principal.type == Admin::"Admin" for some principal : Account;
+.decl AdminExistInvariant(admin: symbol)
+AdminExistInvariant(admin) :-
+    Account(admin),
+    AccountRole(admin, "Role::Admin").
+
+// 2. Admin accounts should not have albums
+// principal.type == Account::"Admin" && !principal.albums.isEmpty()
+//    for none of principal : Account;
+.decl AdminAlbumsInvariant(admin: symbol)
+AdminAlbumsInvariant (user) :-
+    Account(user),
+    AccountRole(user, "Role::Admin"),
+    !(count : { AlbumOwner(_, user) } = 0).
+
+// 3. There should be no photos larger than 10MB
+// photo.size > 10
+//      for none of photo : Photo;
+.decl PhotoSizeInvariant(photo: symbol)
+PhotoSizeInvariant(photo) :-
+    Photo(photo),
+    PhotoSize(photo, size),
+    size > 10.
+
+// 4. All admins can see all photos of users
+// principal.type == Role::"Admin" && forbiddenRequests(Action::"viewPhoto", principal, resource)
+//          for none of principal : Account, resource : Photo;
+.decl AdminAccessInvariant(admin: symbol)
+AdminAccessInvariant(admin) :-
+    Account(admin),
+    AccountRole(admin, "Account::Admin"),
+    Photo(resource),
+    ForbiddenRequests("Action::viewPhoto", admin, resource).

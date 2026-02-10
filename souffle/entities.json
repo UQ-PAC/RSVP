@@ -34,7 +34,6 @@
             "friends" : [
                 { "type": "Account", "id": "Bob" }
             ],
-            "albums" : []
         },
         "parents": []
     },
@@ -48,7 +47,6 @@
                 { "type": "Account", "id": "Alice" },
                 { "type": "Account", "id": "Carl" }
             ],
-            "albums" : []
         },
         "parents": []
     },
@@ -61,7 +59,6 @@
             "friends" : [
                 { "type": "Account", "id": "Bob" }
             ],
-            "albums" : []
         },
         "parents": []
     },
@@ -72,7 +69,6 @@
             "age" : 34,
             "role" : { "type": "Role", "id": "Admin" },
             "friends" : [],
-            "albums" : []
         },
         "parents": []
     },

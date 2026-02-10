@@ -6,7 +6,6 @@ entity Account = {
     "age": Long,
     "role": Role,
     "friends": Set<Account>,
-    "albums": Set<Album>
 };
 
 entity Album = {

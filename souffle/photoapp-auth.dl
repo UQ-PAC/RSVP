@@ -1,37 +1,23 @@
-.decl Visibility(visibility: symbol)
+.type VisibilityType <: symbol
+.decl Visibility(visibility: VisibilityType)
 Visibility("Visibility::Public").
 Visibility("Visibility::Protected").
 Visibility("Visibility::Private").
 
-.decl Role(type: symbol)
+.type RoleType <: symbol
+.decl Role(role: RoleType)
 Role("Role::User").
 Role("Role::Admin").
 
-.decl Account(name: symbol)
+.type AccountType <: symbol
+.decl Account(id: AccountType)
 Account("Account::Alice").
 Account("Account::Bob").
 Account("Account::Carl").
 Account("Account::Tim").
 
-.decl AccountFriends(account: symbol, friend: symbol)
-AccountFriends("Account::Alice", "Account::Bob").
-AccountFriends("Account::Bob",   "Account::Alice").
-AccountFriends("Account::Bob",   "Account::Carl").
-AccountFriends("Account::Carl",  "Account::Bob").
-
-.decl AccountRole(account: symbol, role: symbol)
-AccountRole("Account::Alice", "Role::User").
-AccountRole("Account::Bob",   "Role::User").
-AccountRole("Account::Carl",  "Role::User").
-AccountRole("Account::Tim",   "Role::Admin").
-
-.decl AccountAge(accout: symbol, age: number)
-AccountAge("Account::Alice", 22).
-AccountAge("Account::Bob",   25).
-AccountAge("Account::Carl",  27).
-AccountAge("Account::Tim",   34).
-
-.decl Album(album: symbol)
+.type AlbumType <: symbol
+.decl Album(album: AlbumType)
 Album("Album::AliceSceneries").
 Album("Album::AliceVacation").
 Album("Album::AliceDocuments").
@@ -42,7 +28,42 @@ Album("Album::CarlSceneries").
 Album("Album::CarlVacation").
 Album("Album::CarlDocuments").
 
-.decl AlbumOwner(account: symbol, owner: symbol)
+.type PhotoType <: symbol
+.decl Photo(id: PhotoType)
+Photo("Photo::AliceMeadow").
+Photo("Photo::AlicePassport").
+Photo("Photo::AliceHotel").
+Photo("Photo::BobMeadow").
+Photo("Photo::BobPassport").
+Photo("Photo::BobHotel").
+
+.type ActionType <: symbol
+.decl Action(action: symbol)
+Action("Action::viewPhoto").
+Action("Action::removeAlbum").
+Action("Action::removePhoto").
+Action("Action::uploadPhoto").
+Action("Action::createAlbum").
+
+.decl AccountFriends(account: AccountType, friend: AccountType)
+AccountFriends("Account::Alice", "Account::Bob").
+AccountFriends("Account::Bob",   "Account::Alice").
+AccountFriends("Account::Bob",   "Account::Carl").
+AccountFriends("Account::Carl",  "Account::Bob").
+
+.decl AccountRole(account: AccountType, role: RoleType)
+AccountRole("Account::Alice", "Role::User").
+AccountRole("Account::Bob",   "Role::User").
+AccountRole("Account::Carl",  "Role::User").
+AccountRole("Account::Tim",   "Role::Admin").
+
+.decl AccountAge(accout: AccountType, age: number)
+AccountAge("Account::Alice", 22).
+AccountAge("Account::Bob",   25).
+AccountAge("Account::Carl",  27).
+AccountAge("Account::Tim",   34).
+
+.decl AlbumOwner(album: AlbumType, owner: AccountType)
 AlbumOwner("Album::AliceSceneries", "Account::Alice").
 AlbumOwner("Album::AliceVacation",  "Account::Alice").
 AlbumOwner("Album::AliceDocuments", "Account::Alice").
@@ -53,7 +74,7 @@ AlbumOwner("Album::CarlSceneries",  "Account::Carl").
 AlbumOwner("Album::CarlVacation",   "Account::Carl").
 AlbumOwner("Album::CarlDocuments",  "Account::Carl").
 
-.decl AlbumVisibility(album: symbol, visibility: symbol)
+.decl AlbumVisibility(album: AlbumType, visibility: VisibilityType)
 AlbumVisibility("Album::AliceSceneries", "Visibility::Public").
 AlbumVisibility("Album::AliceVacation",  "Visibility::Protected").
 AlbumVisibility("Album::AliceDocuments", "Visibility::Private").
@@ -64,15 +85,7 @@ AlbumVisibility("Album::CarlSceneries",  "Visibility::Public").
 AlbumVisibility("Album::CarlVacation",   "Visibility::Protected").
 AlbumVisibility("Album::CarlDocuments",  "Visibility::Private").
 
-.decl Photo(id: symbol)
-Photo("Photo::AliceMeadow").
-Photo("Photo::AlicePassport").
-Photo("Photo::AliceHotel").
-Photo("Photo::BobMeadow").
-Photo("Photo::BobPassport").
-Photo("Photo::BobHotel").
-
-.decl PhotoSize(id: symbol, size: number)
+.decl PhotoSize(photo: PhotoType, size: number)
 PhotoSize("Photo::AliceMeadow", 3).
 PhotoSize("Photo::AlicePassport", 4).
 PhotoSize("Photo::AliceHotel", 7).
@@ -80,7 +93,7 @@ PhotoSize("Photo::BobMeadow", 4).
 PhotoSize("Photo::BobPassport", 5).
 PhotoSize("Photo::BobHotel", 9).
 
-.decl PhotoInAlbum(photo: symbol, album: symbol)
+.decl PhotoInAlbum(photo: PhotoType, album: AlbumType)
 PhotoInAlbum("Photo::AliceMeadow",   "Album::AliceSceneries").
 PhotoInAlbum("Photo::AlicePassport", "Album::AliceDocuments").
 PhotoInAlbum("Photo::AliceHotel",    "Album::AliceVacation").
@@ -88,30 +101,24 @@ PhotoInAlbum("Photo::BobMeadow",     "Album::BobSceneries").
 PhotoInAlbum("Photo::BobPassport",   "Album::BobDocuments").
 PhotoInAlbum("Photo::BobHotel",      "Album::BobVacation").
 
-.decl Action(action: symbol)
-Action("Action::viewPhoto").
-Action("Action::removeAlbum").
-Action("Action::removePhoto").
-Action("Action::uploadPhoto").
-Action("Action::createAlbum").
+.type ResourceType = PhotoType | AlbumType | AccountType
+.type PrincipalType = AccountType
 
-.decl ActionResource(action: symbol, resource: symbol)
+.decl ActionResource(action: ActionType, resource: ResourceType)
 ActionResource("Action::viewPhoto",   resource) :- Photo(resource).
 ActionResource("Action::removeAlbum", resource) :- Album(resource).
 ActionResource("Action::removePhoto", resource) :- Photo(resource).
-ActionResource("Action::uploadPhoto", resource) :- Photo(resource).
+ActionResource("Action::uploadPhoto", resource) :- Album(resource).
 ActionResource("Action::createAlbum", resource) :- Account(resource).
 
-.decl ActionPrincipal(action: symbol, resource: symbol)
+.decl ActionPrincipal(action: ActionType, resource: PrincipalType)
 ActionPrincipal("Action::viewPhoto",   resource) :- Account(resource).
 ActionPrincipal("Action::removeAlbum", resource) :- Account(resource).
 ActionPrincipal("Action::removePhoto", resource) :- Account(resource).
 ActionPrincipal("Action::uploadPhoto", resource) :- Account(resource).
 ActionPrincipal("Action::createAlbum", resource) :- Account(resource).
 
-.decl PermitV1(action: symbol, principal: symbol, resource: symbol)
-.decl PermitV2(action: symbol, principal: symbol, resource: symbol)
-
+.decl PermitV1(action: ActionType, principal: PrincipalType, resource: ResourceType)
 // Anyone can see public photos
 PermitV1(action, principal, resource) :-
     action = "Action::viewPhoto",
@@ -136,6 +143,7 @@ PermitV1(action, principal, resource) :-
     AlbumOwner(album, principal).
 
 // Friends can see protected photos of their friends
+.decl PermitV2(action: ActionType, principal: PrincipalType, resource: ResourceType)
 PermitV2(action, principal, resource) :-
     action = "Action::viewPhoto",
     Account(principal),
@@ -146,7 +154,7 @@ PermitV2(action, principal, resource) :-
     AccountFriends(principal, owner).
 
 // Users can upload photos to their albums
-.decl PermitU1(action: symbol, principal: symbol, resource: symbol)
+.decl PermitU1(action: ActionType, principal: PrincipalType, resource: ResourceType)
 PermitU1(action, principal, resource) :-
     action = "Action::uploadPhoto",
     Account(principal),
@@ -154,7 +162,7 @@ PermitU1(action, principal, resource) :-
     AlbumOwner(resource, owner),
     owner = principal.
 
-.decl PermitC1(action: symbol, principal: symbol, resource: symbol)
+.decl PermitC1(action: ActionType, principal: PrincipalType, resource: ResourceType)
 // Users can create albums for their own accounts
 PermitC1(action, principal, resource) :-
     action = "Action::createAlbum",
@@ -169,7 +177,7 @@ PermitC1(action, principal, resource) :-
     Account(resource),
     AccountRole(principal, "Role::Admin").
 
-.decl ForbidC1(action: symbol, principal: symbol, resource: symbol)
+.decl ForbidC1(action: ActionType, principal: PrincipalType, resource: ResourceType)
 // Admins cannot create albums for themselves
 ForbidC1(action, principal, resource) :-
     action = "Action::createAlbum",
@@ -177,7 +185,7 @@ ForbidC1(action, principal, resource) :-
     Account(resource),
     AccountRole(resource, "Role::Admin").
 
-.decl PermitR1(action: symbol, principal: symbol, resource: symbol)
+.decl PermitR1(action: ActionType, principal: PrincipalType, resource: ResourceType)
 PermitR1(action, principal, resource) :-
     action = "Action::removeAlbum",
     Account(principal),
@@ -190,42 +198,43 @@ PermitR1(action, principal, resource) :-
     Album(resource),
     AlbumOwner(resource, principal).
 
-.decl Permit(action: symbol, principal: symbol, resource: symbol)
-Permit(action, principal, resource) :-
-    PermitV1(action, principal, resource);
-    PermitV2(action, principal, resource);
-    PermitU1(action, principal, resource);
-    PermitC1(action, principal, resource);
-    PermitR1(action, principal, resource).
+.decl Permit(action: ActionType, principal: PrincipalType, resource: ResourceType)
+Permit(action, principal, resource) :- PermitV1(action, principal, resource).
+Permit(action, principal, resource) :- PermitV2(action, principal, resource).
+Permit(action, principal, resource) :- PermitU1(action, principal, resource).
+Permit(action, principal, resource) :- PermitC1(action, principal, resource).
+Permit(action, principal, resource) :- PermitR1(action, principal, resource).
 
-.decl Forbid(action: symbol, principal: symbol, resource: symbol)
+// Explicitly forbidden by the policy
+.decl Forbid(action: ActionType, principal: PrincipalType, resource: ResourceType)
 Forbid(action, principal, resource) :-
     ForbidC1(action, principal, resource).
 
 // All possible requests
-.decl AllRequests(x: symbol, y: symbol, z: symbol)
+.decl AllRequests(action: ActionType, principal: PrincipalType, resource: ResourceType)
 AllRequests(action, principal, resource) :-
     ActionResource(action, resource), ActionPrincipal(action, principal).
 
 // Requests allowed by the policy
-.decl PermittedRequests(action: symbol, principal: symbol, resource: symbol)
+.decl PermittedRequests(action: ActionType, principal: PrincipalType, resource: ResourceType)
 PermittedRequests(action, principal, resource) :-
     Permit(action, principal, resource), !Forbid(action, principal, resource).
 
 // Requests forbidden by the policy
-.decl ForbiddenRequests(action: symbol, principal: symbol, resource: symbol)
+.decl ForbiddenRequests(action: ActionType, principal: PrincipalType, resource: ResourceType)
 ForbiddenRequests(action, principal, resource) :-
     AllRequests(action, principal, resource), !PermittedRequests(action, principal, resource).
 
-.output AllRequests(filename="build/AllRequests.csv")
-.output PermittedRequests(filename="build/PermittedRequests.csv")
-.output ForbiddenRequests(filename="build/ForbiddenRequests.csv")
-.output PermittedRequests(IO=stdout)
+.output AllRequests
+.output PermittedRequests
+.output ForbiddenRequests
+.output PermitV1(IO=stdout)
 
 // Security Invariants / Boundaries
 
 // 1. There exists at least one admin in the system
-// principal.type == Admin::"Admin" for some principal : Account;
+// admin.role == Admin::"Admin"
+//      for some admin : Account;
 .decl AdminExistInvariant(admin: symbol)
 AdminExistInvariant(admin) :-
     Account(admin),

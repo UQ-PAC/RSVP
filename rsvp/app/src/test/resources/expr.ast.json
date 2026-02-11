@@ -1,0 +1,215 @@
+[
+  {
+    "effect": "forbid",
+    "condition": {
+      "source": {
+        "file": "expr.cedar",
+        "offset": 5,
+        "len": 25
+      },
+      "type": "binary",
+      "op": "and",
+      "left": {
+        "type": "binary",
+        "op": "eq",
+        "left": {
+          "type": "prop",
+          "obj": {
+            "type": "var",
+            "ref": "principal"
+          },
+          "prop": "role"
+        },
+        "right": {
+          "type": "str",
+          "value": "normie"
+        }
+      },
+      "right": {
+        "type": "binary",
+        "op": "or",
+        "left": {
+          "type": "call",
+          "self": {
+            "type": "set",
+            "elements": [
+              {
+                "type": "str",
+                "value": "secret"
+              },
+              {
+                "type": "str",
+                "value": "top secret"
+              }
+            ]
+          },
+          "func": "contains",
+          "args": [
+            {
+              "type": "prop",
+              "obj": {
+                "type": "var",
+                "ref": "resource"
+              },
+              "prop": "access"
+            }
+          ]
+        },
+        "right": {
+          "type": "binary",
+          "op": "has",
+          "left": {
+            "type": "var",
+            "ref": "resource"
+          },
+          "right": {
+            "type": "str",
+            "value": "leaked"
+          }
+        }
+      }
+    }
+  },
+  {
+    "effect": "permit",
+    "condition": {
+      "type": "binary",
+      "op": "or",
+      "left": {
+        "type": "binary",
+        "op": "eq",
+        "left": {
+          "type": "binary",
+          "op": "add",
+          "left": {
+            "type": "long",
+            "value": 2
+          },
+          "right": {
+            "type": "long",
+            "value": 2
+          }
+        },
+        "right": {
+          "type": "binary",
+          "op": "mul",
+          "left": {
+            "type": "long",
+            "value": 7
+          },
+          "right": {
+            "type": "long",
+            "value": 9
+          }
+        }
+      },
+      "right": {
+        "type": "binary",
+        "op": "neq",
+        "left": {
+          "type": "binary",
+          "op": "sub",
+          "left": {
+            "type": "long",
+            "value": 3
+          },
+          "right": {
+            "type": "long",
+            "value": 5
+          }
+        },
+        "right": {
+          "type": "unary",
+          "op": "neg",
+          "expr": {
+            "type": "long",
+            "value": 2
+          }
+        }
+      }
+    }
+  },
+  {
+    "effect": "forbid",
+    "condition": {
+      "type": "cond",
+      "condition": {
+        "type": "unary",
+        "op": "not",
+        "expr": {
+          "type": "binary",
+          "op": "eq",
+          "left": {
+            "type": "var",
+            "ref": "action"
+          },
+          "right": {
+            "type": "euid",
+            "value": "Gardening::waterRoses"
+          }
+        }
+      },
+      "then": {
+        "type": "binary",
+        "op": "like",
+        "left": {
+          "type": "prop",
+          "obj": {
+            "type": "var",
+            "ref": "principal"
+          },
+          "prop": "hobby"
+        },
+        "right": {
+          "type": "str",
+          "value": "g*rdening"
+        }
+      },
+      "else": {
+        "type": "binary",
+        "op": "neq",
+        "left": {
+          "type": "var",
+          "ref": "principal"
+        },
+        "right": {
+          "type": "slot",
+          "id": "principal"
+        }
+      }
+    }
+  },
+  {
+    "effect": "permit",
+    "condition": {
+      "type": "binary",
+      "op": "eq",
+      "left": {
+        "type": "prop",
+        "obj": {
+          "type": "record",
+          "props": {
+            "key": {
+              "type": "str",
+              "value": "value"
+            }
+          }
+        },
+        "prop": "key"
+      },
+      "right": {
+        "type": "prop",
+        "obj": {
+          "type": "record",
+          "props": {
+            "k e y": {
+              "type": "str",
+              "value": "value"
+            }
+          }
+        },
+        "prop": "k e y"
+      }
+    }
+  }
+]

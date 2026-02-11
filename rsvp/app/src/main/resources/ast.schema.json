@@ -1,0 +1,360 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Policy Set",
+  "description": "Set of Cedar security policies",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "description": "Cedar security policy",
+    "properties": {
+      "effect": {
+        "type": "string",
+        "description": "Policy effect (permit or forbid)",
+        "enum": ["permit", "forbid"]
+      },
+      "condition": {
+        "description": "Expression representing the condition under which a policy should be applied. Includes conditions specified in when and unless clauses as well as constraints on principals, resources or actions.",
+        "$ref": "#/$defs/expr"
+      },
+      "source": { "$ref": "#/$defs/source" }
+    },
+    "required": ["effect"],
+    "additionalProperties": false
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "len": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": ["file", "offset", "len"],
+      "default": {
+        "file": "",
+        "offset": 0,
+        "len": 0
+      }
+    },
+    "expr": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "binary",
+            "unary",
+            "cond",
+            "call",
+            "slot",
+            "var",
+            "prop",
+            "bool",
+            "euid",
+            "long",
+            "str",
+            "record",
+            "set"
+          ]
+        },
+        "source": { "$ref": "#/$defs/source" }
+      },
+      "required": ["type"],
+      "oneOf": [
+        { "$ref": "#/$defs/binaryExpr" },
+        { "$ref": "#/$defs/booleanExpr" },
+        { "$ref": "#/$defs/callExpr" },
+        { "$ref": "#/$defs/conditionalExpr" },
+        { "$ref": "#/$defs/entityExpr" },
+        { "$ref": "#/$defs/longExpr" },
+        { "$ref": "#/$defs/propertyAccessExpr" },
+        { "$ref": "#/$defs/recordExpr" },
+        { "$ref": "#/$defs/setExpr" },
+        { "$ref": "#/$defs/slotExpr" },
+        { "$ref": "#/$defs/stringExpr" },
+        { "$ref": "#/$defs/unaryExpr" },
+        { "$ref": "#/$defs/variableExpr" }
+      ]
+    },
+    "binaryExpr": {
+      "type": "object",
+      "description": "Binary expression",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "binary"
+        },
+        "left": {
+          "description": "LHS of binary expression",
+          "$ref": "#/$defs/expr"
+        },
+        "op": {
+          "type": "string",
+          "description": "Binary expression operator",
+          "enum": [
+            "eq",
+            "neq",
+            "and",
+            "or",
+            "lt",
+            "leq",
+            "gt",
+            "geq",
+            "add",
+            "sub",
+            "mul",
+            "in",
+            "like",
+            "is",
+            "has"
+          ]
+        },
+        "right": {
+          "description": "RHS of binary expression",
+          "$ref": "#/$defs/expr"
+        },
+        "source": { "$ref": "#/$defs/source" }
+      },
+      "required": ["type", "left", "op", "right"],
+      "additionalProperties": false
+    },
+    "booleanExpr": {
+      "type": "object",
+      "description": "Boolean literal expression",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "bool"
+        },
+        "value": {
+          "type": "boolean"
+        },
+        "source": { "$ref": "#/$defs/source" }
+      },
+      "required": ["type", "value"],
+      "additionalProperties": false
+    },
+    "callExpr": {
+      "type": "object",
+      "description": "Function call expression",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "call"
+        },
+        "self": {
+          "description": "Optional calling object",
+          "$ref": "#/$defs/expr"
+        },
+        "func": {
+          "description": "Function name",
+          "type": "string"
+        },
+        "args": {
+          "description": "Array of expression function arguments",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/expr"
+          }
+        },
+        "source": { "$ref": "#/$defs/source" }
+      },
+      "required": ["type", "func"],
+      "additionalProperties": false
+    },
+    "conditionalExpr": {
+      "type": "object",
+      "description": "Conditional expression (if statement)",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "cond"
+        },
+        "condition": {
+          "$ref": "#/$defs/expr"
+        },
+        "then": {
+          "$ref": "#/$defs/expr"
+        },
+        "else": {
+          "$ref": "#/$defs/expr"
+        },
+        "source": { "$ref": "#/$defs/source" }
+      },
+      "required": ["type", "condition", "then"],
+      "additionalProperties": false
+    },
+    "entityExpr": {
+      "type": "object",
+      "description": "Entity literal expression",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "euid"
+        },
+        "value": {
+          "type": "string"
+        },
+        "source": { "$ref": "#/$defs/source" }
+      },
+      "required": ["type", "value"],
+      "additionalProperties": false
+    },
+    "longExpr": {
+      "type": "object",
+      "description": "Long literal expression",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "long"
+        },
+        "value": {
+          "type": "integer"
+        },
+        "source": { "$ref": "#/$defs/source" }
+      },
+      "required": ["type", "value"],
+      "additionalProperties": false
+    },
+    "propertyAccessExpr": {
+      "type": "object",
+      "description": "Property access expression",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "prop"
+        },
+        "obj": {
+          "description": "Property container expression (probably a variable or a record)",
+          "$ref": "#/$defs/expr"
+        },
+        "prop": {
+          "type": "string"
+        },
+        "source": { "$ref": "#/$defs/source" }
+      },
+      "required": ["type", "obj", "prop"],
+      "additionalProperties": false
+    },
+    "recordExpr": {
+      "type": "object",
+      "description": "Record literal expression (basically just a JSON object)",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "record"
+        },
+        "props": {
+          "type": "object",
+          "description": "Map of arbitrary keys to expressions",
+          "additionalProperties": {
+            "$ref": "#/$defs/expr"
+          }
+        },
+        "source": { "$ref": "#/$defs/source" }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+    "setExpr": {
+      "type": "object",
+      "description": "Set literal expression",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "set"
+        },
+        "elements": {
+          "type": "array",
+          "description": "Array of expressions",
+          "items": {
+            "$ref": "#/$defs/expr"
+          }
+        },
+        "source": { "$ref": "#/$defs/source" }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+    "slotExpr": {
+      "description": "Slot expression for policy templates, &principal or &resource only.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "slot"
+        },
+        "id": {
+          "type": "string",
+          "enum": ["principal", "resource"]
+        },
+        "source": { "$ref": "#/$defs/source" }
+      },
+      "required": ["type", "id"],
+      "additionalProperties": false
+    },
+    "stringExpr": {
+      "type": "object",
+      "description": "String literal expression",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "str"
+        },
+        "value": {
+          "type": "string"
+        },
+        "source": { "$ref": "#/$defs/source" }
+      },
+      "required": ["type", "value"],
+      "additionalProperties": false
+    },
+    "unaryExpr": {
+      "type": "object",
+      "description": "Unary expression",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "unary"
+        },
+        "op": {
+          "description": "Unary expression operator, ! or - ",
+          "type": "string",
+          "enum": ["not", "neg"]
+        },
+        "expr": {
+          "$ref": "#/$defs/expr"
+        },
+        "source": { "$ref": "#/$defs/source" }
+      },
+      "required": ["type", "op", "expr"],
+      "additionalProperties": false
+    },
+    "variableExpr": {
+      "type": "object",
+      "description": "Variable reference expression",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "var"
+        },
+        "ref": {
+          "type": "string",
+          "description": "Variable reference, one of principal, resource, action or context",
+          "enum": ["principal", "resource", "action", "context"]
+        },
+        "source": { "$ref": "#/$defs/source" }
+      },
+      "required": ["type", "ref"],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,9 @@
+[
+  {
+    "effect": "permit",
+    "condition": {
+      "type": "bool",
+      "value": true
+    }
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "effect": "permit",
+    "condition": {
+      "type": "binary",
+      "left": {
+        "type": "var",
+        "ref": "principal"
+      },
+      "op": "eq",
+      "right": {
+        "type": "str",
+        "value": "poppy"
+      }
+    }
+  },
+  {
+    "effect": "forbid",
+    "condition": {
+      "type": "binary",
+      "left": {
+        "type": "var",
+        "ref": "action"
+      },
+      "op": "eq",
+      "right": {
+        "type": "str",
+        "value": "murder"
+      }
+    }
+  }
+]

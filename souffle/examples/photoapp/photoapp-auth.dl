@@ -228,7 +228,7 @@ ForbiddenRequests(action, principal, resource) :-
 .output AllRequests
 .output PermittedRequests
 .output ForbiddenRequests
-.output PermitV1(IO=stdout)
+.output PermittedRequests(IO=stdout)
 
 // Security Invariants / Boundaries
 

@@ -43,10 +43,10 @@ the policy are assumed are validated against the schema.
 ## Encoding
 
 A complete example of Datalog encoding using policies, schema an entities of an example application
-+ [Schema](./photoapp.cedarschema) 
-+ [Policies](./photoapp-policy.cedar)
-+ [Entities](./entities.json)
-+ [Resulting encoding using Souffle Datalog](./photoapp-auth.dl)
++ [Schema](./examples/photoapp/photoapp.cedarschema) 
++ [Policies](./examples/photoapp/photoapp-policy.cedar)
++ [Entities](./examples/photoapp/entities.json)
++ [Souffle Datalog Encoding](./examples/photoapp/photoapp-auth.dl)
 
 ## (Step 1) Entity definitions
 

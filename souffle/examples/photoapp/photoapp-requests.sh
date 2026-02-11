@@ -2,7 +2,7 @@
 
 ERROR=
 POLICY=photoapp-policy.cedar
-ENTITIES=entities.json
+ENTITIES=photoapp-entities.json
 SCHEMA=photoapp.cedarschema
 
 authorise() {

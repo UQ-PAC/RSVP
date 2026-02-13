@@ -33,7 +33,7 @@
             "role" : { "type": "Role", "id": "User" },
             "friends" : [
                 { "type": "Account", "id": "Bob" }
-            ],
+            ]
         },
         "parents": []
     },
@@ -46,7 +46,7 @@
             "friends" : [
                 { "type": "Account", "id": "Alice" },
                 { "type": "Account", "id": "Carl" }
-            ],
+            ]
         },
         "parents": []
     },
@@ -58,7 +58,7 @@
             "role" : { "type": "Role", "id": "User" },
             "friends" : [
                 { "type": "Account", "id": "Bob" }
-            ],
+            ]
         },
         "parents": []
     },
@@ -68,7 +68,7 @@
             "name" : "Tim",
             "age" : 34,
             "role" : { "type": "Role", "id": "Admin" },
-            "friends" : [],
+            "friends" : []
         },
         "parents": []
     },

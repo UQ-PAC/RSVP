@@ -4,6 +4,7 @@ ERROR=
 POLICY=photoapp-policy.cedar
 ENTITIES=photoapp-entities.json
 SCHEMA=photoapp.cedarschema
+CONTEXT=photoapp-context.json
 
 authorise() {
   echo "$1 $2 $3"
@@ -14,7 +15,7 @@ authorise() {
       --principal "$1" \
       --action "$2" \
       --resource "$3" \
-      --context context.json)
+      --context $CONTEXT)
 
   out=$(echo $out)
 

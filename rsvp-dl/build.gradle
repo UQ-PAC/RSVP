@@ -1,0 +1,37 @@
+plugins {
+    id "idea"
+    id "java"
+    id "application"
+}
+
+group = 'com.uq.rsvp.datalog'
+version = '0.0.1'
+
+application {
+    mainClass = 'com.uq.rsvp.datalog.Driver'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation "org.junit.jupiter:junit-jupiter-params:5.10.0"
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+	useJUnitPlatform()
+    systemProperty "test.oracles", System.getProperty("test.oracles")
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.uq.rsvp.datalog.Driver'
+    }
+}

@@ -6,6 +6,9 @@ build
 /bin/
 /app/bin/
 
+# Program output
+/app/policy-out.cedar
+
 # IDE files
 .project
 /.settings/

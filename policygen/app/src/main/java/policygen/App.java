@@ -3,10 +3,14 @@
  */
 package policygen;
 
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
-import java.util.Set;
 
 import policygen.entity.Entity;
 import policygen.entity.FileResource;
@@ -22,6 +26,14 @@ public class App {
     private static ArrayList<Group> groupList;
     private static ArrayList<Folder> folderList;
     private static ArrayList<FileResource> fileList;
+
+    private static CedarEntityRef userType = new CedarEntityRef("User",
+            new CedarField("accessLevel", CedarPrimitive.LONG),
+            new CedarField("age", CedarPrimitive.LONG));
+    private static CedarEntityRef fileType = new CedarEntityRef("File",
+            new CedarField("requiredLevel", CedarPrimitive.LONG),
+            new CedarField("owner", userType),
+            new CedarField("creator", userType));
 
     // Generate permit, forbid policies;
     // Some with conditions;
@@ -60,35 +72,40 @@ public class App {
     //    maintenanceMode (bool)
 
 
-    public static void main(String[] args) {
-        Group adminGroup = new Group("Admins", null);
-        Group staffGroup = new Group("Staff", null);
-        Group seniorStaffGroup = new Group("SeniorStaff", staffGroup);
+    public static void main(String[] args) throws Exception {
 
-        groupList = new ArrayList<>();
-        groupList.add(adminGroup);
-        groupList.add(staffGroup);
-        groupList.add(seniorStaffGroup);
+        try (FileOutputStream policyOutFS = new FileOutputStream("policy-out.cedar")) {
+            PrintStream policyOut = new PrintStream(policyOutFS);
 
-        userList = new ArrayList<>();
-        userList.add(new User("Joe", 25, 5, adminGroup));
-        userList.add(new User("Sally", 33, 7, staffGroup));
-        userList.add(new User("Matumbah", 56, 3, seniorStaffGroup));
-        userList.add(new User("Philip", 21, 3, null /* no group */));
+            Group adminGroup = new Group("Admins", null);
+            Group staffGroup = new Group("Staff", null);
+            Group seniorStaffGroup = new Group("SeniorStaff", staffGroup);
 
-        folderList = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            folderList.add(new Folder(null));
-        }
+            groupList = new ArrayList<>();
+            groupList.add(adminGroup);
+            groupList.add(staffGroup);
+            groupList.add(seniorStaffGroup);
 
-        fileList = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
-            Folder parent = folderList.get(random.nextInt(folderList.size()));
-            fileList.add(new FileResource(parent));
-        }
+            userList = new ArrayList<>();
+            userList.add(new User("Joe", 25, 5, adminGroup));
+            userList.add(new User("Sally", 33, 7, staffGroup));
+            userList.add(new User("Matumbah", 56, 3, seniorStaffGroup));
+            userList.add(new User("Philip", 21, 3, null /* no group */));
 
-        for (int i = 0; i < 100; i++) {
-            generatePolicy();
+            folderList = new ArrayList<>();
+            for (int i = 0; i < 10; i++) {
+                folderList.add(new Folder(null));
+            }
+
+            fileList = new ArrayList<>();
+            for (int i = 0; i < 100; i++) {
+                Folder parent = folderList.get(random.nextInt(folderList.size()));
+                fileList.add(new FileResource(parent));
+            }
+
+            for (int i = 0; i < 100; i++) {
+                generatePolicy(policyOut);
+            }
         }
     }
 
@@ -96,11 +113,11 @@ public class App {
         return random.nextInt(100) < percent;
     }
 
-    private static void generatePolicy() {
+    private static void generatePolicy(PrintStream output) {
         // "permit" or "forbid"?
         // 60% permit
         boolean isPermit = randomChance(60);
-        String policyStr = isPermit ? "permit (\n" : "forbid {\n";
+        String policyStr = isPermit ? "permit (\n" : "forbid (\n";
 
         // Need principal, action, resource, conditions
         String principal = randomPrincipal();
@@ -112,8 +129,19 @@ public class App {
         String resource = randomResource();
         policyStr += "    " + resource + "\n";
 
-        policyStr += ");\n";
-        System.out.println(policyStr);
+        policyStr += ")";
+
+        EntitiesCollection principles = new EntitiesCollection(userType, userList);
+        EntitiesCollection resources = new EntitiesCollection(fileType, fileList);
+
+        int conditionChance = 70;
+        while (randomChance(conditionChance)) {
+            policyStr += "\n" + generateCondition(principles, resources, new CedarRecord() /* TODO */);
+            conditionChance = 25; // reduced chance of additional conditions
+        }
+
+        policyStr += ";\n";
+        output.println(policyStr);
     }
 
     private static String randomPrincipal() {
@@ -124,10 +152,13 @@ public class App {
         return randomMultiple("resource", fileList, folderList);
     }
 
-    private static String randomMultiple(String entityType, ArrayList<? extends Entity> primaries, ArrayList<? extends Entity> group) {
-        // Can be a specific principal ('principal == User::"boo_radley"'), a membership check
-        // ('principal in Group::"fun_llamas"') or membership from any in a list
-        // ('principal in [User::"one", User::"two", Group::"some_group"]')
+    private static String randomMultiple(String entityType, ArrayList<? extends Entity> primaries,
+            ArrayList<? extends Entity> group) {
+        // Can be a specific principal ('principal == User::"boo_radley"'), an "is" clause
+        // (type check),  or a membership check ('principal in Group::"fun_llamas"') optionally
+        // combined with "is" clause
+
+        // TODO: generate "is" clauses.
 
         int principalForm = random.nextInt(100);
         if (principalForm == 0) {
@@ -137,62 +168,9 @@ public class App {
             int principalId = random.nextInt(primaries.size());
             return entityType + " == " + primaries.get(principalId).toEntityString();
         }
-        else if (principalForm < 80) {
+        else {
             int groupId = random.nextInt(group.size());
             return entityType + " in " + group.get(groupId).toEntityString();
-        }
-        else {
-            // At least two entities
-            // Maximum 1/4 of principal entities in each category (users, groups)
-            // Maximum 10 of each
-
-            int maxUserCount = primaries.size() / 4;
-            maxUserCount = Math.max(maxUserCount, 10);
-            maxUserCount = Math.min(Math.min(2, primaries.size()), maxUserCount);
-
-            int maxGroupCount = group.size() / 4;
-            maxGroupCount = Math.max(maxGroupCount, 10);
-            maxGroupCount = Math.min(Math.min(2, group.size()), maxGroupCount);
-
-            int userCount;
-            int groupCount;
-            do {
-                userCount = random.nextInt(maxUserCount + 1);
-                groupCount = random.nextInt(maxGroupCount + 1);
-            }
-            while (userCount + groupCount < 2);
-
-            // Choose principals (users, groups)
-
-            Set<Entity> chosenPrincipals = new HashSet<>();
-            for (int i = 0; i < userCount; i++) {
-                int principalId = random.nextInt(primaries.size());
-                if (!chosenPrincipals.add(primaries.get(principalId))) {
-                    // already chosen, try again
-                    i--; continue;
-                }
-            }
-            for (int i = 0; i < groupCount; i++) {
-                int principalId = random.nextInt(group.size());
-                if (!chosenPrincipals.add(group.get(principalId))) {
-                    // already chosen, try again
-                    i--; continue;
-                }
-            }
-
-            // Build string
-
-            String principalStr = entityType + " in [";
-            boolean firstPrincipal = true;
-            for (Entity chosen : chosenPrincipals) {
-                if (!firstPrincipal) {
-                    principalStr += ", ";
-                }
-                principalStr += chosen.toEntityString();
-                firstPrincipal = false;
-            }
-            principalStr += "]";
-            return principalStr;
         }
     }
 
@@ -208,5 +186,188 @@ public class App {
         default: /* 3 */
             return "action";
         }
+    }
+
+    private static class ExpressionWithType {
+        String expression;
+        CedarType exprType;
+    }
+
+    /**
+     * Generate an expression with a value of arbitrary type.
+     */
+    private static ExpressionWithType generateValue(EntitiesCollection principals,
+            EntitiesCollection resources, CedarType requestType, boolean allowLiterals) {
+
+        String valueStr;
+        CedarType valueType;
+
+        // TODO generate literals?
+
+        int valueTypeIndex = random.nextInt(100);
+        // 35% principal, 35% resources, 30% context
+        if (valueTypeIndex < 35) {
+            // principal.
+            valueStr = "principal";
+            valueType = principals.getEntityType();
+        }
+        else if (valueTypeIndex < 70) {
+            // resource
+            valueStr = "resource";
+            valueType = resources.getEntityType();
+        }
+        else {
+            // context
+            valueStr = "context";
+            valueType = requestType;
+        }
+
+        // Potentially drill down, i.e. select a field
+        while (randomChance(80)) {
+            if (valueType.getTypeId() != CedarType.TypeId.ENTITY
+                    && valueType.getTypeId() != CedarType.TypeId.RECORD)
+                break;
+
+            Map<String, CedarType> fields = valueType.getFields();
+
+            if (!fields.isEmpty()) {
+                // Choose a field at random:
+                int fieldIndex = random.nextInt(fields.size());
+                Iterator<Entry<String, CedarType>> it = fields.entrySet().iterator();
+                while (fieldIndex > 0) {
+                    it.next();
+                    fieldIndex--;
+                }
+                Entry<String, CedarType> entry = it.next();
+
+                valueStr += "." + entry.getKey();
+                valueType = entry.getValue();
+            }
+        }
+
+        ExpressionWithType rval = new ExpressionWithType();
+        rval.expression = valueStr;
+        rval.exprType = valueType;
+        return rval;
+    }
+
+    private static ExpressionWithType generateValueOfType(CedarType requiredType,
+            List<EntitiesCollection> availableEntities, EntitiesCollection principals,
+            EntitiesCollection resources, CedarType requestType) {
+        // TODO: for any given type there may be a field (chain) of that type; explore this
+        // possibility (possibly by generating random values until we get one with the right
+        // type)
+        if (requiredType.getTypeId() == CedarType.TypeId.ENTITY) {
+            for (EntitiesCollection coll : availableEntities) {
+                if (coll.getEntityType().equals(requiredType)) {
+                    List<? extends Entity> entities = coll.getEntities();
+                    Entity entity = entities.get(random.nextInt(entities.size()));
+                    ExpressionWithType result = new ExpressionWithType();
+                    result.expression = entity.toEntityString();
+                    result.exprType = requiredType;
+                    return result;
+                }
+            }
+        }
+        else if (requiredType.getTypeId() == CedarType.TypeId.LONG) {
+            int value = random.nextInt(100); // number from 0-99
+            ExpressionWithType result = new ExpressionWithType();
+            result.expression = "" + value;
+            result.exprType = requiredType;
+            return result;
+        }
+        else if (requiredType.getTypeId() == CedarType.TypeId.BOOL) {
+            boolean value = (random.nextInt(2) == 0);
+            ExpressionWithType result = new ExpressionWithType();
+            result.expression = value ? "true" : "false";
+            result.exprType = requiredType;
+            return result;
+        }
+        else if (requiredType.getTypeId() == CedarType.TypeId.RECORD) {
+            ExpressionWithType result = new ExpressionWithType();
+            result.expression = "{}"; // TODO generate field values
+            result.exprType = requiredType;
+            return result;
+        }
+
+        throw new UnsupportedOperationException("Can't handle: " + requiredType.getTypeId().toString());
+    }
+
+    private static String generateCondition(EntitiesCollection principals,
+            EntitiesCollection resources, CedarType requestType) {
+        String result;
+        if (randomChance(50)) {
+            result = "unless {\n";
+        } else {
+            result = "when {\n";
+        }
+
+        result += "    " + generateConditionExpression(principals, resources, requestType);
+        result += "\n}";
+
+        return result;
+    }
+
+    // TODO support multiple principal/resource types; combine with type tests ("is") to avoid errors
+    // TODO requestType should be record type
+    private static String generateConditionExpression(EntitiesCollection principals,
+            EntitiesCollection resources, CedarType requestType) {
+        // x in y
+        // x == y (constant or other)
+        // arithmetic:  x < y, x > y
+
+        // 'principal', 'resource', 'action' -- refer to appropriate entity/action (entity reference)
+        // 'context' -- refers to request context (record)
+
+        ExpressionWithType value = generateValue(principals, resources, requestType, false);
+        if (value.exprType.getTypeId() == CedarType.TypeId.BOOL) {
+            if (randomChance(70)) {
+                // It's a boolean value so can be used as a condition:
+                return value.expression;
+            }
+        }
+
+        // TODO this should be all possible entities, not just immediate principals/resources
+        List<EntitiesCollection> allEntities = new ArrayList<>();
+        allEntities.add(principals);
+        allEntities.add(resources);
+
+        // We now need a comparison or other operator, to another value of appropriate type
+        ExpressionWithType otherValue = generateValueOfType(value.exprType, allEntities,
+                principals, resources, requestType);
+
+        // TODO set membership ("in"), type tests ("is")
+
+        if (value.exprType.getTypeId() == CedarType.TypeId.LONG && randomChance(50)) {
+            // For numbers we can do relational comparisons as well as equality
+            int opIndex = random.nextInt(6);
+            switch (opIndex) {
+            case 0:
+                value.expression += " <= "; break;
+            case 1:
+                value.expression += " < "; break;
+            case 2:
+                value.expression += " == "; break;
+            case 3:
+                value.expression += " != "; break;
+            case 4:
+                value.expression += " > "; break;
+            case 5:
+                value.expression += " >= "; break;
+            }
+        }
+        else {
+            int opIndex = random.nextInt(2);
+            switch (opIndex) {
+            case 0:
+                value.expression += " == "; break;
+            case 1:
+                value.expression += " != "; break;
+            }
+        }
+
+        value.expression += otherValue.expression;
+        value.exprType = CedarPrimitive.BOOL;
+        return value.expression;
     }
 }

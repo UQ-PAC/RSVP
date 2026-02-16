@@ -1,30 +1,4 @@
 [
-
-    {
-        "uid": { "type": "Role", "id": "User" },
-        "attrs": { },
-        "parents": []
-    },
-    {
-        "uid": { "type": "Role", "id": "Admin" },
-        "attrs": { },
-        "parents": []
-    },
-    {
-        "uid": { "type": "Visibility", "id": "Public" },
-        "attrs": { },
-        "parents": []
-    },
-    {
-        "uid": { "type": "Visibility", "id": "Protected" },
-        "attrs": { },
-        "parents": []
-    },
-    {
-        "uid": { "type": "Visibility", "id": "Private" },
-        "attrs": { },
-        "parents": []
-    },
     {
         "uid": { "type": "Account", "id": "Alice" },
         "attrs": {
@@ -77,8 +51,7 @@
         "uid": { "type": "Album", "id": "AliceSceneries" },
         "attrs": {
             "owner" : { "type": "Account", "id": "Alice" },
-            "visibility" : { "type": "Visibility", "id": "Public" },
-            "contents" : []
+            "visibility" : { "type": "Visibility", "id": "Public" }
         },
         "parents": []
     },
@@ -86,8 +59,7 @@
         "uid": { "type": "Album", "id": "AliceVacation" },
         "attrs": {
             "owner" : { "type": "Account", "id": "Alice" },
-            "visibility" : { "type": "Visibility", "id": "Protected" },
-            "contents" : []
+            "visibility" : { "type": "Visibility", "id": "Protected" }
         },
         "parents": []
     },
@@ -95,8 +67,7 @@
         "uid": { "type": "Album", "id": "AliceDocuments" },
         "attrs": {
             "owner" : { "type": "Account", "id": "Alice" },
-            "visibility" : { "type": "Visibility", "id": "Private" },
-            "contents" : []
+            "visibility" : { "type": "Visibility", "id": "Private" }
         },
         "parents": []
     },
@@ -105,8 +76,7 @@
         "uid": { "type": "Album", "id": "BobSceneries" },
         "attrs": {
             "owner" : { "type": "Account", "id": "Bob" },
-            "visibility" : { "type": "Visibility", "id": "Public" },
-            "contents" : []
+            "visibility" : { "type": "Visibility", "id": "Public" }
         },
         "parents": []
     },
@@ -114,8 +84,7 @@
         "uid": { "type": "Album", "id": "BobVacation" },
         "attrs": {
             "owner" : { "type": "Account", "id": "Bob" },
-            "visibility" : { "type": "Visibility", "id": "Protected" },
-            "contents" : []
+            "visibility" : { "type": "Visibility", "id": "Protected" }
         },
         "parents": []
     },
@@ -123,8 +92,7 @@
         "uid": { "type": "Album", "id": "BobDocuments" },
         "attrs": {
             "owner" : { "type": "Account", "id": "Bob" },
-            "visibility" : { "type": "Visibility", "id": "Private" },
-            "contents" : []
+            "visibility" : { "type": "Visibility", "id": "Private" }
         },
         "parents": []
     },
@@ -132,8 +100,7 @@
         "uid": { "type": "Album", "id": "CarlSceneries" },
         "attrs": {
             "owner" : { "type": "Account", "id": "Carl" },
-            "visibility" : { "type": "Visibility", "id": "Public" },
-            "contents" : []
+            "visibility" : { "type": "Visibility", "id": "Public" }
         },
         "parents": []
     },
@@ -141,8 +108,7 @@
         "uid": { "type": "Album", "id": "CarlVacation" },
         "attrs": {
             "owner" : { "type": "Account", "id": "Carl" },
-            "visibility" : { "type": "Visibility", "id": "Protected" },
-            "contents" : []
+            "visibility" : { "type": "Visibility", "id": "Protected" }
         },
         "parents": []
     },
@@ -150,8 +116,7 @@
         "uid": { "type": "Album", "id": "CarlDocuments" },
         "attrs": {
             "owner" : { "type": "Account", "id": "Carl" },
-            "visibility" : { "type": "Visibility", "id": "Private" },
-            "contents" : []
+            "visibility" : { "type": "Visibility", "id": "Private" }
         },
         "parents": []
     },
@@ -212,8 +177,6 @@
         "parents": []
     },
 
-
-
     {
         "uid": { "type": "Action", "id": "uploadPhoto" },
         "attrs": { },
@@ -234,5 +197,4 @@
         "attrs": { },
         "parents": []
     }
-
 ]

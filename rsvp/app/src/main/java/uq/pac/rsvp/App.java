@@ -10,10 +10,10 @@ import java.nio.file.Path;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import uq.pac.rsvp.ast.Policy;
-import uq.pac.rsvp.ast.PolicySet;
-import uq.pac.rsvp.ast.expr.Expression;
-import uq.pac.rsvp.ast.expr.Expression.ExpressionDeserialiser;
+import uq.pac.rsvp.policy.ast.Policy;
+import uq.pac.rsvp.policy.ast.PolicySet;
+import uq.pac.rsvp.policy.ast.expr.Expression;
+import uq.pac.rsvp.policy.ast.expr.Expression.ExpressionDeserialiser;
 
 public class App {
 

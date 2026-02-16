@@ -3,7 +3,7 @@
 ERROR=
 POLICY=photoapp-policy.cedar
 ENTITIES=photoapp-entities.json
-SCHEMA=photoapp.cedarschema
+SCHEMA=photoapp-schema.cedarschema
 CONTEXT=photoapp-context.json
 
 authorise() {

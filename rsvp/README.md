@@ -2,6 +2,30 @@
 
 ## Local development
 
+Before building this project, you will need to build and deploy CedarJava locally from
+[our fork of the CedarJava repository](https://github.com/rebecca-odonoghue/cedar-java).
+
+- Build and deploy CedarJava:
+  1. Clone CedarJava somewhere on your machine:
+     ```
+     git clone git@github.com:rebecca-odonoghue/cedar-java.git
+     ```
+  2. Build CedarJava:
+     ```
+     cd CedarJava
+     ./gradlew build
+     ```
+  3. Optionally, run the Rust test suite that is not executed as part of the Gradle build:
+     ```
+     cd CedarJavaFFI
+     cargo test
+     ```
+  4. Deploy CedarJava locally:
+     ```
+     cd CedarJava
+     ./gradlew publishToMavenLocal
+     ```
+
 - Build:
 
   ```

@@ -4,30 +4,24 @@
 package uq.pac.rsvp;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.cedarpolicy.model.exception.InternalException;
 
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
-import uq.pac.rsvp.policy.ast.expr.Expression;
-import uq.pac.rsvp.policy.ast.expr.Expression.ExpressionDeserialiser;
 
 public class App {
 
-    // Currently the app just accepts zero or more JSON AST file paths as arguments
-    // which are parsed and the resulting expressions printed to stdout.
-    public static void main(String[] args) throws IOException {
-        Gson gson = new GsonBuilder().registerTypeAdapter(Expression.class, new ExpressionDeserialiser())
-                .create();
+    // Currently the app just accepts zero or more cedar policy file paths as
+    // arguments which are parsed and the resulting policies and conditions printed
+    // to stdout.
+    public static void main(String[] args) throws IOException, InternalException {
 
         // Parse each command line arg as a policy ast file
         for (String arg : args) {
             Path input = Path.of(arg).toAbsolutePath();
-            String json = Files.readString(input);
-            PolicySet policies = gson.fromJson(json, PolicySet.class);
+            PolicySet policies = PolicySet.parseCedarPolicySet(input);
 
             // Print it out
             System.out.println("file: " + input);

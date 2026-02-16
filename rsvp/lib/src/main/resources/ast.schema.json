@@ -25,9 +25,6 @@
     "source": {
       "type": "object",
       "properties": {
-        "file": {
-          "type": "string"
-        },
         "offset": {
           "type": "integer",
           "minimum": 0
@@ -37,7 +34,7 @@
           "minimum": 0
         }
       },
-      "required": ["file", "offset", "len"],
+      "required": ["offset", "len"],
       "default": {
         "file": "",
         "offset": 0,

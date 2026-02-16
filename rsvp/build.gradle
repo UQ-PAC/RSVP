@@ -3,6 +3,7 @@ allprojects {
     apply plugin: 'jacoco'
 
     repositories {
+        mavenLocal()
         mavenCentral()
     }
 
@@ -16,6 +17,8 @@ allprojects {
 
         // This dependency is used by the application.
         implementation libs.guava
+
+        implementation 'com.cedarpolicy:cedar-java:3.1.2-rsvp:uber'
     }
 
     // Apply a specific Java toolchain to ease working on different environments.

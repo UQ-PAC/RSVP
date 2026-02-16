@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import com.cedarpolicy.model.exception.InternalException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -38,6 +39,17 @@ public class PolicySetTest {
         URL url = ClassLoader.getSystemResource(file);
         String json = Files.readString(Path.of(url.toURI()));
         PolicySet policies = gson.fromJson(json, PolicySet.class);
+        assertEquals(expected, policies.toString());
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiter = ';', value = {
+            "permit-all.cedar;[permit on: true]",
+            "permit-and-forbid.cedar;[permit on: (true && (true && (true && (principal == \"poppy\")))), forbid on: (true && (true && (true && (action == \"murder\"))))]"
+    })
+    void testCedarParsing(String file, String expected) throws IOException, InternalException {
+        URL url = ClassLoader.getSystemResource(file);
+        PolicySet policies = PolicySet.parseCedarPolicySet(Path.of(url.getPath()));
         assertEquals(expected, policies.toString());
     }
 

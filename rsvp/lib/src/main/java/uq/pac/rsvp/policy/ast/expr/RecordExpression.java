@@ -1,13 +1,13 @@
-package uq.pac.rsvp.ast.expr;
+package uq.pac.rsvp.policy.ast.expr;
 
-import static uq.pac.rsvp.ast.expr.Expression.ExprType.Record;
+import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Record;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import uq.pac.rsvp.ast.SourceLoc;
-import uq.pac.rsvp.ast.visitor.PolicyVisitor;;
+import uq.pac.rsvp.policy.ast.SourceLoc;
+import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;;
 
 public class RecordExpression extends Expression {
 

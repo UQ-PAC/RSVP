@@ -1,4 +1,4 @@
-package uq.pac.rsvp.ast;
+package uq.pac.rsvp.policy.ast;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -15,8 +15,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import uq.pac.rsvp.ast.expr.Expression;
-import uq.pac.rsvp.ast.expr.Expression.ExpressionDeserialiser;
+import uq.pac.rsvp.policy.ast.expr.Expression;
+import uq.pac.rsvp.policy.ast.expr.Expression.ExpressionDeserialiser;
 
 public class PolicySetTest {
 

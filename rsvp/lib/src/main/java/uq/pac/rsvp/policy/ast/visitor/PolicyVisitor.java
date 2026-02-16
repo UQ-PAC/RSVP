@@ -1,20 +1,20 @@
-package uq.pac.rsvp.ast.visitor;
+package uq.pac.rsvp.policy.ast.visitor;
 
-import uq.pac.rsvp.ast.Policy;
-import uq.pac.rsvp.ast.PolicySet;
-import uq.pac.rsvp.ast.expr.BinaryExpression;
-import uq.pac.rsvp.ast.expr.BooleanExpression;
-import uq.pac.rsvp.ast.expr.CallExpression;
-import uq.pac.rsvp.ast.expr.ConditionalExpression;
-import uq.pac.rsvp.ast.expr.EntityExpression;
-import uq.pac.rsvp.ast.expr.LongExpression;
-import uq.pac.rsvp.ast.expr.PropertyAccessExpression;
-import uq.pac.rsvp.ast.expr.RecordExpression;
-import uq.pac.rsvp.ast.expr.SetExpression;
-import uq.pac.rsvp.ast.expr.SlotExpression;
-import uq.pac.rsvp.ast.expr.StringExpression;
-import uq.pac.rsvp.ast.expr.UnaryExpression;
-import uq.pac.rsvp.ast.expr.VariableExpression;
+import uq.pac.rsvp.policy.ast.Policy;
+import uq.pac.rsvp.policy.ast.PolicySet;
+import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
+import uq.pac.rsvp.policy.ast.expr.BooleanExpression;
+import uq.pac.rsvp.policy.ast.expr.CallExpression;
+import uq.pac.rsvp.policy.ast.expr.ConditionalExpression;
+import uq.pac.rsvp.policy.ast.expr.EntityExpression;
+import uq.pac.rsvp.policy.ast.expr.LongExpression;
+import uq.pac.rsvp.policy.ast.expr.PropertyAccessExpression;
+import uq.pac.rsvp.policy.ast.expr.RecordExpression;
+import uq.pac.rsvp.policy.ast.expr.SetExpression;
+import uq.pac.rsvp.policy.ast.expr.SlotExpression;
+import uq.pac.rsvp.policy.ast.expr.StringExpression;
+import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
+import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 
 public interface PolicyVisitor {
     public void visitPolicySet(PolicySet policySet);

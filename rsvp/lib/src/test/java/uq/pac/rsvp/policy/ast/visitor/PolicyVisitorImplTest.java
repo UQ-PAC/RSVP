@@ -1,4 +1,4 @@
-package uq.pac.rsvp.ast.visitor;
+package uq.pac.rsvp.policy.ast.visitor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -14,15 +14,15 @@ import org.junit.jupiter.api.Test;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import uq.pac.rsvp.ast.PolicySet;
-import uq.pac.rsvp.ast.expr.BooleanExpression;
-import uq.pac.rsvp.ast.expr.EntityExpression;
-import uq.pac.rsvp.ast.expr.Expression;
-import uq.pac.rsvp.ast.expr.Expression.ExpressionDeserialiser;
-import uq.pac.rsvp.ast.expr.LongExpression;
-import uq.pac.rsvp.ast.expr.SlotExpression;
-import uq.pac.rsvp.ast.expr.StringExpression;
-import uq.pac.rsvp.ast.expr.VariableExpression;
+import uq.pac.rsvp.policy.ast.PolicySet;
+import uq.pac.rsvp.policy.ast.expr.BooleanExpression;
+import uq.pac.rsvp.policy.ast.expr.EntityExpression;
+import uq.pac.rsvp.policy.ast.expr.Expression;
+import uq.pac.rsvp.policy.ast.expr.Expression.ExpressionDeserialiser;
+import uq.pac.rsvp.policy.ast.expr.LongExpression;
+import uq.pac.rsvp.policy.ast.expr.SlotExpression;
+import uq.pac.rsvp.policy.ast.expr.StringExpression;
+import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 
 public class PolicyVisitorImplTest {
 

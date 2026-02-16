@@ -1,4 +1,4 @@
-package uq.pac.rsvp.ast.expr;
+package uq.pac.rsvp.policy.ast.expr;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
@@ -11,8 +11,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.annotations.SerializedName;
 
-import uq.pac.rsvp.ast.SourceLoc;
-import uq.pac.rsvp.ast.visitor.PolicyVisitor;
+import uq.pac.rsvp.policy.ast.SourceLoc;
+import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
 public abstract class Expression {
 

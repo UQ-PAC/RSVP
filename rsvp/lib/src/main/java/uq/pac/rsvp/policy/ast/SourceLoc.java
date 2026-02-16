@@ -1,4 +1,4 @@
-package uq.pac.rsvp.ast;
+package uq.pac.rsvp.policy.ast;
 
 public class SourceLoc {
     public final String file;

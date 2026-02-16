@@ -1,11 +1,11 @@
-package uq.pac.rsvp.ast.expr;
+package uq.pac.rsvp.policy.ast.expr;
 
-import static uq.pac.rsvp.ast.expr.Expression.ExprType.Slot;
+import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Slot;
 
 import com.google.gson.annotations.SerializedName;
 
-import uq.pac.rsvp.ast.SourceLoc;
-import uq.pac.rsvp.ast.visitor.PolicyVisitor;
+import uq.pac.rsvp.policy.ast.SourceLoc;
+import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
 public class SlotExpression extends Expression {
 

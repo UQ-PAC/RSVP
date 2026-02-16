@@ -1,4 +1,4 @@
-package uq.pac.rsvp.ast.expr;
+package uq.pac.rsvp.policy.ast.expr;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -17,10 +17,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 
-import uq.pac.rsvp.ast.Policy;
-import uq.pac.rsvp.ast.PolicySet;
-import uq.pac.rsvp.ast.SourceLoc;
-import uq.pac.rsvp.ast.expr.Expression.ExpressionDeserialiser;
+import uq.pac.rsvp.policy.ast.Policy;
+import uq.pac.rsvp.policy.ast.PolicySet;
+import uq.pac.rsvp.policy.ast.SourceLoc;
+import uq.pac.rsvp.policy.ast.expr.Expression.ExpressionDeserialiser;
 
 public class ExpressionTest {
     static Gson gson;

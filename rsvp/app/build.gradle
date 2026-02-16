@@ -8,11 +8,11 @@ dependencies {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'uq.pac.rsvp.ast.App'
+        attributes 'Main-Class': 'uq.pac.rsvp.App'
     }
 }
 
 application {
     // Define the main class for the application.
-    mainClass = 'uq.pac.rsvp.ast.App'
+    mainClass = 'uq.pac.rsvp.App'
 }

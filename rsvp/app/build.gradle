@@ -1,0 +1,18 @@
+plugins {
+    id 'application'
+}
+
+dependencies {
+    implementation project(':lib')
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'uq.pac.rsvp.ast.App'
+    }
+}
+
+application {
+    // Define the main class for the application.
+    mainClass = 'uq.pac.rsvp.ast.App'
+}

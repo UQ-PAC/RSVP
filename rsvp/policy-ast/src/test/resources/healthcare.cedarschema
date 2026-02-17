@@ -1,0 +1,33 @@
+namespace HealthCareApp {
+    entity Role enum ["Admin", "Doctor", "InsuranceRep"];
+    entity User in [Role];
+    entity InfoType;
+    entity Info in [InfoType] {
+        provider: User,
+        patient: User
+    };
+    action createAppointment in [updateAppointment] appliesTo {
+        principal: [User],
+        resource: [Info],
+        context: {
+            referrer: User,
+            detail: AppointmentDetails
+        }
+    };
+    action updateAppointment appliesTo {
+        principal: [User],
+        resource: [Info],
+    };
+    action deleteAppointment appliesTo {
+        principal: [User],
+        resource: [Info],
+    };
+    action listAppointments appliesTo {
+        principal: [User],
+        resource: [Info],
+    };
+    type AppointmentDetails = {
+        reason: String,
+        cost: Long,
+    };
+}

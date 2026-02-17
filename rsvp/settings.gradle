@@ -4,5 +4,5 @@ plugins {
 }
 
 rootProject.name = 'rsvp'
-include 'lib'
+include 'policy-ast'
 include 'app'

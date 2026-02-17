@@ -11,6 +11,10 @@ public class DLProgram extends DLNode {
         this.statements = statements.stream().toList();
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     @Override
     public String stringify() {
         return String.join("\n", statements.stream().map(DLStatement::toString).toList());
@@ -38,6 +42,11 @@ public class DLProgram extends DLNode {
 
         public Builder comment(String msg) {
             add(new DLComment(msg));
+            return this;
+        }
+
+        public Builder add(List<DLStatement> stmts) {
+            statements.addAll(stmts);
             return this;
         }
 

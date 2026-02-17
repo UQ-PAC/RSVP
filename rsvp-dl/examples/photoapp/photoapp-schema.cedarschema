@@ -1,8 +1,5 @@
-entity Visibility {
-    supported: Bool,
-    date: Long
-};
-entity Role;
+entity Visibility;
+entity Role enum [ "User", "Admin" ];
 
 entity Account = {
     name: String,
@@ -13,16 +10,16 @@ entity Account = {
 
 entity Album = {
     owner: Account,
-    visibility: Visibility,
+    visibility: Visibility
 };
 
-entity Photo in Album = {
+entity Photo = {
     album: Album,
     size : Long,
-    type : String
+    type: String
 };
 
-action "viewPhoto" appliesTo {
+action viewPhoto appliesTo {
     principal: Account,
     resource: Photo,
     context: {
@@ -30,7 +27,7 @@ action "viewPhoto" appliesTo {
     }
 };
 
-action "removeAlbum" appliesTo {
+action removeAlbum appliesTo {
     principal: Account,
     resource: Album,
     context: {
@@ -38,7 +35,7 @@ action "removeAlbum" appliesTo {
     }
 };
 
-action "uploadPhoto" appliesTo {
+action uploadPhoto appliesTo {
     principal: Account,
     resource: Album,
     context: {
@@ -46,11 +43,11 @@ action "uploadPhoto" appliesTo {
     }
 };
 
-action "createAlbum" appliesTo {
+action createAlbum appliesTo {
     principal: Account,
     resource: Account,
     context: {
-        authenticated: Bool
+        authenticated: Bool,
     }
 };
 

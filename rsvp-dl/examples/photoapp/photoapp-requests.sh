@@ -24,6 +24,7 @@ authorise() {
   else
       echo -e "\e[31m  FAIL [ "Expected: $4, got $out" ] \e[0m"
       ERROR=1
+      exit 1
   fi
 }
 

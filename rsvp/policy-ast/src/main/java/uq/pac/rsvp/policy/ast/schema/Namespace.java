@@ -8,7 +8,7 @@ import uq.pac.rsvp.policy.ast.schema.attribute.AttributeType;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
-public class Namespace {
+public class Namespace implements SchemaFileEntry {
 
     private final Map<String, EntityType> entityTypes;
     private final Map<String, Action> actions;
@@ -56,10 +56,12 @@ public class Namespace {
         return commonTypes != null ? commonTypes.get(name) : null;
     }
 
+    @Override
     public void accept(SchemaVisitor visitor) {
         visitor.visitNamespace(this);
     }
 
+    @Override
     public <T> T compute(SchemaComputationVisitor<T> visitor) {
         return visitor.visitNamespace(this);
     }

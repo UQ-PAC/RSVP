@@ -8,13 +8,17 @@ import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
 public class PropertyAccessExpression extends Expression {
 
-    private Expression obj;
-    private String prop;
+    private final Expression obj;
+    private final String prop;
 
     public PropertyAccessExpression(Expression obj, String prop, SourceLoc source) {
         super(PropertyAccess, source);
         this.obj = obj;
         this.prop = prop;
+    }
+
+    public PropertyAccessExpression(Expression obj, String prop) {
+        this(obj, prop, SourceLoc.MISSING);
     }
 
     public Expression getObject() {

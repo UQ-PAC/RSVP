@@ -11,11 +11,15 @@ import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
 public class SetExpression extends Expression {
 
-    private Set<Expression> elements;
+    private final Set<Expression> elements;
 
     public SetExpression(Set<Expression> elements, SourceLoc source) {
         super(Set, source);
         this.elements = new HashSet<>(elements);
+    }
+
+    public SetExpression(Set<Expression> elements) {
+        this(elements, SourceLoc.MISSING);
     }
 
     public Set<Expression> getElements() {

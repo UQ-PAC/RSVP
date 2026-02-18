@@ -23,6 +23,7 @@ import uq.pac.rsvp.policy.ast.schema.attribute.AttributeType;
 import uq.pac.rsvp.policy.ast.schema.attribute.EntityOrCommonType;
 import uq.pac.rsvp.policy.ast.schema.attribute.PrimitiveType;
 import uq.pac.rsvp.policy.ast.schema.attribute.RecordType;
+import uq.pac.rsvp.policy.ast.schema.attribute.SetType;
 import uq.pac.rsvp.policy.ast.schema.attribute.AttributeType.AttributeTypeDeserialiser;
 import uq.pac.rsvp.policy.ast.schema.attribute.PrimitiveType.PrimitiveTypeDeserialiser;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
@@ -145,6 +146,8 @@ public class SchemaTest {
         AttributeType referrer = create.getAppliesToContext().getAttributeType("referrer");
 
         assertTrue(referrer instanceof EntityOrCommonType);
+        assertEquals("referrer", referrer.getDefinitionName());
+        assertEquals("User", ((EntityOrCommonType) referrer).getName());
         assertTrue(((EntityOrCommonType) referrer).isResolved());
         assertEquals(user, ((EntityOrCommonType) referrer).getEntityTypeOrNull());
 
@@ -163,6 +166,26 @@ public class SchemaTest {
         assertEquals(details, ((EntityOrCommonType) detailAttr).getCommonTypeOrNull());
     }
 
+    private void checkCollectionSchema(Schema schema) {
+        Namespace dataApp = schema.get("DataCollectionApp");
+        assertEquals(2, dataApp.entityTypeNames().size());
+        assertEquals(0, dataApp.actionNames().size());
+        assertEquals(0, dataApp.commonTypeNames().size());
+
+        EntityType user = dataApp.getEntityType("User");
+        EntityType colour = dataApp.getEntityType("Colour");
+        assertNotNull(user);
+        assertNotNull(colour);
+
+        AttributeType nicknames = user.getShapeAttributeType("nicknames");
+        AttributeType preferences = user.getShapeAttributeType("preferences");
+
+        assertTrue(nicknames instanceof SetType);
+        assertTrue(preferences instanceof RecordType);
+
+        assertTrue(((RecordType) preferences).getAttributeNames().containsAll(Arrays.asList("diet", "colour")));
+    }
+
     @Test
     public void testDeserialisation() throws IOException {
         URL url = ClassLoader.getSystemResource("healthcare.cedarschema.json");
@@ -173,6 +196,15 @@ public class SchemaTest {
         visitor.visitSchema(schema);
 
         checkHealthCareSchema(schema);
+
+        url = ClassLoader.getSystemResource("collection-types.cedarschema.json");
+        json = Files.readString(Path.of(url.getPath()));
+        schema = gson.fromJson(json, Schema.class);
+
+        visitor = new SchemaResolutionVisitor();
+        visitor.visitSchema(schema);
+
+        checkCollectionSchema(schema);
     }
 
     @Test
@@ -182,7 +214,11 @@ public class SchemaTest {
         Schema schema = Schema.parseCedarSchema(Path.of(url.getPath()));
 
         checkHealthCareSchema(schema);
+
+        url = ClassLoader.getSystemResource("collection-types.cedarschema");
+        schema = Schema.parseCedarSchema(Path.of(url.getPath()));
+
+        checkCollectionSchema(schema);
     }
 
 }
- 

@@ -9,7 +9,7 @@ import uq.pac.rsvp.policy.ast.schema.attribute.RecordType;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
-public class Action {
+public class Action implements SchemaFileEntry {
 
     private static class ActionReference {
         private final String id;
@@ -143,10 +143,12 @@ public class Action {
         return annotations != null ? annotations : Collections.emptyMap();
     }
 
+    @Override
     public void accept(SchemaVisitor visitor) {
         visitor.visitAction(this);
     }
 
+    @Override
     public <T> T compute(SchemaComputationVisitor<T> visitor) {
         return visitor.visitAction(this);
     }

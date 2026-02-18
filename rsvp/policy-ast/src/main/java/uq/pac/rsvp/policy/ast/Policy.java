@@ -6,7 +6,7 @@ import uq.pac.rsvp.policy.ast.expr.Expression;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
-public class Policy {
+public class Policy extends PolicyFileEntry {
 
     static enum Effect {
         @SerializedName("permit")
@@ -16,15 +16,17 @@ public class Policy {
         Forbid
     }
 
-    public final SourceLoc source;
-
     private Effect effect;
     private Expression condition;
 
     public Policy(Effect effect, Expression condition, SourceLoc source) {
+        super(source);
         this.effect = effect;
         this.condition = condition;
-        this.source = source;
+    }
+
+    public Policy(Effect effect, Expression condition) {
+        this(effect, condition, SourceLoc.MISSING);
     }
 
     public boolean isPermit() {
@@ -39,10 +41,12 @@ public class Policy {
         return condition;
     }
 
+    @Override
     public void accept(PolicyVisitor visitor) {
         visitor.visitPolicy(this);
     }
 
+    @Override
     public <T> T compute(PolicyComputationVisitor<T> visitor) {
         return visitor.visitPolicy(this);
     }

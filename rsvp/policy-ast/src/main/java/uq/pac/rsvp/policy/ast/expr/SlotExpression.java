@@ -18,11 +18,15 @@ public class SlotExpression extends Expression {
         Resource,
     }
 
-    private SlotId id;
+    private final SlotId id;
 
     public SlotExpression(SlotId id, SourceLoc source) {
         super(Slot, source);
         this.id = id;
+    }
+
+    public SlotExpression(SlotId id) {
+        this(id, SourceLoc.MISSING);
     }
 
     public boolean isPrincipalSlot() {

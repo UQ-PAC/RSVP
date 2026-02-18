@@ -23,6 +23,7 @@ import uq.pac.rsvp.policy.ast.expr.LongExpression;
 import uq.pac.rsvp.policy.ast.expr.SlotExpression;
 import uq.pac.rsvp.policy.ast.expr.StringExpression;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
+import uq.pac.rsvp.policy.ast.expr.EntityExpression.EntityExpressionDeserialiser;
 
 public class PolicyVisitorImplTest {
 
@@ -31,6 +32,7 @@ public class PolicyVisitorImplTest {
     @BeforeAll
     static void beforeAll() {
         gson = new GsonBuilder().registerTypeAdapter(Expression.class, new ExpressionDeserialiser())
+                .registerTypeAdapter(EntityExpression.class, new EntityExpressionDeserialiser())
                 .create();
     }
 

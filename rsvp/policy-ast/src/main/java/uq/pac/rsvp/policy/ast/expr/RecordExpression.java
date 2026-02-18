@@ -2,7 +2,6 @@ package uq.pac.rsvp.policy.ast.expr;
 
 import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Record;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,6 +16,10 @@ public class RecordExpression extends Expression {
     public RecordExpression(Map<String, Expression> props, SourceLoc source) {
         super(Record, source);
         this.props = Map.copyOf(props);
+    }
+
+    public RecordExpression(Map<String, Expression> props) {
+        this(props, SourceLoc.MISSING);
     }
 
     public Map<String, Expression> getProperties() {

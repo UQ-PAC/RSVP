@@ -12,7 +12,7 @@ import uq.pac.rsvp.policy.ast.schema.attribute.RecordType;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
-public class EntityType {
+public class EntityType implements SchemaFileEntry {
 
     private final Set<String> memberOfTypes;
     private final RecordType shape;
@@ -97,10 +97,12 @@ public class EntityType {
         return annotations != null ? annotations : Collections.emptyMap();
     }
 
+    @Override
     public void accept(SchemaVisitor visitor) {
         visitor.visitEntityType(this);
     }
 
+    @Override
     public <T> T compute(SchemaComputationVisitor<T> visitor) {
         return visitor.visitEntityType(this);
     }

@@ -5,6 +5,7 @@ import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Binary;
 import com.google.gson.annotations.SerializedName;
 
 import uq.pac.rsvp.policy.ast.SourceLoc;
+import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
 public class BinaryExpression extends Expression {
@@ -82,6 +83,11 @@ public class BinaryExpression extends Expression {
     @Override
     public void accept(PolicyVisitor visitor) {
         visitor.visitBinaryExpr(this);
+    }
+
+    @Override
+    public <T> T compute(PolicyComputationVisitor<T> visitor) {
+        return visitor.visitBinaryExpr(this);
     }
 
     @Override

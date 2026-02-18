@@ -5,12 +5,17 @@ import java.util.Map;
 import uq.pac.rsvp.policy.ast.schema.EntityType;
 import uq.pac.rsvp.policy.ast.schema.Namespace;
 import uq.pac.rsvp.policy.ast.schema.Schema;
+import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class EntityOrCommonType extends AttributeType {
 
-    private String name;
+    private final String name;
+
+    // Resolved entity type referenced by this type (if applicable)
     private EntityType resolvedEntityType;
+
+    // Resolved common type referenced by this type (if applicable)
     private AttributeType resolvedAttributeType;
 
     public EntityOrCommonType(String name, boolean required, Map<String, String> annotations) {
@@ -62,7 +67,13 @@ public class EntityOrCommonType extends AttributeType {
         }
     }
 
+    @Override
     public void accept(SchemaVisitor visitor) {
         visitor.visitEntityOrCommonAttributeType(this);
+    }
+
+    @Override
+    public <T> T compute(SchemaComputationVisitor<T> visitor) {
+        return visitor.visitEntityOrCommonAttributeType(this);
     }
 }

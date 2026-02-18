@@ -9,6 +9,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
+import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class PrimitiveType extends AttributeType {
@@ -16,7 +17,7 @@ public class PrimitiveType extends AttributeType {
         String, Long, Boolean
     }
 
-    private Type type;
+    private final Type type;
 
     public PrimitiveType(Type type, boolean required, Map<String, String> annotations) {
         super(required, annotations);
@@ -41,8 +42,14 @@ public class PrimitiveType extends AttributeType {
         return type;
     }
 
+    @Override
     public void accept(SchemaVisitor visitor) {
         visitor.visitPrimitiveAttributeType(this);
+    }
+
+    @Override
+    public <T> T compute(SchemaComputationVisitor<T> visitor) {
+        return visitor.visitPrimitiveAttributeType(this);
     }
 
     public static class PrimitiveTypeDeserialiser implements JsonDeserializer<PrimitiveType> {
@@ -65,8 +72,7 @@ public class PrimitiveType extends AttributeType {
             };
 
             return new PrimitiveType(primativeType, required != null ? required.getAsBoolean() : false,
-                    context.deserialize(annotations,
-                            new HashMap<String, String>().getClass()));
+                    context.deserialize(annotations, HashMap.class));
 
         }
     }

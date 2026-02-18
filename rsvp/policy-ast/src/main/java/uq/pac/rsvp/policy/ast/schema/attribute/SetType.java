@@ -2,11 +2,12 @@ package uq.pac.rsvp.policy.ast.schema.attribute;
 
 import java.util.Map;
 
+import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class SetType extends AttributeType {
 
-    private AttributeType element;
+    private final AttributeType element;
 
     public SetType(AttributeType element, boolean required, Map<String, String> annotations) {
         super(required, annotations);
@@ -31,7 +32,13 @@ public class SetType extends AttributeType {
         return this.element;
     }
 
+    @Override
     public void accept(SchemaVisitor visitor) {
         visitor.visitSetAttributeType(this);
+    }
+
+    @Override
+    public <T> T compute(SchemaComputationVisitor<T> visitor) {
+        return visitor.visitSetAttributeType(this);
     }
 }

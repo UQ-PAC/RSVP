@@ -10,10 +10,9 @@ allprojects {
     dependencies {
         // Custom cedar-java fork (https://github.com/rebecca-odonoghue/cedar-java)
         implementation 'com.cedarpolicy:cedar-java:3.1.2-rsvp:uber'
-
         implementation 'com.google.code.gson:gson:2.13.2'
-
         implementation 'com.fasterxml.jackson.core:jackson-databind:2.20.0'
+        implementation libs.guava
 
         // Use JUnit Jupiter for testing.
         testImplementation libs.junit.jupiter

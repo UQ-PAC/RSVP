@@ -3,6 +3,7 @@ package uq.pac.rsvp.policy.ast.expr;
 import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.BooleanLiteral;
 
 import uq.pac.rsvp.policy.ast.SourceLoc;
+import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;;
 
 public class BooleanExpression extends Expression {
@@ -21,6 +22,11 @@ public class BooleanExpression extends Expression {
     @Override
     public void accept(PolicyVisitor visitor) {
         visitor.visitBooleanExpr(this);
+    }
+
+    @Override
+    public <T> T compute(PolicyComputationVisitor<T> visitor) {
+        return visitor.visitBooleanExpr(this);
     }
 
     @Override

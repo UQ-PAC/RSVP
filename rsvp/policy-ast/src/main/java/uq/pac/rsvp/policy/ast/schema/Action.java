@@ -1,55 +1,69 @@
 package uq.pac.rsvp.policy.ast.schema;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import uq.pac.rsvp.policy.ast.schema.attribute.RecordType;
+import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class Action {
 
     private static class ActionReference {
-        private String id;
-        private String type;
+        private final String id;
+        private final String type;
+
+        protected ActionReference(String id, String type) {
+            this.id = id;
+            this.type = type;
+        }
     }
 
     private static class ActionApplication {
-        private Set<String> principalTypes;
-        private Set<String> resourceTypes;
-        private RecordType context;
+        private final Set<String> principalTypes;
+        private final Set<String> resourceTypes;
+        private final RecordType context;
 
+        // Resolved principal type references
         private Set<EntityType> principalTypeRefs;
+
+        // Resolved resource type references
         private Set<EntityType> resourceTypeRefs;
 
+        // Any unresolved principal types
         private Set<String> unresolvedPrincipalTypes;
+
+        // Any unresolved resource types
         private Set<String> unresolvedResourceTypes;
 
-        private ActionApplication(Set<String> principalTypes, Set<String> resourceTypes,
-                RecordType context) {
-            this.principalTypes = principalTypes != null ? new HashSet<>(principalTypes) : Collections.emptySet();
-            this.resourceTypes = resourceTypes != null ? new HashSet<>(resourceTypes) : Collections.emptySet();
+        private ActionApplication(Set<String> principalTypes, Set<String> resourceTypes, RecordType context) {
+            this.principalTypes = principalTypes != null ? Set.copyOf(principalTypes) : Collections.emptySet();
+            this.resourceTypes = resourceTypes != null ? Set.copyOf(resourceTypes) : Collections.emptySet();
             this.context = context;
         }
     }
 
+    private final Set<ActionReference> memberOf;
+    private final ActionApplication appliesTo;
+    private final Map<String, String> annotations;
+
+    // The name that this Action is mapped to within the namespace
     private String name;
 
-    private Set<ActionReference> memberOf;
-    private ActionApplication appliesTo;
-    private Map<String, String> annotations;
-
+    // Resolved memberOf Action references
     private Set<Action> memberOfReferences;
+
+    // Any unresolved memberOf Actions
     private Set<ActionReference> unresolvedMemberOf;
 
     public Action(Set<ActionReference> memberOf, Set<String> principalTypes, Set<String> resourceTypes,
             RecordType context, Map<String, String> annotations) {
 
-        this.memberOf = memberOf != null ? new HashSet<>(memberOf) : Collections.emptySet();
+        this.memberOf = memberOf != null ? Set.copyOf(memberOf) : Collections.emptySet();
         this.appliesTo = new ActionApplication(principalTypes, resourceTypes, context);
-        this.annotations = annotations != null ? new HashMap<>(annotations) : Collections.emptyMap();
+        this.annotations = annotations != null ? Map.copyOf(annotations) : Collections.emptyMap();
     }
 
     public void resolveReferences(Schema schema, Namespace local) {
@@ -109,16 +123,16 @@ public class Action {
     }
 
     public Set<Action> getMemberOfActions() {
-        return memberOfReferences != null ? new HashSet<>(memberOfReferences) : Collections.emptySet();
+        return memberOfReferences != null ? Set.copyOf(memberOfReferences) : Collections.emptySet();
     }
 
     public Set<EntityType> getAppliesToPrincipalTypes() {
-        return appliesTo.principalTypeRefs != null ? new HashSet<>(appliesTo.principalTypeRefs)
+        return appliesTo.principalTypeRefs != null ? Set.copyOf(appliesTo.principalTypeRefs)
                 : Collections.emptySet();
     }
 
     public Set<EntityType> getAppliesToResourceTypes() {
-        return appliesTo.resourceTypeRefs != null ? new HashSet<>(appliesTo.resourceTypeRefs) : Collections.emptySet();
+        return appliesTo.resourceTypeRefs != null ? Set.copyOf(appliesTo.resourceTypeRefs) : Collections.emptySet();
     }
 
     public RecordType getAppliesToContext() {
@@ -126,10 +140,14 @@ public class Action {
     }
 
     public Map<String, String> getAnnotations() {
-        return annotations != null ? new HashMap<>(annotations) : Collections.emptyMap();
+        return annotations != null ? annotations : Collections.emptyMap();
     }
 
     public void accept(SchemaVisitor visitor) {
         visitor.visitAction(this);
+    }
+
+    public <T> T compute(SchemaComputationVisitor<T> visitor) {
+        return visitor.visitAction(this);
     }
 }

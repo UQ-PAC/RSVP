@@ -5,6 +5,7 @@ import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Conditional;
 import com.google.gson.annotations.SerializedName;
 
 import uq.pac.rsvp.policy.ast.SourceLoc;
+import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
 public class ConditionalExpression extends Expression {
@@ -38,6 +39,11 @@ public class ConditionalExpression extends Expression {
     @Override
     public void accept(PolicyVisitor visitor) {
         visitor.visitConditionalExpr(this);
+    }
+
+    @Override
+    public <T> T compute(PolicyComputationVisitor<T> visitor) {
+        return visitor.visitConditionalExpr(this);
     }
 
     @Override

@@ -1,25 +1,27 @@
 package uq.pac.rsvp.policy.ast.schema;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import uq.pac.rsvp.policy.ast.schema.attribute.AttributeType;
+import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class Namespace {
 
+    private final Map<String, EntityType> entityTypes;
+    private final Map<String, Action> actions;
+    private final Map<String, AttributeType> commonTypes;
+
+    // The key for this namespace within the Schema
     private String name;
-    private Map<String, EntityType> entityTypes;
-    private Map<String, Action> actions;
-    private Map<String, AttributeType> commonTypes;
 
     public Namespace(Map<String, EntityType> entityTypes, Map<String, Action> actions,
             Map<String, AttributeType> commonTypes) {
-        this.entityTypes = entityTypes != null ? new HashMap<>(entityTypes) : Collections.emptyMap();
-        this.actions = actions != null ? new HashMap<>(actions) : Collections.emptyMap();
-        this.commonTypes = commonTypes != null ? new HashMap<>(commonTypes) : Collections.emptyMap();
+        this.entityTypes = entityTypes != null ? Map.copyOf(entityTypes) : Collections.emptyMap();
+        this.actions = actions != null ? Map.copyOf(actions) : Collections.emptyMap();
+        this.commonTypes = commonTypes != null ? Map.copyOf(commonTypes) : Collections.emptyMap();
     }
 
     public String getName() {
@@ -56,6 +58,10 @@ public class Namespace {
 
     public void accept(SchemaVisitor visitor) {
         visitor.visitNamespace(this);
+    }
+
+    public <T> T compute(SchemaComputationVisitor<T> visitor) {
+        return visitor.visitNamespace(this);
     }
 
 }

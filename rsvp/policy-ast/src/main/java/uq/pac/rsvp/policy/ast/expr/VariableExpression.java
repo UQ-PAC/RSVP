@@ -5,6 +5,7 @@ import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Variable;
 import com.google.gson.annotations.SerializedName;
 
 import uq.pac.rsvp.policy.ast.SourceLoc;
+import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
 public class VariableExpression extends Expression {
@@ -54,6 +55,11 @@ public class VariableExpression extends Expression {
     @Override
     public void accept(PolicyVisitor visitor) {
         visitor.visitVariableExpr(this);
+    }
+
+    @Override
+    public <T> T compute(PolicyComputationVisitor<T> visitor) {
+        return visitor.visitVariableExpr(this);
     }
 
     @Override

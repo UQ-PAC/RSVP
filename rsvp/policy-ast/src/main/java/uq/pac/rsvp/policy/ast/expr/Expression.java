@@ -7,72 +7,35 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import com.google.gson.annotations.SerializedName;
 
+import uq.pac.rsvp.policy.ast.PolicyFileEntry;
 import uq.pac.rsvp.policy.ast.SourceLoc;
-import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
-import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
-public abstract class Expression {
+public abstract class Expression extends PolicyFileEntry {
 
-    protected static final SourceLoc MISSING_SRC = new SourceLoc("unknown", -1, 0);
-    protected static final Pattern NICE_PROP_NAME = Pattern.compile("[a-z0-9_]+");
+    protected static final Pattern NICE_PROP_NAME = Pattern.compile("[a-zA-Z0-9_]+");
 
     public static enum ExprType {
-        @SerializedName("binary")
         Binary,
-
-        @SerializedName("unary")
         Unary,
-
-        @SerializedName("cond")
         Conditional,
-
-        @SerializedName("call")
         Call,
-
-        @SerializedName("slot")
         Slot,
-
-        @SerializedName("var")
         Variable,
-
-        @SerializedName("prop")
         PropertyAccess,
-
-        @SerializedName("bool")
         BooleanLiteral,
-
-        @SerializedName("euid")
         EntityLiteral,
-
-        @SerializedName("long")
         LongLiteral,
-
-        @SerializedName("str")
         StringLiteral,
-
-        @SerializedName("record")
         Record,
-
-        @SerializedName("set")
         Set
     }
 
     private final ExprType type;
-    private SourceLoc source;
 
     protected Expression(ExprType type, SourceLoc source) {
+        super(source);
         this.type = type;
-        this.source = source;
-    }
-
-    public abstract void accept(PolicyVisitor visitor);
-
-    public abstract <T> T compute(PolicyComputationVisitor<T> visitor);
-
-    public final SourceLoc getSourceLoc() {
-        return source != null ? source : MISSING_SRC;
     }
 
     public final boolean isLiteral() {

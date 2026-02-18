@@ -1,0 +1,40 @@
+{
+  "DataCollectionApp": {
+    "entityTypes": {
+      "User": {
+        "shape": {
+          "type": "Record",
+          "attributes": {
+            "nicknames": {
+              "type": "Set",
+              "element": {
+                "type": "String"
+              }
+            },
+            "preferences": {
+              "type": "Record",
+              "attributes": {
+                "diet": {
+                  "type": "String"
+                },
+                "colour": {
+                  "type": "EntityOrCommon",
+                  "name": "Colour"
+                }
+              }
+            },
+            "consented": {
+              "type": "Boolean",
+              "required": false
+            }
+          }
+        }
+      },
+      "Colour": {
+        "enum": ["red", "green", "blue", "purple", "pink", "yellow"]
+      }
+    },
+    "actions": {},
+    "commonTypes": {}
+  }
+}

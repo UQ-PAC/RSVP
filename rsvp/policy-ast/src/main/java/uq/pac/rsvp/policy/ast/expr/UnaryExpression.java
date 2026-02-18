@@ -17,13 +17,17 @@ public class UnaryExpression extends Expression {
         Neg
     }
 
-    private UnaryOp op;
-    private Expression expr;
+    private final UnaryOp op;
+    private final Expression expr;
 
     public UnaryExpression(UnaryOp op, Expression expr, SourceLoc source) {
         super(Unary, source);
         this.op = op;
         this.expr = expr;
+    }
+
+    public UnaryExpression(UnaryOp op, Expression expr) {
+        this(op, expr, SourceLoc.MISSING);
     }
 
     public UnaryOp getOp() {

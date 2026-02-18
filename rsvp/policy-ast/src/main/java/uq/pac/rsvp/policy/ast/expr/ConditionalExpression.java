@@ -10,18 +10,22 @@ import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
 public class ConditionalExpression extends Expression {
 
-    private Expression condition;
+    private final Expression condition;
 
-    private Expression then;
+    private final Expression then;
 
     @SerializedName("else")
-    private Expression els;
+    private final Expression els;
 
     public ConditionalExpression(Expression condition, Expression then, Expression els, SourceLoc source) {
         super(Conditional, source);
         this.condition = condition;
         this.then = then;
         this.els = els;
+    }
+
+    public ConditionalExpression(Expression condition, Expression then, Expression els) {
+        this(condition, then, els, SourceLoc.MISSING);
     }
 
     public Expression getCondition() {

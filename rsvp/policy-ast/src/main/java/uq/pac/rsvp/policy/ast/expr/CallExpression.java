@@ -10,9 +10,9 @@ import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
 public class CallExpression extends Expression {
 
-    private Expression self;
-    private String func;
-    private List<Expression> args;
+    private final Expression self;
+    private final String func;
+    private final List<Expression> args;
 
     public CallExpression(Expression self, String func, List<Expression> args, SourceLoc source) {
         super(Call, source);
@@ -21,10 +21,19 @@ public class CallExpression extends Expression {
         this.args = args;
     }
 
+    public CallExpression(Expression self, String func, List<Expression> args) {
+        this(self, func, args, SourceLoc.MISSING);
+    }
+
     public CallExpression(String func, List<Expression> args, SourceLoc source) {
         super(Call, source);
+        this.self = null;
         this.func = func;
         this.args = args;
+    }
+
+    public CallExpression(String func, List<Expression> args) {
+        this(func, args, null);
     }
 
     public Expression getSelf() {

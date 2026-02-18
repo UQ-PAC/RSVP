@@ -57,15 +57,19 @@ public class BinaryExpression extends Expression {
         HasAttr
     }
 
-    private BinaryOp op;
-    private Expression left;
-    private Expression right;
+    private final BinaryOp op;
+    private final Expression left;
+    private final Expression right;
 
     public BinaryExpression(Expression left, BinaryOp op, Expression right, SourceLoc source) {
         super(Binary, source);
         this.left = left;
         this.op = op;
         this.right = right;
+    }
+
+    public BinaryExpression(Expression left, BinaryOp op, Expression right) {
+        this(left, op, right, SourceLoc.MISSING);
     }
 
     public Expression getLeft() {
@@ -96,53 +100,27 @@ public class BinaryExpression extends Expression {
         sb.append('(');
         sb.append(left.toString());
         sb.append(' ');
-        switch (op) {
-            case Add:
-                sb.append("+");
-                break;
-            case And:
-                sb.append("&&");
-                break;
-            case Eq:
-                sb.append("==");
-                break;
-            case Greater:
-                sb.append(">");
-                break;
-            case GreaterEq:
-                sb.append(">=");
-                break;
-            case HasAttr:
-                sb.append("has");
-                break;
-            case In:
-                sb.append("in");
-                break;
-            case Is:
-                sb.append("is");
-                break;
-            case Less:
-                sb.append("<");
-                break;
-            case LessEq:
-                sb.append("<=");
-                break;
-            case Like:
-                sb.append("like");
-                break;
-            case Mul:
-                sb.append("*");
-                break;
-            case Neq:
-                sb.append("!=");
-                break;
-            case Or:
-                sb.append("||");
-                break;
-            case Sub:
-                sb.append("-");
-                break;
-        }
+
+        String opStr = switch (op) {
+            case Add -> "+";
+            case And -> "&&";
+            case Eq -> "==";
+            case Greater -> "=";
+            case GreaterEq -> ">=";
+            case HasAttr -> "has";
+            case In -> "in";
+            case Is -> "is";
+            case Less -> "<";
+            case LessEq -> "<=";
+            case Like -> "like";
+            case Mul -> "*";
+            case Neq -> "!=";
+            case Or -> "||";
+            case Sub -> "-";
+            default -> "error";
+        };
+
+        sb.append(opStr);
         sb.append(' ');
         sb.append(right.toString());
         sb.append(')');

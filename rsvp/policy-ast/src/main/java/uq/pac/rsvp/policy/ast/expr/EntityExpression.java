@@ -18,13 +18,17 @@ import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;;
 
 public class EntityExpression extends Expression {
 
-    private List<String> path;
-    private String eid;
+    private final List<String> path;
+    private final String eid;
 
     public EntityExpression(String eid, List<String> path, SourceLoc source) {
         super(EntityLiteral, source);
         this.path = path;
         this.eid = eid;
+    }
+
+    public EntityExpression(String eid, List<String> path) {
+        this(eid, path, SourceLoc.MISSING);
     }
 
     public String getEid() {

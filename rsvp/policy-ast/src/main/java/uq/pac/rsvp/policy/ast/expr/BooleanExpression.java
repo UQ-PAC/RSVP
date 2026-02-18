@@ -8,11 +8,15 @@ import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;;
 
 public class BooleanExpression extends Expression {
 
-    private boolean value;
+    private final boolean value;
 
     public BooleanExpression(boolean value, SourceLoc source) {
         super(BooleanLiteral, source);
         this.value = value;
+    }
+
+    public BooleanExpression(boolean value) {
+        this(value, SourceLoc.MISSING);
     }
 
     public boolean getValue() {

@@ -8,11 +8,15 @@ import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;;
 
 public class StringExpression extends Expression {
 
-    private String value;
+    private final String value;
 
     public StringExpression(String value, SourceLoc source) {
         super(StringLiteral, source);
         this.value = value;
+    }
+
+    public StringExpression(String value) {
+        this(value, SourceLoc.MISSING);
     }
 
     public String getValue() {

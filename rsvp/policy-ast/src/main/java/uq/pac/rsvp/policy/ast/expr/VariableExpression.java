@@ -25,11 +25,15 @@ public class VariableExpression extends Expression {
         Context
     }
 
-    private Reference ref;
+    private final Reference ref;
 
     public VariableExpression(Reference ref, SourceLoc source) {
         super(Variable, source);
         this.ref = ref;
+    }
+
+    public VariableExpression(Reference ref) {
+        this(ref, SourceLoc.MISSING);
     }
 
     public static VariableExpression createPrincipalRef(SourceLoc source) {

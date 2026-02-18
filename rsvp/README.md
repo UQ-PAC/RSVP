@@ -57,7 +57,7 @@ need to visit every node type but would still like to traverse the entire tree, 
 `SchemaVisitorImpl` can be extended instead.
 
 Visitors that return a value from their `visit` methods should implement `PolicyComputationVisitor` or
-`SchemaComputationVisitor` and call the generic `compute` method on each `AST` node, rather than `visit`.
+`SchemaComputationVisitor` and call the generic `compute` method on each `AST` node, rather than `accept`.
 
 The JSON schema for the serialised Java AST is defined in `lib/src/main/resources/ast.schema.json`. A
 schema for the Cedar JSON schema syntax can be found in the [Cedar VSCode Extension repository](https://raw.githubusercontent.com/cedar-policy/vscode-cedar/refs/heads/main/schemas/cedarschema.schema.json).

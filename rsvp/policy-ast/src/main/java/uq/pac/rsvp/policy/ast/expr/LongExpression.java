@@ -8,11 +8,15 @@ import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;;
 
 public class LongExpression extends Expression {
 
-    private long value;
+    private final long value;
 
     public LongExpression(long value, SourceLoc source) {
         super(LongLiteral, source);
         this.value = value;
+    }
+
+    public LongExpression(long value) {
+        this(value, SourceLoc.MISSING);
     }
 
     public long getValue() {

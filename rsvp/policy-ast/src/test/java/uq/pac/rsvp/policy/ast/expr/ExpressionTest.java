@@ -57,7 +57,7 @@ public class ExpressionTest {
                 assertEquals(5, source.offset);
                 assertEquals(25, source.len);
             } else {
-                assertEquals(Expression.MISSING_SRC, source);
+                assertEquals(SourceLoc.MISSING, source);
             }
 
             // Check expression

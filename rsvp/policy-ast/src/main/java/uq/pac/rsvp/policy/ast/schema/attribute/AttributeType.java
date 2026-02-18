@@ -2,7 +2,6 @@ package uq.pac.rsvp.policy.ast.schema.attribute;
 
 import java.lang.reflect.Type;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gson.JsonDeserializationContext;
@@ -10,21 +9,24 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 
+import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public abstract class AttributeType {
 
+    private final boolean required;
+    private final Map<String, String> annotations;
+
     private String definitionName;
-    private boolean required;
-    private Map<String, String> annotations;
 
     protected AttributeType(boolean required) {
         this.required = required;
+        this.annotations = Collections.emptyMap();
     }
 
-    protected AttributeType(boolean required, Map<String, String> annnotations) {
-        this(required);
-        this.annotations = annotations != null ? new HashMap<>(annnotations) : Collections.emptyMap();
+    protected AttributeType(boolean required, Map<String, String> annotations) {
+        this.required = required;
+        this.annotations = annotations != null ? Map.copyOf(annotations) : Collections.emptyMap();
     }
 
     public boolean isRequired() {
@@ -32,7 +34,7 @@ public abstract class AttributeType {
     }
 
     public Map<String, String> getAnnotations() {
-        return new HashMap<>(annotations);
+        return annotations;
     }
 
     /**
@@ -48,6 +50,8 @@ public abstract class AttributeType {
     }
 
     public abstract void accept(SchemaVisitor visitor);
+
+    public abstract <T> T compute(SchemaComputationVisitor<T> visitor);
 
     public static class AttributeTypeDeserialiser implements JsonDeserializer<AttributeType> {
 

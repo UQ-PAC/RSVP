@@ -5,6 +5,7 @@ import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Unary;
 import com.google.gson.annotations.SerializedName;
 
 import uq.pac.rsvp.policy.ast.SourceLoc;
+import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
 public class UnaryExpression extends Expression {
@@ -36,6 +37,11 @@ public class UnaryExpression extends Expression {
     @Override
     public void accept(PolicyVisitor visitor) {
         visitor.visitUnaryExpr(this);
+    }
+
+    @Override
+    public <T> T compute(PolicyComputationVisitor<T> visitor) {
+        return visitor.visitUnaryExpr(this);
     }
 
     @Override

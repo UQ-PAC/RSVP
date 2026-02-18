@@ -10,6 +10,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.annotations.SerializedName;
 
 import uq.pac.rsvp.policy.ast.SourceLoc;
+import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
 public abstract class Expression {
@@ -67,6 +68,8 @@ public abstract class Expression {
     }
 
     public abstract void accept(PolicyVisitor visitor);
+
+    public abstract <T> T compute(PolicyComputationVisitor<T> visitor);
 
     public final SourceLoc getSourceLoc() {
         return source != null ? source : MISSING_SRC;

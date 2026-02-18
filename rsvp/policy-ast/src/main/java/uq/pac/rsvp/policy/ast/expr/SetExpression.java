@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import uq.pac.rsvp.policy.ast.SourceLoc;
+import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
 public class SetExpression extends Expression {
@@ -24,6 +25,11 @@ public class SetExpression extends Expression {
     @Override
     public void accept(PolicyVisitor visitor) {
         visitor.visitSetExpr(this);
+    }
+
+    @Override
+    public <T> T compute(PolicyComputationVisitor<T> visitor) {
+        return visitor.visitSetExpr(this);
     }
 
     @Override

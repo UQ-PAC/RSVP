@@ -5,6 +5,7 @@ import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Slot;
 import com.google.gson.annotations.SerializedName;
 
 import uq.pac.rsvp.policy.ast.SourceLoc;
+import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
 public class SlotExpression extends Expression {
@@ -35,6 +36,11 @@ public class SlotExpression extends Expression {
     @Override
     public void accept(PolicyVisitor visitor) {
         visitor.visitSlotExpr(this);
+    }
+
+    @Override
+    public <T> T compute(PolicyComputationVisitor<T> visitor) {
+        return visitor.visitSlotExpr(this);
     }
 
     @Override

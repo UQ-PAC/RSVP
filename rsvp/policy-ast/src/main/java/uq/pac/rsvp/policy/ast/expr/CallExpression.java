@@ -5,6 +5,7 @@ import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Call;
 import java.util.List;
 
 import uq.pac.rsvp.policy.ast.SourceLoc;
+import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
 public class CallExpression extends Expression {
@@ -41,6 +42,11 @@ public class CallExpression extends Expression {
     @Override
     public void accept(PolicyVisitor visitor) {
         visitor.visitCallExpr(this);
+    }
+
+    @Override
+    public <T> T compute(PolicyComputationVisitor<T> visitor) {
+        return visitor.visitCallExpr(this);
     }
 
     @Override

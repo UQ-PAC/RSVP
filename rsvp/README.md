@@ -49,10 +49,18 @@ Before building this project, you will need to build and deploy CedarJava locall
 
 ## Implement a new policy visitor
 
-Visitor classes can be found in the `uq.pac.rsvp.policy.ast.visitor` package. Visitors that don't need to visit every node type but would still like to traverse the entire tree can extend the `PolicyVisitorImpl` class. Otherwise, interface `PolicyVisitor` can be implemented directly.
+Visitor classes can be found in the `uq.pac.rsvp.policy.ast.visitor` package.
 
-The JSON schema for the serialised Java AST is defined in `lib/src/main/resources/ast.schema.json`. A schema for the Cedar JSON
-Schema syntax can be found in the [Cedar VSCode Extension repository](https://raw.githubusercontent.com/cedar-policy/vscode-cedar/refs/heads/main/schemas/cedarschema.schema.json).
+There are two types of visitors, visitors that return `void` from their visit methods, and visitors that return a
+generic typed value. Visitors that return void should implement `PolicyVisitor` or `SchemaVisitor`. If they don't
+need to visit every node type but would still like to traverse the entire tree, `PolicyVisitorImpl` or
+`SchemaVisitorImpl` can be extended instead.
+
+Visitors that return a value from their `visit` methods should implement `PolicyComputationVisitor` or
+`SchemaComputationVisitor` and call the generic `compute` method on each `AST` node, rather than `visit`.
+
+The JSON schema for the serialised Java AST is defined in `lib/src/main/resources/ast.schema.json`. A
+schema for the Cedar JSON schema syntax can be found in the [Cedar VSCode Extension repository](https://raw.githubusercontent.com/cedar-policy/vscode-cedar/refs/heads/main/schemas/cedarschema.schema.json).
 
 ## Using the policy AST library in another project
 

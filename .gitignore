@@ -7,9 +7,9 @@
 **/.kotlin
 
 # Build dirs
-rsvp/build
-rsvp/bin
-rsvp/app/build
-rsvp/app/bin
-rsvp/policy-ast/build
-rsvp/policy-ast/bin
+/rsvp/build
+/rsvp/bin
+/rsvp/app/build
+/rsvp/app/bin
+/rsvp/policy-ast/build
+/rsvp/policy-ast/bin

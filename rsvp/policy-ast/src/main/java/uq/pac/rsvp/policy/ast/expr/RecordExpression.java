@@ -7,19 +7,20 @@ import java.util.Map;
 import java.util.Set;
 
 import uq.pac.rsvp.policy.ast.SourceLoc;
+import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;;
 
 public class RecordExpression extends Expression {
 
-    private Map<String, Expression> props;
+    private final Map<String, Expression> props;
 
     public RecordExpression(Map<String, Expression> props, SourceLoc source) {
         super(Record, source);
-        this.props = new HashMap<>(props);
+        this.props = Map.copyOf(props);
     }
 
     public Map<String, Expression> getProperties() {
-        return new HashMap<>(props);
+        return props;
     }
 
     public Set<String> getPropertyNames() {
@@ -37,6 +38,11 @@ public class RecordExpression extends Expression {
     @Override
     public void accept(PolicyVisitor visitor) {
         visitor.visitRecordExpr(this);
+    }
+
+    @Override
+    public <T> T compute(PolicyComputationVisitor<T> visitor) {
+        return visitor.visitRecordExpr(this);
     }
 
     @Override

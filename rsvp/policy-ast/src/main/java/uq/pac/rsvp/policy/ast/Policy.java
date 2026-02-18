@@ -3,6 +3,7 @@ package uq.pac.rsvp.policy.ast;
 import com.google.gson.annotations.SerializedName;
 
 import uq.pac.rsvp.policy.ast.expr.Expression;
+import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
 public class Policy {
@@ -40,6 +41,10 @@ public class Policy {
 
     public void accept(PolicyVisitor visitor) {
         visitor.visitPolicy(this);
+    }
+
+    public <T> T compute(PolicyComputationVisitor<T> visitor) {
+        return visitor.visitPolicy(this);
     }
 
     @Override

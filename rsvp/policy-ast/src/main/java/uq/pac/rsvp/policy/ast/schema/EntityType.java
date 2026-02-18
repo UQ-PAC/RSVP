@@ -1,7 +1,6 @@
 package uq.pac.rsvp.policy.ast.schema;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -10,32 +9,48 @@ import com.google.gson.annotations.SerializedName;
 
 import uq.pac.rsvp.policy.ast.schema.attribute.AttributeType;
 import uq.pac.rsvp.policy.ast.schema.attribute.RecordType;
+import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class EntityType {
 
-    private String name;
-
-    private Set<String> memberOfTypes;
-    private RecordType shape;
+    private final Set<String> memberOfTypes;
+    private final RecordType shape;
 
     @SerializedName("enum")
-    private Set<String> entityNamesEnum;
+    private final Set<String> entityNamesEnum;
 
-    private Map<String, String> annotations;
+    private final Map<String, String> annotations;
 
+    // Resolved memberOfTypes
     private Set<EntityType> memberOfTypeRefs;
 
+    // Any unresolved memberOfTypes
     private Set<String> unresolvedMemberOfTypes;
 
+    // The name that this entity is mapped to in the namespace
+    private String name;
+
     public EntityType(Set<String> memberOfTypes, Map<String, AttributeType> shape) {
-        this.memberOfTypes = memberOfTypes != null ? new HashSet<>(memberOfTypes) : Collections.emptySet();
+        this.memberOfTypes = memberOfTypes != null ? Set.copyOf(memberOfTypes) : Collections.emptySet();
         this.shape = new RecordType(shape);
+        this.annotations = Collections.emptyMap();
+        this.entityNamesEnum = Collections.emptySet();
     }
 
-    public EntityType(Set<String> memberOfTypes, Map<String, AttributeType> shape, Map<String, String> annotations) {
-        this(memberOfTypes, shape);
-        this.annotations = annotations != null ? new HashMap<>(annotations) : Collections.emptyMap();
+    public EntityType(Set<String> memberOfTypes, Map<String, AttributeType> shape, Set<String> entityNamesEnum) {
+        this.memberOfTypes = memberOfTypes != null ? Set.copyOf(memberOfTypes) : Collections.emptySet();
+        this.shape = new RecordType(shape);
+        this.entityNamesEnum = entityNamesEnum != null ? Set.copyOf(entityNamesEnum) : Collections.emptySet();
+        this.annotations = Collections.emptyMap();
+    }
+
+    public EntityType(Set<String> memberOfTypes, Map<String, AttributeType> shape, Set<String> entityNamesEnum,
+            Map<String, String> annotations) {
+        this.memberOfTypes = memberOfTypes != null ? Set.copyOf(memberOfTypes) : Collections.emptySet();
+        this.shape = new RecordType(shape);
+        this.annotations = annotations != null ? Map.copyOf(annotations) : Collections.emptyMap();
+        this.entityNamesEnum = entityNamesEnum != null ? Set.copyOf(entityNamesEnum) : Collections.emptySet();
     }
 
     public void resolveMemberOfTypes(Schema schema, Namespace local) {
@@ -63,7 +78,7 @@ public class EntityType {
     }
 
     public Set<EntityType> getMemberOfTypes() {
-        return memberOfTypeRefs != null ? new HashSet<>(memberOfTypeRefs) : Collections.emptySet();
+        return memberOfTypeRefs != null ? Set.copyOf(memberOfTypeRefs) : Collections.emptySet();
     }
 
     public Set<String> getShapeAttributeNames() {
@@ -75,14 +90,18 @@ public class EntityType {
     }
 
     public Set<String> getEntityNamesEnum() {
-        return entityNamesEnum != null ? new HashSet<>(entityNamesEnum) : Collections.emptySet();
+        return entityNamesEnum != null ? entityNamesEnum : Collections.emptySet();
     }
 
     public Map<String, String> getAnnotations() {
-        return annotations != null ? new HashMap<>(annotations) : Collections.emptyMap();
+        return annotations != null ? annotations : Collections.emptyMap();
     }
 
     public void accept(SchemaVisitor visitor) {
         visitor.visitEntityType(this);
+    }
+
+    public <T> T compute(SchemaComputationVisitor<T> visitor) {
+        return visitor.visitEntityType(this);
     }
 }

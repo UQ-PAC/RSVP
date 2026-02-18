@@ -2,11 +2,12 @@ package uq.pac.rsvp.policy.ast.schema.attribute;
 
 import java.util.Map;
 
+import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class ExtensionType extends AttributeType {
 
-    private String name;
+    private final String name;
 
     public ExtensionType(String name, boolean required, Map<String, String> annotations) {
         super(required, annotations);
@@ -31,7 +32,13 @@ public class ExtensionType extends AttributeType {
         return name;
     }
 
+    @Override
     public void accept(SchemaVisitor visitor) {
         visitor.visitExtensionAttributeType(this);
+    }
+
+    @Override
+    public <T> T compute(SchemaComputationVisitor<T> visitor) {
+        return visitor.visitExtensionAttributeType(this);
     }
 }

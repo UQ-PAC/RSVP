@@ -7,7 +7,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestProgram {
+public class DLProgramTest {
 
     private final static String TEST = """
         // Facts

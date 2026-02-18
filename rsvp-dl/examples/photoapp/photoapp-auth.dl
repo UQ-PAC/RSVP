@@ -88,18 +88,18 @@ AlbumVisibility("Album::CarlDocuments",  "Visibility::Private").
 .decl PhotoSize(photo: PhotoType, size: number)
 PhotoSize("Photo::AliceMeadow", 3).
 PhotoSize("Photo::AlicePassport", 4).
-PhotoSize("Photo::AliceHotel", 7).
-PhotoSize("Photo::BobMeadow", 4).
+PhotoSize("Photo::AliceHotel", 6).
+PhotoSize("Photo::BobMeadow", 3).
 PhotoSize("Photo::BobPassport", 5).
 PhotoSize("Photo::BobHotel", 9).
 
-.decl PhotoInAlbum(photo: PhotoType, album: AlbumType)
-PhotoInAlbum("Photo::AliceMeadow",   "Album::AliceSceneries").
-PhotoInAlbum("Photo::AlicePassport", "Album::AliceDocuments").
-PhotoInAlbum("Photo::AliceHotel",    "Album::AliceVacation").
-PhotoInAlbum("Photo::BobMeadow",     "Album::BobSceneries").
-PhotoInAlbum("Photo::BobPassport",   "Album::BobDocuments").
-PhotoInAlbum("Photo::BobHotel",      "Album::BobVacation").
+.decl PhotoAlbum(photo: PhotoType, album: AlbumType)
+PhotoAlbum("Photo::AliceMeadow", "Album::AliceSceneries").
+PhotoAlbum("Photo::AlicePassport", "Album::AliceDocuments").
+PhotoAlbum("Photo::AliceHotel", "Album::AliceVacation").
+PhotoAlbum("Photo::BobMeadow", "Album::BobSceneries").
+PhotoAlbum("Photo::BobPassport", "Album::BobDocuments").
+PhotoAlbum("Photo::BobHotel", "Album::BobVacation").
 
 .type ResourceType = PhotoType | AlbumType | AccountType
 .type PrincipalType = AccountType
@@ -119,27 +119,33 @@ ActionPrincipal("Action::uploadPhoto", resource) :- Account(resource).
 ActionPrincipal("Action::createAlbum", resource) :- Account(resource).
 
 .decl PermitV1(action: ActionType, principal: PrincipalType, resource: ResourceType)
-// Anyone can see public photos
+// Anyone can see public photos:
 PermitV1(action, principal, resource) :-
+    // action == Action::"viewPhoto"
     action = "Action::viewPhoto",
+    // principal is Account
     Account(principal),
+    // resource is Photo
     Photo(resource),
-    PhotoInAlbum(resource, album),
-    AlbumVisibility(album, "Visibility::Public").
+    // resource.album.visibility == Visibility::"Public"
+    PhotoAlbum(resource, album),
+    AlbumVisibility(album, visibility),
+    visibility = "Visibility::Public".
 
 // Admins can see any photo
 PermitV1(action, principal, resource) :-
     action = "Action::viewPhoto",
     Account(principal),
     Photo(resource),
-    AccountRole(principal, "Role::Admin").
+    AccountRole(principal, role),
+    role = "Role::Admin".
 
 // Users can see their own photos
 PermitV1(action, principal, resource) :-
     action = "Action::viewPhoto",
     Account(principal),
     Photo(resource),
-    PhotoInAlbum(resource, album),
+    PhotoAlbum(resource, album),
     AlbumOwner(album, principal).
 
 // Friends can see protected photos of their friends
@@ -148,7 +154,7 @@ PermitV2(action, principal, resource) :-
     action = "Action::viewPhoto",
     Account(principal),
     Photo(resource),
-    PhotoInAlbum(resource, album),
+    PhotoAlbum(resource, album),
     AlbumVisibility(album, "Visibility::Protected"),
     AlbumOwner(album, owner),
     AccountFriends(principal, owner).

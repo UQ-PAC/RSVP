@@ -12,6 +12,7 @@ application {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
@@ -19,7 +20,13 @@ dependencies {
 }
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
+    implementation("org.slf4j:slf4j-api:2.0.17")
+    implementation("org.slf4j:slf4j-simple:2.0.17")
+    implementation 'com.google.guava:guava:33.5.0-jre'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.20.0'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.20.0'
+    implementation 'com.cedarpolicy:cedar-java:3.1.2-rsvp:uber'
+    testImplementation platform ('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation "org.junit.jupiter:junit-jupiter-params:5.10.0"
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

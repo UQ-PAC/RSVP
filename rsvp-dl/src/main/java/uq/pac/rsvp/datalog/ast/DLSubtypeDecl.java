@@ -11,7 +11,7 @@ public class DLSubtypeDecl extends DLTypeDecl {
 
     @Override
     public String stringify() {
-        return subtype + " <: " + supertype;
+        return ".type " + subtype + " <: " + supertype;
     }
 
     @Override

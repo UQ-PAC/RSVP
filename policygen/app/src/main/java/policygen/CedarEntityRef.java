@@ -10,7 +10,6 @@ public class CedarEntityRef implements CedarType {
     private Map<String, CedarType> fieldsMap = new HashMap<>();
 
     public CedarEntityRef(String entityType, CedarField ... cedarFields) {
-        // TODO Auto-generated constructor stub
         this.entityType = entityType;
         for (CedarField field : cedarFields) {
             fieldsMap.put(field.getName(), field.getType());

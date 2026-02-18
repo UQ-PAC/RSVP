@@ -34,6 +34,10 @@ public class App {
             new CedarField("requiredLevel", CedarPrimitive.LONG),
             new CedarField("owner", userType),
             new CedarField("creator", userType));
+    private static CedarRecord requestType = new CedarRecord(
+            new CedarField("srcSubnet", CedarPrimitive.STRING),
+            new CedarField("maintenanceMode", CedarPrimitive.BOOL)
+            );
 
     // Generate permit, forbid policies;
     // Some with conditions;
@@ -136,7 +140,7 @@ public class App {
 
         int conditionChance = 70;
         while (randomChance(conditionChance)) {
-            policyStr += "\n" + generateCondition(principles, resources, new CedarRecord() /* TODO */);
+            policyStr += "\n" + generateCondition(principles, resources, requestType);
             conditionChance = 25; // reduced chance of additional conditions
         }
 
@@ -289,12 +293,18 @@ public class App {
             result.exprType = requiredType;
             return result;
         }
+        else if (requiredType.getTypeId() == CedarType.TypeId.STRING) {
+            ExpressionWithType result = new ExpressionWithType();
+            result.expression = "\"string" + random.nextInt(30) + "\"";
+            result.exprType = requiredType;
+            return result;
+        }
 
         throw new UnsupportedOperationException("Can't handle: " + requiredType.getTypeId().toString());
     }
 
     private static String generateCondition(EntitiesCollection principals,
-            EntitiesCollection resources, CedarType requestType) {
+            EntitiesCollection resources, CedarRecord requestType) {
         String result;
         if (randomChance(50)) {
             result = "unless {\n";
@@ -309,9 +319,8 @@ public class App {
     }
 
     // TODO support multiple principal/resource types; combine with type tests ("is") to avoid errors
-    // TODO requestType should be record type
     private static String generateConditionExpression(EntitiesCollection principals,
-            EntitiesCollection resources, CedarType requestType) {
+            EntitiesCollection resources, CedarRecord requestType) {
         // x in y
         // x == y (constant or other)
         // arithmetic:  x < y, x > y

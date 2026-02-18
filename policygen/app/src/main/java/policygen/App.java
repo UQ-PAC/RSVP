@@ -6,6 +6,8 @@ package policygen;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +19,15 @@ import policygen.entity.FileResource;
 import policygen.entity.Folder;
 import policygen.entity.Group;
 import policygen.entity.User;
+import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
+import uq.pac.rsvp.policy.ast.expr.BooleanExpression;
+import uq.pac.rsvp.policy.ast.expr.EntityExpression;
+import uq.pac.rsvp.policy.ast.expr.Expression;
+import uq.pac.rsvp.policy.ast.expr.LongExpression;
+import uq.pac.rsvp.policy.ast.expr.PropertyAccessExpression;
+import uq.pac.rsvp.policy.ast.expr.RecordExpression;
+import uq.pac.rsvp.policy.ast.expr.StringExpression;
+import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 
 public class App {
 
@@ -193,36 +204,34 @@ public class App {
     }
 
     private static class ExpressionWithType {
-        String expression;
+        Expression expression;
         CedarType exprType;
     }
 
     /**
      * Generate an expression with a value of arbitrary type.
      */
-    private static ExpressionWithType generateValue(EntitiesCollection principals,
+    private static ExpressionWithType generateValueExpr(EntitiesCollection principals,
             EntitiesCollection resources, CedarType requestType, boolean allowLiterals) {
 
-        String valueStr;
+        Expression valueExpr;
         CedarType valueType;
-
-        // TODO generate literals?
 
         int valueTypeIndex = random.nextInt(100);
         // 35% principal, 35% resources, 30% context
         if (valueTypeIndex < 35) {
             // principal.
-            valueStr = "principal";
+            valueExpr = VariableExpression.createPrincipalRef(null);
             valueType = principals.getEntityType();
         }
         else if (valueTypeIndex < 70) {
             // resource
-            valueStr = "resource";
+            valueExpr = VariableExpression.createResourceRef(null);
             valueType = resources.getEntityType();
         }
         else {
             // context
-            valueStr = "context";
+            valueExpr = VariableExpression.createContextRef(null);
             valueType = requestType;
         }
 
@@ -244,15 +253,15 @@ public class App {
                 }
                 Entry<String, CedarType> entry = it.next();
 
-                valueStr += "." + entry.getKey();
+                valueExpr = new PropertyAccessExpression(valueExpr, entry.getKey(), null);
                 valueType = entry.getValue();
             }
         }
 
-        ExpressionWithType rval = new ExpressionWithType();
-        rval.expression = valueStr;
-        rval.exprType = valueType;
-        return rval;
+        ExpressionWithType result = new ExpressionWithType();
+        result.expression = valueExpr;
+        result.exprType = valueType;
+        return result;
     }
 
     private static ExpressionWithType generateValueOfType(CedarType requiredType,
@@ -267,7 +276,8 @@ public class App {
                     List<? extends Entity> entities = coll.getEntities();
                     Entity entity = entities.get(random.nextInt(entities.size()));
                     ExpressionWithType result = new ExpressionWithType();
-                    result.expression = entity.toEntityString();
+                    result.expression = new EntityExpression(entity.getEntityId(),
+                            Arrays.asList(entity.getEntityType()), null);
                     result.exprType = requiredType;
                     return result;
                 }
@@ -276,26 +286,27 @@ public class App {
         else if (requiredType.getTypeId() == CedarType.TypeId.LONG) {
             int value = random.nextInt(100); // number from 0-99
             ExpressionWithType result = new ExpressionWithType();
-            result.expression = "" + value;
+            result.expression = new LongExpression(value, null);
             result.exprType = requiredType;
             return result;
         }
         else if (requiredType.getTypeId() == CedarType.TypeId.BOOL) {
             boolean value = (random.nextInt(2) == 0);
             ExpressionWithType result = new ExpressionWithType();
-            result.expression = value ? "true" : "false";
+            result.expression = new BooleanExpression(value, null);
             result.exprType = requiredType;
             return result;
         }
         else if (requiredType.getTypeId() == CedarType.TypeId.RECORD) {
             ExpressionWithType result = new ExpressionWithType();
-            result.expression = "{}"; // TODO generate field values
+            result.expression = new RecordExpression(Collections.emptyMap(), null); // TODO generate field values
             result.exprType = requiredType;
             return result;
         }
         else if (requiredType.getTypeId() == CedarType.TypeId.STRING) {
             ExpressionWithType result = new ExpressionWithType();
-            result.expression = "\"string" + random.nextInt(30) + "\"";
+            String stringValue = "string" + random.nextInt(30);
+            result.expression = new StringExpression(stringValue, null);
             result.exprType = requiredType;
             return result;
         }
@@ -319,7 +330,7 @@ public class App {
     }
 
     // TODO support multiple principal/resource types; combine with type tests ("is") to avoid errors
-    private static String generateConditionExpression(EntitiesCollection principals,
+    private static Expression generateConditionExpression(EntitiesCollection principals,
             EntitiesCollection resources, CedarRecord requestType) {
         // x in y
         // x == y (constant or other)
@@ -328,7 +339,7 @@ public class App {
         // 'principal', 'resource', 'action' -- refer to appropriate entity/action (entity reference)
         // 'context' -- refers to request context (record)
 
-        ExpressionWithType value = generateValue(principals, resources, requestType, false);
+        ExpressionWithType value = generateValueExpr(principals, resources, requestType, false);
         if (value.exprType.getTypeId() == CedarType.TypeId.BOOL) {
             if (randomChance(70)) {
                 // It's a boolean value so can be used as a condition:
@@ -347,35 +358,37 @@ public class App {
 
         // TODO set membership ("in"), type tests ("is")
 
+        BinaryExpression.BinaryOp operation = null;
+
         if (value.exprType.getTypeId() == CedarType.TypeId.LONG && randomChance(50)) {
             // For numbers we can do relational comparisons as well as equality
             int opIndex = random.nextInt(6);
             switch (opIndex) {
             case 0:
-                value.expression += " <= "; break;
+                operation = BinaryExpression.BinaryOp.LessEq; break;
             case 1:
-                value.expression += " < "; break;
+                operation = BinaryExpression.BinaryOp.Less; break;
             case 2:
-                value.expression += " == "; break;
+                operation = BinaryExpression.BinaryOp.Eq; break;
             case 3:
-                value.expression += " != "; break;
+                operation = BinaryExpression.BinaryOp.Neq; break;
             case 4:
-                value.expression += " > "; break;
+                operation = BinaryExpression.BinaryOp.Greater; break;
             case 5:
-                value.expression += " >= "; break;
+                operation = BinaryExpression.BinaryOp.GreaterEq; break;
             }
         }
         else {
             int opIndex = random.nextInt(2);
             switch (opIndex) {
             case 0:
-                value.expression += " == "; break;
+                operation = BinaryExpression.BinaryOp.Eq; break;
             case 1:
-                value.expression += " != "; break;
+                operation = BinaryExpression.BinaryOp.Neq; break;
             }
         }
 
-        value.expression += otherValue.expression;
+        value.expression = new BinaryExpression(value.expression, operation, otherValue.expression, null);
         value.exprType = CedarPrimitive.BOOL;
         return value.expression;
     }

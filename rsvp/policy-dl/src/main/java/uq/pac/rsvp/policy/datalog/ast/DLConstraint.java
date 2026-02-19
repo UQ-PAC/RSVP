@@ -1,5 +1,11 @@
 package uq.pac.rsvp.policy.datalog.ast;
 
+/**
+ * Datalog relation constraint
+ * <code>
+ *   Constraint ::= Term ( '=' | '>' | '<' | '<=' | '>=' | '!=' ) Term
+ * </code>
+ */
 public final class DLConstraint extends DLRuleExpr {
     private final DLTerm lhs;
     private final DLTerm rhs;

@@ -1,5 +1,8 @@
 package uq.pac.rsvp.policy.datalog.ast;
 
+/**
+ * String literal term (double-quoted)
+ */
 public final class DLString extends DLTerm {
     private final String value;
 

@@ -5,6 +5,12 @@ import java.util.List;
 
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
+/**
+ * Datalog atom
+ * <code>
+ *   Atom := IDENT '(' Term [ ',' Term ]* ')'
+ * </code>
+ */
 public final class DLAtom extends DLRuleExpr {
     private final String name;
     private final List<DLTerm> terms;

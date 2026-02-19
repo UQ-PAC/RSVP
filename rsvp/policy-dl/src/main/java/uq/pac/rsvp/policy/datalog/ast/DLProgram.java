@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Datalog program as an ordered list of statements
+ */
 public class DLProgram extends DLNode {
     private final List<DLStatement> statements;
 

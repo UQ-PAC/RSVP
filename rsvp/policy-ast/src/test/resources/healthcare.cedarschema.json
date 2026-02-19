@@ -1,0 +1,86 @@
+{
+  "HealthCareApp": {
+    "entityTypes": {
+      "User": {
+        "memberOfTypes": ["Role"]
+      },
+      "Role": {
+        "enum": ["Admin", "Doctor", "InsuranceRep"]
+      },
+      "Info": {
+        "shape": {
+          "type": "Record",
+          "attributes": {
+            "provider": {
+              "type": "Entity",
+              "name": "User"
+            },
+            "patient": {
+              "type": "Entity",
+              "name": "User"
+            }
+          }
+        },
+        "memberOfTypes": ["InfoType"]
+      },
+      "InfoType": {}
+    },
+    "actions": {
+      "createAppointment": {
+        "memberOf": [
+          {
+            "id": "updateAppointment"
+          }
+        ],
+        "appliesTo": {
+          "principalTypes": ["User"],
+          "resourceTypes": ["Info"],
+          "context": {
+            "type": "Record",
+            "attributes": {
+              "referrer": {
+                "type": "Entity",
+                "name": "User"
+              },
+              "detail": {
+                "type": "EntityOrCommon",
+                "name": "AppointmentDetails"
+              }
+            }
+          }
+        }
+      },
+      "updateAppointment": {
+        "appliesTo": {
+          "principalTypes": ["User"],
+          "resourceTypes": ["Info"]
+        }
+      },
+      "deleteAppointment": {
+        "appliesTo": {
+          "principalTypes": ["User"],
+          "resourceTypes": ["Info"]
+        }
+      },
+      "listAppointments": {
+        "appliesTo": {
+          "principalTypes": ["User"],
+          "resourceTypes": ["Info"]
+        }
+      }
+    },
+    "commonTypes": {
+      "AppointmentDetails": {
+        "type": "Record",
+        "attributes": {
+          "reason": {
+            "type": "String"
+          },
+          "cost": {
+            "type": "Long"
+          }
+        }
+      }
+    }
+  }
+}

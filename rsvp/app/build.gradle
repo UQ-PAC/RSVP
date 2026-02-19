@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation project(':lib')
+    implementation project(':policy-ast')
 }
 
 jar {

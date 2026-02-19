@@ -5,6 +5,12 @@ import java.util.List;
 
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
+/**
+ * Datalog rule
+ * <code>
+ *   Rule := Atom ':-' RuleExpression [',' RuleExpression] '.'
+ * </code>
+ */
 public class DLRule extends DLStatement {
     private final DLAtom head;
     private final List<DLRuleExpr> body;

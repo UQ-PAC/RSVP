@@ -2,7 +2,6 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import com.cedarpolicy.model.entity.Entity;
 import com.cedarpolicy.value.*;
-import uq.pac.rsvp.datalog.ast.*;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
 import java.util.ArrayList;

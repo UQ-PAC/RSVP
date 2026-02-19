@@ -4,6 +4,12 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Input/output directive
+ * <code>
+ *   Directive ::= ('.input' | '.output') IDENT '(' [IDENT = (IDENT | STRING)]* ')'
+ * </code>
+ */
 public class DLDirective extends DLStatement {
     public enum Kind {
         INPUT("input"),

@@ -1,5 +1,8 @@
 package uq.pac.rsvp.policy.datalog.ast;
 
+/**
+ * Comment node for documentation
+*/
 public class DLComment extends DLStatement {
     private final String text;
 

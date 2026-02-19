@@ -4,6 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Datalog type name
+ * <code>
+ *    Type := IDENT | 'symbol' | 'number' | 'unsigned' | 'float'
+ * </code>
+ */
 public class DLType extends DLNode {
     private static final Set<String> RESERVED_TYPENAMES = Set.of(
             "number",

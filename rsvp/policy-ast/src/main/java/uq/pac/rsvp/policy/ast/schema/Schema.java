@@ -38,6 +38,26 @@ public class Schema extends HashMap<String, Namespace> {
             InternalException, NullPointerException, IllegalStateException, IOException {
         String cedar = Files.readString(schemaFile);
         String json = com.cedarpolicy.model.schema.Schema.parse(JsonOrCedar.Cedar, cedar).toJsonFormat().toString();
+        return parseJsonSchema(json);
+    }
+
+    /**
+     * Parse a schema in the JSON format and return the corresponding AST.
+     *
+     * @param schemaFile the path to the Cedar schema file in the JSON format
+     * @return a Schema instance corresponding to the parsed JSON schema file
+     */
+    public static Schema parseJsonSchema(Path schemaFile) throws NullPointerException, IllegalStateException, IOException {
+        return parseJsonSchema(Files.readString(schemaFile));
+    }
+
+    /**
+     * Parse a schema in the JSON format and return the corresponding AST.
+     *
+     * @param json schema in JSON format as string
+     * @return a Schema instance corresponding to the parsed Cedar schema file
+     */
+    public static Schema parseJsonSchema(String json) throws NullPointerException, IllegalStateException {
         Gson gson = new GsonBuilder().registerTypeAdapter(AttributeType.class, new AttributeTypeDeserialiser())
                 .registerTypeAdapter(PrimitiveType.class, new PrimitiveTypeDeserialiser())
                 .create();

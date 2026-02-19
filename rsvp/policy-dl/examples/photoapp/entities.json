@@ -151,10 +151,8 @@
         "uid": { "type": "Photo", "id": "AliceMeadow" },
         "attrs": {
             "album" : { "__entity": { "type": "Album", "id": "AliceSceneries" } },
-            "metadata" : {
-                "size" : 3,
-                "type" : "jpg"
-            }
+            "size" : 3,
+            "type" : "jpg"
         },
         "parents": []
     },
@@ -162,10 +160,8 @@
         "uid": { "type": "Photo", "id": "AlicePassport" },
         "attrs": {
             "album" : { "__entity": { "type": "Album", "id": "AliceDocuments" } },
-            "metadata" : {
-                "size" : 4,
-                "type" : "pdf"
-            }
+            "size" : 4,
+            "type" : "pdf"
         },
         "parents": []
     },
@@ -173,10 +169,8 @@
         "uid": { "type": "Photo", "id": "AliceHotel" },
         "attrs": {
             "album" : { "__entity": { "type": "Album", "id": "AliceVacation" } },
-            "metadata" : {
-                "size" : 6,
-                "type" : "jpg"
-            }
+            "size" : 6,
+            "type" : "jpg"
         },
         "parents": []
     },
@@ -185,10 +179,8 @@
         "uid": { "type": "Photo", "id": "BobMeadow" },
         "attrs": {
             "album" : { "__entity": { "type": "Album", "id": "BobSceneries" } },
-            "metadata" : {
-                "size" : 3,
-                "type" : "jpg"
-            }
+            "size" : 3,
+            "type" : "jpg"
         },
         "parents": []
     },
@@ -196,10 +188,8 @@
         "uid": { "type": "Photo", "id": "BobPassport" },
         "attrs": {
             "album" : { "__entity": { "type": "Album", "id": "BobDocuments" } },
-            "metadata" : {
-                "size" : 5,
-                "type" : "jpg"
-            }
+            "size" : 5,
+            "type" : "jpg"
         },
         "parents": []
     },
@@ -207,10 +197,8 @@
         "uid": { "type": "Photo", "id": "BobHotel" },
         "attrs": {
             "album" : { "__entity": { "type": "Album", "id": "BobVacation" } },
-            "metadata" : {
-                "size" : 9,
-                "type" : "jpg"
-            }
+            "size" : 9,
+            "type" : "jpg"
         },
         "parents": []
     },

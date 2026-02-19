@@ -41,6 +41,9 @@ subprojects {
     }
 
     dependencies {
+        // Avoid log4j warnings
+        implementation("org.slf4j:slf4j-api:2.0.17")
+        implementation("org.slf4j:slf4j-simple:2.0.17")
         // Custom cedar-java fork (https://github.com/rebecca-odonoghue/cedar-java)
         implementation 'com.cedarpolicy:cedar-java:3.1.2-rsvp-3:uber'
         implementation 'com.google.code.gson:gson:2.13.2'
@@ -50,6 +53,8 @@ subprojects {
         // Use JUnit Jupiter for testing.
         testImplementation libs.junit.jupiter
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        // Parameterised tests
+        testImplementation "org.junit.jupiter:junit-jupiter-params:5.10.0"
 
 
     }

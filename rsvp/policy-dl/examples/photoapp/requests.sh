@@ -1,10 +1,10 @@
 #!/bin/bash
 
 ERROR=
-POLICY=photoapp-policy.cedar
-ENTITIES=photoapp-entities.json
-SCHEMA=photoapp-schema.cedarschema
-CONTEXT=photoapp-context.json
+POLICY=policy.cedar
+ENTITIES=entities.json
+SCHEMA=schema.cedarschema
+CONTEXT=context.json
 
 authorise() {
   echo "$1 $2 $3"

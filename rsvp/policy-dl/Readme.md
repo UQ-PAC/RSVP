@@ -2,27 +2,27 @@
 
 ## Closed-world Assumption
 
-For this type of analysis we assume operating in a closed world with a 
+For this type of analysis we assume operating in a closed world with a
 finite set of entities. Consequently, facts and relations not given by entities,
-schema or policies are treated as _false_ rather than _undefined_. 
+schema or policies are treated as _false_ rather than _undefined_.
 Under this assumption the precision of the analysis is limited by the world,
 however, the key intent is to reason about the model of the system
 (even if incomplete) and reduce the potential search space.
 
 ## Cedar Extension for Invariant Checking
 
-A permit or forbid rule of Cedar policy language can be written as 
-a boolean-valued expression over variables _principal_, _action_ and _resource_. 
+A permit or forbid rule of Cedar policy language can be written as
+a boolean-valued expression over variables _principal_, _action_ and _resource_.
 A Cedar policy (say _P_), then can be written as `(A1 ∧ ... ∧ An) ∧ ¬(F1 ∨ ... ∨ Fk)`,
 where `<A1, ..., An>` and  `<F1, ... Fk>` are permit and forbid rules respectively.
 An input request _R_ (as a value triple `(a, p, r)`) is permitted
-as long as the instantiation of _P_ (wrt a given entity set) with 
-the values of _R_ evaluates to _true_ and forbidden otherwise. 
-The request _R_ can be seen as an additional constraint 
+as long as the instantiation of _P_ (wrt a given entity set) with
+the values of _R_ evaluates to _true_ and forbidden otherwise.
+The request _R_ can be seen as an additional constraint
 `principal == p ∧ action == a ∧ resource == r`.
 
 For a more general case we let Cedar expressions range over a set of arbitrary variables
-as long as their types are known and introduce the notion of quantification. 
+as long as their types are known and introduce the notion of quantification.
 
 ```
     (1) <expr> for all  p : Account, a : Action
@@ -37,16 +37,16 @@ combination of `a` and `p` <expr> evaluates to _true_ (wrt some set of entities)
 ## Encoding inputs
 
 For correct encoding of Cedar policies we assume a fixed set of entities (representing the world),
-a Cedar policy and its corresponding schema. Before encoding, the provided set of entities and 
+a Cedar policy and its corresponding schema. Before encoding, the provided set of entities and
 the policy are assumed are validated against the schema.
 
 ## Encoding
 
 A complete example of Datalog encoding using policies, schema an entities of an example application
-+ [Schema](./examples/photoapp/photoapp.cedarschema) 
-+ [Policies](./examples/photoapp/photoapp-policy.cedar)
-+ [Entities](./examples/photoapp/entities.json)
-+ [Souffle Datalog Encoding](./examples/photoapp/photoapp-auth.dl)
++ [Schema](examples/pohotoapp/schema.cedarschema)
++ [Policies](examples/pohotoapp/policy.cedar)
++ [Entities](examples/pohotoapp/entities.json)
++ [Souffle Datalog Encoding](examples/pohotoapp/auth.dl)
 
 ## (Step 1) Entity definitions
 
@@ -88,7 +88,7 @@ Relations between entities and their contents are modelled as binary relations (
 For instance, the following _Account_-type entities have properties _age_ and _friends_
 that can be encoded as follows.
 
-```    
+```
 {
         "uid": { "type": "Account", "id": "Alice" },
         "attrs": {
@@ -144,8 +144,8 @@ AccountFriends("Account::Carl",  "Account::Bob").
 ## (Step 3) Policy Conversion
 
 Each Cedar-level rule (permit or forbid) is translated into a unique relation
-(over actions, principals and resources) using relations defined before. 
-For instance, a permit rule 
+(over actions, principals and resources) using relations defined before.
+For instance, a permit rule
 ```permit (
     principal is Account,
     action == Action::"viewPhoto",

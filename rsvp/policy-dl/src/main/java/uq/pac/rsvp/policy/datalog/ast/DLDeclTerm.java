@@ -1,5 +1,11 @@
 package uq.pac.rsvp.policy.datalog.ast;
 
+/**
+ * Declaration (typed) term
+ * <code>
+ *   DeclTerm := IDENT ':' Type
+ * </code>
+ */
 public class DLDeclTerm extends DLNode {
     private final DLType type;
     private final String name;

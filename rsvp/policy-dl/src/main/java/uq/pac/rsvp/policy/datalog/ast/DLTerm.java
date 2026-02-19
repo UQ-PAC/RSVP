@@ -1,7 +1,10 @@
 package uq.pac.rsvp.policy.datalog.ast;
 
 /**
- * Terms of a relation or a constraint
+ * Superclass for a datalog term of a relation or a constraint
+ * <code>
+ *    Term ::= Variable | NUMBER | STRING
+ * </code>
  */
 public abstract class DLTerm extends DLNode {
     public static DLTerm var(String name) {

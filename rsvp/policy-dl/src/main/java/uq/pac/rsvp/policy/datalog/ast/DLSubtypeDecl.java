@@ -1,5 +1,11 @@
 package uq.pac.rsvp.policy.datalog.ast;
 
+/**
+ * Declaration of a primitive subtype
+ * <code>
+ *   SubTypeDeclaration ::= '.type' '<:' ('symbol' | 'number')
+ * </code>
+ */
 public class DLSubtypeDecl extends DLTypeDecl {
     private final DLType subtype;
     private final DLType supertype;

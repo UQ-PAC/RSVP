@@ -4,6 +4,12 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Union type declaration
+ * <code>
+ *   UnionTypeDeclaration ::= Type [ '|' Type ]*
+ * </code>
+ */
 public class DLUnionTypeDecl extends DLTypeDecl {
     private final DLType decl;
     private final Set<DLType> components;

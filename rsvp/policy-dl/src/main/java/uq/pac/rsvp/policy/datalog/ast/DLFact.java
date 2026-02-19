@@ -1,5 +1,11 @@
 package uq.pac.rsvp.policy.datalog.ast;
 
+/**
+ * Datalog fact
+ * <code>
+ *   Fact := Atom '.'
+ * </code>
+ */
 public class DLFact extends DLStatement {
     private final DLAtom atom;
 

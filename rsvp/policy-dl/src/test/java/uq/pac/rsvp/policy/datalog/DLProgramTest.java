@@ -1,7 +1,6 @@
 package uq.pac.rsvp.policy.datalog;
 
 import org.junit.jupiter.api.Test;
-import uq.pac.rsvp.datalog.ast.*;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
 import java.util.List;

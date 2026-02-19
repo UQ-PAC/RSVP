@@ -2,6 +2,9 @@ package uq.pac.rsvp.policy.datalog.ast;
 
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
+/**
+ * Numeric literal term
+ */
 public final class DLNumber extends DLTerm {
     private final double number;
 

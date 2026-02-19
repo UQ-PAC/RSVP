@@ -1,5 +1,11 @@
 package uq.pac.rsvp.policy.datalog.ast;
 
+/**
+ * Datalog variable:
+ * <code>
+ *   Variable ::= IDENT
+ * </code>
+ */
 public final class DLVar extends DLTerm {
     private final String name;
 

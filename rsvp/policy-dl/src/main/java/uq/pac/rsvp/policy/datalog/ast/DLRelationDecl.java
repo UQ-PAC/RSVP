@@ -4,6 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Relation declaration
+ * <code>
+ *  RelationDeclaration ::= '.decl' IDENT '(' DeclTerm [ ',' DeclTerm ]* ')'
+ * </code>
+ */
 public class DLRelationDecl extends DLStatement {
     private final String name;
     private final List<DLDeclTerm> terms;

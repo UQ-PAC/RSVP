@@ -13,13 +13,14 @@ package uq.pac.rsvp.policy.datalog.ast;
  * RuleExpression ::= Atom | Constraint
  * Rule := Atom ':-' RuleExpression [',' RuleExpression] '.'
  * Fact := Atom '.'
- * Type := IDENT | 'symbol' | 'number'
- * TypedTerm := IDENT ':' Type
+ * Type := IDENT | 'symbol' | 'number' | 'unsigned' | 'float'
+ * DeclTerm := IDENT ':' Type
  * SubTypeDeclaration ::= '.type' '<:' ('symbol' | 'number')
  * UnionTypeDeclaration ::= Type [ '|' Type ]*
  * TypeDeclaration ::= SubTypeDeclaration | UnionTypeDeclaration
  * Directive ::= ('.input' | '.output') IDENT '(' [IDENT = (IDENT | STRING)]* ')'
- * RelationDeclaration ::= '.decl' IDENT '(' TypedTerm [ ',' TypedTerm ]* ')'
+ * RelationDeclaration ::= '.decl' IDENT '(' DeclTerm [ ',' DeclTerm ]* ')'
+ * Constraint ::= Term ( '=' | '>' | '<' | '<=' | '>=' | '!=' ) Term
  * Statement ::= RelationDeclaration | TypeDeclaration | Fact | Rule
  */
 

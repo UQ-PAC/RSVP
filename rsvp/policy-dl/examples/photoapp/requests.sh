@@ -6,6 +6,12 @@ ENTITIES=entities.json
 SCHEMA=schema.cedarschema
 CONTEXT=context.json
 
+
+if [ "$1" = "validate" ]; then
+    cedar validate --schema $SCHEMA --policies $POLICY || exit 1
+    exit 0
+fi
+
 authorise() {
   echo "$1 $2 $3"
   out=$(cedar authorize \

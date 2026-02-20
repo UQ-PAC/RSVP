@@ -11,4 +11,13 @@ public class Util {
         Map<Object, Boolean> seen = new ConcurrentHashMap<>();
         return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
+
+    static <E> E required(Object o, Class<E> cls) {
+        if (cls.isInstance(o)) {
+            return cls.cast(o);
+        }
+        throw new RuntimeException("Unsupported type: " + o.getClass().getSimpleName());
+    }
+
+
 }

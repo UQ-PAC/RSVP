@@ -2,17 +2,17 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import com.cedarpolicy.value.EntityTypeName;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
+/**
+ * Translation for the entire schema (presently a collection of entity declarations)
+ */
 public class TranslationSchema {
-    private final Map<EntityTypeName, TranslationType> schema;
+    private final Map<EntityTypeName, TranslationEntity> schema;
 
-    public TranslationSchema(Collection<TranslationType> types) {
-        Map<EntityTypeName, TranslationType> data = new HashMap<>();
-        for (TranslationType t : types) {
+    public TranslationSchema(Collection<TranslationEntity> types) {
+        Map<EntityTypeName, TranslationEntity> data = new HashMap<>();
+        for (TranslationEntity t : types) {
             EntityTypeName tn = t.getTypeName();
             if (data.containsKey(tn)) {
                 throw new RuntimeException("Duplicate entity type: " + tn);
@@ -22,7 +22,11 @@ public class TranslationSchema {
         schema = Collections.unmodifiableMap(data);
     }
 
-    public TranslationType getTranslationType(EntityTypeName tn) {
+    public TranslationEntity getTranslationType(String tn) {
+        return EntityTypeName.parse(tn).map(schema::get).orElse(null);
+    }
+
+    public TranslationEntity getTranslationType(EntityTypeName tn) {
         return schema.get(tn);
     }
 

@@ -6,20 +6,23 @@ import uq.pac.rsvp.policy.datalog.util.Util;
 
 import java.util.*;
 
+/**
+ * Putting translation of the cedar schema, entries, context and policies together
+ */
 public class TranslationDriver {
 
     public static DLProgram getTranslation(Entities entities) {
-        List<TranslationType> types = entities.getEntities()
+        List<TranslationEntity> types = entities.getEntities()
                 .stream()
                 .filter(Util.distinctBy(k -> k.getEUID().getType()))
-                .map(TranslationType::new)
+                .map(TranslationEntity::new)
                 .toList();
 
         TranslationSchema schema = new TranslationSchema(types);
 
-        List<TranslationEntity> facts = entities.getEntities()
+        List<TranslationEntitySchema> facts = entities.getEntities()
                 .stream()
-                .map(e -> new TranslationEntity(e, schema))
+                .map(e -> new TranslationEntitySchema(e, schema))
                 .toList();
 
         DLProgram.Builder builder = new DLProgram.Builder();

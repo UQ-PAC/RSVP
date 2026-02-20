@@ -52,7 +52,8 @@ A complete example of Datalog encoding using policies, schema an entities of an 
 
 ## Cedar Policies
 
-### Principal Scope
+#bclose
+    ## Principal Scope
 
 ```
 principal

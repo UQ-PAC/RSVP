@@ -12,17 +12,17 @@ import java.util.*;
 public class TranslationDriver {
 
     public static DLProgram getTranslation(Entities entities) {
-        List<TranslationEntity> types = entities.getEntities()
+        List<TranslationType> types = entities.getEntities()
                 .stream()
                 .filter(Util.distinctBy(k -> k.getEUID().getType()))
-                .map(TranslationEntity::new)
+                .map(TranslationType::new)
                 .toList();
 
         TranslationSchema schema = new TranslationSchema(types);
 
-        List<TranslationEntitySchema> facts = entities.getEntities()
+        List<TranslationEntity> facts = entities.getEntities()
                 .stream()
-                .map(e -> new TranslationEntitySchema(e, schema))
+                .map(e -> new TranslationEntity(e, schema))
                 .toList();
 
         DLProgram.Builder builder = new DLProgram.Builder();

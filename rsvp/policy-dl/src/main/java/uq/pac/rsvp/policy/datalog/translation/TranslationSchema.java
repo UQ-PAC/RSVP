@@ -8,11 +8,11 @@ import java.util.*;
  * Translation for the entire schema (presently a collection of entity declarations)
  */
 public class TranslationSchema {
-    private final Map<EntityTypeName, TranslationEntity> schema;
+    private final Map<EntityTypeName, TranslationType> schema;
 
-    public TranslationSchema(Collection<TranslationEntity> types) {
-        Map<EntityTypeName, TranslationEntity> data = new HashMap<>();
-        for (TranslationEntity t : types) {
+    public TranslationSchema(Collection<TranslationType> types) {
+        Map<EntityTypeName, TranslationType> data = new HashMap<>();
+        for (TranslationType t : types) {
             EntityTypeName tn = t.getTypeName();
             if (data.containsKey(tn)) {
                 throw new RuntimeException("Duplicate entity type: " + tn);
@@ -22,11 +22,11 @@ public class TranslationSchema {
         schema = Collections.unmodifiableMap(data);
     }
 
-    public TranslationEntity getTranslationType(String tn) {
+    public TranslationType getTranslationType(String tn) {
         return EntityTypeName.parse(tn).map(schema::get).orElse(null);
     }
 
-    public TranslationEntity getTranslationType(EntityTypeName tn) {
+    public TranslationType getTranslationType(EntityTypeName tn) {
         return schema.get(tn);
     }
 

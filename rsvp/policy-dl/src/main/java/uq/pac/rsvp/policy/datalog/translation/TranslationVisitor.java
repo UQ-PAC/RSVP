@@ -35,7 +35,7 @@ public class TranslationVisitor implements PolicyVisitor {
         switch (expr.getOp()) {
             case BinaryExpression.BinaryOp.Is -> {
                 TypeExpression type = (TypeExpression) expr.getRight();
-                TranslationEntity en = schema.getTranslationType(type.getTypeName());
+                TranslationType en = schema.getTranslationType(type.getTypeName());
             }
             default -> throw new RuntimeException("unsupported");
         }

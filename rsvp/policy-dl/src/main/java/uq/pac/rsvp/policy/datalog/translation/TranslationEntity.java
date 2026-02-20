@@ -17,7 +17,7 @@ import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
  *
  *  FIXME: This information needs to be collected from the schema, not entities
  */
-public class TranslationEntity extends TranslationComponent {
+public class TranslationEntity extends Translator {
 
     private final List<DLStatement> statements;
 
@@ -71,7 +71,7 @@ public class TranslationEntity extends TranslationComponent {
         entity.attrs.forEach((attr, value) -> {
             List<DLTerm> terms = getTerms(value);
             terms.forEach(term -> {
-                DLRelationDecl ad = type.getAttributeRelation(attr);
+                DLRelationDecl ad = type.getAttribute(attr).getRelationDecl();
                 statements.add(new DLFact(ad.getName(), euid, term));
             });
         });

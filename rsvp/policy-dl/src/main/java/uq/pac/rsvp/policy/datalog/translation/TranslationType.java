@@ -17,11 +17,11 @@ import java.util.Map;
  * - A fact for the entity relation
  * - Collection of facts for attribute relations
  */
-public class TranslationType extends TranslationComponent {
+public class TranslationType extends Translator {
 
     private final EntityTypeName entityTypeName;
     private final DLRelationDecl relation;
-    private final Map<String, DLRelationDecl> attributeRelations;
+    private final Map<String, TranslationAttribute> attributeRelations;
 
     public TranslationType(Entity entity) {
         EntityUID uid = entity.getEUID();
@@ -36,12 +36,18 @@ public class TranslationType extends TranslationComponent {
                 case PrimLong s -> DLType.NUMBER;
                 case PrimBool b -> DLType.SYMBOL;
                 case EntityUID i -> DLType.SYMBOL;
-                case CedarList l -> DLType.SYMBOL;
+                case CedarList l -> DLType.SYMBOL; // FIXME: This assumes a simple list
                 default -> throw new RuntimeException("Unsupported type: " + value.getClass().getSimpleName());
             };
+
+            EntityTypeName tn = switch (value) {
+                case EntityUID i -> i.getType();
+                default -> null;
+            };
+
             DLRelationDecl attributeRelation =
                      new DLRelationDecl(relationName + "_attr_" + attr, DLType.SYMBOL, attrType);
-            attributeRelations.put(attr, attributeRelation);
+            attributeRelations.put(attr, new TranslationAttribute(attr, tn, attributeRelation));
         });
     }
 
@@ -49,7 +55,7 @@ public class TranslationType extends TranslationComponent {
         return relation;
     }
 
-    public DLRelationDecl getAttributeRelation(String attr) {
+    public TranslationAttribute getAttribute(String attr) {
         return attributeRelations.get(attr);
     }
 
@@ -60,7 +66,10 @@ public class TranslationType extends TranslationComponent {
     public List<DLStatement> getTranslation() {
         List<DLStatement> statements = new ArrayList<>();
         statements.add(relation);
-        statements.addAll(attributeRelations.values());
+        statements.addAll(
+                attributeRelations.values().stream()
+                        .map(TranslationAttribute::getRelationDecl)
+                        .toList());
         return statements;
     }
 

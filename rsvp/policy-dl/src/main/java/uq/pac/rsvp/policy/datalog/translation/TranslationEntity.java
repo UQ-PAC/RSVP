@@ -2,70 +2,90 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import com.cedarpolicy.model.entity.Entity;
 import com.cedarpolicy.value.*;
-import uq.pac.rsvp.policy.datalog.ast.DLProgram;
-import uq.pac.rsvp.policy.datalog.ast.DLRelationDecl;
-import uq.pac.rsvp.policy.datalog.ast.DLStatement;
-import uq.pac.rsvp.policy.datalog.ast.DLType;
+import uq.pac.rsvp.policy.datalog.ast.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+
+import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
 /**
- * Translation of entities. For the moment each entity translates into a collection of facts
- * - A fact for the entity relation
- * - Collection of facts for attribute relations
+ * Translation involving:
+ *  - declaration of unary entity relations
+ *  - declarations of binary attribute relations
+ *
+ *  FIXME: This information needs to be collected from the schema, not entities
  */
 public class TranslationEntity extends TranslationComponent {
 
-    private final EntityTypeName entityTypeName;
-    private final DLRelationDecl relation;
-    private final Map<String, DLRelationDecl> attributeRelations;
+    private final List<DLStatement> statements;
 
-    public TranslationEntity(Entity entity) {
-        EntityUID uid = entity.getEUID();
-        String relationName = uid.getType().toString().replace(':', '_');
-        this.entityTypeName = uid.getType();
-        this.relation = new DLRelationDecl(relationName, DLType.SYMBOL);
-
-        this.attributeRelations = new HashMap<>();
-        entity.attrs.forEach((attr, value) -> {
-            DLType attrType = switch (value) {
-                case PrimString s -> DLType.SYMBOL;
-                case PrimLong s -> DLType.NUMBER;
-                case PrimBool b -> DLType.SYMBOL;
-                case EntityUID i -> DLType.SYMBOL;
-                case CedarList l -> DLType.SYMBOL;
-                default -> throw new RuntimeException("Unsupported type: " + value.getClass().getSimpleName());
-            };
-            DLRelationDecl attributeRelation =
-                     new DLRelationDecl(relationName + "_attr_" + attr, DLType.SYMBOL, attrType);
-            attributeRelations.put(attr, attributeRelation);
-        });
+    public static DLTerm getEUIDLiteral(Entity entity) {
+        return getEUIDLiteral(entity.getEUID());
     }
 
-    DLRelationDecl getEntityRelation() {
-        return relation;
+    public static DLTerm getEUIDLiteral(EntityUID id) {
+        String prefix = id.getType().toString();
+        if (!prefix.isEmpty()) {
+            prefix += "::";
+        }
+        return DLTerm.lit(prefix + id.getId().toString());
     }
 
-    public DLRelationDecl getAttributeRelation(String attr) {
-        return attributeRelations.get(attr);
+    private void getTerms(Value value, List<DLTerm> terms) {
+        switch (value) {
+            case PrimString s -> terms.add(DLTerm.lit(s.toString()));
+            case PrimLong l -> terms.add(DLTerm.lit(l.toString()));
+            case PrimBool b -> terms.add(DLTerm.lit(b.toString()));
+            case EntityUID e -> terms.add(getEUIDLiteral(e));
+            case CedarList l -> {
+                for (Value v : l) {
+                    if (v instanceof CedarList) {
+                        throw new RuntimeException("Unsupported value: " + l);
+                    }
+                    getTerms(v, terms);
+                }
+            }
+            default -> throw new RuntimeException("Unsupported value: " + value);
+        }
     }
 
-    public EntityTypeName getTypeName() {
-        return entityTypeName;
+    private List<DLTerm> getTerms(Value value) {
+        List<DLTerm> terms = new ArrayList<>();
+        getTerms(value, terms);
+        return terms;
     }
 
-    public List<DLStatement> getTranslation() {
+    public TranslationEntity(Entity entity, TranslationSchema schema) {
         List<DLStatement> statements = new ArrayList<>();
-        statements.add(relation);
-        statements.addAll(attributeRelations.values());
+        TranslationType type = schema.getTranslationType(entity.getEUID().getType());
+        // We assume the inputs are validated, so by the time we get to see entities,
+        // it has been made sure that there is an underlying type for each encountered EUID
+        require(type != null, "Cannot locate type for entity " + entity.getEUID());
+        // Build facts
+        DLRelationDecl relation = type.getEntityRelation();
+        DLTerm euid = getEUIDLiteral(entity.getEUID());
+        statements.add(new DLFact(relation.getName(), euid));
+
+        entity.attrs.forEach((attr, value) -> {
+            List<DLTerm> terms = getTerms(value);
+            terms.forEach(term -> {
+                DLRelationDecl ad = type.getAttributeRelation(attr);
+                statements.add(new DLFact(ad.getName(), euid, term));
+            });
+        });
+
+        this.statements = Collections.unmodifiableList(statements);
+    }
+
+    @Override
+    public List<DLStatement> getTranslation() {
         return statements;
     }
 
     @Override
     public String toString() {
-        return new DLProgram(getTranslation()).toString();
+        return new DLProgram(statements).toString();
     }
 }

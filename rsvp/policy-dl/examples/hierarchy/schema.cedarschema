@@ -1,0 +1,25 @@
+entity Group = {
+    groupName: String
+};
+
+entity User in Group = {
+    userName: String,
+    company: String
+};
+
+entity Admin in Group = {
+    adminName: String,
+    company: String,
+};
+
+entity Photo in [User, Admin] {
+    name: String,
+    size: Long
+};
+
+action "View" appliesTo {
+  principal: [User, Admin],
+  resource: Photo,
+  context: {}
+};
+

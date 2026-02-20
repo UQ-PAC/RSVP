@@ -1,0 +1,91 @@
+[
+    {
+        "uid": { "type": "Group", "id": "Dogs" },
+        "attrs": {
+            "groupName": "cats"
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "Group", "id": "Cats" },
+        "attrs": {
+            "groupName": "cats"
+        },
+        "parents": [ ]
+    },
+
+    {
+        "uid": { "type": "Admin", "id": "Tim" },
+        "attrs": {
+            "adminName": "tim",
+            "company": "pets"
+        },
+        "parents": [
+            { "__entity": { "type": "Group", "id": "Cats" } }
+        ]
+    },
+    {
+        "uid": { "type": "User", "id": "Alice" },
+        "attrs": {
+            "userName": "alice",
+            "company": "pets"
+        },
+        "parents": [
+            { "__entity": { "type": "Group", "id": "Cats" } }
+        ]
+    },
+    {
+        "uid": { "type": "User", "id": "Bob" },
+        "attrs": {
+            "userName": "bob",
+            "company": "pets"
+        },
+        "parents": [
+            { "__entity": { "type": "Group", "id": "Dogs" } }
+        ]
+    },
+    {
+        "uid": { "type": "User", "id": "Carl" },
+        "attrs": {
+            "userName": "carl",
+            "company": "pets"
+        },
+        "parents": [
+            { "__entity": { "type": "Group", "id": "Dogs" } },
+            { "__entity": { "type": "Group", "id": "Cats" } }
+        ]
+    },
+    {
+        "uid": { "type": "Photo", "id": "clowder" },
+        "attrs": {
+            "name": "clowder",
+            "size": 12
+        },
+        "parents": [
+            { "__entity": { "type": "User", "id": "Alice" } }
+        ]
+    },
+    {
+        "uid": { "type": "Photo", "id": "pack" },
+        "attrs": {
+            "name": "pack",
+            "size": 10
+        },
+        "parents": [
+            { "__entity": { "type": "User", "id": "Bob" } }
+        ]
+    },
+    {
+        "uid": { "type": "Photo", "id": "gathering" },
+        "attrs": {
+            "name": "pack",
+            "size": 10
+        },
+        "parents": [
+            { "__entity": { "type": "User", "id": "Alice" } },
+            { "__entity": { "type": "User", "id": "Bob" } },
+            { "__entity": { "type": "User", "id": "Carl" } }
+        ]
+    }
+
+]

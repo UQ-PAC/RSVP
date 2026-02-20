@@ -48,154 +48,42 @@ A complete example of Datalog encoding using policies, schema an entities of an 
 + [Entities](examples/pohotoapp/entities.json)
 + [Souffle Datalog Encoding](examples/pohotoapp/auth.dl)
 
-## (Step 1) Entity definitions
+# Cedar Language Subset
 
-Each type in the schema and a set of accompanying entities are encoded as unary relations that
-allow to restrict the world (including actions). Example conversion is as follows.
+## Cedar Policies
 
-```
-entity Role;
-entity Account = {
-    "name": String,
-    "age": Long,
-    "role": Role,
-    "friends": Set<Account>,
-    "albums": Set<Album>
-};
-```
-
-```datalog
-.type RoleType <: symbol
-.decl Role(role: RoleType)
-Role("Role::User").
-Role("Role::Admin").
-
-.type AccountType <: symbol
-.decl Account(id: AccountType)
-Account("Account::Alice").
-Account("Account::Bob").
-Account("Account::Carl").
-Account("Account::Tim").
-```
-
-Given that each entity is uniquely identified as its namespace, type and id, each corresponding
-Datalog type is derived from _symbol_ primitive type.
-
-
-## (Step 2) Encoding relations
-
-Relations between entities and their contents are modelled as binary relations (over respective types).
-For instance, the following _Account_-type entities have properties _age_ and _friends_
-that can be encoded as follows.
+### Principal Scope
 
 ```
-{
-        "uid": { "type": "Account", "id": "Alice" },
-        "attrs": {
-            "age" : 22,
-            "role" : { "type": "Role", "id": "User" },
-            "friends" : [
-                { "type": "Account", "id": "Bob" }
-            ],
-        },
-        "parents": []
-    },
-    {
-        "uid": { "type": "Account", "id": "Bob" },
-        "attrs": {
-            "name" : "Bob",
-            "age" : 25,
-            "role" : { "type": "Role", "id": "User" },
-            "friends" : [
-                { "type": "Account", "id": "Alice" },
-                { "type": "Account", "id": "Carl" }
-            ],
-        },
-        "parents": []
-    },
-    {
-        "uid": { "type": "Account", "id": "Carl" },
-        "attrs": {
-            "name" : "Carl",
-            "age" : 27,
-            "role" : { "type": "Role", "id": "User" },
-            "friends" : [
-                { "type": "Account", "id": "Bob" }
-            ],
-        },
-        "parents": []
-    }
+principal
+principal == Entity
+principal is Type
+principal in Entity          // Unsupported
+principal is Type in Entity  // Unsupported
 ```
 
-```Datalog
-.decl AccountAge(accout: AccountType, age: number)
-AccountAge("Account::Alice", 22).
-AccountAge("Account::Bob",   25).
-AccountAge("Account::Carl",  27).
-AccountAge("Account::Tim",   34).
+### Resource Scope
 
-.decl AccountFriends(account: AccountType, friend: AccountType)
-AccountFriends("Account::Alice", "Account::Bob").
-AccountFriends("Account::Bob",   "Account::Alice").
-AccountFriends("Account::Bob",   "Account::Carl").
-AccountFriends("Account::Carl",  "Account::Bob").
+```
+resource 
+resource == Entity
+resource is Type
+resource in Entity          // Unsupported
+resource is Type in Entity  // Unsupported
 ```
 
-## (Step 3) Policy Conversion
+### Action Scope
 
-Each Cedar-level rule (permit or forbid) is translated into a unique relation
-(over actions, principals and resources) using relations defined before.
-For instance, a permit rule
-```permit (
-    principal is Account,
-    action == Action::"viewPhoto",
-    resource is Photo)
-when {
-    resource.album.visibility == Visibility::"Public"
-};
+```
+action
+action == Entity
+action in Entity                 // Unsupported
+action in [ Entity, ..., Entity] // Unsupported
 ```
 
-is encoded as follows:
-```Datalog
-.decl PermitV1(action: ActionType, principal: PrincipalType, resource: ResourceType)
-// Anyone can see public photos
-PermitV1(action, principal, resource) :-
-    action = "Action::viewPhoto",
-    Account(principal),
-    Photo(resource),
-    PhotoInAlbum(resource, album),
-    AlbumVisibility(album, "Visibility::Public").
-```
+### Conditions
 
-## (Step 4) Request rules
+TBD
 
-The following relations are added.
-```
-// All permitted requests
-.decl Permit(action: ActionType, principal: PrincipalType, resource: ResourceType)
-Permit(action, principal, resource) :- PermitV1(action, principal, resource).
-Permit(action, principal, resource) :- PermitV2(action, principal, resource).
-Permit(action, principal, resource) :- PermitU1(action, principal, resource).
-Permit(action, principal, resource) :- PermitC1(action, principal, resource).
-Permit(action, principal, resource) :- PermitR1(action, principal, resource).
+## Cedar Schema
 
-// Requests explicitly forbidden by the policy
-.decl Forbid(action: ActionType, principal: PrincipalType, resource: ResourceType)
-Forbid(action, principal, resource) :-
-    ForbidC1(action, principal, resource).
-
-// All possible requests
-.decl AllRequests(action: ActionType, principal: PrincipalType, resource: ResourceType)
-AllRequests(action, principal, resource) :-
-    ActionResource(action, resource), ActionPrincipal(action, principal).
-
-// Requests allowed by the policy
-.decl PermittedRequests(action: ActionType, principal: PrincipalType, resource: ResourceType)
-PermittedRequests(action, principal, resource) :-
-    Permit(action, principal, resource), !Forbid(action, principal, resource).
-
-// Requests forbidden by the policy
-.decl ForbiddenRequests(action: ActionType, principal: PrincipalType, resource: ResourceType)
-ForbiddenRequests(action, principal, resource) :-
-    AllRequests(action, principal, resource), !PermittedRequests(action, principal, resource).
-```

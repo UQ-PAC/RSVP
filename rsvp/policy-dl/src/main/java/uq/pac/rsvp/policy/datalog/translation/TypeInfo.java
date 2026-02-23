@@ -1,8 +1,9 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import com.cedarpolicy.value.EntityTypeName;
-import uq.pac.rsvp.policy.ast.schema.attribute.AttributeType;
+
+import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 
 import java.util.HashMap;
 
-public class TypeInfo extends HashMap<String, AttributeType> { }
+// FIXME: Rename
+public class TypeInfo extends HashMap<String, CommonTypeDefinition> { }

@@ -3,13 +3,14 @@ package uq.pac.rsvp.policy.datalog.translation;
 import com.cedarpolicy.model.entity.Entities;
 import org.junit.jupiter.api.Test;
 import uq.pac.rsvp.policy.ast.expr.*;
-import uq.pac.rsvp.policy.ast.schema.EntityType;
+import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.Namespace;
 import uq.pac.rsvp.policy.ast.schema.Schema;
-import uq.pac.rsvp.policy.ast.schema.attribute.AttributeType;
-import uq.pac.rsvp.policy.ast.schema.attribute.EntityOrCommonType;
-import uq.pac.rsvp.policy.ast.schema.attribute.PrimitiveType;
-import uq.pac.rsvp.policy.ast.schema.attribute.SetType;
+import uq.pac.rsvp.policy.ast.schema.common.EntityTypeReference;
+import uq.pac.rsvp.policy.ast.schema.common.LongType;
+import uq.pac.rsvp.policy.ast.schema.common.SetTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.common.StringType;
 import uq.pac.rsvp.policy.datalog.ast.DLAtom;
 import uq.pac.rsvp.policy.datalog.ast.DLRule;
 import uq.pac.rsvp.policy.datalog.ast.DLTerm;
@@ -25,43 +26,43 @@ public class TranslationDriverTest {
 
     private static final Path ENTITIES = Path.of("examples/photoapp/entities.json");
     private static final Path POLICIES = Path.of("examples/photoapp/policy.cedar");
+    private static final Path SCHEMA = Path.of("examples/photoapp/schema.json");
 
     Schema getSchema() {
-        EntityType visibility = new EntityType(Collections.emptySet(), Collections.emptyMap());
-        EntityType role = new EntityType(Collections.emptySet(), Collections.emptyMap());
+        EntityTypeDefinition visibility = new EntityTypeDefinition(Collections.emptySet(), Collections.emptyMap());
+        EntityTypeDefinition role = new EntityTypeDefinition(Collections.emptySet(), Collections.emptyMap());
 
-        AttributeType accountName = new PrimitiveType(PrimitiveType.Type.String);
-        AttributeType accountAge = new PrimitiveType(PrimitiveType.Type.Long);
-        AttributeType accountRole = new EntityOrCommonType("Role");
-        AttributeType accountFriend = new EntityOrCommonType("Account");
-        AttributeType accountFriends = new SetType(accountFriend);
-        Map<String, AttributeType> accountAttrs = Map.of("name", accountName,
+        CommonTypeDefinition accountName = new StringType();
+        CommonTypeDefinition accountAge = new LongType();
+        CommonTypeDefinition accountRole = new EntityTypeReference("Role");
+        CommonTypeDefinition accountFriend = new EntityTypeReference("Account");
+        CommonTypeDefinition accountFriends = new SetTypeDefinition(accountFriend);
+        Map<String, CommonTypeDefinition> accountAttrs = Map.of("name", accountName,
                 "age", accountAge,
                 "role", accountRole,
                 "friends", accountFriends);
-        EntityType account = new EntityType(Collections.emptySet(), accountAttrs);
+        EntityTypeDefinition account = new EntityTypeDefinition(Collections.emptySet(), accountAttrs);
 
-        AttributeType photoAlbum = new EntityOrCommonType("Album");
-        AttributeType photoSize = new PrimitiveType(PrimitiveType.Type.Long);
-        AttributeType photoType = new PrimitiveType(PrimitiveType.Type.String);
-        Map<String, AttributeType> photoAttrs = Map.of("type", photoType,
+        CommonTypeDefinition photoAlbum = new EntityTypeReference("Album");
+        CommonTypeDefinition photoSize = new LongType();
+        CommonTypeDefinition photoType = new StringType();
+        Map<String, CommonTypeDefinition> photoAttrs = Map.of("type", photoType,
                 "size", photoSize,
                 "album", photoAlbum);
-        EntityType photo = new EntityType(Collections.emptySet(), photoAttrs);
+        EntityTypeDefinition photo = new EntityTypeDefinition(Collections.emptySet(), photoAttrs);
 
-        AttributeType albumOwner = new EntityOrCommonType("Account");
-        AttributeType albumVisibility = new EntityOrCommonType("Visibility");
-        Map<String, AttributeType> albumAttrs = Map.of("owner", albumOwner,
+        CommonTypeDefinition albumOwner = new EntityTypeReference("Account");
+        CommonTypeDefinition albumVisibility = new EntityTypeReference("Visibility");
+        Map<String, CommonTypeDefinition> albumAttrs = Map.of("owner", albumOwner,
                 "visibility", albumVisibility);
-        EntityType album = new EntityType(Collections.emptySet(), albumAttrs);
+        EntityTypeDefinition album = new EntityTypeDefinition(Collections.emptySet(), albumAttrs);
 
-        Map<String, EntityType> entityTypes = Map.of(
+        Map<String, EntityTypeDefinition> entityTypes = Map.of(
                 "Visibility", visibility,
                 "Role", role,
                 "Account", account,
                 "Photo", photo,
-                "Album", album
-        );
+                "Album", album);
 
         // FIXME: this should not be here
         visibility.setName("Visibility");
@@ -79,9 +80,9 @@ public class TranslationDriverTest {
 
     TypeInfo getTypeInfo() {
         TypeInfo typeInfo = new TypeInfo();
-        typeInfo.put("principal", new EntityOrCommonType("Account"));
-        typeInfo.put("action", new EntityOrCommonType("Action"));
-        typeInfo.put("resource", new EntityOrCommonType("Photo"));
+        typeInfo.put("principal", new EntityTypeReference("Account"));
+        typeInfo.put("action", new EntityTypeReference("Action"));
+        typeInfo.put("resource", new EntityTypeReference("Photo"));
         return typeInfo;
     }
 
@@ -133,11 +134,11 @@ public class TranslationDriverTest {
                 principal, BinaryExpression.BinaryOp.And, resource);
         BinaryExpression p2 = new BinaryExpression(
                 p1, BinaryExpression.BinaryOp.And, action);
-        BinaryExpression p3 = new BinaryExpression(
+        BinaryExpression policy = new BinaryExpression(
                 p2, BinaryExpression.BinaryOp.And, when);
 
         TranslationVisitor et = new TranslationVisitor(translationSchema, types);
-        p3.accept(et);
+        policy.accept(et);
 
         DLAtom atom = new DLAtom("permit",
                 DLTerm.var("principal"), DLTerm.var("resource"), DLTerm.var("action"));

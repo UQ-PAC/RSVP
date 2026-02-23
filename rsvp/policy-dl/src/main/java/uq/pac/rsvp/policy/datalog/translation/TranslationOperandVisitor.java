@@ -4,9 +4,10 @@ import uq.pac.rsvp.policy.ast.expr.EntityExpression;
 import uq.pac.rsvp.policy.ast.expr.Expression;
 import uq.pac.rsvp.policy.ast.expr.PropertyAccessExpression;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
-import uq.pac.rsvp.policy.ast.schema.attribute.AttributeType;
-import uq.pac.rsvp.policy.ast.schema.attribute.EntityOrCommonType;
-import uq.pac.rsvp.policy.ast.schema.attribute.PrimitiveType;
+import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.common.EntityTypeReference;
+import uq.pac.rsvp.policy.ast.schema.common.LongType;
+import uq.pac.rsvp.policy.ast.schema.common.StringType;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
@@ -14,7 +15,7 @@ import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 // Code generation for property access expressions
 public class TranslationOperandVisitor extends TranslationValueAdapter<String> {
     private final TypeInfo types;
-    private AttributeType type;
+    private CommonTypeDefinition type;
 
     public TranslationOperandVisitor(TranslationSchema schema, TypeInfo types) {
         super(schema);
@@ -22,7 +23,7 @@ public class TranslationOperandVisitor extends TranslationValueAdapter<String> {
         this.type = null;
     }
 
-    AttributeType getType() {
+    CommonTypeDefinition getType() {
         return type;
     }
 
@@ -44,10 +45,10 @@ public class TranslationOperandVisitor extends TranslationValueAdapter<String> {
         // LHS variable name
         String lhsVar = object.compute(this);
         // Type of the LHS variable (or sub-expression)
-        EntityOrCommonType lhsVarType = (EntityOrCommonType)
+        EntityTypeReference lhsVarType = (EntityTypeReference)
                 (this.type == null ? types.get(lhsVar) : this.type);
         // Translation type for the LHS variable, so we know which relation to use
-        TranslationType tt = schema.getTranslationType(lhsVarType.getName());
+        TranslationType tt = schema.getTranslationType(lhsVarType.getTypename());
         TranslationAttribute attr = tt.getAttribute(property);
         // RHS variable
         DLVar rhsVar = TranslationNameGenerator.getVar();
@@ -57,7 +58,9 @@ public class TranslationOperandVisitor extends TranslationValueAdapter<String> {
         this.expressions.add(generated);
         this.type = attr.getType();
         // TODO: Support for more types
-        require(type instanceof EntityOrCommonType || type instanceof PrimitiveType);
+        require(type instanceof EntityTypeReference ||
+                type instanceof StringType ||
+                type instanceof LongType);
         return rhsVar.getName();
     }
 

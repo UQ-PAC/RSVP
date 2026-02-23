@@ -21,8 +21,8 @@ public class TranslationVisitor extends TranslationVoidAdapter {
                 TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, types);
                 TranslationOperandVisitor rhs = new TranslationOperandVisitor(schema, types);
 
-                DLTerm lhsOp = DLTerm.var(expr.getLeft().compute(lhs));
-                DLTerm rhsOp = DLTerm.var(expr.getRight().compute(rhs));
+                DLTerm lhsOp = expr.getLeft().compute(lhs);
+                DLTerm rhsOp = expr.getRight().compute(rhs);
 
                 expressions.addAll(lhs.getExpressions());
                 expressions.addAll(rhs.getExpressions());
@@ -34,7 +34,7 @@ public class TranslationVisitor extends TranslationVoidAdapter {
             }
             case BinaryExpression.BinaryOp.Is -> {
                 TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, types);
-                String var = expr.getLeft().compute(lhs);
+                DLTerm var = expr.getLeft().compute(lhs);
                 expressions.addAll(lhs.getExpressions());
 
                 // FIXME: Should not be a string expression
@@ -43,7 +43,7 @@ public class TranslationVisitor extends TranslationVoidAdapter {
                 String relationName = schema.getTranslationType(typeString)
                         .getEntityRelation()
                         .getName();
-                expressions.add(new DLAtom(relationName, DLTerm.var(var)));
+                expressions.add(new DLAtom(relationName, var));
             }
             default -> throw new RuntimeException("unsupported: " + expr.getOp());
         }

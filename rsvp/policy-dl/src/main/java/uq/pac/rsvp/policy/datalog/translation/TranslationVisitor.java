@@ -1,10 +1,13 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
 import uq.pac.rsvp.policy.ast.expr.*;
+import uq.pac.rsvp.policy.datalog.ast.DLAtom;
+import uq.pac.rsvp.policy.datalog.ast.DLConstraint;
+import uq.pac.rsvp.policy.datalog.ast.DLTerm;
 
-public class TranslationVisitor extends TranslationValueAdapter<Void> {
+public class TranslationVisitor extends TranslationVoidAdapter {
 
-    private TypeInfo types;
+    private final TypeInfo types;
 
     public TranslationVisitor(TranslationSchema schema, TypeInfo types) {
         super(schema);
@@ -12,13 +15,37 @@ public class TranslationVisitor extends TranslationValueAdapter<Void> {
     }
 
     @Override
-    public Void visitBinaryExpr(BinaryExpression expr) {
+    public void visitBinaryExpr(BinaryExpression expr) {
         switch (expr.getOp()) {
-            case BinaryExpression.BinaryOp.Is -> {
-                // FIXME
+            case BinaryExpression.BinaryOp.Eq -> {
+                TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, types);
+                TranslationOperandVisitor rhs = new TranslationOperandVisitor(schema, types);
+
+                DLTerm lhsOp = DLTerm.var(expr.getLeft().compute(lhs));
+                DLTerm rhsOp = DLTerm.var(expr.getRight().compute(rhs));
+
+                expressions.addAll(lhs.getExpressions());
+                expressions.addAll(rhs.getExpressions());
+                expressions.add(new DLConstraint(lhsOp, rhsOp, DLConstraint.Operator.EQ));
             }
-            default -> throw new RuntimeException("unsupported");
+            case BinaryExpression.BinaryOp.And -> {
+                expr.getLeft().accept(this);
+                expr.getRight().accept(this);
+            }
+            case BinaryExpression.BinaryOp.Is -> {
+                TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, types);
+                String var = expr.getLeft().compute(lhs);
+                expressions.addAll(lhs.getExpressions());
+
+                // FIXME: Should not be a string expression
+                // FIXME: Quoted string
+                String typeString = expr.getRight().toString().replace("\"", "");
+                String relationName = schema.getTranslationType(typeString)
+                        .getEntityRelation()
+                        .getName();
+                expressions.add(new DLAtom(relationName, DLTerm.var(var)));
+            }
+            default -> throw new RuntimeException("unsupported: " + expr.getOp());
         }
-        throw new RuntimeException("unsupported");
     }
 }

@@ -1,7 +1,7 @@
 permit (
-    principal is User in Group::"Cats",
-    action == Action::"View",
-    resource is Photo
+    principal is Photo,
+    action,
+    resource
 ) when {
-    resource in principal
+    (2 + 3 - 1) ==
 };

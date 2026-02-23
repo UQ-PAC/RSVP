@@ -10,6 +10,9 @@ import uq.pac.rsvp.policy.ast.schema.attribute.AttributeType;
 import uq.pac.rsvp.policy.ast.schema.attribute.EntityOrCommonType;
 import uq.pac.rsvp.policy.ast.schema.attribute.PrimitiveType;
 import uq.pac.rsvp.policy.ast.schema.attribute.SetType;
+import uq.pac.rsvp.policy.datalog.ast.DLAtom;
+import uq.pac.rsvp.policy.datalog.ast.DLRule;
+import uq.pac.rsvp.policy.datalog.ast.DLTerm;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -121,10 +124,24 @@ public class TranslationDriverTest {
         TypeInfo types = getTypeInfo();
         Map<String, Expression> expressions = makeExpressions();
 
-        BinaryExpression e = (BinaryExpression) expressions.get("when");
-        TranslationPropertyAccessVisitor vs = new TranslationPropertyAccessVisitor(translationSchema, types);
-        String var = e.getLeft().compute(vs);
-        System.out.println(var);
-        System.out.println(vs.getExpressions());
+        Expression principal = expressions.get("principal");
+        Expression resource = expressions.get("resource");
+        Expression action = expressions.get("action");
+        Expression when = expressions.get("when");
+
+        BinaryExpression p1 = new BinaryExpression(
+                principal, BinaryExpression.BinaryOp.And, resource);
+        BinaryExpression p2 = new BinaryExpression(
+                p1, BinaryExpression.BinaryOp.And, action);
+        BinaryExpression p3 = new BinaryExpression(
+                p2, BinaryExpression.BinaryOp.And, when);
+
+        TranslationVisitor et = new TranslationVisitor(translationSchema, types);
+        p3.accept(et);
+
+        DLAtom atom = new DLAtom("permit",
+                DLTerm.var("principal"), DLTerm.var("resource"), DLTerm.var("action"));
+        DLRule rule = new DLRule(atom, et.expressions);
+        System.out.println(rule);
     }
 }

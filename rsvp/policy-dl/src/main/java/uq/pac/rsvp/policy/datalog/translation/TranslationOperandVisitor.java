@@ -1,25 +1,39 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
+import uq.pac.rsvp.policy.ast.expr.EntityExpression;
 import uq.pac.rsvp.policy.ast.expr.Expression;
 import uq.pac.rsvp.policy.ast.expr.PropertyAccessExpression;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 import uq.pac.rsvp.policy.ast.schema.attribute.AttributeType;
 import uq.pac.rsvp.policy.ast.schema.attribute.EntityOrCommonType;
 import uq.pac.rsvp.policy.ast.schema.attribute.PrimitiveType;
-import uq.pac.rsvp.policy.datalog.ast.DLAtom;
-import uq.pac.rsvp.policy.datalog.ast.DLTerm;
+import uq.pac.rsvp.policy.datalog.ast.*;
 
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
 // Code generation for property access expressions
-public class TranslationPropertyAccessVisitor extends TranslationValueAdapter<String> {
+public class TranslationOperandVisitor extends TranslationValueAdapter<String> {
     private final TypeInfo types;
     private AttributeType type;
 
-    public TranslationPropertyAccessVisitor(TranslationSchema schema, TypeInfo types) {
+    public TranslationOperandVisitor(TranslationSchema schema, TypeInfo types) {
         super(schema);
         this.types = types;
         this.type = null;
+    }
+
+    AttributeType getType() {
+        return type;
+    }
+
+    @Override
+    public String visitEntityExpr(EntityExpression expr) {
+        DLVar var = TranslationNameGenerator.getVar();
+        DLString val = new DLString(String.join("::", expr.getQualifiedEid()));
+        expr.getQualifiedEid();
+        DLRuleExpr re = new DLConstraint(var, val, DLConstraint.Operator.EQ);
+        expressions.add(re);
+        return var.getName();
     }
 
     @Override
@@ -36,15 +50,15 @@ public class TranslationPropertyAccessVisitor extends TranslationValueAdapter<St
         TranslationType tt = schema.getTranslationType(lhsVarType.getName());
         TranslationAttribute attr = tt.getAttribute(property);
         // RHS variable
-        String rhsVar = TranslationNameGenerator.getVar();
+        DLVar rhsVar = TranslationNameGenerator.getVar();
         // Generated relation
         String relationName = attr.getRelationDecl().getName();
-        DLAtom generated = new DLAtom(relationName, DLTerm.var(lhsVar), DLTerm.var(rhsVar));
+        DLAtom generated = new DLAtom(relationName, DLTerm.var(lhsVar), rhsVar);
         this.expressions.add(generated);
         this.type = attr.getType();
         // TODO: Support for more types
         require(type instanceof EntityOrCommonType || type instanceof PrimitiveType);
-        return rhsVar;
+        return rhsVar.getName();
     }
 
     @Override

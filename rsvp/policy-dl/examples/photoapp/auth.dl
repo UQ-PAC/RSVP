@@ -234,7 +234,14 @@ ForbiddenRequests(action, principal, resource) :-
 .output AllRequests
 .output PermittedRequests
 .output ForbiddenRequests
-.output PermittedRequests(IO=stdout)
+//.output PermittedRequests(IO=stdout)
+
+.decl permit11(x: symbol)
+permit11(action) :-
+    __rsvp_dl_var0 = "Action::viewPhoto",
+    action = __rsvp_dl_var0.
+.output permit11(IO=stdout)
+
 
 // Security Invariants / Boundaries
 

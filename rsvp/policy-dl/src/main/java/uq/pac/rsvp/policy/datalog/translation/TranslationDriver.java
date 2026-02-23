@@ -1,8 +1,8 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
 import com.cedarpolicy.model.entity.Entities;
+import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.ast.DLProgram;
-import uq.pac.rsvp.policy.datalog.util.Util;
 
 import java.util.*;
 
@@ -10,25 +10,15 @@ import java.util.*;
  * Putting translation of the cedar schema, entries, context and policies together
  */
 public class TranslationDriver {
-
-    public static DLProgram getTranslation(Entities entities) {
-        List<TranslationType> types = entities.getEntities()
-                .stream()
-                .filter(Util.distinctBy(k -> k.getEUID().getType()))
-                .map(TranslationType::new)
-                .toList();
-
-        TranslationSchema schema = new TranslationSchema(types);
-
+    public static DLProgram getTranslation(Schema schema, Entities entities) {
+        TranslationSchema translationSchema = TranslationSchema.get(schema);
         List<TranslationEntity> facts = entities.getEntities()
                 .stream()
-                .map(e -> new TranslationEntity(e, schema))
+                .map(e -> new TranslationEntity(e, translationSchema))
                 .toList();
-
         DLProgram.Builder builder = new DLProgram.Builder();
-        types.forEach(t -> builder.add(t.getTranslation()));
+        translationSchema.getTranslationTypes().forEach(t -> builder.add(t.getTranslation()));
         facts.forEach(t -> builder.add(t.getTranslation()));
-
         return builder.build();
     }
 }

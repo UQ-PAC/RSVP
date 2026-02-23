@@ -9,13 +9,17 @@ import uq.pac.rsvp.policy.datalog.ast.DLRuleExpr;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class TranslationComputingAdapter<T> implements PolicyComputationVisitor<T> {
+public abstract class TranslationValueAdapter<T> implements PolicyComputationVisitor<T> {
     protected TranslationSchema schema;
     protected List<DLRuleExpr> expressions;
 
-    public TranslationComputingAdapter(TranslationSchema schema) {
+    public TranslationValueAdapter(TranslationSchema schema) {
         this.schema = schema;
         this.expressions = new ArrayList<>();
+    }
+
+    protected List<DLRuleExpr> getExpressions() {
+        return expressions;
     }
 
     @Override
@@ -90,11 +94,6 @@ public abstract class TranslationComputingAdapter<T> implements PolicyComputatio
 
     @Override
     public T visitStringExpr(StringExpression expr) {
-        throw new RuntimeException("unsupported");
-    }
-
-    @Override
-    public T visitTypeExpr(TypeExpression expr) {
         throw new RuntimeException("unsupported");
     }
 }

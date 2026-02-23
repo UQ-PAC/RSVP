@@ -1,6 +1,6 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import com.cedarpolicy.value.EntityTypeName;
+import uq.pac.rsvp.policy.ast.schema.Schema;
 
 import java.util.*;
 
@@ -8,12 +8,12 @@ import java.util.*;
  * Translation for the entire schema (presently a collection of entity declarations)
  */
 public class TranslationSchema {
-    private final Map<EntityTypeName, TranslationType> schema;
+    private final Map<String, TranslationType> schema;
 
-    public TranslationSchema(Collection<TranslationType> types) {
-        Map<EntityTypeName, TranslationType> data = new HashMap<>();
+    private TranslationSchema(Collection<TranslationType> types) {
+        Map<String, TranslationType> data = new HashMap<>();
         for (TranslationType t : types) {
-            EntityTypeName tn = t.getTypeName();
+            String tn = t.getName();
             if (data.containsKey(tn)) {
                 throw new RuntimeException("Duplicate entity type: " + tn);
             }
@@ -23,11 +23,11 @@ public class TranslationSchema {
     }
 
     public TranslationType getTranslationType(String tn) {
-        return EntityTypeName.parse(tn).map(schema::get).orElse(null);
+        return schema.get(tn);
     }
 
-    public TranslationType getTranslationType(EntityTypeName tn) {
-        return schema.get(tn);
+    public Collection<TranslationType> getTranslationTypes() {
+        return schema.values();
     }
 
     @Override
@@ -37,5 +37,16 @@ public class TranslationSchema {
             sb.append(etn).append('\n');
         });
         return sb.toString();
+    }
+
+    public static TranslationSchema get(Schema schema) {
+        List<TranslationType> types = schema.values().stream().flatMap(namespace -> {
+                return namespace.entityTypeNames().stream()
+                        .map(namespace::getEntityType)
+                        .map(entity -> new TranslationType(entity, namespace))
+                        .toList()
+                        .stream();
+        }).toList();
+        return new TranslationSchema(types);
     }
 }

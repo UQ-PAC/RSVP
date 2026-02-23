@@ -10,13 +10,6 @@ import java.util.List;
 
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
-/**
- * Translation involving:
- *  - declaration of unary entity relations
- *  - declarations of binary attribute relations
- *
- *  FIXME: This information needs to be collected from the schema, not entities
- */
 public class TranslationEntity extends Translator {
 
     private final List<DLStatement> statements;
@@ -59,7 +52,7 @@ public class TranslationEntity extends Translator {
 
     public TranslationEntity(Entity entity, TranslationSchema schema) {
         List<DLStatement> statements = new ArrayList<>();
-        TranslationType type = schema.getTranslationType(entity.getEUID().getType());
+        TranslationType type = schema.getTranslationType(entity.getEUID().getType().toString());
         // We assume the inputs are validated, so by the time we get to see entities,
         // it has been made sure that there is an underlying type for each encountered EUID
         require(type != null, "Cannot locate type for entity " + entity.getEUID());

@@ -2,18 +2,20 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import uq.pac.rsvp.policy.ast.expr.*;
 
-public class TranslationVisitor extends TranslationVisitorAdapter {
+public class TranslationVisitor extends TranslationValueAdapter<Void> {
 
-    public TranslationVisitor(TranslationSchema schema) {
+    private TypeInfo types;
+
+    public TranslationVisitor(TranslationSchema schema, TypeInfo types) {
         super(schema);
+        this.types = types;
     }
 
     @Override
-    public void visitBinaryExpr(BinaryExpression expr) {
+    public Void visitBinaryExpr(BinaryExpression expr) {
         switch (expr.getOp()) {
             case BinaryExpression.BinaryOp.Is -> {
-                TypeExpression type = required(expr.getRight(), TypeExpression.class);
-                TranslationType en = schema.getTranslationType(type.getTypeName());
+                // FIXME
             }
             default -> throw new RuntimeException("unsupported");
         }

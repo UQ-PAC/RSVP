@@ -1,7 +1,9 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import com.cedarpolicy.model.entity.Entity;
 import com.cedarpolicy.value.*;
+import uq.pac.rsvp.policy.ast.schema.EntityType;
+import uq.pac.rsvp.policy.ast.schema.Namespace;
+import uq.pac.rsvp.policy.ast.schema.attribute.*;
 import uq.pac.rsvp.policy.datalog.ast.DLProgram;
 import uq.pac.rsvp.policy.datalog.ast.DLRelationDecl;
 import uq.pac.rsvp.policy.datalog.ast.DLStatement;
@@ -18,40 +20,44 @@ import java.util.Map;
  * - Collection of facts for attribute relations
  */
 public class TranslationType extends Translator {
-
-    private final EntityTypeName entityTypeName;
+    // FIXME: Entity Definition
+    private final String name;
+    private final EntityType entity;
     private final DLRelationDecl relation;
     private final Map<String, TranslationAttribute> attributeRelations;
 
-    public TranslationType(Entity entity) {
-        EntityUID uid = entity.getEUID();
-        String relationName = uid.getType().toString().replace(':', '_');
-        this.entityTypeName = uid.getType();
+    public TranslationType(EntityType entity, Namespace namespace) {
+        this.entity = entity;
+        String prefix = namespace.getName().isEmpty() ? "" : namespace.getName() + "::";
+        this.name = prefix + entity.getName();
+        String relationName = name.replace(':', '_');
         this.relation = new DLRelationDecl(relationName, DLType.SYMBOL);
-
         this.attributeRelations = new HashMap<>();
-        entity.attrs.forEach((attr, value) -> {
-            DLType attrType = switch (value) {
-                case PrimString s -> DLType.SYMBOL;
-                case PrimLong s -> DLType.NUMBER;
-                case PrimBool b -> DLType.SYMBOL;
-                case EntityUID i -> DLType.SYMBOL;
-                case CedarList l -> DLType.SYMBOL; // FIXME: This assumes a simple list
-                default -> throw new RuntimeException("Unsupported type: " + value.getClass().getSimpleName());
+
+        RecordType shape = entity.getShape();
+        shape.getAttributeNames().forEach(attrName -> {
+            AttributeType attrType = shape.getAttributeType(attrName);
+            DLType dlAttrType = switch (attrType) {
+                case PrimitiveType s ->
+                        s.getType() == PrimitiveType.Type.Long ?  DLType.NUMBER : DLType.SYMBOL;
+                case EntityOrCommonType i -> DLType.SYMBOL;
+                case SetType s -> {
+                    Class<?> sub = s.getElementType().getClass();
+                    if (sub != PrimitiveType.class && sub != EntityOrCommonType.class) {
+                        throw new RuntimeException("Unsupported set type: " + s);
+                    }
+                    yield DLType.SYMBOL;
+                }
+                default -> throw new RuntimeException("Unsupported type: " + attrType.getClass().getSimpleName());
             };
 
-            EntityTypeName tn = switch (value) {
-                case EntityUID i -> i.getType();
-                default -> null;
-            };
-
-            DLRelationDecl attributeRelation =
-                     new DLRelationDecl(relationName + "_attr_" + attr, DLType.SYMBOL, attrType);
-            attributeRelations.put(attr, new TranslationAttribute(attr, tn, attributeRelation));
+            DLRelationDecl dlAttributeRelation =
+                    new DLRelationDecl(relationName + "_attr_" + attrName, DLType.SYMBOL, dlAttrType);
+            attributeRelations.put(attrName, new TranslationAttribute(attrName, attrType, dlAttributeRelation));
         });
     }
 
-    DLRelationDecl getEntityRelation() {
+    public DLRelationDecl getEntityRelation() {
         return relation;
     }
 
@@ -59,18 +65,21 @@ public class TranslationType extends Translator {
         return attributeRelations.get(attr);
     }
 
-    public EntityTypeName getTypeName() {
-        return entityTypeName;
+    public EntityType getEntityDefinition() {
+        return entity;
     }
 
     public List<DLStatement> getTranslation() {
         List<DLStatement> statements = new ArrayList<>();
         statements.add(relation);
-        statements.addAll(
-                attributeRelations.values().stream()
-                        .map(TranslationAttribute::getRelationDecl)
-                        .toList());
+        statements.addAll(attributeRelations.values().stream()
+                .map(TranslationAttribute::getRelationDecl)
+                .toList());
         return statements;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override

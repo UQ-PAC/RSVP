@@ -350,65 +350,95 @@ public class App {
         // 'principal', 'resource', 'action' -- refer to appropriate entity/action (entity reference)
         // 'context' -- refers to request context (record)
 
-        ExpressionWithType value = generateValueExpr(principals, resources, requestType, false);
-        if (value.exprType.getTypeId() == CedarType.TypeId.BOOL) {
-            if (randomChance(70)) {
-                // It's a boolean value so can be used as a condition:
-                if (randomChance(50))
-                    return value.expression;
-                else {
-                    value.expression = new UnaryExpression(UnaryExpression.UnaryOp.Not,
-                            value.expression, null);
-                }
-            }
-        }
-
         // TODO this should be all possible entities, not just immediate principals/resources
         List<EntitiesCollection> allEntities = new ArrayList<>();
         allEntities.add(principals);
         allEntities.add(resources);
 
-        // We now need a comparison or other operator, to another value of appropriate type
-        ExpressionWithType otherValue;
-        do {
-            otherValue = generateValueOfType(value.exprType, allEntities,
-                    principals, resources, requestType);
-        } while (value.expression.toString().equals(otherValue.expression.toString()));
+        ExpressionWithType combineValue = null;
+        ExpressionWithType value;
 
-        // TODO set membership ("in"), type tests ("is")
+        boolean skipBinOp;
 
-        BinaryExpression.BinaryOp operation = null;
+        while (true) {
+            value = generateValueExpr(principals, resources, requestType, false);
 
-        if (value.exprType.getTypeId() == CedarType.TypeId.LONG && randomChance(50)) {
-            // For numbers we can do relational comparisons as well as equality
-            int opIndex = random.nextInt(6);
-            switch (opIndex) {
-            case 0:
-                operation = BinaryExpression.BinaryOp.LessEq; break;
-            case 1:
-                operation = BinaryExpression.BinaryOp.Less; break;
-            case 2:
-                operation = BinaryExpression.BinaryOp.Eq; break;
-            case 3:
-                operation = BinaryExpression.BinaryOp.Neq; break;
-            case 4:
-                operation = BinaryExpression.BinaryOp.Greater; break;
-            case 5:
-                operation = BinaryExpression.BinaryOp.GreaterEq; break;
+            skipBinOp = false;
+            if (value.exprType.getTypeId() == CedarType.TypeId.BOOL) {
+                if (randomChance(70)) {
+                    // It's a boolean value so can be used as a condition:
+                    if (randomChance(50))
+                        skipBinOp = true;
+                    else {
+                        value.expression = new UnaryExpression(UnaryExpression.UnaryOp.Not,
+                                value.expression, null);
+                        skipBinOp = true;
+                    }
+                }
             }
-        }
-        else {
-            int opIndex = random.nextInt(2);
-            switch (opIndex) {
-            case 0:
-                operation = BinaryExpression.BinaryOp.Eq; break;
-            case 1:
-                operation = BinaryExpression.BinaryOp.Neq; break;
+
+            if (!skipBinOp) {
+                // We now need a comparison or other operator, to another value of appropriate type
+                ExpressionWithType otherValue;
+                do {
+                    otherValue = generateValueOfType(value.exprType, allEntities,
+                            principals, resources, requestType);
+                } while (value.expression.toString().equals(otherValue.expression.toString()));
+
+                // TODO set membership ("in"), type tests ("is")
+
+                BinaryExpression.BinaryOp operation = null;
+
+                if (value.exprType.getTypeId() == CedarType.TypeId.LONG && randomChance(50)) {
+                    // For numbers we can do relational comparisons as well as equality
+                    int opIndex = random.nextInt(6);
+                    switch (opIndex) {
+                    case 0:
+                        operation = BinaryExpression.BinaryOp.LessEq; break;
+                    case 1:
+                        operation = BinaryExpression.BinaryOp.Less; break;
+                    case 2:
+                        operation = BinaryExpression.BinaryOp.Eq; break;
+                    case 3:
+                        operation = BinaryExpression.BinaryOp.Neq; break;
+                    case 4:
+                        operation = BinaryExpression.BinaryOp.Greater; break;
+                    case 5:
+                        operation = BinaryExpression.BinaryOp.GreaterEq; break;
+                    }
+                }
+                else {
+                    int opIndex = random.nextInt(2);
+                    switch (opIndex) {
+                    case 0:
+                        operation = BinaryExpression.BinaryOp.Eq; break;
+                    case 1:
+                        operation = BinaryExpression.BinaryOp.Neq; break;
+                    }
+                }
+
+                value.expression = new BinaryExpression(value.expression, operation, otherValue.expression, null);
+                value.exprType = CedarPrimitive.BOOL;
             }
+
+            if (combineValue != null) {
+                BinaryExpression.BinaryOp operation = null;
+                int opIndex = random.nextInt(2);
+                switch (opIndex) {
+                case 0:
+                    operation = BinaryExpression.BinaryOp.And; break;
+                case 1:
+                    operation = BinaryExpression.BinaryOp.Or; break;
+                }
+                value.expression = new BinaryExpression(combineValue.expression, operation, value.expression, null);
+            }
+
+            if (randomChance(75)) break;
+
+            // On the next pass combine another boolean expression with the one we have now:
+            combineValue = value;
         }
 
-        value.expression = new BinaryExpression(value.expression, operation, otherValue.expression, null);
-        value.exprType = CedarPrimitive.BOOL;
         return value.expression;
     }
 }

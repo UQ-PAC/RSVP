@@ -14,12 +14,10 @@ import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
 // Code generation for property access expressions
 public class TranslationOperandVisitor extends TranslationValueAdapter<DLTerm> {
-    private final TypeInfo types;
     private CommonTypeDefinition type;
 
-    public TranslationOperandVisitor(TranslationSchema schema, TypeInfo types) {
-        super(schema);
-        this.types = types;
+    public TranslationOperandVisitor(TranslationSchema schema, TranslationTypeInfo typeInfo) {
+        super(schema, typeInfo);
         this.type = null;
     }
 
@@ -42,7 +40,7 @@ public class TranslationOperandVisitor extends TranslationValueAdapter<DLTerm> {
         DLTerm lhsVar = object.compute(this);
         // Type of the LHS variable (or sub-expression)
         EntityTypeReference lhsVarType = (EntityTypeReference)
-                (this.type == null ? types.get(lhsVar.toString()) : this.type);
+                (this.type == null ? typeInfo.get(lhsVar.toString()) : this.type);
         // Translation type for the LHS variable, so we know which relation to use
         TranslationType tt = schema.getTranslationType(lhsVarType.getTypename());
         TranslationAttribute attr = tt.getAttribute(property);

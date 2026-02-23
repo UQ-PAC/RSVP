@@ -7,19 +7,16 @@ import uq.pac.rsvp.policy.datalog.ast.DLTerm;
 
 public class TranslationVisitor extends TranslationVoidAdapter {
 
-    private final TypeInfo types;
-
-    public TranslationVisitor(TranslationSchema schema, TypeInfo types) {
-        super(schema);
-        this.types = types;
+    public TranslationVisitor(TranslationSchema schema, TranslationTypeInfo typeInfo) {
+        super(schema, typeInfo);
     }
 
     @Override
     public void visitBinaryExpr(BinaryExpression expr) {
         switch (expr.getOp()) {
             case BinaryExpression.BinaryOp.Eq -> {
-                TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, types);
-                TranslationOperandVisitor rhs = new TranslationOperandVisitor(schema, types);
+                TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, typeInfo);
+                TranslationOperandVisitor rhs = new TranslationOperandVisitor(schema, typeInfo);
 
                 DLTerm lhsOp = expr.getLeft().compute(lhs);
                 DLTerm rhsOp = expr.getRight().compute(rhs);
@@ -33,7 +30,7 @@ public class TranslationVisitor extends TranslationVoidAdapter {
                 expr.getRight().accept(this);
             }
             case BinaryExpression.BinaryOp.Is -> {
-                TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, types);
+                TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, typeInfo);
                 DLTerm var = expr.getLeft().compute(lhs);
                 expressions.addAll(lhs.getExpressions());
 

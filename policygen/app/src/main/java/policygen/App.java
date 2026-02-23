@@ -27,6 +27,7 @@ import uq.pac.rsvp.policy.ast.expr.LongExpression;
 import uq.pac.rsvp.policy.ast.expr.PropertyAccessExpression;
 import uq.pac.rsvp.policy.ast.expr.RecordExpression;
 import uq.pac.rsvp.policy.ast.expr.StringExpression;
+import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 
 public class App {
@@ -267,9 +268,19 @@ public class App {
     private static ExpressionWithType generateValueOfType(CedarType requiredType,
             List<EntitiesCollection> availableEntities, EntitiesCollection principals,
             EntitiesCollection resources, CedarType requestType) {
-        // TODO: for any given type there may be a field (chain) of that type; explore this
-        // possibility (possibly by generating random values until we get one with the right
-        // type)
+
+        if (randomChance(75) || requiredType.getTypeId() == CedarType.TypeId.BOOL) {
+            // Crude but, hopefully, effective: just generate expressions until we get one with the right type.
+            for (int i = 0; i < 20; i++) {
+                ExpressionWithType attempt = generateValueExpr(principals, resources, requestType, false);
+                if (attempt.exprType.equals(requiredType)) {
+                    return attempt;
+                }
+            }
+        }
+
+        // Generate a literal of the required type:
+
         if (requiredType.getTypeId() == CedarType.TypeId.ENTITY) {
             for (EntitiesCollection coll : availableEntities) {
                 if (coll.getEntityType().equals(requiredType)) {
@@ -329,7 +340,7 @@ public class App {
         return result;
     }
 
-    // TODO support multiple principal/resource types; combine with type tests ("is") to avoid errors
+    // TODO support multiple principal/resource types; combine with type tests ("is"/"has") to avoid errors
     private static Expression generateConditionExpression(EntitiesCollection principals,
             EntitiesCollection resources, CedarRecord requestType) {
         // x in y
@@ -343,7 +354,12 @@ public class App {
         if (value.exprType.getTypeId() == CedarType.TypeId.BOOL) {
             if (randomChance(70)) {
                 // It's a boolean value so can be used as a condition:
-                return value.expression;
+                if (randomChance(50))
+                    return value.expression;
+                else {
+                    value.expression = new UnaryExpression(UnaryExpression.UnaryOp.Not,
+                            value.expression, null);
+                }
             }
         }
 
@@ -353,8 +369,11 @@ public class App {
         allEntities.add(resources);
 
         // We now need a comparison or other operator, to another value of appropriate type
-        ExpressionWithType otherValue = generateValueOfType(value.exprType, allEntities,
-                principals, resources, requestType);
+        ExpressionWithType otherValue;
+        do {
+            otherValue = generateValueOfType(value.exprType, allEntities,
+                    principals, resources, requestType);
+        } while (value.expression.toString().equals(otherValue.expression.toString()));
 
         // TODO set membership ("in"), type tests ("is")
 

@@ -19,13 +19,12 @@ import com.cedarpolicy.model.exception.InternalException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import uq.pac.rsvp.policy.ast.schema.attribute.AttributeType;
-import uq.pac.rsvp.policy.ast.schema.attribute.EntityOrCommonType;
-import uq.pac.rsvp.policy.ast.schema.attribute.PrimitiveType;
-import uq.pac.rsvp.policy.ast.schema.attribute.RecordType;
-import uq.pac.rsvp.policy.ast.schema.attribute.SetType;
-import uq.pac.rsvp.policy.ast.schema.attribute.AttributeType.AttributeTypeDeserialiser;
-import uq.pac.rsvp.policy.ast.schema.attribute.PrimitiveType.PrimitiveTypeDeserialiser;
+import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition.CommonTypeDefinitionDeserialiser;
+import uq.pac.rsvp.policy.ast.schema.common.UnresolvedTypeReference;
+import uq.pac.rsvp.policy.ast.schema.common.CommonTypeReference;
+import uq.pac.rsvp.policy.ast.schema.common.EntityTypeReference;
+import uq.pac.rsvp.policy.ast.schema.common.RecordTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.common.SetTypeDefinition;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaResolutionVisitor;
 
@@ -35,8 +34,7 @@ public class SchemaTest {
 
     @BeforeAll
     static void beforeAll() {
-        gson = new GsonBuilder().registerTypeAdapter(AttributeType.class, new AttributeTypeDeserialiser())
-                .registerTypeAdapter(PrimitiveType.class, new PrimitiveTypeDeserialiser())
+        gson = new GsonBuilder().registerTypeAdapter(CommonTypeDefinition.class, new CommonTypeDefinitionDeserialiser())
                 .create();
     }
 
@@ -50,10 +48,10 @@ public class SchemaTest {
         assertEquals(4, healthcareApp.entityTypeNames().size());
         assertTrue(healthcareApp.entityTypeNames().containsAll(Arrays.asList("Role", "User", "InfoType", "Info")));
 
-        EntityType role = healthcareApp.getEntityType("Role");
-        EntityType user = healthcareApp.getEntityType("User");
-        EntityType infoType = healthcareApp.getEntityType("InfoType");
-        EntityType info = healthcareApp.getEntityType("Info");
+        EntityTypeDefinition role = healthcareApp.getEntityType("Role");
+        EntityTypeDefinition user = healthcareApp.getEntityType("User");
+        EntityTypeDefinition infoType = healthcareApp.getEntityType("InfoType");
+        EntityTypeDefinition info = healthcareApp.getEntityType("Info");
 
         assertEquals(infoType, Schema.resolveEntityType("HealthCareApp::InfoType", schema, healthcareApp));
 
@@ -82,26 +80,26 @@ public class SchemaTest {
         assertEquals(0, infoType.getShapeAttributeNames().size());
         assertEquals(2, info.getShapeAttributeNames().size());
 
-        AttributeType provider = info.getShapeAttributeType("provider");
-        AttributeType patient = info.getShapeAttributeType("patient");
+        CommonTypeDefinition provider = info.getShapeAttributeType("provider");
+        CommonTypeDefinition patient = info.getShapeAttributeType("patient");
 
-        assertTrue(provider instanceof EntityOrCommonType);
-        assertTrue(patient instanceof EntityOrCommonType);
+        assertTrue(provider.isResolved());
+        assertTrue(patient.isResolved());
 
-        assertTrue(((EntityOrCommonType) provider).isResolved());
-        assertTrue(((EntityOrCommonType) patient).isResolved());
+        assertTrue(provider instanceof EntityTypeReference);
+        assertTrue(patient instanceof EntityTypeReference);
 
-        assertEquals(user, ((EntityOrCommonType) provider).getEntityTypeOrNull());
-        assertEquals(user, ((EntityOrCommonType) patient).getEntityTypeOrNull());
+        assertEquals(user, ((EntityTypeReference) provider).getDefinition());
+        assertEquals(user, ((EntityTypeReference) patient).getDefinition());
 
         assertEquals(4, healthcareApp.actionNames().size());
         assertTrue(healthcareApp.actionNames()
                 .containsAll(Arrays.asList("createAppointment", "updateAppointment", "listAppointments")));
 
-        Action create = healthcareApp.getAction("createAppointment");
-        Action update = healthcareApp.getAction("updateAppointment");
-        Action delete = healthcareApp.getAction("deleteAppointment");
-        Action list = healthcareApp.getAction("listAppointments");
+        ActionDefinition create = healthcareApp.getAction("createAppointment");
+        ActionDefinition update = healthcareApp.getAction("updateAppointment");
+        ActionDefinition delete = healthcareApp.getAction("deleteAppointment");
+        ActionDefinition list = healthcareApp.getAction("listAppointments");
 
         assertEquals(create,
                 Schema.resolveActionType("createAppointment", "HealthCareApp::Action", schema, healthcareApp));
@@ -111,12 +109,12 @@ public class SchemaTest {
         assertEquals("deleteAppointment", delete.getName());
         assertEquals("listAppointments", list.getName());
 
-        assertEquals(1, create.getMemberOfActions().size());
-        assertEquals(0, update.getMemberOfActions().size());
-        assertEquals(0, delete.getMemberOfActions().size());
-        assertEquals(0, list.getMemberOfActions().size());
+        assertEquals(1, create.getMemberOf().size());
+        assertEquals(0, update.getMemberOf().size());
+        assertEquals(0, delete.getMemberOf().size());
+        assertEquals(0, list.getMemberOf().size());
 
-        assertTrue(create.getMemberOfActions().contains(update));
+        assertTrue(create.getMemberOf().contains(update));
 
         assertEquals(1, create.getAppliesToPrincipalTypes().size());
         assertEquals(1, update.getAppliesToPrincipalTypes().size());
@@ -143,27 +141,26 @@ public class SchemaTest {
         assertNull(delete.getAppliesToContext());
         assertNull(list.getAppliesToContext());
 
-        AttributeType referrer = create.getAppliesToContext().getAttributeType("referrer");
+        CommonTypeDefinition referrer = create.getAppliesToContext().getAttributeType("referrer");
 
-        assertTrue(referrer instanceof EntityOrCommonType);
-        assertEquals("referrer", referrer.getDefinitionName());
-        assertEquals("User", ((EntityOrCommonType) referrer).getName());
-        assertTrue(((EntityOrCommonType) referrer).isResolved());
-        assertEquals(user, ((EntityOrCommonType) referrer).getEntityTypeOrNull());
+        assertTrue(referrer.isResolved());
+        assertTrue(referrer instanceof EntityTypeReference);
+        assertEquals("referrer", referrer.getName());
+        assertEquals(user, ((EntityTypeReference) referrer).getDefinition());
 
         assertEquals(1, healthcareApp.commonTypeNames().size());
         assertTrue(healthcareApp.commonTypeNames().contains("AppointmentDetails"));
 
-        AttributeType details = healthcareApp.getCommonType("AppointmentDetails");
-        assertTrue(details instanceof RecordType);
+        CommonTypeDefinition details = healthcareApp.getCommonType("AppointmentDetails");
+        assertTrue(details instanceof RecordTypeDefinition);
 
         assertEquals(details, Schema.resolveCommonType("HealthCareApp::AppointmentDetails", schema, healthcareApp));
 
-        AttributeType detailAttr = create.getAppliesToContext().getAttributeType("detail");
+        CommonTypeDefinition detailAttr = create.getAppliesToContext().getAttributeType("detail");
 
-        assertTrue(detailAttr instanceof EntityOrCommonType);
-        assertTrue(((EntityOrCommonType) detailAttr).isResolved());
-        assertEquals(details, ((EntityOrCommonType) detailAttr).getCommonTypeOrNull());
+        assertTrue(detailAttr.isResolved());
+        assertTrue(detailAttr instanceof CommonTypeReference);
+        assertEquals(details, ((CommonTypeReference) detailAttr).getDefinition());
     }
 
     private void checkCollectionSchema(Schema schema) {
@@ -172,18 +169,19 @@ public class SchemaTest {
         assertEquals(0, dataApp.actionNames().size());
         assertEquals(0, dataApp.commonTypeNames().size());
 
-        EntityType user = dataApp.getEntityType("User");
-        EntityType colour = dataApp.getEntityType("Colour");
+        EntityTypeDefinition user = dataApp.getEntityType("User");
+        EntityTypeDefinition colour = dataApp.getEntityType("Colour");
         assertNotNull(user);
         assertNotNull(colour);
 
-        AttributeType nicknames = user.getShapeAttributeType("nicknames");
-        AttributeType preferences = user.getShapeAttributeType("preferences");
+        CommonTypeDefinition nicknames = user.getShapeAttributeType("nicknames");
+        CommonTypeDefinition preferences = user.getShapeAttributeType("preferences");
 
-        assertTrue(nicknames instanceof SetType);
-        assertTrue(preferences instanceof RecordType);
+        assertTrue(nicknames instanceof SetTypeDefinition);
+        assertTrue(preferences instanceof RecordTypeDefinition);
 
-        assertTrue(((RecordType) preferences).getAttributeNames().containsAll(Arrays.asList("diet", "colour")));
+        assertTrue(
+                ((RecordTypeDefinition) preferences).getAttributeNames().containsAll(Arrays.asList("diet", "colour")));
     }
 
     @Test

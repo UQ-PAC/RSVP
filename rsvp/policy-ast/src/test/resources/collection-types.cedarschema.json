@@ -8,14 +8,16 @@
             "nicknames": {
               "type": "Set",
               "element": {
-                "type": "String"
+                "type": "EntityOrCommon",
+                "name": "String"
               }
             },
             "preferences": {
               "type": "Record",
               "attributes": {
                 "diet": {
-                  "type": "String"
+                  "type": "EntityOrCommon",
+                  "name": "String"
                 },
                 "colour": {
                   "type": "EntityOrCommon",
@@ -24,7 +26,8 @@
               }
             },
             "consented": {
-              "type": "Boolean",
+              "type": "EntityOrCommon",
+              "name": "Boolean",
               "required": false
             }
           }

@@ -1,31 +1,53 @@
 package uq.pac.rsvp.policy.ast.visitor;
 
-import uq.pac.rsvp.policy.ast.schema.Action;
-import uq.pac.rsvp.policy.ast.schema.EntityType;
+import uq.pac.rsvp.policy.ast.schema.ActionDefinition;
+import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.Namespace;
 import uq.pac.rsvp.policy.ast.schema.Schema;
-import uq.pac.rsvp.policy.ast.schema.attribute.EntityOrCommonType;
-import uq.pac.rsvp.policy.ast.schema.attribute.ExtensionType;
-import uq.pac.rsvp.policy.ast.schema.attribute.PrimitiveType;
-import uq.pac.rsvp.policy.ast.schema.attribute.RecordType;
-import uq.pac.rsvp.policy.ast.schema.attribute.SetType;
+import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
+import uq.pac.rsvp.policy.ast.schema.common.CommonTypeReference;
+import uq.pac.rsvp.policy.ast.schema.common.DateTimeType;
+import uq.pac.rsvp.policy.ast.schema.common.DecimalType;
+import uq.pac.rsvp.policy.ast.schema.common.DurationType;
+import uq.pac.rsvp.policy.ast.schema.common.EntityTypeReference;
+import uq.pac.rsvp.policy.ast.schema.common.IpAddressType;
+import uq.pac.rsvp.policy.ast.schema.common.LongType;
+import uq.pac.rsvp.policy.ast.schema.common.RecordTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.common.SetTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.common.StringType;
 
 public interface SchemaVisitor {
     public void visitSchema(Schema schema);
 
     public void visitNamespace(Namespace namespace);
 
-    public void visitEntityType(EntityType type);
+    public void visitEntityTypeDefinition(EntityTypeDefinition type);
 
-    public void visitAction(Action action);
+    public void visitActionDefinition(ActionDefinition action);
 
-    public void visitEntityOrCommonAttributeType(EntityOrCommonType type);
+    public void visitRecordTypeDefinition(RecordTypeDefinition type);
 
-    public void visitExtensionAttributeType(ExtensionType type);
+    public void visitSetTypeDefinition(SetTypeDefinition type);
 
-    public void visitPrimitiveAttributeType(PrimitiveType type);
+    // Type references
+    public void visitEntityTypeReference(EntityTypeReference type);
 
-    public void visitRecordAttributeType(RecordType type);
+    public void visitCommonTypeReference(CommonTypeReference type);
 
-    public void visitSetAttributeType(SetType type);
+    // Primitive types
+    public void visitBoolean(BooleanType type);
+
+    public void visitLong(LongType type);
+
+    public void visitString(StringType type);
+
+    // Extension types
+    public void visitDateTime(DateTimeType type);
+
+    public void visitDecimal(DecimalType type);
+
+    public void visitDuration(DurationType type);
+
+    public void visitIpAddress(IpAddressType type);
+
 }

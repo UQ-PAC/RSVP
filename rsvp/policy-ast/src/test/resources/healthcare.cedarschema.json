@@ -74,10 +74,12 @@
         "type": "Record",
         "attributes": {
           "reason": {
-            "type": "String"
+            "type": "EntityOrCommon",
+            "name": "String"
           },
           "cost": {
-            "type": "Long"
+            "type": "EntityOrCommon",
+            "name": "Long"
           }
         }
       }

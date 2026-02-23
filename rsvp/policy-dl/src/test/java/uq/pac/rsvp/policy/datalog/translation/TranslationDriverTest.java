@@ -78,8 +78,8 @@ public class TranslationDriverTest {
         return schema;
     }
 
-    TypeInfo getTypeInfo() {
-        TypeInfo typeInfo = new TypeInfo();
+    TranslationTypeInfo getTypeInfo() {
+        TranslationTypeInfo typeInfo = new TranslationTypeInfo();
         typeInfo.put("principal", new EntityTypeReference("Account"));
         typeInfo.put("action", new EntityTypeReference("Action"));
         typeInfo.put("resource", new EntityTypeReference("Photo"));
@@ -122,7 +122,7 @@ public class TranslationDriverTest {
         Schema schema = getSchema();
         TranslationSchema translationSchema = TranslationSchema.get(schema);
 
-        TypeInfo types = getTypeInfo();
+        TranslationTypeInfo types = getTypeInfo();
         Map<String, Expression> expressions = makeExpressions();
 
         Expression principal = expressions.get("principal");

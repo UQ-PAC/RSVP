@@ -11,10 +11,12 @@ import java.util.List;
 
 public abstract class TranslationVoidAdapter implements PolicyVisitor {
     protected TranslationSchema schema;
+    protected TranslationTypeInfo typeInfo;
     protected List<DLRuleExpr> expressions;
 
-    public TranslationVoidAdapter(TranslationSchema schema) {
+    public TranslationVoidAdapter(TranslationSchema schema, TranslationTypeInfo typeInfo) {
         this.schema = schema;
+        this.typeInfo = typeInfo;
         this.expressions = new ArrayList<>();
     }
 

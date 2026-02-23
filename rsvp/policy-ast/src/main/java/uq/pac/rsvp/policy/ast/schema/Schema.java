@@ -12,10 +12,16 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import uq.pac.rsvp.policy.ast.schema.attribute.AttributeType;
-import uq.pac.rsvp.policy.ast.schema.attribute.AttributeType.AttributeTypeDeserialiser;
-import uq.pac.rsvp.policy.ast.schema.attribute.PrimitiveType;
-import uq.pac.rsvp.policy.ast.schema.attribute.PrimitiveType.PrimitiveTypeDeserialiser;
+import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition.CommonTypeDefinitionDeserialiser;
+import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
+import uq.pac.rsvp.policy.ast.schema.common.CommonTypeReference;
+import uq.pac.rsvp.policy.ast.schema.common.DateTimeType;
+import uq.pac.rsvp.policy.ast.schema.common.DecimalType;
+import uq.pac.rsvp.policy.ast.schema.common.DurationType;
+import uq.pac.rsvp.policy.ast.schema.common.EntityTypeReference;
+import uq.pac.rsvp.policy.ast.schema.common.IpAddressType;
+import uq.pac.rsvp.policy.ast.schema.common.LongType;
+import uq.pac.rsvp.policy.ast.schema.common.StringType;
 import uq.pac.rsvp.policy.ast.visitor.SchemaResolutionVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
@@ -37,7 +43,11 @@ public class Schema extends HashMap<String, Namespace> {
     public static Schema parseCedarSchema(Path schemaFile) throws JsonMappingException, JsonProcessingException,
             InternalException, NullPointerException, IllegalStateException, IOException {
         String cedar = Files.readString(schemaFile);
-        String json = com.cedarpolicy.model.schema.Schema.parse(JsonOrCedar.Cedar, cedar).toJsonFormat().toString();
+        String json = com.cedarpolicy.model.schema.Schema.parse(JsonOrCedar.Cedar,
+                cedar).toJsonFormat().toString();
+        // Resolve types:
+        // String json =
+        // com.cedarpolicy.model.schema.Schema.parseCedarSchemaToResolvedJson(cedar);
         return parseJsonSchema(json);
     }
 
@@ -47,7 +57,8 @@ public class Schema extends HashMap<String, Namespace> {
      * @param schemaFile the path to the Cedar schema file in the JSON format
      * @return a Schema instance corresponding to the parsed JSON schema file
      */
-    public static Schema parseJsonSchema(Path schemaFile) throws NullPointerException, IllegalStateException, IOException {
+    public static Schema parseJsonSchema(Path schemaFile)
+            throws NullPointerException, IllegalStateException, IOException {
         return parseJsonSchema(Files.readString(schemaFile));
     }
 
@@ -58,8 +69,8 @@ public class Schema extends HashMap<String, Namespace> {
      * @return a Schema instance corresponding to the parsed Cedar schema file
      */
     public static Schema parseJsonSchema(String json) throws NullPointerException, IllegalStateException {
-        Gson gson = new GsonBuilder().registerTypeAdapter(AttributeType.class, new AttributeTypeDeserialiser())
-                .registerTypeAdapter(PrimitiveType.class, new PrimitiveTypeDeserialiser())
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(CommonTypeDefinition.class, new CommonTypeDefinitionDeserialiser())
                 .create();
         Schema result = gson.fromJson(json, Schema.class);
         SchemaVisitor visitor = new SchemaResolutionVisitor();
@@ -67,7 +78,35 @@ public class Schema extends HashMap<String, Namespace> {
         return result;
     }
 
-    public static EntityType resolveEntityType(String entityType, Schema schema, Namespace local) {
+    // Cedar docs say type resolution order is:
+    // common type > entity type > primitive/extension type
+    public static CommonTypeDefinition resolveTypeReference(String name, Schema schema, Namespace local) {
+        CommonTypeDefinition common = resolveCommonType(name, schema, local);
+
+        if (common != null) {
+            return new CommonTypeReference(common);
+        }
+
+        EntityTypeDefinition entity = resolveEntityType(name, schema, local);
+
+        if (entity != null) {
+            return new EntityTypeReference(entity);
+        }
+
+        return switch (name) {
+            case "Boolean" -> new BooleanType();
+            case "Long" -> new LongType();
+            case "String" -> new StringType();
+            case "datetime" -> new DateTimeType();
+            case "decimal" -> new DecimalType();
+            case "duration" -> new DurationType();
+            case "ipaddr" -> new IpAddressType();
+            default -> null;
+        };
+
+    }
+
+    public static EntityTypeDefinition resolveEntityType(String entityType, Schema schema, Namespace local) {
         if (entityType.contains("::")) {
             String[] entityNameParts = entityType.split("::");
             if (schema.containsKey(entityNameParts[0])) {
@@ -80,7 +119,7 @@ public class Schema extends HashMap<String, Namespace> {
         return null;
     }
 
-    public static Action resolveActionType(String id, String type, Schema schema, Namespace local) {
+    public static ActionDefinition resolveActionType(String id, String type, Schema schema, Namespace local) {
 
         if (type != null) {
             if (!type.endsWith("::Action")) {
@@ -101,7 +140,7 @@ public class Schema extends HashMap<String, Namespace> {
 
     }
 
-    public static AttributeType resolveCommonType(String attributeType, Schema schema, Namespace local) {
+    public static CommonTypeDefinition resolveCommonType(String attributeType, Schema schema, Namespace local) {
         if (attributeType.contains("::")) {
             String[] entityNameParts = attributeType.split("::");
             if (schema.containsKey(entityNameParts[0])) {

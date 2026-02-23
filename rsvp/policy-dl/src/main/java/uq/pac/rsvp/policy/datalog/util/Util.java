@@ -19,5 +19,12 @@ public class Util {
         throw new RuntimeException("Unsupported type: " + o.getClass().getSimpleName());
     }
 
-
+    public static boolean instanceOf(Object o, Class<?> ... cls) {
+        for (Class<?> c : cls) {
+            if (c.isInstance(o)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

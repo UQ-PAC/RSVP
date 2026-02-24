@@ -39,15 +39,11 @@ public class TranslationSchema {
         return sb.toString();
     }
 
-    // FIXME: Find out what happens to namespaces
     public static TranslationSchema get(Schema schema) {
-        List<TranslationType> types = schema.values().stream().flatMap(namespace -> {
-                return namespace.entityTypeNames().stream()
-                        .map(namespace::getEntityType)
-                        .map(entity -> new TranslationType(entity, namespace))
-                        .toList()
-                        .stream();
-        }).toList();
-        return new TranslationSchema(types);
+        return new TranslationSchema(schema.entityTypeNames()
+                        .stream()
+                        .map(schema::getEntityType)
+                        .map(TranslationType::new)
+                        .toList());
     }
 }

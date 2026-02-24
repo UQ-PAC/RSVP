@@ -36,8 +36,8 @@ public class TranslationVisitor extends TranslationVoidAdapter {
 
                 // FIXME: Should not be a string expression
                 // FIXME: Quoted string
-                String typeString = expr.getRight().toString().replace("\"", "");
-                String relationName = schema.getTranslationType(typeString)
+                TypeExpression typeExpr = required(expr.getRight(), TypeExpression.class);
+                String relationName = schema.getTranslationType(typeExpr.getValue())
                         .getEntityRelation()
                         .getName();
                 expressions.add(new DLAtom(relationName, var));

@@ -98,4 +98,9 @@ public abstract class TranslationValueAdapter<T> implements PolicyComputationVis
     public T visitStringExpr(StringExpression expr) {
         throw new RuntimeException("unsupported");
     }
+
+    @Override
+    public T visitTypeExpr(TypeExpression expr) {
+        throw new RuntimeException("unsupported");
+    }
 }

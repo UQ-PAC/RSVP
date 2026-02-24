@@ -21,40 +21,42 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
         this.schema = schema;
         for (Map.Entry<String, Namespace> entry : schema.entrySet()) {
             this.namespace = entry.getValue();
-            entry.getValue().setName(entry.getKey());
-            entry.getValue().accept(this);
-        }
-    }
+            this.namespace.setName(entry.getKey());
 
-    @Override
-    public void visitNamespace(Namespace namespace) {
-        for (String name : namespace.entityTypeNames()) {
-            EntityTypeDefinition entityType = namespace.getEntityType(name);
-            entityType.setName(name);
-            entityType.accept(this);
-        }
-
-        for (String name : namespace.actionNames()) {
-            ActionDefinition action = namespace.getAction(name);
-            action.setName(name);
-            action.accept(this);
-        }
-
-        for (String name : namespace.commonTypeNames()) {
-            CommonTypeDefinition commonType = namespace.getCommonType(name);
-
-            if (!commonType.isResolved()) {
-                commonType = Schema.resolveTypeReference(commonType.getName(), schema, namespace);
-
-                if (commonType == null) {
-                    continue; // TODO: error reporting
-                }
-
-                namespace.resolveCommonType(name, commonType);
+            for (String name : this.namespace.entityTypeNames()) {
+                EntityTypeDefinition entityType = this.namespace.getEntityType(name);
+                String qualifiedName = this.namespace.getName() + "::" + name;
+                schema.putEntityType(qualifiedName, entityType);
+                entityType.setName(qualifiedName);
+                entityType.accept(this);
             }
 
-            commonType.setName(name);
-            commonType.accept(this);
+            for (String name : this.namespace.actionNames()) {
+                ActionDefinition action = this.namespace.getAction(name);
+                String qualifiedName = this.namespace.getName() + "::Action::" + name;
+                schema.putAction(qualifiedName, action);
+                action.setName(qualifiedName);
+                action.accept(this);
+            }
+
+            for (String name : this.namespace.commonTypeNames()) {
+                CommonTypeDefinition commonType = this.namespace.getCommonType(name);
+
+                if (!commonType.isResolved()) {
+                    commonType = Schema.resolveTypeReference(commonType.getName(), schema, this.namespace);
+
+                    if (commonType == null) {
+                        continue; // TODO: error reporting
+                    }
+
+                    this.namespace.resolveCommonType(name, commonType);
+                }
+
+                String qualifiedName = this.namespace.getName() + "::" + name;
+                schema.putCommonType(qualifiedName, commonType);
+                commonType.setName(qualifiedName);
+                commonType.accept(this);
+            }
         }
     }
 

@@ -1,0 +1,35 @@
+{
+  "One": {
+    "entityTypes": {
+      "A": {}
+    },
+    "actions": {},
+    "commonTypes": {}
+  },
+  "Two": {
+    "entityTypes": {
+      "A": {},
+      "B": {
+        "shape": {
+          "type": "Record",
+          "attributes": {
+            "a": {
+              "type": "EntityOrCommon",
+              "name": "One::A"
+            },
+            "b": {
+              "type": "EntityOrCommon",
+              "name": "Two::A"
+            },
+            "c": {
+              "type": "EntityOrCommon",
+              "name": "A"
+            }
+          }
+        }
+      }
+    },
+    "actions": {},
+    "commonTypes": {}
+  }
+}

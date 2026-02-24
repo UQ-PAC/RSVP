@@ -19,8 +19,6 @@ import uq.pac.rsvp.policy.ast.schema.common.StringType;
 public interface SchemaVisitor {
     public void visitSchema(Schema schema);
 
-    public void visitNamespace(Namespace namespace);
-
     public void visitEntityTypeDefinition(EntityTypeDefinition type);
 
     public void visitActionDefinition(ActionDefinition action);

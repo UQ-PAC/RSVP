@@ -1,0 +1,20 @@
+{
+  "": {
+    "entityTypes": {
+      "Account": {
+        "shape": {
+          "type": "Record",
+          "attributes": {
+            "age": {
+              "type": "Long"
+            },
+            "name": {
+              "type": "String"
+            }
+          }
+        }
+      }
+    },
+    "actions": {}
+  }
+}

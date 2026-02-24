@@ -120,6 +120,11 @@ public class Schema extends HashMap<String, Namespace> {
     // Cedar docs say type resolution order is:
     // common type > entity type > primitive/extension type
     public static CommonTypeDefinition resolveTypeReference(String name, Schema schema, Namespace local) {
+
+        if (name == null) {
+            return null;
+        }
+
         CommonTypeDefinition common = resolveCommonType(name, schema, local);
 
         if (common != null) {
@@ -146,19 +151,25 @@ public class Schema extends HashMap<String, Namespace> {
     }
 
     public static EntityTypeDefinition resolveEntityType(String entityType, Schema schema, Namespace local) {
-        if (entityType.contains("::")) {
-            String[] entityNameParts = entityType.split("::");
-            if (schema.containsKey(entityNameParts[0])) {
-                return schema.get(entityNameParts[0]).getEntityType(entityNameParts[1]);
+        if (entityType != null) {
+            if (entityType.contains("::")) {
+                String[] entityNameParts = entityType.split("::");
+                if (schema.containsKey(entityNameParts[0])) {
+                    return schema.get(entityNameParts[0]).getEntityType(entityNameParts[1]);
+                }
+            } else {
+                return local.getEntityType(entityType);
             }
-        } else {
-            return local.getEntityType(entityType);
         }
 
         return null;
     }
 
     public static ActionDefinition resolveActionType(String id, String type, Schema schema, Namespace local) {
+
+        if (id == null) {
+            return null;
+        }
 
         if (type != null) {
             if (!type.endsWith("::Action")) {
@@ -180,13 +191,15 @@ public class Schema extends HashMap<String, Namespace> {
     }
 
     public static CommonTypeDefinition resolveCommonType(String attributeType, Schema schema, Namespace local) {
-        if (attributeType.contains("::")) {
-            String[] entityNameParts = attributeType.split("::");
-            if (schema.containsKey(entityNameParts[0])) {
-                return schema.get(entityNameParts[0]).getCommonType(entityNameParts[1]);
+        if (attributeType != null) {
+            if (attributeType.contains("::")) {
+                String[] entityNameParts = attributeType.split("::");
+                if (schema.containsKey(entityNameParts[0])) {
+                    return schema.get(entityNameParts[0]).getCommonType(entityNameParts[1]);
+                }
+            } else {
+                return local.getCommonType(attributeType);
             }
-        } else {
-            return local.getCommonType(attributeType);
         }
 
         return null;

@@ -1,5 +1,6 @@
 package uq.pac.rsvp.policy.ast.schema;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -200,6 +201,17 @@ public class SchemaTest {
             new SchemaResolutionVisitor().visitSchema(schema);
 
             checkShadowing(schema);
+        }
+
+        @Test
+        @DisplayName("handles resolved type format")
+        public void invalidTypes() throws IOException {
+            URL url = ClassLoader.getSystemResource("invalid-types.cedarschema.json");
+            String json = Files.readString(Path.of(url.getPath()));
+            Schema schema = gson.fromJson(json, Schema.class);
+
+            assertDoesNotThrow(() -> new SchemaResolutionVisitor().visitSchema(schema));
+
         }
     }
 

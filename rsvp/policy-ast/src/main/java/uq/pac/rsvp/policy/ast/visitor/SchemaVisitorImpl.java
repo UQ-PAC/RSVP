@@ -20,23 +20,16 @@ public class SchemaVisitorImpl implements SchemaVisitor {
 
     @Override
     public void visitSchema(Schema schema) {
-        for (Namespace namespace : schema.values()) {
-            namespace.accept(this);
-        }
-    }
-
-    @Override
-    public void visitNamespace(Namespace namespace) {
-        for (String entityType : namespace.entityTypeNames()) {
-            namespace.getEntityType(entityType).accept(this);
+        for (String entityType : schema.entityTypeNames()) {
+            schema.getEntityType(entityType).accept(this);
         }
 
-        for (String action : namespace.actionNames()) {
-            namespace.getAction(action).accept(this);
+        for (String action : schema.actionNames()) {
+            schema.getAction(action).accept(this);
         }
 
-        for (String commonType : namespace.commonTypeNames()) {
-            namespace.getCommonType(commonType).accept(this);
+        for (String commonType : schema.commonTypeNames()) {
+            schema.getCommonType(commonType).accept(this);
         }
     }
 

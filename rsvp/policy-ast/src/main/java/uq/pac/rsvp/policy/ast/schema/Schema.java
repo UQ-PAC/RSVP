@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import javax.swing.Action;
 
 import com.cedarpolicy.model.exception.InternalException;
 import com.cedarpolicy.model.schema.Schema.JsonOrCedar;
@@ -27,6 +31,46 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class Schema extends HashMap<String, Namespace> {
 
+    private Map<String, EntityTypeDefinition> entityTypes = new HashMap<>();
+    private Map<String, ActionDefinition> actions = new HashMap<>();
+    private Map<String, CommonTypeDefinition> commonTypes = new HashMap<>();
+
+    public Set<String> entityTypeNames() {
+        return Set.copyOf(entityTypes.keySet());
+    }
+
+    public EntityTypeDefinition getEntityType(String name) {
+        return entityTypes.get(name);
+    }
+
+    public void putEntityType(String name, EntityTypeDefinition type) {
+        entityTypes.put(name, type);
+    }
+
+    public Set<String> actionNames() {
+        return Set.copyOf(actions.keySet());
+    }
+
+    public ActionDefinition getAction(String name) {
+        return actions.get(name);
+    }
+
+    public void putAction(String name, ActionDefinition action) {
+        actions.put(name, action);
+    }
+
+    public Set<String> commonTypeNames() {
+        return Set.copyOf(commonTypes.keySet());
+    }
+
+    public CommonTypeDefinition getCommonType(String name) {
+        return commonTypes.get(name);
+    }
+
+    public void putCommonType(String name, CommonTypeDefinition type) {
+        commonTypes.put(name, type);
+    }
+
     /**
      * Parse a schema in the Cedar format and return the corresponding AST.
      * 
@@ -45,9 +89,6 @@ public class Schema extends HashMap<String, Namespace> {
         String cedar = Files.readString(schemaFile);
         String json = com.cedarpolicy.model.schema.Schema.parse(JsonOrCedar.Cedar,
                 cedar).toJsonFormat().toString();
-        // Resolve types:
-        // String json =
-        // com.cedarpolicy.model.schema.Schema.parseCedarSchemaToResolvedJson(cedar);
         return parseJsonSchema(json);
     }
 

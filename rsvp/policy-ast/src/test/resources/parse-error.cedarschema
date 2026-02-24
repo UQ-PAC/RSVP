@@ -1,0 +1,4 @@
+entity App::Role;
+namespace App {
+   entity Visibility;
+}

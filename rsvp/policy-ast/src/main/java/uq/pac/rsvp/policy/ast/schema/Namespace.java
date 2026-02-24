@@ -5,10 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
-import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
-
-public class Namespace implements SchemaFileEntry {
+public class Namespace {
 
     private final Map<String, EntityTypeDefinition> entityTypes;
     private final Map<String, ActionDefinition> actions;
@@ -58,16 +55,6 @@ public class Namespace implements SchemaFileEntry {
 
     public CommonTypeDefinition resolveCommonType(String name, CommonTypeDefinition definition) {
         return commonTypes != null ? commonTypes.put(name, definition) : null;
-    }
-
-    @Override
-    public void accept(SchemaVisitor visitor) {
-        visitor.visitNamespace(this);
-    }
-
-    @Override
-    public <T> T compute(SchemaComputationVisitor<T> visitor) {
-        return visitor.visitNamespace(this);
     }
 
 }

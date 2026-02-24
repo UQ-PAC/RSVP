@@ -3,6 +3,7 @@ package uq.pac.rsvp.policy.ast.schema;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -109,6 +111,33 @@ public class SchemaTest {
             checkCircularReference(schema);
         }
 
+        @Test
+        @DisplayName("throws parser errors")
+        public void parseError() throws JsonMappingException,
+                JsonProcessingException, InternalException,
+                NullPointerException, IllegalStateException, IOException {
+            URL url = ClassLoader.getSystemResource("parse-error.cedarschema");
+            assertThrowsExactly(InternalException.class, () -> Schema.parseCedarSchema(Path.of(url.getPath())));
+        }
+
+        @Test
+        @DisplayName("throws illegal shadowing errors")
+        public void illegalShadow() throws JsonMappingException,
+                JsonProcessingException, InternalException,
+                NullPointerException, IllegalStateException, IOException {
+            URL url = ClassLoader.getSystemResource("illegal-shadow.cedarschema");
+            assertThrowsExactly(InternalException.class, () -> Schema.parseCedarSchema(Path.of(url.getPath())));
+        }
+
+        @Test
+        @DisplayName("handles legal shadowing")
+        public void legalShadow() throws JsonMappingException,
+                JsonProcessingException, InternalException,
+                NullPointerException, IllegalStateException, IOException {
+            URL url = ClassLoader.getSystemResource("legal-shadow.cedarschema");
+            Schema schema = Schema.parseCedarSchema(Path.of(url.getPath()));
+            checkShadowing(schema);
+        }
     }
 
     @Nested
@@ -160,6 +189,18 @@ public class SchemaTest {
             new SchemaResolutionVisitor().visitSchema(schema);
 
             checkEmptyNamespace(schema);
+        }
+
+        @Test
+        @DisplayName("handles legal shadowing")
+        public void legalShadow() throws IOException {
+            URL url = ClassLoader.getSystemResource("legal-shadow.cedarschema.json");
+            String json = Files.readString(Path.of(url.getPath()));
+            Schema schema = gson.fromJson(json, Schema.class);
+
+            new SchemaResolutionVisitor().visitSchema(schema);
+
+            checkShadowing(schema);
         }
     }
 
@@ -223,6 +264,36 @@ public class SchemaTest {
             checkCircularReference(schema);
         }
 
+        @Test
+        @DisplayName("handles legal shadowing")
+        public void legalShadow() {
+            Schema schema = new Schema();
+
+            Map<String, EntityTypeDefinition> oneEntities = new HashMap<>();
+            oneEntities.put("A", new EntityTypeDefinition(new HashSet<>(), new HashMap<>()));
+
+            Namespace one = new Namespace(oneEntities, new HashMap<>(), new HashMap<>());
+            schema.put("One", one);
+
+            Map<String, EntityTypeDefinition> twoEntities = new HashMap<>();
+
+            twoEntities.put("A", new EntityTypeDefinition(new HashSet<>(), new HashMap<>()));
+
+            Map<String, CommonTypeDefinition> shape = new HashMap<>();
+
+            shape.put("a", new UnresolvedTypeReference("One::A"));
+            shape.put("b", new UnresolvedTypeReference("Two::A"));
+            shape.put("c", new UnresolvedTypeReference("A"));
+            twoEntities.put("B", new EntityTypeDefinition(new HashSet<>(), shape));
+
+            Namespace two = new Namespace(twoEntities, new HashMap<>(), new HashMap<>());
+            schema.put("Two", two);
+
+            new SchemaResolutionVisitor().visitSchema(schema);
+
+            checkShadowing(schema);
+        }
+
     }
 
     private void checkHealthCareSchema(Schema schema) {
@@ -234,6 +305,9 @@ public class SchemaTest {
 
         assertEquals(4, healthcareApp.entityTypeNames().size());
         assertTrue(healthcareApp.entityTypeNames().containsAll(Arrays.asList("Role", "User", "InfoType", "Info")));
+        assertEquals(4, schema.entityTypeNames().size());
+        assertTrue(schema.entityTypeNames().containsAll(Arrays.asList("HealthCareApp::Role", "HealthCareApp::User",
+                "HealthCareApp::InfoType", "HealthCareApp::Info")));
 
         EntityTypeDefinition role = healthcareApp.getEntityType("Role");
         EntityTypeDefinition user = healthcareApp.getEntityType("User");
@@ -241,11 +315,12 @@ public class SchemaTest {
         EntityTypeDefinition info = healthcareApp.getEntityType("Info");
 
         assertEquals(infoType, Schema.resolveEntityType("HealthCareApp::InfoType", schema, healthcareApp));
+        assertEquals(infoType, schema.getEntityType("HealthCareApp::InfoType"));
 
-        assertEquals("Role", role.getName());
-        assertEquals("User", user.getName());
-        assertEquals("InfoType", infoType.getName());
-        assertEquals("Info", info.getName());
+        assertEquals("HealthCareApp::Role", role.getName());
+        assertEquals("HealthCareApp::User", user.getName());
+        assertEquals("HealthCareApp::InfoType", infoType.getName());
+        assertEquals("HealthCareApp::Info", info.getName());
 
         assertEquals(3, role.getEntityNamesEnum().size());
         assertEquals(0, user.getEntityNamesEnum().size());
@@ -280,8 +355,14 @@ public class SchemaTest {
         assertEquals(user, ((EntityTypeReference) patient).getDefinition());
 
         assertEquals(4, healthcareApp.actionNames().size());
-        assertTrue(healthcareApp.actionNames()
-                .containsAll(Arrays.asList("createAppointment", "updateAppointment", "listAppointments")));
+        assertEquals(4, schema.actionNames().size());
+
+        assertTrue(healthcareApp.actionNames().containsAll(
+                Arrays.asList("createAppointment", "updateAppointment", "deleteAppointment", "listAppointments")));
+        assertTrue(schema.actionNames()
+                .containsAll(Arrays.asList("HealthCareApp::Action::createAppointment",
+                        "HealthCareApp::Action::updateAppointment", "HealthCareApp::Action::deleteAppointment",
+                        "HealthCareApp::Action::listAppointments")));
 
         ActionDefinition create = healthcareApp.getAction("createAppointment");
         ActionDefinition update = healthcareApp.getAction("updateAppointment");
@@ -290,11 +371,12 @@ public class SchemaTest {
 
         assertEquals(create,
                 Schema.resolveActionType("createAppointment", "HealthCareApp::Action", schema, healthcareApp));
+        assertEquals(create, schema.getAction("HealthCareApp::Action::createAppointment"));
 
-        assertEquals("createAppointment", create.getName());
-        assertEquals("updateAppointment", update.getName());
-        assertEquals("deleteAppointment", delete.getName());
-        assertEquals("listAppointments", list.getName());
+        assertEquals("HealthCareApp::Action::createAppointment", create.getName());
+        assertEquals("HealthCareApp::Action::updateAppointment", update.getName());
+        assertEquals("HealthCareApp::Action::deleteAppointment", delete.getName());
+        assertEquals("HealthCareApp::Action::listAppointments", list.getName());
 
         assertEquals(1, create.getMemberOf().size());
         assertEquals(0, update.getMemberOf().size());
@@ -336,12 +418,15 @@ public class SchemaTest {
         assertEquals(user, ((EntityTypeReference) referrer).getDefinition());
 
         assertEquals(1, healthcareApp.commonTypeNames().size());
+        assertEquals(1, schema.commonTypeNames().size());
         assertTrue(healthcareApp.commonTypeNames().contains("AppointmentDetails"));
+        assertTrue(schema.commonTypeNames().contains("HealthCareApp::AppointmentDetails"));
 
         CommonTypeDefinition details = healthcareApp.getCommonType("AppointmentDetails");
         assertTrue(details instanceof RecordTypeDefinition);
 
         assertEquals(details, Schema.resolveCommonType("HealthCareApp::AppointmentDetails", schema, healthcareApp));
+        assertEquals(details, schema.getCommonType("HealthCareApp::AppointmentDetails"));
 
         CommonTypeDefinition detailAttr = create.getAppliesToContext().getAttributeType("detail");
 
@@ -445,5 +530,41 @@ public class SchemaTest {
 
         assertTrue(duration instanceof DurationType);
         assertTrue(deep instanceof BooleanType);
+    }
+
+    private void checkShadowing(Schema schema) {
+        Namespace one = schema.get("One");
+        Namespace two = schema.get("Two");
+
+        EntityTypeDefinition oneA = one.getEntityType("A");
+        assertNotNull(oneA);
+        assertEquals("One::A", oneA.getName());
+
+        EntityTypeDefinition twoA = two.getEntityType("A");
+        assertNotNull(twoA);
+        assertEquals("Two::A", twoA.getName());
+
+        EntityTypeDefinition twoB = two.getEntityType("B");
+        assertNotNull(twoB);
+        assertEquals("Two::B", twoB.getName());
+
+        assertEquals(oneA, schema.getEntityType("One::A"));
+        assertEquals(twoA, schema.getEntityType("Two::A"));
+        assertEquals(twoB, schema.getEntityType("Two::B"));
+
+        CommonTypeDefinition a = twoB.getShapeAttributeType("a");
+        CommonTypeDefinition b = twoB.getShapeAttributeType("b");
+        CommonTypeDefinition c = twoB.getShapeAttributeType("c");
+        assertNotNull(a);
+        assertNotNull(b);
+        assertNotNull(c);
+
+        assertTrue(a instanceof EntityTypeReference);
+        assertTrue(b instanceof EntityTypeReference);
+        assertTrue(c instanceof EntityTypeReference);
+
+        assertEquals(oneA, ((EntityTypeReference) a).getDefinition());
+        assertEquals(twoA, ((EntityTypeReference) b).getDefinition());
+        assertEquals(twoA, ((EntityTypeReference) c).getDefinition());
     }
 }

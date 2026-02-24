@@ -1,7 +1,16 @@
 permit (
-    principal is Photo,
-    action,
-    resource
+    principal is User in Group::"Cats",
+    action == Action::"View",
+    resource is Photo
 ) when {
-    (2 + 3 - 1) ==
+    resource in principal
 };
+
+permit (
+    principal,
+    action,
+    resource is Photo
+) when {
+    principal has company && principal.company == "pets"
+};
+

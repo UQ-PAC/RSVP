@@ -462,11 +462,15 @@ public class SchemaTest {
         assertEquals(1, namespace.actionNames().size());
         assertEquals(0, namespace.commonTypeNames().size());
 
-        EntityTypeDefinition person = namespace.getEntityType("Person");
+        EntityTypeDefinition person = schema.getEntityType("Person");
         assertNotNull(person);
+        assertEquals("Person", person.getName());
+        assertEquals(person, namespace.getEntityType("Person"));
 
-        ActionDefinition slap = namespace.getAction("slap");
+        ActionDefinition slap = schema.getAction("Action::slap");
         assertNotNull(slap);
+        assertEquals("Action::slap", slap.getName());
+        assertEquals(slap, namespace.getAction("slap"));
 
         Set<EntityTypeDefinition> principals = slap.getAppliesToPrincipalTypes();
         Set<EntityTypeDefinition> resources = slap.getAppliesToResourceTypes();

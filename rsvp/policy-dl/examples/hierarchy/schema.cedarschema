@@ -23,3 +23,8 @@ action "View" appliesTo {
   context: {}
 };
 
+action "Look" appliesTo {
+  principal: [User, Admin, Group],
+  resource: Photo,
+  context: {}
+};

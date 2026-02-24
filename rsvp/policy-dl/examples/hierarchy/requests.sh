@@ -42,4 +42,9 @@ authorise 'User::"Bob"'   'Action::"View"' 'Photo::"gathering"'
 authorise 'User::"Carl"'  'Action::"View"' 'Photo::"gathering"'
 authorise 'Admin::"Tim"'  'Action::"View"' 'Photo::"gathering"'
 
+echo ========
+
+authorise 'User::"Alice"' 'Action::"Look"' 'Photo::"gathering"'
+authorise 'Admin::"Tim"'  'Action::"Look"' 'Photo::"gathering"'
+
 exit 0

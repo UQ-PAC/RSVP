@@ -21,11 +21,16 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
         this.schema = schema;
         for (Map.Entry<String, Namespace> entry : schema.entrySet()) {
             this.namespace = entry.getValue();
-            this.namespace.setName(entry.getKey());
+
+            String namespaceName = entry.getKey();
+
+            this.namespace.setName(namespaceName);
+
+            boolean topNamespace = namespaceName.isEmpty();
 
             for (String name : this.namespace.entityTypeNames()) {
                 EntityTypeDefinition entityType = this.namespace.getEntityType(name);
-                String qualifiedName = this.namespace.getName() + "::" + name;
+                String qualifiedName = topNamespace ? name : namespaceName + "::" + name;
                 schema.putEntityType(qualifiedName, entityType);
                 entityType.setName(qualifiedName);
                 entityType.accept(this);
@@ -33,7 +38,7 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
 
             for (String name : this.namespace.actionNames()) {
                 ActionDefinition action = this.namespace.getAction(name);
-                String qualifiedName = this.namespace.getName() + "::Action::" + name;
+                String qualifiedName = topNamespace ? "Action::" + name : namespaceName + "::Action::" + name;
                 schema.putAction(qualifiedName, action);
                 action.setName(qualifiedName);
                 action.accept(this);
@@ -52,7 +57,7 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
                     this.namespace.resolveCommonType(name, commonType);
                 }
 
-                String qualifiedName = this.namespace.getName() + "::" + name;
+                String qualifiedName = topNamespace ? name : namespaceName + "::" + name;
                 schema.putCommonType(qualifiedName, commonType);
                 commonType.setName(qualifiedName);
                 commonType.accept(this);

@@ -3,6 +3,9 @@ package uq.pac.rsvp.policy.datalog.translation;
 import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.exception.InternalException;
 import org.junit.jupiter.api.Test;
+import org.logicng.formulas.Formula;
+import org.logicng.transformations.dnf.DNFFactorization;
+import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.ast.schema.Namespace;
 import uq.pac.rsvp.policy.ast.schema.Schema;
@@ -62,6 +65,13 @@ public class TranslationDriverTest {
         data.put("when", new BinaryExpression(prop2, BinaryExpression.BinaryOp.Eq, publicVisibility));
 
         return data;
+    }
+
+    @Test
+    void testPolicy() throws IOException, InternalException {
+        PolicySet policySet = PolicySet.parseCedarPolicySet(POLICIES);
+        Expression expr = policySet.getFirst().getCondition();
+        System.out.println(NFConverter.toDNF(expr));
     }
 
     @Test

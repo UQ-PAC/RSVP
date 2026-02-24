@@ -1,4 +1,4 @@
-entity Visibility;
+entity Visibility [ "Private", "Protected", "Public" ];
 entity Role enum [ "User", "Admin" ];
 
 entity Account = {

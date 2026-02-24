@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.Action;
-
 import com.cedarpolicy.model.exception.InternalException;
 import com.cedarpolicy.model.schema.Schema.JsonOrCedar;
 import com.fasterxml.jackson.core.JsonProcessingException;

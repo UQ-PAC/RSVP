@@ -53,7 +53,7 @@ public class EntityExpression extends Expression {
 
     @Override
     public String toString() {
-        return String.join("::", path) + "::\"" + eid + "\"";
+        return path.isEmpty() ? eid : String.join("::", path) + "::\"" + eid + "\"";
     }
 
     public static class EntityExpressionDeserialiser implements JsonDeserializer<EntityExpression> {
@@ -66,7 +66,11 @@ public class EntityExpression extends Expression {
             String[] euid = json.getAsJsonObject().get("value").getAsString().split("::");
             int parts = Array.getLength(euid);
 
-            return new EntityExpression(euid[parts - 1], Arrays.asList(euid).subList(0, parts - 1),
+            String quotedName = euid[parts - 1];
+
+            return new EntityExpression(
+                    quotedName.startsWith("\"") ? quotedName.substring(1, quotedName.length() - 1) : quotedName,
+                    Arrays.asList(euid).subList(0, parts - 1),
                     context.deserialize(src, SourceLoc.class));
         }
 

@@ -2,7 +2,6 @@ package uq.pac.rsvp.policy.ast.visitor;
 
 import uq.pac.rsvp.policy.ast.schema.ActionDefinition;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
-import uq.pac.rsvp.policy.ast.schema.Namespace;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.policy.ast.schema.common.CommonTypeReference;

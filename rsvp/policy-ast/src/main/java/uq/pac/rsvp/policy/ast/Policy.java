@@ -1,5 +1,8 @@
 package uq.pac.rsvp.policy.ast;
 
+import java.util.Collections;
+import java.util.Map;
+
 import com.google.gson.annotations.SerializedName;
 
 import uq.pac.rsvp.policy.ast.expr.Expression;
@@ -16,17 +19,23 @@ public class Policy extends PolicyFileEntry {
         Forbid
     }
 
-    private Effect effect;
-    private Expression condition;
+    private final Effect effect;
+    private final Expression condition;
+    private final Map<String, String> annotations;
 
-    public Policy(Effect effect, Expression condition, SourceLoc source) {
+    public Policy(Effect effect, Expression condition, Map<String, String> annotations, SourceLoc source) {
         super(source);
         this.effect = effect;
         this.condition = condition;
+        this.annotations = annotations != null ? Map.copyOf(annotations) : Collections.emptyMap();
+    }
+
+    public Policy(Effect effect, Expression condition, Map<String, String> annotations) {
+        this(effect, condition, annotations, SourceLoc.MISSING);
     }
 
     public Policy(Effect effect, Expression condition) {
-        this(effect, condition, SourceLoc.MISSING);
+        this(effect, condition, null, SourceLoc.MISSING);
     }
 
     public boolean isPermit() {
@@ -39,6 +48,10 @@ public class Policy extends PolicyFileEntry {
 
     public Expression getCondition() {
         return condition;
+    }
+
+    public Map<String, String> getAnnotations() {
+        return annotations;
     }
 
     @Override

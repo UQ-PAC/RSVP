@@ -39,6 +39,16 @@ public class PolicyTest {
             assertEquals(SourceLoc.MISSING, policy.getSourceLoc());
             assertEquals("true", policy.getCondition().toString());
         }
+
+        @Test
+        @DisplayName("handles annotations")
+        void testAnnotations() {
+            String json = "{ \"effect\": \"permit\", \"condition\": { \"type\": \"bool\", \"value\": \"true\" }, \"annotations\": { \"key\": \"value\"}}";
+            Gson gson = new GsonBuilder().registerTypeAdapter(Expression.class, new ExpressionDeserialiser())
+                    .create();
+            Policy policy = gson.fromJson(json, Policy.class);
+            assertEquals("value", policy.getAnnotations().get("key"));
+        }
     }
 
     @Nested

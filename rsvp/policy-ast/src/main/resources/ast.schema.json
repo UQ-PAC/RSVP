@@ -16,7 +16,14 @@
         "description": "Expression representing the condition under which a policy should be applied. Includes conditions specified in when and unless clauses as well as constraints on principals, resources or actions.",
         "$ref": "#/$defs/expr"
       },
-      "source": { "$ref": "#/$defs/source" }
+      "source": { "$ref": "#/$defs/source" },
+      "annotations": {
+        "type": "object",
+        "description": "Optional policy annotations (key-value pairs)",
+        "additionalProperties": {
+          "type": "string"
+        }
+      }
     },
     "required": ["effect"],
     "additionalProperties": false

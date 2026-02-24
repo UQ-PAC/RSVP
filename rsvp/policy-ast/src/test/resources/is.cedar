@@ -1,0 +1,1 @@
+permit(principal is App::Role::Admin, action, resource);

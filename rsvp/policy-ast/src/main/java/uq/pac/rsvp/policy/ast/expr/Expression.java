@@ -27,6 +27,7 @@ public abstract class Expression extends PolicyFileEntry {
         EntityLiteral,
         LongLiteral,
         StringLiteral,
+        Type,
         Record,
         Set
     }
@@ -68,6 +69,7 @@ public abstract class Expression extends PolicyFileEntry {
                 case "str" -> StringExpression.class;
                 case "record" -> RecordExpression.class;
                 case "set" -> SetExpression.class;
+                case "type" -> TypeExpression.class;
                 default -> throw new JsonParseException("Unknown expression type: " + type);
             };
 

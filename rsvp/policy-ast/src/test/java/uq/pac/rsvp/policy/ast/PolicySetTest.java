@@ -35,7 +35,7 @@ public class PolicySetTest {
     }
 
     @Nested
-    @DisplayName("Parse Cedar policies")
+    @DisplayName("Cedar policies")
     class TestCedarParsing {
 
         @ParameterizedTest
@@ -53,7 +53,7 @@ public class PolicySetTest {
     }
 
     @Nested
-    @DisplayName("Parse JSON policies")
+    @DisplayName("JSON policies")
     class TestJSONParsing {
 
         @ParameterizedTest

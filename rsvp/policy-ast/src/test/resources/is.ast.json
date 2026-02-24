@@ -1,0 +1,17 @@
+[
+  {
+    "effect": "permit",
+    "condition": {
+      "type": "binary",
+      "op": "is",
+      "left": {
+        "type": "var",
+        "ref": "principal"
+      },
+      "right": {
+        "type": "type",
+        "value": "App::Role::Admin"
+      }
+    }
+  }
+]

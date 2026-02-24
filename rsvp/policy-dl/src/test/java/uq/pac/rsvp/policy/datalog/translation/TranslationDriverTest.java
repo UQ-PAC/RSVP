@@ -1,88 +1,36 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
 import com.cedarpolicy.model.entity.Entities;
+import com.cedarpolicy.model.exception.InternalException;
 import org.junit.jupiter.api.Test;
 import uq.pac.rsvp.policy.ast.expr.*;
-import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
-import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.Namespace;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.common.EntityTypeReference;
-import uq.pac.rsvp.policy.ast.schema.common.LongType;
-import uq.pac.rsvp.policy.ast.schema.common.SetTypeDefinition;
-import uq.pac.rsvp.policy.ast.schema.common.StringType;
 import uq.pac.rsvp.policy.datalog.ast.DLAtom;
 import uq.pac.rsvp.policy.datalog.ast.DLRule;
 import uq.pac.rsvp.policy.datalog.ast.DLTerm;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TranslationDriverTest {
 
     private static final Path ENTITIES = Path.of("examples/photoapp/entities.json");
     private static final Path POLICIES = Path.of("examples/photoapp/policy.cedar");
-    private static final Path SCHEMA = Path.of("examples/photoapp/schema.json");
+    private static final Path SCHEMA = Path.of("examples/photoapp/schema.cedarschema");
 
-    Schema getSchema() {
-        EntityTypeDefinition visibility = new EntityTypeDefinition(Collections.emptySet(), Collections.emptyMap());
-        EntityTypeDefinition role = new EntityTypeDefinition(Collections.emptySet(), Collections.emptyMap());
-
-        CommonTypeDefinition accountName = new StringType();
-        CommonTypeDefinition accountAge = new LongType();
-        CommonTypeDefinition accountRole = new EntityTypeReference("Role");
-        CommonTypeDefinition accountFriend = new EntityTypeReference("Account");
-        CommonTypeDefinition accountFriends = new SetTypeDefinition(accountFriend);
-        Map<String, CommonTypeDefinition> accountAttrs = Map.of("name", accountName,
-                "age", accountAge,
-                "role", accountRole,
-                "friends", accountFriends);
-        EntityTypeDefinition account = new EntityTypeDefinition(Collections.emptySet(), accountAttrs);
-
-        CommonTypeDefinition photoAlbum = new EntityTypeReference("Album");
-        CommonTypeDefinition photoSize = new LongType();
-        CommonTypeDefinition photoType = new StringType();
-        Map<String, CommonTypeDefinition> photoAttrs = Map.of("type", photoType,
-                "size", photoSize,
-                "album", photoAlbum);
-        EntityTypeDefinition photo = new EntityTypeDefinition(Collections.emptySet(), photoAttrs);
-
-        CommonTypeDefinition albumOwner = new EntityTypeReference("Account");
-        CommonTypeDefinition albumVisibility = new EntityTypeReference("Visibility");
-        Map<String, CommonTypeDefinition> albumAttrs = Map.of("owner", albumOwner,
-                "visibility", albumVisibility);
-        EntityTypeDefinition album = new EntityTypeDefinition(Collections.emptySet(), albumAttrs);
-
-        Map<String, EntityTypeDefinition> entityTypes = Map.of(
-                "Visibility", visibility,
-                "Role", role,
-                "Account", account,
-                "Photo", photo,
-                "Album", album);
-
-        // FIXME: this should not be here
-        visibility.setName("Visibility");
-        role.setName("Role");
-        account.setName("Account");
-        photo.setName("Photo");
-        album.setName("Album");
-
-        Namespace namespace = new Namespace(entityTypes, Collections.emptyMap(), Collections.emptyMap());
-        namespace.setName("");
-        Schema schema = new Schema();
-        schema.put("", namespace);
-        return schema;
+    Schema getSchema() throws IOException, InternalException {
+        return Schema.parseCedarSchema(SCHEMA);
     }
 
-    TranslationTypeInfo getTypeInfo() {
+    TranslationTypeInfo getTypeInfo(Schema schema) {
+        Namespace ns = schema.get("");
         TranslationTypeInfo typeInfo = new TranslationTypeInfo();
-        typeInfo.put("principal", new EntityTypeReference("Account"));
-        typeInfo.put("action", new EntityTypeReference("Action"));
-        typeInfo.put("resource", new EntityTypeReference("Photo"));
+        typeInfo.put("principal", new EntityTypeReference(ns.getEntityType("Account")));
+        typeInfo.put("action", new EntityTypeReference(ns.getEntityType("Action")));
+        typeInfo.put("resource", new EntityTypeReference(ns.getEntityType("Photo")));
         return typeInfo;
     }
 
@@ -117,12 +65,12 @@ public class TranslationDriverTest {
     }
 
     @Test
-    public void test() throws IOException {
+    public void test() throws IOException, InternalException {
         Entities entities = Entities.parse(ENTITIES);
         Schema schema = getSchema();
         TranslationSchema translationSchema = TranslationSchema.get(schema);
 
-        TranslationTypeInfo types = getTypeInfo();
+        TranslationTypeInfo types = getTypeInfo(schema);
         Map<String, Expression> expressions = makeExpressions();
 
         Expression principal = expressions.get("principal");

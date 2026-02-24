@@ -1,6 +1,7 @@
 package uq.pac.rsvp.policy.ast.schema;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,9 +19,9 @@ public class Namespace implements SchemaFileEntry {
 
     public Namespace(Map<String, EntityTypeDefinition> entityTypes, Map<String, ActionDefinition> actions,
             Map<String, CommonTypeDefinition> commonTypes) {
-        this.entityTypes = entityTypes != null ? Map.copyOf(entityTypes) : Collections.emptyMap();
-        this.actions = actions != null ? Map.copyOf(actions) : Collections.emptyMap();
-        this.commonTypes = commonTypes != null ? Map.copyOf(commonTypes) : Collections.emptyMap();
+        this.entityTypes = entityTypes != null ? new HashMap<>(entityTypes) : new HashMap<>();
+        this.actions = actions != null ? new HashMap<>(actions) : new HashMap<>();
+        this.commonTypes = commonTypes != null ? new HashMap<>(commonTypes) : new HashMap<>();
     }
 
     public String getName() {

@@ -16,6 +16,11 @@ public class UnresolvedTypeReference extends CommonTypeDefinition {
         this.setName(name);
     }
 
+    public UnresolvedTypeReference(String name) {
+        super(true, null);
+        this.setName(name);
+    }
+
     @Override
     public void accept(SchemaVisitor visitor) {
     }

@@ -27,7 +27,7 @@
             },
             "consented": {
               "type": "EntityOrCommon",
-              "name": "Boolean",
+              "name": "Bool",
               "required": false
             }
           }

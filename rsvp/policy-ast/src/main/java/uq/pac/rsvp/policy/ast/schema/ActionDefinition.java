@@ -139,7 +139,7 @@ public class ActionDefinition implements SchemaFileEntry {
     }
 
     public Map<String, String> getAnnotations() {
-        return annotations != null ? annotations : Collections.emptyMap();
+        return annotations;
     }
 
     @Override

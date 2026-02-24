@@ -1,0 +1,35 @@
+{
+  "": {
+    "entityTypes": {
+      "Person": {
+        "shape": {
+          "type": "Record",
+          "attributes": {
+            "name": { "type": "EntityOrCommon", "name": "__cedar::String" },
+            "age": { "type": "EntityOrCommon", "name": "__cedar::Long" },
+            "worth": { "type": "EntityOrCommon", "name": "__cedar::decimal" },
+            "bedtime": {
+              "type": "EntityOrCommon",
+              "name": "__cedar::datetime"
+            },
+            "address": { "type": "EntityOrCommon", "name": "__cedar::ipaddr" }
+          }
+        }
+      },
+      "Sleep": {
+        "shape": {
+          "type": "Record",
+          "attributes": {
+            "duration": {
+              "type": "EntityOrCommon",
+              "name": "__cedar::duration"
+            },
+            "deep": { "type": "EntityOrCommon", "name": "__cedar::Bool" }
+          }
+        }
+      }
+    },
+    "actions": {},
+    "commonTypes": {}
+  }
+}

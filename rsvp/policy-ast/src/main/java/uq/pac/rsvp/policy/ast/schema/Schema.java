@@ -94,7 +94,7 @@ public class Schema extends HashMap<String, Namespace> {
         }
 
         return switch (name) {
-            case "Boolean" -> new BooleanType();
+            case "Bool" -> new BooleanType();
             case "Long" -> new LongType();
             case "String" -> new StringType();
             case "datetime" -> new DateTimeType();

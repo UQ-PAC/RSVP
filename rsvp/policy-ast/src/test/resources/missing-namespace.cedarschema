@@ -1,0 +1,8 @@
+entity Person {
+    name: String,
+    age: Long
+};
+action slap appliesTo {
+    principal: [Person],
+    resource: [Person]
+};

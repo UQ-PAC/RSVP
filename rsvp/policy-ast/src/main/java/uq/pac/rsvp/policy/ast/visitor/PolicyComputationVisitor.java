@@ -13,6 +13,7 @@ import uq.pac.rsvp.policy.ast.expr.RecordExpression;
 import uq.pac.rsvp.policy.ast.expr.SetExpression;
 import uq.pac.rsvp.policy.ast.expr.SlotExpression;
 import uq.pac.rsvp.policy.ast.expr.StringExpression;
+import uq.pac.rsvp.policy.ast.expr.TypeExpression;
 import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 
@@ -46,4 +47,6 @@ public interface PolicyComputationVisitor<T> {
     public T visitSlotExpr(SlotExpression expr);
 
     public T visitStringExpr(StringExpression expr);
+
+    public T visitTypeExpr(TypeExpression expr);
 }

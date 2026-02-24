@@ -30,11 +30,14 @@ Before building this project, you will need to build and deploy CedarJava locall
   ./gradlew build
   ```
 
-- Run tests and output coverage to `**/build/reports/jacoco/test/html/index.html`:
+- Run tests and generate reports:
 
   ```
   ./gradlew test
   ```
+
+  Test report: `build/reports/tests/test/aggregated-results/index.html`
+  Coverage report: `build/reports/jacoco/testSuiteCodeCoverageReport/html/index.html`
 
 - Run CLI application:
 
@@ -42,9 +45,25 @@ Before building this project, you will need to build and deploy CedarJava locall
   ./gradlew run --args="optional string of space separated args"
   ```
 
-- Deploy library to local repository for use in other projects:
+- Deploy libraries to local repository for use in other projects:
+
   ```
   ./gradlew publishToMavenLocal
+  ```
+
+  Then import libraries by adding to `build.gradle`:
+
+  ```
+  repositories {
+      mavenLocal();
+      // any other repositories
+  }
+
+  dependencies {
+      implementation 'uq.pac.rsvp:policy-ast:1.0.0'
+      // any other dependencies
+  }
+
   ```
 
 ## Implement a new policy visitor
@@ -62,18 +81,25 @@ Visitors that return a value from their `visit` methods should implement `Policy
 The JSON schema for the serialised Java AST is defined in `lib/src/main/resources/ast.schema.json`. A
 schema for the Cedar JSON schema syntax can be found in the [Cedar VSCode Extension repository](https://raw.githubusercontent.com/cedar-policy/vscode-cedar/refs/heads/main/schemas/cedarschema.schema.json).
 
-## Using the policy AST library in another project
+## Programmatically construct schema AST
 
-Include in `build.gradle`:
+As schemas contain type references, there is a type resolution pass that is executed after
+parsing. If you are constructing a schema manually, some constructs (particularly recursive type definitions)
+might not be possible to construct using resolved type reference classes.
 
-```
-repositories {
-    mavenLocal();
-    // (any other repositories here)
-}
-
-dependencies {
-    implementation 'uq.pac.rsvp:policy-ast:1.0.0'
-}
+In this case, and probably in any case, the easiest way to create type references is to use instances of
+`UnresolvedTypeReference` and then run the type resolution pass once your schema is complete.
 
 ```
+// ...
+
+record.put("attribute", new UnresolvedTypeReference("Namespace::Attribute"));
+
+//...
+
+new SchemaResolutionVisitor().visitSchema(schema);
+
+//...
+```
+
+See `uq.pac.rsvp.policy.ast.schema.SchemaTest.TestManual` for examples.

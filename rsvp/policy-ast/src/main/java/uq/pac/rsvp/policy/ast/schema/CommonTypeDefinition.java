@@ -96,7 +96,7 @@ public abstract class CommonTypeDefinition implements SchemaFileEntry {
                 default -> switch (name) {
                     case "__cedar::String" -> StringType.class;
                     case "__cedar::Long" -> LongType.class;
-                    case "__cedar::Boolean" -> BooleanType.class;
+                    case "__cedar::Bool" -> BooleanType.class;
                     case "__cedar::datetime" -> DateTimeType.class;
                     case "__cedar::decimal" -> DecimalType.class;
                     case "__cedar::duration" -> DurationType.class;

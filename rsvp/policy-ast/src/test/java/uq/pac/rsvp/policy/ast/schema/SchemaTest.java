@@ -11,23 +11,38 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.cedarpolicy.model.exception.InternalException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition.CommonTypeDefinitionDeserialiser;
-import uq.pac.rsvp.policy.ast.schema.common.UnresolvedTypeReference;
+import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.policy.ast.schema.common.CommonTypeReference;
+import uq.pac.rsvp.policy.ast.schema.common.DateTimeType;
+import uq.pac.rsvp.policy.ast.schema.common.DecimalType;
+import uq.pac.rsvp.policy.ast.schema.common.DurationType;
 import uq.pac.rsvp.policy.ast.schema.common.EntityTypeReference;
+import uq.pac.rsvp.policy.ast.schema.common.IpAddressType;
+import uq.pac.rsvp.policy.ast.schema.common.LongType;
 import uq.pac.rsvp.policy.ast.schema.common.RecordTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.common.SetTypeDefinition;
-import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
+import uq.pac.rsvp.policy.ast.schema.common.StringType;
+import uq.pac.rsvp.policy.ast.schema.common.UnresolvedTypeReference;
 import uq.pac.rsvp.policy.ast.visitor.SchemaResolutionVisitor;
 
+@DisplayName("Schema AST")
 public class SchemaTest {
 
     static Gson gson;
@@ -36,6 +51,178 @@ public class SchemaTest {
     static void beforeAll() {
         gson = new GsonBuilder().registerTypeAdapter(CommonTypeDefinition.class, new CommonTypeDefinitionDeserialiser())
                 .create();
+    }
+
+    @Nested
+    @DisplayName("Parse Cedar schema")
+    class TestCedarParsing {
+
+        @Test
+        @DisplayName("parses healthcare app correctly")
+        public void healthcareApp()
+                throws IOException, URISyntaxException, InternalException, NullPointerException, IllegalStateException {
+            URL url = ClassLoader.getSystemResource("healthcare.cedarschema");
+            Schema schema = Schema.parseCedarSchema(Path.of(url.getPath()));
+
+            checkHealthCareSchema(schema);
+        }
+
+        @Test
+        @DisplayName("handles collection types")
+        public void collections()
+                throws IOException, URISyntaxException, InternalException, NullPointerException, IllegalStateException {
+            URL url = ClassLoader.getSystemResource("collection-types.cedarschema");
+            Schema schema = Schema.parseCedarSchema(Path.of(url.getPath()));
+
+            checkCollectionSchema(schema);
+        }
+
+        @Test
+        @DisplayName("handles reserved types")
+        public void reservedTypes()
+                throws IOException, URISyntaxException, InternalException,
+                NullPointerException, IllegalStateException {
+            URL url = ClassLoader.getSystemResource("reserved-types.cedarschema");
+            Schema schema = Schema.parseCedarSchema(Path.of(url.getPath()));
+
+            checkReservedTypes(schema);
+
+        }
+
+        @Test
+        @DisplayName("handles missing namespace")
+        public void missingNamespace() throws JsonMappingException, JsonProcessingException, InternalException,
+                NullPointerException, IllegalStateException, IOException {
+            URL url = ClassLoader.getSystemResource("missing-namespace.cedarschema");
+            Schema schema = Schema.parseCedarSchema(Path.of(url.getPath()));
+
+            checkEmptyNamespace(schema);
+        }
+
+        @Test
+        @DisplayName("handles circular references")
+        public void circularReference() throws JsonMappingException,
+                JsonProcessingException, InternalException,
+                NullPointerException, IllegalStateException, IOException {
+            URL url = ClassLoader.getSystemResource("circular-reference.cedarschema");
+            Schema schema = Schema.parseCedarSchema(Path.of(url.getPath()));
+            checkCircularReference(schema);
+        }
+
+    }
+
+    @Nested
+    @DisplayName("Parse JSON schema")
+    class TestJSONParsing {
+
+        @Test
+        @DisplayName("parses healthcare app correctly")
+        public void healthcareApp() throws IOException {
+            URL url = ClassLoader.getSystemResource("healthcare.cedarschema.json");
+            String json = Files.readString(Path.of(url.getPath()));
+            Schema schema = gson.fromJson(json, Schema.class);
+
+            new SchemaResolutionVisitor().visitSchema(schema);
+
+            checkHealthCareSchema(schema);
+        }
+
+        @Test
+        @DisplayName("handles collection types")
+        public void collections() throws IOException {
+            URL url = ClassLoader.getSystemResource("collection-types.cedarschema.json");
+            String json = Files.readString(Path.of(url.getPath()));
+            Schema schema = gson.fromJson(json, Schema.class);
+
+            new SchemaResolutionVisitor().visitSchema(schema);
+
+            checkCollectionSchema(schema);
+        }
+
+        @Test
+        @DisplayName("handles reserved types")
+        public void reservedTypes()
+                throws IOException {
+            URL url = ClassLoader.getSystemResource("reserved-types.cedarschema.json");
+            String json = Files.readString(Path.of(url.getPath()));
+            Schema schema = gson.fromJson(json, Schema.class);
+
+            checkReservedTypes(schema);
+        }
+
+        @Test
+        @DisplayName("handles empty namespace")
+        public void emptyNamespace() throws IOException {
+            URL url = ClassLoader.getSystemResource("empty-namespace.cedarschema.json");
+            String json = Files.readString(Path.of(url.getPath()));
+            Schema schema = gson.fromJson(json, Schema.class);
+
+            new SchemaResolutionVisitor().visitSchema(schema);
+
+            checkEmptyNamespace(schema);
+        }
+    }
+
+    @Nested
+    @DisplayName("Construct schema manually")
+    class TestManual {
+
+        @Test
+        @DisplayName("handles collection types")
+        public void collections() throws IOException {
+            Schema schema = new Schema();
+
+            Map<String, EntityTypeDefinition> entityTypes = new HashMap<>();
+            Map<String, ActionDefinition> actions = new HashMap<>();
+            Map<String, CommonTypeDefinition> commonTypes = new HashMap<>();
+
+            Map<String, CommonTypeDefinition> userShape = new HashMap<>();
+
+            userShape.put("nicknames", new SetTypeDefinition(new StringType()));
+
+            Map<String, CommonTypeDefinition> preferences = new HashMap<>();
+            preferences.put("diet", new StringType());
+            preferences.put("colour", new UnresolvedTypeReference("Colour"));
+
+            userShape.put("preferences", new RecordTypeDefinition(preferences));
+
+            userShape.put("consented", new BooleanType(false));
+            entityTypes.put("User", new EntityTypeDefinition(new HashSet<>(), userShape));
+
+            Set<String> colourEnum = Set.copyOf(Arrays.asList("red", "green", "blue", "purple", "pink", "yellow"));
+            entityTypes.put("Colour", new EntityTypeDefinition(new HashSet<>(), new HashMap<>(),
+                    colourEnum, new HashMap<>()));
+
+            Namespace dataCollection = new Namespace(entityTypes, actions, commonTypes);
+            schema.put("DataCollectionApp", dataCollection);
+
+            new SchemaResolutionVisitor().visitSchema(schema);
+
+            checkCollectionSchema(schema);
+        }
+
+        @Test
+        @DisplayName("handles circular references")
+        public void circularReference() {
+            Schema schema = new Schema();
+
+            Map<String, EntityTypeDefinition> entityTypes = new HashMap<>();
+            Map<String, ActionDefinition> actions = new HashMap<>();
+            Map<String, CommonTypeDefinition> commonTypes = new HashMap<>();
+
+            Map<String, CommonTypeDefinition> accountShape = new HashMap<>();
+
+            accountShape.put("friend", new UnresolvedTypeReference("Account"));
+            entityTypes.put("Account", new EntityTypeDefinition(new HashSet<>(), accountShape));
+
+            Namespace app = new Namespace(entityTypes, actions, commonTypes);
+            schema.put("App", app);
+
+            new SchemaResolutionVisitor().visitSchema(schema);
+
+            checkCircularReference(schema);
+        }
+
     }
 
     private void checkHealthCareSchema(Schema schema) {
@@ -184,39 +371,79 @@ public class SchemaTest {
                 ((RecordTypeDefinition) preferences).getAttributeNames().containsAll(Arrays.asList("diet", "colour")));
     }
 
-    @Test
-    public void testDeserialisation() throws IOException {
-        URL url = ClassLoader.getSystemResource("healthcare.cedarschema.json");
-        String json = Files.readString(Path.of(url.getPath()));
-        Schema schema = gson.fromJson(json, Schema.class);
+    private void checkEmptyNamespace(Schema schema) {
+        Namespace namespace = schema.get("");
+        assertEquals(1, namespace.entityTypeNames().size());
+        assertEquals(1, namespace.actionNames().size());
+        assertEquals(0, namespace.commonTypeNames().size());
 
-        SchemaVisitor visitor = new SchemaResolutionVisitor();
-        visitor.visitSchema(schema);
+        EntityTypeDefinition person = namespace.getEntityType("Person");
+        assertNotNull(person);
 
-        checkHealthCareSchema(schema);
+        ActionDefinition slap = namespace.getAction("slap");
+        assertNotNull(slap);
 
-        url = ClassLoader.getSystemResource("collection-types.cedarschema.json");
-        json = Files.readString(Path.of(url.getPath()));
-        schema = gson.fromJson(json, Schema.class);
+        Set<EntityTypeDefinition> principals = slap.getAppliesToPrincipalTypes();
+        Set<EntityTypeDefinition> resources = slap.getAppliesToResourceTypes();
 
-        visitor = new SchemaResolutionVisitor();
-        visitor.visitSchema(schema);
+        assertEquals(1, principals.size());
+        assertEquals(1, resources.size());
 
-        checkCollectionSchema(schema);
+        assertTrue(principals.contains(person));
+        assertTrue(resources.contains(person));
+
     }
 
-    @Test
-    public void testCedarParsing()
-            throws IOException, URISyntaxException, InternalException, NullPointerException, IllegalStateException {
-        URL url = ClassLoader.getSystemResource("healthcare.cedarschema");
-        Schema schema = Schema.parseCedarSchema(Path.of(url.getPath()));
+    private void checkCircularReference(Schema schema) {
+        Namespace app = schema.get("App");
+        assertEquals(1, app.entityTypeNames().size());
+        assertEquals(0, app.actionNames().size());
+        assertEquals(0, app.commonTypeNames().size());
 
-        checkHealthCareSchema(schema);
+        EntityTypeDefinition account = app.getEntityType("Account");
+        assertNotNull(account);
 
-        url = ClassLoader.getSystemResource("collection-types.cedarschema");
-        schema = Schema.parseCedarSchema(Path.of(url.getPath()));
+        CommonTypeDefinition friend = account.getShapeAttributeType("friend");
+        assertNotNull(friend);
 
-        checkCollectionSchema(schema);
+        assertTrue(friend instanceof EntityTypeReference);
+        assertEquals(account, ((EntityTypeReference) friend).getDefinition());
     }
 
+    private void checkReservedTypes(Schema schema) {
+        Namespace namespace = schema.get("");
+        assertEquals(2, namespace.entityTypeNames().size());
+        assertEquals(0, namespace.actionNames().size());
+        assertEquals(0, namespace.commonTypeNames().size());
+
+        EntityTypeDefinition person = namespace.getEntityType("Person");
+        EntityTypeDefinition sleep = namespace.getEntityType("Sleep");
+        assertNotNull(person);
+        assertNotNull(sleep);
+
+        CommonTypeDefinition name = person.getShapeAttributeType("name");
+        CommonTypeDefinition age = person.getShapeAttributeType("age");
+        CommonTypeDefinition worth = person.getShapeAttributeType("worth");
+        CommonTypeDefinition bedtime = person.getShapeAttributeType("bedtime");
+        CommonTypeDefinition address = person.getShapeAttributeType("address");
+        assertNotNull(name);
+        assertNotNull(age);
+        assertNotNull(worth);
+        assertNotNull(bedtime);
+        assertNotNull(address);
+
+        assertTrue(name instanceof StringType);
+        assertTrue(age instanceof LongType);
+        assertTrue(worth instanceof DecimalType);
+        assertTrue(bedtime instanceof DateTimeType);
+        assertTrue(address instanceof IpAddressType);
+
+        CommonTypeDefinition duration = sleep.getShapeAttributeType("duration");
+        CommonTypeDefinition deep = sleep.getShapeAttributeType("deep");
+        assertNotNull(duration);
+        assertNotNull(deep);
+
+        assertTrue(duration instanceof DurationType);
+        assertTrue(deep instanceof BooleanType);
+    }
 }

@@ -1,0 +1,33 @@
+{
+  "": {
+    "entityTypes": {
+      "Person": {
+        "shape": {
+          "type": "Record",
+          "attributes": {
+            "name": {
+              "type": "EntityOrCommon",
+              "name": "String"
+            },
+            "age": {
+              "type": "EntityOrCommon",
+              "name": "Long"
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "slap": {
+        "appliesTo": {
+          "principalTypes": ["Person"],
+          "resourceTypes": ["Person"],
+          "context": {
+            "type": "Record",
+            "attributes": {}
+          }
+        }
+      }
+    }
+  }
+}

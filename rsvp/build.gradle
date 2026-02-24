@@ -1,4 +1,37 @@
-allprojects {
+plugins {
+    id 'java'
+    id 'test-report-aggregation'
+    id 'jacoco-report-aggregation'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    subprojects.each { sub -> 
+        testReportAggregation project(':' + sub.name)
+        jacocoAggregation project(':' + sub.name)
+    };
+}
+
+reporting {
+    reports {
+        testAggregateTestReport(AggregateTestReport) { 
+            testSuiteName = "test"
+        }
+        testSuiteCodeCoverageReport(JacocoCoverageReport) { 
+            testSuiteName = "test"
+        }
+    }
+}
+
+test {
+    finalizedBy testAggregateTestReport, testSuiteCodeCoverageReport // report is always generated after tests run
+}
+
+subprojects {
     apply plugin: 'java'
     apply plugin: 'jacoco'
 
@@ -39,3 +72,4 @@ allprojects {
         dependsOn test // tests are required to run before generating the report
     }
 }
+

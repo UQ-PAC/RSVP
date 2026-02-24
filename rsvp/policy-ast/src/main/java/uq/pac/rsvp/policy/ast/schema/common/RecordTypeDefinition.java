@@ -1,6 +1,7 @@
 package uq.pac.rsvp.policy.ast.schema.common;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,7 +15,7 @@ public class RecordTypeDefinition extends CommonTypeDefinition {
     public RecordTypeDefinition(Map<String, CommonTypeDefinition> attributes, boolean required,
             Map<String, String> annotations) {
         super(required, annotations);
-        this.attributes = attributes != null ? Map.copyOf(attributes) : Collections.emptyMap();
+        this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
     }
 
     public RecordTypeDefinition(Map<String, CommonTypeDefinition> attributes, Map<String, String> annotations) {
@@ -23,7 +24,7 @@ public class RecordTypeDefinition extends CommonTypeDefinition {
 
     public RecordTypeDefinition(Map<String, CommonTypeDefinition> attributes, boolean required) {
         super(required);
-        this.attributes = attributes != null ? Map.copyOf(attributes) : Collections.emptyMap();
+        this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
     }
 
     public RecordTypeDefinition(Map<String, CommonTypeDefinition> attributes) {

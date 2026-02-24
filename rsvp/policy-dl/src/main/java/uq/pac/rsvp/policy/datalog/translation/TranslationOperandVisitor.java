@@ -21,13 +21,8 @@ public class TranslationOperandVisitor extends TranslationValueAdapter<DLTerm> {
         this.type = null;
     }
 
-    CommonTypeDefinition getType() {
-        return type;
-    }
-
     @Override
     public DLTerm visitEntityExpr(EntityExpression expr) {
-        DLVar var = TranslationNameGenerator.getVar();
         return new DLString(String.join("::", expr.getQualifiedEid()));
     }
 
@@ -42,7 +37,7 @@ public class TranslationOperandVisitor extends TranslationValueAdapter<DLTerm> {
         EntityTypeReference lhsVarType = (EntityTypeReference)
                 (this.type == null ? typeInfo.get(lhsVar.toString()) : this.type);
         // Translation type for the LHS variable, so we know which relation to use
-        TranslationType tt = schema.getTranslationType(lhsVarType.getTypename());
+        TranslationType tt = schema.getTranslationType(lhsVarType.getDefinition().getName());
         TranslationAttribute attr = tt.getAttribute(property);
         // RHS variable
         DLVar rhsVar = TranslationNameGenerator.getVar();

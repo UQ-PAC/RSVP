@@ -49,13 +49,9 @@ public class SlotExpression extends Expression {
 
     @Override
     public String toString() {
-        switch (id) {
-            case Principal:
-                return "&principal";
-            case Resource:
-                return "&resource";
-            default:
-                return "&error";
-        }
+        return switch (id) {
+            case Principal -> "&principal";
+            case Resource -> "&resource";
+        };
     }
 }

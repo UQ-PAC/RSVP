@@ -68,17 +68,11 @@ public class VariableExpression extends Expression {
 
     @Override
     public String toString() {
-        switch (ref) {
-            case Action:
-                return "action";
-            case Context:
-                return "context";
-            case Principal:
-                return "principal";
-            case Resource:
-                return "resource";
-            default:
-                return "error";
-        }
+        return switch (ref) {
+            case Action -> "action";
+            case Context -> "context";
+            case Principal -> "principal";
+            case Resource -> "resource";
+        };
     }
 }

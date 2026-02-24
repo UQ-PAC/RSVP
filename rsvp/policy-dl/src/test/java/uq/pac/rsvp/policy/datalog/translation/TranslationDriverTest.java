@@ -47,8 +47,8 @@ public class TranslationDriverTest {
         VariableExpression resource = new VariableExpression(VariableExpression.Reference.Resource);
         EntityExpression viewPhoto = new EntityExpression("viewPhoto", List.of("Action"));
         EntityExpression publicVisibility = new EntityExpression("Public", List.of("Visibility"));
-        StringExpression photo = new StringExpression("Photo");
-        StringExpression account = new StringExpression("Account");
+        TypeExpression photo = new TypeExpression("Photo");
+        TypeExpression account = new TypeExpression("Account");
         PropertyAccessExpression prop1 = new PropertyAccessExpression(resource, "album");
         PropertyAccessExpression prop2 = new PropertyAccessExpression(prop1, "visibility");
 

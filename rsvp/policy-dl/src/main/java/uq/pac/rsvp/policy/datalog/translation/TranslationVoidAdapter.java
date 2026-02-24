@@ -101,4 +101,9 @@ public abstract class TranslationVoidAdapter implements PolicyVisitor {
     public void visitStringExpr(StringExpression expr) {
         throw new RuntimeException("unsupported");
     }
+
+    @Override
+    public void visitTypeExpr(TypeExpression expr) {
+        throw new RuntimeException("unsupported");
+    }
 }

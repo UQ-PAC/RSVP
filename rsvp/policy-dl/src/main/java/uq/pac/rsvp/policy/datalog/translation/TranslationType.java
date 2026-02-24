@@ -3,7 +3,6 @@ package uq.pac.rsvp.policy.datalog.translation;
 import com.cedarpolicy.value.*;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
-import uq.pac.rsvp.policy.ast.schema.Namespace;
 import uq.pac.rsvp.policy.ast.schema.common.*;
 import uq.pac.rsvp.policy.datalog.ast.DLProgram;
 import uq.pac.rsvp.policy.datalog.ast.DLRelationDecl;
@@ -22,10 +21,9 @@ public class TranslationType extends Translator {
     private final DLRelationDecl relation;
     private final Map<String, TranslationAttribute> attributeRelations;
 
-    public TranslationType(EntityTypeDefinition entity, Namespace namespace) {
+    public TranslationType(EntityTypeDefinition entity) {
         this.entity = entity;
-        String prefix = namespace.getName().isEmpty() ? "" : namespace.getName() + "::";
-        this.name = prefix + entity.getName();
+        this.name = entity.getName();
         String relationName = name.replace(':', '_');
         this.relation = new DLRelationDecl(relationName, DLType.SYMBOL);
         this.attributeRelations = new HashMap<>();

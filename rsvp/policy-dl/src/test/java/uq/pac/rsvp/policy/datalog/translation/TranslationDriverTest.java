@@ -5,9 +5,7 @@ import com.cedarpolicy.model.exception.InternalException;
 import org.junit.jupiter.api.Test;
 import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.expr.*;
-import uq.pac.rsvp.policy.ast.schema.Namespace;
 import uq.pac.rsvp.policy.ast.schema.Schema;
-import uq.pac.rsvp.policy.ast.schema.common.EntityTypeReference;
 import uq.pac.rsvp.policy.datalog.ast.DLAtom;
 import uq.pac.rsvp.policy.datalog.ast.DLRule;
 import uq.pac.rsvp.policy.datalog.ast.DLTerm;
@@ -24,15 +22,6 @@ public class TranslationDriverTest {
 
     Schema getSchema() throws IOException, InternalException {
         return Schema.parseCedarSchema(SCHEMA);
-    }
-
-    TranslationTypeInfo getTypeInfo(Schema schema) {
-        Namespace ns = schema.get("");
-        TranslationTypeInfo typeInfo = new TranslationTypeInfo();
-        typeInfo.put("principal", new EntityTypeReference(ns.getEntityType("Account")));
-        typeInfo.put("action", new EntityTypeReference(ns.getEntityType("Action")));
-        typeInfo.put("resource", new EntityTypeReference(ns.getEntityType("Photo")));
-        return typeInfo;
     }
 
     // Generating the following expression
@@ -78,7 +67,7 @@ public class TranslationDriverTest {
         Schema schema = getSchema();
         TranslationSchema translationSchema = new TranslationSchema(schema);
 
-        TranslationTypeInfo types = getTypeInfo(schema);
+        TranslationTyping types = new TranslationTyping(schema);
         Map<String, Expression> expressions = makeExpressions();
 
         Expression principal = expressions.get("principal");

@@ -4,26 +4,25 @@ import uq.pac.rsvp.policy.ast.expr.EntityExpression;
 import uq.pac.rsvp.policy.ast.expr.Expression;
 import uq.pac.rsvp.policy.ast.expr.PropertyAccessExpression;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
-import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
-import uq.pac.rsvp.policy.ast.schema.common.EntityTypeReference;
-import uq.pac.rsvp.policy.ast.schema.common.LongType;
-import uq.pac.rsvp.policy.ast.schema.common.StringType;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
+import java.util.Set;
+
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
+import static uq.pac.rsvp.policy.datalog.util.Util.required;
 
 // Code generation for property access expressions
 public class TranslationOperandVisitor extends TranslationValueAdapter<DLTerm> {
-    private CommonTypeDefinition type;
+    private Set<String> types;
 
-    public TranslationOperandVisitor(TranslationSchema schema, TranslationTypeInfo typeInfo) {
+    public TranslationOperandVisitor(TranslationSchema schema, TranslationTyping typeInfo) {
         super(schema, typeInfo);
-        this.type = null;
+        this.types = null;
     }
 
     @Override
     public DLTerm visitEntityExpr(EntityExpression expr) {
-        return new DLString(String.join("::", expr.getQualifiedEid()));
+        return new DLString(expr.getUnquotedName());
     }
 
     @Override
@@ -31,30 +30,34 @@ public class TranslationOperandVisitor extends TranslationValueAdapter<DLTerm> {
         Expression object = expr.getObject();
         String property = expr.getProperty();
 
-        // LHS variable name
+        // LHS variable
         DLTerm lhsVar = object.compute(this);
-        // Type of the LHS variable (or sub-expression)
-        EntityTypeReference lhsVarType = (EntityTypeReference)
-                (this.type == null ? typeInfo.get(lhsVar.toString()) : this.type);
-        // Translation type for the LHS variable, so we know which relation to use
-        TranslationType tt = schema.getTranslationType(lhsVarType.getDefinition().getName());
-        TranslationAttribute attr = tt.getAttribute(property);
         // RHS variable
         DLVar rhsVar = TranslationNameGenerator.getVar();
+
+        TranslationError.error(types.size() == 1,
+                "No/Multiple applicable types found: " + types);
+
+        String lhsVarType = types.stream().findFirst().get();
+        // Translation type for the LHS variable, so we know which relation to use
+        TranslationType tt = schema.getTranslationType(lhsVarType);
+        TranslationError.error(tt != null,
+                "No definition for type: " + lhsVarType);
+        TranslationAttribute attr = tt.getAttribute(property);
+        TranslationError.error(attr != null,
+                "No attribute " + property + " for type: " + lhsVarType);
+
         // Generated relation
         String relationName = attr.getRelationDecl().getName();
         DLAtom generated = new DLAtom(relationName, lhsVar, rhsVar);
         this.expressions.add(generated);
-        this.type = attr.getType();
-        // TODO: Support for more types
-        require(type instanceof EntityTypeReference ||
-                type instanceof StringType ||
-                type instanceof LongType);
+        this.types = Set.of(TranslationTyping.getTypeName(attr.getType()));
         return rhsVar;
     }
 
     @Override
     public DLTerm visitVariableExpr(VariableExpression expr) {
+        this.types = typing.get(expr.getReference());
         return DLTerm.var(expr.toString());
     }
 }

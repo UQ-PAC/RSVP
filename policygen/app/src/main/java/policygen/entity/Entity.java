@@ -6,7 +6,7 @@ public abstract class Entity {
     public abstract String getEntityId();
 
     public String toEntityString() {
-        return getClass().getSimpleName() + "::\"" + getEntityId() + "\"";
+        return getEntityType() + "::\"" + getEntityId() + "\"";
     }
 
     public String getEntityType() {

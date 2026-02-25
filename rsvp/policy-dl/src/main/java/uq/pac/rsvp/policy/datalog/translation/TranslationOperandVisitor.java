@@ -8,8 +8,8 @@ import uq.pac.rsvp.policy.datalog.ast.*;
 
 import java.util.Set;
 
-import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
-import static uq.pac.rsvp.policy.datalog.util.Util.required;
+import static uq.pac.rsvp.policy.ast.expr.VariableExpression.Reference.Context;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationError.error;
 
 // Code generation for property access expressions
 public class TranslationOperandVisitor extends TranslationValueAdapter<DLTerm> {
@@ -35,16 +35,16 @@ public class TranslationOperandVisitor extends TranslationValueAdapter<DLTerm> {
         // RHS variable
         DLVar rhsVar = TranslationNameGenerator.getVar();
 
-        TranslationError.error(types.size() == 1,
+        error(types.size() == 1,
                 "No/Multiple applicable types found: " + types);
 
         String lhsVarType = types.stream().findFirst().get();
         // Translation type for the LHS variable, so we know which relation to use
         TranslationType tt = schema.getTranslationType(lhsVarType);
-        TranslationError.error(tt != null,
+        error(tt != null,
                 "No definition for type: " + lhsVarType);
         TranslationAttribute attr = tt.getAttribute(property);
-        TranslationError.error(attr != null,
+        error(attr != null,
                 "No attribute " + property + " for type: " + lhsVarType);
 
         // Generated relation
@@ -57,6 +57,8 @@ public class TranslationOperandVisitor extends TranslationValueAdapter<DLTerm> {
 
     @Override
     public DLTerm visitVariableExpr(VariableExpression expr) {
+        error(expr.getReference() == Context,
+                "Context variable is unsupported");
         this.types = typing.get(expr.getReference());
         return DLTerm.var(expr.toString());
     }

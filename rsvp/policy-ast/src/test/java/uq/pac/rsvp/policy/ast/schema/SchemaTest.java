@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.ast.schema;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
@@ -356,11 +357,11 @@ public class SchemaTest {
         CommonTypeDefinition provider = info.getShapeAttributeType("provider");
         CommonTypeDefinition patient = info.getShapeAttributeType("patient");
 
-        assertTrue(provider.isResolved());
-        assertTrue(patient.isResolved());
-
         assertTrue(provider instanceof EntityTypeReference);
         assertTrue(patient instanceof EntityTypeReference);
+
+        assertNull(provider.getName());
+        assertNull(patient.getName());
 
         assertEquals(user, ((EntityTypeReference) provider).getDefinition());
         assertEquals(user, ((EntityTypeReference) patient).getDefinition());
@@ -423,9 +424,8 @@ public class SchemaTest {
 
         CommonTypeDefinition referrer = create.getAppliesToContext().getAttributeType("referrer");
 
-        assertTrue(referrer.isResolved());
         assertTrue(referrer instanceof EntityTypeReference);
-        assertEquals("referrer", referrer.getName());
+        assertNull(referrer.getName());
         assertEquals(user, ((EntityTypeReference) referrer).getDefinition());
 
         assertEquals(1, healthcareApp.commonTypeNames().size());
@@ -441,7 +441,6 @@ public class SchemaTest {
 
         CommonTypeDefinition detailAttr = create.getAppliesToContext().getAttributeType("detail");
 
-        assertTrue(detailAttr.isResolved());
         assertTrue(detailAttr instanceof CommonTypeReference);
         assertEquals(details, ((CommonTypeReference) detailAttr).getDefinition());
     }

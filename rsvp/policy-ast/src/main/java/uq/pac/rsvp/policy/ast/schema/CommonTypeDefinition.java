@@ -24,11 +24,15 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public abstract class CommonTypeDefinition implements SchemaFileEntry {
 
+    // If this type definition is a record property, this may be true. Otherwise,
+    // it will be false
     private final boolean required;
+
     private final Map<String, String> annotations;
 
-    // May or may not be available in JSON
-    private String name;
+    // Set during type resolution to the key this type was mapped to in the
+    // namespace, if any. Types defined in records and sets will not be named.
+    private String definitionName;
 
     protected CommonTypeDefinition(boolean required, Map<String, String> annotations) {
         this.required = required;
@@ -51,24 +55,24 @@ public abstract class CommonTypeDefinition implements SchemaFileEntry {
         return required;
     }
 
-    public boolean isResolved() {
-        return !(this instanceof UnresolvedTypeReference);
-    }
-
     public Map<String, String> getAnnotations() {
         return annotations;
     }
 
     /**
-     * If this type was defined in a record, entity shape or as a common type, then
-     * return the name this attribute type was mapped to within that structure.
+     * If this type was defined as a common type within a resolved namespace, then
+     * return the fully qualified name of this type definition in the format
+     * {@code Namespace::TypeName}
+     * 
+     * @return The fully qualified name of this type if this type is defined within
+     *         a resolved namespace, {@code null} otherwise.
      */
     public final String getName() {
-        return name;
+        return definitionName;
     }
 
     public final void setName(String name) {
-        this.name = name;
+        this.definitionName = name;
     }
 
     @Override

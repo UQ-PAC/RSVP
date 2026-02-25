@@ -8,6 +8,7 @@ import uq.pac.rsvp.policy.ast.schema.Namespace;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.common.RecordTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.common.SetTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.common.UnresolvedTypeReference;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 
 // Set definition names and resolve all references to entity types
@@ -47,8 +48,9 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
             for (String name : this.namespace.commonTypeNames()) {
                 CommonTypeDefinition commonType = this.namespace.getCommonType(name);
 
-                if (!commonType.isResolved()) {
-                    commonType = Schema.resolveTypeReference(commonType.getName(), schema, this.namespace);
+                if (commonType instanceof UnresolvedTypeReference) {
+                    String typeName = ((UnresolvedTypeReference) commonType).getRawTypeName();
+                    commonType = Schema.resolveTypeReference(typeName, schema, this.namespace);
 
                     if (commonType == null) {
                         continue; // TODO: error reporting
@@ -72,8 +74,9 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
         for (String name : type.getShapeAttributeNames()) {
             CommonTypeDefinition attribute = type.getShapeAttributeType(name);
 
-            if (!attribute.isResolved()) {
-                attribute = Schema.resolveTypeReference(attribute.getName(), schema, namespace);
+            if (attribute instanceof UnresolvedTypeReference) {
+                String typeName = ((UnresolvedTypeReference) attribute).getRawTypeName();
+                attribute = Schema.resolveTypeReference(typeName, schema, namespace);
 
                 if (attribute == null) {
                     continue; // TODO: error reporting
@@ -82,7 +85,6 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
                 type.resolveShapeAttributeType(name, attribute);
             }
 
-            attribute.setName(name);
             attribute.accept(this);
         }
 
@@ -101,8 +103,9 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
         for (String name : type.getAttributeNames()) {
             CommonTypeDefinition prop = type.getAttributeType(name);
 
-            if (!prop.isResolved()) {
-                prop = Schema.resolveTypeReference(prop.getName(), schema, namespace);
+            if (prop instanceof UnresolvedTypeReference) {
+                String typeName = ((UnresolvedTypeReference) prop).getRawTypeName();
+                prop = Schema.resolveTypeReference(typeName, schema, namespace);
 
                 if (prop == null) {
                     continue; // TODO: error reporting
@@ -111,7 +114,6 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
                 type.resolveAttributeType(name, prop);
             }
 
-            prop.setName(name);
             prop.accept(this);
         }
     }
@@ -120,8 +122,9 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
     public void visitSetTypeDefinition(SetTypeDefinition type) {
         CommonTypeDefinition element = type.getElementType();
 
-        if (!element.isResolved()) {
-            element = Schema.resolveTypeReference(element.getName(), schema, namespace);
+        if (element instanceof UnresolvedTypeReference) {
+            String typeName = ((UnresolvedTypeReference) element).getRawTypeName();
+            element = Schema.resolveTypeReference(typeName, schema, namespace);
 
             if (element == null) {
                 return; // TODO: error reporting

@@ -15,4 +15,9 @@ public class FileResource extends Entity {
         return fileName;
     }
 
+    @Override
+    public String getEntityType() {
+        return "File";
+    }
+
 }

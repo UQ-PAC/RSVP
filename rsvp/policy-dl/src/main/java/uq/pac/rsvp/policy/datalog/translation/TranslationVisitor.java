@@ -5,18 +5,23 @@ import uq.pac.rsvp.policy.datalog.ast.DLAtom;
 import uq.pac.rsvp.policy.datalog.ast.DLConstraint;
 import uq.pac.rsvp.policy.datalog.ast.DLTerm;
 
+import java.util.Set;
+
+import static uq.pac.rsvp.policy.datalog.util.Util.required;
+
 public class TranslationVisitor extends TranslationVoidAdapter {
 
-    public TranslationVisitor(TranslationSchema schema, TranslationTypeInfo typeInfo) {
+    public TranslationVisitor(TranslationSchema schema, TranslationTyping typeInfo) {
         super(schema, typeInfo);
     }
 
     @Override
     public void visitBinaryExpr(BinaryExpression expr) {
+        typing.update(expr);
         switch (expr.getOp()) {
             case BinaryExpression.BinaryOp.Eq -> {
-                TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, typeInfo);
-                TranslationOperandVisitor rhs = new TranslationOperandVisitor(schema, typeInfo);
+                TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, typing);
+                TranslationOperandVisitor rhs = new TranslationOperandVisitor(schema, typing);
 
                 DLTerm lhsOp = expr.getLeft().compute(lhs);
                 DLTerm rhsOp = expr.getRight().compute(rhs);
@@ -30,13 +35,10 @@ public class TranslationVisitor extends TranslationVoidAdapter {
                 expr.getRight().accept(this);
             }
             case BinaryExpression.BinaryOp.Is -> {
-                TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, typeInfo);
+                TypeExpression typeExpr = required(expr.getRight(), TypeExpression.class);
+                TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, typing);
                 DLTerm var = expr.getLeft().compute(lhs);
                 expressions.addAll(lhs.getExpressions());
-
-                // FIXME: Should not be a string expression
-                // FIXME: Quoted string
-                TypeExpression typeExpr = required(expr.getRight(), TypeExpression.class);
                 String relationName = schema.getTranslationType(typeExpr.getValue())
                         .getEntityRelation()
                         .getName();

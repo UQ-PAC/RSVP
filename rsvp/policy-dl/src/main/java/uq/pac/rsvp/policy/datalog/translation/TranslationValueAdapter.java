@@ -11,12 +11,12 @@ import java.util.List;
 
 public abstract class TranslationValueAdapter<T> implements PolicyComputationVisitor<T> {
     protected TranslationSchema schema;
-    protected TranslationTypeInfo typeInfo;
+    protected TranslationTyping typing;
     protected List<DLRuleExpr> expressions;
 
-    public TranslationValueAdapter(TranslationSchema schema, TranslationTypeInfo typeInfo) {
+    public TranslationValueAdapter(TranslationSchema schema, TranslationTyping typing) {
         this.schema = schema;
-        this.typeInfo = typeInfo;
+        this.typing = typing;
         this.expressions = new ArrayList<>();
     }
 

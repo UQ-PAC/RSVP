@@ -1,6 +1,8 @@
 package uq.pac.rsvp.policy.datalog.util;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -12,7 +14,7 @@ public class Util {
         return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
-    static <E> E required(Object o, Class<E> cls) {
+    public static <E> E required(Object o, Class<E> cls) {
         if (cls.isInstance(o)) {
             return cls.cast(o);
         }

@@ -3,8 +3,6 @@ package uq.pac.rsvp.policy.datalog.translation;
 import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.exception.InternalException;
 import org.junit.jupiter.api.Test;
-import org.logicng.formulas.Formula;
-import org.logicng.transformations.dnf.DNFFactorization;
 import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.ast.schema.Namespace;
@@ -78,7 +76,7 @@ public class TranslationDriverTest {
     public void test() throws IOException, InternalException {
         Entities entities = Entities.parse(ENTITIES);
         Schema schema = getSchema();
-        TranslationSchema translationSchema = TranslationSchema.get(schema);
+        TranslationSchema translationSchema = new TranslationSchema(schema);
 
         TranslationTypeInfo types = getTypeInfo(schema);
         Map<String, Expression> expressions = makeExpressions();

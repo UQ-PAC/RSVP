@@ -8,42 +8,43 @@ import java.util.*;
  * Translation for the entire schema (presently a collection of entity declarations)
  */
 public class TranslationSchema {
-    private final Map<String, TranslationType> schema;
+    private final Map<String, TranslationType> entityTypes;
+    private final Schema schema;
 
-    private TranslationSchema(Collection<TranslationType> types) {
+    TranslationSchema(Schema schema) {
+        this.schema = schema;
         Map<String, TranslationType> data = new HashMap<>();
-        for (TranslationType t : types) {
-            String tn = t.getName();
-            if (data.containsKey(tn)) {
-                throw new RuntimeException("Duplicate entity type: " + tn);
-            }
-            data.put(tn, t);
-        }
-        schema = Collections.unmodifiableMap(data);
+        schema.entityTypeNames().stream()
+                .map(schema::getEntityType)
+                .map(TranslationType::new)
+                .forEach(t -> {
+                    String tn = t.getName();
+                    if (data.containsKey(tn)) {
+                        throw new RuntimeException("Duplicate entity type: " + tn);
+                    }
+                    data.put(tn, t);
+                });
+        entityTypes = Collections.unmodifiableMap(data);
+    }
+
+    public Schema getSchema() {
+        return schema;
     }
 
     public TranslationType getTranslationType(String tn) {
-        return schema.get(tn);
+        return entityTypes.get(tn);
     }
 
     public Collection<TranslationType> getTranslationTypes() {
-        return schema.values();
+        return entityTypes.values();
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        schema.forEach((etn, tt) -> {
+        entityTypes.forEach((etn, tt) -> {
             sb.append(etn).append('\n');
         });
         return sb.toString();
-    }
-
-    public static TranslationSchema get(Schema schema) {
-        return new TranslationSchema(schema.entityTypeNames()
-                        .stream()
-                        .map(schema::getEntityType)
-                        .map(TranslationType::new)
-                        .toList());
     }
 }

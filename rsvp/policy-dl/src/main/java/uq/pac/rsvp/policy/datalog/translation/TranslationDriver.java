@@ -11,7 +11,7 @@ import java.util.*;
  */
 public class TranslationDriver {
     public static DLProgram getTranslation(Schema schema, Entities entities) {
-        TranslationSchema translationSchema = TranslationSchema.get(schema);
+        TranslationSchema translationSchema = new TranslationSchema(schema);
         List<TranslationEntity> facts = entities.getEntities()
                 .stream()
                 .map(e -> new TranslationEntity(e, translationSchema))

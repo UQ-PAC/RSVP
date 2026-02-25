@@ -13,7 +13,7 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class ActionDefinition implements SchemaFileEntry {
 
-    private static class ActionReference {
+    public static class ActionReference {
         private final String id;
         private final String type;
 
@@ -51,12 +51,14 @@ public class ActionDefinition implements SchemaFileEntry {
     private final Set<ActionReference> unresolvedMemberOf;
 
     private final ActionApplication appliesTo;
+
     private final Map<String, String> annotations;
 
-    // The name that this Action is mapped to within the namespace
+    // Set during type resolution to the key this action was mapped to in the
+    // namespace
     private String name;
 
-    // Resolved memberOf Action references
+    // Set during type resolution
     private Set<ActionDefinition> resolvedMemberOf;
 
     public ActionDefinition(Set<ActionReference> memberOf, Set<String> principalTypes, Set<String> resourceTypes,
@@ -112,6 +114,14 @@ public class ActionDefinition implements SchemaFileEntry {
 
     }
 
+    /**
+     * If this action is defined within a resolved namespace, then return the fully
+     * qualified name of this action definition in the format
+     * {@code Namespace::Action::actionName}
+     * 
+     * @return The fully qualified name of this action if this action is defined
+     *         within a resolved namespace, {@code null} otherwise.
+     */
     public String getName() {
         return name;
     }

@@ -12,10 +12,20 @@ public class SlotExpression extends Expression {
 
     public static enum SlotId {
         @SerializedName("principal")
-        Principal,
+        Principal("principal"),
 
         @SerializedName("resource")
-        Resource,
+        Resource("resource");
+
+        private final String value;
+
+        SlotId(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
     }
 
     private final SlotId id;
@@ -49,9 +59,6 @@ public class SlotExpression extends Expression {
 
     @Override
     public String toString() {
-        return switch (id) {
-            case Principal -> "&principal";
-            case Resource -> "&resource";
-        };
+        return "&" + id.getValue();
     }
 }

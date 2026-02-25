@@ -13,16 +13,26 @@ public class VariableExpression extends Expression {
     public static enum Reference {
 
         @SerializedName("principal")
-        Principal,
+        Principal("principal"),
 
         @SerializedName("resource")
-        Resource,
+        Resource("resource"),
 
         @SerializedName("action")
-        Action,
+        Action("action"),
 
         @SerializedName("context")
-        Context
+        Context("context");
+
+        private final String value;
+
+        Reference(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
     }
 
     private final Reference ref;
@@ -68,11 +78,6 @@ public class VariableExpression extends Expression {
 
     @Override
     public String toString() {
-        return switch (ref) {
-            case Action -> "action";
-            case Context -> "context";
-            case Principal -> "principal";
-            case Resource -> "resource";
-        };
+        return ref.getValue();
     }
 }

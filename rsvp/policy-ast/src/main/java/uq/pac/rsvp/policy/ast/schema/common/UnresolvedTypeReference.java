@@ -2,6 +2,8 @@ package uq.pac.rsvp.policy.ast.schema.common;
 
 import java.util.Map;
 
+import com.google.gson.annotations.SerializedName;
+
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
@@ -11,14 +13,20 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
  */
 public class UnresolvedTypeReference extends CommonTypeDefinition {
 
+    @SerializedName("name")
+    private final String rawTypeName;
+
     public UnresolvedTypeReference(String name, boolean required, Map<String, String> annotations) {
         super(required, annotations);
-        this.setName(name);
+        this.rawTypeName = name;
     }
 
     public UnresolvedTypeReference(String name) {
-        super(true, null);
-        this.setName(name);
+        this(name, true, null);
+    }
+
+    public String getRawTypeName() {
+        return rawTypeName;
     }
 
     @Override

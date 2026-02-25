@@ -23,10 +23,11 @@ public class EntityTypeDefinition implements SchemaFileEntry {
 
     private final Map<String, String> annotations;
 
-    // Resolved memberOfTypes
+    // Set during type resolution
     private Set<EntityTypeDefinition> resolvedMemberOfDefinitions;
 
-    // The name that this entity is mapped to in the namespace
+    // Set during type resolution to the key this entity was mapped to in the
+    // namespace
     private String name;
 
     public EntityTypeDefinition(Set<String> memberOfTypes, Map<String, CommonTypeDefinition> shape) {
@@ -67,6 +68,14 @@ public class EntityTypeDefinition implements SchemaFileEntry {
         }
     }
 
+    /**
+     * If this type is defined within a resolved namespace, then return the fully
+     * qualified name of this type definition in the format
+     * {@code Namespace::TypeName}
+     * 
+     * @return The fully qualified name of this type if this type is defined within
+     *         a resolved namespace, {@code null} otherwise.
+     */
     public String getName() {
         return name;
     }

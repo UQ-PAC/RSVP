@@ -5,85 +5,89 @@ import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 
-public abstract class ValueVisitorAdapter<T> implements PolicyComputationVisitor<T> {
+public class ValueVisitorAdapter<T> implements PolicyComputationVisitor<T> {
+
+    private T unsupported(Object o) {
+        throw new TranslationError("unsupported element: " + o);
+    }
 
     @Override
     public T visitPolicySet(PolicySet policies) {
-        throw new TranslationError("unsupported element" + policies);
+        return unsupported(policies);
     }
 
     @Override
     public T visitPolicy(Policy policy) {
-        throw new TranslationError("unsupported element" + policy);
+        return unsupported(policy);
     }
 
     @Override
     public T visitBinaryExpr(BinaryExpression expr) {
-        throw new TranslationError("unsupported element" + expr);
+        return unsupported(expr);
     }
 
     @Override
     public T visitPropertyAccessExpr(PropertyAccessExpression expr) {
-        throw new TranslationError("unsupported element" + expr);
+        return unsupported(expr);
     }
 
     @Override
     public T visitCallExpr(CallExpression expr) {
-        throw new TranslationError("unsupported element" + expr);
+        return unsupported(expr);
     }
 
     @Override
     public T visitConditionalExpr(ConditionalExpression expr) {
-        throw new TranslationError("unsupported element" + expr);
+        return unsupported(expr);
     }
 
     @Override
     public T visitRecordExpr(RecordExpression expr) {
-        throw new TranslationError("unsupported element" + expr);
+        return unsupported(expr);
     }
 
     @Override
     public T visitSetExpr(SetExpression expr) {
-        throw new TranslationError("unsupported element" + expr);
+        return unsupported(expr);
     }
 
     @Override
     public T visitUnaryExpr(UnaryExpression expr) {
-        throw new TranslationError("unsupported element" + expr);
+        return unsupported(expr);
     }
 
     @Override
     public T visitVariableExpr(VariableExpression expr) {
-        throw new TranslationError("unsupported element" + expr);
+        return unsupported(expr);
     }
 
     @Override
     public T visitBooleanExpr(BooleanExpression expr) {
-        throw new TranslationError("unsupported element" + expr);
+        return unsupported(expr);
     }
 
     @Override
     public T visitEntityExpr(EntityExpression expr) {
-        throw new TranslationError("unsupported element" + expr);
+        return unsupported(expr);
     }
 
     @Override
     public T visitLongExpr(LongExpression expr) {
-        throw new TranslationError("unsupported element" + expr);
+        return unsupported(expr);
     }
 
     @Override
     public T visitSlotExpr(SlotExpression expr) {
-        throw new TranslationError("unsupported element" + expr);
+        return unsupported(expr);
     }
 
     @Override
     public T visitStringExpr(StringExpression expr) {
-        throw new TranslationError("unsupported element" + expr);
+        return unsupported(expr);
     }
 
     @Override
     public T visitTypeExpr(TypeExpression expr) {
-        throw new TranslationError("unsupported element" + expr);
+        return unsupported(expr);
     }
 }

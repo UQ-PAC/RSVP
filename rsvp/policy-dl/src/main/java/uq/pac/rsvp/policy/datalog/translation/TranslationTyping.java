@@ -10,8 +10,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static uq.pac.rsvp.policy.ast.expr.VariableExpression.Reference.*;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationError.error;
 import static uq.pac.rsvp.policy.datalog.util.Util.required;
 
 public class TranslationTyping {
@@ -31,9 +33,9 @@ public class TranslationTyping {
                 typing.put(Action, a);
         });
 
-        TranslationError.error(typing.containsKey(Principal), "No available types for: " + Principal);
-        TranslationError.error(typing.containsKey(Resource), "No available types for: " + Resource);
-        TranslationError.error(typing.containsKey(Action), "No available types for: " + Action);
+        Stream.of(Principal, Resource, Action).forEach(v -> {
+            error(typing.containsKey(Principal), "No available types for: " + Principal);
+        });
     }
 
     boolean supported(VariableExpression.Reference ref) {
@@ -44,7 +46,7 @@ public class TranslationTyping {
     }
 
     Set<String> get(VariableExpression.Reference ref) {
-        TranslationError.error(supported(ref), "Unsupported variable reference: " + ref);
+        error(supported(ref), "Unsupported variable reference: " + ref);
         return typing.get(ref);
     }
 
@@ -53,23 +55,27 @@ public class TranslationTyping {
     }
 
     public void update(VariableExpression.Reference ref, Set<String> types) {
-        TranslationError.error(supported(ref), "Unsupported variable reference: " + ref);
+        error(supported(ref), "Unsupported variable reference: " + ref);
         for (String type : types) {
             switch (ref) {
                 case Principal, Resource ->
-                        TranslationError.error(schema.getEntityType(type) != null, "Cannot locate entity definition: " + type);
+                        error(schema.getEntityType(type) != null, "Cannot locate entity definition: " + type);
                 case Action ->
-                        TranslationError.error(schema.getAction(type) != null, "Cannot locate entity definition: " + type);
+                        error(schema.getAction(type) != null, "Cannot locate entity definition: " + type);
                 default ->
-                        TranslationError.error("Unexpected variable: " + ref.name());
+                        error("Unexpected variable: " + ref.name());
             }
         }
 
         Set<String> applicable = typing.get(ref);
         applicable.removeIf(e -> !types.contains(e));
-        TranslationError.error(!applicable.isEmpty(), "No available types for: " + ref + " after reduction");
+        error(!applicable.isEmpty(), "No available types for: " + ref + " after reduction");
+
+        // FIXME: If we are updating action, we also need to update principal and resource as per
+        //        limits of the schema
     }
 
+    // FIXME: May be not needed, check CommonTypeDefinition.getName
     public static String getTypeName(CommonTypeDefinition def) {
         return switch (def) {
             case EntityTypeReference t -> t.getDefinition().getName();
@@ -78,7 +84,11 @@ public class TranslationTyping {
             case LongType t -> "Long";
             case StringType t -> "String";
             case BooleanType t -> "Bool";
-            default -> throw new TranslationError("unsupported type");
+            case IpAddressType t -> "ipaddr";
+            case DurationType t -> "duration";
+            case DecimalType t -> "decimal";
+            case DateTimeType t -> "datetime";
+            default -> throw new TranslationError("unsupported type: " + def);
         };
     }
 
@@ -86,7 +96,8 @@ public class TranslationTyping {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (VariableExpression.Reference ref : typing.keySet()) {
-            sb.append(ref.value())
+            sb.append("   ")
+                    .append(ref.getValue())
                     .append(": ")
                     .append(typing.get(ref))
                     .append('\n');

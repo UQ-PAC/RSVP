@@ -16,7 +16,7 @@ public abstract class TranslationVoidAdapter extends VoidVisitorAdapter {
         this.expressions = new ArrayList<>();
     }
 
-    public List<DLRuleExpr> getExpressions() {
-        return expressions;
+    protected List<DLRuleExpr> getExpressions() {
+        return List.copyOf(expressions);
     }
 }

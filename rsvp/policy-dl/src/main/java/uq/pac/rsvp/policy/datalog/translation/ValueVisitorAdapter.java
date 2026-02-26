@@ -11,6 +11,18 @@ public class ValueVisitorAdapter<T> implements PolicyComputationVisitor<T> {
         throw new TranslationError("unsupported element: " + o);
     }
 
+    public T compute(Expression e) {
+        return e.compute(this);
+    }
+
+    public T compute(Policy e) {
+        return e.compute(this);
+    }
+
+    public T compute(PolicySet e) {
+        throw new AssertionError();
+    }
+
     @Override
     public T visitPolicySet(PolicySet policies) {
         return unsupported(policies);

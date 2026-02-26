@@ -1,6 +1,5 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import com.cedarpolicy.value.*;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.common.*;
@@ -15,13 +14,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TranslationType extends Translator {
+public class TranslationEntityTypeDefinition extends Translator {
     private final String name;
     private final EntityTypeDefinition entity;
     private final DLRelationDecl relation;
     private final Map<String, TranslationAttribute> attributeRelations;
 
-    public TranslationType(EntityTypeDefinition entity) {
+    public TranslationEntityTypeDefinition(EntityTypeDefinition entity) {
         this.entity = entity;
         this.name = entity.getName();
         String relationName = name.replace(':', '_');

@@ -50,11 +50,11 @@ public class TranslationTyping {
         return typing.get(ref);
     }
 
-    public void update(VariableExpression.Reference ref, String ...types) {
-        update(ref, Arrays.stream(types).collect(Collectors.toCollection(HashSet::new)));
+    public void update(VariableExpression.Reference ref, boolean negated, String ...types) {
+        update(ref, negated, Arrays.stream(types).collect(Collectors.toCollection(HashSet::new)));
     }
 
-    public void update(VariableExpression.Reference ref, Set<String> types) {
+    public void update(VariableExpression.Reference ref, boolean negated, Set<String> types) {
         error(supported(ref), "Unsupported variable reference: " + ref);
         for (String type : types) {
             switch (ref) {
@@ -68,7 +68,11 @@ public class TranslationTyping {
         }
 
         Set<String> applicable = typing.get(ref);
-        applicable.removeIf(e -> !types.contains(e));
+        if (negated) {
+            applicable.removeAll(types);
+        } else {
+            applicable.removeIf(e -> !types.contains(e));
+        }
         error(!applicable.isEmpty(), "No available types for: " + ref + " after reduction");
 
         // FIXME: If we are updating action, we also need to update principal and resource as per
@@ -105,23 +109,21 @@ public class TranslationTyping {
         return sb.toString();
     }
 
-    public void update(Expression expr) {
+    public void update(Expression expr, boolean negated) {
         expr.accept(new VoidVisitorAdapter() {
             @Override
             public void visitBinaryExpr(BinaryExpression expr) {
-                Expression lhs = expr.getLeft(),
-                        rhs = expr.getRight();
+                Expression lhs = expr.getLeft(), rhs = expr.getRight();
                 switch (expr.getOp()) {
                     case Eq -> {
                         if (lhs instanceof VariableExpression v && rhs instanceof EntityExpression e) {
-                            update(v.getReference(), e.getUnquotedName());
+                            update(v.getReference(), negated, e.getUnquotedName());
                         }
                     }
-                    case And -> {}
                     case Is -> {
                         TypeExpression typeExpr = required(expr.getRight(), TypeExpression.class);
                         if (lhs instanceof VariableExpression v) {
-                            update(v.getReference(), typeExpr.getValue());
+                            update(v.getReference(), negated, typeExpr.getValue());
                         }
                     }
                     default -> throw new RuntimeException("unsupported: " + expr.getOp());

@@ -3,16 +3,17 @@ package uq.pac.rsvp.policy.datalog.translation;
 import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.exception.InternalException;
 import org.junit.jupiter.api.Test;
+import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.ast.schema.Schema;
-import uq.pac.rsvp.policy.datalog.ast.DLAtom;
-import uq.pac.rsvp.policy.datalog.ast.DLRule;
-import uq.pac.rsvp.policy.datalog.ast.DLTerm;
+import uq.pac.rsvp.policy.datalog.ast.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TranslationDriverTest {
 
@@ -20,74 +21,42 @@ public class TranslationDriverTest {
     private static final Path POLICIES = Path.of("examples/photoapp/policy.cedar");
     private static final Path SCHEMA = Path.of("examples/photoapp/schema.cedarschema");
 
-    Schema getSchema() throws IOException, InternalException {
-        return Schema.parseCedarSchema(SCHEMA);
-    }
-
-    // Generating the following expression
-    //      principal: principal is Account &&
-    //      action:    action == Action::"viewPhoto" &&
-    //      resource:  resource is Photo &&
-    //      when:      resource.album.visibility == Visibility::"Public"
-    private Map<String, Expression> makeExpressions() {
-        Map<String, Expression> data = new HashMap<>();
-
-        VariableExpression principal = new VariableExpression(VariableExpression.Reference.Principal);
-        VariableExpression action = new VariableExpression(VariableExpression.Reference.Action);
-        VariableExpression resource = new VariableExpression(VariableExpression.Reference.Resource);
-        EntityExpression viewPhoto = new EntityExpression("viewPhoto", List.of("Action"));
-        EntityExpression publicVisibility = new EntityExpression("Public", List.of("Visibility"));
-        TypeExpression photo = new TypeExpression("Photo");
-        TypeExpression account = new TypeExpression("Account");
-        PropertyAccessExpression prop1 = new PropertyAccessExpression(resource, "album");
-        PropertyAccessExpression prop2 = new PropertyAccessExpression(prop1, "visibility");
-
-        // principal is Account
-        data.put("principal", new BinaryExpression(principal, BinaryExpression.BinaryOp.Is, account));
-        // action == Action::viewPhoto
-        data.put("action", new BinaryExpression(action, BinaryExpression.BinaryOp.Eq, viewPhoto));
-        // resource is Photo
-        data.put("resource", new BinaryExpression(resource, BinaryExpression.BinaryOp.Is, photo));
-        // resource.album.visibility == Visibility::"Public"
-        data.put("when", new BinaryExpression(prop2, BinaryExpression.BinaryOp.Eq, publicVisibility));
-
-        return data;
-    }
-
-    @Test
-    void testPolicy() throws IOException, InternalException {
+    Map<String, Policy> getPolicies() throws IOException, InternalException {
+        Map<String, Policy> policies = new HashMap<>();
         PolicySet policySet = PolicySet.parseCedarPolicySet(POLICIES);
-        Expression expr = policySet.getFirst().getCondition();
-        System.out.println(NFConverter.toDNF(expr));
+        for (Policy p : policySet) {
+            Map<String, String> annotations = p.getAnnotations();
+            assertEquals(1, annotations.size());
+            String annotation = annotations.keySet().stream().findFirst().orElse(null);
+            if (!annotations.get(annotation).equalsIgnoreCase("unsupported")) {
+                policies.put(annotation, p);
+            }
+        }
+        return policies;
     }
 
     @Test
     public void test() throws IOException, InternalException {
         Entities entities = Entities.parse(ENTITIES);
-        Schema schema = getSchema();
+        Schema schema = Schema.parseCedarSchema(SCHEMA);
         TranslationSchema translationSchema = new TranslationSchema(schema);
 
         TranslationTyping types = new TranslationTyping(schema);
-        Map<String, Expression> expressions = makeExpressions();
+        Map<String, Policy> policies = getPolicies();
 
-        Expression principal = expressions.get("principal");
-        Expression resource = expressions.get("resource");
-        Expression action = expressions.get("action");
-        Expression when = expressions.get("when");
+        policies.forEach((annotation, policy) -> {
+            System.out.println(" === " + annotation + " =========== ");
+            DLRelationDecl declaration = new DLRelationDecl(annotation,
+                    new DLDeclTerm("principal", DLType.SYMBOL),
+                    new DLDeclTerm("resource", DLType.SYMBOL),
+                    new DLDeclTerm("action", DLType.SYMBOL));
+            System.out.println(declaration);
 
-        BinaryExpression p1 = new BinaryExpression(
-                principal, BinaryExpression.BinaryOp.And, resource);
-        BinaryExpression p2 = new BinaryExpression(
-                p1, BinaryExpression.BinaryOp.And, action);
-        BinaryExpression policy = new BinaryExpression(
-                p2, BinaryExpression.BinaryOp.And, when);
-
-        TranslationVisitor et = new TranslationVisitor(translationSchema, types);
-        policy.accept(et);
-
-        DLAtom atom = new DLAtom("permit",
-                DLTerm.var("principal"), DLTerm.var("resource"), DLTerm.var("action"));
-        DLRule rule = new DLRule(atom, et.expressions);
-        System.out.println(rule);
+            List<List<Expression>> disjunctions = NFConverter.toDNF(policy.getCondition());
+            for (List<Expression> disjunction : disjunctions) {
+                DLRule rule = TranslationVisitor.translate(translationSchema, disjunction, declaration);
+                System.out.println(rule);
+            }
+        });
     }
 }

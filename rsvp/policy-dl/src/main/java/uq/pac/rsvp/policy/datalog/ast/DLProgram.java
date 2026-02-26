@@ -2,7 +2,9 @@ package uq.pac.rsvp.policy.datalog.ast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Datalog program as an ordered list of statements
@@ -31,11 +33,15 @@ public class DLProgram extends DLNode {
         return false;
     }
 
+    Stream<DLStatement> statements() {
+        return statements.stream();
+    }
+
     public static class Builder {
         private final List<DLStatement> statements;
 
         public Builder() {
-            this.statements = new ArrayList<DLStatement>();
+            this.statements = new ArrayList<>();
         }
 
         public Builder add(DLStatement stmt) {
@@ -48,7 +54,7 @@ public class DLProgram extends DLNode {
             return this;
         }
 
-        public Builder add(List<DLStatement> stmts) {
+        public Builder add(Collection<? extends DLStatement> stmts) {
             statements.addAll(stmts);
             return this;
         }

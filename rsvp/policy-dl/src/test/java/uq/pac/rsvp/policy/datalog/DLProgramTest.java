@@ -28,7 +28,7 @@ public class DLProgramTest {
 
         builder.comment("Facts");
         builder.add(
-            new DLRelationDecl("edge", List.of(
+            new DLRuleDecl("edge", List.of(
                 new DLDeclTerm("x", DLType.NUMBER),
                 new DLDeclTerm("y", DLType.NUMBER)
         )));
@@ -39,7 +39,7 @@ public class DLProgramTest {
 
         builder.comment("Closure");
         builder.add(
-            new DLRelationDecl("path", List.of(
+            new DLRuleDecl("path", List.of(
                 new DLDeclTerm("x", DLType.NUMBER),
                 new DLDeclTerm("y", DLType.NUMBER))));
         builder.add(new DLDirective(DLDirective.Kind.OUTPUT, "path", "stdout"));

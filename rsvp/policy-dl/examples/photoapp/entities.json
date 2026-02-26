@@ -1,5 +1,4 @@
 [
-
     {
         "uid": { "type": "Role", "id": "User" },
         "attrs": { },
@@ -200,27 +199,6 @@
             "size" : 9,
             "type" : "jpg"
         },
-        "parents": []
-    },
-
-    {
-        "uid": { "type": "Action", "id": "uploadPhoto" },
-        "attrs": { },
-        "parents": []
-    },
-    {
-        "uid": { "type": "Action", "id": "viewPhoto" },
-        "attrs": { },
-        "parents": []
-    },
-    {
-        "uid": { "type": "Action", "id": "createAlbum" },
-        "attrs": { },
-        "parents": []
-    },
-    {
-        "uid": { "type": "Action", "id": "removeAlbum" },
-        "attrs": { },
         "parents": []
     }
 ]

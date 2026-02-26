@@ -3,7 +3,7 @@ package uq.pac.rsvp.policy.datalog.ast;
 /**
  * STRING ::= ? quoted string ?
  * NUMBER ::= ? integer or floating point number ?
- * IDENT ::= ? alpha-numeric identifier ?
+ * IDENT ::= ? alphanumeric identifier ?
  * ====
  * Variable ::= IDENT
  * Term ::= Variable | NUMBER | STRING

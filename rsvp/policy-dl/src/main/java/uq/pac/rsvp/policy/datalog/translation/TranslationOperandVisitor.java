@@ -38,9 +38,9 @@ public class TranslationOperandVisitor extends TranslationValueAdapter<DLTerm> {
         error(types.size() == 1,
                 "No/Multiple applicable types found: " + types);
 
-        String lhsVarType = types.stream().findFirst().get();
+        String lhsVarType = types.stream().findFirst().orElse(null);
         // Translation type for the LHS variable, so we know which relation to use
-        TranslationEntityTypeDefinition tt = schema.getTranslationType(lhsVarType);
+        TranslationEntityType tt = schema.getTranslationType(lhsVarType);
         error(tt != null,
                 "No definition for type: " + lhsVarType);
         TranslationAttribute attr = tt.getAttribute(property);
@@ -48,7 +48,7 @@ public class TranslationOperandVisitor extends TranslationValueAdapter<DLTerm> {
                 "No attribute " + property + " for type: " + lhsVarType);
 
         // Generated relation
-        String relationName = attr.getRelationDecl().getName();
+        String relationName = attr.getRuleDecl().getName();
         DLAtom generated = new DLAtom(relationName, lhsVar, rhsVar);
         this.expressions.add(generated);
         this.types = Set.of(TranslationTyping.getTypeName(attr.getType()));

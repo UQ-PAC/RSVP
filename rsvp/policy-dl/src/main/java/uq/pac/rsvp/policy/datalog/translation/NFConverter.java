@@ -2,10 +2,7 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import org.logicng.formulas.*;
 import org.logicng.transformations.dnf.DNFFactorization;
-import uq.pac.rsvp.policy.ast.Policy;
-import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.expr.*;
-import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,7 +11,7 @@ import java.util.stream.Stream;
 /**
  * Converting a Cedar expression to a normal form
  */
-public class NFConverter implements PolicyComputationVisitor<Formula> {
+public class NFConverter extends ValueVisitorAdapter<Formula> {
     private final Map<String, Expression> cache;
     private final FormulaFactory factory;
     private int counter = 0;
@@ -74,84 +71,19 @@ public class NFConverter implements PolicyComputationVisitor<Formula> {
         };
     }
 
-    public static Expression transform(Expression expr, FormulaTransformation transform) {
-        NFConverter e2f = new NFConverter();
-        Formula formula = expr.compute(e2f);
-        Formula dnf = formula.transform(transform);
-        return e2f.toExpression(dnf);
-    }
+    public static List<List<Expression>> toDNF(Expression expr) {
+        NFConverter converter = new NFConverter();
+        Formula formula = expr.compute(converter);
+        Formula nf = formula.transform(new DNFFactorization());
+        Stream<Formula> disjunctions = nf instanceof Or or ? or.stream() : Stream.of(nf);
 
-    public static Expression toDNF(Expression expr) {
-        return transform(expr, new DNFFactorization());
-    }
-
-    @Override
-    public Formula visitPolicySet(PolicySet policySet) {
-        throw new RuntimeException("unsupported");
-    }
-
-    @Override
-    public Formula visitPolicy(Policy policy) {
-        throw new RuntimeException("unsupported");
-    }
-
-    @Override
-    public Formula visitPropertyAccessExpr(PropertyAccessExpression expr) {
-        throw new RuntimeException("unsupported");
-    }
-
-    @Override
-    public Formula visitCallExpr(CallExpression expr) {
-        throw new RuntimeException("unsupported");
-    }
-
-    @Override
-    public Formula visitConditionalExpr(ConditionalExpression expr) {
-        throw new RuntimeException("unsupported");
-    }
-
-    @Override
-    public Formula visitRecordExpr(RecordExpression expr) {
-        throw new RuntimeException("unsupported");
-    }
-
-    @Override
-    public Formula visitSetExpr(SetExpression expr) {
-        throw new RuntimeException("unsupported");
-    }
-
-    @Override
-    public Formula visitVariableExpr(VariableExpression expr) {
-        throw new RuntimeException("unsupported");
-    }
-
-    @Override
-    public Formula visitBooleanExpr(BooleanExpression expr) {
-        throw new RuntimeException("unsupported");
-    }
-
-    @Override
-    public Formula visitEntityExpr(EntityExpression expr) {
-        throw new RuntimeException("unsupported");
-    }
-
-    @Override
-    public Formula visitLongExpr(LongExpression expr) {
-        throw new RuntimeException("unsupported");
-    }
-
-    @Override
-    public Formula visitSlotExpr(SlotExpression expr) {
-        throw new RuntimeException("unsupported");
-    }
-
-    @Override
-    public Formula visitStringExpr(StringExpression expr) {
-        throw new RuntimeException("unsupported");
-    }
-
-    @Override
-    public Formula visitTypeExpr(TypeExpression expr) {
-        throw new RuntimeException("unsupported");
+        return disjunctions.map(dis -> {
+            return (dis instanceof And and ? and.stream() : Stream.of(dis)).toList();
+        }).map(dis -> {
+            return dis.stream()
+                    .map(converter::toExpression)
+                    .sorted(Comparator.comparingInt(ExpressionOrdering::order))
+                    .toList();
+        }).toList();
     }
 }

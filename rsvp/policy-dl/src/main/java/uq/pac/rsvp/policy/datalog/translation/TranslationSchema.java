@@ -8,15 +8,15 @@ import java.util.*;
  * Translation for the entire schema (presently a collection of entity declarations)
  */
 public class TranslationSchema {
-    private final Map<String, TranslationType> entityTypes;
+    private final Map<String, TranslationEntityTypeDefinition> entityTypes;
     private final Schema schema;
 
     TranslationSchema(Schema schema) {
         this.schema = schema;
-        Map<String, TranslationType> data = new HashMap<>();
+        Map<String, TranslationEntityTypeDefinition> data = new HashMap<>();
         schema.entityTypeNames().stream()
                 .map(schema::getEntityType)
-                .map(TranslationType::new)
+                .map(TranslationEntityTypeDefinition::new)
                 .forEach(t -> {
                     String tn = t.getName();
                     if (data.containsKey(tn)) {
@@ -31,11 +31,11 @@ public class TranslationSchema {
         return schema;
     }
 
-    public TranslationType getTranslationType(String tn) {
+    public TranslationEntityTypeDefinition getTranslationType(String tn) {
         return entityTypes.get(tn);
     }
 
-    public Collection<TranslationType> getTranslationTypes() {
+    public Collection<TranslationEntityTypeDefinition> getTranslationTypes() {
         return entityTypes.values();
     }
 

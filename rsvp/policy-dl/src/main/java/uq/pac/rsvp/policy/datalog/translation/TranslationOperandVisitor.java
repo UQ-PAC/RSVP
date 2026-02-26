@@ -40,7 +40,7 @@ public class TranslationOperandVisitor extends TranslationValueAdapter<DLTerm> {
 
         String lhsVarType = types.stream().findFirst().get();
         // Translation type for the LHS variable, so we know which relation to use
-        TranslationType tt = schema.getTranslationType(lhsVarType);
+        TranslationEntityTypeDefinition tt = schema.getTranslationType(lhsVarType);
         error(tt != null,
                 "No definition for type: " + lhsVarType);
         TranslationAttribute attr = tt.getAttribute(property);
@@ -57,7 +57,7 @@ public class TranslationOperandVisitor extends TranslationValueAdapter<DLTerm> {
 
     @Override
     public DLTerm visitVariableExpr(VariableExpression expr) {
-        error(expr.getReference() == Context,
+        error(expr.getReference() != Context,
                 "Context variable is unsupported");
         this.types = typing.get(expr.getReference());
         return DLTerm.var(expr.toString());

@@ -21,7 +21,7 @@ public class TranslationVisitor extends TranslationVoidAdapter {
         super(schema, new TranslationTyping(schema.getSchema()));
     }
 
-    public static DLRule translate(TranslationSchema schema, Collection<Expression> exprs, DLRelationDecl decl) {
+    public static DLRule translate(TranslationSchema schema, Collection<Expression> exprs, DLRuleDecl decl) {
         TranslationVisitor visitor = new TranslationVisitor(schema);
         exprs.forEach(e -> e.accept(visitor));
         DLAtom atom = new DLAtom(decl.getName(),
@@ -55,7 +55,7 @@ public class TranslationVisitor extends TranslationVoidAdapter {
                 DLTerm var = expr.getLeft().compute(lhs);
                 expressions.addAll(lhs.getExpressions());
                 String relationName = schema.getTranslationType(typeExpr.getValue())
-                        .getEntityRelation()
+                        .getEntityRuleDecl()
                         .getName();
                 expressions.add(new DLAtom(relationName, var));
             }

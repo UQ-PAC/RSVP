@@ -46,7 +46,7 @@ public class TranslationDriverTest {
 
         policies.forEach((annotation, policy) -> {
             System.out.println(" === " + annotation + " =========== ");
-            DLRelationDecl declaration = new DLRelationDecl(annotation,
+            DLRuleDecl declaration = new DLRuleDecl(annotation,
                     new DLDeclTerm("principal", DLType.SYMBOL),
                     new DLDeclTerm("resource", DLType.SYMBOL),
                     new DLDeclTerm("action", DLType.SYMBOL));
@@ -59,4 +59,13 @@ public class TranslationDriverTest {
             }
         });
     }
+
+    void TranslationDriverTest() throws IOException, InternalException {
+        Entities entities = Entities.parse(ENTITIES);
+        Schema schema = Schema.parseCedarSchema(SCHEMA);
+        PolicySet policySet = PolicySet.parseCedarPolicySet(POLICIES);
+
+        DLProgram driver = TranslationDriver.translate(schema, policySet, entities);
+    }
+
 }

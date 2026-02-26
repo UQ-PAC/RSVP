@@ -15,10 +15,10 @@ public class DLRule extends DLStatement {
     private final DLAtom head;
     private final List<DLRuleExpr> body;
 
-    public DLRule(DLAtom head, DLRuleExpr ...exprs) {
-        require(exprs.length > 0);
+    public DLRule(DLAtom head, DLRuleExpr ...expressions) {
+        require(expressions.length > 0);
         this.head = head;
-        this.body = Arrays.stream(exprs).toList();
+        this.body = Arrays.stream(expressions).toList();
     }
 
     public DLRule(DLAtom head, List<DLRuleExpr> body) {

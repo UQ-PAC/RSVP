@@ -5,21 +5,21 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Relation declaration
+ * Rule declaration
  * <code>
- *  RelationDeclaration ::= '.decl' IDENT '(' DeclTerm [ ',' DeclTerm ]* ')'
+ *  RuleDeclaration ::= '.decl' IDENT '(' DeclTerm [ ',' DeclTerm ]* ')'
  * </code>
  */
-public class DLRelationDecl extends DLStatement {
+public class DLRuleDecl extends DLStatement {
     private final String name;
     private final List<DLDeclTerm> terms;
 
-    public DLRelationDecl(String name, List<DLDeclTerm> terms) {
+    public DLRuleDecl(String name, List<DLDeclTerm> terms) {
         this.name = name;
         this.terms = List.copyOf(terms);
     }
 
-    public DLRelationDecl(String name, DLType ...types) {
+    public DLRuleDecl(String name, DLType ...types) {
         this.name = name;
         if (types.length > 26) {
             throw new RuntimeException("Size exceeds allowed limit");
@@ -31,7 +31,7 @@ public class DLRelationDecl extends DLStatement {
         this.terms = List.copyOf(terms);
     }
 
-    public DLRelationDecl(String name, DLDeclTerm ...terms) {
+    public DLRuleDecl(String name, DLDeclTerm ...terms) {
         this(name, Arrays.stream(terms).toList());
     }
 

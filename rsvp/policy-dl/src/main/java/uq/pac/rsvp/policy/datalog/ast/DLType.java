@@ -11,7 +11,7 @@ import java.util.Set;
  * </code>
  */
 public class DLType extends DLNode {
-    private static final Set<String> RESERVED_TYPENAMES = Set.of(
+    private static final Set<String> RESERVED_TYPE_NAMES = Set.of(
             "number",
             "symbol",
             "unsigned",
@@ -20,7 +20,7 @@ public class DLType extends DLNode {
     private static final Map<String, DLType> RESERVED_TYPES;
     static {
         RESERVED_TYPES = new HashMap<>();
-        for (String tn : RESERVED_TYPENAMES) {
+        for (String tn : RESERVED_TYPE_NAMES) {
             RESERVED_TYPES.put(tn, new DLType(tn));
         }
     }

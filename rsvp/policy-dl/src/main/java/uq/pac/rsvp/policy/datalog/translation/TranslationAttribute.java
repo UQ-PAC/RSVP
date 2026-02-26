@@ -1,14 +1,14 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
-import uq.pac.rsvp.policy.datalog.ast.DLRelationDecl;
+import uq.pac.rsvp.policy.datalog.ast.DLRuleDecl;
 
 public class TranslationAttribute {
     private final String name;
-    private final DLRelationDecl declaration;
+    private final DLRuleDecl declaration;
     private final CommonTypeDefinition type;
 
-    public TranslationAttribute(String name, CommonTypeDefinition type, DLRelationDecl declaration) {
+    public TranslationAttribute(String name, CommonTypeDefinition type, DLRuleDecl declaration) {
         this.name = name;
         this.type = type;
         this.declaration = declaration;
@@ -18,7 +18,7 @@ public class TranslationAttribute {
         return name;
     }
 
-    public DLRelationDecl getRelationDecl() {
+    public DLRuleDecl getRuleDecl() {
         return declaration;
     }
 

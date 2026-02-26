@@ -24,4 +24,8 @@ public class DLFact extends DLStatement {
     public DLAtom getAtom() {
         return atom;
     }
+
+    public String getRelationName() {
+        return atom.getName();
+    }
 }

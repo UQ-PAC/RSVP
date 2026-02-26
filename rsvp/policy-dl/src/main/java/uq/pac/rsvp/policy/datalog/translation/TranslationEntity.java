@@ -10,13 +10,13 @@ import java.util.List;
 
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
-public class TranslationEntity extends Translator {
+/**
+ * Translation of an entity into a set of datalog facts
+ */
+public class TranslationEntity {
 
-    private final List<DLStatement> statements;
-
-    public static DLTerm getEUIDLiteral(Entity entity) {
-        return getEUIDLiteral(entity.getEUID());
-    }
+    private final List<DLFact> facts;
+    private final TranslationEntityType definition;
 
     public static DLTerm getEUIDLiteral(EntityUID id) {
         String prefix = id.getType().toString();
@@ -51,34 +51,40 @@ public class TranslationEntity extends Translator {
     }
 
     public TranslationEntity(Entity entity, TranslationSchema schema) {
-        List<DLStatement> statements = new ArrayList<>();
-        TranslationEntityTypeDefinition type = schema.getTranslationType(entity.getEUID().getType().toString());
+        List<DLFact> statements = new ArrayList<>();
+        this.definition = schema.getTranslationType(entity.getEUID().getType().toString());
         // We assume the inputs are validated, so by the time we get to see entities,
         // it has been made sure that there is an underlying type for each encountered EUID
-        require(type != null, "Cannot locate type for entity " + entity.getEUID());
+        require(definition != null, "Cannot locate type for entity " + entity.getEUID());
         // Build facts
-        DLRelationDecl relation = type.getEntityRelation();
+        DLRuleDecl relation = definition.getEntityRuleDecl();
         DLTerm euid = getEUIDLiteral(entity.getEUID());
         statements.add(new DLFact(relation.getName(), euid));
 
         entity.attrs.forEach((attr, value) -> {
             List<DLTerm> terms = getTerms(value);
             terms.forEach(term -> {
-                DLRelationDecl ad = type.getAttribute(attr).getRelationDecl();
+                DLRuleDecl ad = definition.getAttribute(attr).getRuleDecl();
                 statements.add(new DLFact(ad.getName(), euid, term));
             });
         });
 
-        this.statements = Collections.unmodifiableList(statements);
+        this.facts = Collections.unmodifiableList(statements);
     }
 
-    @Override
-    public List<DLStatement> getTranslation() {
-        return statements;
+    public List<DLFact> getFacts() {
+        return facts;
     }
 
     @Override
     public String toString() {
+        List<DLStatement> statements = facts.stream()
+                .map(f -> (DLStatement)f)
+                .toList();
         return new DLProgram(statements).toString();
+    }
+
+    public TranslationEntityType getEntityTypeDefinition() {
+        return definition;
     }
 }

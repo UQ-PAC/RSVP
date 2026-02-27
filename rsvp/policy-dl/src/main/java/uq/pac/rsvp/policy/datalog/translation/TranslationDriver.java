@@ -9,6 +9,9 @@ import uq.pac.rsvp.policy.datalog.ast.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
+
+import static uq.pac.rsvp.policy.datalog.translation.TranslationVar.*;
 
 /**
  * Putting translation of the cedar schema, entries, context and policies together
@@ -39,16 +42,25 @@ public class TranslationDriver {
 
         TranslationAction actionType = new TranslationAction(translationSchema);
         builder.comment("Actions")
-                .add(actionType.getAction().getDecl())
-                .add(actionType.getAction().getContents())
+                .add(actionType.getAction().getStatements())
                 .space()
-                .comment("ActionPrincipal")
-                .add(actionType.getActionPrincipal().getDecl())
-                .add(actionType.getActionPrincipal().getContents())
+                .comment("Program principals (as specified by the schema)")
+                .add(actionType.getActionPrincipal().getStatements())
                 .space()
-                .comment("ActionResource")
-                .add(actionType.getActionResource().getDecl())
-                .add(actionType.getActionResource().getContents())
+                .comment("Program resources (as specified by the schema)")
+                .add(actionType.getActionResource().getStatements())
+                .space()
+                .comment("Actionable requests")
+                .add(actionType.getActionableRequests().getStatements())
+                .space()
+                .comment("All (potential) principals")
+                .add(getPrincipalTypes(translationSchema).getStatements())
+                .space()
+                .comment("All (potential) resources")
+                .add(getResourceTypes().getStatements())
+                .space()
+                .comment("All (potential) requests")
+                .add(getAllRequests().getStatements())
                 .space();
 
         builder.comment("Permit Policy Rules");
@@ -89,6 +101,35 @@ public class TranslationDriver {
         }
         builder.space();
         return builder.build();
+    }
+
+    public static TranslationRule getPrincipalTypes(TranslationSchema schema) {
+        DLRuleDecl principalDecl = new DLRuleDecl("Principal", PrincipalVarDecl);
+        List<DLRule> facts = schema.getTranslationEntityTypes().stream()
+                .map(e -> {
+                    return new DLRule(
+                           new DLAtom(principalDecl.getName(), PrincipalVar),
+                           new DLAtom(e.getEntityRuleDecl().getName(), PrincipalVar));
+                })
+                .toList();
+        return new TranslationRule(principalDecl, facts);
+    }
+
+    public static TranslationRule getResourceTypes() {
+        DLRuleDecl resourceDecl = new DLRuleDecl("Resource", ResourceVarDecl);
+        DLRule rule = new DLRule(new DLAtom(resourceDecl.getName(), ResourceVar),
+                            new DLAtom("Principal", ResourceVar));
+        return new TranslationRule(resourceDecl, rule);
+    }
+
+    public static TranslationRule getAllRequests() {
+        DLRuleDecl decl = makePolicyRuleDecl("AllRequests");
+        DLRule rule = new DLRule(
+        makePolicyAtom(decl.getName()),
+                new DLAtom("Principal", PrincipalVar),
+                new DLAtom("Resource", ResourceVar),
+                new DLAtom("Action", ActionVar));
+        return new TranslationRule(decl, rule);
     }
 
     // FIXME: Testing. Remove

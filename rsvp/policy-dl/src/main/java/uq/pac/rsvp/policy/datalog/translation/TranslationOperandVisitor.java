@@ -40,7 +40,7 @@ public class TranslationOperandVisitor extends TranslationValueAdapter<DLTerm> {
 
         String lhsVarType = types.stream().findFirst().orElse(null);
         // Translation type for the LHS variable, so we know which relation to use
-        TranslationEntityType tt = schema.getTranslationType(lhsVarType);
+        TranslationEntityType tt = schema.getTranslationEntityType(lhsVarType);
         error(tt != null,
                 "No definition for type: " + lhsVarType);
         TranslationAttribute attr = tt.getAttribute(property);

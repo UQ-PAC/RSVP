@@ -27,4 +27,12 @@ public class DLDeclTerm extends DLNode {
         }
         return false;
     }
+
+    public static DLDeclTerm symbolic(String name) {
+        return new DLDeclTerm(name, DLType.SYMBOL);
+    }
+
+    public static DLDeclTerm numeric(String name) {
+        return new DLDeclTerm(name, DLType.NUMBER);
+    }
 }

@@ -54,7 +54,7 @@ public class TranslationVisitor extends TranslationVoidAdapter {
                 TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, typing);
                 DLTerm var = expr.getLeft().compute(lhs);
                 expressions.addAll(lhs.getExpressions());
-                String relationName = schema.getTranslationType(typeExpr.getValue())
+                String relationName = schema.getTranslationEntityType(typeExpr.getValue())
                         .getEntityRuleDecl()
                         .getName();
                 expressions.add(new DLAtom(relationName, var));

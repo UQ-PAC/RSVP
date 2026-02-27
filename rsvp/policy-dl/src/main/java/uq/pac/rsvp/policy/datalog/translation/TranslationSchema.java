@@ -31,7 +31,7 @@ public class TranslationSchema {
         return schema;
     }
 
-    public TranslationEntityType getTranslationType(String tn) {
+    public TranslationEntityType getTranslationEntityType(String tn) {
         return entityTypes.get(tn);
     }
 

@@ -9,7 +9,6 @@ import uq.pac.rsvp.policy.datalog.ast.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
 
 /**
  * Putting translation of the cedar schema, entries, context and policies together
@@ -38,7 +37,21 @@ public class TranslationDriver {
             builder.space();
         }
 
-        builder.comment(" ===== Permit Policies =====");
+        TranslationAction actionType = new TranslationAction(translationSchema);
+        builder.comment("Actions")
+                .add(actionType.getAction().getDecl())
+                .add(actionType.getAction().getContents())
+                .space()
+                .comment("ActionPrincipal")
+                .add(actionType.getActionPrincipal().getDecl())
+                .add(actionType.getActionPrincipal().getContents())
+                .space()
+                .comment("ActionResource")
+                .add(actionType.getActionResource().getDecl())
+                .add(actionType.getActionResource().getContents())
+                .space();
+
+        builder.comment("Permit Policy Rules");
         for (TranslationPolicy policy : translationPolicies.getPermitTranslation()) {
             builder.comment("Permit Policy: " + policy.getDeclaration().getName());
             builder.add(policy.getDeclaration());
@@ -48,7 +61,7 @@ public class TranslationDriver {
             builder.space();
         }
 
-        builder.comment(" ===== Forbid Policies =====");
+        builder.comment("Forbid Policy Rules");
         for (TranslationPolicy policy : translationPolicies.getForbidTranslation()) {
             builder.comment("Forbid Policy: " + policy.getDeclaration().getName());
             builder.add(policy.getDeclaration());
@@ -57,6 +70,24 @@ public class TranslationDriver {
             }
             builder.space();
         }
+
+        builder.comment("General Permit Rule (requests explicitly allowed by the policy)");
+        builder.add(TranslationPolicy.makePolicyRuleDecl("Permit"));
+        DLAtom permit = TranslationPolicy.makePolicyAtom("Permit");
+        for (TranslationPolicy policy : translationPolicies.getPermitTranslation()) {
+            DLAtom policyPermit = TranslationPolicy.makePolicyAtom(policy.getName());
+            builder.add(new DLRule(permit, policyPermit));
+        }
+        builder.space();
+
+        builder.comment("General Forbid Rule (requests explicitly forbidden by the policy)");
+        builder.add(TranslationPolicy.makePolicyRuleDecl("Forbid"));
+        DLAtom forbid = TranslationPolicy.makePolicyAtom("Forbid");
+        for (TranslationPolicy policy : translationPolicies.getForbidTranslation()) {
+            DLAtom policyForbid = TranslationPolicy.makePolicyAtom(policy.getName());
+            builder.add(new DLRule(forbid, policyForbid));
+        }
+        builder.space();
         return builder.build();
     }
 

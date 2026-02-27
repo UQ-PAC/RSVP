@@ -2,6 +2,8 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import uq.pac.rsvp.policy.datalog.ast.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -10,6 +12,11 @@ import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 public class TranslationRule {
     private final DLRuleDecl decl;
     private final List<DLStatement> contents;
+
+
+    public TranslationRule(DLRuleDecl decl, DLStatement ...statements) {
+        this(decl, Arrays.stream(statements).toList());
+    }
 
     public TranslationRule(DLRuleDecl decl, Collection<? extends DLStatement> statements) {
         this.decl = decl;
@@ -32,5 +39,12 @@ public class TranslationRule {
 
     public List<DLStatement> getContents() {
         return contents;
+    }
+
+    public List<DLStatement> getStatements() {
+        List<DLStatement> statements = new ArrayList<>(contents.size() + 1);
+        statements.add(decl);
+        statements.addAll(contents);
+        return statements;
     }
 }

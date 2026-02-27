@@ -46,9 +46,6 @@ public class TranslationVisitor extends TranslationVoidAdapter {
                 expressions.addAll(rhs.getExpressions());
                 expressions.add(new DLConstraint(lhsOp, rhsOp, DLConstraint.Operator.EQ));
             }
-            case And, Or -> {
-                throw new AssertionError("Unreachable");
-            }
             case BinaryExpression.BinaryOp.Is -> {
                 TypeExpression typeExpr = required(expr.getRight(), TypeExpression.class);
                 TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, typing);
@@ -59,6 +56,7 @@ public class TranslationVisitor extends TranslationVoidAdapter {
                         .getName();
                 expressions.add(new DLAtom(relationName, var));
             }
+            case And, Or -> throw new AssertionError("Unreachable");
             default -> throw new RuntimeException("unsupported: " + expr.getOp());
         }
     }

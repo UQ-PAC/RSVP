@@ -15,6 +15,10 @@ public final class DLAtom extends DLRuleExpr {
     private final String name;
     private final List<DLTerm> terms;
 
+    public DLAtom(DLRuleDecl decl, DLTerm ...terms) {
+        this(decl.getName(), Arrays.stream(terms).toList());
+    }
+
     public DLAtom(String name, DLTerm ...terms) {
         this(name, Arrays.stream(terms).toList());
     }

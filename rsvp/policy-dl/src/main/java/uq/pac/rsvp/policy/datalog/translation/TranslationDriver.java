@@ -43,24 +43,18 @@ public class TranslationDriver {
         TranslationAction actionType = new TranslationAction(translationSchema);
         builder.comment("Actions")
                 .add(actionType.getAction().getStatements())
-                .space()
-                .comment("Program principals (as specified by the schema)")
+                .nlComment("Program principals (as specified by the schema)")
                 .add(actionType.getActionPrincipal().getStatements())
-                .space()
-                .comment("Program resources (as specified by the schema)")
+                .nlComment("Program resources (as specified by the schema)")
                 .add(actionType.getActionResource().getStatements())
-                .space()
-                .comment("Actionable requests")
+                .nlComment("Actionable requests")
                 .add(actionType.getActionableRequests().getStatements())
-                .space()
-                .comment("All (potential) principals")
-                .add(getPrincipalTypes(translationSchema).getStatements())
-                .space()
-                .comment("All (potential) resources")
-                .add(getResourceTypes().getStatements())
-                .space()
-                .comment("All (potential) requests")
-                .add(getAllRequests().getStatements())
+                .nlComment("All (potential) principals")
+                .add(makePrincipalTypes(translationSchema).getStatements())
+                .nlComment("All (potential) resources")
+                .add(makeResourceTypes().getStatements())
+                .nlComment("All (potential) requests")
+                .add(makeAllRequestsRule().getStatements())
                 .space();
 
         builder.comment("Permit Policy Rules");
@@ -90,20 +84,26 @@ public class TranslationDriver {
             DLAtom policyPermit = makeStandardAtom(policy.getName());
             builder.add(new DLRule(permit, policyPermit));
         }
-        builder.space();
 
-        builder.comment("General Forbid Rule (requests explicitly forbidden by the policy)");
+        builder.nlComment("General Forbid Rule (requests explicitly forbidden by the policy)");
         builder.add(ForbidRuleDecl);
         DLAtom forbid = makeStandardAtom(ForbidRuleDecl);
         for (TranslationPolicy policy : translationPolicies.getForbidTranslation()) {
             DLAtom policyForbid = makeStandardAtom(policy.getName());
             builder.add(new DLRule(forbid, policyForbid));
         }
-        builder.space();
+
+        builder.nlComment("All permitted requests")
+            .add(makePermittedRequestsRule().getStatements())
+            .nlComment("All forbidden requests")
+            .add(makeForbiddenRequestsRule().getStatements())
+            .nlComment("I/O")
+            .add(makeIODirectives());
+
         return builder.build();
     }
 
-    public static TranslationRule getPrincipalTypes(TranslationSchema schema) {
+    public static TranslationRule makePrincipalTypes(TranslationSchema schema) {
         List<DLRule> facts = schema.getTranslationEntityTypes().stream()
                 .map(e -> {
                     return new DLRule(new DLAtom(PrincipalRuleDecl, PrincipalVar),
@@ -113,19 +113,11 @@ public class TranslationDriver {
         return new TranslationRule(PrincipalRuleDecl, facts);
     }
 
-    public static TranslationRule getResourceTypes() {
+    public static TranslationRule makeResourceTypes() {
         DLRule rule = new DLRule(
                 new DLAtom(ResourceRuleDecl, ResourceVar),
                 new DLAtom(PrincipalRuleDecl, ResourceVar));
         return new TranslationRule(ResourceRuleDecl, rule);
-    }
-
-    public static TranslationRule getAllRequests() {
-        DLRule rule = new DLRule(makeStandardAtom(AllRequestsRuleDecl),
-                new DLAtom(PrincipalRuleDecl, PrincipalVar),
-                new DLAtom(ResourceRuleDecl, ResourceVar),
-                new DLAtom(ActionRuleDecl, ActionVar));
-        return new TranslationRule(AllRequestsRuleDecl, rule);
     }
 
     // FIXME: Testing. Remove

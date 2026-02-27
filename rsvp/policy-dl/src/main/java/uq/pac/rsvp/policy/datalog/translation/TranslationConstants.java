@@ -3,6 +3,8 @@ package uq.pac.rsvp.policy.datalog.translation;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
+import java.util.List;
+
 /**
  * Constants used throughout the translation of Cedar to datalog
  */
@@ -37,8 +39,16 @@ public class TranslationConstants {
         return new DLAtom(name, PrincipalVar, ResourceVar, ActionVar);
     }
 
+    public static DLAtom makeStandardAtom(DLRuleDecl decl, boolean negate) {
+        return new DLAtom(decl.getName(), negate, PrincipalVar, ResourceVar, ActionVar);
+    }
+
     public static DLAtom makeStandardAtom(DLRuleDecl decl) {
-        return new DLAtom(decl.getName(), PrincipalVar, ResourceVar, ActionVar);
+        return makeStandardAtom(decl, false);
+    }
+
+    public static DLAtom makeNegatedStandardAtom(DLRuleDecl decl) {
+        return makeStandardAtom(decl, true);
     }
 
     /**
@@ -92,6 +102,18 @@ public class TranslationConstants {
             makeStandardRuleDecl("AllRequests");
 
     /**
+     *  AllRequests(action, principal, resource) :-
+     *      Action(action), Principal(principal), Resource(resource).
+     */
+    public static TranslationRule makeAllRequestsRule() {
+        DLRule rule = new DLRule(makeStandardAtom(AllRequestsRuleDecl),
+                new DLAtom(PrincipalRuleDecl, PrincipalVar),
+                new DLAtom(ResourceRuleDecl, ResourceVar),
+                new DLAtom(ActionRuleDecl, ActionVar));
+        return new TranslationRule(AllRequestsRuleDecl, rule);
+    }
+
+    /**
      * Rule that describes all explicitly permitted requests
      */
     public final static DLRuleDecl PermitRuleDecl =
@@ -102,4 +124,50 @@ public class TranslationConstants {
      */
     public final static DLRuleDecl ForbidRuleDecl =
             makeStandardRuleDecl("Forbid");
+
+    /**
+     * All requests forbidden by the policy
+     */
+    public final static DLRuleDecl PermittedRequestsRuleDecl =
+            makeStandardRuleDecl("PermittedRequests");
+
+    /**
+     * PermittedRequests(action, principal, resource) :-
+     *     Permit(action, principal, resource),
+     *     !Forbid(action, principal, resource).
+     */
+    public static TranslationRule makePermittedRequestsRule() {
+        DLRule rule = new DLRule(makeStandardAtom(PermittedRequestsRuleDecl),
+                makeStandardAtom(PermitRuleDecl),
+                makeNegatedStandardAtom(ForbidRuleDecl));
+        return new TranslationRule(PermittedRequestsRuleDecl, rule);
+    }
+
+    /**
+     * All requests forbidden by the policy
+     */
+    public final static DLRuleDecl ForbiddenRequestsRuleDecl =
+            makeStandardRuleDecl("ForbiddenRequests");
+
+    /**
+     *  ForbiddenRequests(action, principal, resource) :-
+     *      AllRequests(action, principal, resource),
+     *      !PermittedRequests(action, principal, resource).
+     */
+    public static TranslationRule makeForbiddenRequestsRule() {
+        DLRule rule = new DLRule(makeStandardAtom(ForbiddenRequestsRuleDecl),
+                makeStandardAtom(AllActionableRequestsRuleDecl),
+                makeNegatedStandardAtom(PermittedRequestsRuleDecl));
+        return new TranslationRule(ForbiddenRequestsRuleDecl, rule);
+    }
+
+    public static List<DLStatement> makeIODirectives() {
+        return List.of(
+            new DLDirective(DLDirective.Kind.OUTPUT, PermitRuleDecl),
+            new DLDirective(DLDirective.Kind.OUTPUT, ForbidRuleDecl),
+            new DLDirective(DLDirective.Kind.OUTPUT, PermittedRequestsRuleDecl),
+            new DLDirective(DLDirective.Kind.OUTPUT, ForbiddenRequestsRuleDecl),
+            new DLDirective(DLDirective.Kind.OUTPUT, AllActionableRequestsRuleDecl),
+            new DLDirective(DLDirective.Kind.OUTPUT, AllRequestsRuleDecl));
+    }
 }

@@ -54,6 +54,12 @@ public class DLProgram extends DLNode {
             return this;
         }
 
+        public Builder nlComment(String msg) {
+            space();
+            add(new DLComment(msg));
+            return this;
+        }
+
         public Builder add(Collection<? extends DLStatement> stmts) {
             statements.addAll(stmts);
             return this;

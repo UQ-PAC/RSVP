@@ -14,6 +14,23 @@ import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 public final class DLAtom extends DLRuleExpr {
     private final String name;
     private final List<DLTerm> terms;
+    // FIXME: Break atoms into expression/non-expression
+    private final boolean negate;
+
+    public DLAtom(String name, boolean negate, List<DLTerm> terms) {
+        this.name = name;
+        this.terms = terms.stream().toList();
+        this.negate = negate;
+        require(!terms.isEmpty());
+    }
+
+    public DLAtom(DLRuleDecl decl, boolean negate, DLTerm ...terms) {
+        this(decl.getName(), negate, Arrays.stream(terms).toList());
+    }
+
+    public DLAtom(String name, boolean negate, DLTerm ...terms) {
+        this(name, negate, Arrays.stream(terms).toList());
+    }
 
     public DLAtom(DLRuleDecl decl, DLTerm ...terms) {
         this(decl.getName(), Arrays.stream(terms).toList());
@@ -24,9 +41,7 @@ public final class DLAtom extends DLRuleExpr {
     }
 
     public DLAtom(String name, List<DLTerm> terms) {
-        this.name = name;
-        this.terms = terms.stream().toList();
-        require(!terms.isEmpty());
+        this(name, false, terms);
     }
 
     public List<DLTerm> getTerms() {
@@ -45,9 +60,15 @@ public final class DLAtom extends DLRuleExpr {
         return name;
     }
 
+    public boolean isNegated() {
+        return negate;
+    }
+
     @Override
     protected String stringify() {
-        return name + "(" + String.join(", ", terms.stream().map(DLTerm::toString).toList()) + ")";
+        return  (negate ? "!" : "") +
+                name +
+                "(" + String.join(", ", terms.stream().map(DLTerm::toString).toList()) + ")";
     }
 
 }

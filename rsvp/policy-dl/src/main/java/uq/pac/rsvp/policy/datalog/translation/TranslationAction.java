@@ -54,7 +54,6 @@ public class TranslationAction {
         this.actionableRequests = new TranslationRule(AllActionableRequestsRuleDecl, actionableRequestRule);
     }
 
-
     public TranslationRule getAction() {
         return action;
     }

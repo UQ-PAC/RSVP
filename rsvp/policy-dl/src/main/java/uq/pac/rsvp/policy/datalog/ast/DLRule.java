@@ -17,6 +17,7 @@ public class DLRule extends DLStatement {
 
     public DLRule(DLAtom head, DLRuleExpr ...expressions) {
         require(expressions.length > 0);
+        require(!head.isNegated(), "Negated atom in head");
         this.head = head;
         this.body = Arrays.stream(expressions).toList();
     }

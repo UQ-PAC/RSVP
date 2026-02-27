@@ -38,50 +38,54 @@ public class App {
 
         try (FileOutputStream policyOutFS = new FileOutputStream("policy-out.cedar")) {
             PrintStream policyOut = new PrintStream(policyOutFS);
-
-            Group adminGroup = new Group("Admins", null);
-            Group staffGroup = new Group("Staff", null);
-            Group seniorStaffGroup = new Group("SeniorStaff", staffGroup);
-
-            ArrayList<User> userList;
-            ArrayList<Group> groupList;
-            ArrayList<Folder> folderList;
-            ArrayList<FileResource> fileList;
-
-            groupList = new ArrayList<>();
-            groupList.add(adminGroup);
-            groupList.add(staffGroup);
-            groupList.add(seniorStaffGroup);
-
-            userList = new ArrayList<>();
-            userList.add(new User("Joe", 25, 5, adminGroup));
-            userList.add(new User("Sally", 33, 7, staffGroup));
-            userList.add(new User("Matumbah", 56, 3, seniorStaffGroup));
-            userList.add(new User("Philip", 21, 3, null /* no group */));
-
-            folderList = new ArrayList<>();
-            for (int i = 0; i < 10; i++) {
-                folderList.add(new Folder(null));
-            }
-
-            fileList = new ArrayList<>();
-            for (int i = 0; i < 100; i++) {
-                Folder parent = folderList.get(random.nextInt(folderList.size()));
-                fileList.add(new FileResource(parent));
-            }
-
-            EntityPool pool = new EntityPool();
-            groupList.forEach(g -> pool.addEntity(g));
-            userList.forEach(u -> pool.addEntity(u));
-            folderList.forEach(f -> pool.addEntity(f));
-            fileList.forEach(f -> pool.addEntity(f));
-
+            EntityPool pool = getDefaultEntityPool();
             SchemaWrapper schema = new SchemaWrapperDefault();
 
             for (int i = 0; i < 100; i++) {
                 generatePolicy(policyOut, pool, schema);
             }
         }
+    }
+
+    private static EntityPool getDefaultEntityPool() {
+        Group adminGroup = new Group("Admins", null);
+        Group staffGroup = new Group("Staff", null);
+        Group seniorStaffGroup = new Group("SeniorStaff", staffGroup);
+
+        ArrayList<User> userList;
+        ArrayList<Group> groupList;
+        ArrayList<Folder> folderList;
+        ArrayList<FileResource> fileList;
+
+        groupList = new ArrayList<>();
+        groupList.add(adminGroup);
+        groupList.add(staffGroup);
+        groupList.add(seniorStaffGroup);
+
+        userList = new ArrayList<>();
+        userList.add(new User("Joe", 25, 5, adminGroup));
+        userList.add(new User("Sally", 33, 7, staffGroup));
+        userList.add(new User("Matumbah", 56, 3, seniorStaffGroup));
+        userList.add(new User("Philip", 21, 3, null /* no group */));
+
+        folderList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            folderList.add(new Folder(null));
+        }
+
+        fileList = new ArrayList<>();
+        for (int i = 0; i < 100; i++) {
+            Folder parent = folderList.get(random.nextInt(folderList.size()));
+            fileList.add(new FileResource(parent));
+        }
+
+        EntityPool pool = new EntityPool();
+        groupList.forEach(g -> pool.addEntity(g));
+        userList.forEach(u -> pool.addEntity(u));
+        folderList.forEach(f -> pool.addEntity(f));
+        fileList.forEach(f -> pool.addEntity(f));
+
+        return pool;
     }
 
     private static boolean randomChance(int percent) {

@@ -43,6 +43,10 @@ public class DLRuleDecl extends DLStatement {
         return terms;
     }
 
+    public int arity() {
+        return getTerms().size();
+    }
+
     @Override
     protected String stringify() {
         return ".decl " + name + "(" +

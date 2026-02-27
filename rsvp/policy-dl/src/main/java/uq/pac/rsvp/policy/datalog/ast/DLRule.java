@@ -34,6 +34,10 @@ public class DLRule extends DLStatement {
         return body;
     }
 
+    public String getName() {
+        return head.getName();
+    }
+
     protected String stringify() {
         return head.toString() + " :- \n    " +
                 String.join(",\n    ", body.stream().map(DLRuleExpr::toString).toList()) + ".";

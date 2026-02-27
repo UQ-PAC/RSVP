@@ -52,7 +52,7 @@ public class TranslationEntity {
 
     public TranslationEntity(Entity entity, TranslationSchema schema) {
         List<DLFact> statements = new ArrayList<>();
-        this.definition = schema.getTranslationType(entity.getEUID().getType().toString());
+        this.definition = schema.getTranslationEntityType(entity.getEUID().getType().toString());
         // We assume the inputs are validated, so by the time we get to see entities,
         // it has been made sure that there is an underlying type for each encountered EUID
         require(definition != null, "Cannot locate type for entity " + entity.getEUID());

@@ -47,6 +47,10 @@ public class DLDirective extends DLStatement {
         this(kind, relation, "file");
     }
 
+    public DLDirective(Kind kind, DLRuleDecl decl) {
+        this(kind, decl.getName(), "file");
+    }
+
     public Kind getKind() {
         return kind;
     }

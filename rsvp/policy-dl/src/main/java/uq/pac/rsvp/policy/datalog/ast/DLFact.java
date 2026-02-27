@@ -17,6 +17,10 @@ public class DLFact extends DLStatement {
         this.atom = new DLAtom(relation, terms);
     }
 
+    public DLFact(DLRuleDecl decl, DLTerm ...terms) {
+        this.atom = new DLAtom(decl.getName(), terms);
+    }
+
     protected String stringify() {
         return atom.toString() + ".";
     }

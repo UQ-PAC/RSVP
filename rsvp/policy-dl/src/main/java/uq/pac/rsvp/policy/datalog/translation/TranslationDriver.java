@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-import static uq.pac.rsvp.policy.datalog.translation.TranslationVar.*;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
 
 /**
  * Putting translation of the cedar schema, entries, context and policies together
@@ -84,19 +84,19 @@ public class TranslationDriver {
         }
 
         builder.comment("General Permit Rule (requests explicitly allowed by the policy)");
-        builder.add(TranslationPolicy.makePolicyRuleDecl("Permit"));
-        DLAtom permit = TranslationPolicy.makePolicyAtom("Permit");
+        builder.add(PermitRuleDecl);
+        DLAtom permit = makeStandardAtom(PermitRuleDecl);
         for (TranslationPolicy policy : translationPolicies.getPermitTranslation()) {
-            DLAtom policyPermit = TranslationPolicy.makePolicyAtom(policy.getName());
+            DLAtom policyPermit = makeStandardAtom(policy.getName());
             builder.add(new DLRule(permit, policyPermit));
         }
         builder.space();
 
         builder.comment("General Forbid Rule (requests explicitly forbidden by the policy)");
-        builder.add(TranslationPolicy.makePolicyRuleDecl("Forbid"));
-        DLAtom forbid = TranslationPolicy.makePolicyAtom("Forbid");
+        builder.add(ForbidRuleDecl);
+        DLAtom forbid = makeStandardAtom(ForbidRuleDecl);
         for (TranslationPolicy policy : translationPolicies.getForbidTranslation()) {
-            DLAtom policyForbid = TranslationPolicy.makePolicyAtom(policy.getName());
+            DLAtom policyForbid = makeStandardAtom(policy.getName());
             builder.add(new DLRule(forbid, policyForbid));
         }
         builder.space();
@@ -104,32 +104,28 @@ public class TranslationDriver {
     }
 
     public static TranslationRule getPrincipalTypes(TranslationSchema schema) {
-        DLRuleDecl principalDecl = new DLRuleDecl("Principal", PrincipalVarDecl);
         List<DLRule> facts = schema.getTranslationEntityTypes().stream()
                 .map(e -> {
-                    return new DLRule(
-                           new DLAtom(principalDecl.getName(), PrincipalVar),
-                           new DLAtom(e.getEntityRuleDecl().getName(), PrincipalVar));
+                    return new DLRule(new DLAtom(PrincipalRuleDecl, PrincipalVar),
+                           new DLAtom(e.getEntityRuleDecl(), PrincipalVar));
                 })
                 .toList();
-        return new TranslationRule(principalDecl, facts);
+        return new TranslationRule(PrincipalRuleDecl, facts);
     }
 
     public static TranslationRule getResourceTypes() {
-        DLRuleDecl resourceDecl = new DLRuleDecl("Resource", ResourceVarDecl);
-        DLRule rule = new DLRule(new DLAtom(resourceDecl.getName(), ResourceVar),
-                            new DLAtom("Principal", ResourceVar));
-        return new TranslationRule(resourceDecl, rule);
+        DLRule rule = new DLRule(
+                new DLAtom(ResourceRuleDecl, ResourceVar),
+                new DLAtom(PrincipalRuleDecl, ResourceVar));
+        return new TranslationRule(ResourceRuleDecl, rule);
     }
 
     public static TranslationRule getAllRequests() {
-        DLRuleDecl decl = makePolicyRuleDecl("AllRequests");
-        DLRule rule = new DLRule(
-        makePolicyAtom(decl.getName()),
-                new DLAtom("Principal", PrincipalVar),
-                new DLAtom("Resource", ResourceVar),
-                new DLAtom("Action", ActionVar));
-        return new TranslationRule(decl, rule);
+        DLRule rule = new DLRule(makeStandardAtom(AllRequestsRuleDecl),
+                new DLAtom(PrincipalRuleDecl, PrincipalVar),
+                new DLAtom(ResourceRuleDecl, ResourceVar),
+                new DLAtom(ActionRuleDecl, ActionVar));
+        return new TranslationRule(AllRequestsRuleDecl, rule);
     }
 
     // FIXME: Testing. Remove

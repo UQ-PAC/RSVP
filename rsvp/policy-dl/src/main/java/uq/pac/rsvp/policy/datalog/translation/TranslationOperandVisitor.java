@@ -22,7 +22,7 @@ public class TranslationOperandVisitor extends TranslationValueAdapter<DLTerm> {
 
     @Override
     public DLTerm visitEntityExpr(EntityExpression expr) {
-        return new DLString(expr.getUnquotedName());
+        return new DLString(String.join("::", expr.getQualifiedEid()));
     }
 
     @Override

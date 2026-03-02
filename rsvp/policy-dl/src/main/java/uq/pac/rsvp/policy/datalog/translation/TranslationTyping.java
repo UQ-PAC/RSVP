@@ -117,7 +117,7 @@ public class TranslationTyping {
                 switch (expr.getOp()) {
                     case Eq -> {
                         if (lhs instanceof VariableExpression v && rhs instanceof EntityExpression e) {
-                            update(v.getReference(), negated, e.getUnquotedName());
+                            update(v.getReference(), negated, String.join("::", e.getQualifiedEid()));
                         }
                     }
                     case Is -> {

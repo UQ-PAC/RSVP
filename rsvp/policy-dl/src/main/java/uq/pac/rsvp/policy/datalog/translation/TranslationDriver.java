@@ -9,6 +9,7 @@ import uq.pac.rsvp.policy.datalog.ast.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
@@ -23,6 +24,7 @@ public class TranslationDriver {
         TranslationEntitySet translationEntities = new TranslationEntitySet(entities, translationSchema);
         TranslationPolicySet translationPolicies = new TranslationPolicySet(policies, translationSchema);
         DLProgram.Builder builder = new DLProgram.Builder();
+        List<DLRuleDecl> output = new ArrayList<>();
 
         Multimap<String, DLFact> facts = translationEntities.getFacts();
 
@@ -32,8 +34,7 @@ public class TranslationDriver {
             builder.add(facts.get(type.getEntityRuleDecl().getName()));
 
             for (TranslationAttribute attr : type.getAttributes()) {
-                builder.comment("");
-                builder.comment("Cedar Attribute: " + type.getName() + "." + attr.getName());
+                builder.nlComment("Cedar Attribute: " + type.getName() + "." + attr.getName());
                 builder.add(attr.getRuleDecl());
                 builder.add(facts.get(attr.getRuleDecl().getName()));
             }
@@ -54,13 +55,13 @@ public class TranslationDriver {
                 .nlComment("All (potential) resources")
                 .add(makeResourceTypes().getStatements())
                 .nlComment("All (potential) requests")
-                .add(makeAllRequestsRule().getStatements())
-                .space();
+                .add(makeAllRequestsRule().getStatements());
 
-        builder.comment("Permit Policy Rules");
+        builder.nlComment("Permit Policy Rules");
         for (TranslationPolicy policy : translationPolicies.getPermitTranslation()) {
             builder.comment("Permit Policy: " + policy.getDeclaration().getName());
             builder.add(policy.getDeclaration());
+            output.add(policy.getDeclaration());
             for (DLRule rule : policy.getRules()) {
                 builder.add(rule);
             }
@@ -71,6 +72,7 @@ public class TranslationDriver {
         for (TranslationPolicy policy : translationPolicies.getForbidTranslation()) {
             builder.comment("Forbid Policy: " + policy.getDeclaration().getName());
             builder.add(policy.getDeclaration());
+            output.add(policy.getDeclaration());
             for (DLRule rule : policy.getRules()) {
                 builder.add(rule);
             }
@@ -98,7 +100,7 @@ public class TranslationDriver {
             .nlComment("All forbidden requests")
             .add(makeForbiddenRequestsRule().getStatements())
             .nlComment("I/O")
-            .add(makeIODirectives());
+            .add(makeIODirectives(output));
 
         return builder.build();
     }
@@ -121,11 +123,11 @@ public class TranslationDriver {
     }
 
     // FIXME: Testing. Remove
-    public static void main(String[] args) throws IOException, InternalException {
+    public static void main(String[] args) throws IOException, InternalException, InterruptedException {
         Schema schema = Schema.parseCedarSchema(Path.of("examples/photoapp/schema.cedarschema"));
         Entities entities = Entities.parse(Path.of("examples/photoapp/entities.json"));
         PolicySet policies = PolicySet.parseCedarPolicySet(Path.of("examples/photoapp/policy.cedar"));
         DLProgram program = translate(schema, policies, entities);
-        System.out.println(program);
+        RequestAuth auth = program.execute();
     }
 }

@@ -1,9 +1,18 @@
 package uq.pac.rsvp.policy.datalog.ast;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import com.cedarpolicy.AuthorizationEngine;
+import uq.pac.rsvp.policy.datalog.translation.RequestAuth;
+import uq.pac.rsvp.policy.datalog.translation.TranslationError;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -81,6 +90,31 @@ public class DLProgram extends DLNode {
             statements.clear();
             return this;
         }
+    }
 
+    public RequestAuth execute() throws IOException, InterruptedException {
+        // FIXME: Temporary directory
+        Path baseDir = Path.of("/tmp/rsvp_dl").toAbsolutePath();
+
+        Files.createDirectories(baseDir);
+        Path authDl = Path.of(baseDir.toString(), "auth.dl");
+
+        Files.writeString(authDl, stringify());
+
+        ProcessBuilder builder = new ProcessBuilder();
+
+        Process process = builder.directory(baseDir.toFile())
+                .command("souffle", "-j", "auto", authDl.toString())
+                .start();
+
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+            BufferedReader error =
+                    new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            String errorString = error.lines().collect(Collectors.joining("\n"));
+            throw new TranslationError(errorString);
+        } else {
+            return RequestAuth.load(baseDir);
+        }
     }
 }

@@ -3,7 +3,10 @@ package uq.pac.rsvp.policy.datalog.translation;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Constants used throughout the translation of Cedar to datalog
@@ -161,13 +164,23 @@ public class TranslationConstants {
         return new TranslationRule(ForbiddenRequestsRuleDecl, rule);
     }
 
-    public static List<DLStatement> makeIODirectives() {
-        return List.of(
-            new DLDirective(DLDirective.Kind.OUTPUT, PermitRuleDecl),
-            new DLDirective(DLDirective.Kind.OUTPUT, ForbidRuleDecl),
-            new DLDirective(DLDirective.Kind.OUTPUT, PermittedRequestsRuleDecl),
-            new DLDirective(DLDirective.Kind.OUTPUT, ForbiddenRequestsRuleDecl),
-            new DLDirective(DLDirective.Kind.OUTPUT, AllActionableRequestsRuleDecl),
-            new DLDirective(DLDirective.Kind.OUTPUT, AllRequestsRuleDecl));
+    public final static String OUTPUT_DELIMITER = "|";
+    public final static String OUTPUT_DEST = "file";
+
+    public static List<DLDirective> makeIODirectives(Collection<DLRuleDecl> output) {
+        List<DLRuleDecl> rules = new ArrayList<>(output);
+
+        Map<String, String> options = Map.of("delimiter", OUTPUT_DELIMITER);
+
+        rules.addAll(List.of(PermitRuleDecl,
+                ForbidRuleDecl,
+                PermittedRequestsRuleDecl,
+                ForbiddenRequestsRuleDecl,
+                AllActionableRequestsRuleDecl,
+                AllRequestsRuleDecl));
+
+        return rules.stream()
+                .map(rd -> new DLDirective(DLDirective.Kind.OUTPUT, rd.getName(), OUTPUT_DEST, options))
+                .toList();
     }
 }

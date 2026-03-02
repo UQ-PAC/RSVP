@@ -29,7 +29,7 @@ public class TranslationEntity {
     private void getTerms(Value value, List<DLTerm> terms) {
         switch (value) {
             case PrimString s -> terms.add(DLTerm.lit(s.toString()));
-            case PrimLong l -> terms.add(DLTerm.lit(l.toString()));
+            case PrimLong l -> terms.add(DLTerm.lit(l.getValue()));
             case PrimBool b -> terms.add(DLTerm.lit(b.toString()));
             case EntityUID e -> terms.add(getEUIDLiteral(e));
             case CedarList l -> {

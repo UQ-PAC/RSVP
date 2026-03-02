@@ -45,7 +45,7 @@ public class TranslationAction {
         }
 
         DLRule actionableRequestRule = new DLRule(makeStandardAtom(AllActionableRequestsRuleDecl),
-                new DLAtom(ActionPrincipalRuleDecl, ActionVar, ResourceVar),
+                new DLAtom(ActionPrincipalRuleDecl, ActionVar, PrincipalVar),
                 new DLAtom(ActionResourceRuleDecl, ActionVar, ResourceVar));
 
         this.action = new TranslationRule(ActionRuleDecl, actionFacts);

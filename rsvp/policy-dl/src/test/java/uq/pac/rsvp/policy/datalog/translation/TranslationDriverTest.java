@@ -64,8 +64,7 @@ public class TranslationDriverTest {
         Entities entities = Entities.parse(ENTITIES);
         Schema schema = Schema.parseCedarSchema(SCHEMA);
         PolicySet policySet = PolicySet.parseCedarPolicySet(POLICIES);
-
-        DLProgram driver = TranslationDriver.translate(schema, policySet, entities);
+        DLProgram program = TranslationDriver.translate(schema, policySet, entities);
     }
 
 }

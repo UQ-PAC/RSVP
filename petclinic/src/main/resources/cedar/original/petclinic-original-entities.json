@@ -1,0 +1,128 @@
+[
+  {
+    "uid": { "type": "PetClinic::Visitor", "id": "Anonymous" },
+    "attrs": { },
+    "parents": [ ]
+  },
+
+
+  {
+    "uid": { "type": "PetClinic::Database", "id": "Owners" },
+    "attrs": { },
+    "parents": [ ]
+  },
+  {
+    "uid": { "type": "PetClinic::Database", "id": "Pets" },
+    "attrs": { },
+    "parents": [ ]
+  },
+  {
+    "uid": { "type": "PetClinic::Database", "id": "Visits" },
+    "attrs": { },
+    "parents": [ ]
+  },
+
+
+  {
+    "uid": { "type": "PetClinic::WebPage", "id": "Home" },
+    "attrs": { },
+    "parents": [ ]
+  },
+  {
+    "uid": { "type": "PetClinic::WebPage", "id": "FindOwners" },
+    "attrs": { },
+    "parents": [ ]
+  },
+  {
+    "uid": { "type": "PetClinic::WebPage", "id": "Owners" },
+    "attrs": { },
+    "parents": [ ]
+  },
+  {
+    "uid": { "type": "PetClinic::WebPage", "id": "Owner" },
+    "attrs": { },
+    "parents": [ ]
+  },
+  {
+    "uid": { "type": "PetClinic::WebPage", "id": "EditOwner" },
+    "attrs": { },
+    "parents": [ ]
+  },
+  {
+    "uid": { "type": "PetClinic::WebPage", "id": "AddNewPet" },
+    "attrs": { },
+    "parents": [ ]
+  },
+  {
+    "uid": { "type": "PetClinic::WebPage", "id": "EditPet" },
+    "attrs": { },
+    "parents": [ ]
+  },
+  {
+    "uid": { "type": "PetClinic::WebPage", "id": "AddVisit" },
+    "attrs": { },
+    "parents": [ ]
+  },
+  {
+    "uid": { "type": "PetClinic::WebPage", "id": "AddOwner" },
+    "attrs": { },
+    "parents": [ ]
+  },
+  {
+    "uid": { "type": "PetClinic::WebPage", "id": "Veterinarians" },
+    "attrs": { },
+    "parents": [ ]
+  },
+  {
+    "uid": { "type": "PetClinic::WebPage", "id": "Error" },
+    "attrs": { },
+    "parents": [ ]
+  },
+
+
+  {
+    "uid": { "type": "PetClinic::Action", "id": "ReadFromDatabase" },
+    "attrs": { },
+    "parents": [ ]
+  },
+  {
+    "uid": { "type": "PetClinic::Action", "id": "WriteToDatabase" },
+    "attrs": { },
+    "parents": [ ]
+  },
+  {
+    "uid": { "type": "PetClinic::Action", "id": "ViewWebPage" },
+    "attrs": { },
+    "parents": [ ]
+  },
+  {
+    "uid": { "type": "PetClinic::Action", "id": "FindOwner" },
+    "attrs": { },
+    "parents": [ ]
+  },
+  {
+    "uid": { "type": "PetClinic::Action", "id": "AddOwner" },
+    "attrs": { },
+    "parents": [ ]
+  },
+  {
+    "uid": { "type": "PetClinic::Action", "id": "EditOwner" },
+    "attrs": { },
+    "parents": [ ]
+  },
+  {
+    "uid": { "type": "PetClinic::Action", "id": "AddPet" },
+    "attrs": { },
+    "parents": [ ]
+  },
+  {
+    "uid": { "type": "PetClinic::Action", "id": "EditPet" },
+    "attrs": { },
+    "parents": [ ]
+  },
+  {
+    "uid": { "type": "PetClinic::Action", "id": "AddVisit" },
+    "attrs": { },
+    "parents": [ ]
+  }
+]

@@ -28,7 +28,7 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaResolutionVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
-public class Schema extends HashMap<String, Namespace> implements SchemaFileEntry {
+public class Schema extends HashMap<String, Namespace> implements SchemaItem {
 
     private Map<String, EntityTypeDefinition> entityTypes = new HashMap<>();
     private Map<String, ActionDefinition> actions = new HashMap<>();

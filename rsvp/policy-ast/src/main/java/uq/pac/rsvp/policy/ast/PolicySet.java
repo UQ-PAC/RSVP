@@ -15,7 +15,7 @@ import uq.pac.rsvp.policy.ast.expr.Expression.ExpressionDeserialiser;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
-public class PolicySet extends LinkedHashSet<Policy> {
+public class PolicySet extends LinkedHashSet<Policy> implements PolicyItem {
 
     /**
      * Parse a Cedar policy file and return the corresponding AST.
@@ -36,10 +36,12 @@ public class PolicySet extends LinkedHashSet<Policy> {
         return gson.fromJson(json, PolicySet.class);
     }
 
+    @Override
     public void accept(PolicyVisitor visitor) {
         visitor.visitPolicySet(this);
     }
 
+    @Override
     public <T> T compute(PolicyComputationVisitor<T> visitor) {
         return visitor.visitPolicySet(this);
     }

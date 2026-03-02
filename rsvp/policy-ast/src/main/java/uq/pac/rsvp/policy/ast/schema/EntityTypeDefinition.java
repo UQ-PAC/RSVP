@@ -11,7 +11,7 @@ import uq.pac.rsvp.policy.ast.schema.common.RecordTypeDefinition;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
-public class EntityTypeDefinition implements SchemaFileEntry {
+public class EntityTypeDefinition implements SchemaItem {
 
     @SerializedName("memberOfTypes")
     private final Set<String> unresolvedMemberOfTypes;

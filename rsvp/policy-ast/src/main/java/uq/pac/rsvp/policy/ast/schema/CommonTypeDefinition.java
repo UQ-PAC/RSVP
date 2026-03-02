@@ -7,6 +7,7 @@ import java.util.Map;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
@@ -22,7 +23,7 @@ import uq.pac.rsvp.policy.ast.schema.common.UnresolvedTypeReference;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
-public abstract class CommonTypeDefinition implements SchemaFileEntry {
+public abstract class CommonTypeDefinition implements SchemaItem {
 
     // If this type definition is a record property, this may be true. Otherwise,
     // it will be false
@@ -44,11 +45,11 @@ public abstract class CommonTypeDefinition implements SchemaFileEntry {
     }
 
     protected CommonTypeDefinition(Map<String, String> annotations) {
-        this(true, annotations);
+        this(false, annotations);
     }
 
     protected CommonTypeDefinition() {
-        this(true, null);
+        this(false, null);
     }
 
     public boolean isRequired() {
@@ -86,16 +87,36 @@ public abstract class CommonTypeDefinition implements SchemaFileEntry {
         @Override
         public CommonTypeDefinition deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
                 throws JsonParseException {
-            String type = json.getAsJsonObject().get("type").getAsString();
-            JsonElement nameElem = json.getAsJsonObject().get("name");
+
+            if (!json.isJsonObject()) {
+                return new UnresolvedTypeReference();
+            }
+
+            JsonObject definition = json.getAsJsonObject();
+
+            String type = definition.get("type").getAsString();
+            JsonElement nameElem = definition.get("name");
             String name = nameElem != null ? nameElem.getAsString() : "unknown";
 
-            // FIXME: Cedar treats attributes as required by default, but to Gson there is
-            // no difference between a missing boolean and an explicitly false boolean.
-            // Probably need to add some special handling for this.
-
             Type attributeType = switch (type) {
-                case "Record" -> RecordTypeDefinition.class;
+                case "Record" -> {
+                    // Record attributes are required by Cedar by default. If there is no
+                    // explicit configuration, set required to true.
+                    JsonElement attributes = definition.get("attributes");
+
+                    if (attributes.isJsonObject()) {
+                        for (Map.Entry<String, JsonElement> attr : attributes.getAsJsonObject().entrySet()) {
+                            if (attr.getValue().isJsonObject()) {
+                                JsonObject value = attr.getValue().getAsJsonObject();
+                                if (!value.has("required")) {
+                                    value.addProperty("required", true);
+                                }
+                            }
+                        }
+                    }
+
+                    yield RecordTypeDefinition.class;
+                }
                 case "Set" -> SetTypeDefinition.class;
                 default -> switch (name) {
                     case "__cedar::String" -> StringType.class;

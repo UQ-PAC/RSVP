@@ -1,0 +1,36 @@
+{
+  "App": {
+    "entityTypes": {
+      "Something": {
+        "shape": {
+          "type": "Record",
+          "attributes": {
+            "optional": {
+              "type": "__cedar::String",
+              "required": false
+            }
+          }
+        }
+      }
+    },
+    "actions": {},
+    "commonTypes": {
+      "SomeType": {
+        "type": "Record",
+        "attributes": {
+          "default": {
+            "type": "__cedar::String"
+          },
+          "explicit": {
+            "type": "__cedar::String",
+            "required": true
+          },
+          "optional": {
+            "type": "__cedar::String",
+            "required": false
+          }
+        }
+      }
+    }
+  }
+}

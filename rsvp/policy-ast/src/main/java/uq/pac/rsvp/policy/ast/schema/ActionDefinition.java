@@ -11,7 +11,7 @@ import uq.pac.rsvp.policy.ast.schema.common.RecordTypeDefinition;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
-public class ActionDefinition implements SchemaFileEntry {
+public class ActionDefinition implements SchemaItem {
 
     public static class ActionReference {
         private final String id;

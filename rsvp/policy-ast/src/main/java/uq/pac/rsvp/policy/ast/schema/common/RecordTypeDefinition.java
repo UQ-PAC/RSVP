@@ -1,6 +1,5 @@
 package uq.pac.rsvp.policy.ast.schema.common;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -56,4 +55,5 @@ public class RecordTypeDefinition extends CommonTypeDefinition {
     public <T> T compute(SchemaComputationVisitor<T> visitor) {
         return visitor.visitRecordTypeDefinition(this);
     }
+
 }

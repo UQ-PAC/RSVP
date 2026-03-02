@@ -12,6 +12,8 @@ import uq.pac.rsvp.policy.ast.expr.EntityExpression;
 import uq.pac.rsvp.policy.ast.expr.Expression;
 import uq.pac.rsvp.policy.ast.expr.EntityExpression.EntityExpressionDeserialiser;
 import uq.pac.rsvp.policy.ast.expr.Expression.ExpressionDeserialiser;
+import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
+import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
 public class PolicySet extends LinkedHashSet<Policy> {
 
@@ -29,7 +31,16 @@ public class PolicySet extends LinkedHashSet<Policy> {
         String json = com.cedarpolicy.model.policy.PolicySet.parseToJsonAst(policyFile);
         Gson gson = new GsonBuilder().registerTypeAdapter(Expression.class, new ExpressionDeserialiser())
                 .registerTypeAdapter(EntityExpression.class, new EntityExpressionDeserialiser())
+                .disableJdkUnsafe()
                 .create();
         return gson.fromJson(json, PolicySet.class);
+    }
+
+    public void accept(PolicyVisitor visitor) {
+        visitor.visitPolicySet(this);
+    }
+
+    public <T> T compute(PolicyComputationVisitor<T> visitor) {
+        return visitor.visitPolicySet(this);
     }
 }

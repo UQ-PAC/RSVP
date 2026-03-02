@@ -21,6 +21,14 @@ public class Namespace {
         this.commonTypes = commonTypes != null ? new HashMap<>(commonTypes) : new HashMap<>();
     }
 
+    public Namespace(Map<String, EntityTypeDefinition> entityTypes, Map<String, ActionDefinition> actions) {
+        this(entityTypes, actions, null);
+    }
+
+    public Namespace() {
+        this(null, null, null);
+    }
+
     public String getName() {
         return name;
     }
@@ -30,31 +38,31 @@ public class Namespace {
     }
 
     public Set<String> entityTypeNames() {
-        return entityTypes != null ? entityTypes.keySet() : Collections.emptySet();
+        return entityTypes.keySet();
     }
 
     public EntityTypeDefinition getEntityType(String name) {
-        return entityTypes != null ? entityTypes.get(name) : null;
+        return entityTypes.get(name);
     }
 
     public Set<String> actionNames() {
-        return actions != null ? actions.keySet() : Collections.emptySet();
+        return actions.keySet();
     }
 
     public ActionDefinition getAction(String name) {
-        return actions != null ? actions.get(name) : null;
+        return actions.get(name);
     }
 
     public Set<String> commonTypeNames() {
-        return commonTypes != null ? Set.copyOf(commonTypes.keySet()) : Collections.emptySet();
+        return Set.copyOf(commonTypes.keySet());
     }
 
     public CommonTypeDefinition getCommonType(String name) {
-        return commonTypes != null ? commonTypes.get(name) : null;
+        return commonTypes.get(name);
     }
 
-    public CommonTypeDefinition resolveCommonType(String name, CommonTypeDefinition definition) {
-        return commonTypes != null ? commonTypes.put(name, definition) : null;
+    public void resolveCommonType(String name, CommonTypeDefinition definition) {
+        commonTypes.put(name, definition);
     }
 
 }

@@ -1,0 +1,34 @@
+{
+  "App": {
+    "entityTypes": {
+      "User": {}
+    },
+    "actions": {
+      "someAction": {
+        "appliesTo": {
+          "principalTypes": [],
+          "resourceTypes": []
+        }
+      }
+    }
+  },
+  "Local": {
+    "entityTypes": {
+      "Loser": {}
+    },
+    "actions": {
+      "anotherAction": {
+        "memberOf": [
+          {
+            "id": "someAction",
+            "type": "App::Action"
+          }
+        ],
+        "appliesTo": {
+          "principalTypes": ["App::User", "Loser"],
+          "resourceTypes": ["Loser"]
+        }
+      }
+    }
+  }
+}

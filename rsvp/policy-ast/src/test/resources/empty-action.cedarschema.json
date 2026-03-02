@@ -1,0 +1,11 @@
+{
+  "App": {
+    "entityTypes": {},
+    "actions": {
+      "someAction": {},
+      "anotherAction": {
+        "appliesTo": {}
+      }
+    }
+  }
+}

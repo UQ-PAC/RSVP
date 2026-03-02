@@ -15,11 +15,15 @@ public class SetExpression extends Expression {
 
     public SetExpression(Set<Expression> elements, SourceLoc source) {
         super(Set, source);
-        this.elements = new HashSet<>(elements);
+        this.elements = elements == null ? new HashSet<>() : new HashSet<>(elements);
     }
 
     public SetExpression(Set<Expression> elements) {
         this(elements, SourceLoc.MISSING);
+    }
+
+    public SetExpression() {
+        this(null, SourceLoc.MISSING);
     }
 
     public Set<Expression> getElements() {

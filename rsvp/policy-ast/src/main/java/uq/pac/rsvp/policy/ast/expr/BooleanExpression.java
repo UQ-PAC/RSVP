@@ -19,6 +19,12 @@ public class BooleanExpression extends Expression {
         this(value, SourceLoc.MISSING);
     }
 
+    // Used by Gson
+    @SuppressWarnings("unused")
+    private BooleanExpression() {
+        this(false, SourceLoc.MISSING);
+    }
+
     public boolean getValue() {
         return value;
     }

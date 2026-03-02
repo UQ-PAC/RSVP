@@ -1,0 +1,20 @@
+{
+  "App": {
+    "entityTypes": {
+      "Item": {},
+      "User": {
+        "memberOfTypes": ["Lib::Role", "Item"]
+      },
+      "Loser": {
+        "memberOfTypes": ["Lib::Role", "Lib::Invalid"]
+      }
+    },
+    "actions": {}
+  },
+  "Lib": {
+    "entityTypes": {
+      "Role": {}
+    },
+    "actions": {}
+  }
+}

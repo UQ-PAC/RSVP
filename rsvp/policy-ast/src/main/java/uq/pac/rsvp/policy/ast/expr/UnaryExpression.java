@@ -30,6 +30,12 @@ public class UnaryExpression extends Expression {
         this(op, expr, SourceLoc.MISSING);
     }
 
+    // Used by Gson
+    @SuppressWarnings("unused")
+    private UnaryExpression() {
+        this(null, null, SourceLoc.MISSING);
+    }
+
     public UnaryOp getOp() {
         return op;
     }

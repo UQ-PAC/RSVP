@@ -30,21 +30,6 @@ public class EntityTypeDefinition implements SchemaFileEntry {
     // namespace
     private String name;
 
-    public EntityTypeDefinition(Set<String> memberOfTypes, Map<String, CommonTypeDefinition> shape) {
-        this.unresolvedMemberOfTypes = memberOfTypes != null ? Set.copyOf(memberOfTypes) : Collections.emptySet();
-        this.shape = new RecordTypeDefinition(shape);
-        this.annotations = Collections.emptyMap();
-        this.entityNamesEnum = Collections.emptySet();
-    }
-
-    public EntityTypeDefinition(Set<String> memberOfTypes, Map<String, CommonTypeDefinition> shape,
-            Set<String> entityNamesEnum) {
-        this.unresolvedMemberOfTypes = memberOfTypes != null ? Set.copyOf(memberOfTypes) : Collections.emptySet();
-        this.shape = new RecordTypeDefinition(shape);
-        this.entityNamesEnum = entityNamesEnum != null ? Set.copyOf(entityNamesEnum) : Collections.emptySet();
-        this.annotations = Collections.emptyMap();
-    }
-
     public EntityTypeDefinition(Set<String> memberOfTypes, Map<String, CommonTypeDefinition> shape,
             Set<String> entityNamesEnum,
             Map<String, String> annotations) {
@@ -54,16 +39,27 @@ public class EntityTypeDefinition implements SchemaFileEntry {
         this.entityNamesEnum = entityNamesEnum != null ? Set.copyOf(entityNamesEnum) : Collections.emptySet();
     }
 
+    public EntityTypeDefinition(Set<String> memberOfTypes, Map<String, CommonTypeDefinition> shape,
+            Set<String> entityNamesEnum) {
+        this(memberOfTypes, shape, entityNamesEnum, null);
+    }
+
+    public EntityTypeDefinition(Set<String> memberOfTypes, Map<String, CommonTypeDefinition> shape) {
+        this(memberOfTypes, shape, null, null);
+    }
+
+    public EntityTypeDefinition() {
+        this(null, null, null, null);
+    }
+
     public void resolveMemberOfTypes(Schema schema, Namespace local) {
         resolvedMemberOfDefinitions = new HashSet<>();
 
-        if (unresolvedMemberOfTypes != null) {
-            for (String entityType : unresolvedMemberOfTypes) {
-                EntityTypeDefinition resolved = Schema.resolveEntityType(entityType, schema, local);
+        for (String entityType : unresolvedMemberOfTypes) {
+            EntityTypeDefinition resolved = Schema.resolveEntityType(entityType, schema, local);
 
-                if (resolved != null) {
-                    resolvedMemberOfDefinitions.add(resolved);
-                }
+            if (resolved != null) {
+                resolvedMemberOfDefinitions.add(resolved);
             }
         }
     }
@@ -89,25 +85,23 @@ public class EntityTypeDefinition implements SchemaFileEntry {
     }
 
     public Set<String> getShapeAttributeNames() {
-        return shape != null ? shape.getAttributeNames() : Collections.emptySet();
+        return shape.getAttributeNames();
     }
 
     public CommonTypeDefinition getShapeAttributeType(String name) {
-        return shape != null ? shape.getAttributeType(name) : null;
+        return shape.getAttributeType(name);
     }
 
     public void resolveShapeAttributeType(String name, CommonTypeDefinition type) {
-        if (shape != null) {
-            shape.resolveAttributeType(name, type);
-        }
+        shape.resolveAttributeType(name, type);
     }
 
     public Set<String> getEntityNamesEnum() {
-        return entityNamesEnum != null ? entityNamesEnum : Collections.emptySet();
+        return entityNamesEnum;
     }
 
     public Map<String, String> getAnnotations() {
-        return annotations != null ? annotations : Collections.emptyMap();
+        return annotations;
     }
 
     @Override

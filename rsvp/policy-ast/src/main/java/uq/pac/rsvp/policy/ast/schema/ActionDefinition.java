@@ -21,6 +21,11 @@ public class ActionDefinition implements SchemaFileEntry {
             this.id = id;
             this.type = type;
         }
+
+        protected ActionReference() {
+            this.id = null;
+            this.type = null;
+        }
     }
 
     private static class ActionApplication {
@@ -44,6 +49,12 @@ public class ActionDefinition implements SchemaFileEntry {
                     : Collections.emptySet();
             this.unresolvedResourceTypes = resourceTypes != null ? Set.copyOf(resourceTypes) : Collections.emptySet();
             this.context = context;
+        }
+
+        private ActionApplication() {
+            this.unresolvedPrincipalTypes = Collections.emptySet();
+            this.unresolvedResourceTypes = Collections.emptySet();
+            this.context = null;
         }
     }
 
@@ -69,46 +80,38 @@ public class ActionDefinition implements SchemaFileEntry {
         this.annotations = annotations != null ? Map.copyOf(annotations) : Collections.emptyMap();
     }
 
+    public ActionDefinition() {
+        this(null, null, null, null, null);
+    }
+
     public void resolveReferences(Schema schema, Namespace local) {
 
         resolvedMemberOf = new HashSet<>();
 
-        if (unresolvedMemberOf != null) {
-            for (ActionReference ref : unresolvedMemberOf) {
-                ActionDefinition resolved = Schema.resolveActionType(ref.id, ref.type, schema, local);
+        for (ActionReference ref : unresolvedMemberOf) {
+            ActionDefinition resolved = Schema.resolveActionType(ref.id, ref.type, schema, local);
 
-                if (resolved != null) {
-                    resolvedMemberOf.add(resolved);
-                } else {
-                    unresolvedMemberOf.add(ref);
-                }
+            if (resolved != null) {
+                resolvedMemberOf.add(resolved);
             }
         }
 
         appliesTo.resolvedPrincipalDefinitions = new HashSet<>();
         appliesTo.resolvedResourceDefinitions = new HashSet<>();
 
-        if (appliesTo.unresolvedPrincipalTypes != null) {
-            for (String entityType : appliesTo.unresolvedPrincipalTypes) {
-                EntityTypeDefinition resolved = Schema.resolveEntityType(entityType, schema, local);
+        for (String entityType : appliesTo.unresolvedPrincipalTypes) {
+            EntityTypeDefinition resolved = Schema.resolveEntityType(entityType, schema, local);
 
-                if (resolved != null) {
-                    appliesTo.resolvedPrincipalDefinitions.add(resolved);
-                } else {
-                    appliesTo.unresolvedPrincipalTypes.add(entityType);
-                }
+            if (resolved != null) {
+                appliesTo.resolvedPrincipalDefinitions.add(resolved);
             }
         }
 
-        if (appliesTo.unresolvedResourceTypes != null) {
-            for (String entityType : appliesTo.unresolvedResourceTypes) {
-                EntityTypeDefinition resolved = Schema.resolveEntityType(entityType, schema, local);
+        for (String entityType : appliesTo.unresolvedResourceTypes) {
+            EntityTypeDefinition resolved = Schema.resolveEntityType(entityType, schema, local);
 
-                if (resolved != null) {
-                    appliesTo.resolvedResourceDefinitions.add(resolved);
-                } else {
-                    appliesTo.unresolvedResourceTypes.add(entityType);
-                }
+            if (resolved != null) {
+                appliesTo.resolvedResourceDefinitions.add(resolved);
             }
         }
 
@@ -135,12 +138,14 @@ public class ActionDefinition implements SchemaFileEntry {
     }
 
     public Set<EntityTypeDefinition> getAppliesToPrincipalTypes() {
-        return appliesTo.resolvedPrincipalDefinitions != null ? Set.copyOf(appliesTo.resolvedPrincipalDefinitions)
+        return appliesTo.resolvedPrincipalDefinitions != null
+                ? Set.copyOf(appliesTo.resolvedPrincipalDefinitions)
                 : Collections.emptySet();
     }
 
     public Set<EntityTypeDefinition> getAppliesToResourceTypes() {
-        return appliesTo.resolvedResourceDefinitions != null ? Set.copyOf(appliesTo.resolvedResourceDefinitions)
+        return appliesTo.resolvedResourceDefinitions != null
+                ? Set.copyOf(appliesTo.resolvedResourceDefinitions)
                 : Collections.emptySet();
     }
 

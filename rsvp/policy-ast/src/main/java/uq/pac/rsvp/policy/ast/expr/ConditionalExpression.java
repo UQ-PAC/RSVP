@@ -2,6 +2,8 @@ package uq.pac.rsvp.policy.ast.expr;
 
 import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Conditional;
 
+import java.util.Collections;
+
 import com.google.gson.annotations.SerializedName;
 
 import uq.pac.rsvp.policy.ast.SourceLoc;
@@ -26,6 +28,12 @@ public class ConditionalExpression extends Expression {
 
     public ConditionalExpression(Expression condition, Expression then, Expression els) {
         this(condition, then, els, SourceLoc.MISSING);
+    }
+
+    // Used by Gson
+    @SuppressWarnings("unused")
+    private ConditionalExpression() {
+        this(null, null, null, SourceLoc.MISSING);
     }
 
     public Expression getCondition() {

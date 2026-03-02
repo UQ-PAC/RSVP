@@ -50,7 +50,8 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
 
                 if (commonType instanceof UnresolvedTypeReference) {
                     String typeName = ((UnresolvedTypeReference) commonType).getRawTypeName();
-                    commonType = Schema.resolveTypeReference(typeName, schema, this.namespace);
+                    commonType = Schema.resolveTypeReference(typeName, schema, this.namespace,
+                            commonType.getAnnotations());
 
                     if (commonType == null) {
                         continue; // TODO: error reporting
@@ -76,7 +77,7 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
 
             if (attribute instanceof UnresolvedTypeReference) {
                 String typeName = ((UnresolvedTypeReference) attribute).getRawTypeName();
-                attribute = Schema.resolveTypeReference(typeName, schema, namespace);
+                attribute = Schema.resolveTypeReference(typeName, schema, namespace, attribute.getAnnotations());
 
                 if (attribute == null) {
                     continue; // TODO: error reporting
@@ -105,7 +106,7 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
 
             if (prop instanceof UnresolvedTypeReference) {
                 String typeName = ((UnresolvedTypeReference) prop).getRawTypeName();
-                prop = Schema.resolveTypeReference(typeName, schema, namespace);
+                prop = Schema.resolveTypeReference(typeName, schema, namespace, prop.getAnnotations());
 
                 if (prop == null) {
                     continue; // TODO: error reporting
@@ -124,7 +125,7 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
 
         if (element instanceof UnresolvedTypeReference) {
             String typeName = ((UnresolvedTypeReference) element).getRawTypeName();
-            element = Schema.resolveTypeReference(typeName, schema, namespace);
+            element = Schema.resolveTypeReference(typeName, schema, namespace, element.getAnnotations());
 
             if (element == null) {
                 return; // TODO: error reporting

@@ -1,7 +1,6 @@
 package uq.pac.rsvp.policy.ast;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.net.URL;
@@ -24,7 +23,7 @@ import uq.pac.rsvp.policy.ast.expr.EntityExpression.EntityExpressionDeserialiser
 import uq.pac.rsvp.policy.ast.expr.Expression;
 import uq.pac.rsvp.policy.ast.expr.Expression.ExpressionDeserialiser;
 
-@DisplayName("PolicySet AST")
+@DisplayName("Policy set AST")
 public class PolicySetTest {
 
     static Gson gson;
@@ -33,6 +32,7 @@ public class PolicySetTest {
     static void beforeAll() {
         gson = new GsonBuilder().registerTypeAdapter(Expression.class, new ExpressionDeserialiser())
                 .registerTypeAdapter(EntityExpression.class, new EntityExpressionDeserialiser())
+                .disableJdkUnsafe()
                 .create();
     }
 

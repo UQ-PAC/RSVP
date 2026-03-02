@@ -38,6 +38,10 @@ public class Policy extends PolicyFileEntry {
         this(effect, condition, null, SourceLoc.MISSING);
     }
 
+    public Policy() {
+        this(Effect.Forbid, null, null, SourceLoc.MISSING);
+    }
+
     public boolean isPermit() {
         return effect == Effect.Permit;
     }
@@ -51,7 +55,7 @@ public class Policy extends PolicyFileEntry {
     }
 
     public Map<String, String> getAnnotations() {
-        return annotations;
+        return annotations == null ? Collections.emptyMap() : annotations;
     }
 
     @Override

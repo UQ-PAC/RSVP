@@ -24,10 +24,11 @@ import uq.pac.rsvp.policy.ast.schema.common.EntityTypeReference;
 import uq.pac.rsvp.policy.ast.schema.common.IpAddressType;
 import uq.pac.rsvp.policy.ast.schema.common.LongType;
 import uq.pac.rsvp.policy.ast.schema.common.StringType;
+import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaResolutionVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
-public class Schema extends HashMap<String, Namespace> {
+public class Schema extends HashMap<String, Namespace> implements SchemaFileEntry {
 
     private Map<String, EntityTypeDefinition> entityTypes = new HashMap<>();
     private Map<String, ActionDefinition> actions = new HashMap<>();
@@ -110,6 +111,7 @@ public class Schema extends HashMap<String, Namespace> {
     public static Schema parseJsonSchema(String json) throws NullPointerException, IllegalStateException {
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(CommonTypeDefinition.class, new CommonTypeDefinitionDeserialiser())
+                .disableJdkUnsafe()
                 .create();
         Schema result = gson.fromJson(json, Schema.class);
         SchemaVisitor visitor = new SchemaResolutionVisitor();
@@ -117,9 +119,14 @@ public class Schema extends HashMap<String, Namespace> {
         return result;
     }
 
+    public static CommonTypeDefinition resolveTypeReference(String name, Schema schema, Namespace local) {
+        return resolveTypeReference(name, schema, local, null);
+    }
+
     // Cedar docs say type resolution order is:
     // common type > entity type > primitive/extension type
-    public static CommonTypeDefinition resolveTypeReference(String name, Schema schema, Namespace local) {
+    public static CommonTypeDefinition resolveTypeReference(String name, Schema schema, Namespace local,
+            Map<String, String> annotations) {
 
         if (name == null) {
             return null;
@@ -128,13 +135,13 @@ public class Schema extends HashMap<String, Namespace> {
         CommonTypeDefinition common = resolveCommonType(name, schema, local);
 
         if (common != null) {
-            return new CommonTypeReference(common);
+            return new CommonTypeReference(common, annotations);
         }
 
         EntityTypeDefinition entity = resolveEntityType(name, schema, local);
 
         if (entity != null) {
-            return new EntityTypeReference(entity);
+            return new EntityTypeReference(entity, annotations);
         }
 
         return switch (name) {
@@ -203,5 +210,15 @@ public class Schema extends HashMap<String, Namespace> {
         }
 
         return null;
+    }
+
+    @Override
+    public void accept(SchemaVisitor visitor) {
+        visitor.visitSchema(this);
+    }
+
+    @Override
+    public <T> T compute(SchemaComputationVisitor<T> visitor) {
+        return visitor.visitSchema(this);
     }
 }

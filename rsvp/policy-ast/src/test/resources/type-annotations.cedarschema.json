@@ -1,0 +1,31 @@
+{
+  "App": {
+    "entityTypes": {
+      "SomeEntity": {
+        "annotations": {
+          "AnEntityAnnotation": "with a value!"
+        }
+      }
+    },
+    "actions": {
+      "someAction": {
+        "appliesTo": {
+          "principalTypes": ["App::SomeEntity"],
+          "resourceTypes": ["App::SomeEntity"]
+        },
+        "annotations": {
+          "AnActionAnnotation": "with a totally different value?"
+        }
+      }
+    },
+    "commonTypes": {
+      "SomeType": {
+        "type": "EntityOrCommon",
+        "name": "SomeEntity",
+        "annotations": {
+          "ATypeAnnotation": "enough annotations already..."
+        }
+      }
+    }
+  }
+}

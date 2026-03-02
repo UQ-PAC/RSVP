@@ -31,14 +31,20 @@ public class EntityExpression extends Expression {
         this(eid, path, SourceLoc.MISSING);
     }
 
+    // Used by Gson
+    @SuppressWarnings("unused")
+    private EntityExpression() {
+        this(null, null, SourceLoc.MISSING);
+    }
+
     public String getEid() {
         return eid;
     }
 
-    public List<String> getQualifiedEid() {
+    public String getQualifiedEid() {
         List<String> result = new ArrayList<>(path);
         result.add(eid);
-        return result;
+        return String.join("::", result);
     }
 
     @Override
@@ -53,7 +59,7 @@ public class EntityExpression extends Expression {
 
     @Override
     public String toString() {
-        return path.isEmpty() ? eid : String.join("::", path) + "::\"" + eid + "\"";
+        return String.join("::", path) + "::\"" + eid + "\"";
     }
 
     public static class EntityExpressionDeserialiser implements JsonDeserializer<EntityExpression> {

@@ -39,6 +39,12 @@ public class SlotExpression extends Expression {
         this(id, SourceLoc.MISSING);
     }
 
+    // Used by Gson
+    @SuppressWarnings("unused")
+    private SlotExpression() {
+        this(null, SourceLoc.MISSING);
+    }
+
     public boolean isPrincipalSlot() {
         return id == SlotId.Principal;
     }

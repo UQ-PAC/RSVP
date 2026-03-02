@@ -97,7 +97,7 @@ record.put("attribute", new UnresolvedTypeReference("Namespace::Attribute"));
 
 //...
 
-new SchemaResolutionVisitor().visitSchema(schema);
+schema.accept(new SchemaResolutionVisitor());
 
 //...
 ```

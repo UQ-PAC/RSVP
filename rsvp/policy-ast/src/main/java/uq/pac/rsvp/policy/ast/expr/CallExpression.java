@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.ast.expr;
 
 import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Call;
 
+import java.util.Collections;
 import java.util.List;
 
 import uq.pac.rsvp.policy.ast.SourceLoc;
@@ -26,14 +27,17 @@ public class CallExpression extends Expression {
     }
 
     public CallExpression(String func, List<Expression> args, SourceLoc source) {
-        super(Call, source);
-        this.self = null;
-        this.func = func;
-        this.args = args;
+        this(null, func, args, source);
     }
 
     public CallExpression(String func, List<Expression> args) {
         this(func, args, null);
+    }
+
+    // Used by Gson
+    @SuppressWarnings("unused")
+    private CallExpression() {
+        this(null, null, Collections.emptyList(), SourceLoc.MISSING);
     }
 
     public Expression getSelf() {

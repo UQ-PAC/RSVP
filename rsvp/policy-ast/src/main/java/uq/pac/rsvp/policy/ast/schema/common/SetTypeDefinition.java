@@ -16,7 +16,7 @@ public class SetTypeDefinition extends CommonTypeDefinition {
     }
 
     public SetTypeDefinition(CommonTypeDefinition element, Map<String, String> annotations) {
-        super(false, annotations);
+        super(annotations);
         this.element = element;
     }
 
@@ -26,7 +26,12 @@ public class SetTypeDefinition extends CommonTypeDefinition {
     }
 
     public SetTypeDefinition(CommonTypeDefinition element) {
-        this(element, false);
+        super();
+        this.element = element;
+    }
+
+    public SetTypeDefinition() {
+        super();
     }
 
     public CommonTypeDefinition getElementType() {

@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.google.gson.Gson;
@@ -25,6 +26,7 @@ import uq.pac.rsvp.policy.ast.expr.StringExpression;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 import uq.pac.rsvp.policy.ast.expr.EntityExpression.EntityExpressionDeserialiser;
 
+@DisplayName("Abstract policy visitor")
 public class PolicyVisitorImplTest {
 
     static Gson gson;
@@ -33,6 +35,7 @@ public class PolicyVisitorImplTest {
     static void beforeAll() {
         gson = new GsonBuilder().registerTypeAdapter(Expression.class, new ExpressionDeserialiser())
                 .registerTypeAdapter(EntityExpression.class, new EntityExpressionDeserialiser())
+                .disableJdkUnsafe()
                 .create();
     }
 

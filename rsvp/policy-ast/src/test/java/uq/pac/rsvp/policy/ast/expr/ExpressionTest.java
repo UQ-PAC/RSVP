@@ -27,6 +27,7 @@ import uq.pac.rsvp.policy.ast.SourceLoc;
 import uq.pac.rsvp.policy.ast.expr.EntityExpression.EntityExpressionDeserialiser;
 import uq.pac.rsvp.policy.ast.expr.Expression.ExpressionDeserialiser;
 
+@DisplayName("Policy condition AST")
 public class ExpressionTest {
     static Gson gson;
 
@@ -34,6 +35,7 @@ public class ExpressionTest {
     static void beforeAll() {
         gson = new GsonBuilder().registerTypeAdapter(Expression.class, new ExpressionDeserialiser())
                 .registerTypeAdapter(EntityExpression.class, new EntityExpressionDeserialiser())
+                .disableJdkUnsafe()
                 .create();
     }
 

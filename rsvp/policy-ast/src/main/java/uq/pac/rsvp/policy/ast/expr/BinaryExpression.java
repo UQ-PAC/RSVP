@@ -72,6 +72,12 @@ public class BinaryExpression extends Expression {
         this(left, op, right, SourceLoc.MISSING);
     }
 
+    // Used by Gson
+    @SuppressWarnings("unused")
+    private BinaryExpression() {
+        this(null, null, null, SourceLoc.MISSING);
+    }
+
     public Expression getLeft() {
         return left;
     }

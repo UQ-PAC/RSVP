@@ -21,6 +21,12 @@ public class PropertyAccessExpression extends Expression {
         this(obj, prop, SourceLoc.MISSING);
     }
 
+    // Used by Gson
+    @SuppressWarnings("unused")
+    private PropertyAccessExpression() {
+        this(null, null, SourceLoc.MISSING);
+    }
+
     public Expression getObject() {
         return obj;
     }

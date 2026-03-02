@@ -82,6 +82,10 @@
             "name": "Long"
           }
         }
+      },
+      "Diagnosis": {
+        "type": "EntityOrCommon",
+        "name": "String"
       }
     }
   }

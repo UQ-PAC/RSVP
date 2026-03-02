@@ -12,7 +12,7 @@ public class StringType extends CommonTypeDefinition {
     }
 
     public StringType(Map<String, String> annotations) {
-        super(true, annotations);
+        super(annotations);
     }
 
     public StringType(boolean required) {
@@ -20,7 +20,7 @@ public class StringType extends CommonTypeDefinition {
     }
 
     public StringType() {
-        this(true);
+        super();
     }
 
     @Override

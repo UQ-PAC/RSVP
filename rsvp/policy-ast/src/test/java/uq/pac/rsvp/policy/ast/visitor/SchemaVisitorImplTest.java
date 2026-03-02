@@ -7,6 +7,7 @@ import java.net.URL;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.cedarpolicy.model.exception.InternalException;
@@ -28,6 +29,7 @@ import uq.pac.rsvp.policy.ast.schema.common.IpAddressType;
 import uq.pac.rsvp.policy.ast.schema.common.LongType;
 import uq.pac.rsvp.policy.ast.schema.common.StringType;
 
+@DisplayName("Abstract schema visitor")
 public class SchemaVisitorImplTest {
 
     static Gson gson;
@@ -35,6 +37,7 @@ public class SchemaVisitorImplTest {
     @BeforeAll
     static void beforeAll() {
         gson = new GsonBuilder().registerTypeAdapter(CommonTypeDefinition.class, new CommonTypeDefinitionDeserialiser())
+                .disableJdkUnsafe()
                 .create();
     }
 
@@ -104,7 +107,7 @@ public class SchemaVisitorImplTest {
         assertEquals(0, visitor.durations);
         assertEquals(0, visitor.ipaddrs);
         assertEquals(1, visitor.longs);
-        assertEquals(1, visitor.strings);
+        assertEquals(2, visitor.strings);
         assertEquals(0, visitor.bools);
 
         url = ClassLoader.getSystemResource("collection-types.cedarschema.json");

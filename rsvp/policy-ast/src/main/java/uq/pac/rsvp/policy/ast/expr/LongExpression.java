@@ -19,6 +19,12 @@ public class LongExpression extends Expression {
         this(value, SourceLoc.MISSING);
     }
 
+    // Used by Gson
+    @SuppressWarnings("unused")
+    private LongExpression() {
+        this(-1, SourceLoc.MISSING);
+    }
+
     public long getValue() {
         return value;
     }

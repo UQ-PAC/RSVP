@@ -19,6 +19,10 @@ public class StringExpression extends Expression {
         this(value, SourceLoc.MISSING);
     }
 
+    public StringExpression() {
+        this("", SourceLoc.MISSING);
+    }
+
     public String getValue() {
         return value;
     }

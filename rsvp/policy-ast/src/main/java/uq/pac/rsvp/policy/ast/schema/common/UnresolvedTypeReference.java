@@ -22,7 +22,13 @@ public class UnresolvedTypeReference extends CommonTypeDefinition {
     }
 
     public UnresolvedTypeReference(String name) {
-        this(name, true, null);
+        super();
+        this.rawTypeName = name;
+    }
+
+    public UnresolvedTypeReference() {
+        super();
+        this.rawTypeName = null;
     }
 
     public String getRawTypeName() {

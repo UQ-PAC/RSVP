@@ -20,7 +20,7 @@ public class LongType extends CommonTypeDefinition {
     }
 
     public LongType() {
-        this(true);
+        super();
     }
 
     @Override

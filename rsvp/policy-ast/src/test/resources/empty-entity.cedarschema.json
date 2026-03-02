@@ -1,0 +1,17 @@
+{
+  "App": {
+    "entityTypes": {
+      "SomeEntity": {},
+      "AnotherEntity": {
+        "annotations": {},
+        "memberOfTypes": [],
+        "shape": {
+          "type": "Record",
+          "attributes": {}
+        },
+        "enum": []
+      }
+    },
+    "actions": {}
+  }
+}

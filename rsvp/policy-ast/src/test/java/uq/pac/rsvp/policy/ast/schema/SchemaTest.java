@@ -2,7 +2,6 @@ package uq.pac.rsvp.policy.ast.schema;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
@@ -47,14 +46,6 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaResolutionVisitor;
 
 @DisplayName("Schema AST")
 public class SchemaTest {
-
-    static Gson gson;
-
-    @BeforeAll
-    static void beforeAll() {
-        gson = new GsonBuilder().registerTypeAdapter(CommonTypeDefinition.class, new CommonTypeDefinitionDeserialiser())
-                .create();
-    }
 
     @Nested
     @DisplayName("Parse Cedar schema")
@@ -139,11 +130,31 @@ public class SchemaTest {
             Schema schema = Schema.parseCedarSchema(Path.of(url.getPath()));
             checkShadowing(schema);
         }
+
+        @Test
+        @DisplayName("handles annotations")
+        public void annotations() throws JsonMappingException,
+                JsonProcessingException, InternalException,
+                NullPointerException, IllegalStateException, IOException {
+            URL url = ClassLoader.getSystemResource("type-annotations.cedarschema");
+            Schema schema = Schema.parseCedarSchema(Path.of(url.getPath()));
+            checkAnnotations(schema);
+        }
     }
 
     @Nested
     @DisplayName("Parse JSON schema")
     class TestJSONParsing {
+
+        static Gson gson;
+
+        @BeforeAll
+        static void beforeAll() {
+            gson = new GsonBuilder()
+                    .registerTypeAdapter(CommonTypeDefinition.class, new CommonTypeDefinitionDeserialiser())
+                    .disableJdkUnsafe()
+                    .create();
+        }
 
         @Test
         @DisplayName("parses healthcare app correctly")
@@ -181,9 +192,9 @@ public class SchemaTest {
         }
 
         @Test
-        @DisplayName("handles empty namespace")
+        @DisplayName("handles unnamed namespace")
         public void emptyNamespace() throws IOException {
-            URL url = ClassLoader.getSystemResource("empty-namespace.cedarschema.json");
+            URL url = ClassLoader.getSystemResource("unnamed-namespace.cedarschema.json");
             String json = Files.readString(Path.of(url.getPath()));
             Schema schema = gson.fromJson(json, Schema.class);
 
@@ -212,6 +223,18 @@ public class SchemaTest {
             Schema schema = gson.fromJson(json, Schema.class);
 
             assertDoesNotThrow(() -> new SchemaResolutionVisitor().visitSchema(schema));
+        }
+
+        @Test
+        @DisplayName("handles annotations")
+        public void annotations() throws IOException {
+            URL url = ClassLoader.getSystemResource("type-annotations.cedarschema.json");
+            String json = Files.readString(Path.of(url.getPath()));
+            Schema schema = gson.fromJson(json, Schema.class);
+
+            new SchemaResolutionVisitor().visitSchema(schema);
+
+            checkAnnotations(schema);
 
         }
     }
@@ -304,6 +327,77 @@ public class SchemaTest {
             new SchemaResolutionVisitor().visitSchema(schema);
 
             checkShadowing(schema);
+        }
+
+        @Test
+        @DisplayName("resolves extension types")
+        public void resolutions() {
+            Schema schema = new Schema();
+            Namespace namespace = new Namespace();
+            schema.put("App", namespace);
+
+            assertTrue(Schema.resolveTypeReference("datetime", schema, namespace) instanceof DateTimeType);
+            assertTrue(Schema.resolveTypeReference("decimal", schema, namespace) instanceof DecimalType);
+            assertTrue(Schema.resolveTypeReference("duration", schema, namespace) instanceof DurationType);
+            assertTrue(Schema.resolveTypeReference("ipaddr", schema, namespace) instanceof IpAddressType);
+
+        }
+
+        @Test
+        @DisplayName("handles malformed resolutions")
+        public void badResolutions() {
+            Schema schema = new Schema();
+            Namespace namespace = new Namespace();
+            schema.put("App", namespace);
+
+            assertNull(Schema.resolveEntityType(null, schema, namespace));
+            assertNull(Schema.resolveEntityType("Missing::Type", schema, namespace));
+            assertNull(Schema.resolveCommonType(null, schema, namespace));
+            assertNull(Schema.resolveCommonType("Missing::Type", schema, namespace));
+            assertNull(Schema.resolveActionType(null, null, schema, namespace));
+            assertNull(Schema.resolveActionType("id", null, schema, namespace));
+            assertNull(Schema.resolveActionType("id", "bad type", schema, namespace));
+            assertNull(Schema.resolveActionType("id", "Missing::Action", schema, namespace));
+
+            assertNull(Schema.resolveTypeReference("nonsense", schema, namespace));
+
+        }
+
+        @Test
+        @DisplayName("handles annotations")
+        public void annotations() {
+            Schema schema = new Schema();
+
+            Map<String, EntityTypeDefinition> entities = new HashMap<>();
+
+            Map<String, String> entityAnnotations = new HashMap<>();
+            entityAnnotations.put("AnEntityAnnotation", "with a value!");
+
+            EntityTypeDefinition entity = new EntityTypeDefinition(new HashSet<>(), new HashMap<>(), null,
+                    entityAnnotations);
+            entities.put("SomeEntity", entity);
+
+            Map<String, ActionDefinition> actions = new HashMap<>();
+
+            Map<String, String> actionAnnotations = new HashMap<>();
+            actionAnnotations.put("AnActionAnnotation", "with a totally different value?");
+
+            Set<String> appliesTo = Set.copyOf(Arrays.asList("App::SomeEntity"));
+            actions.put("someAction", new ActionDefinition(null, appliesTo, appliesTo, null, actionAnnotations));
+
+            Map<String, CommonTypeDefinition> types = new HashMap<>();
+
+            Map<String, String> typeAnnotations = new HashMap<>();
+            typeAnnotations.put("ATypeAnnotation", "enough annotations already...");
+
+            types.put("SomeType", new EntityTypeReference(entity, typeAnnotations));
+
+            Namespace app = new Namespace(entities, actions, types);
+            schema.put("App", app);
+
+            new SchemaResolutionVisitor().visitSchema(schema);
+
+            checkAnnotations(schema);
         }
 
     }
@@ -428,10 +522,12 @@ public class SchemaTest {
         assertNull(referrer.getName());
         assertEquals(user, ((EntityTypeReference) referrer).getDefinition());
 
-        assertEquals(1, healthcareApp.commonTypeNames().size());
-        assertEquals(1, schema.commonTypeNames().size());
+        assertEquals(2, healthcareApp.commonTypeNames().size());
+        assertEquals(2, schema.commonTypeNames().size());
         assertTrue(healthcareApp.commonTypeNames().contains("AppointmentDetails"));
+        assertTrue(healthcareApp.commonTypeNames().contains("Diagnosis"));
         assertTrue(schema.commonTypeNames().contains("HealthCareApp::AppointmentDetails"));
+        assertTrue(schema.commonTypeNames().contains("HealthCareApp::Diagnosis"));
 
         CommonTypeDefinition details = healthcareApp.getCommonType("AppointmentDetails");
         assertTrue(details instanceof RecordTypeDefinition);
@@ -443,6 +539,13 @@ public class SchemaTest {
 
         assertTrue(detailAttr instanceof CommonTypeReference);
         assertEquals(details, ((CommonTypeReference) detailAttr).getDefinition());
+
+        CommonTypeDefinition diagnosis = healthcareApp.getCommonType("Diagnosis");
+        assertTrue(diagnosis instanceof StringType);
+
+        assertNull(healthcareApp.getAction("Missing"));
+        assertNull(healthcareApp.getEntityType("Missing"));
+        assertNull(healthcareApp.getCommonType("Missing"));
     }
 
     private void checkCollectionSchema(Schema schema) {
@@ -580,5 +683,24 @@ public class SchemaTest {
         assertEquals(oneA, ((EntityTypeReference) a).getDefinition());
         assertEquals(twoA, ((EntityTypeReference) b).getDefinition());
         assertEquals(twoA, ((EntityTypeReference) c).getDefinition());
+    }
+
+    private void checkAnnotations(Schema schema) {
+        EntityTypeDefinition entity = schema.getEntityType("App::SomeEntity");
+
+        assertEquals(1, entity.getAnnotations().size());
+        assertEquals("with a value!", entity.getAnnotations().get("AnEntityAnnotation"));
+
+        ActionDefinition action = schema.getAction("App::Action::someAction");
+
+        assertEquals(1, action.getAnnotations().size());
+        assertEquals("with a totally different value?", action.getAnnotations().get("AnActionAnnotation"));
+
+        CommonTypeDefinition type = schema.getCommonType("App::SomeType");
+
+        assertEquals(1, type.getAnnotations().size());
+        assertEquals("enough annotations already...", type.getAnnotations().get("ATypeAnnotation"));
+        assertTrue(type instanceof EntityTypeReference);
+        assertEquals(entity, ((EntityTypeReference) type).getDefinition());
     }
 }

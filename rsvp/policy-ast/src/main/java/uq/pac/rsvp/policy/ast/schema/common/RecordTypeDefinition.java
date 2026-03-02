@@ -19,30 +19,32 @@ public class RecordTypeDefinition extends CommonTypeDefinition {
     }
 
     public RecordTypeDefinition(Map<String, CommonTypeDefinition> attributes, Map<String, String> annotations) {
-        this(attributes, false, annotations);
-    }
-
-    public RecordTypeDefinition(Map<String, CommonTypeDefinition> attributes, boolean required) {
-        super(required);
+        super(annotations);
         this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
     }
 
+    public RecordTypeDefinition(Map<String, CommonTypeDefinition> attributes, boolean required) {
+        this(attributes, required, null);
+    }
+
     public RecordTypeDefinition(Map<String, CommonTypeDefinition> attributes) {
-        this(attributes, false);
+        this(attributes, null);
+    }
+
+    public RecordTypeDefinition() {
+        this(null, false, null);
     }
 
     public Set<String> getAttributeNames() {
-        return attributes != null ? Set.copyOf(attributes.keySet()) : Collections.emptySet();
+        return Set.copyOf(attributes.keySet());
     }
 
     public CommonTypeDefinition getAttributeType(String name) {
-        return attributes != null ? attributes.get(name) : null;
+        return attributes.get(name);
     }
 
     public void resolveAttributeType(String name, CommonTypeDefinition attr) {
-        if (attributes != null) {
-            attributes.put(name, attr);
-        }
+        attributes.put(name, attr);
     }
 
     @Override

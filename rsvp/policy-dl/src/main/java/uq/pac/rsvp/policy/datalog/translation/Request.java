@@ -35,6 +35,6 @@ public class Request {
 
     @Override
     public String toString() {
-        return super.toString();
+        return request.replaceAll("\\" + DELIMITER, "\t");
     }
 }

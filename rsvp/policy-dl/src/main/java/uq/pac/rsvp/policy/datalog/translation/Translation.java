@@ -17,7 +17,9 @@ import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
 /**
  * Putting translation of the cedar schema, entries, context and policies together
  */
-public class TranslationDriver {
+public class Translation {
+
+    private Translation() {}
 
     public static DLProgram translate(Schema schema, PolicySet policies, Entities entities) {
         TranslationSchema translationSchema = new TranslationSchema(schema);

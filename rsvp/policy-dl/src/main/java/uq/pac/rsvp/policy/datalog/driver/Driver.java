@@ -1,4 +1,133 @@
 package uq.pac.rsvp.policy.datalog.driver;
 
+import com.cedarpolicy.model.entity.Entities;
+import com.cedarpolicy.model.exception.InternalException;
+import com.google.devtools.common.options.OptionsParser;
+import org.fusesource.jansi.Ansi;
+import org.fusesource.jansi.AnsiConsole;
+import uq.pac.rsvp.policy.ast.PolicySet;
+import uq.pac.rsvp.policy.ast.schema.Schema;
+import uq.pac.rsvp.policy.datalog.ast.DLProgram;
+import uq.pac.rsvp.policy.datalog.translation.Request;
+import uq.pac.rsvp.policy.datalog.translation.RequestAuth;
+import uq.pac.rsvp.policy.datalog.translation.Translation;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
+import static org.fusesource.jansi.Ansi.ansi;
+
 public class Driver {
+
+    private static void error(String message) {
+        System.err.println("ERROR: " + message);
+        System.exit(1);
+    }
+
+    private static void printUsage(OptionsParser parser) {
+        System.out.println(parser.describeOptions(Collections.emptyMap(), OptionsParser.HelpVerbosity.LONG));
+        System.exit(2);
+    }
+
+    private static <E> E requiredOpt(Map<String, Object> options, String option, Class<E> cls) {
+        Object optionValue = options.get(option);
+        if (optionValue == null) {
+            error("Required option: '%s' has not been provided".formatted(option));
+        } else {
+            return cls.cast(optionValue);
+        }
+        return null;
+    }
+
+    private static Path requiredPathOpt(Map<String, Object> options, String option, boolean isDir) {
+        String filename = requiredOpt(options, option, String.class);
+        Function<Path, Boolean> typeTest = !isDir ? Files::isRegularFile : Files::isDirectory;
+        if (filename != null) {
+            Path path = Path.of(filename);
+            if (Files.exists(path) && typeTest.apply(path)) {
+                return path;
+            } else {
+                error("File '%s' does not exist or not a regular file".formatted(filename));
+            }
+        } else {
+            error("Required option: '%s' has not been provided".formatted(option));
+        }
+        return null;
+    }
+
+    private static Path requiredFile(Map<String, Object> options, String option) {
+        return requiredPathOpt(options, option, false);
+    }
+
+    private static Path requiredDir(Map<String, Object> options, String option) {
+        return requiredPathOpt(options, option, true);
+    }
+
+    private static String colour(Ansi.Color color, String text) {
+        return ansi().fg(color).a(text).reset().toString();
+    }
+
+    record ExpectedRequest(Request request, RequestAuth.Result expectation) {}
+
+    public static void main(String[] args) throws IOException, InternalException, InterruptedException {
+        OptionsParser parser = OptionsParser.newOptionsParser(DriverOptions.class);
+        parser.parseAndExitUponError(args);
+        DriverOptions options = parser.getOptions(DriverOptions.class);
+        Map<String, Object> optionsMap = options.asMap();
+
+        Path schemaFile = requiredFile(optionsMap, "schema");
+        Path policyFile = requiredFile(optionsMap, "policies");
+        Path entityFile = requiredFile(optionsMap, "entities");
+        Path dlDir = null;
+        if (options.datalogDir != null) {
+            dlDir = Path.of(options.datalogDir);
+        }
+
+        Path authRequests = requiredFile(optionsMap, "requests");
+        List<ExpectedRequest> requests = Files.readAllLines(authRequests).stream()
+                .map(String::trim)
+                .filter(s -> !s.isEmpty() && !s.startsWith("#"))
+                .map(s -> {
+                    String [] parts = s.split("\\s+");
+                    if (parts.length != 4) {
+                        error("Malformed request string (expected 4 items): " + s);
+                    }
+                    Request req = new Request(parts[0], parts[1], parts[2]);
+                    RequestAuth.Result exp = null;
+                    try {
+                        exp = RequestAuth.Result.valueOf(parts[3].toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        error("Malformed request string (invalid expected name): " + s);
+                    }
+                    return new ExpectedRequest(req, exp);
+                })
+                .toList();
+
+        Schema schema = Schema.parseCedarSchema(schemaFile);
+        Entities entities = Entities.parse(entityFile);
+        PolicySet policies = PolicySet.parseCedarPolicySet(policyFile);
+        DLProgram translation = Translation.translate(schema, policies, entities);
+        RequestAuth auth = translation.execute(dlDir);
+
+        for (ExpectedRequest req : requests) {
+            RequestAuth.Result result = auth.authorize(req.request);
+            Ansi.Color colour;
+            String resultStr;
+            if (req.expectation == result) {
+                colour = Ansi.Color.GREEN;
+                resultStr = "OK";
+            } else {
+                colour = Ansi.Color.RED;
+                resultStr = "FAIL: expected %s, got %s".formatted(req.expectation, result);
+            }
+            resultStr = colour(colour, resultStr);
+            System.out.println(colour(Ansi.Color.YELLOW, req.request.toString()) + ": " + resultStr);
+        }
+        System.exit(0);
+    }
 }

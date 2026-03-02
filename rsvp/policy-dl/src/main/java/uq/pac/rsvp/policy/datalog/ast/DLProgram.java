@@ -1,16 +1,13 @@
 package uq.pac.rsvp.policy.datalog.ast;
 
-import com.cedarpolicy.AuthorizationEngine;
 import uq.pac.rsvp.policy.datalog.translation.RequestAuth;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileAttribute;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -93,8 +90,16 @@ public class DLProgram extends DLNode {
     }
 
     public RequestAuth execute() throws IOException, InterruptedException {
-        // FIXME: Temporary directory
-        Path baseDir = Path.of("/tmp/rsvp_dl").toAbsolutePath();
+        return execute(null);
+    }
+
+    public RequestAuth execute(Path dir) throws IOException, InterruptedException {
+        Path baseDir = dir;
+        if (dir == null) {
+            baseDir = Files.createTempDirectory("rsvp");
+        } else {
+            Files.createDirectories(baseDir);
+        }
 
         Files.createDirectories(baseDir);
         Path authDl = Path.of(baseDir.toString(), "auth.dl");

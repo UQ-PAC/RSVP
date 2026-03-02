@@ -15,7 +15,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TranslationDriverTest {
+public class TranslationTest {
 
     private static final Path ENTITIES = Path.of("examples/photoapp/entities.json");
     private static final Path POLICIES = Path.of("examples/photoapp/policy.cedar");
@@ -64,7 +64,7 @@ public class TranslationDriverTest {
         Entities entities = Entities.parse(ENTITIES);
         Schema schema = Schema.parseCedarSchema(SCHEMA);
         PolicySet policySet = PolicySet.parseCedarPolicySet(POLICIES);
-        DLProgram program = TranslationDriver.translate(schema, policySet, entities);
+        DLProgram program = Translation.translate(schema, policySet, entities);
     }
 
 }

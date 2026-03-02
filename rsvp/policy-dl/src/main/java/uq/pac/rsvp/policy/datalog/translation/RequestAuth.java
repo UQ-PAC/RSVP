@@ -82,4 +82,14 @@ public class RequestAuth {
         Set<Request> forbidden = readFile(forbiddenFile);
         return new RequestAuth(universe, permitted, forbidden);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Permitted: \n");
+        for (Request p : permitted) {
+            sb.append("   ").append(p.toString()).append('\n');
+        }
+        return sb.toString();
+    }
 }

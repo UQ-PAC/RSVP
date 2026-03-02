@@ -30,31 +30,6 @@ import static org.fusesource.jansi.Ansi.ansi;
 
 public class Driver {
 
-    private static void validate(Path schemaFile, Path policyFile, Path entityFile) throws IOException, AuthException {
-        Entities entities = Entities.parse(entityFile);
-        com.cedarpolicy.model.schema.Schema schema =
-                new com.cedarpolicy.model.schema.Schema(Files.readString(schemaFile));
-        com.cedarpolicy.model.policy.PolicySet policies =
-                com.cedarpolicy.model.policy.PolicySet.parsePolicies(policyFile);
-
-        ValidationRequest vReq = new ValidationRequest(schema, policies);
-        AuthorizationEngine engine = new BasicAuthorizationEngine();
-        ValidationResponse vResp = engine.validate(vReq);
-
-        if (!vResp.validationPassed()) {
-            List<DetailedError> errors = vResp.errors.isPresent() ?
-                    vResp.errors.get() : Collections.emptyList();
-            for (DetailedError error : errors) {
-                System.err.println(error);
-            }
-            error("Schema/Policy validation failed");
-        }
-
-        EntityValidationRequest eReq =
-                new EntityValidationRequest(schema, entities.getEntities().stream().toList());
-        engine.validateEntities(eReq);
-    }
-
     private static void error(String message) {
         System.err.println(colour(RED, "ERROR: ") + message);
         System.exit(1);
@@ -139,11 +114,7 @@ public class Driver {
                 })
                 .toList();
 
-        validate(schemaFile, policyFile, entitiesFile);
-        Schema schema = Schema.parseCedarSchema(schemaFile);
-        Entities entities = Entities.parse(entitiesFile);
-        PolicySet policies = PolicySet.parseCedarPolicySet(policyFile);
-        DLProgram translation = Translation.translate(schema, policies, entities);
+        DLProgram translation = Translation.translate(schemaFile, policyFile, entitiesFile);
         RequestAuth auth = translation.execute(dlDir);
 
         if (requests.isEmpty()) {

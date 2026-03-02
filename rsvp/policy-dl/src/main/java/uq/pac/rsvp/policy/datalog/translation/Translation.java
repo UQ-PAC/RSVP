@@ -1,15 +1,23 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
+import com.cedarpolicy.AuthorizationEngine;
+import com.cedarpolicy.BasicAuthorizationEngine;
+import com.cedarpolicy.model.DetailedError;
+import com.cedarpolicy.model.EntityValidationRequest;
+import com.cedarpolicy.model.ValidationRequest;
+import com.cedarpolicy.model.ValidationResponse;
 import com.cedarpolicy.model.entity.Entities;
-import com.cedarpolicy.model.exception.InternalException;
+import com.cedarpolicy.model.exception.AuthException;
 import com.google.common.collect.Multimap;
 import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
@@ -21,7 +29,42 @@ public class Translation {
 
     private Translation() {}
 
-    public static DLProgram translate(Schema schema, PolicySet policies, Entities entities) {
+    private static void validate(Path schemaFile, Path policyFile, Path entityFile) throws IOException, AuthException {
+        Entities entities = Entities.parse(entityFile);
+        com.cedarpolicy.model.schema.Schema schema =
+                new com.cedarpolicy.model.schema.Schema(Files.readString(schemaFile));
+        com.cedarpolicy.model.policy.PolicySet policies =
+                com.cedarpolicy.model.policy.PolicySet.parsePolicies(policyFile);
+
+        ValidationRequest vReq = new ValidationRequest(schema, policies);
+        AuthorizationEngine engine = new BasicAuthorizationEngine();
+        ValidationResponse vResp = engine.validate(vReq);
+
+        if (!vResp.validationPassed()) {
+            List<DetailedError> errors = vResp.errors.isPresent() ?
+                    vResp.errors.get() : Collections.emptyList();
+            for (DetailedError error : errors) {
+                System.err.println(error);
+            }
+            throw new TranslationError("Schema/Policy validation failed");
+        }
+
+        EntityValidationRequest eReq =
+                new EntityValidationRequest(schema, entities.getEntities().stream().toList());
+        engine.validateEntities(eReq);
+    }
+
+    public static DLProgram translate(Path schemaFile, Path policiesFile, Path entitiesFile) throws IOException, AuthException {
+        validate(schemaFile, policiesFile, entitiesFile);
+
+        Schema schema = Schema.parseCedarSchema(schemaFile);
+        Entities entities = Entities.parse(entitiesFile);
+        PolicySet policies = PolicySet.parseCedarPolicySet(policiesFile);
+
+        return translate(schema, policies, entities);
+    }
+
+    private static DLProgram translate(Schema schema, PolicySet policies, Entities entities) {
         TranslationSchema translationSchema = new TranslationSchema(schema);
         TranslationEntitySet translationEntities = new TranslationEntitySet(entities, translationSchema);
         TranslationPolicySet translationPolicies = new TranslationPolicySet(policies, translationSchema);
@@ -122,14 +165,5 @@ public class Translation {
                 new DLAtom(ResourceRuleDecl, ResourceVar),
                 new DLAtom(PrincipalRuleDecl, ResourceVar));
         return new TranslationRule(ResourceRuleDecl, rule);
-    }
-
-    // FIXME: Testing. Remove
-    public static void main(String[] args) throws IOException, InternalException, InterruptedException {
-        Schema schema = Schema.parseCedarSchema(Path.of("examples/photoapp/schema.cedarschema"));
-        Entities entities = Entities.parse(Path.of("examples/photoapp/entities.json"));
-        PolicySet policies = PolicySet.parseCedarPolicySet(Path.of("examples/photoapp/policy.cedar"));
-        DLProgram program = translate(schema, policies, entities);
-        RequestAuth auth = program.execute();
     }
 }

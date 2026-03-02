@@ -1,10 +1,15 @@
 package uq.pac.rsvp.policy.datalog.driver;
 
+import com.cedarpolicy.AuthorizationEngine;
+import com.cedarpolicy.BasicAuthorizationEngine;
+import com.cedarpolicy.model.DetailedError;
+import com.cedarpolicy.model.EntityValidationRequest;
+import com.cedarpolicy.model.ValidationRequest;
+import com.cedarpolicy.model.ValidationResponse;
 import com.cedarpolicy.model.entity.Entities;
-import com.cedarpolicy.model.exception.InternalException;
+import com.cedarpolicy.model.exception.AuthException;
 import com.google.devtools.common.options.OptionsParser;
 import org.fusesource.jansi.Ansi;
-import org.fusesource.jansi.AnsiConsole;
 import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.ast.DLProgram;
@@ -20,12 +25,38 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import static org.fusesource.jansi.Ansi.Color.*;
 import static org.fusesource.jansi.Ansi.ansi;
 
 public class Driver {
 
+    private static void validate(Path schemaFile, Path policyFile, Path entityFile) throws IOException, AuthException {
+        Entities entities = Entities.parse(entityFile);
+        com.cedarpolicy.model.schema.Schema schema =
+                new com.cedarpolicy.model.schema.Schema(Files.readString(schemaFile));
+        com.cedarpolicy.model.policy.PolicySet policies =
+                com.cedarpolicy.model.policy.PolicySet.parsePolicies(policyFile);
+
+        ValidationRequest vReq = new ValidationRequest(schema, policies);
+        AuthorizationEngine engine = new BasicAuthorizationEngine();
+        ValidationResponse vResp = engine.validate(vReq);
+
+        if (!vResp.validationPassed()) {
+            List<DetailedError> errors = vResp.errors.isPresent() ?
+                    vResp.errors.get() : Collections.emptyList();
+            for (DetailedError error : errors) {
+                System.err.println(error);
+            }
+            error("Schema/Policy validation failed");
+        }
+
+        EntityValidationRequest eReq =
+                new EntityValidationRequest(schema, entities.getEntities().stream().toList());
+        engine.validateEntities(eReq);
+    }
+
     private static void error(String message) {
-        System.err.println("ERROR: " + message);
+        System.err.println(colour(RED, "ERROR: ") + message);
         System.exit(1);
     }
 
@@ -68,13 +99,13 @@ public class Driver {
         return requiredPathOpt(options, option, true);
     }
 
-    private static String colour(Ansi.Color color, String text) {
+    private static String colour(Ansi.Color color, Object text) {
         return ansi().fg(color).a(text).reset().toString();
     }
 
     record ExpectedRequest(Request request, RequestAuth.Result expectation) {}
 
-    public static void main(String[] args) throws IOException, InternalException, InterruptedException {
+    public static void main(String[] args) throws IOException, AuthException, InterruptedException {
         OptionsParser parser = OptionsParser.newOptionsParser(DriverOptions.class);
         parser.parseAndExitUponError(args);
         DriverOptions options = parser.getOptions(DriverOptions.class);
@@ -82,7 +113,7 @@ public class Driver {
 
         Path schemaFile = requiredFile(optionsMap, "schema");
         Path policyFile = requiredFile(optionsMap, "policies");
-        Path entityFile = requiredFile(optionsMap, "entities");
+        Path entitiesFile = requiredFile(optionsMap, "entities");
         Path dlDir = null;
         if (options.datalogDir != null) {
             dlDir = Path.of(options.datalogDir);
@@ -108,25 +139,34 @@ public class Driver {
                 })
                 .toList();
 
+        validate(schemaFile, policyFile, entitiesFile);
         Schema schema = Schema.parseCedarSchema(schemaFile);
-        Entities entities = Entities.parse(entityFile);
+        Entities entities = Entities.parse(entitiesFile);
         PolicySet policies = PolicySet.parseCedarPolicySet(policyFile);
         DLProgram translation = Translation.translate(schema, policies, entities);
         RequestAuth auth = translation.execute(dlDir);
+
+        if (requests.isEmpty()) {
+            System.out.println(colour(RED, "No requests found"));
+        } else {
+            System.out.println(ansi().bold().fgBlue()
+                    .a("Principal\tResource\tAction\n===============================")
+                    .reset());
+        }
 
         for (ExpectedRequest req : requests) {
             RequestAuth.Result result = auth.authorize(req.request);
             Ansi.Color colour;
             String resultStr;
             if (req.expectation == result) {
-                colour = Ansi.Color.GREEN;
+                colour = GREEN;
                 resultStr = "OK";
             } else {
-                colour = Ansi.Color.RED;
+                colour = RED;
                 resultStr = "FAIL: expected %s, got %s".formatted(req.expectation, result);
             }
             resultStr = colour(colour, resultStr);
-            System.out.println(colour(Ansi.Color.YELLOW, req.request.toString()) + ": " + resultStr);
+            System.out.println(colour(YELLOW, req.request) + ": " + resultStr);
         }
         System.exit(0);
     }

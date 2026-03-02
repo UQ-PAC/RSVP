@@ -1,0 +1,6 @@
+{
+    "principal": "PetClinic::Visitor::\"Anonymous\"",
+    "action": "PetClinic::Action::\"FindOwner\"",
+    "resource": "PetClinic::WebPage::\"Home\"",
+    "context": { }
+}

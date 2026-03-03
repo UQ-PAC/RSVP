@@ -10,35 +10,20 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
 import com.cedarpolicy.model.exception.InternalException;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 
+import uq.pac.rsvp.policy.ast.JsonParser;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.SourceLoc;
-import uq.pac.rsvp.policy.ast.expr.EntityExpression.EntityExpressionDeserialiser;
-import uq.pac.rsvp.policy.ast.expr.Expression.ExpressionDeserialiser;
 
 @DisplayName("Policy condition AST")
 public class ExpressionTest {
-    static Gson gson;
-
-    @BeforeAll
-    static void beforeAll() {
-        gson = new GsonBuilder().registerTypeAdapter(Expression.class, new ExpressionDeserialiser())
-                .registerTypeAdapter(EntityExpression.class, new EntityExpressionDeserialiser())
-                .disableJdkUnsafe()
-                .create();
-    }
-
     @Nested
     @DisplayName("Cedar parsing")
     class TestCedarParsing {
@@ -71,7 +56,7 @@ public class ExpressionTest {
         void testDeserialisation() throws IOException, URISyntaxException {
             URL url = ClassLoader.getSystemResource("expr.ast.json");
             String json = Files.readString(Path.of(url.toURI()));
-            PolicySet policies = gson.fromJson(json, PolicySet.class);
+            PolicySet policies = JsonParser.parsePolicySet(json);
 
             String[] expected = {
                     "((principal.role == \"normie\") && ([\"secret\", \"top secret\"].contains(resource.access) || (resource has \"leaked\")))",
@@ -105,12 +90,7 @@ public class ExpressionTest {
         void testInvalidAstFile() throws IOException, URISyntaxException {
             URL url = ClassLoader.getSystemResource("invalid.ast.json");
             String json = Files.readString(Path.of(url.toURI()));
-            assertThrows(JsonParseException.class, new Executable() {
-                @Override
-                public void execute() {
-                    gson.fromJson(json, PolicySet.class);
-                }
-            });
+            assertThrows(JsonParseException.class, () -> JsonParser.parsePolicySet(json));
         }
 
         @Test
@@ -119,7 +99,7 @@ public class ExpressionTest {
             URL url = ClassLoader.getSystemResource("is.ast.json");
             String json = Files.readString(Path.of(url.toURI()));
 
-            PolicySet policies = gson.fromJson(json, PolicySet.class);
+            PolicySet policies = JsonParser.parsePolicySet(json);
 
             Expression condition = policies.getFirst().getCondition();
             assertTrue(condition instanceof BinaryExpression);

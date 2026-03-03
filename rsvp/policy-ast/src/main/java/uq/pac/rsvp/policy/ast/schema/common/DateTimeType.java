@@ -7,8 +7,17 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class DateTimeType extends CommonTypeDefinition {
+
+    public DateTimeType(String name, boolean required, Map<String, String> annotations) {
+        super(name, required, annotations);
+    }
+
     public DateTimeType(boolean required, Map<String, String> annotations) {
         super(required, annotations);
+    }
+
+    public DateTimeType(String name, Map<String, String> annotations) {
+        super(name, annotations);
     }
 
     public DateTimeType(Map<String, String> annotations) {
@@ -17,6 +26,10 @@ public class DateTimeType extends CommonTypeDefinition {
 
     public DateTimeType(boolean required) {
         super(required);
+    }
+
+    public DateTimeType(String name) {
+        super(name);
     }
 
     public DateTimeType() {

@@ -6,7 +6,8 @@
           "type": "Record",
           "attributes": {
             "optional": {
-              "type": "__cedar::String",
+              "type": "EntityOrCommon",
+              "name": "__cedar::String",
               "required": false
             }
           }
@@ -19,14 +20,17 @@
         "type": "Record",
         "attributes": {
           "default": {
-            "type": "__cedar::String"
+            "type": "EntityOrCommon",
+            "name": "__cedar::String"
           },
           "explicit": {
-            "type": "__cedar::String",
+            "type": "EntityOrCommon",
+            "name": "__cedar::String",
             "required": true
           },
           "optional": {
-            "type": "__cedar::String",
+            "type": "EntityOrCommon",
+            "name": "__cedar::String",
             "required": false
           }
         }

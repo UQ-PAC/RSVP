@@ -13,6 +13,8 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class EntityTypeDefinition implements SchemaItem {
 
+    private final String name;
+
     @SerializedName("memberOfTypes")
     private final Set<String> unresolvedMemberOfTypes;
 
@@ -26,30 +28,31 @@ public class EntityTypeDefinition implements SchemaItem {
     // Set during type resolution
     private Set<EntityTypeDefinition> resolvedMemberOfDefinitions;
 
-    // Set during type resolution to the key this entity was mapped to in the
-    // namespace
-    private String name;
-
-    public EntityTypeDefinition(Set<String> memberOfTypes, Map<String, CommonTypeDefinition> shape,
+    public EntityTypeDefinition(String name, Set<String> memberOfTypes, Map<String, CommonTypeDefinition> shape,
             Set<String> entityNamesEnum,
             Map<String, String> annotations) {
+        this.name = name;
         this.unresolvedMemberOfTypes = memberOfTypes != null ? Set.copyOf(memberOfTypes) : Collections.emptySet();
         this.shape = new RecordTypeDefinition(shape);
         this.annotations = annotations != null ? Map.copyOf(annotations) : Collections.emptyMap();
         this.entityNamesEnum = entityNamesEnum != null ? Set.copyOf(entityNamesEnum) : Collections.emptySet();
     }
 
-    public EntityTypeDefinition(Set<String> memberOfTypes, Map<String, CommonTypeDefinition> shape,
+    public EntityTypeDefinition(String name, Set<String> memberOfTypes, Map<String, CommonTypeDefinition> shape,
             Set<String> entityNamesEnum) {
-        this(memberOfTypes, shape, entityNamesEnum, null);
+        this(name, memberOfTypes, shape, entityNamesEnum, null);
     }
 
-    public EntityTypeDefinition(Set<String> memberOfTypes, Map<String, CommonTypeDefinition> shape) {
-        this(memberOfTypes, shape, null, null);
+    public EntityTypeDefinition(String name, Set<String> memberOfTypes, Map<String, CommonTypeDefinition> shape) {
+        this(name, memberOfTypes, shape, null, null);
+    }
+
+    public EntityTypeDefinition(String name) {
+        this(name, null, null, null, null);
     }
 
     public EntityTypeDefinition() {
-        this(null, null, null, null);
+        this(null, null, null, null, null);
     }
 
     public void resolveMemberOfTypes(Schema schema, Namespace local) {
@@ -65,8 +68,7 @@ public class EntityTypeDefinition implements SchemaItem {
     }
 
     /**
-     * If this type is defined within a resolved namespace, then return the fully
-     * qualified name of this type definition in the format
+     * Return the fully qualified name of this type definition in the format
      * {@code Namespace::TypeName}
      * 
      * @return The fully qualified name of this type if this type is defined within
@@ -74,10 +76,6 @@ public class EntityTypeDefinition implements SchemaItem {
      */
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Set<EntityTypeDefinition> getMemberOfTypes() {

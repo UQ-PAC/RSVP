@@ -23,25 +23,15 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
         for (Map.Entry<String, Namespace> entry : schema.entrySet()) {
             this.namespace = entry.getValue();
 
-            String namespaceName = entry.getKey();
-
-            this.namespace.setName(namespaceName);
-
-            boolean topNamespace = namespaceName.isEmpty();
-
             for (String name : this.namespace.entityTypeNames()) {
                 EntityTypeDefinition entityType = this.namespace.getEntityType(name);
-                String qualifiedName = topNamespace ? name : namespaceName + "::" + name;
-                schema.putEntityType(qualifiedName, entityType);
-                entityType.setName(qualifiedName);
+                schema.addEntityType(entityType);
                 entityType.accept(this);
             }
 
             for (String name : this.namespace.actionNames()) {
                 ActionDefinition action = this.namespace.getAction(name);
-                String qualifiedName = topNamespace ? "Action::" + name : namespaceName + "::Action::" + name;
-                schema.putAction(qualifiedName, action);
-                action.setName(qualifiedName);
+                schema.addAction(action);
                 action.accept(this);
             }
 
@@ -49,9 +39,8 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
                 CommonTypeDefinition commonType = this.namespace.getCommonType(name);
 
                 if (commonType instanceof UnresolvedTypeReference) {
-                    String typeName = ((UnresolvedTypeReference) commonType).getRawTypeName();
-                    commonType = Schema.resolveTypeReference(typeName, schema, this.namespace,
-                            commonType.getAnnotations());
+                    commonType = Schema.resolveTypeReference((UnresolvedTypeReference) commonType, schema,
+                            this.namespace);
 
                     if (commonType == null) {
                         continue; // TODO: error reporting
@@ -60,9 +49,7 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
                     this.namespace.resolveCommonType(name, commonType);
                 }
 
-                String qualifiedName = topNamespace ? name : namespaceName + "::" + name;
-                schema.putCommonType(qualifiedName, commonType);
-                commonType.setName(qualifiedName);
+                schema.addCommonType(commonType);
                 commonType.accept(this);
             }
         }
@@ -76,8 +63,7 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
             CommonTypeDefinition attribute = type.getShapeAttributeType(name);
 
             if (attribute instanceof UnresolvedTypeReference) {
-                String typeName = ((UnresolvedTypeReference) attribute).getRawTypeName();
-                attribute = Schema.resolveTypeReference(typeName, schema, namespace, attribute.getAnnotations());
+                attribute = Schema.resolveTypeReference((UnresolvedTypeReference) attribute, schema, namespace);
 
                 if (attribute == null) {
                     continue; // TODO: error reporting
@@ -105,8 +91,7 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
             CommonTypeDefinition prop = type.getAttributeType(name);
 
             if (prop instanceof UnresolvedTypeReference) {
-                String typeName = ((UnresolvedTypeReference) prop).getRawTypeName();
-                prop = Schema.resolveTypeReference(typeName, schema, namespace, prop.getAnnotations());
+                prop = Schema.resolveTypeReference((UnresolvedTypeReference) prop, schema, namespace);
 
                 if (prop == null) {
                     continue; // TODO: error reporting
@@ -124,8 +109,7 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
         CommonTypeDefinition element = type.getElementType();
 
         if (element instanceof UnresolvedTypeReference) {
-            String typeName = ((UnresolvedTypeReference) element).getRawTypeName();
-            element = Schema.resolveTypeReference(typeName, schema, namespace, element.getAnnotations());
+            element = Schema.resolveTypeReference((UnresolvedTypeReference) element, schema, namespace);
 
             if (element == null) {
                 return; // TODO: error reporting

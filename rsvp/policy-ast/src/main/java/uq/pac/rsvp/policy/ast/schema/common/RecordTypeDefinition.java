@@ -1,5 +1,6 @@
 package uq.pac.rsvp.policy.ast.schema.common;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -11,9 +12,21 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 public class RecordTypeDefinition extends CommonTypeDefinition {
     private final Map<String, CommonTypeDefinition> attributes;
 
+    public RecordTypeDefinition(String name, Map<String, CommonTypeDefinition> attributes, boolean required,
+            Map<String, String> annotations) {
+        super(name, required, annotations);
+        this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
+    }
+
     public RecordTypeDefinition(Map<String, CommonTypeDefinition> attributes, boolean required,
             Map<String, String> annotations) {
         super(required, annotations);
+        this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
+    }
+
+    public RecordTypeDefinition(String name, Map<String, CommonTypeDefinition> attributes,
+            Map<String, String> annotations) {
+        super(name, annotations);
         this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
     }
 
@@ -23,15 +36,23 @@ public class RecordTypeDefinition extends CommonTypeDefinition {
     }
 
     public RecordTypeDefinition(Map<String, CommonTypeDefinition> attributes, boolean required) {
-        this(attributes, required, null);
+        super(required);
+        this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
+    }
+
+    public RecordTypeDefinition(String name, Map<String, CommonTypeDefinition> attributes) {
+        super(name);
+        this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
     }
 
     public RecordTypeDefinition(Map<String, CommonTypeDefinition> attributes) {
-        this(attributes, null);
+        super();
+        this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
     }
 
     public RecordTypeDefinition() {
-        this(null, false, null);
+        super();
+        this.attributes = Collections.emptyMap();
     }
 
     public Set<String> getAttributeNames() {

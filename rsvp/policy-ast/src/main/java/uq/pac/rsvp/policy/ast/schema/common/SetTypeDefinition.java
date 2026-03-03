@@ -10,8 +10,19 @@ public class SetTypeDefinition extends CommonTypeDefinition {
 
     private CommonTypeDefinition element;
 
+    public SetTypeDefinition(String name, CommonTypeDefinition element, boolean required,
+            Map<String, String> annotations) {
+        super(name, required, annotations);
+        this.element = element;
+    }
+
     public SetTypeDefinition(CommonTypeDefinition element, boolean required, Map<String, String> annotations) {
         super(required, annotations);
+        this.element = element;
+    }
+
+    public SetTypeDefinition(String name, CommonTypeDefinition element, Map<String, String> annotations) {
+        super(name, annotations);
         this.element = element;
     }
 
@@ -25,9 +36,18 @@ public class SetTypeDefinition extends CommonTypeDefinition {
         this.element = element;
     }
 
+    public SetTypeDefinition(String name, CommonTypeDefinition element) {
+        super(name);
+        this.element = element;
+    }
+
     public SetTypeDefinition(CommonTypeDefinition element) {
         super();
         this.element = element;
+    }
+
+    public SetTypeDefinition(String name) {
+        super(name);
     }
 
     public SetTypeDefinition() {

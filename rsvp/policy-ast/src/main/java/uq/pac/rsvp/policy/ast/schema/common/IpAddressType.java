@@ -7,8 +7,17 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class IpAddressType extends CommonTypeDefinition {
+
+    public IpAddressType(String name, boolean required, Map<String, String> annotations) {
+        super(name, required, annotations);
+    }
+
     public IpAddressType(boolean required, Map<String, String> annotations) {
         super(required, annotations);
+    }
+
+    public IpAddressType(String name, Map<String, String> annotations) {
+        super(name, annotations);
     }
 
     public IpAddressType(Map<String, String> annotations) {
@@ -17,6 +26,10 @@ public class IpAddressType extends CommonTypeDefinition {
 
     public IpAddressType(boolean required) {
         super(required);
+    }
+
+    public IpAddressType(String name) {
+        super(name);
     }
 
     public IpAddressType() {

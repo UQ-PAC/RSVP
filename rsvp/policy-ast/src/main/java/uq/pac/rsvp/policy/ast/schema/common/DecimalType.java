@@ -7,8 +7,17 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class DecimalType extends CommonTypeDefinition {
+
+    public DecimalType(String name, boolean required, Map<String, String> annotations) {
+        super(name, required, annotations);
+    }
+
     public DecimalType(boolean required, Map<String, String> annotations) {
         super(required, annotations);
+    }
+
+    public DecimalType(String name, Map<String, String> annotations) {
+        super(name, annotations);
     }
 
     public DecimalType(Map<String, String> annotations) {
@@ -17,6 +26,10 @@ public class DecimalType extends CommonTypeDefinition {
 
     public DecimalType(boolean required) {
         super(required);
+    }
+
+    public DecimalType(String name) {
+        super(name);
     }
 
     public DecimalType() {

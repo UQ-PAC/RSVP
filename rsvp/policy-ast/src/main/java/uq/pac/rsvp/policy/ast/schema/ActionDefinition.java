@@ -58,6 +58,8 @@ public class ActionDefinition implements SchemaItem {
         }
     }
 
+    private final String name;
+
     @SerializedName("memberOf")
     private final Set<ActionReference> unresolvedMemberOf;
 
@@ -65,23 +67,24 @@ public class ActionDefinition implements SchemaItem {
 
     private final Map<String, String> annotations;
 
-    // Set during type resolution to the key this action was mapped to in the
-    // namespace
-    private String name;
-
     // Set during type resolution
     private Set<ActionDefinition> resolvedMemberOf;
 
-    public ActionDefinition(Set<ActionReference> memberOf, Set<String> principalTypes, Set<String> resourceTypes,
+    public ActionDefinition(String name, Set<ActionReference> memberOf, Set<String> principalTypes,
+            Set<String> resourceTypes,
             RecordTypeDefinition context, Map<String, String> annotations) {
-
+        this.name = name;
         this.unresolvedMemberOf = memberOf != null ? Set.copyOf(memberOf) : Collections.emptySet();
         this.appliesTo = new ActionApplication(principalTypes, resourceTypes, context);
         this.annotations = annotations != null ? Map.copyOf(annotations) : Collections.emptyMap();
     }
 
+    public ActionDefinition(String name) {
+        this(name, null, null, null, null, null);
+    }
+
     public ActionDefinition() {
-        this(null, null, null, null, null);
+        this(null, null, null, null, null, null);
     }
 
     public void resolveReferences(Schema schema, Namespace local) {
@@ -118,8 +121,7 @@ public class ActionDefinition implements SchemaItem {
     }
 
     /**
-     * If this action is defined within a resolved namespace, then return the fully
-     * qualified name of this action definition in the format
+     * Return the fully qualified name of this action definition in the format
      * {@code Namespace::Action::actionName}
      * 
      * @return The fully qualified name of this action if this action is defined
@@ -127,10 +129,6 @@ public class ActionDefinition implements SchemaItem {
      */
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Set<ActionDefinition> getMemberOf() {

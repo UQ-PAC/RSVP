@@ -6,19 +6,14 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.cedarpolicy.model.exception.InternalException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import uq.pac.rsvp.policy.ast.schema.Schema;
-import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition.CommonTypeDefinitionDeserialiser;
-import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.policy.ast.schema.common.CommonTypeReference;
 import uq.pac.rsvp.policy.ast.schema.common.DateTimeType;
@@ -31,15 +26,6 @@ import uq.pac.rsvp.policy.ast.schema.common.StringType;
 
 @DisplayName("Abstract schema visitor")
 public class SchemaVisitorImplTest {
-
-    static Gson gson;
-
-    @BeforeAll
-    static void beforeAll() {
-        gson = new GsonBuilder().registerTypeAdapter(CommonTypeDefinition.class, new CommonTypeDefinitionDeserialiser())
-                .disableJdkUnsafe()
-                .create();
-    }
 
     static class TestVisitor extends SchemaVisitorImpl {
 

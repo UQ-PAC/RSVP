@@ -25,31 +25,42 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public abstract class CommonTypeDefinition implements SchemaItem {
 
+    private final String definitionName;
+
     // If this type definition is a record property, this may be true. Otherwise,
     // it will be false
     private final boolean required;
 
     private final Map<String, String> annotations;
 
-    // Set during type resolution to the key this type was mapped to in the
-    // namespace, if any. Types defined in records and sets will not be named.
-    private String definitionName;
-
-    protected CommonTypeDefinition(boolean required, Map<String, String> annotations) {
+    protected CommonTypeDefinition(String name, boolean required, Map<String, String> annotations) {
+        this.definitionName = name;
         this.required = required;
         this.annotations = annotations != null ? Map.copyOf(annotations) : Collections.emptyMap();
     }
 
+    protected CommonTypeDefinition(boolean required, Map<String, String> annotations) {
+        this(null, required, annotations);
+    }
+
     protected CommonTypeDefinition(boolean required) {
-        this(required, null);
+        this(null, required, null);
+    }
+
+    protected CommonTypeDefinition(String name, Map<String, String> annotations) {
+        this(name, false, annotations);
     }
 
     protected CommonTypeDefinition(Map<String, String> annotations) {
-        this(false, annotations);
+        this(null, false, annotations);
+    }
+
+    protected CommonTypeDefinition(String name) {
+        this(name, false, null);
     }
 
     protected CommonTypeDefinition() {
-        this(false, null);
+        this(null, false, null);
     }
 
     public boolean isRequired() {
@@ -61,19 +72,17 @@ public abstract class CommonTypeDefinition implements SchemaItem {
     }
 
     /**
-     * If this type was defined as a common type within a resolved namespace, then
+     * If this type represents a {@code commonType} definition, then
      * return the fully qualified name of this type definition in the format
-     * {@code Namespace::TypeName}
+     * {@code Namespace::TypeName}. A definition is a {@code commonType} if it is
+     * defined in the {@code commonTypes} array within a namespace, not as a
+     * component of some other type.
      * 
      * @return The fully qualified name of this type if this type is defined within
      *         a resolved namespace, {@code null} otherwise.
      */
     public final String getName() {
         return definitionName;
-    }
-
-    public final void setName(String name) {
-        this.definitionName = name;
     }
 
     @Override

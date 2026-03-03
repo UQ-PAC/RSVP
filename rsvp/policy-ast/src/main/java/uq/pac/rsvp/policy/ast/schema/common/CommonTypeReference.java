@@ -10,8 +10,19 @@ public class CommonTypeReference extends CommonTypeDefinition {
 
     private final CommonTypeDefinition definition;
 
+    public CommonTypeReference(String name, CommonTypeDefinition definition, boolean required,
+            Map<String, String> annotations) {
+        super(name, required, annotations);
+        this.definition = definition;
+    }
+
     public CommonTypeReference(CommonTypeDefinition definition, boolean required, Map<String, String> annotations) {
         super(required, annotations);
+        this.definition = definition;
+    }
+
+    public CommonTypeReference(String name, CommonTypeDefinition definition, Map<String, String> annotations) {
+        super(name, annotations);
         this.definition = definition;
     }
 
@@ -22,6 +33,11 @@ public class CommonTypeReference extends CommonTypeDefinition {
 
     public CommonTypeReference(CommonTypeDefinition definition, boolean required) {
         super(required);
+        this.definition = definition;
+    }
+
+    public CommonTypeReference(String name, CommonTypeDefinition definition) {
+        super(name);
         this.definition = definition;
     }
 

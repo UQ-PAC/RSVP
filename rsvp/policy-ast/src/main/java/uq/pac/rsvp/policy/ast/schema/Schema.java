@@ -1,6 +1,7 @@
 package uq.pac.rsvp.policy.ast.schema;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -11,10 +12,13 @@ import com.cedarpolicy.model.exception.InternalException;
 import com.cedarpolicy.model.schema.Schema.JsonOrCedar;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
-import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition.CommonTypeDefinitionDeserialiser;
+import uq.pac.rsvp.policy.ast.JsonParser;
 import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.policy.ast.schema.common.CommonTypeReference;
 import uq.pac.rsvp.policy.ast.schema.common.DateTimeType;
@@ -24,15 +28,34 @@ import uq.pac.rsvp.policy.ast.schema.common.EntityTypeReference;
 import uq.pac.rsvp.policy.ast.schema.common.IpAddressType;
 import uq.pac.rsvp.policy.ast.schema.common.LongType;
 import uq.pac.rsvp.policy.ast.schema.common.StringType;
+import uq.pac.rsvp.policy.ast.schema.common.UnresolvedTypeReference;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaResolutionVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class Schema extends HashMap<String, Namespace> implements SchemaItem {
 
-    private Map<String, EntityTypeDefinition> entityTypes = new HashMap<>();
-    private Map<String, ActionDefinition> actions = new HashMap<>();
-    private Map<String, CommonTypeDefinition> commonTypes = new HashMap<>();
+    private final Map<String, EntityTypeDefinition> entityTypes;
+    private final Map<String, ActionDefinition> actions;
+    private final Map<String, CommonTypeDefinition> commonTypes;
+
+    public Schema(Map<String, Namespace> other) {
+        super(other);
+        entityTypes = new HashMap<>();
+        actions = new HashMap<>();
+        commonTypes = new HashMap<>();
+    }
+
+    public Schema() {
+        super();
+        entityTypes = new HashMap<>();
+        actions = new HashMap<>();
+        commonTypes = new HashMap<>();
+    }
+
+    public void add(Namespace namespace) {
+        this.put(namespace.getName(), namespace);
+    }
 
     public Set<String> entityTypeNames() {
         return Set.copyOf(entityTypes.keySet());
@@ -42,8 +65,8 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
         return entityTypes.get(name);
     }
 
-    public void putEntityType(String name, EntityTypeDefinition type) {
-        entityTypes.put(name, type);
+    public void addEntityType(EntityTypeDefinition type) {
+        entityTypes.put(type.getName(), type);
     }
 
     public Set<String> actionNames() {
@@ -54,8 +77,8 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
         return actions.get(name);
     }
 
-    public void putAction(String name, ActionDefinition action) {
-        actions.put(name, action);
+    public void addAction(ActionDefinition action) {
+        actions.put(action.getName(), action);
     }
 
     public Set<String> commonTypeNames() {
@@ -66,8 +89,8 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
         return commonTypes.get(name);
     }
 
-    public void putCommonType(String name, CommonTypeDefinition type) {
-        commonTypes.put(name, type);
+    public void addCommonType(CommonTypeDefinition type) {
+        commonTypes.put(type.getName(), type);
     }
 
     /**
@@ -109,49 +132,51 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
      * @return a Schema instance corresponding to the parsed Cedar schema file
      */
     public static Schema parseJsonSchema(String json) throws NullPointerException, IllegalStateException {
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(CommonTypeDefinition.class, new CommonTypeDefinitionDeserialiser())
-                .disableJdkUnsafe()
-                .create();
-        Schema result = gson.fromJson(json, Schema.class);
+        Schema result = JsonParser.parseSchema(json);
         SchemaVisitor visitor = new SchemaResolutionVisitor();
         visitor.visitSchema(result);
         return result;
     }
 
-    public static CommonTypeDefinition resolveTypeReference(String name, Schema schema, Namespace local) {
-        return resolveTypeReference(name, schema, local, null);
-    }
-
     // Cedar docs say type resolution order is:
     // common type > entity type > primitive/extension type
-    public static CommonTypeDefinition resolveTypeReference(String name, Schema schema, Namespace local,
-            Map<String, String> annotations) {
+    public static CommonTypeDefinition resolveTypeReference(UnresolvedTypeReference unresolved, Schema schema,
+            Namespace local) {
 
-        if (name == null) {
+        if (unresolved == null) {
             return null;
         }
 
-        CommonTypeDefinition common = resolveCommonType(name, schema, local);
+        String referenceTypeName = unresolved.getRawTypeName();
+
+        if (referenceTypeName == null) {
+            return null;
+        }
+
+        String definitionName = unresolved.getName();
+
+        CommonTypeDefinition common = resolveCommonType(referenceTypeName, schema, local);
 
         if (common != null) {
-            return new CommonTypeReference(common, annotations);
+            return new CommonTypeReference(definitionName, common, unresolved.isRequired(),
+                    unresolved.getAnnotations());
         }
 
-        EntityTypeDefinition entity = resolveEntityType(name, schema, local);
+        EntityTypeDefinition entity = resolveEntityType(referenceTypeName, schema, local);
 
         if (entity != null) {
-            return new EntityTypeReference(entity, annotations);
+            return new EntityTypeReference(definitionName, entity, unresolved.isRequired(),
+                    unresolved.getAnnotations());
         }
 
-        return switch (name) {
-            case "Bool" -> new BooleanType();
-            case "Long" -> new LongType();
-            case "String" -> new StringType();
-            case "datetime" -> new DateTimeType();
-            case "decimal" -> new DecimalType();
-            case "duration" -> new DurationType();
-            case "ipaddr" -> new IpAddressType();
+        return switch (referenceTypeName) {
+            case "Bool" -> new BooleanType(definitionName, unresolved.isRequired(), unresolved.getAnnotations());
+            case "Long" -> new LongType(definitionName, unresolved.isRequired(), unresolved.getAnnotations());
+            case "String" -> new StringType(definitionName, unresolved.isRequired(), unresolved.getAnnotations());
+            case "datetime" -> new DateTimeType(definitionName, unresolved.isRequired(), unresolved.getAnnotations());
+            case "decimal" -> new DecimalType(definitionName, unresolved.isRequired(), unresolved.getAnnotations());
+            case "duration" -> new DurationType(definitionName, unresolved.isRequired(), unresolved.getAnnotations());
+            case "ipaddr" -> new IpAddressType(definitionName, unresolved.isRequired(), unresolved.getAnnotations());
             default -> null;
         };
 
@@ -221,4 +246,76 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
     public <T> T compute(SchemaComputationVisitor<T> visitor) {
         return visitor.visitSchema(this);
     }
+
+    public static class SchemaDeserialiser implements JsonDeserializer<Schema> {
+
+        @Override
+        public Schema deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+                throws JsonParseException {
+
+            Schema result = new Schema();
+
+            // TODO: error reporting
+            if (json.isJsonObject()) {
+
+                for (Map.Entry<String, JsonElement> definition : json.getAsJsonObject().entrySet()) {
+
+                    String name = definition.getKey();
+                    JsonElement value = definition.getValue();
+
+                    if (value.isJsonObject()) {
+
+                        JsonObject namespace = value.getAsJsonObject();
+
+                        namespace.addProperty("name", name);
+
+                        JsonElement entityTypes = namespace.get("entityTypes");
+
+                        if (entityTypes != null && entityTypes.isJsonObject()) {
+                            for (Map.Entry<String, JsonElement> entityType : entityTypes.getAsJsonObject().entrySet()) {
+                                if (entityType.getValue().isJsonObject()) {
+                                    JsonObject type = entityType.getValue().getAsJsonObject();
+
+                                    type.addProperty("name",
+                                            name.isEmpty() ? entityType.getKey() : name + "::" + entityType.getKey());
+                                }
+                            }
+                        }
+
+                        JsonElement actions = namespace.get("actions");
+
+                        if (actions != null && actions.isJsonObject()) {
+                            for (Map.Entry<String, JsonElement> action : actions.getAsJsonObject().entrySet()) {
+                                if (action.getValue().isJsonObject()) {
+                                    JsonObject type = action.getValue().getAsJsonObject();
+
+                                    type.addProperty("name",
+                                            name.isEmpty() ? "Action::" + action.getKey()
+                                                    : name + "::Action::" + action.getKey());
+                                }
+                            }
+                        }
+
+                        JsonElement commonTypes = namespace.get("commonTypes");
+
+                        if (commonTypes != null && commonTypes.isJsonObject()) {
+                            for (Map.Entry<String, JsonElement> commonType : commonTypes.getAsJsonObject().entrySet()) {
+                                if (commonType.getValue().isJsonObject()) {
+                                    JsonObject type = commonType.getValue().getAsJsonObject();
+
+                                    type.addProperty("definitionName",
+                                            name.isEmpty() ? commonType.getKey() : name + "::" + commonType.getKey());
+                                }
+                            }
+                        }
+
+                        result.add(context.deserialize(value, Namespace.class));
+                    }
+                }
+            }
+
+            return result;
+        }
+    }
+
 }

@@ -7,7 +7,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,26 +14,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import com.cedarpolicy.model.exception.InternalException;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import uq.pac.rsvp.policy.ast.expr.EntityExpression;
-import uq.pac.rsvp.policy.ast.expr.EntityExpression.EntityExpressionDeserialiser;
-import uq.pac.rsvp.policy.ast.expr.Expression;
-import uq.pac.rsvp.policy.ast.expr.Expression.ExpressionDeserialiser;
 
 @DisplayName("Policy set AST")
 public class PolicySetTest {
-
-    static Gson gson;
-
-    @BeforeAll
-    static void beforeAll() {
-        gson = new GsonBuilder().registerTypeAdapter(Expression.class, new ExpressionDeserialiser())
-                .registerTypeAdapter(EntityExpression.class, new EntityExpressionDeserialiser())
-                .disableJdkUnsafe()
-                .create();
-    }
 
     @Nested
     @DisplayName("Cedar policies")
@@ -79,7 +61,7 @@ public class PolicySetTest {
         void testDeserialisation(String file, String expected) throws IOException {
             URL url = ClassLoader.getSystemResource(file);
             String json = Files.readString(Path.of(url.getPath()));
-            PolicySet policies = gson.fromJson(json, PolicySet.class);
+            PolicySet policies = JsonParser.parsePolicySet(json);
             assertEquals(expected, policies.toString());
         }
     }

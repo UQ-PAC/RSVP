@@ -7,8 +7,16 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class StringType extends CommonTypeDefinition {
+    public StringType(String name, boolean required, Map<String, String> annotations) {
+        super(name, required, annotations);
+    }
+
     public StringType(boolean required, Map<String, String> annotations) {
         super(required, annotations);
+    }
+
+    public StringType(String name, Map<String, String> annotations) {
+        super(name, annotations);
     }
 
     public StringType(Map<String, String> annotations) {
@@ -17,6 +25,10 @@ public class StringType extends CommonTypeDefinition {
 
     public StringType(boolean required) {
         super(required);
+    }
+
+    public StringType(String name) {
+        super(name);
     }
 
     public StringType() {

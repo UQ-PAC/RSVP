@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.ast.schema.common;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import uq.pac.rsvp.policy.ast.JsonParser;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition.CommonTypeDefinitionDeserialiser;
@@ -62,13 +64,15 @@ public class RecordTypeDefinitionTest {
         void required() throws IOException {
             URL url = ClassLoader.getSystemResource("required-attr.cedarschema.json");
             String json = Files.readString(Path.of(url.getPath()));
-            Schema schema = gson.fromJson(json, Schema.class);
+            Schema schema = JsonParser.parseSchema(json);
 
             schema.accept(new SchemaResolutionVisitor());
 
             EntityTypeDefinition something = schema.getEntityType("App::Something");
             CommonTypeDefinition sometype = schema.getCommonType("App::SomeType");
 
+            assertNotNull(something);
+            assertNotNull(sometype);
             assertFalse(sometype.isRequired());
 
             assertTrue(something.getShapeAttributeNames().contains("optional"));

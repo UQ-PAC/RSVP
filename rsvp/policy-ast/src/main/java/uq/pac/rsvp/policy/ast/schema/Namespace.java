@@ -1,6 +1,5 @@
 package uq.pac.rsvp.policy.ast.schema;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -12,29 +11,31 @@ public class Namespace {
     private final Map<String, CommonTypeDefinition> commonTypes;
 
     // The key for this namespace within the Schema
-    private String name;
+    private final String name;
 
-    public Namespace(Map<String, EntityTypeDefinition> entityTypes, Map<String, ActionDefinition> actions,
+    public Namespace(String name, Map<String, EntityTypeDefinition> entityTypes, Map<String, ActionDefinition> actions,
             Map<String, CommonTypeDefinition> commonTypes) {
+        this.name = name;
         this.entityTypes = entityTypes != null ? new HashMap<>(entityTypes) : new HashMap<>();
         this.actions = actions != null ? new HashMap<>(actions) : new HashMap<>();
         this.commonTypes = commonTypes != null ? new HashMap<>(commonTypes) : new HashMap<>();
     }
 
-    public Namespace(Map<String, EntityTypeDefinition> entityTypes, Map<String, ActionDefinition> actions) {
-        this(entityTypes, actions, null);
+    public Namespace(String name, Map<String, EntityTypeDefinition> entityTypes,
+            Map<String, ActionDefinition> actions) {
+        this(name, entityTypes, actions, null);
+    }
+
+    public Namespace(String name) {
+        this(name, null, null, null);
     }
 
     public Namespace() {
-        this(null, null, null);
+        this("", null, null, null);
     }
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Set<String> entityTypeNames() {

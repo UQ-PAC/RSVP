@@ -11,8 +11,19 @@ public class EntityTypeReference extends CommonTypeDefinition {
 
     private final EntityTypeDefinition definition;
 
+    public EntityTypeReference(String name, EntityTypeDefinition definition, boolean required,
+            Map<String, String> annotations) {
+        super(name, required, annotations);
+        this.definition = definition;
+    }
+
     public EntityTypeReference(EntityTypeDefinition definition, boolean required, Map<String, String> annotations) {
         super(required, annotations);
+        this.definition = definition;
+    }
+
+    public EntityTypeReference(String name, EntityTypeDefinition definition, Map<String, String> annotations) {
+        super(name, annotations);
         this.definition = definition;
     }
 
@@ -23,6 +34,11 @@ public class EntityTypeReference extends CommonTypeDefinition {
 
     public EntityTypeReference(EntityTypeDefinition definition, boolean required) {
         super(required);
+        this.definition = definition;
+    }
+
+    public EntityTypeReference(String name, EntityTypeDefinition definition) {
+        super(name);
         this.definition = definition;
     }
 

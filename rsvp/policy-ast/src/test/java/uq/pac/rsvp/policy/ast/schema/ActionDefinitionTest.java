@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.ast.schema;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -19,10 +20,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition.CommonTypeDefinitionDeserialiser;
+import uq.pac.rsvp.policy.ast.JsonParser;
 import uq.pac.rsvp.policy.ast.visitor.SchemaResolutionVisitor;
 
 @DisplayName("Schema action AST")
@@ -32,22 +30,12 @@ public class ActionDefinitionTest {
     @DisplayName("Parse JSON")
     class TestJSON {
 
-        static Gson gson;
-
-        @BeforeAll
-        static void beforeAll() {
-            gson = new GsonBuilder()
-                    .registerTypeAdapter(CommonTypeDefinition.class, new CommonTypeDefinitionDeserialiser())
-                    .disableJdkUnsafe()
-                    .create();
-        }
-
         @Test
         @DisplayName("Handles nil references")
         void noReferences() throws IOException {
             URL url = ClassLoader.getSystemResource("empty-action.cedarschema.json");
             String json = Files.readString(Path.of(url.getPath()));
-            Schema schema = gson.fromJson(json, Schema.class);
+            Schema schema = JsonParser.parseSchema(json);
 
             ActionDefinition action = schema.get("App").getAction("someAction");
             ActionDefinition another = schema.get("App").getAction("anotherAction");
@@ -83,7 +71,7 @@ public class ActionDefinitionTest {
         void resolvesMemberOf() throws IOException {
             URL url = ClassLoader.getSystemResource("action.cedarschema.json");
             String json = Files.readString(Path.of(url.getPath()));
-            Schema schema = gson.fromJson(json, Schema.class);
+            Schema schema = JsonParser.parseSchema(json);
 
             new SchemaResolutionVisitor().visitSchema(schema);
 
@@ -114,30 +102,31 @@ public class ActionDefinitionTest {
             schema = new Schema();
 
             Map<String, EntityTypeDefinition> localEntities = new HashMap<>();
-            localEntities.put("Loser", new EntityTypeDefinition(null, null));
+            localEntities.put("Loser", new EntityTypeDefinition("Local::Loser"));
 
-            local = new Namespace(localEntities, null, null);
+            local = new Namespace("Local", localEntities, null, null);
 
             Map<String, EntityTypeDefinition> otherEntities = new HashMap<>();
-            otherEntities.put("User", new EntityTypeDefinition(null, null));
+            otherEntities.put("User", new EntityTypeDefinition("App::User"));
 
             Map<String, ActionDefinition> otherActions = new HashMap<>();
-            otherActions.put("someAction", new ActionDefinition(null, null, null, null, null));
+            otherActions.put("someAction", new ActionDefinition("App::Action::someAction"));
 
-            Namespace other = new Namespace(otherEntities, otherActions, null);
+            Namespace other = new Namespace("App", otherEntities, otherActions, null);
 
-            schema.put("App", other);
-            schema.put("Local", local);
+            schema.add(other);
+            schema.add(local);
         }
 
         @Test
         @DisplayName("Handles nil references")
         void noReferences() {
 
-            ActionDefinition action = new ActionDefinition(null, null, null, null, null);
+            ActionDefinition action = new ActionDefinition();
 
             action.resolveReferences(schema, local);
 
+            assertNull(action.getName());
             assertEquals(0, action.getMemberOf().size());
             assertEquals(0, action.getAppliesToPrincipalTypes().size());
             assertEquals(0, action.getAppliesToResourceTypes().size());
@@ -154,7 +143,7 @@ public class ActionDefinitionTest {
             Set<String> principalTypes = Set.copyOf(Arrays.asList("App::User", "Loser"));
             Set<String> resourceTypes = Set.copyOf(Arrays.asList("Loser"));
 
-            ActionDefinition action = new ActionDefinition(memberOf, principalTypes, resourceTypes, null, null);
+            ActionDefinition action = new ActionDefinition("", memberOf, principalTypes, resourceTypes, null, null);
 
             action.resolveReferences(schema, local);
 
@@ -177,7 +166,7 @@ public class ActionDefinitionTest {
             Set<String> principalTypes = Set.copyOf(Arrays.asList("App::Loser", "Missing"));
             Set<String> resourceTypes = Set.copyOf(Arrays.asList("Missing"));
 
-            ActionDefinition action = new ActionDefinition(memberOf, principalTypes, resourceTypes, null, null);
+            ActionDefinition action = new ActionDefinition("", memberOf, principalTypes, resourceTypes, null, null);
 
             action.resolveReferences(schema, local);
 
@@ -192,7 +181,7 @@ public class ActionDefinitionTest {
             annotations.put("some_annotation", "for testing");
             annotations.put("another_annotation", "for luck");
 
-            ActionDefinition action = new ActionDefinition(null, null, null, null, annotations);
+            ActionDefinition action = new ActionDefinition("", null, null, null, null, annotations);
 
             assertEquals(2, action.getAnnotations().size());
             assertEquals("for testing", action.getAnnotations().get("some_annotation"));

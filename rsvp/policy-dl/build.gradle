@@ -1,0 +1,20 @@
+plugins {
+    id "application"
+}
+
+dependencies {
+    implementation project(':policy-ast')
+    implementation 'org.logicng:logicng:2.6.0'
+    implementation 'com.github.pcj:google-options:1.0.0'
+    implementation 'org.fusesource.jansi:jansi:2.4.2'
+}
+
+application {
+    mainClass = 'uq.pac.rsvp.policy.datalog.driver.Driver'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'uq.pac.rsvp.policy.datalog.driver.Driver'
+    }
+}

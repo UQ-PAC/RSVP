@@ -1,0 +1,46 @@
+package uq.pac.rsvp.policy.datalog.ast;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
+
+/**
+ * Datalog rule
+ * <code>
+ *   Rule := Atom ':-' RuleExpression [',' RuleExpression] '.'
+ * </code>
+ */
+public class DLRule extends DLStatement {
+    private final DLAtom head;
+    private final List<DLRuleExpr> body;
+
+    public DLRule(DLAtom head, DLRuleExpr ...expressions) {
+        require(expressions.length > 0);
+        require(!head.isNegated(), "Negated atom in head");
+        this.head = head;
+        this.body = Arrays.stream(expressions).toList();
+    }
+
+    public DLRule(DLAtom head, List<DLRuleExpr> body) {
+        this.head = head;
+        this.body = body.stream().toList();
+    }
+
+    public DLAtom getHead() {
+        return head;
+    }
+
+    public List<DLRuleExpr> getBody() {
+        return body;
+    }
+
+    public String getName() {
+        return head.getName();
+    }
+
+    protected String stringify() {
+        return head.toString() + " :- \n    " +
+                String.join(",\n    ", body.stream().map(DLRuleExpr::toString).toList()) + ".";
+    }
+}

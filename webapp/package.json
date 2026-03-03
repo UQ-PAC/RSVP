@@ -1,0 +1,39 @@
+{
+  "name": "rsvp",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Web application for executing RSVP policy queries and displaying the results",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "pnpm build:server && pnpm build:client",
+    "test": "pnpm test:server && pnpm test:client",
+    "build:server": "tsc",
+    "start:server": "node build/index.js",
+    "test:server": "jest --coverage",
+    "build:client": "cd client && pnpm build",
+    "start:client": "cd client && pnpm start",
+    "test:client": "cd client && pnpm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UQ-PAC/RSVP.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/UQ-PAC/RSVP/issues"
+  },
+  "homepage": "https://github.com/UQ-PAC/RSVP#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.3.3",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}

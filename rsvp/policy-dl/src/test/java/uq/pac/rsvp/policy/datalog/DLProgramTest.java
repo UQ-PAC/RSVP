@@ -19,8 +19,11 @@ public class DLProgramTest {
         .decl path(x: number, y: number)
         .output path(IO=stdout)
 
-        path(x, y) :- edge(x, y).
-        path(x, y) :- edge(x, y), edge(y, z).""";
+        path(x, y) :-
+            edge(x, y).
+        path(x, y) :-
+            edge(x, y),
+            edge(y, z).""";
 
     @Test
     void test() {

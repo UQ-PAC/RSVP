@@ -40,7 +40,7 @@ public class DLRule extends DLStatement {
     }
 
     protected String stringify() {
-        return head.toString() + " :- \n    " +
+        return head.toString() + " :-\n    " +
                 String.join(",\n    ", body.stream().map(DLRuleExpr::toString).toList()) + ".";
     }
 }

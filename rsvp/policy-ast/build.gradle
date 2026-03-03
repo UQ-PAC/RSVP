@@ -1,13 +1,9 @@
-plugins {
-    id 'maven-publish'
-}
-
 publishing {
     publications {
         mavenJava(MavenPublication) {
             groupId "uq.pac.rsvp"
             artifactId "policy-ast"
-            version "1.0.0"
+            version "1.0.1-SNAPSHOT"
             from components.java
         }
     }

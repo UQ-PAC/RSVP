@@ -7,6 +7,20 @@ plugins {
 repositories {
     mavenLocal()
     mavenCentral()
+    maven {
+        url = 'https://maven.pkg.github.com/rebecca-odonoghue/cedar-java'
+        credentials {
+            username = System.getenv('PACKAGES_USER')
+            password = System.getenv('PACKAGES_TOKEN')
+        }
+    }
+    maven {
+        url = 'https://maven.pkg.github.com/UQ-PAC/RSVP'
+        credentials {
+            username = System.getenv('PACKAGES_USER')
+            password = System.getenv('PACKAGES_TOKEN')
+        }
+    }
 }
 
 dependencies {
@@ -34,10 +48,25 @@ test {
 subprojects {
     apply plugin: 'java'
     apply plugin: 'jacoco'
+    apply plugin: 'maven-publish'
 
     repositories {
         mavenLocal()
         mavenCentral()
+        maven {
+            url = 'https://maven.pkg.github.com/rebecca-odonoghue/cedar-java'
+            credentials {
+                username = System.getenv('PACKAGES_USER')
+                password = System.getenv('PACKAGES_TOKEN')
+            }
+        }
+        maven {
+            url = 'https://maven.pkg.github.com/UQ-PAC/RSVP'
+            credentials {
+                username = System.getenv('PACKAGES_USER')
+                password = System.getenv('PACKAGES_TOKEN')
+            }
+        }
     }
 
     dependencies {
@@ -45,7 +74,7 @@ subprojects {
         implementation("org.slf4j:slf4j-api:2.0.17")
         implementation("org.slf4j:slf4j-simple:2.0.17")
         // Custom cedar-java fork (https://github.com/rebecca-odonoghue/cedar-java)
-        implementation 'com.cedarpolicy:cedar-java:3.1.2-rsvp-3:uber'
+        implementation 'com.cedarpolicy:cedar-java:4.8.0-rsvp:uber'
         implementation 'com.google.code.gson:gson:2.13.2'
         implementation 'com.fasterxml.jackson.core:jackson-databind:2.20.0'
         implementation libs.guava
@@ -75,6 +104,18 @@ subprojects {
 
     jacocoTestReport {
         dependsOn test // tests are required to run before generating the report
+    }
+
+    publishing {
+        repositories {
+            maven {
+                url = 'https://maven.pkg.github.com/UQ-PAC/RSVP'
+                credentials {
+                    username = System.getenv('GITHUB_ACTOR')
+                    password = System.getenv('GITHUB_TOKEN')
+                }
+            }
+        }
     }
 }
 

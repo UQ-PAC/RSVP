@@ -1,6 +1,7 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
 import com.cedarpolicy.model.entity.Entities;
+import com.cedarpolicy.model.exception.AuthException;
 import com.cedarpolicy.model.exception.InternalException;
 import org.junit.jupiter.api.Test;
 import uq.pac.rsvp.policy.ast.Policy;
@@ -45,26 +46,20 @@ public class TranslationTest {
         Map<String, Policy> policies = getPolicies();
 
         policies.forEach((annotation, policy) -> {
-            System.out.println(" === " + annotation + " =========== ");
             DLRuleDecl declaration = new DLRuleDecl(annotation,
                     new DLDeclTerm("principal", DLType.SYMBOL),
                     new DLDeclTerm("resource", DLType.SYMBOL),
                     new DLDeclTerm("action", DLType.SYMBOL));
-            System.out.println(declaration);
 
             List<List<Expression>> disjunctions = NFConverter.toDNF(policy.getCondition());
             for (List<Expression> disjunction : disjunctions) {
                 DLRule rule = TranslationVisitor.translate(translationSchema, disjunction, declaration);
-                System.out.println(rule);
             }
         });
     }
 
-    void TranslationDriverTest() throws IOException, InternalException {
-        Entities entities = Entities.parse(ENTITIES);
-        Schema schema = Schema.parseCedarSchema(SCHEMA);
-        PolicySet policySet = PolicySet.parseCedarPolicySet(POLICIES);
-        DLProgram program = Translation.translate(schema, policySet, entities);
+    void TranslationDriverTest() throws IOException, AuthException {
+        DLProgram program = Translation.translate(SCHEMA, POLICIES, ENTITIES);
     }
 
 }

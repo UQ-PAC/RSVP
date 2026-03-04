@@ -1,0 +1,172 @@
+strict digraph {
+	ordering="out"
+	node[shape=box]
+	subgraph "cluster_PetClinic::Pet" {
+		label="PetClinic::Pet"
+		"PetClinic::Pet::\"Max\"" [label="Max"]
+		"PetClinic::Pet::\"Jewel\"" [label="Jewel"]
+		"PetClinic::Pet::\"Leo\"" [label="Leo"]
+		"PetClinic::Pet::\"Samantha\"" [label="Samantha"]
+		"PetClinic::Pet::\"Rosy\"" [label="Rosy"]
+		"PetClinic::Pet::\"Lucky\"" [label="Lucky"]
+		"PetClinic::Pet::\"Sly\"" [label="Sly"]
+	}
+	subgraph "cluster_PetClinic::WebPage" {
+		label="PetClinic::WebPage"
+		"PetClinic::WebPage::\"Veterinarians\"" [label="Veterinarians"]
+		"PetClinic::WebPage::\"EditOwner\"" [label="EditOwner"]
+		"PetClinic::WebPage::\"Owner\"" [label="Owner"]
+		"PetClinic::WebPage::\"AddVisit\"" [label="AddVisit"]
+		"PetClinic::WebPage::\"AddNewPet\"" [label="AddNewPet"]
+		"PetClinic::WebPage::\"FindOwners\"" [label="FindOwners"]
+		"PetClinic::WebPage::\"AddOwner\"" [label="AddOwner"]
+		"PetClinic::WebPage::\"EditPet\"" [label="EditPet"]
+		"PetClinic::WebPage::\"Home\"" [label="Home"]
+		"PetClinic::WebPage::\"Owners\"" [label="Owners"]
+		"PetClinic::WebPage::\"Error\"" [label="Error"]
+	}
+	subgraph "cluster_PetClinic::Database" {
+		label="PetClinic::Database"
+		"PetClinic::Database::\"Owners (B)\"" [label="Owners (B)"]
+		"PetClinic::Database::\"Clinic A\"" [label="Clinic A"]
+		"PetClinic::Database::\"Clinic B\"" [label="Clinic B"]
+		"PetClinic::Database::\"Pets (A)\"" [label="Pets (A)"]
+		"PetClinic::Database::\"Owners (A)\"" [label="Owners (A)"]
+		"PetClinic::Database::\"Users (A)\"" [label="Users (A)"]
+		"PetClinic::Database::\"Veterinarians (B)\"" [label="Veterinarians (B)"]
+		"PetClinic::Database::\"Veterinarians (A)\"" [label="Veterinarians (A)"]
+		"PetClinic::Database::\"Pets (B)\"" [label="Pets (B)"]
+		"PetClinic::Database::\"Visits (A)\"" [label="Visits (A)"]
+		"PetClinic::Database::\"Users (B)\"" [label="Users (B)"]
+		"PetClinic::Database::\"Visits (B)\"" [label="Visits (B)"]
+	}
+	subgraph "cluster_PetClinic::Visit" {
+		label="PetClinic::Visit"
+		"PetClinic::Visit::\"Lucky 1\"" [label="Lucky 1"]
+		"PetClinic::Visit::\"Samantha 2\"" [label="Samantha 2"]
+		"PetClinic::Visit::\"Max 2\"" [label="Max 2"]
+		"PetClinic::Visit::\"Sly 1\"" [label="Sly 1"]
+		"PetClinic::Visit::\"Rosy 1\"" [label="Rosy 1"]
+		"PetClinic::Visit::\"Max 1\"" [label="Max 1"]
+		"PetClinic::Visit::\"Jewel 1\"" [label="Jewel 1"]
+		"PetClinic::Visit::\"Samantha 1\"" [label="Samantha 1"]
+	}
+	subgraph "cluster_PetClinic::Action" {
+		label="PetClinic::Action"
+		"PetClinic::Action::\"EditVeterinarian\"" [label="EditVeterinarian"]
+		"PetClinic::Action::\"AddVisit\"" [label="AddVisit"]
+		"PetClinic::Action::\"DeleteVeterinarian\"" [label="DeleteVeterinarian"]
+		"PetClinic::Action::\"AddVeterinarian\"" [label="AddVeterinarian"]
+		"PetClinic::Action::\"DeletePet\"" [label="DeletePet"]
+		"PetClinic::Action::\"ViewWebPage\"" [label="ViewWebPage"]
+		"PetClinic::Action::\"WebPageOperations\"" [label="WebPageOperations"]
+		"PetClinic::Action::\"ReadFromDatabase\"" [label="ReadFromDatabase"]
+		"PetClinic::Action::\"DatabaseOperations\"" [label="DatabaseOperations"]
+		"PetClinic::Action::\"AddOwner\"" [label="AddOwner"]
+		"PetClinic::Action::\"EditOnDatabase\"" [label="EditOnDatabase"]
+		"PetClinic::Action::\"DeleteFromDatabase\"" [label="DeleteFromDatabase"]
+		"PetClinic::Action::\"EditPet\"" [label="EditPet"]
+		"PetClinic::Action::\"DestructiveOperations\"" [label="DestructiveOperations"]
+		"PetClinic::Action::\"FindOwner\"" [label="FindOwner"]
+		"PetClinic::Action::\"DeleteOwner\"" [label="DeleteOwner"]
+		"PetClinic::Action::\"AddPet\"" [label="AddPet"]
+		"PetClinic::Action::\"EditOwner\"" [label="EditOwner"]
+		"PetClinic::Action::\"DeleteVisit\"" [label="DeleteVisit"]
+		"PetClinic::Action::\"AddToDatabase\"" [label="AddToDatabase"]
+		"PetClinic::Action::\"EditVisit\"" [label="EditVisit"]
+	}
+	subgraph "cluster_PetClinic::User" {
+		label="PetClinic::User"
+		"PetClinic::User::\"Unknown\"" [label="Unknown"]
+		"PetClinic::User::\"Sharon Jenkins\"" [label="Sharon Jenkins"]
+		"PetClinic::User::\"James Carter\"" [label="James Carter"]
+		"PetClinic::User::\"Linda Douglas\"" [label="Linda Douglas"]
+		"PetClinic::User::\"Bob\"" [label="Bob"]
+	}
+	subgraph "cluster_PetClinic::Administrator" {
+		label="PetClinic::Administrator"
+		"PetClinic::Administrator::\"Administrator\"" [label="Administrator"]
+	}
+	subgraph "cluster_PetClinic::Guest" {
+		label="PetClinic::Guest"
+		"PetClinic::Guest::\"Guest\"" [label="Guest"]
+	}
+	subgraph "cluster_PetClinic::Owner" {
+		label="PetClinic::Owner"
+		"PetClinic::Owner::\"Eduardo Rodriquez\"" [label="Eduardo Rodriquez"]
+		"PetClinic::Owner::\"Jean Coleman\"" [label="Jean Coleman"]
+		"PetClinic::Owner::\"Carlos Estaban\"" [label="Carlos Estaban"]
+		"PetClinic::Owner::\"George Franklin\"" [label="George Franklin"]
+	}
+	subgraph "cluster_PetClinic::Veterinarian" {
+		label="PetClinic::Veterinarian"
+		"PetClinic::Veterinarian::\"James Carter\"" [label="James Carter"]
+		"PetClinic::Veterinarian::\"Sharon Jenkins\"" [label="Sharon Jenkins"]
+		"PetClinic::Veterinarian::\"Linda Douglas\"" [label="Linda Douglas"]
+	}
+	"PetClinic::Visit::\"Lucky 1\"" -> "PetClinic::Database::\"Visits (A)\""
+	"PetClinic::Pet::\"Max\"" -> "PetClinic::Database::\"Pets (A)\""
+	"PetClinic::Database::\"Owners (B)\"" -> "PetClinic::Database::\"Clinic B\""
+	"PetClinic::Veterinarian::\"James Carter\"" -> "PetClinic::Database::\"Veterinarians (B)\""
+	"PetClinic::Veterinarian::\"James Carter\"" -> "PetClinic::Database::\"Veterinarians (A)\""
+	"PetClinic::Action::\"EditVeterinarian\"" -> "PetClinic::Action::\"WebPageOperations\""
+	"PetClinic::Owner::\"Eduardo Rodriquez\"" -> "PetClinic::Database::\"Owners (B)\""
+	"PetClinic::Pet::\"Jewel\"" -> "PetClinic::Database::\"Pets (B)\""
+	"PetClinic::Veterinarian::\"Sharon Jenkins\"" -> "PetClinic::Database::\"Veterinarians (A)\""
+	"PetClinic::Action::\"AddVisit\"" -> "PetClinic::Action::\"WebPageOperations\""
+	"PetClinic::Action::\"DeleteVeterinarian\"" -> "PetClinic::Action::\"WebPageOperations\""
+	"PetClinic::Action::\"AddVeterinarian\"" -> "PetClinic::Action::\"WebPageOperations\""
+	"PetClinic::Pet::\"Leo\"" -> "PetClinic::Database::\"Pets (A)\""
+	"PetClinic::Pet::\"Leo\"" -> "PetClinic::Database::\"Pets (B)\""
+	"PetClinic::Pet::\"Samantha\"" -> "PetClinic::Database::\"Pets (A)\""
+	"PetClinic::Visit::\"Samantha 2\"" -> "PetClinic::Database::\"Visits (A)\""
+	"PetClinic::Database::\"Pets (A)\"" -> "PetClinic::Database::\"Clinic A\""
+	"PetClinic::Action::\"DeletePet\"" -> "PetClinic::Action::\"WebPageOperations\""
+	"PetClinic::User::\"Unknown\"" -> "PetClinic::Guest::\"Guest\""
+	"PetClinic::User::\"Sharon Jenkins\"" -> "PetClinic::Veterinarian::\"Sharon Jenkins\""
+	"PetClinic::User::\"Sharon Jenkins\"" -> "PetClinic::Database::\"Users (A)\""
+	"PetClinic::Owner::\"Jean Coleman\"" -> "PetClinic::Database::\"Owners (A)\""
+	"PetClinic::Action::\"ViewWebPage\"" -> "PetClinic::Action::\"WebPageOperations\""
+	"PetClinic::Database::\"Owners (A)\"" -> "PetClinic::Database::\"Clinic A\""
+	"PetClinic::Action::\"ReadFromDatabase\"" -> "PetClinic::Action::\"DatabaseOperations\""
+	"PetClinic::Action::\"AddOwner\"" -> "PetClinic::Action::\"WebPageOperations\""
+	"PetClinic::Owner::\"Carlos Estaban\"" -> "PetClinic::Database::\"Owners (B)\""
+	"PetClinic::Visit::\"Max 2\"" -> "PetClinic::Database::\"Visits (A)\""
+	"PetClinic::User::\"James Carter\"" -> "PetClinic::Veterinarian::\"James Carter\""
+	"PetClinic::User::\"James Carter\"" -> "PetClinic::Database::\"Users (A)\""
+	"PetClinic::User::\"James Carter\"" -> "PetClinic::Database::\"Users (B)\""
+	"PetClinic::Pet::\"Rosy\"" -> "PetClinic::Database::\"Pets (B)\""
+	"PetClinic::Action::\"EditOnDatabase\"" -> "PetClinic::Action::\"DestructiveOperations\""
+	"PetClinic::Action::\"EditOnDatabase\"" -> "PetClinic::Action::\"DatabaseOperations\""
+	"PetClinic::Action::\"DeleteFromDatabase\"" -> "PetClinic::Action::\"DestructiveOperations\""
+	"PetClinic::Action::\"DeleteFromDatabase\"" -> "PetClinic::Action::\"DatabaseOperations\""
+	"PetClinic::Database::\"Users (A)\"" -> "PetClinic::Database::\"Clinic A\""
+	"PetClinic::Action::\"EditPet\"" -> "PetClinic::Action::\"WebPageOperations\""
+	"PetClinic::Pet::\"Lucky\"" -> "PetClinic::Database::\"Pets (A)\""
+	"PetClinic::Visit::\"Sly 1\"" -> "PetClinic::Database::\"Visits (A)\""
+	"PetClinic::Action::\"FindOwner\"" -> "PetClinic::Action::\"WebPageOperations\""
+	"PetClinic::Action::\"DeleteOwner\"" -> "PetClinic::Action::\"WebPageOperations\""
+	"PetClinic::User::\"Linda Douglas\"" -> "PetClinic::Database::\"Users (A)\""
+	"PetClinic::User::\"Linda Douglas\"" -> "PetClinic::Veterinarian::\"Linda Douglas\""
+	"PetClinic::Visit::\"Rosy 1\"" -> "PetClinic::Database::\"Visits (B)\""
+	"PetClinic::Action::\"AddPet\"" -> "PetClinic::Action::\"WebPageOperations\""
+	"PetClinic::Database::\"Veterinarians (B)\"" -> "PetClinic::Database::\"Clinic B\""
+	"PetClinic::Visit::\"Max 1\"" -> "PetClinic::Database::\"Visits (A)\""
+	"PetClinic::User::\"Bob\"" -> "PetClinic::Administrator::\"Administrator\""
+	"PetClinic::Owner::\"George Franklin\"" -> "PetClinic::Database::\"Owners (B)\""
+	"PetClinic::Owner::\"George Franklin\"" -> "PetClinic::Database::\"Owners (A)\""
+	"PetClinic::Veterinarian::\"Linda Douglas\"" -> "PetClinic::Database::\"Veterinarians (A)\""
+	"PetClinic::Database::\"Veterinarians (A)\"" -> "PetClinic::Database::\"Clinic A\""
+	"PetClinic::Action::\"EditOwner\"" -> "PetClinic::Action::\"WebPageOperations\""
+	"PetClinic::Action::\"DeleteVisit\"" -> "PetClinic::Action::\"WebPageOperations\""
+	"PetClinic::Database::\"Pets (B)\"" -> "PetClinic::Database::\"Clinic B\""
+	"PetClinic::Visit::\"Jewel 1\"" -> "PetClinic::Database::\"Visits (B)\""
+	"PetClinic::Action::\"AddToDatabase\"" -> "PetClinic::Action::\"DatabaseOperations\""
+	"PetClinic::Pet::\"Sly\"" -> "PetClinic::Database::\"Pets (A)\""
+	"PetClinic::Visit::\"Samantha 1\"" -> "PetClinic::Database::\"Visits (A)\""
+	"PetClinic::Database::\"Visits (A)\"" -> "PetClinic::Database::\"Clinic A\""
+	"PetClinic::Database::\"Users (B)\"" -> "PetClinic::Database::\"Clinic B\""
+	"PetClinic::Database::\"Visits (B)\"" -> "PetClinic::Database::\"Clinic B\""
+	"PetClinic::Action::\"EditVisit\"" -> "PetClinic::Action::\"WebPageOperations\""
+}
+

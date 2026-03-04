@@ -1,0 +1,9 @@
+{
+    "principal": "PetClinic::User::\"Unknown\"",
+    "action": "PetClinic::Action::\"ViewWebPage\"",
+    "resource": "PetClinic::WebPage::\"FindOwners\"",
+    "context": {
+        "database": { "__entity": { "type": "PetClinic::Database", "id": "Owners (A)" } },
+        "readAction": { "__entity": { "type": "PetClinic::Action", "id": "ReadFromDatabase" } }
+    }
+}

@@ -93,10 +93,24 @@ public class DLProgram extends DLNode {
         return execute(null);
     }
 
+    private static void removeTempDir(Path dir) throws IOException {
+        if (dir == null) {
+            return;
+        }
+        try (Stream<Path> files = Files.list(dir)) {
+            for (Path path : files.toList()) {
+                Files.delete(path);
+            }
+        }
+        Files.delete(dir);
+    }
+
     public RequestAuth execute(Path dir) throws IOException, InterruptedException {
         Path baseDir = dir;
+        Path removeDir = null;
         if (dir == null) {
             baseDir = Files.createTempDirectory("rsvp");
+            removeDir = baseDir;
         } else {
             Files.createDirectories(baseDir);
         }
@@ -114,12 +128,14 @@ public class DLProgram extends DLNode {
 
         int exitCode = process.waitFor();
         if (exitCode != 0) {
+            removeTempDir(removeDir);
             BufferedReader error =
                     new BufferedReader(new InputStreamReader(process.getErrorStream()));
-            String errorString = error.lines().collect(Collectors.joining("\n"));
-            throw new TranslationError(errorString);
+            throw new TranslationError(error.lines().collect(Collectors.joining("\n")));
         } else {
-            return RequestAuth.load(baseDir);
+            RequestAuth auth = RequestAuth.load(baseDir);
+            removeTempDir(removeDir);
+            return auth;
         }
     }
 }

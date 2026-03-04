@@ -32,7 +32,7 @@ public class DriverOptions extends OptionsBase {
             abbrev = 'e',
             help = "Cedar entities",
             category = "input",
-            defaultValue = "")
+            defaultValue = "null")
     public String entitiesFile;
 
     @Option(
@@ -40,7 +40,7 @@ public class DriverOptions extends OptionsBase {
             abbrev = 'r',
             help = "Authorisation requests",
             category = "input",
-            defaultValue = "")
+            defaultValue = "null")
     public String queriesFile;
 
     @Option(
@@ -48,6 +48,6 @@ public class DriverOptions extends OptionsBase {
             abbrev = 'D',
             help = "A directory with Datalog outputs",
             category = "input",
-            defaultValue = "")
+            defaultValue = "/tmp/rsvp-dl")
     public String datalogDir;
 }

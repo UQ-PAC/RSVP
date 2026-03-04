@@ -9,6 +9,7 @@ public class TranslationPolicySet {
     private final List<TranslationPolicy> permit;
     private final List<TranslationPolicy> forbid;
     private static final String FORMAT = "CedarPolicy";
+    private static final String NAME_ANNOTATION = "name";
 
     public TranslationPolicySet(PolicySet policies, TranslationSchema schema) {
         List<TranslationPolicy> permitPolicies = new ArrayList<>();
@@ -18,7 +19,11 @@ public class TranslationPolicySet {
         for (Policy policy: policies) {
             boolean effect = policy.isPermit();
             int index = effect ? 0 : 1;
-            String name = (effect ? "Permit" : "Forbid") + FORMAT + ++counter[index];
+            String prefix = effect ? "PermitPolicy" : "ForbidPolicy";
+            String annotationName = policy.getAnnotations().get(NAME_ANNOTATION);
+            String name = annotationName == null || annotationName.isEmpty() ?
+                    prefix + FORMAT + ++counter[index] : annotationName;
+            name = prefix + name;
             TranslationPolicy translation = new TranslationPolicy(name, policy, schema);
             List<TranslationPolicy> target = effect ? permitPolicies : forbidPolicies;
             target.add(translation);

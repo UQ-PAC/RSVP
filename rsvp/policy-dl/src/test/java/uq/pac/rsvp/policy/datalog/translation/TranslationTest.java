@@ -3,16 +3,14 @@ package uq.pac.rsvp.policy.datalog.translation;
 import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.exception.AuthException;
 import com.cedarpolicy.model.exception.InternalException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
-import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
 import java.io.IOException;
-import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -25,9 +23,9 @@ public class TranslationTest {
     private static final Path POLICIES = pathOf("photoapp/policy.cedar");
     private static final Path SCHEMA = pathOf("photoapp/schema.cedarschema");
 
-    Map<String, Policy> getPolicies() throws IOException, InternalException {
+    PolicySet getPolicySet(Path filename) throws IOException, InternalException {
         Map<String, Policy> policies = new HashMap<>();
-        PolicySet policySet = PolicySet.parseCedarPolicySet(POLICIES);
+        PolicySet policySet = PolicySet.parseCedarPolicySet(filename);
         for (Policy p : policySet) {
             Map<String, String> annotations = p.getAnnotations();
             // All annotations should be named
@@ -41,12 +39,21 @@ public class TranslationTest {
                 policies.put(name, p);
             }
         }
-        return policies;
+        PolicySet set = new PolicySet();
+        set.addAll(policies.values());
+        return set;
     }
 
     @Test
-    void TranslationDriverTest() throws IOException, AuthException {
+    void TranslationDriverTest() throws IOException, AuthException, InterruptedException {
         DLProgram program = Translation.translate(SCHEMA, POLICIES, ENTITIES);
-    }
 
+        Entities entities = Entities.parse(ENTITIES);
+        com.cedarpolicy.model.schema.Schema schema =
+                new com.cedarpolicy.model.schema.Schema(Files.readString(SCHEMA));
+        com.cedarpolicy.model.policy.PolicySet policies =
+                com.cedarpolicy.model.policy.PolicySet.parsePolicies(POLICIES);
+
+        RequestAuth auth = program.execute();
+    }
 }

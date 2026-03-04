@@ -1,17 +1,8 @@
 package uq.pac.rsvp.policy.datalog.driver;
 
-import com.cedarpolicy.AuthorizationEngine;
-import com.cedarpolicy.BasicAuthorizationEngine;
-import com.cedarpolicy.model.DetailedError;
-import com.cedarpolicy.model.EntityValidationRequest;
-import com.cedarpolicy.model.ValidationRequest;
-import com.cedarpolicy.model.ValidationResponse;
-import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.exception.AuthException;
 import com.google.devtools.common.options.OptionsParser;
 import org.fusesource.jansi.Ansi;
-import uq.pac.rsvp.policy.ast.PolicySet;
-import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.ast.DLProgram;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestAuth;
@@ -23,7 +14,6 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import static org.fusesource.jansi.Ansi.Color.*;
 import static org.fusesource.jansi.Ansi.ansi;
@@ -50,28 +40,19 @@ public class Driver {
         return null;
     }
 
-    private static Path requiredPathOpt(Map<String, Object> options, String option, boolean isDir) {
+    private static Path requiredFile(Map<String, Object> options, String option) {
         String filename = requiredOpt(options, option, String.class);
-        Function<Path, Boolean> typeTest = !isDir ? Files::isRegularFile : Files::isDirectory;
-        if (filename != null) {
+        if (filename != null && !filename.isEmpty()) {
             Path path = Path.of(filename);
-            if (Files.exists(path) && typeTest.apply(path)) {
+            if (Files.exists(path) && Files.isRegularFile(path)) {
                 return path;
             } else {
-                error("File '%s' does not exist or not a regular file".formatted(filename));
+                error("File '%s' (option %s) does not exist or not a regular file".formatted(filename, option));
             }
         } else {
             error("Required option: '%s' has not been provided".formatted(option));
         }
         return null;
-    }
-
-    private static Path requiredFile(Map<String, Object> options, String option) {
-        return requiredPathOpt(options, option, false);
-    }
-
-    private static Path requiredDir(Map<String, Object> options, String option) {
-        return requiredPathOpt(options, option, true);
     }
 
     private static String colour(Ansi.Color color, Object text) {
@@ -89,10 +70,7 @@ public class Driver {
         Path schemaFile = requiredFile(optionsMap, "schema");
         Path policyFile = requiredFile(optionsMap, "policies");
         Path entitiesFile = requiredFile(optionsMap, "entities");
-        Path dlDir = null;
-        if (options.datalogDir != null) {
-            dlDir = Path.of(options.datalogDir);
-        }
+        String dlDir = requiredOpt(optionsMap, "datalog-dir", String.class);
 
         Path authRequests = requiredFile(optionsMap, "requests");
         List<ExpectedRequest> requests = Files.readAllLines(authRequests).stream()
@@ -115,7 +93,7 @@ public class Driver {
                 .toList();
 
         DLProgram translation = Translation.translate(schemaFile, policyFile, entitiesFile);
-        RequestAuth auth = translation.execute(dlDir);
+        RequestAuth auth = translation.execute(Path.of(dlDir));
 
         if (requests.isEmpty()) {
             System.out.println(colour(RED, "No requests found"));

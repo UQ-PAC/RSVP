@@ -15,16 +15,16 @@ when {
 
 // === View
 //   + Owner's friends can see protected photos
-@name("permitViewProtectedPhoto")
-@unsupported
-permit (
-    principal is Account,
-    action == Action::"viewPhoto",
-    resource is Photo)
-when {
-    resource.album.visibility == Visibility::"Protected"
-        && principal in resource.album.owner.friends
-};
+// @name("permitViewProtectedPhoto")
+// @unsupported
+// permit (
+//     principal is Account,
+//     action == Action::"viewPhoto",
+//     resource is Photo)
+// when {
+//     resource.album.visibility == Visibility::"Protected"
+//         && principal in resource.album.owner.friends
+// };
 
 // === Upload
 //  + Users can upload photos to their albums

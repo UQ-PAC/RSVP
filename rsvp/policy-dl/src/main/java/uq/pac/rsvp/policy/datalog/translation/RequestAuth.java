@@ -8,20 +8,22 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
-import static uq.pac.rsvp.policy.datalog.translation.RequestAuth.Result.INVALID;
+import static uq.pac.rsvp.policy.datalog.translation.RequestAuth.Result.*;
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
 public class RequestAuth {
 
-    public final Set<Request> permitted;
-    public final Set<Request> forbidden;
-    public final Set<Request> universe;
+    private final Set<Request> permitted;
+    private final Set<Request> forbidden;
+    private final Set<Request> universe;
+    private final Set<Request> actionable;
 
-    private RequestAuth(Set<Request> universe,
+    private RequestAuth(Set<Request> universe, Set<Request> actionable,
                         Set<Request> permitted, Set<Request> forbidden) {
         this.universe = universe;
         this.permitted = permitted;
         this.forbidden = forbidden;
+        this.actionable = actionable;
 
         // Permitted and forbidden are disjoint sets
         permitted.forEach(s -> require(!forbidden.contains(s)));
@@ -38,11 +40,11 @@ public class RequestAuth {
 
     public Result authorize(Request request) {
         if (permitted.contains(request)) {
-            return Result.PERMITTED;
+            return PERMITTED;
         } else if (forbidden.contains(request)) {
-            return Result.FORBIDDEN;
+            return FORBIDDEN;
         } else if (universe.contains(request)) {
-            return Result.FORBIDDEN;
+            return FORBIDDEN;
         }
         return INVALID;
     }
@@ -73,6 +75,10 @@ public class RequestAuth {
                 TranslationConstants.AllRequestsRuleDecl.getName() + ".csv");
         Set<Request> universe = readFile(universeFile);
 
+        Path actionableFile = Path.of(dir.toString(),
+                TranslationConstants.AllActionableRequestsRuleDecl.getName() + ".csv");
+        Set<Request> actionable = readFile(actionableFile);
+
         Path permittedFile = Path.of(dir.toString(),
                 TranslationConstants.PermittedRequestsRuleDecl.getName() + ".csv");
         Set<Request> permitted = readFile(permittedFile);
@@ -80,7 +86,23 @@ public class RequestAuth {
         Path forbiddenFile = Path.of(dir.toString(),
                 TranslationConstants.ForbiddenRequestsRuleDecl.getName() + ".csv");
         Set<Request> forbidden = readFile(forbiddenFile);
-        return new RequestAuth(universe, permitted, forbidden);
+        return new RequestAuth(universe, actionable, permitted, forbidden);
+    }
+
+    public Set<Request> getAllActionableRequests() {
+        return actionable;
+    }
+
+    public Set<Request> getAllPermittedRequests() {
+        return permitted;
+    }
+
+    public Set<Request> getAllForbiddenRequests() {
+        return forbidden;
+    }
+
+    public Set<Request> getRequestUniverse() {
+        return universe;
     }
 
     @Override

@@ -41,7 +41,7 @@ jobs:
           path: webapp/coverage/
           if-no-files-found: error
           retention-days: 7
-      - name: Upload cleint test coverage
+      - name: Upload client test coverage
         if: success()
         uses: actions/upload-artifact@v4
         with:

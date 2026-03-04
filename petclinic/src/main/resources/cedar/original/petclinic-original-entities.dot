@@ -1,0 +1,41 @@
+strict digraph {
+	ordering="out"
+	node[shape=box]
+	subgraph "cluster_PetClinic::Database" {
+		label="PetClinic::Database"
+		"PetClinic::Database::\"Pets\"" [label="Pets"]
+		"PetClinic::Database::\"Visits\"" [label="Visits"]
+		"PetClinic::Database::\"Owners\"" [label="Owners"]
+	}
+	subgraph "cluster_PetClinic::WebPage" {
+		label="PetClinic::WebPage"
+		"PetClinic::WebPage::\"EditOwner\"" [label="EditOwner"]
+		"PetClinic::WebPage::\"Owners\"" [label="Owners"]
+		"PetClinic::WebPage::\"Owner\"" [label="Owner"]
+		"PetClinic::WebPage::\"Home\"" [label="Home"]
+		"PetClinic::WebPage::\"FindOwners\"" [label="FindOwners"]
+		"PetClinic::WebPage::\"AddNewPet\"" [label="AddNewPet"]
+		"PetClinic::WebPage::\"AddVisit\"" [label="AddVisit"]
+		"PetClinic::WebPage::\"Error\"" [label="Error"]
+		"PetClinic::WebPage::\"EditPet\"" [label="EditPet"]
+		"PetClinic::WebPage::\"Veterinarians\"" [label="Veterinarians"]
+		"PetClinic::WebPage::\"AddOwner\"" [label="AddOwner"]
+	}
+	subgraph "cluster_PetClinic::Action" {
+		label="PetClinic::Action"
+		"PetClinic::Action::\"EditOwner\"" [label="EditOwner"]
+		"PetClinic::Action::\"ReadFromDatabase\"" [label="ReadFromDatabase"]
+		"PetClinic::Action::\"EditPet\"" [label="EditPet"]
+		"PetClinic::Action::\"AddVisit\"" [label="AddVisit"]
+		"PetClinic::Action::\"ViewWebPage\"" [label="ViewWebPage"]
+		"PetClinic::Action::\"WriteToDatabase\"" [label="WriteToDatabase"]
+		"PetClinic::Action::\"FindOwner\"" [label="FindOwner"]
+		"PetClinic::Action::\"AddPet\"" [label="AddPet"]
+		"PetClinic::Action::\"AddOwner\"" [label="AddOwner"]
+	}
+	subgraph "cluster_PetClinic::Visitor" {
+		label="PetClinic::Visitor"
+		"PetClinic::Visitor::\"Anonymous\"" [label="Anonymous"]
+	}
+}
+

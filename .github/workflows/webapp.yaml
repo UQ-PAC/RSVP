@@ -1,4 +1,4 @@
-name: Build RSVP Web Application
+name: Build Web Application
 
 on:
   push:
@@ -32,11 +32,20 @@ jobs:
         working-directory: webapp/client
       - name: Run Tests
         run: pnpm test
-      - name: Upload test coverage
+        working-directory: webapp
+      - name: Upload server test coverage
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: code-coverage-report
+          name: server-coverage-report
           path: webapp/coverage/
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload cleint test coverage
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-coverage-report
+          path: webapp/client/coverage/
           if-no-files-found: error
           retention-days: 7

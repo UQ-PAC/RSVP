@@ -1,0 +1,51 @@
+name: Build Web Application
+
+on:
+  push:
+    paths:
+      - "webapp/**"
+      - ".github/workflows/webapp.yaml"
+  pull_request:
+    paths:
+      - "webapp/**"
+      - ".github/workflows/webapp.yaml"
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 10
+          cache: true
+      - name: Install server dependencies
+        run: pnpm install
+        working-directory: webapp
+      - name: Install client dependencies
+        run: pnpm install
+        working-directory: webapp/client
+      - name: Run Tests
+        run: pnpm test
+        working-directory: webapp
+      - name: Upload server test coverage
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-coverage-report
+          path: webapp/coverage/
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload client test coverage
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-coverage-report
+          path: webapp/client/coverage/
+          if-no-files-found: error
+          retention-days: 7

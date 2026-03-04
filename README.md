@@ -13,3 +13,8 @@ Gradle projects in `./rsvp`:
 - `app`: Java CLI
 - `policy-ast`: AST library for modelling policies and schemas in Java
 - `policy-dl`: Datalog encoding of Cedar policies
+
+## Web application
+
+Node/React application (in `./webapp`) provides a GUI for running queries using the Java CLI
+and displaying the resulting reports in a user-friendly way.

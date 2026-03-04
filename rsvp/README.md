@@ -1,5 +1,7 @@
 # RSVP Java CLI
 
+[![RSVP Java CLI](https://github.com/UQ-PAC/RSVP/actions/workflows/rsvp.yaml/badge.svg)](https://github.com/UQ-PAC/RSVP/actions/workflows/rsvp.yaml)
+
 ## Prerequisite: Cedar Java
 
 This project depends on [a fork of CedarJava](https://github.com/rebecca-odonoghue/cedar-java) which

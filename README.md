@@ -1,7 +1,15 @@
 # Resilient and Secure systems through Verified security Policies (RSVP)
 
-Policy verification
+## Policy generation
 
-- policygen : Cedar policy (random) generation
-- rsvp : policy AST library
-- rsvp-dl: Datalog encoding of Cedar policies
+A Gradle project (in `./policygen`) for generating random Cedar policies for testing purposes.
+
+## Java CLI and libraries for policy verification
+
+[![RSVP Java CLI](https://github.com/UQ-PAC/RSVP/actions/workflows/rsvp.yaml/badge.svg)](https://github.com/UQ-PAC/RSVP/actions/workflows/rsvp.yaml)
+
+Gradle projects in `./rsvp`:
+
+- `app`: Java CLI
+- `policy-ast`: AST library for modelling policies and schemas in Java
+- `policy-dl`: Datalog encoding of Cedar policies

@@ -4,20 +4,16 @@ This folder contains the Cedar files for both the original and RSVP's versions o
 
 ## Original
 
-Folder `original`.
-All tests should return `ALLOW`.
-
-### Run Tests
+Folder `./original`.
 
 To run all tests: `./petclinic-original-requests.sh`.
 
-#### Run Cedar Schema Validation
+All tests should return `ALLOW`.
 
-`cedar validate -s petclinic-original-schema.cedarschema -p petclinic-original-policy.cedar`
+## RSVP
 
-#### Run Cedar Authorization Tests
+Folder `./rsvp`.
 
-- `cedar authorize --policies petclinic-original-policy.cedar --schema petclinic-original-schema.cedarschema --entities petclinic-original-entities.json --request-json ALLOW/visitor-findowner-findowners.json`
-- `cedar authorize --policies petclinic-original-policy.cedar --schema petclinic-original-schema.cedarschema --entities petclinic-original-entities.json --request-json ALLOW/visitor-findowner-home.json`
-- `cedar authorize --policies petclinic-original-policy.cedar --schema petclinic-original-schema.cedarschema --entities petclinic-original-entities.json --request-json ALLOW/visitor-findowner-owner.json`
-- `cedar authorize --policies petclinic-original-policy.cedar --schema petclinic-original-schema.cedarschema --entities petclinic-original-entities.json --request-json ALLOW/visitor-viewwebpage-home.json`
+### Run Tests
+
+To run all tests: `./petclinic-rsvp-requests.sh`.

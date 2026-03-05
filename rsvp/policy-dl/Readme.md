@@ -41,3 +41,28 @@ A preliminary example of Datalog encoding using policies, schema an entities of 
 + [Policies](examples/pohotoapp/policy.cedar)
 + [Entities](examples/pohotoapp/entities.json)
 + [Souffle Datalog Encoding](examples/pohotoapp/auth.dl)
+
+## Initial prototype 
+
+The initial prototype tool is available via the `policy-dl-all.jar` shadow jar. 
+For the moment the tool accepts the following arguments:
++ `--schema`: Cedar schema (Cedar)
++ `--policies`: Cedar policies (Cedar)
++ `--entities`: Cedar entities (Json)
++ `--requests`: Requests file ([see example](../examples/photoapp/requests.tx)) 
++ `--datalog-dir`: An (optional) directory for datalog outputs 
+
+The tool translates Cedar components to Souffle Datalog specification, executes it
+and loads the results back to Java. The resulting information contains all forbidden and
+permitted requests (under word assumption). Finally, the tool reads the provided requests
+and outputs the results (as well as comparison with specified expectations).
+
+Example (assuming `RSVP/rsvp` as a current working directory):
+```
+java -jar policy-dl/build/libs/policy-dl-all.jar \
+    --schema examples/photoapp/schema.cedarschema \
+    --policies examples/photoapp/policy.cedar \
+    --entities examples/photoapp/entities.json \
+    --requests examples/photoapp/requests.tx \
+    --datalog-dir /tmp/rsvp-dl
+```

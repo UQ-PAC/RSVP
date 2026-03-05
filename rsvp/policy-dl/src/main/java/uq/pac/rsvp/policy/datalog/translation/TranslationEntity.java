@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import com.cedarpolicy.model.entity.Entity;
 import com.cedarpolicy.value.*;
+import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
 import java.util.ArrayList;
@@ -11,12 +12,19 @@ import java.util.List;
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
 /**
- * Translation of an entity into a set of datalog facts
+ * Translation of a concrete entities to Datalog. As per entity definition
+ * (see {@link EntityTypeDefinition}) a concrete entity translates into a collection
+ * of datalog facts for relations provided by the definition.
  */
 public class TranslationEntity {
-
+    /**
+     * The generated list of facts including entity and attribute relations facts
+     */
     private final List<DLFact> facts;
-    private final TranslationEntityType definition;
+    /**
+     * Reference of the definition of this entity
+     */
+    private final TranslationEntityDefinition definition;
 
     public static DLTerm getEUIDLiteral(EntityUID id) {
         String prefix = id.getType().toString();
@@ -84,7 +92,7 @@ public class TranslationEntity {
         return new DLProgram(statements).toString();
     }
 
-    public TranslationEntityType getEntityTypeDefinition() {
+    public TranslationEntityDefinition getEntityTypeDefinition() {
         return definition;
     }
 }

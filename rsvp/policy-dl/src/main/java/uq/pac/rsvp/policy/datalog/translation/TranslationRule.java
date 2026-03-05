@@ -9,10 +9,12 @@ import java.util.List;
 
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
+/**
+ * Helper class associating rule declarations with statements defining that rule
+ */
 public class TranslationRule {
     private final DLRuleDecl decl;
     private final List<DLStatement> contents;
-
 
     public TranslationRule(DLRuleDecl decl, DLStatement ...statements) {
         this(decl, Arrays.stream(statements).toList());

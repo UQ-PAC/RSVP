@@ -116,10 +116,8 @@ public class DLProgram extends DLNode {
         }
 
         Files.createDirectories(baseDir);
-        Path authDl = Path.of(baseDir.toString(), "auth.dl");
-
-        Files.writeString(authDl, stringify());
-
+        Path authDl = Path.of("auth.dl");
+        Files.writeString(Path.of(baseDir.toString(), authDl.toString()), stringify());
         ProcessBuilder builder = new ProcessBuilder();
 
         Process process = builder.directory(baseDir.toFile())

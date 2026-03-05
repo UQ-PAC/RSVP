@@ -48,6 +48,6 @@ public class DriverOptions extends OptionsBase {
             abbrev = 'D',
             help = "A directory with Datalog outputs",
             category = "input",
-            defaultValue = "/tmp/rsvp-dl")
+            defaultValue = "rsvp-dl-tmp")
     public String datalogDir;
 }

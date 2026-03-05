@@ -10,53 +10,32 @@ import java.util.stream.Collectors;
  *   Directive ::= ('.input' | '.output') IDENT '(' [IDENT = (IDENT | STRING)]* ')'
  * </code>
  */
-public class DLDirective extends DLStatement {
-    public enum Kind {
-        INPUT("input"),
-        OUTPUT("output");
+public abstract class DLDirective extends DLStatement {
 
-        private final String value;
-
-        Kind(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return value;
-        }
-    }
-
-    private final Kind kind;
-    private final String relation;
+    private final DLRuleDecl rule;
     private final String dest;
     private final Map<String, String> properties;
 
-    public DLDirective(Kind kind, String relation, String dest, Map<String, String> properties) {
-        this.kind = kind;
-        this.relation = relation;
+    private static final String DEFAULT_DEST = "file";
+
+    public DLDirective(DLRuleDecl rule, String dest, Map<String, String> properties) {
+        this.rule = rule;
         this.dest = dest;
         this.properties = Map.copyOf(properties);
     }
 
-    public DLDirective(Kind kind, String relation, String dest) {
-        this(kind, relation, dest, Collections.emptyMap());
+    protected abstract String getKind();
+
+    public DLDirective(DLRuleDecl rule, String dest) {
+        this(rule, dest, Collections.emptyMap());
     }
 
-    public DLDirective(Kind kind, String relation) {
-        this(kind, relation, "file");
+    public DLDirective(DLRuleDecl decl) {
+        this(decl, DEFAULT_DEST);
     }
 
-    public DLDirective(Kind kind, DLRuleDecl decl) {
-        this(kind, decl.getName(), "file");
-    }
-
-    public Kind getKind() {
-        return kind;
-    }
-
-    public String getRelation() {
-        return relation;
+    public DLRuleDecl getRule() {
+        return rule;
     }
 
     public String getDest() {
@@ -75,6 +54,6 @@ public class DLDirective extends DLStatement {
         if (!propStr.isEmpty()) {
             propStr = ", " + propStr;
         }
-        return ".%s %s(IO=%s%s)".formatted(kind, relation, dest, propStr);
+        return ".%s %s(IO=%s%s)".formatted(getKind(), rule.getName(), dest, propStr);
     }
 }

@@ -93,7 +93,9 @@ public class Driver {
                 .toList();
 
         DLProgram translation = Translation.translate(schemaFile, policyFile, entitiesFile);
-        RequestAuth auth = translation.execute(Path.of(dlDir));
+        Path dlPath = Path.of(dlDir);
+        translation.execute(dlPath);
+        RequestAuth auth = RequestAuth.load(dlPath);
 
         if (requests.isEmpty()) {
             System.out.println(colour(RED, "No requests found"));

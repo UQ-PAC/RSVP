@@ -39,12 +39,12 @@ public class DLRuleDecl extends DLStatement {
         return name;
     }
 
-    public List<DLDeclTerm> getTerms() {
+    public List<DLDeclTerm> getDeclTerms() {
         return terms;
     }
 
     public int arity() {
-        return getTerms().size();
+        return getDeclTerms().size();
     }
 
     @Override

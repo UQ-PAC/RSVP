@@ -1,5 +1,7 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
+import uq.pac.rsvp.policy.datalog.ast.DLRuleDecl;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -66,26 +68,22 @@ public class RequestAuth {
         return set;
     }
 
+    private static Set<Request> loadRequests(Path dir, DLRuleDecl decl) {
+        Path csv = Path.of(dir.toString(), decl.getName() + ".csv");
+        if (Files.exists(csv)) {
+            throw new TranslationError("Target CSV file %s does not exist or not a directory".formatted(csv));
+        }
+        return readFile(csv);
+    }
+
     public static RequestAuth load(Path dir) {
         if (!Files.exists(dir) ||  !Files.isDirectory(dir)) {
             throw new TranslationError("Target directory %s does not exist or not a directory".formatted(dir));
         }
-
-        Path universeFile = Path.of(dir.toString(),
-                TranslationConstants.AllRequestsRuleDecl.getName() + ".csv");
-        Set<Request> universe = readFile(universeFile);
-
-        Path actionableFile = Path.of(dir.toString(),
-                TranslationConstants.AllActionableRequestsRuleDecl.getName() + ".csv");
-        Set<Request> actionable = readFile(actionableFile);
-
-        Path permittedFile = Path.of(dir.toString(),
-                TranslationConstants.PermittedRequestsRuleDecl.getName() + ".csv");
-        Set<Request> permitted = readFile(permittedFile);
-
-        Path forbiddenFile = Path.of(dir.toString(),
-                TranslationConstants.ForbiddenRequestsRuleDecl.getName() + ".csv");
-        Set<Request> forbidden = readFile(forbiddenFile);
+        Set<Request> universe = loadRequests(dir, TranslationConstants.AllRequestsRuleDecl);
+        Set<Request> actionable = loadRequests(dir, TranslationConstants.AllActionableRequestsRuleDecl);
+        Set<Request> permitted = loadRequests(dir, TranslationConstants.PermittedRequestsRuleDecl);
+        Set<Request> forbidden = loadRequests(dir, TranslationConstants.ForbiddenRequestsRuleDecl);
         return new RequestAuth(universe, actionable, permitted, forbidden);
     }
 

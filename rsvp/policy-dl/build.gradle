@@ -17,3 +17,7 @@ application {
 shadowJar {
     mainClass = 'uq.pac.rsvp.policy.datalog.driver.Driver'
 }
+
+test {
+    systemProperties 'test.builddir': layout.buildDirectory.asFile.get()
+}

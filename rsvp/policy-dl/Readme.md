@@ -34,57 +34,10 @@ The above example shows universal (1) and existential (2) quantification for som
 combination of `a` and `p` <expr> evaluates to _true_ (wrt some set of entities). Respectively,
 (2) holds as long as there exists at least one pair `(a, p)` for which `<expr>` is _true_.
 
-## Encoding inputs
-
-For correct encoding of Cedar policies we assume a fixed set of entities (representing the world),
-a Cedar policy and its corresponding schema. Before encoding, the provided set of entities and
-the policy are assumed are validated against the schema.
-
 ## Encoding
 
-A complete example of Datalog encoding using policies, schema an entities of an example application
+A preliminary example of Datalog encoding using policies, schema an entities of an example application
 + [Schema](examples/pohotoapp/schema.cedarschema)
 + [Policies](examples/pohotoapp/policy.cedar)
 + [Entities](examples/pohotoapp/entities.json)
 + [Souffle Datalog Encoding](examples/pohotoapp/auth.dl)
-
-# Cedar Language Subset
-
-## Cedar Policies
-
-#bclose
-    ## Principal Scope
-
-```
-principal
-principal == Entity
-principal is Type
-principal in Entity          // Unsupported
-principal is Type in Entity  // Unsupported
-```
-
-### Resource Scope
-
-```
-resource 
-resource == Entity
-resource is Type
-resource in Entity          // Unsupported
-resource is Type in Entity  // Unsupported
-```
-
-### Action Scope
-
-```
-action
-action == Entity
-action in Entity                 // Unsupported
-action in [ Entity, ..., Entity] // Unsupported
-```
-
-### Conditions
-
-TBD
-
-## Cedar Schema
-

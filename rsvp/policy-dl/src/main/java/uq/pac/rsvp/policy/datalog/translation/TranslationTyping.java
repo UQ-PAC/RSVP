@@ -16,6 +16,9 @@ import static uq.pac.rsvp.policy.ast.expr.VariableExpression.Reference.*;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationError.error;
 import static uq.pac.rsvp.policy.datalog.util.Util.required;
 
+/**
+ * Type inference during translation
+ */
 public class TranslationTyping {
     private final HashMultimap<VariableExpression.Reference, String> typing;
     private final Schema schema;
@@ -25,12 +28,12 @@ public class TranslationTyping {
         this.schema = schema;
 
         schema.entityTypeNames().forEach(e -> {
-                typing.put(Principal, e);
-                typing.put(Resource, e);
+            typing.put(Principal, e);
+            typing.put(Resource, e);
         });
 
         schema.actionNames().forEach(a -> {
-                typing.put(Action, a);
+            typing.put(Action, a);
         });
 
         Stream.of(Principal, Resource, Action).forEach(v -> {

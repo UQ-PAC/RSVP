@@ -12,6 +12,9 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Build and test and run a datalog program
+ */
 public class DLProgramTest {
 
     private final static String TEST = """

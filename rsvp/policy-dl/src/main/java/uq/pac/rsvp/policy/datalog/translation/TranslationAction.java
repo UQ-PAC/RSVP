@@ -8,10 +8,32 @@ import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Translation of actions defined in Cedar Schema to datalog.
+ * The translation consists of 4 relations
+ *
+ * <ul>
+ *     <li> Action relation: a unary relation named 'Action' over action names in the input schema </li>
+ *     <li> Action/Principal relation: a binary relation mapping actions to principal entities the action applies to </li>
+ *     <li> Action/Resource relation: a binary relation mapping actions to resource entities the action applies to </li>
+ *     <li> Actionable Requests: a ternary relation over principals, resources and actions that defines
+ *            the space of all valid requests according to 'appliesTo' part of actions in the schema </li>
+ * </ul>
+ */
 public class TranslationAction {
+    /** Action relation */
     private final TranslationRule action;
+    /**
+     * Action/Principal relation
+     */
     private final TranslationRule actionPrincipal;
+    /**
+     * Action/Resource relation
+     */
     private final TranslationRule actionResource;
+    /**
+     * All actionable requests relation
+    */
     private final TranslationRule actionableRequests;
 
     public TranslationAction(TranslationSchema translationSchema) {

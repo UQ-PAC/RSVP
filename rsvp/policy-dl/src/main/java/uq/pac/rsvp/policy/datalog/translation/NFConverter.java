@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Converting a Cedar expression to a normal form
+ * Converting a Cedar expression to DNF
  */
 public class NFConverter extends ValueVisitorAdapter<Formula> {
     private final Map<String, Expression> cache;

@@ -5,18 +5,18 @@ import uq.pac.rsvp.policy.ast.schema.Schema;
 import java.util.*;
 
 /**
- * Translation for the entire schema (presently a collection of entity declarations)
+ * Translation for the entire schema (presently a collection of entity type definitions)
  */
 public class TranslationSchema {
-    private final Map<String, TranslationEntityType> entityTypes;
+    private final Map<String, TranslationEntityDefinition> entityTypes;
     private final Schema schema;
 
     TranslationSchema(Schema schema) {
         this.schema = schema;
-        Map<String, TranslationEntityType> data = new HashMap<>();
+        Map<String, TranslationEntityDefinition> data = new HashMap<>();
         schema.entityTypeNames().stream()
                 .map(schema::getEntityType)
-                .map(TranslationEntityType::new)
+                .map(TranslationEntityDefinition::new)
                 .forEach(t -> {
                     String tn = t.getName();
                     if (data.containsKey(tn)) {
@@ -31,11 +31,11 @@ public class TranslationSchema {
         return schema;
     }
 
-    public TranslationEntityType getTranslationEntityType(String tn) {
+    public TranslationEntityDefinition getTranslationEntityType(String tn) {
         return entityTypes.get(tn);
     }
 
-    public Collection<TranslationEntityType> getTranslationEntityTypes() {
+    public Collection<TranslationEntityDefinition> getTranslationEntityTypes() {
         return entityTypes.values();
     }
 

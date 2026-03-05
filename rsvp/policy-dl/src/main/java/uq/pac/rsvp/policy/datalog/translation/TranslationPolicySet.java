@@ -5,6 +5,9 @@ import uq.pac.rsvp.policy.ast.PolicySet;
 
 import java.util.*;
 
+/**
+ * Translation of a policy set as a collection of datalog statements by each policy
+ */
 public class TranslationPolicySet {
     private final List<TranslationPolicy> permit;
     private final List<TranslationPolicy> forbid;

@@ -9,8 +9,10 @@ import static uq.pac.rsvp.policy.datalog.util.Util.required;
 import static uq.pac.rsvp.policy.ast.expr.VariableExpression.Reference.*;
 
 /**
- * This visitor expects (negated) predicate expressions coming from some normal form, i.e.,
- *  - There are no conjunctions or disjunction
+ * Main translation visitor converting a Cedar expression to a set of rules
+ * <p>
+ * The visitor expects (potentially negated) predicate expressions coming from some normal form, i.e.,
+ *  - There are no conjunctions or disjunctions
  *  - An expression can be negated but once only
  */
 public class TranslationVisitor extends TranslationVoidAdapter {

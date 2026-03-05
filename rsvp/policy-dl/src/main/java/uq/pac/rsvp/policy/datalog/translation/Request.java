@@ -1,5 +1,14 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
+/**
+ * A class representing a cedar request as a triple {@code} (principal, resource action) {@code}.
+ * <p>
+ * Internally a request is represented as a single string, where components are separated
+ * by '|' and double quotes are omitted.
+ * <p>
+ * For performance reasons validation of the strings the requests are constructed
+ * from is omitted.
+ */
 public class Request {
     private final String request;
     private static final String DELIMITER = TranslationConstants.OUTPUT_DELIMITER;

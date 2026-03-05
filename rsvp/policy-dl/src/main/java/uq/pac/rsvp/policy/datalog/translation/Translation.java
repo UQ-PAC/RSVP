@@ -73,7 +73,7 @@ public class Translation {
 
         Multimap<String, DLFact> facts = translationEntities.getFacts();
 
-        for (TranslationEntityType type : translationSchema.getTranslationEntityTypes()) {
+        for (TranslationEntityDefinition type : translationSchema.getTranslationEntityTypes()) {
             builder.comment("Cedar entity: " + type.getName());
             builder.add(type.getEntityRuleDecl());
             builder.add(facts.get(type.getEntityRuleDecl().getName()));

@@ -11,13 +11,51 @@ import uq.pac.rsvp.policy.datalog.util.Util;
 
 import java.util.*;
 
-public class TranslationEntityType {
+/**
+ * Translation of a Cedar entity definition provided via Cedar schema to Datalog
+ * <p>
+ * An entity definition translates into two types of rule declarations
+ * <ul>
+ *     <li> Entity relation: A unary relation named after the type of the entity that tracks
+ *          entities of a given type </li>
+ *      <li>
+ *          Attribute relations: A collection of binary relations that map entities to their attributes
+ *      </li>
+ * </ul>
+ * For example, a schema entity definition
+ * <pre>
+ * entity Account = {
+ *     name: String,
+ *     age: Long
+ * };
+ * </pre>
+ * Translates to
+ * <pre>
+ * .decl Account(x: symbol)
+ * .decl Account_attr_name(x: symbol, y: symbol)
+ * .decl Account_attr_agr(x: symbol, y: number)
+ * </pre>
+ */
+public class TranslationEntityDefinition {
+    /**
+     * Fully-qualified entity type name
+     */
     private final String name;
+    /**
+     * The underlying schema definition
+     */
     private final EntityTypeDefinition entity;
+    /**
+     * Entity relation
+     */
     private final DLRuleDecl relation;
+    /**
+     * Named attribute relations. This map associates property names to
+     * translation attributes that capture details of attribute relations
+     */
     private final Map<String, TranslationAttribute> attributes;
 
-    public TranslationEntityType(EntityTypeDefinition entity) {
+    public TranslationEntityDefinition(EntityTypeDefinition entity) {
         this.entity = entity;
         this.name = entity.getName();
         String relationName = name.replace(':', '_');

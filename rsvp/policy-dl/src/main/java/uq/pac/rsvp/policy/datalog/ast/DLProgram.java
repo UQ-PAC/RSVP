@@ -1,6 +1,5 @@
 package uq.pac.rsvp.policy.datalog.ast;
 
-import uq.pac.rsvp.policy.datalog.translation.RequestAuth;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 
 import java.io.BufferedReader;
@@ -16,14 +15,20 @@ import java.util.stream.Stream;
  * Datalog program as an ordered list of statements
  */
 public class DLProgram extends DLNode {
+    private final String name;
     private final List<DLStatement> statements;
 
-    public DLProgram(List<DLStatement> statements) {
+    public DLProgram(String name, List<DLStatement> statements) {
+        this.name = name;
         this.statements = statements.stream().toList();
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public DLProgram(List<DLStatement> statements) {
+        this(null, statements);
+    }
+
+    public static Builder builder(String name) {
+        return new Builder(name);
     }
 
     @Override
@@ -45,9 +50,11 @@ public class DLProgram extends DLNode {
 
     public static class Builder {
         private final List<DLStatement> statements;
+        private final String name;
 
-        public Builder() {
+        public Builder(String name) {
             this.statements = new ArrayList<>();
+            this.name = name;
         }
 
         public Builder add(DLStatement stmt) {
@@ -80,7 +87,7 @@ public class DLProgram extends DLNode {
         }
 
         public DLProgram build() {
-            return new DLProgram(statements);
+            return new DLProgram(name, statements);
         }
 
         public Builder reset() {
@@ -89,51 +96,30 @@ public class DLProgram extends DLNode {
         }
     }
 
-    public RequestAuth execute() throws IOException, InterruptedException {
-        return execute(null);
+    public String getName() {
+        return name;
     }
 
-    private static void removeTempDir(Path dir) throws IOException {
-        if (dir == null) {
-            return;
-        }
-        try (Stream<Path> files = Files.list(dir)) {
-            for (Path path : files.toList()) {
-                Files.delete(path);
-            }
-        }
-        Files.delete(dir);
-    }
-
-    public RequestAuth execute(Path dir) throws IOException, InterruptedException {
-        Path baseDir = dir;
-        Path removeDir = null;
-        if (dir == null) {
-            baseDir = Files.createTempDirectory("rsvp");
-            removeDir = baseDir;
-        } else {
-            Files.createDirectories(baseDir);
+    public void execute(Path baseDir) throws IOException, InterruptedException {
+        String name = this.getName();
+        if (name == null || name.isEmpty()) {
+            throw new TranslationError("Unnamed program cannot be executed");
         }
 
         Files.createDirectories(baseDir);
-        Path authDl = Path.of("auth.dl");
-        Files.writeString(Path.of(baseDir.toString(), authDl.toString()), stringify());
+        Path programDl = Path.of(name + ".dl");
+        Files.writeString(Path.of(baseDir.toString(), programDl.toString()), stringify());
         ProcessBuilder builder = new ProcessBuilder();
 
         Process process = builder.directory(baseDir.toFile())
-                .command("souffle", "-j", "auto", authDl.toString())
+                .command("souffle", "-j", "auto", programDl.toString())
                 .start();
 
         int exitCode = process.waitFor();
         if (exitCode != 0) {
-            removeTempDir(removeDir);
             BufferedReader error =
                     new BufferedReader(new InputStreamReader(process.getErrorStream()));
             throw new TranslationError(error.lines().collect(Collectors.joining("\n")));
-        } else {
-            RequestAuth auth = RequestAuth.load(baseDir);
-            removeTempDir(removeDir);
-            return auth;
         }
     }
 }

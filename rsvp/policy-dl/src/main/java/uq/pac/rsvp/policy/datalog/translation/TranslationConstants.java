@@ -180,7 +180,8 @@ public class TranslationConstants {
                 AllRequestsRuleDecl));
 
         return rules.stream()
-                .map(rd -> new DLDirective(DLDirective.Kind.OUTPUT, rd.getName(), OUTPUT_DEST, options))
+                .map(rd -> new DLOutputDirective(rd, OUTPUT_DEST, options))
+                .map(rd -> (DLDirective) rd)
                 .toList();
     }
 }

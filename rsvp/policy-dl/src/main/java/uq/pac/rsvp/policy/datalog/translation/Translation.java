@@ -68,7 +68,7 @@ public class Translation {
         TranslationSchema translationSchema = new TranslationSchema(schema);
         TranslationEntitySet translationEntities = new TranslationEntitySet(entities, translationSchema);
         TranslationPolicySet translationPolicies = new TranslationPolicySet(policies, translationSchema);
-        DLProgram.Builder builder = new DLProgram.Builder();
+        DLProgram.Builder builder = new DLProgram.Builder("auth.dl");
         List<DLRuleDecl> output = new ArrayList<>();
 
         Multimap<String, DLFact> facts = translationEntities.getFacts();

@@ -1,27 +1,28 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.exception.AuthException;
 import com.cedarpolicy.model.exception.InternalException;
 import org.junit.jupiter.api.Test;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
-import uq.pac.rsvp.policy.ast.schema.Schema;
-import uq.pac.rsvp.policy.datalog.ast.*;
+import uq.pac.rsvp.policy.datalog.ast.DLProgram;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static uq.pac.rsvp.policy.datalog.DLTest.pathOf;
+import static uq.pac.rsvp.policy.datalog.TestUtil.pathOf;
 
 public class TranslationTest {
 
     private static final Path ENTITIES = pathOf("photoapp/entities.json");
     private static final Path POLICIES = pathOf("photoapp/policy.cedar");
     private static final Path SCHEMA = pathOf("photoapp/schema.cedarschema");
+
+    @Test
+    void tt() {
+        System.out.println(System.getProperty("test.builddir"));
+    }
 
     PolicySet getPolicySet(Path filename) throws IOException, InternalException {
         Map<String, Policy> policies = new HashMap<>();
@@ -47,13 +48,5 @@ public class TranslationTest {
     @Test
     void TranslationDriverTest() throws IOException, AuthException, InterruptedException {
         DLProgram program = Translation.translate(SCHEMA, POLICIES, ENTITIES);
-
-        Entities entities = Entities.parse(ENTITIES);
-        com.cedarpolicy.model.schema.Schema schema =
-                new com.cedarpolicy.model.schema.Schema(Files.readString(SCHEMA));
-        com.cedarpolicy.model.policy.PolicySet policies =
-                com.cedarpolicy.model.policy.PolicySet.parsePolicies(POLICIES);
-
-        RequestAuth auth = program.execute();
     }
 }

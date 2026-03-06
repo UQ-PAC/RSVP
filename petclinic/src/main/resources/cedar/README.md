@@ -10,13 +10,15 @@ To run all tests: `./petclinic-original-requests.sh`.
 
 All tests should return `ALLOW`.
 
+Request JSON files are named following the convention: `<principal>-<action>-<resource>.json`.
+
 ## RSVP
 
 Folder `./rsvp`.
 
-### Run Tests
-
 To run all tests: `./petclinic-rsvp-requests.sh`.
+
+Request JSON files are named following the convention: `<principal>-<action>-<resource or resource attribute>-<additional resource attribute(s)>.json`.
 
 ## Graphviz Visualisation of Entities
 

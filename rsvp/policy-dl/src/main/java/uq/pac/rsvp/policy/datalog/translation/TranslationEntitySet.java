@@ -6,6 +6,7 @@ import com.google.common.collect.Multimap;
 import uq.pac.rsvp.policy.datalog.ast.DLFact;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Translating a collection of entities into a set of datalog facts
@@ -14,10 +15,20 @@ public class TranslationEntitySet {
     private final List<TranslationEntity> entities;
 
     public TranslationEntitySet(Entities entities, TranslationSchema schema) {
-        this.entities = entities.getEntities()
+        List<TranslationEntity> entityList = entities.getEntities()
                 .stream()
                 .map(e -> new TranslationEntity(e, schema))
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        // Generate undefined (UID-only) entities omitting Enum entities
+        // that have pre-defined names
+        for (TranslationEntityDefinition def : schema.getDefinitions()) {
+            if (def.getEntityDefinition().getEntityNamesEnum().isEmpty()) {
+                entityList.add(new TranslationEntity(def, TranslationConstants.getUndefinedEUID(def)));
+            }
+        }
+
+        this.entities = List.copyOf(entityList);
     }
 
     public List<TranslationEntity> getTranslationEntities() {

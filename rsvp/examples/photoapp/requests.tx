@@ -1,32 +1,32 @@
 # Principal    Resource          Action
 
 # View
-Account::Alice   Photo::AliceMeadow     Action::viewPhoto    PERMITTED
-Account::Bob     Photo::AliceMeadow     Action::viewPhoto    PERMITTED
-Account::Carl    Photo::AliceMeadow     Action::viewPhoto    PERMITTED
-Account::Tim     Photo::AliceMeadow     Action::viewPhoto    PERMITTED
-Account::Alice   Photo::AliceHotel      Action::viewPhoto    PERMITTED
-Account::Bob     Photo::AliceHotel      Action::viewPhoto    PERMITTED
-Account::Carl    Photo::AliceHotel      Action::viewPhoto    FORBIDDEN
-Account::Tim     Photo::AliceHotel      Action::viewPhoto    PERMITTED
-Account::Alice   Photo::AlicePassport   Action::viewPhoto    PERMITTED
-Account::Bob     Photo::AlicePassport   Action::viewPhoto    FORBIDDEN
-Account::Carl    Photo::AlicePassport   Action::viewPhoto    FORBIDDEN
-Account::Tim     Photo::AlicePassport   Action::viewPhoto    PERMITTED
+Account::Alice   Photo::AliceMeadow     Action::viewPhoto    ALLOW
+Account::Bob     Photo::AliceMeadow     Action::viewPhoto    ALLOW
+Account::Carl    Photo::AliceMeadow     Action::viewPhoto    ALLOW
+Account::Tim     Photo::AliceMeadow     Action::viewPhoto    ALLOW
+Account::Alice   Photo::AliceHotel      Action::viewPhoto    ALLOW
+Account::Bob     Photo::AliceHotel      Action::viewPhoto    ALLOW
+Account::Carl    Photo::AliceHotel      Action::viewPhoto    DENY
+Account::Tim     Photo::AliceHotel      Action::viewPhoto    ALLOW
+Account::Alice   Photo::AlicePassport   Action::viewPhoto    ALLOW
+Account::Bob     Photo::AlicePassport   Action::viewPhoto    DENY
+Account::Carl    Photo::AlicePassport   Action::viewPhoto    DENY
+Account::Tim     Photo::AlicePassport   Action::viewPhoto    ALLOW
 
 # Create
-Account::Alice   Account::Alice         Action::createAlbum  PERMITTED
-Account::Alice   Account::Bob           Action::createAlbum  FORBIDDEN
-Account::Tim     Account::Tim           Action::createAlbum  FORBIDDEN
-Account::Tim     Account::Alice         Action::createAlbum  PERMITTED
+Account::Alice   Account::Alice         Action::createAlbum  ALLOW
+Account::Alice   Account::Bob           Action::createAlbum  DENY
+Account::Tim     Account::Tim           Action::createAlbum  DENY
+Account::Tim     Account::Alice         Action::createAlbum  ALLOW
 
 # Remove
-Account::Alice   Album::AliceVacation   Action::removeAlbum  PERMITTED
-Account::Tim     Album::AliceVacation   Action::removeAlbum  PERMITTED
-Account::Bob     Album::AliceVacation   Action::removeAlbum  FORBIDDEN
+Account::Alice   Album::AliceVacation   Action::removeAlbum  ALLOW
+Account::Tim     Album::AliceVacation   Action::removeAlbum  ALLOW
+Account::Bob     Album::AliceVacation   Action::removeAlbum  DENY
 
 # Upload
-Account::Alice   Album::AliceVacation   Action::uploadPhoto  PERMITTED
-Account::Alice   Album::BobVacation     Action::uploadPhoto  FORBIDDEN
-Account::Tim     Album::BobVacation     Action::uploadPhoto  FORBIDDEN
+Account::Alice   Album::AliceVacation   Action::uploadPhoto  ALLOW
+Account::Alice   Album::BobVacation     Action::uploadPhoto  DENY
+Account::Tim     Album::BobVacation     Action::uploadPhoto  DENY
 

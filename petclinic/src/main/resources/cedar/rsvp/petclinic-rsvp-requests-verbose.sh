@@ -29,8 +29,9 @@ authorise() {
     declare -a result=()
 
     for entry in "${out[@]}"; do
-        if [[ "$entry" =~ policy[[:digit:]]+|^ALLOW$|^DENY$ ]]; then
-            result+=("$entry")
+        if [[ "$entry" =~ ^policy[[:digit:]]+$|^ALLOW$|^DENY$|^Policy:.*\.$ ]]; then
+            temp=$(sed -e 's/^Policy\:[[:space:]]/\"/' -e 's/\.$/\"/' <<< "$entry")
+            result+=("$temp")
         fi
     done
 

@@ -107,7 +107,7 @@ public class DLProgram extends DLNode {
         }
 
         Files.createDirectories(baseDir);
-        Path programDl = Path.of(name + ".dl");
+        Path programDl = Path.of(name.endsWith( ".dl") ? name : name + ".dl");
         Files.writeString(Path.of(baseDir.toString(), programDl.toString()), stringify());
         ProcessBuilder builder = new ProcessBuilder();
 

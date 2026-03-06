@@ -32,8 +32,12 @@ public class TestUtil {
     /**
      * Path of a system resource
      */
-    public static Path pathOf(String resource) {
+    public static Path resourcePath(String resource) {
         return Path.of(TestUtil.class.getClassLoader().getResource(resource).getPath());
+    }
+
+    public static Path getDatalogDir(String ...names) {
+        return Path.of(DLTESTDIR.toString(), names);
     }
 
     /**
@@ -60,5 +64,4 @@ public class TestUtil {
         }
         Files.delete(dir);
     }
-
 }

@@ -22,32 +22,24 @@ entity Photo = {
 action viewPhoto appliesTo {
     principal: Account,
     resource: Photo,
-    context: {
-        authenticated: Bool
-    }
+    context: { }
 };
 
 action removeAlbum appliesTo {
     principal: Account,
     resource: Album,
-    context: {
-        authenticated: Bool
-    }
+    context: { }
 };
 
 action uploadPhoto appliesTo {
     principal: Account,
     resource: Album,
-    context: {
-        authenticated: Bool
-    }
+    context: { }
 };
 
 action createAlbum appliesTo {
     principal: Account,
     resource: Account,
-    context: {
-        authenticated: Bool,
-    }
+    context: { }
 };
 

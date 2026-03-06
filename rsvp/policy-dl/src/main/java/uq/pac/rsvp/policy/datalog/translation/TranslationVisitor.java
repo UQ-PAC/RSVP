@@ -55,7 +55,7 @@ public class TranslationVisitor extends TranslationVoidAdapter {
                 expressions.addAll(lhs.getExpressions());
                 expressions.addAll(rhs.getExpressions());
                 DLConstraint.Operator op = negated ?
-                        DLConstraint.Operator.EQ : DLConstraint.Operator.NEQ;
+                        DLConstraint.Operator.NEQ : DLConstraint.Operator.EQ;
                 expressions.add(new DLConstraint(lhsOp, rhsOp, op));
             }
             case BinaryExpression.BinaryOp.Is -> {

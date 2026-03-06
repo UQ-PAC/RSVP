@@ -16,9 +16,7 @@ import uq.pac.rsvp.policy.datalog.util.Logger;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.fusesource.jansi.Ansi.Color.*;
@@ -79,7 +77,7 @@ public class TranslationTest {
                 assertTrue(rsvpDecision == RequestAuth.Result.DENY ||
                         rsvpDecision == RequestAuth.Result.ALLOW);
 
-                AuthorizationRequest cedarRequest  = rsvpRequest.getCedarRequest(cedarSchema);
+                AuthorizationRequest cedarRequest = rsvpRequest.getCedarRequest(cedarSchema);
                 AuthorizationResponse cedarResponse =
                         cedarAuth.isAuthorized(cedarRequest, cedarPolicies, cedarEntities);
                 assertEquals(AuthorizationResponse.SuccessOrFailure.Success, cedarResponse.type, () -> """

@@ -35,7 +35,7 @@ public class TranslationSchema {
         return entityTypes.get(tn);
     }
 
-    public Collection<TranslationEntityDefinition> getTranslationEntityTypes() {
+    public Collection<TranslationEntityDefinition> getDefinitions() {
         return entityTypes.values();
     }
 

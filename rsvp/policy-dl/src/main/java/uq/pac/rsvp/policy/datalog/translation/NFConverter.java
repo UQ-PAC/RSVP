@@ -66,6 +66,9 @@ public class NFConverter extends ValueVisitorAdapter<Formula> {
             case Or or -> fromStream(or.stream(), BinaryExpression.BinaryOp.Or);
             case And and -> fromStream(and.stream(), BinaryExpression.BinaryOp.And);
             case Variable v -> cache.get(v.name());
+			// Negated literal (equivalent of not)
+            case Literal l -> l.phase() ? cache.get(l.variable().name()) :
+                    new UnaryExpression(UnaryExpression.UnaryOp.Not, toExpression(l.variable()));
             case Not n -> new UnaryExpression(UnaryExpression.UnaryOp.Not, toExpression(n.operand()));
             default -> throw new RuntimeException("Unreachable");
         };

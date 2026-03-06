@@ -3,10 +3,8 @@ package uq.pac.rsvp.policy.datalog.driver;
 import com.cedarpolicy.model.exception.AuthException;
 import com.google.devtools.common.options.OptionsParser;
 import org.fusesource.jansi.Ansi;
-import uq.pac.rsvp.policy.datalog.ast.DLProgram;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestAuth;
-import uq.pac.rsvp.policy.datalog.translation.Translation;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -55,7 +53,7 @@ public class Driver {
         return null;
     }
 
-    private static String colour(Ansi.Color color, Object text) {
+    public static String colour(Ansi.Color color, Object text) {
         return ansi().fg(color).a(text).reset().toString();
     }
 
@@ -92,10 +90,8 @@ public class Driver {
                 })
                 .toList();
 
-        DLProgram translation = Translation.translate(schemaFile, policyFile, entitiesFile);
         Path dlPath = Path.of(dlDir);
-        translation.execute(dlPath);
-        RequestAuth auth = RequestAuth.load(dlPath);
+        RequestAuth auth = RequestAuth.load(schemaFile, policyFile, entitiesFile, dlPath);
 
         if (requests.isEmpty()) {
             System.out.println(colour(RED, "No requests found"));

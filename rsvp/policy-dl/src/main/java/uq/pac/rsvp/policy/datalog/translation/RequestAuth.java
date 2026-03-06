@@ -1,5 +1,7 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
+import com.cedarpolicy.model.exception.AuthException;
+import uq.pac.rsvp.policy.datalog.ast.DLProgram;
 import uq.pac.rsvp.policy.datalog.ast.DLRuleDecl;
 
 import java.io.BufferedReader;
@@ -31,7 +33,10 @@ public class RequestAuth {
      */
     private final Set<Request> forbidden;
     /**
-     * A universe of all (potentially) valid requests under the closed world assumption
+     * A universe of all requests that could be constructed of entities and actions.
+     * Not all of them are necessarily valid from the perspective of the schema and policies.
+	 * For instance, a request using a principal type that goes against the policy is considered
+     * invalid is cedar
      */
     private final Set<Request> universe;
 
@@ -48,16 +53,16 @@ public class RequestAuth {
     }
 
     public enum Result {
-        PERMITTED,
-        FORBIDDEN,
+        ALLOW,
+        DENY,
         INVALID
     }
 
     public Result authorize(Request request) {
         if (permitted.contains(request)) {
-            return PERMITTED;
+            return ALLOW;
         } else if (universe.contains(request)) {
-            return FORBIDDEN;
+            return DENY;
         }
         return INVALID;
     }
@@ -66,7 +71,7 @@ public class RequestAuth {
     // from a datalog specification stored in the {@code dir} directory.
     private static Set<Request> loadRequests(Path dir, DLRuleDecl decl) {
         Path csv = Path.of(dir.toString(), decl.getName() + ".csv");
-        if (Files.exists(csv)) {
+        if (!Files.exists(csv)) {
             throw new TranslationError("Target CSV file %s does not exist or not a directory".formatted(csv));
         }
 
@@ -86,7 +91,13 @@ public class RequestAuth {
         return set;
     }
 
-    public static RequestAuth load(Path dir) {
+    public static RequestAuth load(Path schema, Path policies, Path entities, Path dlDir) throws AuthException, IOException, InterruptedException {
+        DLProgram program = Translation.translate(schema, policies, entities);
+        program.execute(dlDir);
+        return RequestAuth.load(dlDir);
+    }
+
+    private static RequestAuth load(Path dir) {
         if (!Files.exists(dir) ||  !Files.isDirectory(dir)) {
             throw new TranslationError("Target directory %s does not exist or not a directory".formatted(dir));
         }
@@ -96,12 +107,19 @@ public class RequestAuth {
         return new RequestAuth(universe, permitted, forbidden);
     }
 
-    public Set<Request> getAllPermittedRequests() {
+    public Set<Request> getPermittedRequests() {
         return permitted;
     }
 
-    public Set<Request> getAllForbiddenRequests() {
+    public Set<Request> getForbiddenRequests() {
         return forbidden;
+    }
+
+    public Set<Request> getActionableRequests() {
+        Set<Request> requests = new HashSet<>();
+        requests.addAll(getPermittedRequests());
+        requests.addAll(getForbiddenRequests());
+        return requests;
     }
 
     public Set<Request> getRequestUniverse() {

@@ -11,6 +11,7 @@ import com.cedarpolicy.model.policy.PolicySet;
 import com.cedarpolicy.model.schema.Schema;
 import org.junit.jupiter.api.Test;
 import uq.pac.rsvp.policy.datalog.TestUtil;
+import uq.pac.rsvp.policy.datalog.util.Logger;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,10 +22,11 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.fusesource.jansi.Ansi.Color.*;
-import static org.fusesource.jansi.Ansi.ansi;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TranslationTest {
+
+    private final static Logger logger = new Logger();
 
     @Test
     void translationTest() throws IOException, AuthException, InterruptedException {
@@ -60,9 +62,9 @@ public class TranslationTest {
             RequestAuth rsvpAuth = RequestAuth.load(schemaPath, policy, entitiesPath, datalogDir);
             assertTrue(Collections.disjoint(rsvpAuth.getForbiddenRequests(), rsvpAuth.getPermittedRequests()));
 
-            System.out.println(ansi().fg(YELLOW).a("Generated rsvpAuth for policy: " + policy).reset());
-            System.out.println(ansi().fg(CYAN).a("Datalog directory: " + datalogDir).reset());
-            System.out.println(Files.readString(policy));
+            logger.info(YELLOW, "Policy: " + policy)
+                .info(CYAN, Files.readString(policy))
+                .info(MAGENTA, "Datalog directory: " + datalogDir);
 
             AuthorizationEngine cedarAuth = new BasicAuthorizationEngine();
             Entities cedarEntities = Entities.parse(entitiesPath);
@@ -101,7 +103,7 @@ public class TranslationTest {
                             """.formatted(rsvpDecision.toString(), cedarDecision.toString()));
                 }
             }
-            System.out.printf("Validated Requests (allow/deny): %d (%d/%d)\n",
+            logger.info(GREEN, "Validated Requests (allow/deny): %d (%d/%d)\n",
                     universe.size(), requestCounter[0], requestCounter[1]);
         }
     }

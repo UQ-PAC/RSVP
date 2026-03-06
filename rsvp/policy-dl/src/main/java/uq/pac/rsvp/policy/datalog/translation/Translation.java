@@ -73,7 +73,7 @@ public class Translation {
 
         Multimap<String, DLFact> facts = translationEntities.getFacts();
 
-        for (TranslationEntityDefinition type : translationSchema.getTranslationEntityTypes()) {
+        for (TranslationEntityDefinition type : translationSchema.getDefinitions()) {
             builder.comment("Cedar entity: " + type.getName());
             builder.add(type.getEntityRuleDecl());
             builder.add(facts.get(type.getEntityRuleDecl().getName()));
@@ -151,7 +151,7 @@ public class Translation {
     }
 
     public static TranslationRule makePrincipalTypes(TranslationSchema schema) {
-        List<DLRule> facts = schema.getTranslationEntityTypes().stream()
+        List<DLRule> facts = schema.getDefinitions().stream()
                 .map(e -> {
                     return new DLRule(new DLAtom(PrincipalRuleDecl, PrincipalVar),
                            new DLAtom(e.getEntityRuleDecl(), PrincipalVar));

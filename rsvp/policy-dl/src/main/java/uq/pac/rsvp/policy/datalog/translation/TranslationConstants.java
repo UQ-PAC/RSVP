@@ -1,5 +1,6 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
+import com.cedarpolicy.value.EntityUID;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
@@ -12,6 +13,17 @@ import java.util.Map;
  * Constants used throughout the translation of Cedar to datalog
  */
 public class TranslationConstants {
+
+    public static String UndefinedEntityUIDName = "__rsvp_undefined__";
+
+	/** 
+	 * Get an unknown entity (UID) only. Abstraction over entities that can be given for
+	 * authorisation but are not in the provided list of entities
+	*/	
+    public static EntityUID getUndefinedEUID(TranslationEntityDefinition def) {
+        return EntityUID.parse("%s::\"%s\"".formatted(def.getName(), UndefinedEntityUIDName)).orElseThrow();
+    }
+
     /**
      * The translation revolves around rules of the form using principal, resource
      * and action cedar variables.
@@ -79,6 +91,8 @@ public class TranslationConstants {
      */
     public final static DLRuleDecl ActionRuleDecl =
             new DLRuleDecl("Action", ActionVarDecl);
+
+    // FIXME: Add unique prefixes
 
     /**
      * Rule that captures relation between actions and principals,

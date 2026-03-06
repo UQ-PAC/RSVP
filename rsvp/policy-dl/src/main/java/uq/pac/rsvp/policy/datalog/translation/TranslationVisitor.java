@@ -4,7 +4,9 @@ import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
 import java.util.Collection;
+import java.util.List;
 
+import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 import static uq.pac.rsvp.policy.datalog.util.Util.required;
 import static uq.pac.rsvp.policy.ast.expr.VariableExpression.Reference.*;
 
@@ -25,6 +27,13 @@ public class TranslationVisitor extends TranslationVoidAdapter {
 
     public static DLRule translate(TranslationSchema schema, Collection<Expression> exprs, DLRuleDecl decl) {
         TranslationVisitor visitor = new TranslationVisitor(schema);
+
+        // Ground terms
+        visitor.expressions.addAll(List.of(
+                new DLAtom(TranslationConstants.PrincipalRuleDecl, TranslationConstants.PrincipalVar),
+                new DLAtom(TranslationConstants.ResourceRuleDecl, TranslationConstants.ResourceVar),
+                new DLAtom(TranslationConstants.ActionRuleDecl, TranslationConstants.ActionVar)));
+
         exprs.forEach(e -> e.accept(visitor));
         DLAtom atom = new DLAtom(decl.getName(),
                 DLTerm.var(Principal.getValue()),
@@ -38,17 +47,19 @@ public class TranslationVisitor extends TranslationVoidAdapter {
         typing.update(expr, negated);
         switch (expr.getOp()) {
             case Eq -> {
-                TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, typing);
-                TranslationOperandVisitor rhs = new TranslationOperandVisitor(schema, typing);
-
-                DLTerm lhsOp = expr.getLeft().compute(lhs);
-                DLTerm rhsOp = expr.getRight().compute(rhs);
+                TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, typing),
+                        rhs = new TranslationOperandVisitor(schema, typing);
+                DLTerm lhsOp = expr.getLeft().compute(lhs),
+                        rhsOp = expr.getRight().compute(rhs);
 
                 expressions.addAll(lhs.getExpressions());
                 expressions.addAll(rhs.getExpressions());
-                expressions.add(new DLConstraint(lhsOp, rhsOp, DLConstraint.Operator.EQ));
+                DLConstraint.Operator op = negated ?
+                        DLConstraint.Operator.EQ : DLConstraint.Operator.NEQ;
+                expressions.add(new DLConstraint(lhsOp, rhsOp, op));
             }
             case BinaryExpression.BinaryOp.Is -> {
+				// FIXME: Handle negated
                 TypeExpression typeExpr = required(expr.getRight(), TypeExpression.class);
                 TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, typing);
                 DLTerm var = expr.getLeft().compute(lhs);
@@ -65,16 +76,12 @@ public class TranslationVisitor extends TranslationVoidAdapter {
 
     @Override
     public void visitUnaryExpr(UnaryExpression expr) {
-        boolean logic = switch (expr.getOp()) {
-            case Neg -> false;
-            case Not -> true;
-        };
-        if (logic) {
-            negated = true;
+        require(!negated);
+        switch (expr.getOp()) {
+            case Neg -> throw new TranslationError("Unsupported");
+            case Not -> negated = true;
         }
         expr.getExpression().accept(this);
-        if (logic) {
-            negated = false;
-        }
+        negated = false;
     }
 }

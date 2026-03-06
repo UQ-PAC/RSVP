@@ -58,6 +58,18 @@ public class TranslationEntity {
         return terms;
     }
 
+    /**
+     * A special constructor that generates only entity relation.
+     * This is for the case when only an entity UID is known, but
+     * not the entire entity
+     */
+    public TranslationEntity(TranslationEntityDefinition definition, EntityUID uid) {
+        this.definition = definition;
+        DLRuleDecl relation = definition.getEntityRuleDecl();
+        DLTerm euid = getEUIDLiteral(uid);
+        this.facts = List.of(new DLFact(relation.getName(), euid));
+    }
+
     public TranslationEntity(Entity entity, TranslationSchema schema) {
         List<DLFact> statements = new ArrayList<>();
         this.definition = schema.getTranslationEntityType(entity.getEUID().getType().toString());

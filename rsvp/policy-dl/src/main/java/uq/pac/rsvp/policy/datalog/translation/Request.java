@@ -1,5 +1,13 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
+import com.cedarpolicy.model.AuthorizationRequest;
+import com.cedarpolicy.value.EntityUID;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 /**
  * A class representing a cedar request as a triple {@code} (principal, resource action) {@code}.
  * <p>
@@ -42,8 +50,35 @@ public class Request {
         return false;
     }
 
+    /**
+     * Construct a cedar-level authorization request out of this one
+     */
+    public AuthorizationRequest getCedarRequest(com.cedarpolicy.model.schema.Schema schema) {
+        List<EntityUID> uids =  getComponents().stream()
+                .map(s -> {
+                    int i = s.lastIndexOf(':');
+                    String repr = s.substring(0, i + 1) + "\"" + s.substring(i + 1) + "\"";
+                    return EntityUID.parse(repr).orElse(null);
+                }).toList();
+
+        return new AuthorizationRequest(
+                uids.get(0),
+                uids.get(2),
+                uids.get(1),
+                Optional.of(Map.of()),
+                Optional.of(schema),
+                true);
+    }
+
+    /**
+     * Get request components as strings as [principal, resource, action] list
+     */
+    private List<String> getComponents() {
+        return Arrays.asList(request.split("\\" + DELIMITER));
+    }
+
     @Override
     public String toString() {
-        return request.replaceAll("\\" + DELIMITER, "\t");
+        return String.join("\t", getComponents());
     }
 }

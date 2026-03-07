@@ -20,4 +20,6 @@ shadowJar {
 
 test {
     systemProperties 'test.builddir': layout.buildDirectory.asFile.get()
+    systemProperties 'test.rootdir': layout.projectDirectory.toString()
+    systemProperties 'test.oracles.generate': project.findProperty('test.oracles.generate')
 }

@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.fusesource.jansi.Ansi.Color.*;
@@ -29,6 +30,56 @@ public class TranslationTest {
     @Test
     void translationTest() throws IOException, AuthException, InterruptedException {
         translationTest("photoapp");
+    }
+
+    @Test
+    void translationOracles() throws AuthException, IOException, InterruptedException {
+        translationOracles("ancestors");
+    }
+
+    void translationOracles(String name) throws AuthException, IOException, InterruptedException {
+        Path testDir = Path.of(TranslationTest.class.getClassLoader().getResource(name).getFile());
+        Path schemaPath = Path.of(testDir.toString(), "schema.cedarschema");
+        Path entitiesPath = Path.of(testDir.toString(), "entities.json");
+
+        List<Path> policyFiles = null;
+        try (Stream<Path> p = Files.list(testDir)) {
+            policyFiles = p.filter(s -> s.toString().endsWith(".cedar")).toList();
+        } catch (IOException e) {
+            fail(e);
+        }
+
+        for (Path policy : policyFiles) {
+            String baseName = policy.getFileName().toString().replaceAll(".cedar$", "");
+            Path datalogDir = TestUtil.getDatalogDir(name, baseName);
+            RequestAuth rsvpAuth = RequestAuth.load(schemaPath, policy, entitiesPath, datalogDir);
+
+            List<Request> forbiddenRequests = rsvpAuth.getForbiddenRequests().stream()
+                    .sorted(Comparator.comparing(Request::getId))
+                    .toList();
+            String forbiddenString = forbiddenRequests.stream().map(Request::getId)
+                    .collect(Collectors.joining("\n"));
+            if (TestUtil.GENERATE_ORACLES) {
+                Path forbiddenPath = Path.of(TestUtil.TESTRESOURCEDIR.toString(), name, baseName + ".forbidden");
+                Files.writeString(forbiddenPath, forbiddenString);
+            } else {
+                String forbiddenOracle = Files.readString(Path.of(testDir.toString(), baseName + ".forbidden"));
+                assertEquals(forbiddenOracle, forbiddenString);
+            }
+
+            List<Request> permittedRequests = rsvpAuth.getPermittedRequests().stream()
+                    .sorted(Comparator.comparing(Request::getId))
+                    .toList();
+            String permittedString = permittedRequests.stream().map(Request::getId)
+                    .collect(Collectors.joining("\n"));
+            if (TestUtil.GENERATE_ORACLES) {
+                Path permittedPath = Path.of(TestUtil.TESTRESOURCEDIR.toString(), name, baseName + ".permitted");
+                Files.writeString(permittedPath, permittedString);
+            } else {
+                String permittedOracle = Files.readString(Path.of(testDir.toString(), baseName + ".permitted"));
+                assertEquals(permittedOracle, permittedString);
+            }
+        }
     }
 
     /**

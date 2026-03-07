@@ -1,0 +1,15 @@
+entity Parent = {
+    profession: String,
+    descendant: Child
+};
+
+entity Child = {
+    name: String,
+    ancestor: Parent
+};
+
+action "Talk" appliesTo {
+  principal: [Child],
+  resource: Parent,
+  context: {}
+};

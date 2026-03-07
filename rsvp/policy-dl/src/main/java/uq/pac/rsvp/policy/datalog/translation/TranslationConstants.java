@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class TranslationConstants {
 
-    public static String UndefinedEntityUIDName = "__rsvp_undefined__";
+    public static String UndefinedEntityUIDName = "___";
 
 	/** 
 	 * Get an unknown entity (UID) only. Abstraction over entities that can be given for
@@ -178,8 +178,8 @@ public class TranslationConstants {
         return new TranslationRule(ForbiddenRequestsRuleDecl, rule);
     }
 
-    public final static String OUTPUT_DELIMITER = "|";
-    public final static String OUTPUT_DEST = "file";
+    public final static String OUTPUT_DELIMITER = "#";
+    public final static String OUTPUT_DESTINATION = "file";
 
     public static List<DLDirective> makeIODirectives(Collection<DLRuleDecl> output) {
         List<DLRuleDecl> rules = new ArrayList<>(output);
@@ -194,7 +194,7 @@ public class TranslationConstants {
                 AllRequestsRuleDecl));
 
         return rules.stream()
-                .map(rd -> new DLOutputDirective(rd, OUTPUT_DEST, options))
+                .map(rd -> new DLOutputDirective(rd, OUTPUT_DESTINATION, options))
                 .map(rd -> (DLDirective) rd)
                 .toList();
     }

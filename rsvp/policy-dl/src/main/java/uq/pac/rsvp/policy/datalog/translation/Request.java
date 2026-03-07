@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.OUTPUT_DELIMITER;
+
 /**
  * A class representing a cedar request as a triple {@code} (principal, resource action) {@code}.
  * <p>
@@ -18,15 +20,27 @@ import java.util.Optional;
  * from is omitted.
  */
 public class Request {
-    private final String request;
-    private static final String DELIMITER = TranslationConstants.OUTPUT_DELIMITER;
+    private final String id;
+    private final String principal;
+    private final String resource;
+    private final String action;
 
-    public Request(String request) {
-        this.request = request;
+    public Request(String id) {
+        this.id = id;
+        String [] components = id.split(OUTPUT_DELIMITER);
+        if (components.length != 3) {
+            throw new TranslationError("Invalid request format: %s", id);
+        }
+        principal = components[0];
+        resource = components[1];
+        action = components[2];
     }
 
     public Request(String principal, String resource, String action) {
-        this.request = principal + DELIMITER + resource + DELIMITER + action;
+        this.id = principal + OUTPUT_DELIMITER + resource + OUTPUT_DELIMITER + action;
+        this.principal = principal;
+        this.resource = resource;
+        this.action = action;
     }
 
     public static Request of(String request) {
@@ -39,46 +53,50 @@ public class Request {
 
     @Override
     public int hashCode() {
-        return request.hashCode();
+        return id.hashCode();
     }
 
     @Override
     public boolean equals(Object other) {
         if (other instanceof Request req) {
-            return req.request.equals(this.request);
+            return req.id.equals(this.id);
         }
         return false;
     }
 
+    private EntityUID toCedarFormat(String entity) {
+        int i = entity.lastIndexOf(':');
+        String cedarForm = entity.substring(0, i + 1) + "\"" + entity.substring(i + 1) + "\"";
+        return EntityUID.parse(cedarForm).orElseThrow(TranslationError::new);
+    }
+
     /**
-     * Construct a cedar-level authorization request out of this one
+     * Construct a cedar-level authorisation request out of this one
      */
     public AuthorizationRequest getCedarRequest(com.cedarpolicy.model.schema.Schema schema) {
-        List<EntityUID> uids =  getComponents().stream()
-                .map(s -> {
-                    int i = s.lastIndexOf(':');
-                    String repr = s.substring(0, i + 1) + "\"" + s.substring(i + 1) + "\"";
-                    return EntityUID.parse(repr).orElse(null);
-                }).toList();
-
         return new AuthorizationRequest(
-                uids.get(0),
-                uids.get(2),
-                uids.get(1),
+                toCedarFormat(principal),
+                toCedarFormat(resource),
+                toCedarFormat(action),
                 Optional.of(Map.of()),
                 Optional.of(schema),
                 true);
     }
 
-    /**
-     * Get request components as strings as [principal, resource, action] list
-     */
-    private List<String> getComponents() {
-        return Arrays.asList(request.split("\\" + DELIMITER));
+    public String getPrincipal() {
+        return principal;
+    }
+
+    public String getResource() {
+        return resource;
+    }
+
+    public String getAction() {
+        return action;
     }
 
     @Override
     public String toString() {
-        return String.join("\t", getComponents());
+        return "%s\t%s\t%s".formatted(principal, resource, action);
     }
 }

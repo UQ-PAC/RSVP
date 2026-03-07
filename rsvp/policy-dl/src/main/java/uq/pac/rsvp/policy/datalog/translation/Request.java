@@ -83,6 +83,10 @@ public class Request {
                 true);
     }
 
+    public String getId() {
+        return id;
+    }
+
     public String getPrincipal() {
         return principal;
     }

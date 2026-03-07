@@ -1,5 +1,6 @@
 package uq.pac.rsvp.policy.datalog;
 
+import org.junit.jupiter.api.Test;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 
 import java.io.IOException;
@@ -7,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
 public class TestUtil {
@@ -19,6 +21,25 @@ public class TestUtil {
      * Project build destination for temporary datalog specifications
      */
     public final static Path DLTESTDIR = Path.of(BUILDDIR.toString(), "datalog");
+
+    /**
+     * Project root
+     */
+    public final static Path ROOTDIR = Path.of(getProperty("test.rootdir")).toAbsolutePath();
+
+    /**
+     * Test resource dir (source tree)
+     */
+    public final static Path TESTRESOURCEDIR = Path.of(ROOTDIR.toString(), "src", "test", "resources");
+
+    /**
+     * Whether to generate ot check test oracles
+     */
+    public final static boolean GENERATE_ORACLES;
+    static {
+        String testOracles = System.getProperty("test.oracles.generate");
+        GENERATE_ORACLES = testOracles != null && !testOracles.isEmpty();
+    }
 
     /**
      * Get a system property asserting that it is defined
@@ -63,5 +84,10 @@ public class TestUtil {
             }
         }
         Files.delete(dir);
+    }
+
+    @Test
+    void generateOracles() {
+        assertFalse(GENERATE_ORACLES);
     }
 }

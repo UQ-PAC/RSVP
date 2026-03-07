@@ -14,7 +14,8 @@ import java.util.Map;
  */
 public class TranslationConstants {
 
-    public static String UndefinedEntityUIDName = "___";
+    // FIXME: Something more esoteric than that to avoid clashes
+    public static String UndefinedEntityUIDName = "UNKNOWN";
 
 	/** 
 	 * Get an unknown entity (UID) only. Abstraction over entities that can be given for
@@ -178,7 +179,7 @@ public class TranslationConstants {
         return new TranslationRule(ForbiddenRequestsRuleDecl, rule);
     }
 
-    public final static String OUTPUT_DELIMITER = "#";
+    public final static String OUTPUT_DELIMITER = "\t";
     public final static String OUTPUT_DESTINATION = "file";
 
     public static List<DLDirective> makeIODirectives(Collection<DLRuleDecl> output) {

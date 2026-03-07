@@ -1,0 +1,35 @@
+[
+    {
+        "uid": { "type": "Parent", "id": "Jack" },
+        "attrs": {
+            "profession": "teacher",
+            "descendant": { "__entity": { "type": "Child", "id": "John" } }
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "Parent", "id": "Ann" },
+        "attrs": {
+            "profession": "accountant",
+            "descendant": { "__entity": { "type": "Child", "id": "Ann" } }
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "Child", "id": "John" },
+        "attrs": {
+            "ancestor": { "__entity": { "type": "Parent", "id": "Jack" } },
+            "name" : "johnie"
+
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "Child", "id": "Kat" },
+        "attrs": {
+            "ancestor": { "__entity": { "type": "Parent", "id": "Ann" } },
+            "name" : "katie"
+        },
+        "parents": [ ]
+    }
+]

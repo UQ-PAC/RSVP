@@ -32,19 +32,27 @@ public class TranslationTest {
     private final static Logger logger = new Logger();
 
     private static class TestInput {
-        public final String dir;
         public final String policyName;
         public final Path policy;
         public final Path schema;
         public final Path entities;
+        public final Path datalogDir;
+        public final Path testDir;
+        public final String testName;
+        public final Path permitted;
+        public final Path forbidden;
 
-        private TestInput(String dir, Path policy, Path schema, Path entities) {
+        private TestInput(Path testDir, Path policy, Path schema, Path entities) {
             this.policy = policy;
             this.schema = schema;
             this.entities = entities;
-            this.dir = dir;
+            this.testDir = testDir;
             this.policyName = policy.getFileName().toString()
                     .replaceAll(".cedar$", "");
+            this.datalogDir = TestUtil.getDatalogDir(testDir.getFileName().toString(), policyName);
+            this.testName = testDir.getFileName().toString();
+            this.permitted = Path.of(testDir.toString(), policyName + ".permitted");
+            this.forbidden = Path.of(testDir.toString(), policyName + ".forbidden");
         }
 
         public static List<TestInput> load(String dir) {
@@ -55,7 +63,7 @@ public class TranslationTest {
             List<TestInput> inputs = new ArrayList<>();
             try (Stream<Path> p = Files.list(testDir)) {
                 p.filter(s -> s.toString().endsWith(".cedar")).forEach(policy -> {
-                    inputs.add(new TestInput(dir, policy, schema, entities));
+                    inputs.add(new TestInput(testDir, policy, schema, entities));
                 });
             } catch (IOException e) {
                 fail(e);
@@ -71,47 +79,37 @@ public class TranslationTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-        "ancestors"
+        "ancestors",
+        "photoapp"
     })
     void translationOracles(String name) throws AuthException, IOException, InterruptedException {
-        Path testDir = Path.of(TranslationTest.class.getClassLoader().getResource(name).getFile());
-        Path schemaPath = Path.of(testDir.toString(), "schema.cedarschema");
-        Path entitiesPath = Path.of(testDir.toString(), "entities.json");
+        List<TestInput> tests = TestInput.load(name);
 
-        List<Path> policyFiles = null;
-        try (Stream<Path> p = Files.list(testDir)) {
-            policyFiles = p.filter(s -> s.toString().endsWith(".cedar")).toList();
-        } catch (IOException e) {
-            fail(e);
-        }
-
-        for (Path policy : policyFiles) {
-            String baseName = policy.getFileName().toString().replaceAll(".cedar$", "");
-            Path datalogDir = TestUtil.getDatalogDir(name, baseName);
-            RequestAuth rsvpAuth = RequestAuth.load(schemaPath, policy, entitiesPath, datalogDir);
-
-            BiConsumer<Supplier<Set<Request>>, String> doTest = (req, type) -> {
+        for (TestInput test : tests) {
+            RequestAuth rsvpAuth = RequestAuth.load(test.schema, test.policy, test.entities, test.datalogDir);
+            BiConsumer<Supplier<Set<Request>>, Path> doTest = (req, oracle) -> {
                 try {
                     // Get requests from auth
                     String str = req.get().stream()
                             .sorted(Comparator.comparing(Request::getId))
                             .map(Request::getId)
                             .collect(Collectors.joining("\n"));
-                    String fn = baseName + "." + type;
                     if (TestUtil.GENERATE_ORACLES) {
-                        Path path = Path.of(TestUtil.TESTRESOURCEDIR.toString(), name, fn);
+                        Path path = Path.of(TestUtil.TESTRESOURCEDIR.toString(),
+                                test.testDir.getFileName().toString(),
+                                oracle.getFileName().toString());
                         Files.writeString(path, str);
                     } else {
-                        String oracle = Files.readString(Path.of(testDir.toString(), fn));
-                        assertEquals(oracle, str);
+                        String oracleStr = Files.readString(oracle);
+                        assertEquals(oracleStr, str);
                     }
                 } catch (IOException e) {
                     fail(e);
                 }
             };
 
-            doTest.accept(rsvpAuth::getPermittedRequests, "permitted");
-            doTest.accept(rsvpAuth::getForbiddenRequests, "forbidden");
+            doTest.accept(rsvpAuth::getPermittedRequests, test.permitted);
+            doTest.accept(rsvpAuth::getForbiddenRequests, test.forbidden);
         }
     }
 

@@ -7,6 +7,10 @@
     "type": "object",
     "description": "Cedar security policy",
     "properties": {
+      "name": {
+        "type": "string",
+        "description": "A unique identifier for the policy"
+      },
       "effect": {
         "type": "string",
         "description": "Policy effect (permit or forbid)",

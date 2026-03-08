@@ -1,5 +1,25 @@
 # RSVP Policy AST
 
+The JSON schema for the serialised Java AST is defined in `lib/src/main/resources/ast.schema.json`. A
+schema for the Cedar JSON schema syntax can be found in the [Cedar VSCode Extension repository](https://raw.githubusercontent.com/cedar-policy/vscode-cedar/refs/heads/main/schemas/cedarschema.schema.json).
+
+## Usage
+
+```
+        import uq.pac.rsvp.policy.ast.PolicySet;
+        import uq.pac.rsvp.policy.ast.schema.Schema;
+
+        // Use CedarJava to parse a cedar policy file
+        PolicySet policies = PolicySet.parseCedarPolicySet(Path.of(url.getPath()));
+
+        // Parse a Cedar schema in JSON format
+        Schema schema = Schema.parseJsonSchema(jsonPath);
+
+        // Use CedarJava to parse a schema in Cedar format
+        Schema schema = Schema.parseCedarSchema(cedarPath);
+
+```
+
 ## Implement a new policy visitor
 
 Visitor classes can be found in the `uq.pac.rsvp.policy.ast.visitor` package.
@@ -11,9 +31,6 @@ need to visit every node type but would still like to traverse the entire tree, 
 
 Visitors that return a value from their `visit` methods should implement `PolicyComputationVisitor` or
 `SchemaComputationVisitor` and call the generic `compute` method on each `AST` node, rather than `accept`.
-
-The JSON schema for the serialised Java AST is defined in `lib/src/main/resources/ast.schema.json`. A
-schema for the Cedar JSON schema syntax can be found in the [Cedar VSCode Extension repository](https://raw.githubusercontent.com/cedar-policy/vscode-cedar/refs/heads/main/schemas/cedarschema.schema.json).
 
 ## Programmatically construct schema AST
 

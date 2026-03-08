@@ -19,27 +19,33 @@ public class Policy extends PolicyFileEntry {
         Forbid
     }
 
+    private final String name;
     private final Effect effect;
     private final Expression condition;
     private final Map<String, String> annotations;
 
-    public Policy(Effect effect, Expression condition, Map<String, String> annotations, SourceLoc source) {
+    public Policy(String name, Effect effect, Expression condition, Map<String, String> annotations, SourceLoc source) {
         super(source);
+        this.name = name;
         this.effect = effect;
         this.condition = condition;
         this.annotations = annotations != null ? Map.copyOf(annotations) : Collections.emptyMap();
     }
 
     public Policy(Effect effect, Expression condition, Map<String, String> annotations) {
-        this(effect, condition, annotations, SourceLoc.MISSING);
+        this(null, effect, condition, annotations, SourceLoc.MISSING);
+    }
+
+    public Policy(String name, Effect effect, Expression condition) {
+        this(name, effect, condition, null, SourceLoc.MISSING);
     }
 
     public Policy(Effect effect, Expression condition) {
-        this(effect, condition, null, SourceLoc.MISSING);
+        this(null, effect, condition, null, SourceLoc.MISSING);
     }
 
     public Policy() {
-        this(Effect.Forbid, null, null, SourceLoc.MISSING);
+        this(null, Effect.Forbid, null, null, SourceLoc.MISSING);
     }
 
     public boolean isPermit() {
@@ -54,8 +60,23 @@ public class Policy extends PolicyFileEntry {
         return condition;
     }
 
+    /**
+     * Get the name that uniquely identifies this policy. If this policy was parsed
+     * from a Cedar formatted policy file, this name will be the identifier assigned
+     * by Cedar and should correspond to any Cedar log messages. If this policy was
+     * created manually, the name may be {@code null}.
+     * 
+     * Names are not currently checked for uniqueness. If constructed manually, it
+     * is possible for more than one policy to have the same name.
+     * 
+     * @return the unique name of this policy, or null.
+     */
+    public String getName() {
+        return name;
+    }
+
     public Map<String, String> getAnnotations() {
-        return annotations == null ? Collections.emptyMap() : annotations;
+        return annotations;
     }
 
     @Override

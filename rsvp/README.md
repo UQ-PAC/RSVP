@@ -2,27 +2,33 @@
 
 [![RSVP Java CLI](https://github.com/UQ-PAC/RSVP/actions/workflows/rsvp.yaml/badge.svg)](https://github.com/UQ-PAC/RSVP/actions/workflows/rsvp.yaml)
 
-## Prerequisite: Cedar Java
+## Environment setup
 
-This project depends on [a fork of CedarJava](https://github.com/rebecca-odonoghue/cedar-java) which
-can be built locally or pulled from the GitHub Packages repository. Both options are outlined below,
-you need only complete one.
+### GitHub Packages
 
-### Pull CedarJava from GitHub Packages:
+This project pulls dependencies from GitHub Packages repositories, which require authentication
+for read access. Gradle expects to find the required authentication credentials in the system
+properties `packages.user` and `packages.token`.
 
-Pulling artifacts from GitHub Packages repositories requires authentication with a personal access
-token with read permissions. These permissions are granted automatically to CI builds, but you will
-need to add a personal access token to your account in order to pull any of our deployed artifacts.
+You will need to create these credentials in GitHub and supply them to Gradle as system properties.
 
 1. Create a personal access token with `read:packages` permission:
-   [Account Settings > Developer settings > Personal access tokens > Tokens (classic) > Generate new token (classic) > check `read:packages` > Generate token]
-2. Configure your environment such that Gradle has access to the following variables:
+
+   Account Settings > Developer settings > Personal access tokens > Tokens (classic) > Generate new token (classic) > check `read:packages` > Generate token
+
+2. Add the system properties to your user-scoped properties file (`~/.gradle/gradle.properties`):
    ```
-   PACKAGES_USER=<your_github_username>
-   PACKAGES_TOKEN=<your_personal_access_token>
+   systemProp.packages.user=<your_github_username>
+   systemProp.packages.token=<your_personal_access_token>
    ```
 
-### Build and deploy CedarJava locally:
+### CedarJava
+
+The `policy-ast` project depends on [a fork of CedarJava](https://github.com/rebecca-odonoghue/cedar-java) which
+can be built locally or pulled from the GitHub Packages repository. Completing [the steps above](#github-packages)
+will enable you to pull the package directly from GitHub.
+
+To build CedarJava locally:
 
 1. Clone CedarJava somewhere on your machine:
    ```
@@ -41,6 +47,21 @@ need to add a personal access token to your account in order to pull any of our 
    ```
    ./CedarJava/gradlew publishToMavenLocal -p ./CedarJava
    ```
+
+### Soufflé
+
+Soufflé is required to build and run the `policy-dl` project, and can be installed using a package manager:
+
+- Ubuntu (via APT)
+  ```
+  wget https://github.com/souffle-lang/souffle/releases/download/2.5/x86_64-ubuntu-2404-souffle-2.5-Linux.deb
+  sudo apt install ./x86_64-ubuntu-2404-souffle-2.5-Linux.deb
+  ```
+- macOS (via Homebrew)
+  ```
+  brew install souffle
+  ```
+- Other downloads from [their GitHub releases page](https://github.com/souffle-lang/souffle/releases)
 
 ## Local development
 
@@ -70,7 +91,7 @@ need to add a personal access token to your account in order to pull any of our 
 If you want to use the libraries in this project in another project you can either deploy them
 locally or pull them from GitHub Packages.
 
-### Deploy locally
+### Deploy libraries locally
 
 1. Deploy libraries to local repository:
 
@@ -87,19 +108,15 @@ repositories {
 }
 
 dependencies {
-    implementation 'uq.pac.rsvp:policy-ast:1.0.1-SNAPSHOT'
+    implementation 'uq.pac.rsvp:policy-ast:1.1.0'
     // any other dependencies
 }
 
 ```
 
-### Pull from GitHub Packages
+### Pull libraries from GitHub Packages
 
-Just as with CedarJava, a personal access token with `packages:read` permission is required to read
-packages from GitHub Packages repositories.
-
-1. Create a personal access token with `read:packages` permission:
-   [Account Settings > Developer settings > Personal access tokens > Tokens (classic) > Generate new token (classic) > check `read:packages` > Generate token]
+1. Follow the [instructions above](#github-packages) to set up your environment to pull from GitHub Packages.
 
 2. Import libraries by adding the following to `build.gradle`:
 
@@ -108,27 +125,21 @@ packages from GitHub Packages repositories.
        maven {
            url = 'https://maven.pkg.github.com/rebecca-odonoghue/cedar-java'
            credentials {
-               username = System.getenv('PACKAGES_USER')
-               password = System.getenv('PACKAGES_TOKEN')
+               username = System.getProperty('packages.user')
+               password = System.getProperty('packages.token')
            }
        }
        maven {
            url = 'https://maven.pkg.github.com/UQ-PAC/RSVP'
            credentials {
-               username = System.getenv('PACKAGES_USER')
-               password = System.getenv('PACKAGES_TOKEN')
+               username = System.getProperty('packages.user')
+               password = System.getProperty('packages.token')
            }
        }
    }
 
    dependencies {
-      implementation 'uq.pac.rsvp:policy-ast:1.0.1-SNAPSHOT'
+      implementation 'uq.pac.rsvp:policy-ast:1.1.0'
       // any other dependencies
    }
-   ```
-
-3. Configure your environment such that Gradle has access to the following variables:
-   ```
-   PACKAGES_USER=<your_github_username>
-   PACKAGES_TOKEN=<your_personal_access_token>
    ```

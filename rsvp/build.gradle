@@ -10,15 +10,15 @@ repositories {
     maven {
         url = 'https://maven.pkg.github.com/rebecca-odonoghue/cedar-java'
         credentials {
-            username = System.getenv('PACKAGES_USER')
-            password = System.getenv('PACKAGES_TOKEN')
+            username = System.getProperty('packages.user')
+            password = System.getProperty('packages.token')
         }
     }
     maven {
         url = 'https://maven.pkg.github.com/UQ-PAC/RSVP'
         credentials {
-            username = System.getenv('PACKAGES_USER')
-            password = System.getenv('PACKAGES_TOKEN')
+            username = System.getProperty('packages.user')
+            password = System.getProperty('packages.token')
         }
     }
 }
@@ -56,15 +56,15 @@ subprojects {
         maven {
             url = 'https://maven.pkg.github.com/rebecca-odonoghue/cedar-java'
             credentials {
-                username = System.getenv('PACKAGES_USER')
-                password = System.getenv('PACKAGES_TOKEN')
+                username = System.getProperty('packages.user')
+                password = System.getProperty('packages.token')
             }
         }
         maven {
             url = 'https://maven.pkg.github.com/UQ-PAC/RSVP'
             credentials {
-                username = System.getenv('PACKAGES_USER')
-                password = System.getenv('PACKAGES_TOKEN')
+                username = System.getProperty('packages.user')
+                password = System.getProperty('packages.token')
             }
         }
     }
@@ -74,7 +74,7 @@ subprojects {
         implementation("org.slf4j:slf4j-api:2.0.17")
         implementation("org.slf4j:slf4j-simple:2.0.17")
         // Custom cedar-java fork (https://github.com/rebecca-odonoghue/cedar-java)
-        implementation 'com.cedarpolicy:cedar-java:4.8.0-rsvp:uber'
+        implementation 'com.cedarpolicy:cedar-java:4.8.0-rsvp-1:uber'
         implementation 'com.google.code.gson:gson:2.13.2'
         implementation 'com.fasterxml.jackson.core:jackson-databind:2.20.0'
         implementation libs.guava

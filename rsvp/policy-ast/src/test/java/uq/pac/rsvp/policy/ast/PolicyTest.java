@@ -2,7 +2,11 @@ package uq.pac.rsvp.policy.ast;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -39,6 +43,8 @@ public class PolicyTest {
             assertFalse(policy.isForbid());
             assertEquals(SourceLoc.MISSING, policy.getSourceLoc());
             assertEquals("true", policy.getCondition().toString());
+            assertNull(policy.getAnnotations().get("key"));
+
         }
 
         @Test
@@ -50,6 +56,17 @@ public class PolicyTest {
                     .create();
             Policy policy = gson.fromJson(json, Policy.class);
             assertEquals("value", policy.getAnnotations().get("key"));
+        }
+
+        @Test
+        @DisplayName("handles names")
+        void testNames() {
+            String json = "{ \"name\": \"jeremiah\", \"effect\": \"permit\", \"condition\": { \"type\": \"bool\", \"value\": \"true\" } }";
+            Gson gson = new GsonBuilder().registerTypeAdapter(Expression.class, new ExpressionDeserialiser())
+                    .disableJdkUnsafe()
+                    .create();
+            Policy policy = gson.fromJson(json, Policy.class);
+            assertEquals("jeremiah", policy.getName());
         }
     }
 
@@ -65,6 +82,7 @@ public class PolicyTest {
             assertFalse(policy.isForbid());
             assertEquals(SourceLoc.MISSING, policy.getSourceLoc());
             assertEquals("true", policy.getCondition().toString());
+            assertNull(policy.getAnnotations().get("key"));
         }
 
         @Test
@@ -77,6 +95,25 @@ public class PolicyTest {
             assertTrue(policy.isForbid());
             assertEquals(SourceLoc.MISSING, policy.getSourceLoc());
             assertEquals("(principal == \"hacker\")", policy.getCondition().toString());
+        }
+
+        @Test
+        @DisplayName("handles annotations")
+        void testAnnotations() {
+            Map<String, String> annotations = new HashMap<>();
+            annotations.put("key", "value");
+            Policy policy = new Policy(Effect.Permit, new BooleanExpression(true), annotations);
+            assertEquals("value", policy.getAnnotations().get("key"));
+        }
+
+        @Test
+        @DisplayName("handles names")
+        void testNames() {
+            Policy policy = new Policy(Effect.Permit, new BooleanExpression(true));
+            assertNull(policy.getName());
+
+            policy = new Policy("gladys", Effect.Permit, new BooleanExpression(true));
+            assertEquals("gladys", policy.getName());
         }
 
     }

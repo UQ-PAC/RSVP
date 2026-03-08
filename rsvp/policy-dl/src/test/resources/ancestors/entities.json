@@ -1,9 +1,9 @@
 [
     {
-        "uid": { "type": "Parent", "id": "Jack" },
+        "uid": { "type": "Parent", "id": "Jim" },
         "attrs": {
             "profession": "teacher",
-            "descendant": { "__entity": { "type": "Child", "id": "John" } }
+            "descendant": { "__entity": { "type": "Child", "id": "Jon" } }
         },
         "parents": [ ]
     },
@@ -11,24 +11,41 @@
         "uid": { "type": "Parent", "id": "Ann" },
         "attrs": {
             "profession": "accountant",
-            "descendant": { "__entity": { "type": "Child", "id": "Ann" } }
+            "descendant": { "__entity": { "type": "Child", "id": "Amy" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Child", "id": "John" },
+        "uid": { "type": "Parent", "id": "Tom" },
         "attrs": {
-            "ancestor": { "__entity": { "type": "Parent", "id": "Jack" } },
-            "name" : "johnie"
+            "profession": "solicitor",
+            "descendant": { "__entity": { "type": "Child", "id": "Tim" } }
+        },
+        "parents": [ ]
+    },
+
+    {
+        "uid": { "type": "Child", "id": "Jon" },
+        "attrs": {
+            "ancestor": { "__entity": { "type": "Parent", "id": "Jim" } },
+            "name" : "John"
 
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Child", "id": "Kat" },
+        "uid": { "type": "Child", "id": "Amy" },
         "attrs": {
             "ancestor": { "__entity": { "type": "Parent", "id": "Ann" } },
-            "name" : "katie"
+            "name" : "Amy"
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "Child", "id": "Tim" },
+        "attrs": {
+            "ancestor": { "__entity": { "type": "Parent", "id": "Tom" } },
+            "name" : "Tim"
         },
         "parents": [ ]
     }

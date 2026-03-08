@@ -10,6 +10,8 @@ import com.cedarpolicy.model.exception.AuthException;
 import com.cedarpolicy.model.policy.PolicySet;
 import com.cedarpolicy.model.schema.Schema;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import uq.pac.rsvp.policy.datalog.TestUtil;
 import uq.pac.rsvp.policy.datalog.util.Logger;
 
@@ -32,11 +34,10 @@ public class TranslationTest {
         translationTest("photoapp");
     }
 
-    @Test
-    void translationOracles() throws AuthException, IOException, InterruptedException {
-        translationOracles("ancestors");
-    }
-
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "ancestors"
+    })
     void translationOracles(String name) throws AuthException, IOException, InterruptedException {
         Path testDir = Path.of(TranslationTest.class.getClassLoader().getResource(name).getFile());
         Path schemaPath = Path.of(testDir.toString(), "schema.cedarschema");

@@ -1,7 +1,0 @@
-Child::John	Parent::Jack	Action::Talk
-Child::John	Parent::UNKNOWN	Action::Talk
-Child::Kat	Parent::Ann	Action::Talk
-Child::Kat	Parent::UNKNOWN	Action::Talk
-Child::UNKNOWN	Parent::Ann	Action::Talk
-Child::UNKNOWN	Parent::Jack	Action::Talk
-Child::UNKNOWN	Parent::UNKNOWN	Action::Talk

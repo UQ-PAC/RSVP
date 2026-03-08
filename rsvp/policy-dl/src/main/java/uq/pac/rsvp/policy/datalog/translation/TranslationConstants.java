@@ -14,8 +14,7 @@ import java.util.Map;
  */
 public class TranslationConstants {
 
-    // FIXME: Something more esoteric than that to avoid clashes
-    public static String UndefinedEntityUIDName = "UNKNOWN";
+    public static String UndefinedEntityUIDName = "???";
 
 	/** 
 	 * Get an unknown entity (UID) only. Abstraction over entities that can be given for

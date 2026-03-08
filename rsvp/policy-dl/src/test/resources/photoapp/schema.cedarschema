@@ -20,8 +20,7 @@ entity Photo = {
 };
 
 action viewPhoto appliesTo {
-    principal: Abclose
-    ccount,
+    principal: Account,
     resource: Photo,
     context: { }
 };

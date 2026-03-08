@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,6 +30,39 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TranslationTest {
 
     private final static Logger logger = new Logger();
+
+    private static class TestInput {
+        public final String dir;
+        public final String policyName;
+        public final Path policy;
+        public final Path schema;
+        public final Path entities;
+
+        private TestInput(String dir, Path policy, Path schema, Path entities) {
+            this.policy = policy;
+            this.schema = schema;
+            this.entities = entities;
+            this.dir = dir;
+            this.policyName = policy.getFileName().toString()
+                    .replaceAll(".cedar$", "");
+        }
+
+        public static List<TestInput> load(String dir) {
+            Path testDir = Path.of(TranslationTest.class.getClassLoader().getResource(dir).getFile());
+            Path schema = Path.of(testDir.toString(), "schema.cedarschema");
+            Path entities = Path.of(testDir.toString(), "entities.json");
+
+            List<TestInput> inputs = new ArrayList<>();
+            try (Stream<Path> p = Files.list(testDir)) {
+                p.filter(s -> s.toString().endsWith(".cedar")).forEach(policy -> {
+                    inputs.add(new TestInput(dir, policy, schema, entities));
+                });
+            } catch (IOException e) {
+                fail(e);
+            }
+            return inputs;
+        }
+    }
 
     @Test
     void translationTest() throws IOException, AuthException, InterruptedException {
@@ -55,31 +90,28 @@ public class TranslationTest {
             Path datalogDir = TestUtil.getDatalogDir(name, baseName);
             RequestAuth rsvpAuth = RequestAuth.load(schemaPath, policy, entitiesPath, datalogDir);
 
-            List<Request> forbiddenRequests = rsvpAuth.getForbiddenRequests().stream()
-                    .sorted(Comparator.comparing(Request::getId))
-                    .toList();
-            String forbiddenString = forbiddenRequests.stream().map(Request::getId)
-                    .collect(Collectors.joining("\n"));
-            if (TestUtil.GENERATE_ORACLES) {
-                Path forbiddenPath = Path.of(TestUtil.TESTRESOURCEDIR.toString(), name, baseName + ".forbidden");
-                Files.writeString(forbiddenPath, forbiddenString);
-            } else {
-                String forbiddenOracle = Files.readString(Path.of(testDir.toString(), baseName + ".forbidden"));
-                assertEquals(forbiddenOracle, forbiddenString);
-            }
+            BiConsumer<Supplier<Set<Request>>, String> doTest = (req, type) -> {
+                try {
+                    // Get requests from auth
+                    String str = req.get().stream()
+                            .sorted(Comparator.comparing(Request::getId))
+                            .map(Request::getId)
+                            .collect(Collectors.joining("\n"));
+                    String fn = baseName + "." + type;
+                    if (TestUtil.GENERATE_ORACLES) {
+                        Path path = Path.of(TestUtil.TESTRESOURCEDIR.toString(), name, fn);
+                        Files.writeString(path, str);
+                    } else {
+                        String oracle = Files.readString(Path.of(testDir.toString(), fn));
+                        assertEquals(oracle, str);
+                    }
+                } catch (IOException e) {
+                    fail(e);
+                }
+            };
 
-            List<Request> permittedRequests = rsvpAuth.getPermittedRequests().stream()
-                    .sorted(Comparator.comparing(Request::getId))
-                    .toList();
-            String permittedString = permittedRequests.stream().map(Request::getId)
-                    .collect(Collectors.joining("\n"));
-            if (TestUtil.GENERATE_ORACLES) {
-                Path permittedPath = Path.of(TestUtil.TESTRESOURCEDIR.toString(), name, baseName + ".permitted");
-                Files.writeString(permittedPath, permittedString);
-            } else {
-                String permittedOracle = Files.readString(Path.of(testDir.toString(), baseName + ".permitted"));
-                assertEquals(permittedOracle, permittedString);
-            }
+            doTest.accept(rsvpAuth::getPermittedRequests, "permitted");
+            doTest.accept(rsvpAuth::getForbiddenRequests, "forbidden");
         }
     }
 

@@ -39,6 +39,12 @@ public class Logger {
 
     private Level level = Level.Info;
 
+    private Ansi console;
+
+    public Logger () {
+        this.console = ansi();
+    }
+
     public void setLevel(Level level) {
         this.level = level;
     }
@@ -49,10 +55,19 @@ public class Logger {
             if (!level.desc.isEmpty()) {
                 outs = level.desc + ": " + outs;
             }
+
             for (String formatted : outs.split("\n")) {
-                stream.println(ansi().fg(color).a(formatted).reset());
+                console.fg(color).a(formatted).newline();
             }
+            console.reset();
+            stream.print(console);
+            console = ansi();
         }
+        return this;
+    }
+
+    synchronized public Logger attr(Ansi.Attribute attribute) {
+        console.a(attribute);
         return this;
     }
 
@@ -65,10 +80,10 @@ public class Logger {
     }
 
     public Logger warning(String format, Object ...args) {
-        return log(System.out, RED, Level.Warning, format, args);
+        return log(System.err, RED, Level.Warning, format, args);
     }
 
     public Logger error(String format, Object ...args) {
-        return log(System.out, RED, Level.Severe, format, args);
+        return log(System.err, RED, Level.Severe, format, args);
     }
 }

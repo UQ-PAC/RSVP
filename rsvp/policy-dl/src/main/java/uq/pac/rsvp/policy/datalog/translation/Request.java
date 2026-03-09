@@ -3,8 +3,6 @@ package uq.pac.rsvp.policy.datalog.translation;
 import com.cedarpolicy.model.AuthorizationRequest;
 import com.cedarpolicy.value.EntityUID;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -70,14 +68,19 @@ public class Request {
         return EntityUID.parse(cedarForm).orElseThrow(TranslationError::new);
     }
 
+    public boolean isDefined() {
+        String undef = "::" + TranslationConstants.UndefinedEntityUIDName;
+        return !principal.endsWith(undef) && !resource.endsWith(undef);
+    }
+
     /**
      * Construct a cedar-level authorisation request out of this one
      */
     public AuthorizationRequest getCedarRequest(com.cedarpolicy.model.schema.Schema schema) {
         return new AuthorizationRequest(
                 toCedarFormat(principal),
-                toCedarFormat(resource),
                 toCedarFormat(action),
+                toCedarFormat(resource),
                 Optional.of(Map.of()),
                 Optional.of(schema),
                 true);
@@ -101,6 +104,7 @@ public class Request {
 
     @Override
     public String toString() {
-        return "%s\t%s\t%s".formatted(principal, resource, action);
+        return "{ principal: '%s', resource: '%s', action: '%s' }"
+                .formatted(principal, resource, action);
     }
 }

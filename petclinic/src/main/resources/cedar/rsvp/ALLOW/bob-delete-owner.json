@@ -6,5 +6,6 @@
         "database": { "__entity": { "type": "PetClinic::Database", "id": "Owners (A)" } },
         "readAction": { "__entity": { "type": "PetClinic::Action", "id": "ReadFromDatabase" } },
         "writeAction": { "__entity": { "type": "PetClinic::Action", "id": "DeleteFromDatabase" } }
-    }
+    },
+    "validateRequest": true
 }

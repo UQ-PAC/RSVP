@@ -3,16 +3,28 @@ plugins {
 }
 
 dependencies {
+    implementation project(':support')
     implementation project(':policy-ast')
 }
 
 jar {
     manifest {
-        attributes 'Main-Class': 'uq.pac.rsvp.App'
+        attributes 'Main-Class': 'uq.pac.rsvp.Main'
     }
 }
 
 application {
     // Define the main class for the application.
-    mainClass = 'uq.pac.rsvp.App'
+    mainClass = 'uq.pac.rsvp.Main'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId "uq.pac.rsvp"
+            artifactId "rsvp"
+            version "1.0.0"
+            from components.java
+        }
+    }
 }

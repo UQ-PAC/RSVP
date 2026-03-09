@@ -331,6 +331,68 @@ public class SchemaTest {
             checkAnnotations(schema);
 
         }
+
+        @Test
+        @DisplayName("handles string input")
+        void test() throws RsvpException {
+            Schema schema = Schema.parseCedarSchema("type Task = {\n" + //
+                    "    \"id\": Long,\n" + //
+                    "    \"name\": String,\n" + //
+                    "    \"state\": String,\n" + //
+                    "};\n" + //
+                    "\n" + //
+                    "type Tasks = Set<Task>;\n" + //
+                    "entity List in [Application] = {\n" + //
+                    "  \"editors\": Team,\n" + //
+                    "  \"name\": String,\n" + //
+                    "  \"owner\": User,\n" + //
+                    "  \"readers\": Team,\n" + //
+                    "  \"tasks\": Tasks,\n" + //
+                    "};\n" + //
+                    "entity Application enum [\"TinyTodo\"];\n" + //
+                    "entity User in [Team, Application] = {\n" + //
+                    "  \"joblevel\": Long,\n" + //
+                    "  \"location\": String,\n" + //
+                    "};\n" + //
+                    "entity Team in [Team, Application];\n" + //
+                    "\n" + //
+                    "action DeleteList, GetList, UpdateList appliesTo {\n" + //
+                    "  principal: [User],\n" + //
+                    "  resource: [List]\n" + //
+                    "};\n" + //
+                    "action CreateList, GetLists appliesTo {\n" + //
+                    "  principal: [User],\n" + //
+                    "  resource: [Application]\n" + //
+                    "};\n" + //
+                    "action CreateTask, UpdateTask, DeleteTask appliesTo {\n" + //
+                    "  principal: [User],\n" + //
+                    "  resource: [List]\n" + //
+                    "};\n" + //
+                    "action EditShare appliesTo {\n" + //
+                    "  principal: [User],\n" + //
+                    "  resource: [List]\n" + //
+                    "};");
+
+            CommonTypeDefinition task = schema.getCommonType("Task");
+            CommonTypeDefinition tasks = schema.getCommonType("Tasks");
+            assertNotNull(task);
+            assertNotNull(tasks);
+
+            assertTrue(tasks instanceof SetTypeDefinition);
+
+            CommonTypeDefinition tasksElem = ((SetTypeDefinition) tasks).getElementType();
+            assertNotNull(tasksElem);
+            assertTrue(tasksElem instanceof CommonTypeReference);
+            assertEquals(task, ((CommonTypeReference) tasksElem).getDefinition());
+
+            EntityTypeDefinition list = schema.getEntityType("List");
+            assertNotNull(list);
+
+            CommonTypeDefinition tasksProp = list.getShapeAttributeType("tasks");
+            assertNotNull(tasksProp);
+            assertTrue(tasksProp instanceof CommonTypeReference);
+            assertEquals(tasks, ((CommonTypeReference) tasksProp).getDefinition());
+        }
     }
 
     @Nested

@@ -1,6 +1,6 @@
 # RSVP Java CLI
 
-[![RSVP Java CLI](https://github.com/UQ-PAC/RSVP/actions/workflows/rsvp.yaml/badge.svg)](https://github.com/UQ-PAC/RSVP/actions/workflows/rsvp.yaml)
+[![Build Java CLI](https://github.com/UQ-PAC/RSVP/actions/workflows/rsvp.yaml/badge.svg)](https://github.com/UQ-PAC/RSVP/actions/workflows/rsvp.yaml)
 
 ## Environment setup
 
@@ -108,7 +108,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'uq.pac.rsvp:policy-ast:1.1.1'
+    implementation 'uq.pac.rsvp:policy-ast:1.1.2-SNAPSHOT'
     // any other dependencies
 }
 
@@ -139,7 +139,7 @@ dependencies {
    }
 
    dependencies {
-      implementation 'uq.pac.rsvp:policy-ast:1.1.1'
+      implementation 'uq.pac.rsvp:policy-ast:1.1.2-SNAPSHOT'
       // any other dependencies
    }
    ```

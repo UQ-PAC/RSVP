@@ -2,7 +2,7 @@ package uq.pac.rsvp.policy.ast.expr;
 
 import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.EntityLiteral;
 
-import uq.pac.rsvp.policy.ast.SourceLoc;
+import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;;
 

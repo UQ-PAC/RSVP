@@ -5,7 +5,7 @@ import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Call;
 import java.util.Collections;
 import java.util.List;
 
-import uq.pac.rsvp.policy.ast.SourceLoc;
+import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 

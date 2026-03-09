@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@rpldy/uploady':
+        specifier: ^1.13.0
+        version: 1.13.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react:
         specifier: ^19.2.4
         version: 19.2.4
@@ -1066,6 +1069,38 @@ packages:
     engines: {node: '>= 8.0.0'}
     peerDependencies:
       rollup: ^1.20.0||^2.0.0
+
+  '@rpldy/abort@1.13.0':
+    resolution: {integrity: sha512-gPzbKWCgSSM72LtQbytbyIuUBwpwHLQ80xbl6QlSltsPKhWGp/wuTxnrP5fm+rI7kkDoEuxuVG247wZb5C4afw==}
+
+  '@rpldy/life-events@1.13.0':
+    resolution: {integrity: sha512-5hrTeC17Vb7jVFH+8YXhDkmM00jJyguJPHOX0kYxYnR1LZqVFnR/owA/8unC1VmixtCBhs4fojK7rXe+axXBJw==}
+
+  '@rpldy/raw-uploader@1.13.0':
+    resolution: {integrity: sha512-iHvJB1Afeev6My/1NDJIZDwR3Ng4NHEfTX72IwdMJgdcv20+LE093Pt1+v3haYT036RPhkQwE2ta7+Ux7NdRFQ==}
+
+  '@rpldy/sender@1.13.0':
+    resolution: {integrity: sha512-cnImc4A/upy6FGM6eYd7yumv7hfbg/UDEyqkMovgyEgtBx2M6jBlQWvImjrwaH45bh8dSt/60N/QVcQUn1ghbA==}
+
+  '@rpldy/shared-ui@1.13.0':
+    resolution: {integrity: sha512-/Lm1+783iLtlRsqCL6ZS+deD7NiSWw3xyFogIEpYfsAq040dQiIuVEZ7L8JWyZ5mnqqRQSuZuTjbbgDaf+XE7Q==}
+    peerDependencies:
+      react: '>=16.8'
+
+  '@rpldy/shared@1.13.0':
+    resolution: {integrity: sha512-WF9LkjWLGeAs888cLbhneNDnbRUFrwIu/CQJ2E1eiY8jgcXN6PyFyHK7KzVdhM/t3By/BTS+/GlthjM1BQuBcQ==}
+
+  '@rpldy/simple-state@1.13.0':
+    resolution: {integrity: sha512-qAermR75birh9gObMDEkna3z8l3wZ8GGFV6/FbdyIXomnR8q1CwsUgma2gwKPtFAPBsdMCkz1m/yez6RwNLx+A==}
+
+  '@rpldy/uploader@1.13.0':
+    resolution: {integrity: sha512-8nALd8lM+rFu2X5S0edRRSO/9z2U/gWSgIVQOsXYMixETe0OF/Arr19GvudrlcRv13nPxgr9x1AFUScT+6BZBw==}
+
+  '@rpldy/uploady@1.13.0':
+    resolution: {integrity: sha512-OAq7BDe74HaAu2zZrDhGQZXeVlDhBzxjayN1YGlS6vCYL7C7hi9xWHOihcO2MCPulR7XlSeM/72RfKA65hNy4A==}
+    peerDependencies:
+      react: '>=16.8'
+      react-dom: '>=16.8'
 
   '@rtsao/scc@1.1.0':
     resolution: {integrity: sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==}
@@ -3018,6 +3053,9 @@ packages:
     resolution: {integrity: sha512-4gd7VpWNQNB4UKKCFFVcp1AVv+FMOgs9NKzjHKusc8jTMhd5eL1NqQqOpE0KzMds804/yHlglp3uxgluOqAPLw==}
     engines: {node: '>= 0.4'}
 
+  invariant@2.2.4:
+    resolution: {integrity: sha512-phJfQVBuaJM5raOpJjSfkiD6BpbCE4Ns//LaXl6wGYtUBY83nWS6Rf9tXm2e8VaK60JEjYldbPif/A2B1C2gNA==}
+
   ipaddr.js@1.9.1:
     resolution: {integrity: sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==}
     engines: {node: '>= 0.10'}
@@ -3458,6 +3496,9 @@ packages:
   jsx-ast-utils@3.3.5:
     resolution: {integrity: sha512-ZZow9HBI5O6EPgSJLUb8n2NKgmVWTwCvHGwFuJlMjvLFqlGG6pjirPhtdsseaLZjSibD8eegzmYpUZwoIlj2cQ==}
     engines: {node: '>=4.0'}
+
+  just-throttle@4.2.0:
+    resolution: {integrity: sha512-/iAZv1953JcExpvsywaPKjSzfTiCLqeguUTE6+VmK15mOcwxBx7/FHrVvS4WEErMR03TRazH8kcBSHqMagYIYg==}
 
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
@@ -6775,6 +6816,58 @@ snapshots:
       picomatch: 2.3.1
       rollup: 2.80.0
 
+  '@rpldy/abort@1.13.0':
+    dependencies:
+      '@rpldy/raw-uploader': 1.13.0
+      '@rpldy/shared': 1.13.0
+      '@rpldy/simple-state': 1.13.0
+
+  '@rpldy/life-events@1.13.0':
+    dependencies:
+      '@rpldy/shared': 1.13.0
+
+  '@rpldy/raw-uploader@1.13.0':
+    dependencies:
+      '@rpldy/life-events': 1.13.0
+      '@rpldy/shared': 1.13.0
+
+  '@rpldy/sender@1.13.0':
+    dependencies:
+      '@rpldy/shared': 1.13.0
+
+  '@rpldy/shared-ui@1.13.0(react@19.2.4)':
+    dependencies:
+      '@rpldy/shared': 1.13.0
+      '@rpldy/uploader': 1.13.0
+      react: 19.2.4
+
+  '@rpldy/shared@1.13.0':
+    dependencies:
+      invariant: 2.2.4
+      just-throttle: 4.2.0
+
+  '@rpldy/simple-state@1.13.0':
+    dependencies:
+      '@rpldy/shared': 1.13.0
+
+  '@rpldy/uploader@1.13.0':
+    dependencies:
+      '@rpldy/abort': 1.13.0
+      '@rpldy/life-events': 1.13.0
+      '@rpldy/raw-uploader': 1.13.0
+      '@rpldy/sender': 1.13.0
+      '@rpldy/shared': 1.13.0
+      '@rpldy/simple-state': 1.13.0
+
+  '@rpldy/uploady@1.13.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+    dependencies:
+      '@rpldy/life-events': 1.13.0
+      '@rpldy/shared': 1.13.0
+      '@rpldy/shared-ui': 1.13.0(react@19.2.4)
+      '@rpldy/uploader': 1.13.0
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+
   '@rtsao/scc@1.1.0': {}
 
   '@rushstack/eslint-patch@1.16.1': {}
@@ -9091,6 +9184,10 @@ snapshots:
       hasown: 2.0.2
       side-channel: 1.1.0
 
+  invariant@2.2.4:
+    dependencies:
+      loose-envify: 1.4.0
+
   ipaddr.js@1.9.1: {}
 
   ipaddr.js@2.3.0: {}
@@ -9790,6 +9887,8 @@ snapshots:
       array.prototype.flat: 1.3.3
       object.assign: 4.1.7
       object.values: 1.2.1
+
+  just-throttle@4.2.0: {}
 
   keyv@4.5.4:
     dependencies:

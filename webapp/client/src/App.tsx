@@ -18,6 +18,7 @@ function App() {
         <p>learn react</p>
         <p>{!data ? "Loading..." : data}</p>
       </header>
+      <div></div>
     </div>
   );
 }

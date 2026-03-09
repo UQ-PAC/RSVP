@@ -4,7 +4,7 @@ import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Conditional;
 
 import com.google.gson.annotations.SerializedName;
 
-import uq.pac.rsvp.policy.ast.SourceLoc;
+import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 

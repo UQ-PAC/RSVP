@@ -25,7 +25,8 @@
   },
   "homepage": "https://github.com/UQ-PAC/RSVP#readme",
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "java": "^0.18.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

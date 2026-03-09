@@ -9,7 +9,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 
 import uq.pac.rsvp.policy.ast.PolicyFileEntry;
-import uq.pac.rsvp.policy.ast.SourceLoc;
+import uq.pac.rsvp.support.SourceLoc;
 
 public abstract class Expression extends PolicyFileEntry {
 

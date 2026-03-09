@@ -1,5 +1,7 @@
 # RSVP Web Application
 
+[![Build Web Application](https://github.com/UQ-PAC/RSVP/actions/workflows/webapp.yaml/badge.svg)](https://github.com/UQ-PAC/RSVP/actions/workflows/webapp.yaml)
+
 ## Local development
 
 This project requires Node.js, npm and pnpm to be installed. Install Node.js and npm by following

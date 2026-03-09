@@ -20,6 +20,8 @@ yarn-error.log*
 /rsvp/app/bin
 /rsvp/policy-ast/build
 /rsvp/policy-ast/bin
+/rsvp/support/bin
+/rsvp/support/build
 /webapp/coverage
 /webapp/build
 /webapp/client/public

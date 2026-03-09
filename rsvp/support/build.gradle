@@ -1,13 +1,9 @@
-dependencies {
-    implementation project(':support')
-}
-
 publishing {
     publications {
         mavenJava(MavenPublication) {
             groupId "uq.pac.rsvp"
-            artifactId "policy-ast"
-            version "1.1.2-SNAPSHOT"
+            artifactId "support"
+            version "1.0.0-SNAPSHOT"
             from components.java
         }
     }

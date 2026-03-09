@@ -4,6 +4,7 @@ plugins {
 }
 
 rootProject.name = 'rsvp'
+include 'support'
 include 'policy-ast'
 // include 'policy-dl'
 include 'app'

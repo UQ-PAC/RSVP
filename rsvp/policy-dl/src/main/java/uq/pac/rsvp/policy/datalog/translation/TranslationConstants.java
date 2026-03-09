@@ -75,18 +75,6 @@ public class TranslationConstants {
     }
 
     /**
-     * Rule that describes all potential principals on the system
-     */
-    public final static DLRuleDecl PrincipalRuleDecl =
-            new DLRuleDecl("Principal", PrincipalVarDecl);
-
-    /**
-     * Rule that describes all potential resources on the system
-     */
-    public final static DLRuleDecl ResourceRuleDecl =
-            new DLRuleDecl("Resource", ResourceVarDecl);
-
-    /**
      * Rule that describes all potential actions on the system
      */
     public final static DLRuleDecl ActionRuleDecl =

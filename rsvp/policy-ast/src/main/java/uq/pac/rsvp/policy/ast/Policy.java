@@ -5,6 +5,8 @@ import java.util.Map;
 
 import com.google.gson.annotations.SerializedName;
 
+import uq.pac.rsvp.support.SourceLoc;
+
 import uq.pac.rsvp.policy.ast.expr.Expression;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;

@@ -1,6 +1,5 @@
 package policygen;
 
-import java.util.Collection;
 import java.util.List;
 
 public class SchemaWrapperDefault implements SchemaWrapper {
@@ -37,42 +36,40 @@ public class SchemaWrapperDefault implements SchemaWrapper {
     //    srcSubnet (string)
     //    maintenanceMode (bool)
 
-    private static CedarEntityRef userType = new CedarEntityRef("User",
-            new CedarField("accessLevel", CedarPrimitive.LONG),
-            new CedarField("age", CedarPrimitive.LONG));
-    private static CedarEntityRef groupType = new CedarEntityRef("Group");
-    private static CedarEntityRef fileType = new CedarEntityRef("File",
-            new CedarField("requiredLevel", CedarPrimitive.LONG),
-            new CedarField("owner", userType),
-            new CedarField("creator", userType));
-    private static CedarEntityRef folderType = new CedarEntityRef("Folder",
-            new CedarField("requiredLevel", CedarPrimitive.LONG),
-            new CedarField("owner", userType),
-            new CedarField("creator", userType));
+    private static CedarEntityRef groupType;
+    private static CedarEntityRef userType;
+    private static CedarEntityRef folderType;
+    private static CedarEntityRef fileType;
 
     private static CedarRecord requestType = new CedarRecord(
             new CedarField("srcSubnet", CedarPrimitive.STRING),
             new CedarField("maintenanceMode", CedarPrimitive.BOOL)
             );
 
-    // private Collection<CedarEntityRef> principalTypes = List.of(userType);
-    // private Collection<CedarEntityRef> resourceTypes = List.of(fileType, folderType);
+    private static List<CedarAction> actions;
 
-    @Override
-    public Collection<CedarEntityRef> getAncestorTypes(CedarEntityRef entityType) {
-       if (entityType == userType) {
-           return List.of(groupType);
-       }
-       if (entityType == groupType) {
-           return List.of(groupType);
-       }
-       if (entityType == fileType) {
-           return List.of(folderType);
-       }
-       if (entityType == folderType) {
-           return List.of(folderType);
-       }
-       return List.of();
+    static {
+        groupType = new CedarEntityRef("Group");
+        groupType.setParentTypes(List.of(groupType));
+        userType = new CedarEntityRef("User",
+                List.of(groupType),
+                new CedarField("accessLevel", CedarPrimitive.LONG),
+                new CedarField("age", CedarPrimitive.LONG));
+        folderType = new CedarEntityRef("Folder",
+                new CedarField("requiredLevel", CedarPrimitive.LONG),
+                new CedarField("owner", userType),
+                new CedarField("creator", userType));
+        folderType.setParentTypes(List.of(folderType));
+        fileType = new CedarEntityRef("File",
+                List.of(folderType),
+                new CedarField("requiredLevel", CedarPrimitive.LONG),
+                new CedarField("owner", userType),
+                new CedarField("creator", userType));
+
+        actions = List.of(
+                new CedarAction("Action::\"read\"", List.of(userType), List.of(fileType), requestType),
+                new CedarAction("Action::\"update\"", List.of(userType), List.of(fileType), requestType),
+                new CedarAction("Action::\"remove\"", List.of(userType), List.of(fileType), requestType));
     }
 
     @Override
@@ -88,5 +85,10 @@ public class SchemaWrapperDefault implements SchemaWrapper {
     @Override
     public CedarRecord getRequestType() {
         return requestType;
+    }
+
+    @Override
+    public List<CedarAction> getActions() {
+        return actions;
     }
 }

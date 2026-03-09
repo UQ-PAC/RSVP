@@ -1,13 +1,8 @@
 package policygen;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface SchemaWrapper {
-
-    /**
-     * Given an entity type, get all the entity types that can be an ancestor of the type.
-     */
-    Collection<CedarEntityRef> getAncestorTypes(CedarEntityRef entityType);
 
     /**
      * Get the entity type for principals
@@ -20,6 +15,11 @@ public interface SchemaWrapper {
      * TODO multiple types?
      */
     CedarEntityRef getResourceType();
+
+    /**
+     * Get the list of actions (with details such as their applicable resource/principal types)
+     */
+    List<CedarAction> getActions();
 
     /**
      * Get the record type corresponding to request contexts

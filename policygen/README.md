@@ -2,13 +2,9 @@
 
 Work-in-progress.
 
-This program will generate randomized Cedar policies based on a schema. It goes to some effort to
-ensure the individual policies "make sense" (in terms of types etc).
+This program will generate randomized but somewhat feasible Cedar policies based on a schema. It
+goes to some effort to ensure the individual policies "make sense" (in terms of types etc).
 
-## Build requirements
-
-The project requires that the RSVP "policy-ast" library has been built and deployed to the local
-Maven artifact repository (found in: `../rsvp`).
 
 ## Instructions
 
@@ -16,5 +12,11 @@ This project uses the Gradle "application" plugin.
 
  - `./gradlew assemble` - build
  - `./gradlew run` - run
+ - `./gradlew run --args="space-separated-args"` - run with arguments
  
-Generated policies will be output to "app/policy-out.cedar".
+ Arguments accepted:
+ 
+ - `--schema <schema-file.cedarschema>` - generate based on given schema
+ - `--entities <entities.json>` - generated based on the given entities
+ 
+When run via Gradle, generated policies will be output to "app/policy-out.cedar".

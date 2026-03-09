@@ -5,16 +5,25 @@ package policygen;
 
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
+
+import com.cedarpolicy.model.entity.Entities;
 
 import policygen.entity.Entity;
+import policygen.entity.EntityImpl;
 import policygen.entity.FileResource;
 import policygen.entity.Folder;
 import policygen.entity.Group;
@@ -29,6 +38,18 @@ import uq.pac.rsvp.policy.ast.expr.RecordExpression;
 import uq.pac.rsvp.policy.ast.expr.StringExpression;
 import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
+import uq.pac.rsvp.policy.ast.schema.ActionDefinition;
+import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.Schema;
+import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
+import uq.pac.rsvp.policy.ast.schema.common.CommonTypeReference;
+import uq.pac.rsvp.policy.ast.schema.common.EntityTypeReference;
+import uq.pac.rsvp.policy.ast.schema.common.LongType;
+import uq.pac.rsvp.policy.ast.schema.common.RecordTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.common.StringType;
+import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
+import uq.pac.rsvp.policy.ast.visitor.SchemaVisitorImpl;
 
 public class App {
 
@@ -36,11 +57,182 @@ public class App {
 
     public static void main(String[] args) throws Exception {
 
+        SchemaWrapper schema = null;
+        EntityPool pool = null;
+
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("--schema")) {
+                i++;
+                if (i == args.length) {
+                    System.err.println("Error: '--schema' requires an argument");
+                    System.exit(1);
+                }
+                Path schemaPath = Path.of(args[i]);
+                Schema theSchema = Schema.parseCedarSchema(schemaPath);
+
+                SchemaWrapper[] resultSchemaWrapper = new SchemaWrapper[1];
+                SchemaVisitor visitor = new SchemaVisitorImpl() {
+
+                    Map<EntityTypeDefinition, CedarEntityRef> entityTypes = new HashMap<>();
+                    List<CedarAction> actions = new ArrayList<>();
+
+                    private CedarType mapType(CommonTypeDefinition ctd) {
+                        CedarType[] resultType = new CedarType[1];
+                        ctd.accept(new SchemaVisitorImpl() {
+                            @Override
+                            public void visitBoolean(BooleanType type) {
+                                resultType[0] = CedarPrimitive.BOOL;
+                            }
+
+                            @Override
+                            public void visitLong(LongType type) {
+                                resultType[0] = CedarPrimitive.LONG;
+                            }
+
+                            @Override
+                            public void visitString(StringType type) {
+                                resultType[0] = CedarPrimitive.STRING;
+                            }
+
+                            @Override
+                            public void visitCommonTypeReference(CommonTypeReference type) {
+                                // TODO Auto-generated method stub
+                                //visitCommonTypeReference(type);
+                                System.out.println("*** " + type.getName());
+                                if (type.getDefinition() == null) {
+                                    System.out.println("*** definition is null");
+                                }
+                                type.getDefinition().accept(this);
+                            }
+
+                            @Override
+                            public void visitEntityTypeReference(EntityTypeReference type) {
+                                String entityTypeName = type.getDefinition().getName();
+                                CedarEntityRef entityRef = entityTypes.computeIfAbsent(type.getDefinition(),
+                                        k -> new CedarEntityRef(entityTypeName));
+                                resultType[0] = entityRef;
+                            }
+
+                            @Override
+                            public void visitRecordTypeDefinition(RecordTypeDefinition rtd) {
+                                Set<String> attrNames = rtd.getAttributeNames();
+                                CedarField[] fields = new CedarField[attrNames.size()];
+
+                                int i = 0;
+                                for (String attrName : attrNames) {
+                                    fields[i++] = new CedarField(attrName, mapType(rtd.getAttributeType(attrName)));
+                                }
+
+                                resultType[0] = new CedarRecord(fields);
+                            }
+                        });
+
+                        if (resultType[0] == null)
+                            throw new UnsupportedOperationException("Unhandled type in schema: " + ctd);
+
+                        return resultType[0];
+                    }
+
+                    @Override
+                    public void visitEntityTypeDefinition(EntityTypeDefinition etd) {
+                        // etd.getEntityNamesEnum()
+                        // etd.getMemberOfTypes()
+                        String entityTypeName = etd.getName();
+
+                        // Create the type now in case of recursive definition (attributes of
+                        // entity type), or retrieve the existing (empty) entity in case it has
+                        // been referenced previously:
+                        CedarEntityRef entityRef = entityTypes.computeIfAbsent(etd,
+                                k -> new CedarEntityRef(entityTypeName));
+
+                        Set<String> attrNames = etd.getShapeAttributeNames();
+                        CedarField[] fields = new CedarField[attrNames.size()];
+
+                        int i = 0;
+                        for (String attrName : attrNames) {
+                            fields[i++] = new CedarField(attrName, mapType(etd.getShapeAttributeType(attrName)));
+                        }
+
+                        entityRef.setFields(fields);
+
+                        Set<EntityTypeDefinition> memberOfETDs = etd.getMemberOfTypes();
+                        List<CedarEntityRef> memberOfTypes = new ArrayList<>();
+                        for (EntityTypeDefinition parentETD : memberOfETDs) {
+                            CedarEntityRef parentRef = entityTypes.computeIfAbsent(parentETD,
+                                    k -> new CedarEntityRef(parentETD.getName()));
+                            memberOfTypes.add(parentRef);
+                        }
+
+                        entityRef.setParentTypes(memberOfTypes);
+                    }
+
+                    @Override
+                    public void visitActionDefinition(ActionDefinition action) {
+
+                        // Actions:
+                        // - May apply to a context (record) type
+                        // - Apply to specific principal type(s)
+                        // - Apply to specific resource type(s)
+                        List<CedarEntityRef> principals = new ArrayList<>();
+                        for (EntityTypeDefinition etd : action.getAppliesToPrincipalTypes()) {
+                            CedarEntityRef entityRef = entityTypes.computeIfAbsent(etd,
+                                    k -> new CedarEntityRef(etd.getName()));
+                            principals.add(entityRef);
+                        }
+
+                        List<CedarEntityRef> resources = new ArrayList<>();
+                        for (EntityTypeDefinition etd : action.getAppliesToResourceTypes()) {
+                            CedarEntityRef entityRef = entityTypes.computeIfAbsent(etd,
+                                    k -> new CedarEntityRef(etd.getName()));
+                            resources.add(entityRef);
+                        }
+
+                        CedarRecord context = null;
+                        if (action.getAppliesToContext() != null) {
+                            context = (CedarRecord) mapType(action.getAppliesToContext());
+                        }
+
+                        CedarAction newAction = new CedarAction(action.getName(), principals, resources, context);
+                        actions.add(newAction);
+                    }
+
+                    @Override
+                    public void visitSchema(Schema schema) {
+                        super.visitSchema(schema);
+                        resultSchemaWrapper[0] = new SchemaWrapperImpl(entityTypes.values(), actions);
+                    }
+                };
+
+                visitor.visitSchema(theSchema);
+                schema = resultSchemaWrapper[0];
+            } else if (args[i].equals("--entities")) {
+                i++;
+                if (i == args.length) {
+                    System.err.println("Error: '--entities' requires an argument");
+                    System.exit(1);
+                }
+
+                pool = new EntityPool();
+                Entities entities = Entities.parse(Path.of(args[i]));
+                for (com.cedarpolicy.model.entity.Entity entity : entities.getEntities()) {
+                    pool.addEntity(new EntityImpl(entity.getEUID().getType().toString(), entity.getEUID().getId().toString()));
+                }
+            } else {
+                System.err.println("Error: unrecognised argument '" + args[i] + "'.");
+                System.exit(1);
+            }
+        }
+
+        if (schema == null) {
+            pool = getDefaultEntityPool();
+            schema = new SchemaWrapperDefault();
+        } else if (pool == null) {
+            System.err.println("Error: schema provided without entity pool.");
+            System.exit(1);
+        }
+
         try (FileOutputStream policyOutFS = new FileOutputStream("policy-out.cedar")) {
             PrintStream policyOut = new PrintStream(policyOutFS);
-            EntityPool pool = getDefaultEntityPool();
-            SchemaWrapper schema = new SchemaWrapperDefault();
-
             for (int i = 0; i < 100; i++) {
                 generatePolicy(policyOut, pool, schema);
             }
@@ -92,6 +284,26 @@ public class App {
         return random.nextInt(100) < percent;
     }
 
+    /**
+     * Given an entity type, get all the entity types that can be an ancestor of the type.
+     */
+    private static Collection<CedarEntityRef> getAncestorTypes(CedarEntityRef entityType) {
+        Set<CedarEntityRef> allAncestors = new HashSet<>();
+        List<CedarEntityRef> queue = new LinkedList<>();
+        queue.add(entityType);
+
+        while (!queue.isEmpty()) {
+            CedarEntityRef first = queue.removeFirst();
+            for (CedarEntityRef parentType : first.getParentTypes()) {
+                if (allAncestors.add(parentType)) {
+                    queue.add(parentType);
+                }
+            }
+        }
+
+        return allAncestors;
+    }
+
     private static void generatePolicy(PrintStream output, EntityPool entities, SchemaWrapper schema) {
         // "permit" or "forbid"?
         // 60% permit
@@ -102,7 +314,7 @@ public class App {
         String principal = randomPrincipal(entities, schema);
         policyStr += "    " + principal + ",\n";
 
-        String action = randomAction();
+        String action = randomAction(schema);
         policyStr += "    " + action + ",\n";
 
         String resource = randomResource(entities, schema);
@@ -137,38 +349,42 @@ public class App {
         // TODO: generate "is" clauses.
 
         int principalForm = random.nextInt(100);
+        if (principalForm >= 50) {
+            Collection<CedarEntityRef> ancestorTypes = getAncestorTypes(entityType);
+            if (!ancestorTypes.isEmpty()) {
+                int chosenIndex = random.nextInt(ancestorTypes.size());
+                Iterator<CedarEntityRef> iter = ancestorTypes.iterator();
+                for (int i = 0; i < chosenIndex; i++)
+                    iter.next();
+                CedarEntityRef chosenType = iter.next();
+                Entity chosenEntity = entities.getRandomEntityOfType(chosenType, random);
+                return varName + " in " + chosenEntity.toEntityString();
+            }
+            principalForm -= 50; // reduce to [0, 50)
+        }
+
         if (principalForm < 25) {
             return varName;
         }
-        if (principalForm < 50) {
-            Entity entity = entities.getRandomEntityOfType(entityType, random);
-            return varName + " == " + entity.toEntityString();
+
+        // else (principalForm < 50)
+        Entity entity = entities.getRandomEntityOfType(entityType, random);
+        if (entity == null) {
+            // No known entities of the given type, so can't constrain
+            // TODO maybe convert to "is"?
+            return varName;
         }
-        else {
-            Collection<CedarEntityRef> ancestorTypes = schema.getAncestorTypes(entityType);
-            int chosenIndex = random.nextInt(ancestorTypes.size());
-            Iterator<CedarEntityRef> iter = ancestorTypes.iterator();
-            for (int i = 0; i < chosenIndex; i++)
-                iter.next();
-            CedarEntityRef chosenType = iter.next();
-            Entity chosenEntity = entities.getRandomEntityOfType(chosenType, random);
-            return varName + " in " + chosenEntity.toEntityString();
-        }
+        return varName + " == " + entity.toEntityString();
     }
 
-    private static String randomAction() {
-        // FIXME get possible actions from schema
-        int actionIndex = random.nextInt(4);
-        switch (actionIndex) {
-        case 0:
-            return "action == Action::\"read\"";
-        case 1:
-            return "action == Action::\"update\"";
-        case 2:
-            return "action == Action::\"remove\"";
-        default: /* 3 */
-            return "action";
+    private static String randomAction(SchemaWrapper schema) {
+        // FIXME make sure to use actions applicable to the principal/resource
+        List<CedarAction> actions = schema.getActions();
+        int actionIndex = random.nextInt(actions.size() + 1);
+        if (actionIndex == actions.size()) {
+            return "action"; // no constraint
         }
+        return "action == " + actions.get(actionIndex).getName();
     }
 
     private static class ExpressionWithType {
@@ -182,11 +398,20 @@ public class App {
     private static ExpressionWithType generateValueExpr(EntityPool entities, SchemaWrapper schema,
             boolean allowLiterals) {
 
-        Expression valueExpr;
-        CedarType valueType;
+        Expression valueExpr = null;
+        CedarType valueType = null;
 
         int valueTypeIndex = random.nextInt(100);
         // 35% principal, 35% resources, 30% context
+        if (valueTypeIndex >= 70) {
+            // context
+            valueType = schema.getRequestType();
+            if (valueType != null) {
+                valueExpr = VariableExpression.createContextRef(null);
+            }
+            valueTypeIndex = random.nextInt(70);
+        }
+
         if (valueTypeIndex < 35) {
             // principal.
             valueExpr = VariableExpression.createPrincipalRef(null);
@@ -196,11 +421,6 @@ public class App {
             // resource
             valueExpr = VariableExpression.createResourceRef(null);
             valueType = schema.getResourceType();
-        }
-        else {
-            // context
-            valueExpr = VariableExpression.createContextRef(null);
-            valueType = schema.getRequestType();
         }
 
         // Potentially drill down, i.e. select a field

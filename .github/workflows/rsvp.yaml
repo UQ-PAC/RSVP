@@ -26,7 +26,7 @@ jobs:
           sudo apt install ./x86_64-ubuntu-2404-souffle-2.5-Linux.deb
       - uses: actions/checkout@v4
       - name: Build with Gradle Wrapper
-        run: ./gradlew build -Ppackages.user="${{ secrets.PACKAGES_USER }}" -Ppackages.token="${{ secrets.PACKAGES_TOKEN }}"
+        run: ./gradlew build -Dpackages.user="${{ secrets.PACKAGES_USER }}" -Dpackages.token="${{ secrets.PACKAGES_TOKEN }}"
         working-directory: ./rsvp
         env:
           JAVA_HOME: ${{ env.JAVA_HOME_21_X64 }}

@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
 
-public class App {
+public class Main {
 
     // Currently the app just accepts zero or more cedar policy file paths as
     // arguments which are parsed and the resulting policies and conditions printed

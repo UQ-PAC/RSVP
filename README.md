@@ -6,7 +6,7 @@ A Gradle project (in `./policygen`) for generating random Cedar policies for tes
 
 ## Java CLI and libraries for policy verification
 
-[![RSVP Java CLI](https://github.com/UQ-PAC/RSVP/actions/workflows/rsvp.yaml/badge.svg)](https://github.com/UQ-PAC/RSVP/actions/workflows/rsvp.yaml)
+[![Build Java CLI](https://github.com/UQ-PAC/RSVP/actions/workflows/rsvp.yaml/badge.svg)](https://github.com/UQ-PAC/RSVP/actions/workflows/rsvp.yaml)
 
 Gradle projects in `./rsvp`:
 
@@ -15,6 +15,8 @@ Gradle projects in `./rsvp`:
 - `policy-dl`: Datalog encoding of Cedar policies
 
 ## Web application
+
+[![Build Web Application](https://github.com/UQ-PAC/RSVP/actions/workflows/webapp.yaml/badge.svg)](https://github.com/UQ-PAC/RSVP/actions/workflows/webapp.yaml)
 
 Node/React application (in `./webapp`) provides a GUI for running queries using the Java CLI
 and displaying the resulting reports in a user-friendly way.

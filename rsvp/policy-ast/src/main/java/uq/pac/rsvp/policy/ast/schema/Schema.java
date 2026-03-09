@@ -8,6 +8,8 @@ import java.util.*;
 
 import com.cedarpolicy.model.exception.InternalException;
 import com.cedarpolicy.model.schema.Schema.JsonOrCedar;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -133,15 +135,35 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
      * @return a Schema instance corresponding to the parsed Cedar schema file
      */
     public static Schema parseCedarSchema(Path schemaFile) throws RsvpException {
-        String cedar;
         try {
-            cedar = Files.readString(schemaFile);
+            return parseCedarSchema(Files.readString(schemaFile));
+        } catch (RsvpException e) {
+            throw e;
+        } catch (IOException e) {
+            throw new RsvpException("Error parsing schema " + schemaFile, e);
+        }
+    }
 
+    /**
+     * Parse a schema in the Cedar format and return the corresponding AST.
+     * 
+     * @param cedar the Cedar schema text to parse
+     * @return a Schema instance corresponding to the parsed Cedar schema file
+     * @throws JsonProcessingException If the JSON produced by Cedar is invalid
+     * @throws JsonMappingException    If the JSON produced by Cedar is invalid
+     * @throws InternalException       If either Cedar parsing or the conversion
+     *                                 from Cedar to JSON format fails
+     * @throws IllegalStateException   If the Schema is empty? Unclear
+     * @throws IOException             If an IO error occurs when reading the schema
+     *                                 file
+     */
+    public static Schema parseCedarSchema(String cedar) throws RsvpException {
+        try {
             String json = com.cedarpolicy.model.schema.Schema.parse(JsonOrCedar.Cedar,
                     cedar).toJsonFormat().toString();
             return parseJsonSchema(json);
         } catch (IOException | InternalException | NullPointerException | IllegalStateException e) {
-            throw new RsvpException("Error parsing schema in " + schemaFile, e);
+            throw new RsvpException("Error parsing schema", e);
         }
     }
 

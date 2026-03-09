@@ -95,10 +95,6 @@ public class Translation {
                 .add(actionType.getActionResource().getStatements())
                 .nlComment("Actionable requests")
                 .add(actionType.getActionableRequests().getStatements())
-                .nlComment("All (potential) principals")
-                .add(makePrincipalTypes(translationSchema).getStatements())
-                .nlComment("All (potential) resources")
-                .add(makeResourceTypes().getStatements())
                 .nlComment("Empty relation")
                 .add(NullifiedRequestsRuleDecl);
 
@@ -148,22 +144,5 @@ public class Translation {
             .add(makeIODirectives(output));
 
         return builder.build();
-    }
-
-    public static TranslationRule makePrincipalTypes(TranslationSchema schema) {
-        List<DLRule> facts = schema.getDefinitions().stream()
-                .map(e -> {
-                    return new DLRule(new DLAtom(PrincipalRuleDecl, PrincipalVar),
-                           new DLAtom(e.getEntityRuleDecl(), PrincipalVar));
-                })
-                .toList();
-        return new TranslationRule(PrincipalRuleDecl, facts);
-    }
-
-    public static TranslationRule makeResourceTypes() {
-        DLRule rule = new DLRule(
-                new DLAtom(ResourceRuleDecl, ResourceVar),
-                new DLAtom(PrincipalRuleDecl, ResourceVar));
-        return new TranslationRule(ResourceRuleDecl, rule);
     }
 }

@@ -13,7 +13,7 @@ import java.util.Map;
  * Constants used throughout the translation of Cedar to datalog
  */
 public class TranslationConstants {
-
+    // FIXME: Potential clashes
     public static String UndefinedEntityUIDName = "???";
 
 	/** 

@@ -9,7 +9,6 @@ import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.exception.AuthException;
 import com.cedarpolicy.model.policy.PolicySet;
 import com.cedarpolicy.model.schema.Schema;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import uq.pac.rsvp.policy.datalog.TestUtil;
@@ -24,6 +23,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.fusesource.jansi.Ansi.Attribute.INTENSITY_BOLD;
+import static org.fusesource.jansi.Ansi.Attribute.ITALIC;
 import static org.fusesource.jansi.Ansi.Color.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -60,6 +61,10 @@ public class TranslationTest {
             Path schema = Path.of(testDir.toString(), "schema.cedarschema");
             Path entities = Path.of(testDir.toString(), "entities.json");
 
+            assertTrue(Files.exists(testDir) && Files.isDirectory(testDir));
+            assertTrue(Files.exists(schema) && Files.isRegularFile(schema));
+            assertTrue(Files.exists(entities) && Files.isRegularFile(entities));
+
             List<TestInput> inputs = new ArrayList<>();
             try (Stream<Path> p = Files.list(testDir)) {
                 p.filter(s -> s.toString().endsWith(".cedar")).forEach(policy -> {
@@ -72,21 +77,26 @@ public class TranslationTest {
         }
     }
 
-    @Test
-    void translationTest() throws IOException, AuthException, InterruptedException {
-        translationTest("photoapp");
-    }
-
     @ParameterizedTest
     @ValueSource(strings = {
         "ancestors",
         "photoapp"
     })
-    void translationOracles(String name) throws AuthException, IOException, InterruptedException {
-        List<TestInput> tests = TestInput.load(name);
+    void test(String name) throws AuthException, IOException, InterruptedException {
+        functionalTest(name);
+        differentialTest(name);
+    }
 
-        for (TestInput test : tests) {
+    void functionalTest(String name) throws AuthException, IOException, InterruptedException {
+        logger.attr(INTENSITY_BOLD).attr(ITALIC)
+                .info(CYAN, " ======= Functional Test: %s ======= ", name);
+
+        for (TestInput test : TestInput.load(name)) {
             RequestAuth rsvpAuth = RequestAuth.load(test.schema, test.policy, test.entities, test.datalogDir);
+            logger.info(YELLOW, "Policy: " + test.policy)
+                    .info(CYAN, Files.readString(test.policy))
+                    .info(MAGENTA, "Datalog directory: " + test.datalogDir);
+
             BiConsumer<Supplier<Set<Request>>, Path> doTest = (req, oracle) -> {
                 try {
                     // Get requests from auth
@@ -115,72 +125,58 @@ public class TranslationTest {
 
     /**
      * Differential test for Cedar and RSVP.
-     * This test accepts a resource directory that contains the following files:
-     * - 'schema.cedarschema' : cedar schema
-     * - 'entities.json' : cedar entities
-     * - '*.cedar' cedar policies
      * The test runs both, RSVP and Cedar authorisation engines and compares the results that should agree
      */
-    void translationTest(String app) throws IOException, AuthException, InterruptedException {
-        String test = TranslationTest.class.getClassLoader().getResource(app).getFile();
-        Path testDir = Path.of(test);
-
-        Path schemaPath = Path.of(test, "schema.cedarschema");
-        Path entitiesPath = Path.of(test, "entities.json");
-        List<Path> policiesPath;
-        try (Stream<Path> p = Files.list(testDir)) {
-            policiesPath = p.filter(s -> s.toString().endsWith(".cedar")).toList();
-        }
-
-        assertFalse(policiesPath.isEmpty());
-        assertTrue(Files.exists(schemaPath));
-        assertTrue(Files.exists(entitiesPath));
-
-        for (Path policy : policiesPath) {
-            String baseName = policy.getFileName().toString().replaceAll(".cedar$", "");
-            Path datalogDir = TestUtil.getDatalogDir(app, baseName);
-            RequestAuth rsvpAuth = RequestAuth.load(schemaPath, policy, entitiesPath, datalogDir);
+    void differentialTest(String name) throws IOException, AuthException, InterruptedException {
+        logger.attr(INTENSITY_BOLD).attr(ITALIC)
+                .info(CYAN, " ======= Differential Test: %s ======= ", name);
+        for (TestInput test : TestInput.load(name)) {
+            RequestAuth rsvpAuth = RequestAuth.load(test.schema, test.policy, test.entities, test.datalogDir);
             assertTrue(Collections.disjoint(rsvpAuth.getForbiddenRequests(), rsvpAuth.getPermittedRequests()));
 
-            logger.info(YELLOW, "Policy: " + policy)
-                .info(CYAN, Files.readString(policy))
-                .info(MAGENTA, "Datalog directory: " + datalogDir);
+            logger.info(YELLOW, "Policy: " + test.policy)
+                .info(CYAN, Files.readString(test.policy))
+                .info(MAGENTA, "Datalog directory: " + test.datalogDir);
 
             AuthorizationEngine cedarAuth = new BasicAuthorizationEngine();
-            Entities cedarEntities = Entities.parse(entitiesPath);
+            Entities cedarEntities = Entities.parse(test.entities);
 
-            Schema cedarSchema = Schema.parse(Schema.JsonOrCedar.Cedar, Files.readString(schemaPath));
-            PolicySet cedarPolicies = PolicySet.parsePolicies(policy);
+            Schema cedarSchema = Schema.parse(Schema.JsonOrCedar.Cedar, Files.readString(test.schema));
+            PolicySet cedarPolicies = PolicySet.parsePolicies(test.policy);
 
             int [] requestCounter = new int [2];
-            Set<Request> universe = rsvpAuth.getActionableRequests();
+            // Consistency (for the moment at least if based on fully defined request entities)
+            List<Request> universe = rsvpAuth.getActionableRequests().stream()
+                    .filter(Request::isDefined)
+                    .toList();
             for (Request rsvpRequest : universe) {
                 RequestAuth.Result rsvpDecision = rsvpAuth.authorize(rsvpRequest);
-                assertTrue(rsvpDecision == RequestAuth.Result.DENY ||
-                        rsvpDecision == RequestAuth.Result.ALLOW);
+                assertTrue(rsvpDecision == RequestAuth.Result.Deny ||
+                        rsvpDecision == RequestAuth.Result.Allow);
 
                 AuthorizationRequest cedarRequest = rsvpRequest.getCedarRequest(cedarSchema);
                 AuthorizationResponse cedarResponse =
                         cedarAuth.isAuthorized(cedarRequest, cedarPolicies, cedarEntities);
-                assertEquals(AuthorizationResponse.SuccessOrFailure.Success, cedarResponse.type, () -> """
-                        %s
-                        """.formatted(cedarResponse.errors.orElseThrow(AssertionError::new)));
+                assertEquals(AuthorizationResponse.SuccessOrFailure.Success, cedarResponse.type,
+                        () -> cedarResponse.errors.orElseThrow(AssertionError::new).toString());
                 AuthorizationSuccessResponse cedarSuccess =
                         cedarResponse.success.orElseThrow(AssertionError::new);
                 AuthorizationSuccessResponse.Decision cedarDecision = cedarSuccess.getDecision();
 
                 if (cedarDecision == AuthorizationSuccessResponse.Decision.Allow &&
-                        rsvpDecision == RequestAuth.Result.ALLOW) {
+                        rsvpDecision == RequestAuth.Result.Allow) {
                     requestCounter[0]++;
                 } else if (cedarDecision == AuthorizationSuccessResponse.Decision.Deny &&
-                        rsvpDecision == RequestAuth.Result.DENY) {
+                        rsvpDecision == RequestAuth.Result.Deny) {
                     requestCounter[1]++;
                 } else {
                     fail(""" 
                             Request mismatch:
                                 RSVP: %s,
                                 Cedar: %s
-                            """.formatted(rsvpDecision.toString(), cedarDecision.toString()));
+                            RSVP request: %s
+                            CedarRequest: %s
+                            """.formatted(rsvpDecision, cedarDecision, rsvpRequest, cedarRequest));
                 }
             }
             logger.info(GREEN, "Validated Requests (allow/deny): %d (%d/%d)\n",

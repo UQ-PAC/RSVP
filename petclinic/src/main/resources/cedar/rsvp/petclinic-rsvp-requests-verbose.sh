@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ERROR=
-ENTITIES=petclinic-rsvp-entities.json
+ENTITIES=petclinic-rsvp-entities-cli.json
 POLICY=petclinic-rsvp-policy.cedar
 SCHEMA=petclinic-rsvp-schema.cedarschema
 

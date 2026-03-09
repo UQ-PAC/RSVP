@@ -178,6 +178,13 @@ public class ActionDefinition implements SchemaItem {
                 : Collections.emptySet();
     }
 
+    /**
+     * Get the context attributes that must be present for any request for this
+     * action to be permitted.
+     * 
+     * @return the record containing the context attributes required for this action
+     *         to be allowed, or null if none was specified
+     */
     public RecordTypeDefinition getAppliesToContext() {
         return appliesTo.context;
     }

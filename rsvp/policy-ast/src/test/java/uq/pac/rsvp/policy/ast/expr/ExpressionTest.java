@@ -21,7 +21,7 @@ import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.JsonParser;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
-import uq.pac.rsvp.policy.ast.SourceLoc;
+import uq.pac.rsvp.support.SourceLoc;
 
 @DisplayName("Policy condition AST")
 public class ExpressionTest {

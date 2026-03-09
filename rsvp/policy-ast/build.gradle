@@ -1,3 +1,9 @@
+dependencies {
+    implementation project(':support')
+    implementation 'com.cedarpolicy:cedar-java:4.8.0-rsvp-4:uber'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.20.0'
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {

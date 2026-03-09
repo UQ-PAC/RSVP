@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import uq.pac.rsvp.policy.ast.SourceLoc;
+import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;;
 

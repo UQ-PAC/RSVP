@@ -31,6 +31,26 @@ public class PolicySet extends LinkedHashSet<Policy> implements PolicyItem {
         }
     }
 
+    /**
+     * Parse a Cedar policy file and return the corresponding AST.
+     * 
+     * @param policies a string containing the Cedar policy file text
+     * @return a new PolicySet instance corresponding to the parsed Cedar policy
+     *         file
+     * @throws InternalException If an error occurs while parsing the Cedar policy
+     *                           file
+     * @throws IOException       If an IO error occurs while reading the policy file
+     */
+    public static PolicySet parseCedarPolicySet(String policies) throws RsvpException {
+        try {
+
+            String json = com.cedarpolicy.model.policy.PolicySet.parseStringToJsonAst(policies);
+            return JsonParser.parsePolicySet(json);
+        } catch (InternalException | IOException e) {
+            throw new RsvpException("Error parsing policy set", e);
+        }
+    }
+
     @Override
     public void accept(PolicyVisitor visitor) {
         visitor.visitPolicySet(this);

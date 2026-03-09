@@ -108,7 +108,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'uq.pac.rsvp:policy-ast:1.1.0'
+    implementation 'uq.pac.rsvp:policy-ast:1.1.1'
     // any other dependencies
 }
 
@@ -139,7 +139,7 @@ dependencies {
    }
 
    dependencies {
-      implementation 'uq.pac.rsvp:policy-ast:1.1.0'
+      implementation 'uq.pac.rsvp:policy-ast:1.1.1'
       // any other dependencies
    }
    ```

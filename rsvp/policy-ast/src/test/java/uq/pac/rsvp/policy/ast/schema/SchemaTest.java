@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,10 +21,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.cedarpolicy.model.exception.InternalException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-
+import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.JsonParser;
 import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.policy.ast.schema.common.CommonTypeReference;
@@ -50,8 +46,7 @@ public class SchemaTest {
 
         @Test
         @DisplayName("parses healthcare app correctly")
-        public void healthcareApp()
-                throws IOException, URISyntaxException, InternalException, NullPointerException, IllegalStateException {
+        public void healthcareApp() throws RsvpException {
             URL url = ClassLoader.getSystemResource("healthcare.cedarschema");
             Schema schema = Schema.parseCedarSchema(Path.of(url.getPath()));
 
@@ -60,8 +55,7 @@ public class SchemaTest {
 
         @Test
         @DisplayName("handles collection types")
-        public void collections()
-                throws IOException, URISyntaxException, InternalException, NullPointerException, IllegalStateException {
+        public void collections() throws RsvpException {
             URL url = ClassLoader.getSystemResource("collection-types.cedarschema");
             Schema schema = Schema.parseCedarSchema(Path.of(url.getPath()));
 
@@ -70,9 +64,7 @@ public class SchemaTest {
 
         @Test
         @DisplayName("handles reserved types")
-        public void reservedTypes()
-                throws IOException, URISyntaxException, InternalException,
-                NullPointerException, IllegalStateException {
+        public void reservedTypes() throws RsvpException {
             URL url = ClassLoader.getSystemResource("reserved-types.cedarschema");
             Schema schema = Schema.parseCedarSchema(Path.of(url.getPath()));
 
@@ -82,8 +74,7 @@ public class SchemaTest {
 
         @Test
         @DisplayName("handles missing namespace")
-        public void missingNamespace() throws JsonMappingException, JsonProcessingException, InternalException,
-                NullPointerException, IllegalStateException, IOException {
+        public void missingNamespace() throws RsvpException {
             URL url = ClassLoader.getSystemResource("missing-namespace.cedarschema");
             Schema schema = Schema.parseCedarSchema(Path.of(url.getPath()));
 
@@ -92,9 +83,7 @@ public class SchemaTest {
 
         @Test
         @DisplayName("handles circular references")
-        public void circularReference() throws JsonMappingException,
-                JsonProcessingException, InternalException,
-                NullPointerException, IllegalStateException, IOException {
+        public void circularReference() throws RsvpException {
             URL url = ClassLoader.getSystemResource("circular-reference.cedarschema");
             Schema schema = Schema.parseCedarSchema(Path.of(url.getPath()));
             checkCircularReference(schema);
@@ -102,27 +91,21 @@ public class SchemaTest {
 
         @Test
         @DisplayName("throws parser errors")
-        public void parseError() throws JsonMappingException,
-                JsonProcessingException, InternalException,
-                NullPointerException, IllegalStateException, IOException {
+        public void parseError() {
             URL url = ClassLoader.getSystemResource("parse-error.cedarschema");
-            assertThrowsExactly(InternalException.class, () -> Schema.parseCedarSchema(Path.of(url.getPath())));
+            assertThrowsExactly(RsvpException.class, () -> Schema.parseCedarSchema(Path.of(url.getPath())));
         }
 
         @Test
         @DisplayName("throws illegal shadowing errors")
-        public void illegalShadow() throws JsonMappingException,
-                JsonProcessingException, InternalException,
-                NullPointerException, IllegalStateException, IOException {
+        public void illegalShadow() {
             URL url = ClassLoader.getSystemResource("illegal-shadow.cedarschema");
-            assertThrowsExactly(InternalException.class, () -> Schema.parseCedarSchema(Path.of(url.getPath())));
+            assertThrowsExactly(RsvpException.class, () -> Schema.parseCedarSchema(Path.of(url.getPath())));
         }
 
         @Test
         @DisplayName("handles legal shadowing")
-        public void legalShadow() throws JsonMappingException,
-                JsonProcessingException, InternalException,
-                NullPointerException, IllegalStateException, IOException {
+        public void legalShadow() throws RsvpException {
             URL url = ClassLoader.getSystemResource("legal-shadow.cedarschema");
             Schema schema = Schema.parseCedarSchema(Path.of(url.getPath()));
             checkShadowing(schema);
@@ -130,9 +113,7 @@ public class SchemaTest {
 
         @Test
         @DisplayName("handles annotations")
-        public void annotations() throws JsonMappingException,
-                JsonProcessingException, InternalException,
-                NullPointerException, IllegalStateException, IOException {
+        public void annotations() throws RsvpException {
             URL url = ClassLoader.getSystemResource("type-annotations.cedarschema");
             Schema schema = Schema.parseCedarSchema(Path.of(url.getPath()));
             checkAnnotations(schema);

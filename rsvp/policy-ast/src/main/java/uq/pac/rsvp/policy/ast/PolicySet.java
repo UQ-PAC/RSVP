@@ -6,6 +6,7 @@ import java.util.LinkedHashSet;
 
 import com.cedarpolicy.model.exception.InternalException;
 
+import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
@@ -21,9 +22,13 @@ public class PolicySet extends LinkedHashSet<Policy> implements PolicyItem {
      *                           file
      * @throws IOException       If an IO error occurs while reading the policy file
      */
-    public static PolicySet parseCedarPolicySet(Path policyFile) throws InternalException, IOException {
-        String json = com.cedarpolicy.model.policy.PolicySet.parseToJsonAst(policyFile);
-        return JsonParser.parsePolicySet(json);
+    public static PolicySet parseCedarPolicySet(Path policyFile) throws RsvpException {
+        try {
+            String json = com.cedarpolicy.model.policy.PolicySet.parseToJsonAst(policyFile);
+            return JsonParser.parsePolicySet(json);
+        } catch (InternalException | IOException e) {
+            throw new RsvpException("Error parsing policy set in " + policyFile.getFileName(), e);
+        }
     }
 
     @Override

@@ -3,10 +3,7 @@
  */
 package uq.pac.rsvp;
 
-import java.io.IOException;
 import java.nio.file.Path;
-
-import com.cedarpolicy.model.exception.InternalException;
 
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
@@ -16,7 +13,7 @@ public class App {
     // Currently the app just accepts zero or more cedar policy file paths as
     // arguments which are parsed and the resulting policies and conditions printed
     // to stdout.
-    public static void main(String[] args) throws IOException, InternalException {
+    public static void main(String[] args) throws RsvpException {
 
         // Parse each command line arg as a policy ast file
         for (String arg : args) {

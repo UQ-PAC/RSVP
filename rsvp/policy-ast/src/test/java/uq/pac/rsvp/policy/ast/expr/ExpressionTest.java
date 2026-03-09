@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import com.cedarpolicy.model.exception.InternalException;
 import com.google.gson.JsonParseException;
 
+import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.JsonParser;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
@@ -29,7 +30,7 @@ public class ExpressionTest {
     class TestCedarParsing {
         @Test
         @DisplayName("handles is expressions")
-        void testTypeNode() throws IOException, URISyntaxException, InternalException {
+        void testTypeNode() throws RsvpException {
             URL url = ClassLoader.getSystemResource("is.cedar");
             PolicySet policies = PolicySet.parseCedarPolicySet(Path.of(url.getPath()));
 

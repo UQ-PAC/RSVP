@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import com.cedarpolicy.model.exception.InternalException;
+import uq.pac.rsvp.RsvpException;
 
 @DisplayName("Policy set AST")
 public class PolicySetTest {
@@ -29,7 +29,7 @@ public class PolicySetTest {
                 "permit-and-forbid.cedar;[permit on: (true && (true && (true && (principal == \"poppy\")))), forbid on: (true && (true && (true && (action == \"murder\"))))]",
                 "euid.cedar;[permit on: ((principal is Account) && ((action == Action::\"viewPhoto\") && true))]"
         })
-        void testCedarExpressionParsing(String file, String expected) throws IOException, InternalException {
+        void testCedarExpressionParsing(String file, String expected) throws RsvpException {
             URL url = ClassLoader.getSystemResource(file);
             PolicySet policies = PolicySet.parseCedarPolicySet(Path.of(url.getPath()));
             assertEquals(expected, policies.toString());
@@ -37,7 +37,7 @@ public class PolicySetTest {
 
         @Test
         @DisplayName("handles annotations")
-        void testAnnotationParsing() throws InternalException, IOException {
+        void testAnnotationParsing() throws RsvpException {
             URL url = ClassLoader.getSystemResource("annotation.cedar");
             PolicySet policies = PolicySet.parseCedarPolicySet(Path.of(url.getPath()));
             Policy policy = policies.getFirst();

@@ -10,14 +10,13 @@ import java.util.Set;
 
 import com.cedarpolicy.model.exception.InternalException;
 import com.cedarpolicy.model.schema.Schema.JsonOrCedar;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
+import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.JsonParser;
 import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.policy.ast.schema.common.CommonTypeReference;
@@ -98,20 +97,20 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
      * 
      * @param schemaFile the path to the Cedar schema file
      * @return a Schema instance corresponding to the parsed Cedar schema file
-     * @throws JsonProcessingException If the JSON produced by Cedar is invalid
-     * @throws JsonMappingException    If the JSON produced by Cedar is invalid
-     * @throws InternalException       If either Cedar parsing or the conversion
-     *                                 from Cedar to JSON format fails
-     * @throws IllegalStateException   If the Schema is empty? Unclear
-     * @throws IOException             If an IO error occurs when reading the schema
-     *                                 file
      */
-    public static Schema parseCedarSchema(Path schemaFile) throws JsonMappingException, JsonProcessingException,
-            InternalException, NullPointerException, IllegalStateException, IOException {
-        String cedar = Files.readString(schemaFile);
-        String json = com.cedarpolicy.model.schema.Schema.parse(JsonOrCedar.Cedar,
-                cedar).toJsonFormat().toString();
-        return parseJsonSchema(json);
+    public static Schema parseCedarSchema(Path schemaFile) throws RsvpException {
+        String cedar;
+        try {
+            cedar = Files.readString(schemaFile);
+
+            String json = com.cedarpolicy.model.schema.Schema.parse(JsonOrCedar.Cedar,
+                    cedar).toJsonFormat().toString();
+            return parseJsonSchema(json);
+        } catch (RsvpException e) {
+            throw e;
+        } catch (IOException | InternalException | NullPointerException | IllegalStateException e) {
+            throw new RsvpException("Error parsing schema in " + schemaFile, e);
+        }
     }
 
     /**
@@ -120,9 +119,14 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
      * @param schemaFile the path to the Cedar schema file in the JSON format
      * @return a Schema instance corresponding to the parsed JSON schema file
      */
-    public static Schema parseJsonSchema(Path schemaFile)
-            throws NullPointerException, IllegalStateException, IOException {
-        return parseJsonSchema(Files.readString(schemaFile));
+    public static Schema parseJsonSchema(Path schemaFile) throws RsvpException {
+        try {
+            return parseJsonSchema(Files.readString(schemaFile));
+        } catch (RsvpException e) {
+            throw e;
+        } catch (IOException | NullPointerException | IllegalStateException e) {
+            throw new RsvpException("Error parsing schema in " + schemaFile, e);
+        }
     }
 
     /**
@@ -131,11 +135,15 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
      * @param json schema in JSON format as string
      * @return a Schema instance corresponding to the parsed Cedar schema file
      */
-    public static Schema parseJsonSchema(String json) throws NullPointerException, IllegalStateException {
-        Schema result = JsonParser.parseSchema(json);
-        SchemaVisitor visitor = new SchemaResolutionVisitor();
-        visitor.visitSchema(result);
-        return result;
+    public static Schema parseJsonSchema(String json) throws RsvpException {
+        try {
+            Schema result = JsonParser.parseSchema(json);
+            SchemaVisitor visitor = new SchemaResolutionVisitor();
+            visitor.visitSchema(result);
+            return result;
+        } catch (NullPointerException | IllegalStateException e) {
+            throw new RsvpException("Error parsing JSON schema", e);
+        }
     }
 
     // Cedar docs say type resolution order is:

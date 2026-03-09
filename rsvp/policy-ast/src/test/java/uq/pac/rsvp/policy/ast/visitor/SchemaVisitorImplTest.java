@@ -2,17 +2,13 @@ package uq.pac.rsvp.policy.ast.visitor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.cedarpolicy.model.exception.InternalException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-
+import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.policy.ast.schema.common.CommonTypeReference;
@@ -80,8 +76,7 @@ public class SchemaVisitorImplTest {
     }
 
     @Test
-    void testVisitor() throws JsonMappingException, JsonProcessingException, InternalException, NullPointerException,
-            IllegalStateException, IOException {
+    void testVisitor() throws RsvpException {
         URL url = ClassLoader.getSystemResource("healthcare.cedarschema.json");
         Schema schema = Schema.parseJsonSchema(Path.of(url.getPath()));
         TestVisitor visitor = new TestVisitor();

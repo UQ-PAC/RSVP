@@ -2,5 +2,6 @@
     "principal": "PetClinic::User::\"Sharon Jenkins\"",
     "action": "PetClinic::Action::\"ViewWebPage\"",
     "resource": "PetClinic::WebPage::\"Owners\"",
-    "context": { }
+    "context": { },
+    "validateRequest": true
 }

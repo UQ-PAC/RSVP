@@ -5,5 +5,6 @@
     "context": {
         "database": { "__entity": { "type": "PetClinic::Database", "id": "Owners (B)" } },
         "readAction": { "__entity": { "type": "PetClinic::Action", "id": "ReadFromDatabase" } }
-    }
+    },
+    "validateRequest": true
 }

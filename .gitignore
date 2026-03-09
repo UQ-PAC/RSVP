@@ -7,19 +7,17 @@
 **/.kotlin
 **/.gitattributes
 
-# NPM
-**/node_modules
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
 # Build dirs
 /rsvp/build
 /rsvp/bin
 /rsvp/app/build
 /rsvp/app/bin
+/rsvp/webserver/build
+/rsvp/webserver/bin
 /rsvp/policy-ast/build
 /rsvp/policy-ast/bin
+/rsvp/support/bin
+/rsvp/support/build
 /webapp/coverage
 /webapp/build
 /webapp/client/public

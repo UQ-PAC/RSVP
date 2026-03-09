@@ -109,26 +109,14 @@ public class TranslationConstants {
             new DLRuleDecl("ActionResource", ActionVarDecl, ResourceVarDecl);
 
 
-    public final static DLRuleDecl AllActionableRequestsRuleDecl =
+    public final static DLRuleDecl ActionableRequestsRuleDecl =
             makeStandardRuleDecl("AllActionableRequests");
 
     /**
-     * Rule that describes all potential requests (even impossible ones fom the point of Actions)
+     * Empty relation indicating no solutions
      */
-    public final static DLRuleDecl AllRequestsRuleDecl =
-            makeStandardRuleDecl("AllRequests");
-
-    /**
-     *  AllRequests(action, principal, resource) :-
-     *      Action(action), Principal(principal), Resource(resource).
-     */
-    public static TranslationRule makeAllRequestsRule() {
-        DLRule rule = new DLRule(makeStandardAtom(AllRequestsRuleDecl),
-                new DLAtom(PrincipalRuleDecl, PrincipalVar),
-                new DLAtom(ResourceRuleDecl, ResourceVar),
-                new DLAtom(ActionRuleDecl, ActionVar));
-        return new TranslationRule(AllRequestsRuleDecl, rule);
-    }
+    public final static DLRuleDecl NullifiedRequestsRuleDecl =
+            makeStandardRuleDecl("NullifiedRequests");
 
     /**
      * Rule that describes all explicitly permitted requests
@@ -173,7 +161,7 @@ public class TranslationConstants {
      */
     public static TranslationRule makeForbiddenRequestsRule() {
         DLRule rule = new DLRule(makeStandardAtom(ForbiddenRequestsRuleDecl),
-                makeStandardAtom(AllActionableRequestsRuleDecl),
+                makeStandardAtom(ActionableRequestsRuleDecl),
                 makeNegatedStandardAtom(PermittedRequestsRuleDecl));
         return new TranslationRule(ForbiddenRequestsRuleDecl, rule);
     }
@@ -190,8 +178,7 @@ public class TranslationConstants {
                 ForbidRuleDecl,
                 PermittedRequestsRuleDecl,
                 ForbiddenRequestsRuleDecl,
-                AllActionableRequestsRuleDecl,
-                AllRequestsRuleDecl));
+                ActionableRequestsRuleDecl));
 
         return rules.stream()
                 .map(rd -> new DLOutputDirective(rd, OUTPUT_DESTINATION, options))

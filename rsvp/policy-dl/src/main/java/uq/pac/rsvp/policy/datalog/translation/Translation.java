@@ -99,8 +99,8 @@ public class Translation {
                 .add(makePrincipalTypes(translationSchema).getStatements())
                 .nlComment("All (potential) resources")
                 .add(makeResourceTypes().getStatements())
-                .nlComment("All (potential) requests")
-                .add(makeAllRequestsRule().getStatements());
+                .nlComment("Empty relation")
+                .add(NullifiedRequestsRuleDecl);
 
         builder.nlComment("Permit Policy Rules");
         for (TranslationPolicy policy : translationPolicies.getPermitTranslation()) {

@@ -9,8 +9,9 @@ import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.exception.AuthException;
 import com.cedarpolicy.model.policy.PolicySet;
 import com.cedarpolicy.model.schema.Schema;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.policy.datalog.TestUtil;
 import uq.pac.rsvp.policy.datalog.util.Logger;
 
@@ -23,8 +24,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.fusesource.jansi.Ansi.Attribute.INTENSITY_BOLD;
-import static org.fusesource.jansi.Ansi.Attribute.ITALIC;
 import static org.fusesource.jansi.Ansi.Color.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -56,6 +55,12 @@ public class TranslationTest {
             this.forbidden = Path.of(testDir.toString(), policyName + ".forbidden");
         }
 
+        public static TestInput load(String testDir, String policyName) {
+            return load(testDir).stream()
+                    .filter(t -> t.policyName.equals(policyName))
+                    .findAny().orElseThrow();
+        }
+
         public static List<TestInput> load(String dir) {
             Path testDir = Path.of(TranslationTest.class.getClassLoader().getResource(dir).getFile());
             Path schema = Path.of(testDir.toString(), "schema.cedarschema");
@@ -77,110 +82,114 @@ public class TranslationTest {
         }
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {
-        "ancestors",
-        "photoapp"
-    })
-    void test(String name) throws AuthException, IOException, InterruptedException {
-        functionalTest(name);
-        differentialTest(name);
+    // Sample test for development
+    @Test
+    void one() throws AuthException, IOException, InterruptedException {
+        functionalTest(TestInput.load("ancestors", "no-cond"));
     }
 
-    void functionalTest(String name) throws AuthException, IOException, InterruptedException {
-        logger.attr(INTENSITY_BOLD).attr(ITALIC)
-                .info(CYAN, " ======= Functional Test: %s ======= ", name);
+    @TestFactory
+    Collection<DynamicTest> test() throws AuthException, IOException, InterruptedException {
+        List<DynamicTest> tests = new ArrayList<>();
+        tests.addAll(dynaimcTests("ancestors"));
+        tests.addAll(dynaimcTests("photoapp"));
+        return tests;
+    }
 
-        for (TestInput test : TestInput.load(name)) {
-            RequestAuth rsvpAuth = RequestAuth.load(test.schema, test.policy, test.entities, test.datalogDir);
-            logger.info(YELLOW, "Policy: " + test.policy)
-                    .info(CYAN, Files.readString(test.policy))
-                    .info(MAGENTA, "Datalog directory: " + test.datalogDir);
+    Collection<DynamicTest> dynaimcTests(String name) throws AuthException, IOException, InterruptedException {
+        Collection<DynamicTest> tests = new ArrayList<>();
+        TestInput.load(name).forEach(t -> {
+            tests.add(DynamicTest.dynamicTest("func-" + t.testName + "-" + t.policyName, () -> functionalTest(t)));
+            tests.add(DynamicTest.dynamicTest("diff-" + t.testName + "-" + t.policyName, () -> differentialTest(t)));
+        });
+        return tests;
+    }
 
-            BiConsumer<Supplier<Set<Request>>, Path> doTest = (req, oracle) -> {
-                try {
-                    // Get requests from auth
-                    String str = req.get().stream()
-                            .sorted(Comparator.comparing(Request::getId))
-                            .map(Request::getId)
-                            .collect(Collectors.joining("\n"));
-                    if (TestUtil.GENERATE_ORACLES) {
-                        Path path = Path.of(TestUtil.TESTRESOURCEDIR.toString(),
-                                test.testDir.getFileName().toString(),
-                                oracle.getFileName().toString());
-                        Files.writeString(path, str);
-                    } else {
-                        String oracleStr = Files.readString(oracle);
-                        assertEquals(oracleStr, str);
-                    }
-                } catch (IOException e) {
-                    fail(e);
+    void functionalTest(TestInput test) throws AuthException, IOException, InterruptedException {
+        RequestAuth rsvpAuth = RequestAuth.load(test.schema, test.policy, test.entities, test.datalogDir);
+        logger.info(YELLOW, "Policy: " + test.policy)
+                .info(CYAN, Files.readString(test.policy))
+                .info(MAGENTA, "Datalog directory: " + test.datalogDir);
+
+        BiConsumer<Supplier<Set<Request>>, Path> doTest = (req, oracle) -> {
+            try {
+                // Get requests from auth
+                String str = req.get().stream()
+                        .sorted(Comparator.comparing(Request::getId))
+                        .map(Request::getId)
+                        .collect(Collectors.joining("\n"));
+                if (TestUtil.GENERATE_ORACLES) {
+                    Path path = Path.of(TestUtil.TESTRESOURCEDIR.toString(),
+                            test.testDir.getFileName().toString(),
+                            oracle.getFileName().toString());
+                    Files.writeString(path, str);
+                } else {
+                    String oracleStr = Files.readString(oracle);
+                    assertEquals(oracleStr, str);
                 }
-            };
+            } catch (IOException e) {
+                fail(e);
+            }
+        };
 
-            doTest.accept(rsvpAuth::getPermittedRequests, test.permitted);
-            doTest.accept(rsvpAuth::getForbiddenRequests, test.forbidden);
-        }
+        doTest.accept(rsvpAuth::getPermittedRequests, test.permitted);
+        doTest.accept(rsvpAuth::getForbiddenRequests, test.forbidden);
     }
 
     /**
      * Differential test for Cedar and RSVP.
      * The test runs both, RSVP and Cedar authorisation engines and compares the results that should agree
      */
-    void differentialTest(String name) throws IOException, AuthException, InterruptedException {
-        logger.attr(INTENSITY_BOLD).attr(ITALIC)
-                .info(CYAN, " ======= Differential Test: %s ======= ", name);
-        for (TestInput test : TestInput.load(name)) {
-            RequestAuth rsvpAuth = RequestAuth.load(test.schema, test.policy, test.entities, test.datalogDir);
-            assertTrue(Collections.disjoint(rsvpAuth.getForbiddenRequests(), rsvpAuth.getPermittedRequests()));
+    void differentialTest(TestInput test) throws IOException, AuthException, InterruptedException {
+        RequestAuth rsvpAuth = RequestAuth.load(test.schema, test.policy, test.entities, test.datalogDir);
+        assertTrue(Collections.disjoint(rsvpAuth.getForbiddenRequests(), rsvpAuth.getPermittedRequests()));
 
-            logger.info(YELLOW, "Policy: " + test.policy)
-                .info(CYAN, Files.readString(test.policy))
-                .info(MAGENTA, "Datalog directory: " + test.datalogDir);
+        logger.info(YELLOW, "Policy: " + test.policy)
+            .info(CYAN, Files.readString(test.policy))
+            .info(MAGENTA, "Datalog directory: " + test.datalogDir);
 
-            AuthorizationEngine cedarAuth = new BasicAuthorizationEngine();
-            Entities cedarEntities = Entities.parse(test.entities);
+        AuthorizationEngine cedarAuth = new BasicAuthorizationEngine();
+        Entities cedarEntities = Entities.parse(test.entities);
 
-            Schema cedarSchema = Schema.parse(Schema.JsonOrCedar.Cedar, Files.readString(test.schema));
-            PolicySet cedarPolicies = PolicySet.parsePolicies(test.policy);
+        Schema cedarSchema = Schema.parse(Schema.JsonOrCedar.Cedar, Files.readString(test.schema));
+        PolicySet cedarPolicies = PolicySet.parsePolicies(test.policy);
 
-            int [] requestCounter = new int [2];
-            // Consistency (for the moment at least if based on fully defined request entities)
-            List<Request> universe = rsvpAuth.getActionableRequests().stream()
-                    .filter(Request::isDefined)
-                    .toList();
-            for (Request rsvpRequest : universe) {
-                RequestAuth.Result rsvpDecision = rsvpAuth.authorize(rsvpRequest);
-                assertTrue(rsvpDecision == RequestAuth.Result.Deny ||
-                        rsvpDecision == RequestAuth.Result.Allow);
+        int [] requestCounter = new int [2];
+        // Consistency (for the moment at least if based on fully defined request entities)
+        List<Request> universe = rsvpAuth.getActionableRequests().stream()
+                .filter(Request::isDefined)
+                .toList();
+        for (Request rsvpRequest : universe) {
+            RequestAuth.Result rsvpDecision = rsvpAuth.authorize(rsvpRequest);
+            assertTrue(rsvpDecision == RequestAuth.Result.Deny ||
+                    rsvpDecision == RequestAuth.Result.Allow);
 
-                AuthorizationRequest cedarRequest = rsvpRequest.getCedarRequest(cedarSchema);
-                AuthorizationResponse cedarResponse =
-                        cedarAuth.isAuthorized(cedarRequest, cedarPolicies, cedarEntities);
-                assertEquals(AuthorizationResponse.SuccessOrFailure.Success, cedarResponse.type,
-                        () -> cedarResponse.errors.orElseThrow(AssertionError::new).toString());
-                AuthorizationSuccessResponse cedarSuccess =
-                        cedarResponse.success.orElseThrow(AssertionError::new);
-                AuthorizationSuccessResponse.Decision cedarDecision = cedarSuccess.getDecision();
+            AuthorizationRequest cedarRequest = rsvpRequest.getCedarRequest(cedarSchema);
+            AuthorizationResponse cedarResponse =
+                    cedarAuth.isAuthorized(cedarRequest, cedarPolicies, cedarEntities);
+            assertEquals(AuthorizationResponse.SuccessOrFailure.Success, cedarResponse.type,
+                    () -> cedarResponse.errors.orElseThrow(AssertionError::new).toString());
+            AuthorizationSuccessResponse cedarSuccess =
+                    cedarResponse.success.orElseThrow(AssertionError::new);
+            AuthorizationSuccessResponse.Decision cedarDecision = cedarSuccess.getDecision();
 
-                if (cedarDecision == AuthorizationSuccessResponse.Decision.Allow &&
-                        rsvpDecision == RequestAuth.Result.Allow) {
-                    requestCounter[0]++;
-                } else if (cedarDecision == AuthorizationSuccessResponse.Decision.Deny &&
-                        rsvpDecision == RequestAuth.Result.Deny) {
-                    requestCounter[1]++;
-                } else {
-                    fail(""" 
-                            Request mismatch:
-                                RSVP: %s,
-                                Cedar: %s
-                            RSVP request: %s
-                            CedarRequest: %s
-                            """.formatted(rsvpDecision, cedarDecision, rsvpRequest, cedarRequest));
-                }
+            if (cedarDecision == AuthorizationSuccessResponse.Decision.Allow &&
+                    rsvpDecision == RequestAuth.Result.Allow) {
+                requestCounter[0]++;
+            } else if (cedarDecision == AuthorizationSuccessResponse.Decision.Deny &&
+                    rsvpDecision == RequestAuth.Result.Deny) {
+                requestCounter[1]++;
+            } else {
+                fail(""" 
+                        Request mismatch:
+                            RSVP: %s,
+                            Cedar: %s
+                        RSVP request: %s
+                        CedarRequest: %s
+                        """.formatted(rsvpDecision, cedarDecision, rsvpRequest, cedarRequest));
             }
-            logger.info(GREEN, "Validated Requests (allow/deny): %d (%d/%d)\n",
-                    universe.size(), requestCounter[0], requestCounter[1]);
         }
+        logger.info(GREEN, "Validated Requests (allow/deny): %d (%d/%d)\n",
+                universe.size(), requestCounter[0], requestCounter[1]);
     }
 }

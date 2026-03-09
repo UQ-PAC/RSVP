@@ -2,7 +2,9 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import com.google.common.collect.HashMultimap;
 import uq.pac.rsvp.policy.ast.expr.*;
+import uq.pac.rsvp.policy.ast.schema.ActionDefinition;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.common.*;
 
@@ -78,8 +80,32 @@ public class TranslationTyping {
         }
         error(!applicable.isEmpty(), "No available types for: " + ref + " after reduction");
 
-        // FIXME: If we are updating action, we also need to update principal and resource as per
-        //        limits of the schema
+        // If we are updating action, we also need to update principal and resource as per schema
+        if (ref == Action) {
+            Set<String> appliesToPrincipalTypes = applicable.stream().map(schema::getAction)
+                    .flatMap(a -> a.getAppliesToPrincipalTypes().stream())
+                    .map(EntityTypeDefinition::getName)
+                    .collect(Collectors.toSet());
+
+            Set<String> principalTypes = typing.get(Principal);
+            for (String pt : appliesToPrincipalTypes) {
+                if (!principalTypes.contains(pt)) {
+                    principalTypes.remove(pt);
+                }
+            }
+
+            Set<String> appliesToResourceTypes = applicable.stream().map(schema::getAction)
+                    .flatMap(a -> a.getAppliesToResourceTypes().stream())
+                    .map(EntityTypeDefinition::getName)
+                    .collect(Collectors.toSet());
+
+            Set<String> resourceTypes = typing.get(Resource);
+            for (String pt : appliesToResourceTypes) {
+                if (!resourceTypes.contains(pt)) {
+                    resourceTypes.remove(pt);
+                }
+            }
+        }
     }
 
     // FIXME: May be not needed, check CommonTypeDefinition.getName

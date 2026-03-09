@@ -6,6 +6,7 @@ import uq.pac.rsvp.policy.datalog.ast.*;
 import java.util.Collection;
 import java.util.List;
 
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 import static uq.pac.rsvp.policy.datalog.util.Util.required;
 import static uq.pac.rsvp.policy.ast.expr.VariableExpression.Reference.*;
@@ -30,9 +31,9 @@ public class TranslationVisitor extends TranslationVoidAdapter {
 
         // Ground terms
         visitor.expressions.addAll(List.of(
-                new DLAtom(TranslationConstants.PrincipalRuleDecl, TranslationConstants.PrincipalVar),
-                new DLAtom(TranslationConstants.ResourceRuleDecl, TranslationConstants.ResourceVar),
-                new DLAtom(TranslationConstants.ActionRuleDecl, TranslationConstants.ActionVar)));
+                new DLAtom(ActionPrincipalRuleDecl, ActionVar, PrincipalVar),
+                new DLAtom(ActionResourceRuleDecl, ActionVar, ResourceVar),
+                new DLAtom(ActionRuleDecl, ActionVar)));
 
         exprs.forEach(e -> e.accept(visitor));
         DLAtom atom = new DLAtom(decl.getName(),
@@ -83,5 +84,12 @@ public class TranslationVisitor extends TranslationVoidAdapter {
         }
         expr.getExpression().accept(this);
         negated = false;
+    }
+
+    @Override
+    public void visitBooleanExpr(BooleanExpression expr) {
+        if (!expr.getValue()) {
+            expressions.add(makeStandardAtom(NullifiedRequestsRuleDecl));
+        }
     }
 }

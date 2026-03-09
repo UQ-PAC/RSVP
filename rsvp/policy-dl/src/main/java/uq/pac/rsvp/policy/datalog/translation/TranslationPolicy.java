@@ -30,9 +30,9 @@ public class TranslationPolicy {
     public TranslationPolicy(String name, Policy policy, TranslationSchema schema) {
         this.declaration = TranslationConstants.makeStandardRuleDecl(name);
         List<List<Expression>> disjunctions = NFConverter.toDNF(policy.getCondition());
-        this.rules = disjunctions.stream().map(disjunction -> {
-            return TranslationVisitor.translate(schema, disjunction, declaration);
-        }).toList();
+        this.rules = disjunctions.stream()
+                .map(disjunction -> TranslationVisitor.translate(schema, disjunction, declaration))
+                .toList();
     }
 
     public List<DLRule> getRules() {

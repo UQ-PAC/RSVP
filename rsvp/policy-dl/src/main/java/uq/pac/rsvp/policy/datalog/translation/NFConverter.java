@@ -49,6 +49,11 @@ public class NFConverter extends ValueVisitorAdapter<Formula> {
         };
     }
 
+    @Override
+    public Formula visitBooleanExpr(BooleanExpression expr) {
+        return factory.constant(expr.getValue());
+    }
+
     private Expression fromStream(Stream<Formula> stream, BinaryExpression.BinaryOp op) {
         List<Expression> exprs = stream
                 .map(this::toExpression)
@@ -70,6 +75,8 @@ public class NFConverter extends ValueVisitorAdapter<Formula> {
             case Literal l -> l.phase() ? cache.get(l.variable().name()) :
                     new UnaryExpression(UnaryExpression.UnaryOp.Not, toExpression(l.variable()));
             case Not n -> new UnaryExpression(UnaryExpression.UnaryOp.Not, toExpression(n.operand()));
+            case CTrue t -> new BooleanExpression(true);
+            case CFalse f -> new BooleanExpression(false);
             default -> throw new RuntimeException("Unreachable");
         };
     }

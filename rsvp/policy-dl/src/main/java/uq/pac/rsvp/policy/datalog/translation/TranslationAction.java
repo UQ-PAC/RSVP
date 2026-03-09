@@ -66,14 +66,14 @@ public class TranslationAction {
             actionResourceRules.addAll(arRules);
         }
 
-        DLRule actionableRequestRule = new DLRule(makeStandardAtom(AllActionableRequestsRuleDecl),
+        DLRule actionableRequestRule = new DLRule(makeStandardAtom(ActionableRequestsRuleDecl),
                 new DLAtom(ActionPrincipalRuleDecl, ActionVar, PrincipalVar),
                 new DLAtom(ActionResourceRuleDecl, ActionVar, ResourceVar));
 
         this.action = new TranslationRule(ActionRuleDecl, actionFacts);
         this.actionPrincipal = new TranslationRule(ActionPrincipalRuleDecl, actionPrincipalRules);
         this.actionResource = new TranslationRule(ActionResourceRuleDecl, actionResourceRules);
-        this.actionableRequests = new TranslationRule(AllActionableRequestsRuleDecl, actionableRequestRule);
+        this.actionableRequests = new TranslationRule(ActionableRequestsRuleDecl, actionableRequestRule);
     }
 
     public TranslationRule getAction() {

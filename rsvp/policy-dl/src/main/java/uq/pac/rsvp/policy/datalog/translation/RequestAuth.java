@@ -32,24 +32,13 @@ public class RequestAuth {
      * Forbidden requests
      */
     private final Set<Request> forbidden;
-    /**
-     * A universe of all requests that could be constructed of entities and actions.
-     * Not all of them are necessarily valid from the perspective of the schema and policies.
-	 * For instance, a request using a principal type that goes against the policy is considered
-     * invalid is cedar
-     */
-    private final Set<Request> universe;
 
-    private RequestAuth(Set<Request> universe, Set<Request> permitted, Set<Request> forbidden) {
-        this.universe = universe;
+    private RequestAuth(Set<Request> permitted, Set<Request> forbidden) {
         this.permitted = permitted;
         this.forbidden = forbidden;
 
         // Permitted and forbidden are disjoint sets
         permitted.forEach(s -> require(!forbidden.contains(s)));
-        // Permitted and forbidden sets should be in the universe of potential requests
-        require(universe.containsAll(permitted));
-        require(universe.containsAll(forbidden));
     }
 
     public enum Result {
@@ -61,7 +50,7 @@ public class RequestAuth {
     public Result authorize(Request request) {
         if (permitted.contains(request)) {
             return Allow;
-        } else if (universe.contains(request)) {
+        } else if (forbidden.contains(request)) {
             return Deny;
         }
         return Invalid;
@@ -101,10 +90,9 @@ public class RequestAuth {
         if (!Files.exists(dir) ||  !Files.isDirectory(dir)) {
             throw new TranslationError("Target directory %s does not exist or not a directory".formatted(dir));
         }
-        Set<Request> universe = loadRequests(dir, TranslationConstants.AllRequestsRuleDecl);
         Set<Request> permitted = loadRequests(dir, TranslationConstants.PermittedRequestsRuleDecl);
         Set<Request> forbidden = loadRequests(dir, TranslationConstants.ForbiddenRequestsRuleDecl);
-        return new RequestAuth(universe, permitted, forbidden);
+        return new RequestAuth(permitted, forbidden);
     }
 
     public Set<Request> getPermittedRequests() {
@@ -120,10 +108,6 @@ public class RequestAuth {
         requests.addAll(getPermittedRequests());
         requests.addAll(getForbiddenRequests());
         return requests;
-    }
-
-    public Set<Request> getRequestUniverse() {
-        return universe;
     }
 
     @Override

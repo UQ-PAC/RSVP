@@ -1,4 +1,3 @@
-// Children can talk only to parents
 permit (
     principal is Child,
     action == Action::"Talk",

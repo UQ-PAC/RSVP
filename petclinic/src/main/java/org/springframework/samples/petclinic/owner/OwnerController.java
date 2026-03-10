@@ -38,6 +38,8 @@ import jakarta.validation.Valid;
 
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import org.springframework.samples.petclinic.cedar.CedarAuthorization;
+
 /**
  * @author Juergen Hoeller
  * @author Ken Krebs
@@ -164,6 +166,7 @@ class OwnerController {
 	 * @return a ModelMap with the model attributes for the view
 	 */
 	@GetMapping("/owners/{ownerId}")
+	@CedarAuthorization(action = "ViewWebPage", resourceType = "WebPage::\"Owner\"")
 	public ModelAndView showOwner(@PathVariable("ownerId") int ownerId) {
 		ModelAndView mav = new ModelAndView("owners/ownerDetails");
 		Optional<Owner> optionalOwner = this.owners.findById(ownerId);

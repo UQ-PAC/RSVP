@@ -9,6 +9,7 @@
 
   <!-- Status-specific error message -->
   <p th:switch="${status}">
+    <span th:case="403" th:text="#{error.403}">Access denied.</span>
     <span th:case="404" th:text="#{error.404}">The requested page was not found.</span>
     <span th:case="500" th:text="#{error.500}">An internal server error occurred.</span>
     <span th:case="*" th:text="#{error.general}">An unexpected error occurred.</span>

@@ -10,7 +10,6 @@ import com.cedarpolicy.model.exception.AuthException;
 import com.cedarpolicy.model.policy.PolicySet;
 import com.cedarpolicy.model.schema.Schema;
 import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.datalog.TestUtil;
@@ -52,14 +51,8 @@ public class TranslationTest {
                     .replaceAll(".cedar$", "");
             this.datalogDir = TestUtil.getDatalogDir(testDir.getFileName().toString(), policyName);
             this.testName = testDir.getFileName().toString();
-            this.permitted = Path.of(testDir.toString(), policyName + ".permitted");
-            this.forbidden = Path.of(testDir.toString(), policyName + ".forbidden");
-        }
-
-        public static TestInput load(String testDir, String policyName) {
-            return load(testDir).stream()
-                    .filter(t -> t.policyName.equals(policyName))
-                    .findAny().orElseThrow();
+            this.permitted = Path.of(testDir.toString(), policyName + ".allow");
+            this.forbidden = Path.of(testDir.toString(), policyName + ".deny");
         }
 
         public static List<TestInput> load(String dir) {
@@ -85,26 +78,23 @@ public class TranslationTest {
 
     // Sample test for development
     @TestFactory
-    Collection<DynamicTest> one() {
-        return TestInput.load("ancestors").stream().map(t ->
+    Collection<DynamicTest> oneOff() {
+        return TestInput.load("basic").stream().map(t ->
                 DynamicTest.dynamicTest(t.testName + "-" + t.policyName, () -> functionalTest(t))).toList();
     }
 
     @TestFactory
-    Collection<DynamicTest> test() throws AuthException, IOException, InterruptedException {
+    Collection<DynamicTest> test() throws IOException {
         List<DynamicTest> tests = new ArrayList<>();
-        tests.addAll(dynaimcTests("ancestors"));
-        tests.addAll(dynaimcTests("photoapp"));
-//        List<DynamicTest> tests = new ArrayList<>();
-//        try (Stream<Path> dirs = Files.list(TestUtil.RESOURCEDIR)) {
-//            for (Path p : dirs.filter(Files::isDirectory).toList()) {
-//                tests.addAll(dynaimcTests(p.getFileName().toString()));
-//            }
-//        }
+        try (Stream<Path> dirs = Files.list(TestUtil.RESOURCEDIR)) {
+            for (Path p : dirs.filter(Files::isDirectory).toList()) {
+                tests.addAll(dynamicTests(p.getFileName().toString()));
+            }
+        }
         return tests;
     }
 
-    Collection<DynamicTest> dynaimcTests(String name) throws AuthException, IOException, InterruptedException {
+    Collection<DynamicTest> dynamicTests(String name) {
         Collection<DynamicTest> tests = new ArrayList<>();
         TestInput.load(name).forEach(t -> {
             tests.add(DynamicTest.dynamicTest("func-" + t.testName + "-" + t.policyName, () -> functionalTest(t)));

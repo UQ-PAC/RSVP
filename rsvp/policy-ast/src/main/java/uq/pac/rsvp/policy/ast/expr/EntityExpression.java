@@ -41,6 +41,10 @@ public class EntityExpression extends Expression {
         return eid;
     }
 
+    public String getQualifiedType() {
+        return String.join("::", path);
+    }
+
     public String getQualifiedEid() {
         List<String> result = new ArrayList<>(path);
         result.add(eid);

@@ -1,0 +1,6 @@
+User::Bob	File::???	Action::Use
+User::Bob	File::file	Action::Use
+User::Bob	Link::???	Action::Use
+User::Bob	Link::link	Action::Use
+User::Bob	Socket::???	Action::Use
+User::Bob	Socket::socket	Action::Use

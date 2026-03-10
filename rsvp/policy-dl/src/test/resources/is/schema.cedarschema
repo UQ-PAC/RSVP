@@ -1,0 +1,25 @@
+entity User = {
+    "name" : String
+};
+
+entity File = {
+    kind: String,
+    size: Long
+};
+
+entity Link = {
+    kind: String,
+    size: Long
+};
+
+entity Socket = {
+    kind: String,
+    size: Long
+};
+
+action "Use" appliesTo {
+  principal: User,
+  resource: [ File, Link, Socket ],
+  context: {}
+};
+

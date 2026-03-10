@@ -90,7 +90,7 @@ public class TranslationVisitor extends TranslationVoidAdapter {
                 String relationName = schema.getTranslationEntityType(typeExpr.getValue())
                         .getEntityRuleDecl()
                         .getName();
-                expressions.add(new DLAtom(relationName, var));
+                expressions.add(new DLAtom(relationName, negated, var));
             }
             case And, Or -> throw new AssertionError("Unreachable");
             default -> throw new RuntimeException("unsupported: " + expr.getOp());

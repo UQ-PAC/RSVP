@@ -20,6 +20,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
 
@@ -44,10 +45,10 @@ public class Translation {
         if (!vResp.validationPassed()) {
             List<DetailedError> errors = vResp.errors.isPresent() ?
                     vResp.errors.get() : Collections.emptyList();
-            for (DetailedError error : errors) {
-                System.err.println(error);
-            }
-            throw new TranslationError("Schema/Policy validation failed");
+            String err = errors.stream()
+                    .map(e -> e.message)
+                    .collect(Collectors.joining("\n"));
+            throw new TranslationError("Schema/Policy validation failed: \n" + err);
         }
 
         EntityValidationRequest eReq =

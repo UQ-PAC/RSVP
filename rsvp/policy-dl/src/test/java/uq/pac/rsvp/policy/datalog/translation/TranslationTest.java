@@ -85,7 +85,7 @@ public class TranslationTest {
     // Sample test for development
     @TestFactory
     Collection<DynamicTest> one() {
-        return TestInput.load("prim-types").stream().map(t ->
+        return TestInput.load("is").stream().map(t ->
                 DynamicTest.dynamicTest(t.testName + "-" + t.policyName, () -> functionalTest(t))).toList();
     }
 

@@ -144,7 +144,9 @@ public class TranslationTyping {
             public void visitBinaryExpr(BinaryExpression expr) {
                 Expression lhs = expr.getLeft(), rhs = expr.getRight();
                 switch (expr.getOp()) {
+                    case LessEq, Less, Greater, GreaterEq -> {}
                     case Eq -> {
+                        // FIXME
                         if (lhs instanceof VariableExpression v && rhs instanceof EntityExpression e) {
                             update(v.getReference(), negated, String.join("::", e.getQualifiedEid()));
                         }

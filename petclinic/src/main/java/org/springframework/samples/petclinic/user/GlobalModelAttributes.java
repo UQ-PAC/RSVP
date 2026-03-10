@@ -10,21 +10,21 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 @ControllerAdvice
 public class GlobalModelAttributes {
 
-    private final UserRepository userRepository;
+	private final UserRepository userRepository;
 
-    public GlobalModelAttributes(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+	public GlobalModelAttributes(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
 
 	@ModelAttribute("currentUser")
 	public String populateUser(HttpSession session) {
 		String currentUser = (String) session.getAttribute("currentUser");
-		return (currentUser != null) ? currentUser : "GUEST";
+		return (currentUser != null) ? currentUser : "Guest";
 	}
 
-    @ModelAttribute("dynamicUsers")
-    public Iterable<User> populateDynamicUsers() {
-        return this.userRepository.findAll();
-    }
+	@ModelAttribute("dynamicUsers")
+	public Iterable<User> populateDynamicUsers() {
+		return this.userRepository.findAll();
+	}
 
 }

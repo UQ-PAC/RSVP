@@ -10,7 +10,7 @@ public class ContextController {
 
 	@GetMapping("/switch-user")
 	public String switchUser(@RequestParam String currentUser, HttpSession session) {
-		session.setAttribute("currentUser", currentUser.toUpperCase());
+		session.setAttribute("currentUser", currentUser);
 		return "redirect:/";
 	}
 

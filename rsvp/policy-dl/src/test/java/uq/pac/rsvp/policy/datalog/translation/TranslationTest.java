@@ -10,6 +10,7 @@ import com.cedarpolicy.model.exception.AuthException;
 import com.cedarpolicy.model.policy.PolicySet;
 import com.cedarpolicy.model.schema.Schema;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.datalog.TestUtil;
@@ -85,7 +86,7 @@ public class TranslationTest {
     // Sample test for development
     @TestFactory
     Collection<DynamicTest> one() {
-        return TestInput.load("is").stream().map(t ->
+        return TestInput.load("ancestors").stream().map(t ->
                 DynamicTest.dynamicTest(t.testName + "-" + t.policyName, () -> functionalTest(t))).toList();
     }
 
@@ -94,6 +95,12 @@ public class TranslationTest {
         List<DynamicTest> tests = new ArrayList<>();
         tests.addAll(dynaimcTests("ancestors"));
         tests.addAll(dynaimcTests("photoapp"));
+//        List<DynamicTest> tests = new ArrayList<>();
+//        try (Stream<Path> dirs = Files.list(TestUtil.RESOURCEDIR)) {
+//            for (Path p : dirs.filter(Files::isDirectory).toList()) {
+//                tests.addAll(dynaimcTests(p.getFileName().toString()));
+//            }
+//        }
         return tests;
     }
 
@@ -120,7 +127,7 @@ public class TranslationTest {
                         .map(Request::getId)
                         .collect(Collectors.joining("\n"));
                 if (TestUtil.GENERATE_ORACLES) {
-                    Path path = Path.of(TestUtil.TESTRESOURCEDIR.toString(),
+                    Path path = Path.of(TestUtil.RESOURCEDIR.toString(),
                             test.testDir.getFileName().toString(),
                             oracle.getFileName().toString());
                     Files.writeString(path, str);

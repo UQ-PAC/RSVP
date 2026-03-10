@@ -7,8 +7,6 @@ import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.common.*;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -42,7 +40,7 @@ public class TranslationTyping {
         });
     }
 
-    boolean supported(VariableExpression.Reference ref) {
+    private boolean supported(VariableExpression.Reference ref) {
         return switch (ref) {
             case Action, Principal, Resource -> true;
             case Context -> false;
@@ -54,8 +52,14 @@ public class TranslationTyping {
         return typing.get(ref);
     }
 
-    public void update(VariableExpression.Reference ref, boolean negated, String ...types) {
-        update(ref, negated, Arrays.stream(types).collect(Collectors.toCollection(HashSet::new)));
+    public void update(VariableExpression.Reference ref, boolean negated, String type) {
+        update(ref, negated, Set.of(type));
+    }
+
+    public void update(VariableExpression.Reference ref, boolean negated, EntityExpression expr) {
+        String type = expr.getQualifiedEid().startsWith("Action") ?
+                expr.getQualifiedEid() : expr.getQualifiedType();
+        update(ref, negated, type);
     }
 
     public void update(VariableExpression.Reference ref, boolean negated, Set<String> types) {
@@ -65,7 +69,7 @@ public class TranslationTyping {
                 case Principal, Resource ->
                         error(schema.getEntityType(type) != null, "Cannot locate entity definition: " + type);
                 case Action ->
-                        error(schema.getAction(type) != null, "Cannot locate entity definition: " + type);
+                        error(schema.getAction(type) != null, "Cannot locate action definition: " + type);
                 default ->
                         error("Unexpected variable: " + ref.name());
             }
@@ -145,9 +149,9 @@ public class TranslationTyping {
                     case LessEq, Less, Greater, GreaterEq -> {}
                     case Eq -> {
                         if (lhs instanceof VariableExpression v && rhs instanceof EntityExpression e) {
-                            update(v.getReference(), negated, e.getQualifiedType());
+                            update(v.getReference(), negated, e);
                         } else if (rhs instanceof VariableExpression v && lhs instanceof EntityExpression e) {
-                            update(v.getReference(), negated, e.getQualifiedType());
+                            update(v.getReference(), negated, e);
                         }
                     }
                     case Neq -> {

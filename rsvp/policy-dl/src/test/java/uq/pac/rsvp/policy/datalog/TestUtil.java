@@ -30,7 +30,7 @@ public class TestUtil {
     /**
      * Test resource dir (source tree)
      */
-    public final static Path TESTRESOURCEDIR = Path.of(ROOTDIR.toString(), "src", "test", "resources");
+    public final static Path RESOURCEDIR = Path.of(ROOTDIR.toString(), "src", "test", "resources");
 
     /**
      * Whether to generate ot check test oracles

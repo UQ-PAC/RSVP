@@ -13,10 +13,6 @@ public class DLFact extends DLStatement {
         this.atom = atom;
     }
 
-    public DLFact(String relation, DLTerm ...terms) {
-        this.atom = new DLAtom(relation, terms);
-    }
-
     public DLFact(DLRuleDecl decl, DLTerm ...terms) {
         this.atom = new DLAtom(decl.getName(), terms);
     }
@@ -29,7 +25,7 @@ public class DLFact extends DLStatement {
         return atom;
     }
 
-    public String getRelationName() {
+    public String getName() {
         return atom.getName();
     }
 }

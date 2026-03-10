@@ -1,8 +1,11 @@
 package uq.pac.rsvp.policy.datalog.ast;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 
 import java.io.BufferedReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;

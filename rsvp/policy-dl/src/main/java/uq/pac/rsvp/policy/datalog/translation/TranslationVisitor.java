@@ -15,7 +15,7 @@ import static uq.pac.rsvp.policy.ast.expr.VariableExpression.Reference.*;
  * Main translation visitor converting a Cedar expression to a set of rules
  * <p>
  * The visitor expects (potentially negated) predicate expressions coming from some normal form, i.e.,
- *  - There are no conjunctions or disjunctions
+ *  - An expression is a predicate boolean expression, there are no conjunctions or disjunctions
  *  - An expression can be negated but once only
  */
 public class TranslationVisitor extends TranslationVoidAdapter {
@@ -91,5 +91,11 @@ public class TranslationVisitor extends TranslationVoidAdapter {
         if (!expr.getValue()) {
             expressions.add(makeStandardAtom(NullifiedRequestsRuleDecl));
         }
+    }
+
+    @Override
+    public void visitPropertyAccessExpr(PropertyAccessExpression expr) {
+        StringExpression value = new StringExpression(Boolean.toString(!negated));
+        new BinaryExpression(expr, BinaryExpression.BinaryOp.Eq, value).accept(this);
     }
 }

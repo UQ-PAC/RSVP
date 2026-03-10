@@ -41,6 +41,11 @@ public class NFConverter extends ValueVisitorAdapter<Formula> {
     }
 
     @Override
+    public Formula visitPropertyAccessExpr(PropertyAccessExpression expr) {
+        return getVar(expr);
+    }
+
+    @Override
     public Formula visitUnaryExpr(UnaryExpression expr) {
         return switch (expr.getOp()) {
             case UnaryExpression.UnaryOp.Not ->

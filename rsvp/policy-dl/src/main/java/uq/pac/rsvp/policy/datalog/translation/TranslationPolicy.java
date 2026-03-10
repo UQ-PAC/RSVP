@@ -3,6 +3,7 @@ package uq.pac.rsvp.policy.datalog.translation;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.expr.Expression;
 import uq.pac.rsvp.policy.datalog.ast.*;
+import uq.pac.rsvp.policy.datalog.util.Logger;
 
 import java.util.List;
 
@@ -29,7 +30,9 @@ public class TranslationPolicy {
 
     public TranslationPolicy(String name, Policy policy, TranslationSchema schema) {
         this.declaration = TranslationConstants.makeStandardRuleDecl(name);
+        Logger.println(policy.getCondition());
         List<List<Expression>> disjunctions = NFConverter.toDNF(policy.getCondition());
+        disjunctions.forEach(Logger::println);
         this.rules = disjunctions.stream()
                 .map(disjunction -> TranslationVisitor.translate(schema, disjunction, declaration))
                 .toList();

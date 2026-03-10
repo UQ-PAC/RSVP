@@ -1,6 +1,7 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
 import com.cedarpolicy.model.exception.AuthException;
+import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.datalog.ast.DLProgram;
 import uq.pac.rsvp.policy.datalog.ast.DLRuleDecl;
 
@@ -80,7 +81,7 @@ public class RequestAuth {
         return set;
     }
 
-    public static RequestAuth load(Path schema, Path policies, Path entities, Path dlDir) throws AuthException, IOException, InterruptedException {
+    public static RequestAuth load(Path schema, Path policies, Path entities, Path dlDir) throws AuthException, IOException, InterruptedException, RsvpException {
         DLProgram program = Translation.translate(schema, policies, entities);
         program.execute(dlDir);
         return RequestAuth.load(dlDir);

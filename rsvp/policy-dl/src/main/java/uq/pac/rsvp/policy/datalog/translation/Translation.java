@@ -9,6 +9,7 @@ import com.cedarpolicy.model.ValidationResponse;
 import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.exception.AuthException;
 import com.google.common.collect.Multimap;
+import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.ast.*;
@@ -54,7 +55,7 @@ public class Translation {
         engine.validateEntities(eReq);
     }
 
-    public static DLProgram translate(Path schemaFile, Path policiesFile, Path entitiesFile) throws IOException, AuthException {
+    public static DLProgram translate(Path schemaFile, Path policiesFile, Path entitiesFile) throws IOException, AuthException, RsvpException {
         validate(schemaFile, policiesFile, entitiesFile);
 
         Schema schema = Schema.parseCedarSchema(schemaFile);

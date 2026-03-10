@@ -3,6 +3,7 @@ package uq.pac.rsvp.policy.datalog.driver;
 import com.cedarpolicy.model.exception.AuthException;
 import com.google.devtools.common.options.OptionsParser;
 import org.fusesource.jansi.Ansi;
+import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestAuth;
 
@@ -59,7 +60,7 @@ public class Driver {
 
     record ExpectedRequest(Request request, RequestAuth.Result expectation) {}
 
-    public static void main(String[] args) throws IOException, AuthException, InterruptedException {
+    public static void main(String[] args) throws IOException, AuthException, InterruptedException, RsvpException {
         OptionsParser parser = OptionsParser.newOptionsParser(DriverOptions.class);
         parser.parseAndExitUponError(args);
         DriverOptions options = parser.getOptions(DriverOptions.class);

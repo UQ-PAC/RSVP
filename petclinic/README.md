@@ -1,8 +1,8 @@
 # Spring PetClinic Sample Application
 
-Spring PetClinic as of commit `e316074`.
+Based on Spring PetClinic as of commit `e316074`.
 
-Copy of the files from the original [spring-petclinic](https://github.com/spring-projects/spring-petclinic) repository as of commit [`e316074300de4761f7b100a21423525e8b8ecdc5`](https://github.com/spring-projects/spring-petclinic/commit/e316074300de4761f7b100a21423525e8b8ecdc5).
+Initial files copied from the original [spring-petclinic](https://github.com/spring-projects/spring-petclinic) repository as of commit [`e316074300de4761f7b100a21423525e8b8ecdc5`](https://github.com/spring-projects/spring-petclinic/commit/e316074300de4761f7b100a21423525e8b8ecdc5).
 
 Includes only the necessary files to run the application locally using Gradle, i.e. excludes files for Maven, Docker, Kubernetes, and GitHub Workflows.
 
@@ -67,4 +67,3 @@ There is no build profile for Gradle to compile the CSS.
 ## License
 
 The Spring PetClinic sample application is released under version 2.0 of the [Apache License](https://www.apache.org/licenses/LICENSE-2.0).
-

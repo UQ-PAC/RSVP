@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.samples.petclinic.model.NamedEntity;
 import org.springframework.samples.petclinic.model.Person;
 
 import jakarta.persistence.Entity;
@@ -29,6 +28,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import jakarta.xml.bind.annotation.XmlElement;
 
@@ -42,6 +42,7 @@ import jakarta.xml.bind.annotation.XmlElement;
  */
 @Entity
 @Table(name = "vets")
+@PrimaryKeyJoinColumn(name = "entity_id")
 public class Vet extends Person {
 
 	@ManyToMany(fetch = FetchType.EAGER)
@@ -59,7 +60,7 @@ public class Vet extends Person {
 	@XmlElement
 	public List<Specialty> getSpecialties() {
 		return getSpecialtiesInternal().stream()
-			.sorted(Comparator.comparing(NamedEntity::getName))
+			.sorted(Comparator.comparing(Specialty::getName))
 			.collect(Collectors.toList());
 	}
 

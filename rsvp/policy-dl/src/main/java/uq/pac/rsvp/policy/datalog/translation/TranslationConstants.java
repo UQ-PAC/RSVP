@@ -4,10 +4,9 @@ import com.cedarpolicy.value.EntityUID;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Constants used throughout the translation of Cedar to datalog
@@ -155,22 +154,11 @@ public class TranslationConstants {
     }
 
     public final static String OUTPUT_DELIMITER = "\t";
-    public final static String OUTPUT_DESTINATION = "file";
 
-    public static List<DLDirective> makeIODirectives(Collection<DLRuleDecl> output) {
-        List<DLRuleDecl> rules = new ArrayList<>(output);
-
-        Map<String, String> options = Map.of("delimiter", OUTPUT_DELIMITER);
-
-        rules.addAll(List.of(PermitRuleDecl,
-                ForbidRuleDecl,
-                PermittedRequestsRuleDecl,
-                ForbiddenRequestsRuleDecl,
-                ActionableRequestsRuleDecl));
-
-        return rules.stream()
-                .map(rd -> new DLOutputDirective(rd, OUTPUT_DESTINATION, options))
-                .map(rd -> (DLDirective) rd)
+    public static List<DLOutputDirective> makeIODirectives(Collection<DLRuleDecl> output) {
+        return Stream.of(PermitRuleDecl, ForbidRuleDecl, PermittedRequestsRuleDecl,
+                ForbiddenRequestsRuleDecl, ActionableRequestsRuleDecl)
+                .map(DLOutputDirective::new)
                 .toList();
     }
 }

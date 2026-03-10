@@ -67,7 +67,7 @@ public class TranslationEntity {
         this.definition = definition;
         DLRuleDecl relation = definition.getEntityRuleDecl();
         DLTerm euid = getEUIDLiteral(uid);
-        this.facts = List.of(new DLFact(relation.getName(), euid));
+        this.facts = List.of(new DLFact(relation, euid));
     }
 
     public TranslationEntity(Entity entity, TranslationSchema schema) {
@@ -77,15 +77,15 @@ public class TranslationEntity {
         // it has been made sure that there is an underlying type for each encountered EUID
         require(definition != null, "Cannot locate type for entity " + entity.getEUID());
         // Build facts
-        DLRuleDecl relation = definition.getEntityRuleDecl();
+        DLRuleDecl decl = definition.getEntityRuleDecl();
         DLTerm euid = getEUIDLiteral(entity.getEUID());
-        statements.add(new DLFact(relation.getName(), euid));
+        statements.add(new DLFact(decl, euid));
 
         entity.attrs.forEach((attr, value) -> {
             List<DLTerm> terms = getTerms(value);
             terms.forEach(term -> {
                 DLRuleDecl ad = definition.getAttribute(attr).getRuleDecl();
-                statements.add(new DLFact(ad.getName(), euid, term));
+                statements.add(new DLFact(ad, euid, term));
             });
         });
 

@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,7 +24,7 @@ public class DLProgramTest {
 
         // Closure
         .decl path(x: number, y: number)
-        .output path(IO=file, delimiter=" ")
+        .output path
 
         path(x, y) :-
             edge(x, y).
@@ -41,7 +40,6 @@ public class DLProgramTest {
                 new DLDeclTerm("x", DLType.NUMBER),
                 new DLDeclTerm("y", DLType.NUMBER));
         DLRuleDecl path = new DLRuleDecl("path", edge.getDeclTerms());
-        Map<String, String> outProperties = Map.of("delimiter", " ");
 
         builder.comment("Facts")
             .add(edge)
@@ -50,7 +48,7 @@ public class DLProgramTest {
             .space()
             .comment("Closure")
             .add(path)
-            .add(new DLOutputDirective(path, "file", outProperties))
+            .add(new DLOutputDirective(path))
             .space()
             .add(new DLRule(
                 new DLAtom("path", DLTerm.var("x"), DLTerm.var("y")),
@@ -81,8 +79,8 @@ public class DLProgramTest {
 
         Set<String> lines = new HashSet<>(Files.readAllLines(pathCSV));
         assertEquals(3, lines.size());
-        assertTrue(lines.contains("1 2"));
-        assertTrue(lines.contains("1 3"));
-        assertTrue(lines.contains("2 3"));
+        assertTrue(lines.contains("1\t2"));
+        assertTrue(lines.contains("1\t3"));
+        assertTrue(lines.contains("2\t3"));
     }
 }

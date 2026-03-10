@@ -30,6 +30,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.NotBlank;
@@ -46,17 +47,18 @@ import jakarta.validation.constraints.NotBlank;
  */
 @Entity
 @Table(name = "owners")
+@PrimaryKeyJoinColumn(name = "entity_id")
 public class Owner extends Person {
 
-	@Column
+	@Column(name = "address")
 	@NotBlank
 	private String address;
 
-	@Column
+	@Column(name = "city")
 	@NotBlank
 	private String city;
 
-	@Column
+	@Column(name = "telephone")
 	@NotBlank
 	@Pattern(regexp = "\\d{10}", message = "{telephone.invalid}")
 	private String telephone;

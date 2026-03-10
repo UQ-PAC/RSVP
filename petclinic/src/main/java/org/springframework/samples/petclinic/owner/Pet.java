@@ -31,6 +31,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 
 /**
@@ -43,9 +44,10 @@ import jakarta.persistence.Table;
  */
 @Entity
 @Table(name = "pets")
+@PrimaryKeyJoinColumn(name = "entity_id")
 public class Pet extends NamedEntity {
 
-	@Column
+	@Column(name = "birth_date")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate birthDate;
 

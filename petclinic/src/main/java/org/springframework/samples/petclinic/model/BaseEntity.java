@@ -20,7 +20,20 @@ import java.io.Serializable;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Simple JavaBean domain object with an id property. Used as a base class for objects
@@ -29,12 +42,24 @@ import jakarta.persistence.MappedSuperclass;
  * @author Ken Krebs
  * @author Juergen Hoeller
  */
-@MappedSuperclass
+@Entity
+@Table(name = "entities")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class BaseEntity implements Serializable {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "entity_id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "entity_sequence_generator")
+	@SequenceGenerator(name = "entity_sequence_generator", sequenceName = "entities_sequence", allocationSize = 1)
 	private Integer id;
+
+	@ManyToMany
+    @JoinTable(
+        name = "entity_databases",
+        joinColumns = @JoinColumn(name = "entity_id"),
+        inverseJoinColumns = @JoinColumn(name = "database_id")
+    )
+    private Set<Database> databases = new HashSet<>();
 
 	public Integer getId() {
 		return id;
@@ -47,5 +72,17 @@ public class BaseEntity implements Serializable {
 	public boolean isNew() {
 		return this.id == null;
 	}
+
+	public Set<Database> getDatabases() {
+        return databases;
+    }
+
+    public void setDatabases(Set<Database> databases) {
+        this.databases = databases;
+    }
+
+    public void addDatabase(Database database) {
+        this.databases.add(database);
+    }
 
 }

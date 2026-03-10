@@ -27,11 +27,11 @@ import jakarta.validation.constraints.NotBlank;
 @MappedSuperclass
 public class Person extends BaseEntity {
 
-	@Column
+	@Column(name = "first_name")
 	@NotBlank
 	private String firstName;
 
-	@Column
+	@Column(name = "last_name")
 	@NotBlank
 	private String lastName;
 

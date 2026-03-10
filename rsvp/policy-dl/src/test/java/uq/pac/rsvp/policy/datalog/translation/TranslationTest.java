@@ -12,6 +12,7 @@ import com.cedarpolicy.model.schema.Schema;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
+import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.datalog.TestUtil;
 import uq.pac.rsvp.policy.datalog.util.Logger;
 
@@ -84,7 +85,7 @@ public class TranslationTest {
 
     // Sample test for development
     @Test
-    void one() throws AuthException, IOException, InterruptedException {
+    void one() throws AuthException, IOException, InterruptedException, RsvpException {
         functionalTest(TestInput.load("ancestors", "no-cond"));
     }
 
@@ -105,7 +106,7 @@ public class TranslationTest {
         return tests;
     }
 
-    void functionalTest(TestInput test) throws AuthException, IOException, InterruptedException {
+    void functionalTest(TestInput test) throws AuthException, IOException, InterruptedException, RsvpException {
         RequestAuth rsvpAuth = RequestAuth.load(test.schema, test.policy, test.entities, test.datalogDir);
         logger.info(YELLOW, "Policy: " + test.policy)
                 .info(CYAN, Files.readString(test.policy))
@@ -140,7 +141,7 @@ public class TranslationTest {
      * Differential test for Cedar and RSVP.
      * The test runs both, RSVP and Cedar authorisation engines and compares the results that should agree
      */
-    void differentialTest(TestInput test) throws IOException, AuthException, InterruptedException {
+    void differentialTest(TestInput test) throws IOException, AuthException, InterruptedException, RsvpException {
         RequestAuth rsvpAuth = RequestAuth.load(test.schema, test.policy, test.entities, test.datalogDir);
         assertTrue(Collections.disjoint(rsvpAuth.getForbiddenRequests(), rsvpAuth.getPermittedRequests()));
 

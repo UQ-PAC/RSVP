@@ -1,0 +1,4 @@
+User::???	File::file-write	Action::Use
+User::???	File::link-all	Action::Use
+User::Bob	File::file-write	Action::Use
+User::Bob	File::link-all	Action::Use

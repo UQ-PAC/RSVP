@@ -10,7 +10,6 @@ import com.cedarpolicy.model.exception.AuthException;
 import com.cedarpolicy.model.policy.PolicySet;
 import com.cedarpolicy.model.schema.Schema;
 import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.datalog.TestUtil;
@@ -84,10 +83,10 @@ public class TranslationTest {
     }
 
     // Sample test for development
-    @Test
-    void one() throws AuthException, IOException, InterruptedException, RsvpException {
-        functionalTest(TestInput.load("prim-types", "str"));
-        functionalTest(TestInput.load("prim-types", "str-2"));
+    @TestFactory
+    Collection<DynamicTest> one() {
+        return TestInput.load("prim-types").stream().map(t ->
+                DynamicTest.dynamicTest(t.testName + "-" + t.policyName, () -> functionalTest(t))).toList();
     }
 
     @TestFactory

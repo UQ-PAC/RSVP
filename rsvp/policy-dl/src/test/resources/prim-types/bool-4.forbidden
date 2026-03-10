@@ -1,0 +1,11 @@
+User::???	File::???	Action::Use
+User::???	File::file-read	Action::Use
+User::???	File::file-write	Action::Use
+User::???	File::link-all	Action::Use
+User::???	File::link-exec	Action::Use
+User::???	File::link-none	Action::Use
+User::Bob	File::???	Action::Use
+User::Bob	File::file-read	Action::Use
+User::Bob	File::link-all	Action::Use
+User::Bob	File::link-exec	Action::Use
+User::Bob	File::link-none	Action::Use

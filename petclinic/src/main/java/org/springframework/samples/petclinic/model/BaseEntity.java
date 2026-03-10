@@ -31,7 +31,6 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,7 +44,7 @@ import java.util.Set;
 @Entity
 @Table(name = "entities")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class BaseEntity implements Serializable {
+public class BaseEntity implements Serializable, Identifiable {
 
 	@Id
 	@Column(name = "entity_id")
@@ -54,12 +53,9 @@ public class BaseEntity implements Serializable {
 	private Integer id;
 
 	@ManyToMany
-    @JoinTable(
-        name = "entity_databases",
-        joinColumns = @JoinColumn(name = "entity_id"),
-        inverseJoinColumns = @JoinColumn(name = "database_id")
-    )
-    private Set<Database> databases = new HashSet<>();
+	@JoinTable(name = "entity_databases", joinColumns = @JoinColumn(name = "entity_id"),
+			inverseJoinColumns = @JoinColumn(name = "database_id"))
+	private Set<Database> databases = new HashSet<>();
 
 	public Integer getId() {
 		return id;
@@ -74,15 +70,15 @@ public class BaseEntity implements Serializable {
 	}
 
 	public Set<Database> getDatabases() {
-        return databases;
-    }
+		return databases;
+	}
 
-    public void setDatabases(Set<Database> databases) {
-        this.databases = databases;
-    }
+	public void setDatabases(Set<Database> databases) {
+		this.databases = databases;
+	}
 
-    public void addDatabase(Database database) {
-        this.databases.add(database);
-    }
+	public void addDatabase(Database database) {
+		this.databases.add(database);
+	}
 
 }

@@ -18,6 +18,8 @@ Folder `./rsvp`.
 
 To run all tests: `./petclinic-rsvp-requests.sh`.
 
+To run all tests with verbose output: `./petclinic-rsvp-requests-verbose.sh`.
+
 Request JSON files are named following the convention: `<principal>-<action>-<resource or resource attribute>-<additional resource attribute(s)>.json`.
 
 ## Graphviz Visualisation of Entities

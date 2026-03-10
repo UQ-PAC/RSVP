@@ -19,7 +19,7 @@ public class TranslationOperandVisitor extends TranslationValueAdapter<DLTerm> {
 
     @Override
     public DLTerm visitEntityExpr(EntityExpression expr) {
-        return new DLString(String.join("::", expr.getQualifiedEid()));
+        return new DLString(expr.getQualifiedEid());
     }
 
     @Override

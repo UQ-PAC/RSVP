@@ -1,0 +1,34 @@
+[
+    {
+        "uid": { "type": "User", "id": "Bob" },
+        "attrs": {
+            "name" : "Bob"
+        },
+        "parents": [ ]
+    },
+
+    {
+        "uid": { "type": "File", "id": "file" },
+        "attrs": {
+            "kind": "file",
+            "size": 2
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "Link", "id": "link" },
+        "attrs": {
+            "kind": "link",
+            "size": 1
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "Socket", "id": "socket" },
+        "attrs": {
+            "kind": "socket",
+            "size": 0
+        },
+        "parents": [ ]
+    }
+]

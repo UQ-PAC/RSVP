@@ -2,7 +2,6 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import com.google.common.collect.HashMultimap;
 import uq.pac.rsvp.policy.ast.expr.*;
-import uq.pac.rsvp.policy.ast.schema.ActionDefinition;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.Schema;
@@ -78,7 +77,6 @@ public class TranslationTyping {
         } else {
             applicable.removeIf(e -> !types.contains(e));
         }
-        error(!applicable.isEmpty(), "No available types for: " + ref + " after reduction");
 
         // If we are updating action, we also need to update principal and resource as per schema
         if (ref == Action) {
@@ -146,10 +144,14 @@ public class TranslationTyping {
                 switch (expr.getOp()) {
                     case LessEq, Less, Greater, GreaterEq -> {}
                     case Eq -> {
-                        // FIXME
                         if (lhs instanceof VariableExpression v && rhs instanceof EntityExpression e) {
-                            update(v.getReference(), negated, String.join("::", e.getQualifiedEid()));
+                            update(v.getReference(), negated, e.getQualifiedType());
+                        } else if (rhs instanceof VariableExpression v && lhs instanceof EntityExpression e) {
+                            update(v.getReference(), negated, e.getQualifiedType());
                         }
+                    }
+                    case Neq -> {
+                        throw new TranslationError("Expected '!=' rewritten to '=='");
                     }
                     case Is -> {
                         TypeExpression typeExpr = required(expr.getRight(), TypeExpression.class);

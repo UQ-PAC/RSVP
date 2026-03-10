@@ -1,0 +1,4 @@
+User::Bob	File::???	Action::Use
+User::Bob	File::file	Action::Use
+User::Bob	Link::???	Action::Use
+User::Bob	Link::link	Action::Use

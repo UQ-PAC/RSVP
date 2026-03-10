@@ -86,4 +86,20 @@ public class Logger {
     public Logger error(String format, Object ...args) {
         return log(System.err, RED, Level.Severe, format, args);
     }
+
+    public static void println(Ansi.Color color, String format, Object ...args) {
+        new Logger().log(System.out, color, Level.Info, format, args);
+    }
+
+    public static void println(Ansi.Color color, Object o) {
+        new Logger().log(System.out, color, Level.Info, o.toString());
+    }
+
+    public static void println(String format, Object ...args) {
+        println(YELLOW, format, args);
+    }
+
+    public static void println(Object o) {
+        println(YELLOW, o.toString());
+    }
 }

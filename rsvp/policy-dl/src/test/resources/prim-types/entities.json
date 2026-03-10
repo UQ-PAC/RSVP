@@ -1,0 +1,65 @@
+[
+    {
+        "uid": { "type": "User", "id": "Bob" },
+        "attrs": {
+            "name" : "Bob"
+        },
+        "parents": [ ]
+    },
+
+    {
+        "uid": { "type": "File", "id": "file-read" },
+        "attrs": {
+            "kind": "file",
+            "size": 2,
+            "read": true,
+            "write": false,
+            "execute": false
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "File", "id": "file-write" },
+        "attrs": {
+            "kind": "file",
+            "size": 3,
+            "read": true,
+            "write": true,
+            "execute": false
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "File", "id": "link-exec" },
+        "attrs": {
+            "kind": "link",
+            "size": 1,
+            "read": true,
+            "write": false,
+            "execute": true
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "File", "id": "link-all" },
+        "attrs": {
+            "kind": "link",
+            "size": 1,
+            "read": true,
+            "write": true,
+            "execute": true
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "File", "id": "link-none" },
+        "attrs": {
+            "kind": "link",
+            "size": 1,
+            "read": false,
+            "write": false,
+            "execute": false
+        },
+        "parents": [ ]
+    }
+]

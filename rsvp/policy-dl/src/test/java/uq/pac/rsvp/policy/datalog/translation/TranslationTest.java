@@ -86,7 +86,8 @@ public class TranslationTest {
     // Sample test for development
     @Test
     void one() throws AuthException, IOException, InterruptedException, RsvpException {
-        functionalTest(TestInput.load("ancestors", "no-cond"));
+        functionalTest(TestInput.load("prim-types", "str"));
+        functionalTest(TestInput.load("prim-types", "str-2"));
     }
 
     @TestFactory

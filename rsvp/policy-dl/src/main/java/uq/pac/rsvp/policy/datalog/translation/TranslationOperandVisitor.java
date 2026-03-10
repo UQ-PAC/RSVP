@@ -1,9 +1,6 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import uq.pac.rsvp.policy.ast.expr.EntityExpression;
-import uq.pac.rsvp.policy.ast.expr.Expression;
-import uq.pac.rsvp.policy.ast.expr.PropertyAccessExpression;
-import uq.pac.rsvp.policy.ast.expr.VariableExpression;
+import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
 import java.util.Set;
@@ -23,6 +20,11 @@ public class TranslationOperandVisitor extends TranslationValueAdapter<DLTerm> {
     @Override
     public DLTerm visitEntityExpr(EntityExpression expr) {
         return new DLString(String.join("::", expr.getQualifiedEid()));
+    }
+
+    @Override
+    public DLTerm visitStringExpr(StringExpression expr) {
+        return new DLString(expr.getValue());
     }
 
     @Override

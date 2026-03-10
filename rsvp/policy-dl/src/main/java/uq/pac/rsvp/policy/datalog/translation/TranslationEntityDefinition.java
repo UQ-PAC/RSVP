@@ -1,6 +1,5 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import com.cedarpolicy.value.EntityTypeName;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.common.*;
@@ -66,6 +65,7 @@ public class TranslationEntityDefinition {
         entity.getShapeAttributeNames().forEach(attrName -> {
             CommonTypeDefinition attrType = entity.getShapeAttributeType(attrName);
             DLType dlAttrType = switch (attrType) {
+                case BooleanType s -> DLType.SYMBOL;
                 case StringType s -> DLType.SYMBOL;
                 case LongType s -> DLType.NUMBER;
                 case EntityTypeReference r -> DLType.SYMBOL;

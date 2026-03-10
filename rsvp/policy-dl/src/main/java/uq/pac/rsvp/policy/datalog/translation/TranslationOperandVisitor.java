@@ -28,6 +28,11 @@ public class TranslationOperandVisitor extends TranslationValueAdapter<DLTerm> {
     }
 
     @Override
+    public DLTerm visitLongExpr(LongExpression expr) {
+        return new DLNumber(expr.getValue());
+    }
+
+    @Override
     public DLTerm visitPropertyAccessExpr(PropertyAccessExpression expr) {
         Expression object = expr.getObject();
         String property = expr.getProperty();

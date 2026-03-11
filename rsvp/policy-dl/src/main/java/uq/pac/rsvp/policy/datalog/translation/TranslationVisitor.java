@@ -102,7 +102,7 @@ public class TranslationVisitor extends TranslationVoidAdapter {
                 expressions.addAll(rhs.getExpressions());
 
                 String rhsType = rhs.getSingletonType();
-                DLRuleExpr re = rhsType.startsWith("Set<") ? // FIXME: Delegate typing to appropriate class
+                DLRuleExpr re = TranslationTyping.isSetType(rhsType) ?
                     new DLConstraint(lhsOp, rhsOp, getOperator(BinaryExpression.BinaryOp.Eq, negated)) :
                     new DLAtom(ParentOfRuleDecl, negated, rhsOp, lhsOp);
                 expressions.add(re);

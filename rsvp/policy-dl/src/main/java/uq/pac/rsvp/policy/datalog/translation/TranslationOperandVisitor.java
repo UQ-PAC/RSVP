@@ -20,6 +20,12 @@ public class TranslationOperandVisitor extends TranslationValueAdapter<DLTerm> {
     }
 
     @Override
+    public DLTerm visitActionExpr(ActionExpression expr) {
+        this.types = Collections.singleton(TranslationTyping.getTypeName(expr));
+        return new DLString(expr.getQualifiedId());
+    }
+
+    @Override
     public DLTerm visitEntityExpr(EntityExpression expr) {
         this.types = Collections.singleton(TranslationTyping.getTypeName(expr));
         return new DLString(expr.getQualifiedEid());

@@ -113,6 +113,10 @@ public class TranslationTyping {
         update(ref, negated, getTypeName(expr));
     }
 
+    public static boolean isSetType(String type) {
+        return type.startsWith("Set<");
+    }
+
     public static String getTypeName(CommonTypeDefinition def) {
         return switch (def) {
             case EntityTypeReference t -> t.getDefinition().getName();
@@ -128,10 +132,13 @@ public class TranslationTyping {
     public static String getTypeName(Expression expr) {
         return expr.compute(new ValueVisitorAdapter<String>() {
             @Override
+            public String visitActionExpr(ActionExpression expr) {
+                return expr.getQualifiedId();
+            }
+
+            @Override
             public String visitEntityExpr(EntityExpression expr) {
-                String qualifiedType = expr.getQualifiedType();
-                return (qualifiedType.equals("Action") || qualifiedType.endsWith("::Action")) ?
-                    expr.getQualifiedEid() : qualifiedType;
+                return expr.getQualifiedType();
             }
 
             @Override

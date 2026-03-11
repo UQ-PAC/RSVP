@@ -82,7 +82,6 @@ public class TranslationVisitor extends TranslationVoidAdapter {
                 expressions.add(new DLConstraint(lhsOp, rhsOp, getOperator(expr.getOp(), negated)));
             }
             case BinaryExpression.BinaryOp.Is -> {
-				// FIXME: Handle negated
                 TypeExpression typeExpr = required(expr.getRight(), TypeExpression.class);
                 TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, typing);
                 DLTerm var = expr.getLeft().compute(lhs);

@@ -61,6 +61,11 @@ public class ExpressionOrdering extends ValueVisitorAdapter<Integer> {
     }
 
     @Override
+    public Integer visitActionExpr(ActionExpression expr) {
+        return FRONT;
+    }
+
+    @Override
     public Integer visitLongExpr(LongExpression expr) {
         return FRONT;
     }

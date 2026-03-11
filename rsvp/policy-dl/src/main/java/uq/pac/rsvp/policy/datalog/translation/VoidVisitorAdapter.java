@@ -72,6 +72,11 @@ public class VoidVisitorAdapter implements PolicyVisitor {
     }
 
     @Override
+    public void visitActionExpr(ActionExpression expr) {
+        unsupported(expr);
+    }
+
+    @Override
     public void visitLongExpr(LongExpression expr) {
         unsupported(expr);
     }

@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.ast.visitor;
 
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
+import uq.pac.rsvp.policy.ast.expr.ActionExpression;
 import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
 import uq.pac.rsvp.policy.ast.expr.BooleanExpression;
 import uq.pac.rsvp.policy.ast.expr.CallExpression;
@@ -37,6 +38,8 @@ public interface PolicyVisitor {
     public void visitUnaryExpr(UnaryExpression expr);
 
     public void visitVariableExpr(VariableExpression expr);
+
+    public void visitActionExpr(ActionExpression expr);
 
     public void visitBooleanExpr(BooleanExpression expr);
 

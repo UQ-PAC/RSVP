@@ -23,6 +23,7 @@ public abstract class Expression extends PolicyFileEntry {
         Slot,
         Variable,
         PropertyAccess,
+        ActionLiteral,
         BooleanLiteral,
         EntityLiteral,
         LongLiteral,
@@ -41,7 +42,7 @@ public abstract class Expression extends PolicyFileEntry {
 
     public final boolean isLiteral() {
         return type == ExprType.BooleanLiteral || type == ExprType.EntityLiteral || type == ExprType.LongLiteral
-                || type == ExprType.StringLiteral;
+                || type == ExprType.StringLiteral || type == ExprType.ActionLiteral;
     }
 
     public final boolean isCollection() {
@@ -63,6 +64,7 @@ public abstract class Expression extends PolicyFileEntry {
                 case "slot" -> SlotExpression.class;
                 case "var" -> VariableExpression.class;
                 case "prop" -> PropertyAccessExpression.class;
+                case "action" -> ActionExpression.class;
                 case "bool" -> BooleanExpression.class;
                 case "euid" -> EntityExpression.class;
                 case "long" -> LongExpression.class;

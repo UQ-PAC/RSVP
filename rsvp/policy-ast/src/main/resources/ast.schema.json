@@ -82,6 +82,7 @@
         { "$ref": "#/$defs/callExpr" },
         { "$ref": "#/$defs/conditionalExpr" },
         { "$ref": "#/$defs/entityExpr" },
+        { "$ref": "#/$defs/actionExpr" },
         { "$ref": "#/$defs/longExpr" },
         { "$ref": "#/$defs/propertyAccessExpr" },
         { "$ref": "#/$defs/recordExpr" },
@@ -207,6 +208,22 @@
         "type": {
           "type": "string",
           "const": "euid"
+        },
+        "value": {
+          "type": "string"
+        },
+        "source": { "$ref": "#/$defs/source" }
+      },
+      "required": ["type", "value"],
+      "additionalProperties": false
+    },
+    "actionExpr": {
+      "type": "object",
+      "description": "Action literal expression",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "action"
         },
         "value": {
           "type": "string"

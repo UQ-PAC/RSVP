@@ -120,9 +120,9 @@
     },
 
     {
-        "uid": { "type": "PetClinic::User", "id": "Bob" },
+        "uid": { "type": "PetClinic::User", "id": "Administrator" },
         "attrs": {
-            "name": "Bob"
+            "name": "Administrator"
         },
         "parents": [
             { "type": "PetClinic::Administrator", "id": "Administrator" }
@@ -160,9 +160,9 @@
         ]
     },
     {
-        "uid": { "type": "PetClinic::User", "id": "Unknown" },
+        "uid": { "type": "PetClinic::User", "id": "Guest" },
         "attrs": {
-            "name": "Unknown"
+            "name": "Guest"
         },
         "parents": [
             { "type": "PetClinic::Guest", "id": "Guest" }
@@ -291,7 +291,7 @@
             ]
         },
         "parents": [
-            { "type": "PetClinic::Database", "id": "Pets (A)" }
+            { "type": "PetClinic::Database", "id": "Pets (B)" }
         ]
     },
     {
@@ -305,7 +305,7 @@
             ]
         },
         "parents": [
-            { "type": "PetClinic::Database", "id": "Pets (A)" }
+            { "type": "PetClinic::Database", "id": "Pets (B)" }
         ]
     },
 
@@ -392,7 +392,7 @@
             ]
         },
         "parents": [
-            { "type": "PetClinic::Database", "id": "Visits (A)" }
+            { "type": "PetClinic::Database", "id": "Visits (B)" }
         ]
     },
     {
@@ -404,7 +404,7 @@
             ]
         },
         "parents": [
-            { "type": "PetClinic::Database", "id": "Visits (A)" }
+            { "type": "PetClinic::Database", "id": "Visits (B)" }
         ]
     },
 

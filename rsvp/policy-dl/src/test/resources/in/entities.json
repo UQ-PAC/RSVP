@@ -8,11 +8,19 @@
         "parents": [ ]
     },
     {
+        "uid": { "type": "Partition", "id": "sdb" },
+        "attrs": {
+            "kind": "ext4",
+            "size": 512000
+        },
+        "parents": [ ]
+    },
+    {
         "uid": { "type": "Directory", "id": "/usr/bin" },
         "attrs": {
             "private": false,
             "files": [
-                { "__entity" : { "type": "File", "id" : "cedar" } }
+                { "__entity" : { "type": "Directory", "id" : "/usr/sbin" } }
             ]
         },
         "parents": [
@@ -24,7 +32,7 @@
         "attrs": {
             "private": true,
             "files": [
-                { "__entity" : { "type": "File", "id" : "mkfs" } }
+                { "__entity" : { "type": "Directory", "id" : "/usr/bin" } }
             ]
         },
         "parents": [

@@ -93,6 +93,8 @@ public class TranslationEntity {
         entity.parentsEUIDs.forEach(pid -> {
             statements.add(new DLFact(TranslationConstants.ParentOfRuleDecl, getEUIDLiteral(pid), euid));
         });
+        // Entity is reflexive, an element is a member of its own hierarchy
+        statements.add(new DLFact(TranslationConstants.ParentOfRuleDecl, euid, euid));
 
         this.facts = Collections.unmodifiableList(statements);
     }

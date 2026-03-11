@@ -1,9 +1,0 @@
-Account::???	Account::???	Action::createAlbum
-Account::Alice	Account::Alice	Action::createAlbum
-Account::Bob	Account::Bob	Action::createAlbum
-Account::Carl	Account::Carl	Action::createAlbum
-Account::Tim	Account::???	Action::createAlbum
-Account::Tim	Account::Alice	Action::createAlbum
-Account::Tim	Account::Bob	Action::createAlbum
-Account::Tim	Account::Carl	Action::createAlbum
-Account::Tim	Account::Tim	Action::createAlbum

@@ -30,8 +30,6 @@ public class CedarAspect {
 
 	private static final String CONTEXT_PARAM_PREFIX = "cedar-context-";
 
-	private static final String VALIDATE_REQUEST_PARAM = "cedar-validate";
-
 	public CedarAspect(CedarService cedarService) {
 		this.cedarService = cedarService;
 	}
@@ -59,7 +57,7 @@ public class CedarAspect {
 		// Populate context for Attribute-Based Access Control (ABAC).
 		Map<String, Value> contextMap = extractContextFromParameters(request);
 
-		boolean validateRequest = Boolean.parseBoolean(request.getParameter(VALIDATE_REQUEST_PARAM));
+		boolean validateRequest = requiresAuthorization.validate();
 
 		CedarRequest authorizationRequest = new CedarRequest(principal, action, resource, contextMap, validateRequest);
 

@@ -59,7 +59,6 @@ Account::Alice	Photo::???	Action::viewPhoto
 Account::Alice	Photo::AliceHotel	Action::viewPhoto
 Account::Alice	Photo::AliceMeadow	Action::viewPhoto
 Account::Alice	Photo::AlicePassport	Action::viewPhoto
-Account::Alice	Photo::BobHotel	Action::viewPhoto
 Account::Alice	Photo::BobMeadow	Action::viewPhoto
 Account::Alice	Photo::BobPassport	Action::viewPhoto
 Account::Bob	Account::???	Action::createAlbum
@@ -88,7 +87,6 @@ Account::Bob	Album::CarlSceneries	Action::uploadPhoto
 Account::Bob	Album::CarlVacation	Action::removeAlbum
 Account::Bob	Album::CarlVacation	Action::uploadPhoto
 Account::Bob	Photo::???	Action::viewPhoto
-Account::Bob	Photo::AliceHotel	Action::viewPhoto
 Account::Bob	Photo::AliceMeadow	Action::viewPhoto
 Account::Bob	Photo::AlicePassport	Action::viewPhoto
 Account::Bob	Photo::BobHotel	Action::viewPhoto
@@ -123,7 +121,6 @@ Account::Carl	Photo::???	Action::viewPhoto
 Account::Carl	Photo::AliceHotel	Action::viewPhoto
 Account::Carl	Photo::AliceMeadow	Action::viewPhoto
 Account::Carl	Photo::AlicePassport	Action::viewPhoto
-Account::Carl	Photo::BobHotel	Action::viewPhoto
 Account::Carl	Photo::BobMeadow	Action::viewPhoto
 Account::Carl	Photo::BobPassport	Action::viewPhoto
 Account::Tim	Account::???	Action::createAlbum

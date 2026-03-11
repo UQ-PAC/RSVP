@@ -1,4 +1,3 @@
-@name("forbidCreateAlbum")
 //   + ... except themselves or other admins
 forbid (
     principal is Account,

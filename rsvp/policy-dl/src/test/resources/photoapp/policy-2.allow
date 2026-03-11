@@ -1,0 +1,3 @@
+Account::Alice	Photo::BobHotel	Action::viewPhoto
+Account::Bob	Photo::AliceHotel	Action::viewPhoto
+Account::Carl	Photo::BobHotel	Action::viewPhoto

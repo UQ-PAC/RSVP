@@ -11,6 +11,7 @@ import com.cedarpolicy.model.policy.PolicySet;
 import com.cedarpolicy.model.schema.Schema;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiColors;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.RsvpException;
@@ -80,8 +81,9 @@ public class TranslationTest {
 
     // Sample test for development
     @TestFactory
+    @Disabled
     Collection<DynamicTest> oneOff() {
-        return dynamicTests("in");
+        return dynamicTests("in-ns");
     }
 
     @TestFactory

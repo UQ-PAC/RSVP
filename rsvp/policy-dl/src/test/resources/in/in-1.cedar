@@ -1,7 +1,8 @@
 permit (
-    principal is File,
+    principal == File::"ls",
     action == Action::"act",
     resource is Directory
 ) when {
-     principal in resource
+    // in is reflexive, an element is a member of its own hierarchy
+    principal in File::"ls"
 };

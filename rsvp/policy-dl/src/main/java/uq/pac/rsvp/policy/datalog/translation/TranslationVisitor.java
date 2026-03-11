@@ -99,12 +99,7 @@ public class TranslationVisitor extends TranslationVoidAdapter {
 
                 expressions.addAll(lhs.getExpressions());
                 expressions.addAll(rhs.getExpressions());
-
-                String rhsType = rhs.getSingletonType();
-                DLRuleExpr re = TranslationTyping.isSetType(rhsType) ?
-                    new DLConstraint(lhsOp, rhsOp, getOperator(BinaryExpression.BinaryOp.Eq, negated)) :
-                    new DLAtom(ParentOfRuleDecl, negated, rhsOp, lhsOp);
-                expressions.add(re);
+                expressions.add(new DLAtom(ParentOfRuleDecl, negated, rhsOp, lhsOp));
             }
             case And, Or -> throw new TranslationError("Unreachable");
             default -> throw new TranslationError("Unsupported: " + expr.getOp());

@@ -1,4 +1,0 @@
-User::Bob	File::file-read	Action::Use
-User::Bob	File::link-all	Action::Use
-User::Bob	File::link-exec	Action::Use
-User::Bob	File::link-none	Action::Use

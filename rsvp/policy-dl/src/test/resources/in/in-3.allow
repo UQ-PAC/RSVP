@@ -1,4 +1,0 @@
-File::ls	Directory::/usr/sbin	Action::act
-File::ls	Directory::???	Action::act
-File::mkfs	Directory::/usr/bin	Action::act
-File::mkfs	Directory::???	Action::act

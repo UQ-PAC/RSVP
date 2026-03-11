@@ -1,0 +1,462 @@
+[
+  {
+    "uid": {
+      "__entity": {
+        "type": "Organization",
+        "id": "org_0"
+      }
+    },
+    "attrs": {
+      "readers": {
+        "__entity": {
+          "type": "OrgPermission",
+          "id": "org_0_readers"
+        }
+      },
+      "writers": {
+        "__entity": {
+          "type": "OrgPermission",
+          "id": "org_0_writers"
+        }
+      },
+      "admins": {
+        "__entity": {
+          "type": "OrgPermission",
+          "id": "org_0_admins"
+        }
+      }
+    },
+    "parents": [
+      {
+        "__entity": {
+          "type": "OrgPermission",
+          "id": "org_0_writers"
+        }
+      }
+    ]
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "OrgPermission",
+        "id": "org_0_readers"
+      }
+    },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "OrgPermission",
+        "id": "org_0_writers"
+      }
+    },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "OrgPermission",
+        "id": "org_0_admins"
+      }
+    },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "Organization",
+        "id": "org_1"
+      }
+    },
+    "attrs": {
+      "readers": {
+        "__entity": {
+          "type": "OrgPermission",
+          "id": "org_1_readers"
+        }
+      },
+      "writers": {
+        "__entity": {
+          "type": "OrgPermission",
+          "id": "org_1_writers"
+        }
+      },
+      "admins": {
+        "__entity": {
+          "type": "OrgPermission",
+          "id": "org_1_admins"
+        }
+      }
+    },
+    "parents": [
+      {
+        "__entity": {
+          "type": "OrgPermission",
+          "id": "org_1_writers"
+        }
+      }
+    ]
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "OrgPermission",
+        "id": "org_1_readers"
+      }
+    },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "OrgPermission",
+        "id": "org_1_writers"
+      }
+    },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "OrgPermission",
+        "id": "org_1_admins"
+      }
+    },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "Repository",
+        "id": "repo_0"
+      }
+    },
+    "attrs": {
+      "readers": {
+        "__entity": {
+          "type": "RepoPermission",
+          "id": "repo_0_readers"
+        }
+      },
+      "triagers": {
+        "__entity": {
+          "type": "RepoPermission",
+          "id": "repo_0_triagers"
+        }
+      },
+      "writers": {
+        "__entity": {
+          "type": "RepoPermission",
+          "id": "repo_0_writers"
+        }
+      },
+      "maintainers": {
+        "__entity": {
+          "type": "RepoPermission",
+          "id": "repo_0_maintainers"
+        }
+      },
+      "admins": {
+        "__entity": {
+          "type": "RepoPermission",
+          "id": "repo_0_admins"
+        }
+      },
+      "owner": {
+        "__entity": {
+          "type": "Organization",
+          "id": "org_1"
+        }
+      }
+    },
+    "parents": []
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "RepoPermission",
+        "id": "repo_0_readers"
+      }
+    },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "RepoPermission",
+        "id": "repo_0_triagers"
+      }
+    },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "RepoPermission",
+        "id": "repo_0_writers"
+      }
+    },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "RepoPermission",
+        "id": "repo_0_maintainers"
+      }
+    },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "RepoPermission",
+        "id": "repo_0_admins"
+      }
+    },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "Repository",
+        "id": "repo_1"
+      }
+    },
+    "attrs": {
+      "readers": {
+        "__entity": {
+          "type": "RepoPermission",
+          "id": "repo_1_readers"
+        }
+      },
+      "triagers": {
+        "__entity": {
+          "type": "RepoPermission",
+          "id": "repo_1_triagers"
+        }
+      },
+      "writers": {
+        "__entity": {
+          "type": "RepoPermission",
+          "id": "repo_1_writers"
+        }
+      },
+      "maintainers": {
+        "__entity": {
+          "type": "RepoPermission",
+          "id": "repo_1_maintainers"
+        }
+      },
+      "admins": {
+        "__entity": {
+          "type": "RepoPermission",
+          "id": "repo_1_admins"
+        }
+      },
+      "owner": {
+        "__entity": {
+          "type": "Organization",
+          "id": "org_0"
+        }
+      }
+    },
+    "parents": []
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "RepoPermission",
+        "id": "repo_1_readers"
+      }
+    },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "RepoPermission",
+        "id": "repo_1_triagers"
+      }
+    },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "RepoPermission",
+        "id": "repo_1_writers"
+      }
+    },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "RepoPermission",
+        "id": "repo_1_maintainers"
+      }
+    },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "RepoPermission",
+        "id": "repo_1_admins"
+      }
+    },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "Team",
+        "id": "team_0"
+      }
+    },
+    "attrs": {},
+    "parents": [
+      {
+        "__entity": {
+          "type": "RepoPermission",
+          "id": "repo_0_readers"
+        }
+      },
+      {
+        "__entity": {
+          "type": "RepoPermission",
+          "id": "repo_1_admins"
+        }
+      }
+    ]
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "Team",
+        "id": "team_1"
+      }
+    },
+    "attrs": {},
+    "parents": [
+      {
+        "__entity": {
+          "type": "RepoPermission",
+          "id": "repo_0_maintainers"
+        }
+      },
+      {
+        "__entity": {
+          "type": "RepoPermission",
+          "id": "repo_1_readers"
+        }
+      }
+    ]
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "User",
+        "id": "user_0"
+      }
+    },
+    "attrs": {},
+    "parents": [
+      {
+        "__entity": {
+          "type": "RepoPermission",
+          "id": "repo_1_maintainers"
+        }
+      },
+      {
+        "__entity": {
+          "type": "Team",
+          "id": "team_0"
+        }
+      },
+      {
+        "__entity": {
+          "type": "Team",
+          "id": "team_1"
+        }
+      },
+      {
+        "__entity": {
+          "type": "OrgPermission",
+          "id": "org_0_admins"
+        }
+      },
+      {
+        "__entity": {
+          "type": "Organization",
+          "id": "org_1"
+        }
+      },
+      {
+        "__entity": {
+          "type": "OrgPermission",
+          "id": "org_1_readers"
+        }
+      }
+    ]
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "User",
+        "id": "user_1"
+      }
+    },
+    "attrs": {},
+    "parents": [
+      {
+        "__entity": {
+          "type": "RepoPermission",
+          "id": "repo_0_readers"
+        }
+      },
+      {
+        "__entity": {
+          "type": "Team",
+          "id": "team_0"
+        }
+      },
+      {
+        "__entity": {
+          "type": "Team",
+          "id": "team_1"
+        }
+      },
+      {
+        "__entity": {
+          "type": "Organization",
+          "id": "org_0"
+        }
+      },
+      {
+        "__entity": {
+          "type": "OrgPermission",
+          "id": "org_0_readers"
+        }
+      }
+    ]
+  }
+]

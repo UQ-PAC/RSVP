@@ -1,9 +1,0 @@
-Account::Alice	Album::AliceDocuments	Action::uploadPhoto
-Account::Alice	Album::AliceSceneries	Action::uploadPhoto
-Account::Alice	Album::AliceVacation	Action::uploadPhoto
-Account::Bob	Album::BobDocuments	Action::uploadPhoto
-Account::Bob	Album::BobSceneries	Action::uploadPhoto
-Account::Bob	Album::BobVacation	Action::uploadPhoto
-Account::Carl	Album::CarlDocuments	Action::uploadPhoto
-Account::Carl	Album::CarlSceneries	Action::uploadPhoto
-Account::Carl	Album::CarlVacation	Action::uploadPhoto

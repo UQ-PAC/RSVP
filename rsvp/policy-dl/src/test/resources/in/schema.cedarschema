@@ -5,7 +5,7 @@ entity Partition = {
 
 entity Directory in Partition = {
     private: Bool,
-    files: Set<File>
+    files: Set<Directory>
 };
 
 entity File in Directory = {

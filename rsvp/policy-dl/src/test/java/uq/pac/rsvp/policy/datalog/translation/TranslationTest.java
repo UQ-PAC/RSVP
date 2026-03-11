@@ -9,9 +9,7 @@ import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.exception.AuthException;
 import com.cedarpolicy.model.policy.PolicySet;
 import com.cedarpolicy.model.schema.Schema;
-import org.fusesource.jansi.Ansi;
-import org.fusesource.jansi.AnsiColors;
-import org.junit.jupiter.api.Disabled;
+import com.google.gson.*;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.RsvpException;
@@ -42,8 +40,6 @@ public class TranslationTest {
         public final Path datalogDir;
         public final Path testDir;
         public final String testName;
-        public final Path permitted;
-        public final Path forbidden;
 
         private TestInput(Path testDir, Path policy, Path schema, Path entities) {
             this.policy = policy;
@@ -54,8 +50,6 @@ public class TranslationTest {
                     .replaceAll(".cedar$", "");
             this.datalogDir = TestUtil.getDatalogDir(testDir.getFileName().toString(), policyName);
             this.testName = testDir.getFileName().toString();
-            this.permitted = Path.of(testDir.toString(), policyName + ".allow");
-            this.forbidden = Path.of(testDir.toString(), policyName + ".deny");
         }
 
         public static List<TestInput> load(String dir) {
@@ -81,9 +75,8 @@ public class TranslationTest {
 
     // Sample test for development
     @TestFactory
-    @Disabled
     Collection<DynamicTest> oneOff() {
-        return dynamicTests("in-ns");
+        return dynamicTests("in");
     }
 
     @TestFactory
@@ -100,41 +93,9 @@ public class TranslationTest {
     Collection<DynamicTest> dynamicTests(String name) {
         Collection<DynamicTest> tests = new ArrayList<>();
         TestInput.load(name).forEach(t -> {
-            tests.add(DynamicTest.dynamicTest("func-" + t.testName + "-" + t.policyName, () -> functionalTest(t)));
-            tests.add(DynamicTest.dynamicTest("diff-" + t.testName + "-" + t.policyName, () -> differentialTest(t)));
+            tests.add(DynamicTest.dynamicTest(t.testName + "-" + t.policyName, () -> differentialTest(t)));
         });
         return tests;
-    }
-
-    void functionalTest(TestInput test) throws AuthException, IOException, InterruptedException, RsvpException {
-        RequestAuth rsvpAuth = RequestAuth.load(test.schema, test.policy, test.entities, test.datalogDir);
-        logger.info(YELLOW, "Policy: " + test.policy)
-                .info(CYAN, Files.readString(test.policy))
-                .info(MAGENTA, "Datalog directory: " + test.datalogDir);
-
-        BiConsumer<Supplier<Set<Request>>, Path> doTest = (req, oracle) -> {
-            try {
-                // Get requests from auth
-                String str = req.get().stream()
-                        .sorted(Comparator.comparing(Request::getId))
-                        .map(Request::getId)
-                        .collect(Collectors.joining("\n"));
-                if (TestUtil.GENERATE_ORACLES) {
-                    Path path = Path.of(TestUtil.RESOURCEDIR.toString(),
-                            test.testDir.getFileName().toString(),
-                            oracle.getFileName().toString());
-                    Files.writeString(path, str);
-                } else {
-                    String oracleStr = Files.readString(oracle);
-                    assertEquals(oracleStr, str);
-                }
-            } catch (IOException e) {
-                fail(e);
-            }
-        };
-
-        doTest.accept(rsvpAuth::getPermittedRequests, test.permitted);
-        doTest.accept(rsvpAuth::getForbiddenRequests, test.forbidden);
     }
 
     /**
@@ -144,10 +105,6 @@ public class TranslationTest {
     void differentialTest(TestInput test) throws IOException, AuthException, InterruptedException, RsvpException {
         RequestAuth rsvpAuth = RequestAuth.load(test.schema, test.policy, test.entities, test.datalogDir);
         assertTrue(Collections.disjoint(rsvpAuth.getForbiddenRequests(), rsvpAuth.getPermittedRequests()));
-
-        logger.info(YELLOW, "Policy: " + test.policy)
-            .info(CYAN, Files.readString(test.policy))
-            .info(MAGENTA, "Datalog directory: " + test.datalogDir);
 
         AuthorizationEngine cedarAuth = new BasicAuthorizationEngine();
         Entities cedarEntities = Entities.parse(test.entities);

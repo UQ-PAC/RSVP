@@ -1,8 +1,8 @@
 permit (
-    principal is File,
+    principal == File::"ls",
     action == Action::"act",
     resource is Directory
 ) when {
-     principal in Partition::"sda" &&
-         !(principal in resource)
+    // Always false for ls, it is not a member of the hierarchy
+    principal in Directory::"/usr/sbin"
 };

@@ -1,0 +1,8 @@
+File::???	Directory::/usr/bin	Action::act
+File::???	Directory::/usr/sbin	Action::act
+File::???	Directory::???	Action::act
+File::ls	Directory::/usr/bin	Action::act
+File::ls	Directory::/usr/sbin	Action::act
+File::ls	Directory::???	Action::act
+File::mkfs	Directory::/usr/bin	Action::act
+File::mkfs	Directory::???	Action::act

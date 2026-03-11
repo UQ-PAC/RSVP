@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import com.google.common.collect.HashMultimap;
 import uq.pac.rsvp.policy.ast.expr.*;
+import uq.pac.rsvp.policy.ast.schema.ActionDefinition;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.Schema;
@@ -26,52 +27,46 @@ public class TranslationTyping {
         this.typing = HashMultimap.create();
         this.schema = schema;
 
-        schema.entityTypeNames().forEach(e -> {
-            typing.put(Principal, e);
-            typing.put(Resource, e);
-        });
-
+        // Build initial typing information for variables based on actions
         schema.actionNames().forEach(a -> {
             typing.put(Action, a);
+            ActionDefinition ad = schema.getAction(a);
+            for (EntityTypeDefinition pt : ad.getAppliesToPrincipalTypes()) {
+                typing.put(Principal, pt.getName());
+            }
+            for (EntityTypeDefinition rt : ad.getAppliesToResourceTypes()) {
+                typing.put(Resource, rt.getName());
+            }
         });
 
+        // Stop if either of the variables have no associated types
         Stream.of(Principal, Resource, Action).forEach(v -> {
-            error(typing.containsKey(Principal), "No available types for: " + Principal);
+            error(typing.containsKey(v), "No available types for variable: " + v);
         });
     }
 
-    private boolean supported(VariableExpression.Reference ref) {
+    // Retrieve type information in a safe way
+    public Set<String> get(VariableExpression.Reference ref) {
         return switch (ref) {
-            case Action, Principal, Resource -> true;
-            case Context -> false;
+            case Action, Principal, Resource -> typing.get(ref);
+            case Context -> throw new TranslationError("Unsupported variable reference: " + ref);
         };
     }
 
-    Set<String> get(VariableExpression.Reference ref) {
-        error(supported(ref), "Unsupported variable reference: " + ref);
-        return typing.get(ref);
-    }
-
-    public void update(VariableExpression.Reference ref, boolean negated, String type) {
-        update(ref, negated, Set.of(type));
-    }
-
-    public void update(VariableExpression.Reference ref, boolean negated, EntityExpression expr) {
-        String type = expr.getQualifiedEid().startsWith("Action") ?
-                expr.getQualifiedEid() : expr.getQualifiedType();
-        update(ref, negated, type);
-    }
-
-    public void update(VariableExpression.Reference ref, boolean negated, Set<String> types) {
-        error(supported(ref), "Unsupported variable reference: " + ref);
+    // Update type information for a given variable using the following semantics.
+    // Consider set types to be [t1, t2]. Then
+    //   (*) if negated is true, then we assume !(ref is t1) && !(ref is t2)
+    //        that is, all input types are removed
+    //   (*) if negated is false, then we assume ref is t1 || ref is t2
+    //        that is, only input types are retained
+    private void update(VariableExpression.Reference ref, boolean negated, Set<String> types) {
         for (String type : types) {
             switch (ref) {
-                case Principal, Resource ->
-                        error(schema.getEntityType(type) != null, "Cannot locate entity definition: " + type);
-                case Action ->
-                        error(schema.getAction(type) != null, "Cannot locate action definition: " + type);
-                default ->
-                        error("Unexpected variable: " + ref.name());
+                case Principal, Resource -> error(schema.getEntityType(type) != null,
+                        "Cannot locate entity definition: " + type);
+                case Action -> error(schema.getAction(type) != null,
+                        "Cannot locate action definition: " + type);
+                case Context -> error("Unsupported variable: " + ref.name());
             }
         }
 
@@ -110,7 +105,14 @@ public class TranslationTyping {
         }
     }
 
-    // FIXME: May be not needed, check CommonTypeDefinition.getName
+    public void update(VariableExpression.Reference ref, boolean negated, String type) {
+        update(ref, negated, Set.of(type));
+    }
+
+    public void update(VariableExpression.Reference ref, boolean negated, EntityExpression expr) {
+        update(ref, negated, getTypeName(expr));
+    }
+
     public static String getTypeName(CommonTypeDefinition def) {
         return switch (def) {
             case EntityTypeReference t -> t.getDefinition().getName();
@@ -119,25 +121,29 @@ public class TranslationTyping {
             case LongType t -> "Long";
             case StringType t -> "String";
             case BooleanType t -> "Bool";
-            case IpAddressType t -> "ipaddr";
-            case DurationType t -> "duration";
-            case DecimalType t -> "decimal";
-            case DateTimeType t -> "datetime";
-            default -> throw new TranslationError("unsupported type: " + def);
+            default -> throw new TranslationError("Unsupported type: " + def);
         };
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (VariableExpression.Reference ref : typing.keySet()) {
-            sb.append("   ")
-                    .append(ref.getValue())
-                    .append(": ")
-                    .append(typing.get(ref))
-                    .append('\n');
-        }
-        return sb.toString();
+    public static String getTypeName(Expression expr) {
+        return expr.compute(new ValueVisitorAdapter<String>() {
+            @Override
+            public String visitEntityExpr(EntityExpression expr) {
+                String qualifiedType = expr.getQualifiedType();
+                return (qualifiedType.equals("Action") || qualifiedType.endsWith("::Action")) ?
+                    expr.getQualifiedEid() : qualifiedType;
+            }
+
+            @Override
+            public String visitStringExpr(StringExpression expr) {
+                return getTypeName(new StringType());
+            }
+
+            @Override
+            public String visitLongExpr(LongExpression expr) {
+                return getTypeName(new LongType());
+            }
+        });
     }
 
     public void update(Expression expr, boolean negated) {
@@ -146,7 +152,9 @@ public class TranslationTyping {
             public void visitBinaryExpr(BinaryExpression expr) {
                 Expression lhs = expr.getLeft(), rhs = expr.getRight();
                 switch (expr.getOp()) {
-                    case LessEq, Less, Greater, GreaterEq -> {}
+					// FIXME: I can think of a use-case that restricts type information in general here
+					//		  Need to include this type reduction
+                    case LessEq, Less, Greater, GreaterEq, In -> {}
                     case Eq -> {
                         if (lhs instanceof VariableExpression v && rhs instanceof EntityExpression e) {
                             update(v.getReference(), negated, e);
@@ -168,4 +176,18 @@ public class TranslationTyping {
             }
         });
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (VariableExpression.Reference ref : typing.keySet()) {
+            sb.append("   ")
+                    .append(ref.getValue())
+                    .append(": ")
+                    .append(typing.get(ref))
+                    .append('\n');
+        }
+        return sb.toString();
+    }
+
 }

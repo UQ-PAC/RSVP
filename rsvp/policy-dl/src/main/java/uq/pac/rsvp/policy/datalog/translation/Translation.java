@@ -73,76 +73,88 @@ public class Translation {
         DLProgram.Builder builder = new DLProgram.Builder("auth.dl");
         List<DLRuleDecl> output = new ArrayList<>();
 
+        // All facts gathered from entities
         Multimap<String, DLFact> facts = translationEntities.getFacts();
 
         for (TranslationEntityDefinition type : translationSchema.getDefinitions()) {
-            builder.comment("Cedar entity: " + type.getName());
-            builder.add(type.getEntityRuleDecl());
-            builder.add(facts.get(type.getEntityRuleDecl().getName()));
+            // Entity definition facts
+            builder.comment("Entity: " + type.getName())
+                .add(type.getEntityRuleDecl())
+                .add(facts.get(type.getEntityRuleDecl().getName()));
 
+            // Entity attribute facts
             for (TranslationAttribute attr : type.getAttributes()) {
-                builder.nlComment("Cedar Attribute: " + type.getName() + "." + attr.getName());
-                builder.add(attr.getRuleDecl());
-                builder.add(facts.get(attr.getRuleDecl().getName()));
+                builder.comment("Attribute: " + type.getName() + "." + attr.getName())
+                    .add(attr.getRuleDecl())
+                    .add(facts.get(attr.getRuleDecl().getName()));
             }
-            builder.space();
         }
+
+        // ParentOf relation
+        builder.comment("Parents")
+                .add(ParentOfRuleDecl)
+                .add(facts.get(ParentOfRuleDecl.getName()));
+
+        // Parent of relation should be transitive, make it so
+        DLRule rpt = new DLRule(new DLAtom(ParentOfRuleDecl, DLTerm.var("x"), DLTerm.var("z")),
+            new DLAtom(ParentOfRuleDecl, DLTerm.var("x"), DLTerm.var("y")),
+            new DLAtom(ParentOfRuleDecl, DLTerm.var("y"), DLTerm.var("z")));
+        builder.comment("Transitive Parents")
+                .add(rpt);
 
         TranslationAction actionType = new TranslationAction(translationSchema);
         builder.comment("Actions")
                 .add(actionType.getAction().getStatements())
-                .nlComment("Program principals (as specified by the schema)")
+                .comment("Program principals")
                 .add(actionType.getActionPrincipal().getStatements())
-                .nlComment("Program resources (as specified by the schema)")
+                .comment("Program resources")
                 .add(actionType.getActionResource().getStatements())
-                .nlComment("Actionable requests")
+                .comment("Actionable requests")
                 .add(actionType.getActionableRequests().getStatements())
-                .nlComment("Empty relation")
+                .comment("Empty relation")
                 .add(NullifiedRequestsRuleDecl);
 
-        builder.nlComment("Permit Policy Rules");
         for (TranslationPolicy policy : translationPolicies.getPermitTranslation()) {
-            builder.comment("Permit Policy: " + policy.getDeclaration().getName());
-            builder.add(policy.getDeclaration());
+            builder.comment("Permit Policy: " + policy.getDeclaration().getName())
+                    .add(policy.getDeclaration());
             output.add(policy.getDeclaration());
             for (DLRule rule : policy.getRules()) {
                 builder.add(rule);
             }
-            builder.space();
         }
 
-        builder.comment("Forbid Policy Rules");
         for (TranslationPolicy policy : translationPolicies.getForbidTranslation()) {
-            builder.comment("Forbid Policy: " + policy.getDeclaration().getName());
-            builder.add(policy.getDeclaration());
+            builder.comment("Forbid Policy: " + policy.getDeclaration().getName())
+                    .add(policy.getDeclaration());
             output.add(policy.getDeclaration());
             for (DLRule rule : policy.getRules()) {
                 builder.add(rule);
             }
-            builder.space();
         }
 
-        builder.comment("General Permit Rule (requests explicitly allowed by the policy)");
-        builder.add(PermitRuleDecl);
+        builder.comment("General Permit Rule (requests explicitly allowed by the policy)")
+                .add(PermitRuleDecl);
         DLAtom permit = makeStandardAtom(PermitRuleDecl);
         for (TranslationPolicy policy : translationPolicies.getPermitTranslation()) {
             DLAtom policyPermit = makeStandardAtom(policy.getName());
             builder.add(new DLRule(permit, policyPermit));
         }
 
-        builder.nlComment("General Forbid Rule (requests explicitly forbidden by the policy)");
-        builder.add(ForbidRuleDecl);
+        builder.comment("General Forbid Rule (requests explicitly forbidden by the policy)")
+                .add(ForbidRuleDecl);
         DLAtom forbid = makeStandardAtom(ForbidRuleDecl);
         for (TranslationPolicy policy : translationPolicies.getForbidTranslation()) {
             DLAtom policyForbid = makeStandardAtom(policy.getName());
             builder.add(new DLRule(forbid, policyForbid));
         }
 
-        builder.nlComment("All permitted requests")
+        builder.comment("All permitted requests")
             .add(makePermittedRequestsRule().getStatements())
-            .nlComment("All forbidden requests")
-            .add(makeForbiddenRequestsRule().getStatements())
-            .nlComment("I/O")
+            .comment("All forbidden requests")
+            .add(makeForbiddenRequestsRule().getStatements());
+
+        builder
+            .comment("I/O")
             .add(makeIODirectives(output));
 
         return builder.build();

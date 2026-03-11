@@ -43,7 +43,7 @@ public class TranslationPolicy {
        return declaration;
    }
 
-   public String getName() {
+    public String getName() {
         return declaration.getName();
    }
 }

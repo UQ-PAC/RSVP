@@ -1,0 +1,2 @@
+File::ls	Directory::/usr/bin	Action::act
+File::mkfs	Directory::/usr/sbin	Action::act

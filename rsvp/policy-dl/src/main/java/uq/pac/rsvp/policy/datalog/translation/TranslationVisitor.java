@@ -92,8 +92,23 @@ public class TranslationVisitor extends TranslationVoidAdapter {
                         .getName();
                 expressions.add(new DLAtom(relationName, negated, var));
             }
-            case And, Or -> throw new AssertionError("Unreachable");
-            default -> throw new RuntimeException("unsupported: " + expr.getOp());
+            case BinaryExpression.BinaryOp.In -> {
+                TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, typing),
+                        rhs = new TranslationOperandVisitor(schema, typing);
+                DLTerm lhsOp = expr.getLeft().compute(lhs),
+                        rhsOp = expr.getRight().compute(rhs);
+
+                expressions.addAll(lhs.getExpressions());
+                expressions.addAll(rhs.getExpressions());
+
+                String rhsType = rhs.getSingletonType();
+                DLRuleExpr re = rhsType.startsWith("Set<") ? // FIXME: Delegate typing to appropriate class
+                    new DLConstraint(lhsOp, rhsOp, getOperator(BinaryExpression.BinaryOp.Eq, negated)) :
+                    new DLAtom(ParentOfRuleDecl, negated, rhsOp, lhsOp);
+                expressions.add(re);
+            }
+            case And, Or -> throw new TranslationError("Unreachable");
+            default -> throw new TranslationError("Unsupported: " + expr.getOp());
         }
     }
 
@@ -101,7 +116,7 @@ public class TranslationVisitor extends TranslationVoidAdapter {
     public void visitUnaryExpr(UnaryExpression expr) {
         require(!negated);
         switch (expr.getOp()) {
-            case Neg -> throw new TranslationError("Unsupported");
+            case Neg -> throw new TranslationError("Unsupported: " + expr);
             case Not -> negated = true;
         }
         expr.getExpression().accept(this);

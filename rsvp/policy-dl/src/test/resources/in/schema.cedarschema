@@ -1,0 +1,25 @@
+entity User = {
+    "name" : String
+};
+
+entity Partition = {
+    kind: String,
+    size: Long
+};
+
+entity Directory in Partition = {
+    private: Bool,
+    files: Set<File>
+};
+
+entity File in Directory = {
+    kind: String,
+    size: Long
+};
+
+action "act" appliesTo {
+    principal: File,
+    resource: [ Directory ],
+    context: { }
+};
+

@@ -4,9 +4,9 @@ import com.cedarpolicy.value.EntityUID;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * Constants used throughout the translation of Cedar to datalog
@@ -153,12 +153,24 @@ public class TranslationConstants {
         return new TranslationRule(ForbiddenRequestsRuleDecl, rule);
     }
 
+    /**
+     * Parent/child hierarchy of entities
+     */
+    public final static DLRuleDecl ParentOfRuleDecl =
+            new DLRuleDecl("ParentOf",
+                    DLDeclTerm.symbolic("parent"),
+                    DLDeclTerm.symbolic("child"));
+
     public final static String OUTPUT_DELIMITER = "\t";
 
-    public static List<DLOutputDirective> makeIODirectives(Collection<DLRuleDecl> output) {
-        return Stream.of(PermitRuleDecl, ForbidRuleDecl, PermittedRequestsRuleDecl,
-                ForbiddenRequestsRuleDecl, ActionableRequestsRuleDecl)
-                .map(DLOutputDirective::new)
-                .toList();
+    public static List<DLOutputDirective> makeIODirectives(Collection<DLRuleDecl> decls) {
+        List<DLRuleDecl> output = new ArrayList<>(decls);
+        output.addAll(List.of(
+                PermitRuleDecl,
+                ForbidRuleDecl,
+                PermittedRequestsRuleDecl,
+                ForbiddenRequestsRuleDecl,
+                ActionableRequestsRuleDecl));
+        return output.stream().map(DLOutputDirective::new).toList();
     }
 }

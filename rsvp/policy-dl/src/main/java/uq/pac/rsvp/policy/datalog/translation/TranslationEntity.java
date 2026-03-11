@@ -89,6 +89,11 @@ public class TranslationEntity {
             });
         });
 
+		// Generate facts for parent hierarchy
+        entity.parentsEUIDs.forEach(pid -> {
+            statements.add(new DLFact(TranslationConstants.ParentOfRuleDecl, getEUIDLiteral(pid), euid));
+        });
+
         this.facts = Collections.unmodifiableList(statements);
     }
 

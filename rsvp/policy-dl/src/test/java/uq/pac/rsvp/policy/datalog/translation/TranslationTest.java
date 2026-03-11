@@ -9,6 +9,8 @@ import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.exception.AuthException;
 import com.cedarpolicy.model.policy.PolicySet;
 import com.cedarpolicy.model.schema.Schema;
+import org.fusesource.jansi.Ansi;
+import org.fusesource.jansi.AnsiColors;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.RsvpException;
@@ -79,8 +81,7 @@ public class TranslationTest {
     // Sample test for development
     @TestFactory
     Collection<DynamicTest> oneOff() {
-        return TestInput.load("basic").stream().map(t ->
-                DynamicTest.dynamicTest(t.testName + "-" + t.policyName, () -> functionalTest(t))).toList();
+        return dynamicTests("in");
     }
 
     @TestFactory
@@ -152,12 +153,8 @@ public class TranslationTest {
         Schema cedarSchema = Schema.parse(Schema.JsonOrCedar.Cedar, Files.readString(test.schema));
         PolicySet cedarPolicies = PolicySet.parsePolicies(test.policy);
 
-        int [] requestCounter = new int [2];
-        // Consistency (for the moment at least if based on fully defined request entities)
-        List<Request> universe = rsvpAuth.getActionableRequests().stream()
-                .filter(Request::isDefined)
-                .toList();
-        for (Request rsvpRequest : universe) {
+        int [] requestCounter = new int [3];
+        for (Request rsvpRequest : rsvpAuth.getActionableRequests()) {
             RequestAuth.Result rsvpDecision = rsvpAuth.authorize(rsvpRequest);
             assertTrue(rsvpDecision == RequestAuth.Result.Deny ||
                     rsvpDecision == RequestAuth.Result.Allow);
@@ -174,20 +171,24 @@ public class TranslationTest {
             if (cedarDecision == AuthorizationSuccessResponse.Decision.Allow &&
                     rsvpDecision == RequestAuth.Result.Allow) {
                 requestCounter[0]++;
+                logger.info(GREEN, rsvpRequest + ":  " + rsvpDecision + "/" + cedarDecision);
             } else if (cedarDecision == AuthorizationSuccessResponse.Decision.Deny &&
                     rsvpDecision == RequestAuth.Result.Deny) {
                 requestCounter[1]++;
+                logger.info(BLUE, rsvpRequest + ":  " + rsvpDecision + "/" + cedarDecision);
             } else {
-                fail(""" 
+                logger.error(""" 
                         Request mismatch:
                             RSVP: %s,
                             Cedar: %s
                         RSVP request: %s
                         CedarRequest: %s
                         """.formatted(rsvpDecision, cedarDecision, rsvpRequest, cedarRequest));
+                requestCounter[2]++;
             }
         }
-        logger.info(GREEN, "Validated Requests (allow/deny): %d (%d/%d)\n",
-                universe.size(), requestCounter[0], requestCounter[1]);
+        logger.info(GREEN, "Validated Requests (allow/deny/failed): %d (%d/%d/%d)\n",
+                rsvpAuth.getActionableRequests().size(), requestCounter[0], requestCounter[1], requestCounter[2]);
+        assertEquals(0, requestCounter[2], "%d mismatched requests".formatted(requestCounter[2]));
     }
 }

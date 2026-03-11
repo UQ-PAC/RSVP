@@ -1,6 +1,6 @@
 [
     {
-        "uid": { "type": "Partition", "id": "sda" },
+        "uid": { "type": "OS::Partition", "id": "sda" },
         "attrs": {
             "kind": "ext4",
             "size": 256000
@@ -8,47 +8,47 @@
         "parents": [ ]
     },
     {
-        "uid": { "type": "Directory", "id": "/usr/bin" },
+        "uid": { "type": "OS::Directory", "id": "/usr/bin" },
         "attrs": {
             "private": false,
             "files": [
-                { "__entity" : { "type": "File", "id" : "cedar" } }
+                { "__entity" : { "type": "OS::File", "id" : "cedar" } }
             ]
         },
         "parents": [
-            { "type": "Partition", "id" : "sda"  }
+            { "type": "OS::Partition", "id" : "sda"  }
         ]
     },
     {
-        "uid": { "type": "Directory", "id": "/usr/sbin" },
+        "uid": { "type": "OS::Directory", "id": "/usr/sbin" },
         "attrs": {
             "private": true,
             "files": [
-                { "__entity" : { "type": "File", "id" : "mkfs" } }
+                { "__entity" : { "type": "OS::File", "id" : "mkfs" } }
             ]
         },
         "parents": [
-            { "type": "Partition", "id" : "sda" }
+            { "type": "OS::Partition", "id" : "sda" }
         ]
     },
     {
-        "uid": { "type": "File", "id": "ls" },
+        "uid": { "type": "OS::File", "id": "ls" },
         "attrs": {
             "kind": "executable",
             "size": 128
         },
         "parents": [
-            { "type": "Directory", "id" : "/usr/bin" }
+            { "type": "OS::Directory", "id" : "/usr/bin" }
         ]
     },
     {
-        "uid": { "type": "File", "id": "mkfs" },
+        "uid": { "type": "OS::File", "id": "mkfs" },
         "attrs": {
             "kind": "executable",
             "size": 128
         },
         "parents": [
-            { "type": "Directory", "id" : "/usr/sbin" }
+            { "type": "OS::Directory", "id" : "/usr/sbin" }
         ]
     }
 ]

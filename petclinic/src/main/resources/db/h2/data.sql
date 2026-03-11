@@ -47,15 +47,24 @@ INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 3)
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 INSERT INTO owners (entity_id, first_name, last_name, address, city, telephone) VALUES (@new_entity_id, 'George', 'Franklin', '110 W. Liberty St.', 'Madison', '6085551023');
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Owner');
+INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 1);
+INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 6);
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 INSERT INTO owners (entity_id, first_name, last_name, address, city, telephone) VALUES (@new_entity_id, 'Eduardo', 'Rodriquez', '2693 Commerce St.', 'McFarland', '6085558763');
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Owner');
+INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 6);
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 INSERT INTO owners (entity_id, first_name, last_name, address, city, telephone) VALUES (@new_entity_id, 'Jean', 'Coleman', '105 N. Lake St.', 'Monona', '6085552654');
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Owner');
+INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 1);
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 INSERT INTO owners (entity_id, first_name, last_name, address, city, telephone) VALUES (@new_entity_id, 'Carlos', 'Estaban', '2335 Independence La.', 'Waunakee', '6085555487');
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Owner');
+INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 6);
 
 -- Pets.
 
@@ -69,42 +78,57 @@ INSERT INTO types VALUES (default, 'hamster'); -- 6
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_owner_id = (SELECT entity_id FROM owners WHERE telephone = '6085551023');
 INSERT INTO pets (entity_id, name, birth_date, type_id, owner_id) VALUES (@new_entity_id, 'Leo', '2010-09-07', 1, @recovered_owner_id);
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Pet');
+INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 2);
+INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 7);
 -- Owner: George Franklin
 -- Vets: James Carter
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_owner_id = (SELECT entity_id FROM owners WHERE telephone = '6085558763');
-INSERT INTO pets (entity_id, name, birth_date, type_id, owner_id) VALUES (@new_entity_id, 'Rosy', '2011-04-17', 2, @recovered_owner_id); 
+INSERT INTO pets (entity_id, name, birth_date, type_id, owner_id) VALUES (@new_entity_id, 'Rosy', '2011-04-17', 2, @recovered_owner_id);
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Pet');
+INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 7);
 -- Owner: Eduardo Rodriquez
 -- Vets: James Carter
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_owner_id = (SELECT entity_id FROM owners WHERE telephone = '6085558763');
 INSERT INTO pets (entity_id, name, birth_date, type_id, owner_id) VALUES (@new_entity_id, 'Jewel', '2010-03-07', 2, @recovered_owner_id);
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Pet');
+INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 7);
 -- Owner: Eduardo Rodriquez
 -- Vets: James Carter
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_owner_id = (SELECT entity_id FROM owners WHERE telephone = '6085552654');
 INSERT INTO pets (entity_id, name, birth_date, type_id, owner_id) VALUES (@new_entity_id, 'Samantha', '2012-09-04', 1, @recovered_owner_id);
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Pet');
+INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 2);
 -- Owner: Jean Coleman
 -- Vets: Sharon Jenkins, Linda Douglas
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_owner_id = (SELECT entity_id FROM owners WHERE telephone = '6085552654');
 INSERT INTO pets (entity_id, name, birth_date, type_id, owner_id) VALUES (@new_entity_id, 'Max', '2012-09-04', 1, @recovered_owner_id);
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Pet');
+INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 2);
 -- Owner: Jean Coleman
 -- Vets: Sharon Jenkins, Linda Douglas
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_owner_id = (SELECT entity_id FROM owners WHERE telephone = '6085555487');
 INSERT INTO pets (entity_id, name, birth_date, type_id, owner_id) VALUES (@new_entity_id, 'Lucky', '2011-08-06', 5, @recovered_owner_id);
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Pet');
+INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 7);
 -- Owner: Carlos Estaban
 -- Vets: James Carter
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_owner_id = (SELECT entity_id FROM owners WHERE telephone = '6085555487');
 INSERT INTO pets (entity_id, name, birth_date, type_id, owner_id) VALUES (@new_entity_id, 'Sly', '2012-06-08', 1, @recovered_owner_id);
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Pet');
+INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 7);
 -- Owner: Carlos Estaban
 -- Vets: James Carter
 
@@ -114,46 +138,62 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 SET @recovered_owner_id = (SELECT entity_id FROM owners WHERE telephone = '6085552654');
 SET @recovered_pet_id = (SELECT entity_id FROM pets WHERE name = 'Samantha' AND type_id = 1 AND owner_id = @recovered_owner_id);
 INSERT INTO visits (entity_id, pet_id, visit_date, description) VALUES (@new_entity_id, @recovered_pet_id, '2013-01-01', 'rabies shot');
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
+INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 4);
 -- Pet: Samantha
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_owner_id = (SELECT entity_id FROM owners WHERE telephone = '6085552654');
 SET @recovered_pet_id = (SELECT entity_id FROM pets WHERE name = 'Max' AND type_id = 1 AND owner_id = @recovered_owner_id);
 INSERT INTO visits (entity_id, pet_id, visit_date, description) VALUES (@new_entity_id, @recovered_pet_id, '2013-01-02', 'rabies shot');
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
+INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 4);
 -- Pet: Max
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_owner_id = (SELECT entity_id FROM owners WHERE telephone = '6085552654');
 SET @recovered_pet_id = (SELECT entity_id FROM pets WHERE name = 'Max' AND type_id = 1 AND owner_id = @recovered_owner_id);
 INSERT INTO visits (entity_id, pet_id, visit_date, description) VALUES (@new_entity_id, @recovered_pet_id, '2013-01-03', 'neutered');
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
+INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 4);
 -- Pet: Max
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_owner_id = (SELECT entity_id FROM owners WHERE telephone = '6085552654');
 SET @recovered_pet_id = (SELECT entity_id FROM pets WHERE name = 'Samantha' AND type_id = 1 AND owner_id = @recovered_owner_id);
 INSERT INTO visits (entity_id, pet_id, visit_date, description) VALUES (@new_entity_id, @recovered_pet_id, '2013-01-04', 'spayed');
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
+INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 4);
 -- Pet: Samantha
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_owner_id = (SELECT entity_id FROM owners WHERE telephone = '6085558763');
 SET @recovered_pet_id = (SELECT entity_id FROM pets WHERE name = 'Rosy' AND type_id = 2 AND owner_id = @recovered_owner_id);
 INSERT INTO visits (entity_id, pet_id, visit_date, description) VALUES (@new_entity_id, @recovered_pet_id, '2013-01-04', 'rabies shot');
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
+INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 9);
 -- Pet: Rosy
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_owner_id = (SELECT entity_id FROM owners WHERE telephone = '6085558763');
 SET @recovered_pet_id = (SELECT entity_id FROM pets WHERE name = 'Jewel' AND type_id = 2 AND owner_id = @recovered_owner_id);
 INSERT INTO visits (entity_id, pet_id, visit_date, description) VALUES (@new_entity_id, @recovered_pet_id, '2013-01-04', 'rabies shot');
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
+INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 9);
 -- Pet: Jewel
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_owner_id = (SELECT entity_id FROM owners WHERE telephone = '6085555487');
 SET @recovered_pet_id = (SELECT entity_id FROM pets WHERE name = 'Lucky' AND type_id = 5 AND owner_id = @recovered_owner_id);
 INSERT INTO visits (entity_id, pet_id, visit_date, description) VALUES (@new_entity_id, @recovered_pet_id, '2013-01-05', 'vaccination');
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
+INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 9);
 -- Pet: Lucky
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_owner_id = (SELECT entity_id FROM owners WHERE telephone = '6085555487');
 SET @recovered_pet_id = (SELECT entity_id FROM pets WHERE name = 'Sly' AND type_id = 1 AND owner_id = @recovered_owner_id);
 INSERT INTO visits (entity_id, pet_id, visit_date, description) VALUES (@new_entity_id, @recovered_pet_id, '2013-01-05', 'vaccination');
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
+INSERT INTO entity_databases (entity_id, database_id) VALUES (@new_entity_id, 9);
 -- Pet: Sly

@@ -9,7 +9,7 @@ import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.exception.AuthException;
 import com.cedarpolicy.model.policy.PolicySet;
 import com.cedarpolicy.model.schema.Schema;
-import com.google.gson.*;
+import org.fusesource.jansi.Ansi;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.RsvpException;
@@ -20,9 +20,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.fusesource.jansi.Ansi.Color.*;
@@ -76,7 +73,7 @@ public class TranslationTest {
     // Sample test for development
     @TestFactory
     Collection<DynamicTest> oneOff() {
-        return dynamicTests("in");
+        return dynamicTests("github");
     }
 
     @TestFactory
@@ -103,6 +100,10 @@ public class TranslationTest {
      * The test runs both, RSVP and Cedar authorisation engines and compares the results that should agree
      */
     void differentialTest(TestInput test) throws IOException, AuthException, InterruptedException, RsvpException {
+        logger.info(YELLOW, "Policy: " + test.policy)
+                .info(CYAN, Files.readString(test.policy))
+                .info(MAGENTA, "Datalog directory: " + test.datalogDir);
+
         RequestAuth rsvpAuth = RequestAuth.load(test.schema, test.policy, test.entities, test.datalogDir);
         assertTrue(Collections.disjoint(rsvpAuth.getForbiddenRequests(), rsvpAuth.getPermittedRequests()));
 
@@ -112,11 +113,12 @@ public class TranslationTest {
         Schema cedarSchema = Schema.parse(Schema.JsonOrCedar.Cedar, Files.readString(test.schema));
         PolicySet cedarPolicies = PolicySet.parsePolicies(test.policy);
 
-        int [] requestCounter = new int [3];
+        int [] rsvpRequestCounter = new int [2];
+        int [] cedarRequestCounter = new int [2];
         for (Request rsvpRequest : rsvpAuth.getActionableRequests()) {
-            RequestAuth.Result rsvpDecision = rsvpAuth.authorize(rsvpRequest);
-            assertTrue(rsvpDecision == RequestAuth.Result.Deny ||
-                    rsvpDecision == RequestAuth.Result.Allow);
+            RequestAuth.Decision rsvpDecision = rsvpAuth.authorize(rsvpRequest);
+            assertTrue(rsvpDecision == RequestAuth.Decision.Deny ||
+                    rsvpDecision == RequestAuth.Decision.Allow);
 
             AuthorizationRequest cedarRequest = rsvpRequest.getCedarRequest(cedarSchema);
             AuthorizationResponse cedarResponse =
@@ -127,27 +129,25 @@ public class TranslationTest {
                     cedarResponse.success.orElseThrow(AssertionError::new);
             AuthorizationSuccessResponse.Decision cedarDecision = cedarSuccess.getDecision();
 
+
             if (cedarDecision == AuthorizationSuccessResponse.Decision.Allow &&
-                    rsvpDecision == RequestAuth.Result.Allow) {
-                requestCounter[0]++;
+                    rsvpDecision == RequestAuth.Decision.Allow) {
                 logger.info(GREEN, rsvpRequest + ":  " + rsvpDecision + "/" + cedarDecision);
             } else if (cedarDecision == AuthorizationSuccessResponse.Decision.Deny &&
-                    rsvpDecision == RequestAuth.Result.Deny) {
-                requestCounter[1]++;
+                    rsvpDecision == RequestAuth.Decision.Deny) {
                 logger.info(BLUE, rsvpRequest + ":  " + rsvpDecision + "/" + cedarDecision);
             } else {
-                logger.error(""" 
-                        Request mismatch:
-                            RSVP: %s,
-                            Cedar: %s
-                        RSVP request: %s
-                        CedarRequest: %s
-                        """.formatted(rsvpDecision, cedarDecision, rsvpRequest, cedarRequest));
-                requestCounter[2]++;
+                logger.error(rsvpRequest + ":  " + rsvpDecision + "/" + cedarDecision);
             }
+            cedarRequestCounter[cedarDecision.ordinal()]++;
+            rsvpRequestCounter[rsvpDecision.ordinal()]++;
         }
-        logger.info(GREEN, "Validated Requests (allow/deny/failed): %d (%d/%d/%d)\n",
-                rsvpAuth.getActionableRequests().size(), requestCounter[0], requestCounter[1], requestCounter[2]);
-        assertEquals(0, requestCounter[2], "%d mismatched requests".formatted(requestCounter[2]));
+        logger.attr(Ansi.Attribute.INTENSITY_BOLD)
+                .info(GREEN, "RSVP Requests (allow/deny): %d/%d\n",
+                rsvpAuth.getActionableRequests().size(), rsvpRequestCounter[0], rsvpRequestCounter[1]);
+        logger.attr(Ansi.Attribute.INTENSITY_BOLD)
+                .info(BLUE, "Cedar Requests (allow/deny): %d/%d\n",
+                rsvpAuth.getActionableRequests().size(), cedarRequestCounter[0], cedarRequestCounter[1]);
+        assertArrayEquals(rsvpRequestCounter, cedarRequestCounter, "Mismatched request decisions found");
     }
 }

@@ -90,29 +90,30 @@ public class Translation {
             }
         }
 
+        TranslationAction actions = new TranslationAction(translationSchema);
+        builder.comment("Actions")
+                .add(actions.getAction().getStatements())
+                .comment("Program principals")
+                .add(actions.getActionPrincipal().getStatements())
+                .comment("Program resources")
+                .add(actions.getActionResource().getStatements())
+                .comment("Actionable requests")
+                .add(actions.getActionableRequests().getStatements())
+                .comment("Empty relation")
+                .add(NullifiedRequestsRuleDecl);
+
         // ParentOf relation
         builder.comment("Parents")
                 .add(ParentOfRuleDecl)
-                .add(facts.get(ParentOfRuleDecl.getName()));
+                .add(facts.get(ParentOfRuleDecl.getName()))
+                .add(actions.getParentOfFacts());
 
         // Parent of relation should be transitive, make it so
         DLRule rpt = new DLRule(new DLAtom(ParentOfRuleDecl, DLTerm.var("x"), DLTerm.var("z")),
-            new DLAtom(ParentOfRuleDecl, DLTerm.var("x"), DLTerm.var("y")),
-            new DLAtom(ParentOfRuleDecl, DLTerm.var("y"), DLTerm.var("z")));
+                new DLAtom(ParentOfRuleDecl, DLTerm.var("x"), DLTerm.var("y")),
+                new DLAtom(ParentOfRuleDecl, DLTerm.var("y"), DLTerm.var("z")));
         builder.comment("Transitive Parents")
                 .add(rpt);
-
-        TranslationAction actionType = new TranslationAction(translationSchema);
-        builder.comment("Actions")
-                .add(actionType.getAction().getStatements())
-                .comment("Program principals")
-                .add(actionType.getActionPrincipal().getStatements())
-                .comment("Program resources")
-                .add(actionType.getActionResource().getStatements())
-                .comment("Actionable requests")
-                .add(actionType.getActionableRequests().getStatements())
-                .comment("Empty relation")
-                .add(NullifiedRequestsRuleDecl);
 
         for (TranslationPolicy policy : translationPolicies.getPermitTranslation()) {
             builder.comment("Permit Policy: " + policy.getDeclaration().getName())

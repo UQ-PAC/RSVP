@@ -14,6 +14,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import uq.pac.rsvp.RsvpException;
+import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
+import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
+import uq.pac.rsvp.policy.ast.visitor.PolicyVisitorImpl;
 
 @DisplayName("Policy set AST")
 public class PolicySetTest {
@@ -44,6 +47,45 @@ public class PolicySetTest {
             assertEquals(2, policy.getAnnotations().keySet().size());
             assertEquals("annotated!!", policy.getAnnotations().get("testing"));
             assertEquals("pointless annotation", policy.getAnnotations().get("another"));
+        }
+
+        @Test
+        @DisplayName("handles 'has' in policy conditions")
+        void testHasParsing() throws RsvpException {
+            URL url = ClassLoader.getSystemResource("policy-with-has.cedar");
+            PolicySet policies = PolicySet.parseCedarPolicySet(Path.of(url.getPath()));
+            Policy policy = policies.getFirst();
+            int stage[] = new int[] {0};
+            PolicyVisitor pv = new PolicyVisitorImpl() {
+                @Override
+                public void visitBinaryExpr(BinaryExpression expr) {
+                    // First we will see '&&' and then the 'has', i.e.:
+                    //
+                    // (resource has owner) && ...
+                    //            |          |
+                    //            |       stage 0
+                    //         stage 1
+                    //
+                    // But we actually see a bunch of '&&' because the (tautological) conditions
+                    // from (resource, owner, principal) are apparently included.
+                    if (stage[0] == 0) {
+                        assertEquals(expr.getOp(), BinaryExpression.BinaryOp.And);
+                        stage[0] = 1;
+                    }
+                    else if (stage[0] == 1) {
+                        if(expr.getOp() == BinaryExpression.BinaryOp.HasAttr) {
+                            assertEquals(44, expr.getSourceLoc().offset);
+                            assertEquals(18, expr.getSourceLoc().len);
+                            stage[0] = 2;
+                        } else {
+                            assertEquals(expr.getOp(), BinaryExpression.BinaryOp.And);
+                        }
+                    }
+                    super.visitBinaryExpr(expr);
+                }
+            };
+            policy.getCondition().accept(pv);
+            assertEquals(2, stage[0]);
         }
     }
 

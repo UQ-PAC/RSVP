@@ -91,7 +91,6 @@ public class ActionDefinitionTest {
         @Test
         @DisplayName("Resolves references (no namespaces)")
         void resolvesMemberOfNNS() throws IOException {
-            System.err.println("*** resolve refs no namespace"); // XXX
             URL url = ClassLoader.getSystemResource("action.nns.cedarschema.json");
             String json = Files.readString(Path.of(url.getPath()));
             Schema schema = JsonParser.parseSchema(json);

@@ -73,7 +73,7 @@ namespace PetClinic {
         principal: User,
         resource: WebPage,
         context: {
-            database?: Database,
+            databases?: Set<Database>,
             readAction?: Action
         }
     };

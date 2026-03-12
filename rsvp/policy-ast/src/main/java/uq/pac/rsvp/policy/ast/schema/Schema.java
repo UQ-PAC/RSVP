@@ -212,11 +212,11 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
         }
 
         if (type != null) {
-            if (!type.endsWith("::Action")) {
+            if (!type.equals("Action") && !type.endsWith("::Action")) {
                 return null;
             }
 
-            Namespace namespace = schema.get(type.substring(0, type.length() - 8));
+            Namespace namespace = schema.get(type.substring(0, Math.max(0, type.length() - 8)));
 
             if (namespace == null) {
                 return null;

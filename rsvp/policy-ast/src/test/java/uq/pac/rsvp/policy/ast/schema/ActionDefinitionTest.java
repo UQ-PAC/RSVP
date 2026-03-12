@@ -88,6 +88,29 @@ public class ActionDefinitionTest {
             assertTrue(action.getAppliesToResourceTypes().contains(schema.getEntityType("Local::Loser")));
         }
 
+        @Test
+        @DisplayName("Resolves references (no namespaces)")
+        void resolvesMemberOfNNS() throws IOException {
+            System.err.println("*** resolve refs no namespace"); // XXX
+            URL url = ClassLoader.getSystemResource("action.nns.cedarschema.json");
+            String json = Files.readString(Path.of(url.getPath()));
+            Schema schema = JsonParser.parseSchema(json);
+
+            new SchemaResolutionVisitor().visitSchema(schema);
+
+            ActionDefinition action = schema.getAction("Action::anotherAction");
+
+            assertNotNull(action);
+
+            assertEquals(1, action.getMemberOf().size());
+            assertTrue(action.getMemberOf().contains(schema.getAction("Action::someAction")));
+            assertEquals(2, action.getAppliesToPrincipalTypes().size());
+            assertTrue(action.getAppliesToPrincipalTypes().contains(schema.getEntityType("User")));
+            assertTrue(action.getAppliesToPrincipalTypes().contains(schema.getEntityType("Loser")));
+            assertEquals(1, action.getAppliesToResourceTypes().size());
+            assertTrue(action.getAppliesToResourceTypes().contains(schema.getEntityType("Loser")));
+        }
+
     }
 
     @Nested

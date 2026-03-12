@@ -1,0 +1,22 @@
+{
+  "":{
+    "entityTypes":{
+      "Loser":{},
+      "User":{}
+    },
+    "actions":{
+      "anotherAction":{
+        "appliesTo":{
+          "resourceTypes":["Loser"],
+          "principalTypes":["User","Loser"]
+        },
+        "memberOf":[{"id":"someAction","type":"Action"}]
+      },
+      "someAction":{
+        "appliesTo":{
+          "resourceTypes":[],"principalTypes":[]
+        }
+      }
+    }
+  }
+}

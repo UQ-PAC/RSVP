@@ -1,0 +1,253 @@
+[
+  {
+    "uid": {
+      "__entity": {
+        "type": "Application",
+        "id": "TinyTodo"
+      }
+    },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "User",
+        "id": "user_0"
+      }
+    },
+    "attrs": {},
+    "parents": [
+      {
+        "__entity": {
+          "type": "Team",
+          "id": "team_0"
+        }
+      },
+      {
+        "__entity": {
+          "type": "Team",
+          "id": "team_1"
+        }
+      },
+      {
+        "__entity": {
+          "type": "Team",
+          "id": "team_2"
+        }
+      },
+      {
+        "__entity": {
+          "type": "Application",
+          "id": "TinyTodo"
+        }
+      }
+    ]
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "User",
+        "id": "user_1"
+      }
+    },
+    "attrs": {},
+    "parents": [
+      {
+        "__entity": {
+          "type": "Team",
+          "id": "team_2"
+        }
+      },
+      {
+        "__entity": {
+          "type": "Application",
+          "id": "TinyTodo"
+        }
+      }
+    ]
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "User",
+        "id": "user_2"
+      }
+    },
+    "attrs": {},
+    "parents": [
+      {
+        "__entity": {
+          "type": "Team",
+          "id": "team_0"
+        }
+      },
+      {
+        "__entity": {
+          "type": "Team",
+          "id": "team_2"
+        }
+      },
+      {
+        "__entity": {
+          "type": "Application",
+          "id": "TinyTodo"
+        }
+      }
+    ]
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "Team",
+        "id": "team_0"
+      }
+    },
+    "attrs": {},
+    "parents": [
+      {
+        "__entity": {
+          "type": "Application",
+          "id": "TinyTodo"
+        }
+      }
+    ]
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "Team",
+        "id": "team_1"
+      }
+    },
+    "attrs": {},
+    "parents": [
+      {
+        "__entity": {
+          "type": "Application",
+          "id": "TinyTodo"
+        }
+      }
+    ]
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "Team",
+        "id": "team_2"
+      }
+    },
+    "attrs": {},
+    "parents": [
+      {
+        "__entity": {
+          "type": "Team",
+          "id": "team_0"
+        }
+      },
+      {
+        "__entity": {
+          "type": "Application",
+          "id": "TinyTodo"
+        }
+      }
+    ]
+  },
+  {
+    "uid": {"__entity": {"type": "List", "id": "list_0"}
+    },
+    "attrs": {
+      "name": "list_0",
+      "owner": {"__entity": {"type": "User", "id": "user_2"}},
+      "readers": {"__entity": {"type": "Team", "id": "team_2"}},
+      "editors": {
+        "__entity": {
+          "type": "Team",
+          "id": "team_0"
+        }
+      }
+    },
+    "parents": [
+      {
+        "__entity": {
+          "type": "Application",
+          "id": "TinyTodo"
+        }
+      }
+    ]
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "List",
+        "id": "list_1"
+      }
+    },
+    "attrs": {
+      "name": "list_1",
+      "owner": {
+        "__entity": {
+          "type": "User",
+          "id": "user_2"
+        }
+      },
+      "readers": {
+        "__entity": {
+          "type": "Team",
+          "id": "team_1"
+        }
+      },
+      "editors": {
+        "__entity": {
+          "type": "Team",
+          "id": "team_2"
+        }
+      }
+    },
+    "parents": [
+      {
+        "__entity": {
+          "type": "Application",
+          "id": "TinyTodo"
+        }
+      }
+    ]
+  },
+  {
+    "uid": {
+      "__entity": {
+        "type": "List",
+        "id": "list_2"
+      }
+    },
+    "attrs": {
+      "name": "list_2",
+      "owner": {
+        "__entity": {
+          "type": "User",
+          "id": "user_2"
+        }
+      },
+      "readers": {
+        "__entity": {
+          "type": "Team",
+          "id": "team_2"
+        }
+      },
+      "editors": {
+        "__entity": {
+          "type": "Team",
+          "id": "team_2"
+        }
+      }
+    },
+    "parents": [
+      {
+        "__entity": {
+          "type": "Application",
+          "id": "TinyTodo"
+        }
+      }
+    ]
+  }
+]

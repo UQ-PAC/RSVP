@@ -100,11 +100,11 @@ public class Logger {
     }
 
     public Logger warning(String format, Object ...args) {
-        return log(System.err, RED, Level.Warning, format, args);
+        return bold().bright().log(System.err, YELLOW, Level.Warning, format, args);
     }
 
     public Logger error(String format, Object ...args) {
-        return log(System.err, RED, Level.Severe, format, args);
+        return bold().bright().log(System.err, RED, Level.Severe, format, args);
     }
 
     public static void println(Ansi.Color color, String format, Object ...args) {

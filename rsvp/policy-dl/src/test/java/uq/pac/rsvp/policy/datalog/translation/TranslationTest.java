@@ -10,6 +10,7 @@ import com.cedarpolicy.model.exception.AuthException;
 import com.cedarpolicy.model.policy.PolicySet;
 import com.cedarpolicy.model.schema.Schema;
 import org.fusesource.jansi.Ansi;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.RsvpException;
@@ -29,6 +30,11 @@ public class TranslationTest {
 
     private final static Logger logger = new Logger();
 
+    @BeforeAll
+    static void configure() {
+        logger.setLevel(Logger.Level.Warning);
+    }
+
     private static class TestInput {
         public final String policyName;
         public final Path policy;
@@ -43,37 +49,31 @@ public class TranslationTest {
             this.schema = schema;
             this.entities = entities;
             this.testDir = testDir;
-            this.policyName = policy.getFileName().toString()
-                    .replaceAll(".cedar$", "");
+            this.policyName = policy.getFileName().toString().replaceAll("\\.cedar$", "");
             this.datalogDir = TestUtil.getDatalogDir(testDir.getFileName().toString(), policyName);
             this.testName = testDir.getFileName().toString();
         }
 
         public static List<TestInput> load(String dir) {
             Path testDir = Path.of(TranslationTest.class.getClassLoader().getResource(dir).getFile());
-            Path schema = Path.of(testDir.toString(), "schema.cedarschema");
-            Path entities = Path.of(testDir.toString(), "entities.json");
+            Path schema = TestUtil.findFile(testDir, ".cedarschema");
+            Path entities = TestUtil.findFile(testDir, ".json");
 
             assertTrue(Files.exists(testDir) && Files.isDirectory(testDir));
             assertTrue(Files.exists(schema) && Files.isRegularFile(schema));
             assertTrue(Files.exists(entities) && Files.isRegularFile(entities));
 
-            List<TestInput> inputs = new ArrayList<>();
-            try (Stream<Path> p = Files.list(testDir)) {
-                p.filter(s -> s.toString().endsWith(".cedar")).forEach(policy -> {
-                    inputs.add(new TestInput(testDir, policy, schema, entities));
-                });
-            } catch (IOException e) {
-                fail(e);
-            }
-            return inputs;
+            return TestUtil.findFiles(testDir, ".cedar")
+                    .stream()
+                    .map(policy -> new TestInput(testDir, policy, schema, entities))
+                    .toList();
         }
     }
 
     // Sample test for development
     @TestFactory
     Collection<DynamicTest> oneOff() {
-        return dynamicTests("github");
+        return dynamicTests("tinytodo");
     }
 
     @TestFactory
@@ -104,6 +104,16 @@ public class TranslationTest {
                 .info(CYAN, Files.readString(test.policy))
                 .info(MAGENTA, "Datalog directory: " + test.datalogDir);
 
+        long lines = Files.readAllLines(test.policy).stream()
+                .map(String::trim)
+                .filter(l -> !l.startsWith("//"))
+                .filter(l -> l.startsWith("permit") || l.startsWith("forbid"))
+                .count();
+
+        if (lines == 0) {
+            logger.warning("Empty policy: " + test.policy);
+        }
+
         RequestAuth rsvpAuth = RequestAuth.load(test.schema, test.policy, test.entities, test.datalogDir);
         assertTrue(Collections.disjoint(rsvpAuth.getForbiddenRequests(), rsvpAuth.getPermittedRequests()));
 
@@ -128,7 +138,6 @@ public class TranslationTest {
             AuthorizationSuccessResponse cedarSuccess =
                     cedarResponse.success.orElseThrow(AssertionError::new);
             AuthorizationSuccessResponse.Decision cedarDecision = cedarSuccess.getDecision();
-
 
             if (cedarDecision == AuthorizationSuccessResponse.Decision.Allow &&
                     rsvpDecision == RequestAuth.Decision.Allow) {

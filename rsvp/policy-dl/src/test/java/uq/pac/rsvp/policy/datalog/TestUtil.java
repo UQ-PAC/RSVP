@@ -6,8 +6,10 @@ import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
@@ -84,6 +86,21 @@ public class TestUtil {
             }
         }
         Files.delete(dir);
+    }
+
+    public static List<Path> findFiles(Path dir, String ext) {
+        try (Stream<Path> p = Files.list(dir)) {
+            return p.filter(s -> s.toString().endsWith(ext)).toList();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+    }
+
+    public static Path findFile(Path dir, String ext) {
+        List<Path> files = findFiles(dir, ext);
+        assertEquals(1, files.size(),
+                "Expected exactly one file ending with %s in directory %s".formatted(ext, dir.toString()));
+        return files.getFirst();
     }
 
     @Test

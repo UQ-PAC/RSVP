@@ -13,7 +13,7 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
-import static uq.pac.rsvp.policy.datalog.translation.RequestAuth.Result.*;
+import static uq.pac.rsvp.policy.datalog.translation.RequestAuth.Decision.*;
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
 /**
@@ -42,13 +42,13 @@ public class RequestAuth {
         permitted.forEach(s -> require(!forbidden.contains(s)));
     }
 
-    public enum Result {
+    public enum Decision {
         Allow,
         Deny,
         Invalid
     }
 
-    public Result authorize(Request request) {
+    public Decision authorize(Request request) {
         if (permitted.contains(request)) {
             return Allow;
         } else if (forbidden.contains(request)) {

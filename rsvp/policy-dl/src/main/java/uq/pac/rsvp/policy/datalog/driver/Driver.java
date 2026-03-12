@@ -58,7 +58,7 @@ public class Driver {
         return ansi().fg(color).a(text).reset().toString();
     }
 
-    record ExpectedRequest(Request request, RequestAuth.Result expectation) {}
+    record ExpectedRequest(Request request, RequestAuth.Decision expectation) {}
 
     public static void main(String[] args) throws IOException, AuthException, InterruptedException, RsvpException {
         OptionsParser parser = OptionsParser.newOptionsParser(DriverOptions.class);
@@ -81,9 +81,9 @@ public class Driver {
                         error("Malformed request string (expected 4 items): " + s);
                     }
                     Request req = new Request(parts[0], parts[1], parts[2]);
-                    RequestAuth.Result exp = null;
+                    RequestAuth.Decision exp = null;
                     try {
-                        exp = RequestAuth.Result.valueOf(parts[3].toUpperCase());
+                        exp = RequestAuth.Decision.valueOf(parts[3].toUpperCase());
                     } catch (IllegalArgumentException e) {
                         error("Malformed request string (invalid expected name): " + s);
                     }
@@ -103,7 +103,7 @@ public class Driver {
         }
 
         for (ExpectedRequest req : requests) {
-            RequestAuth.Result result = auth.authorize(req.request);
+            RequestAuth.Decision result = auth.authorize(req.request);
             Ansi.Color colour;
             String resultStr;
             if (req.expectation == result) {

@@ -6,6 +6,8 @@ import uq.pac.rsvp.policy.datalog.ast.*;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -35,6 +37,10 @@ public class TranslationAction {
      * All actionable requests relation
     */
     private final TranslationRule actionableRequests;
+    /**
+     * Facts belonging to ParentOf rule
+     */
+    private final List<DLFact> actionParent;
 
     public TranslationAction(TranslationSchema translationSchema) {
         Schema schema = translationSchema.getSchema();
@@ -42,9 +48,18 @@ public class TranslationAction {
         List<DLStatement> actionFacts = new ArrayList<>(),
                 actionPrincipalRules = new ArrayList<>(),
                 actionResourceRules = new ArrayList<>();
+        List<DLFact> actionParents = new ArrayList<>();
+
         for (String name : schema.actionNames()) {
-            actionFacts.add(new DLFact(ActionRuleDecl, DLTerm.lit(name)));
+            DLTerm term = DLTerm.lit(name);
+            actionFacts.add(new DLFact(ActionRuleDecl, term));
             ActionDefinition def = schema.getAction(name);
+
+            actionParents.add(new DLFact(ParentOfRuleDecl, term, term));
+            def.getMemberOfReferences().forEach(aref -> {
+                ActionDefinition ad = schema.getAction(aref.getName());
+                actionParents.add(new DLFact(ParentOfRuleDecl, DLTerm.lit(ad.getName()), term));
+            });
 
             DLAtom headWP = new DLAtom(ActionPrincipalRuleDecl, DLTerm.lit(name), PrincipalVar);
             List<DLStatement> apRules = def.getAppliesToPrincipalTypes().stream()
@@ -54,7 +69,6 @@ public class TranslationAction {
                         return (DLStatement) new DLRule(headWP, tail);
                     }).toList();
             actionPrincipalRules.addAll(apRules);
-
 
             DLAtom headWR = new DLAtom(ActionResourceRuleDecl, DLTerm.lit(name), PrincipalVar);
             List<DLStatement> arRules = def.getAppliesToResourceTypes().stream()
@@ -74,6 +88,11 @@ public class TranslationAction {
         this.actionPrincipal = new TranslationRule(ActionPrincipalRuleDecl, actionPrincipalRules);
         this.actionResource = new TranslationRule(ActionResourceRuleDecl, actionResourceRules);
         this.actionableRequests = new TranslationRule(ActionableRequestsRuleDecl, actionableRequestRule);
+        this.actionParent = Collections.unmodifiableList(actionParents);
+    }
+
+    public Collection<DLFact> getParentOfFacts() {
+        return actionParent;
     }
 
     public TranslationRule getAction() {

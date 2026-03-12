@@ -13,7 +13,25 @@ entity File in Directory = {
     size: Long
 };
 
-action "act" appliesTo {
+action "manage" appliesTo {
+    principal: File,
+    resource: [ Directory ],
+    context: { }
+};
+
+action "write" in [Action::"manage"] appliesTo {
+    principal: File,
+    resource: [ Directory ],
+    context: { }
+};
+
+action "read" in [Action::"write"] appliesTo {
+    principal: File,
+    resource: [ Directory ],
+    context: { }
+};
+
+action "act" in [Action::"manage"] appliesTo {
     principal: File,
     resource: [ Directory ],
     context: { }

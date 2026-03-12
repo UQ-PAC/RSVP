@@ -3,6 +3,7 @@ package uq.pac.rsvp.policy.datalog.util;
 import org.fusesource.jansi.Ansi;
 
 import java.io.PrintStream;
+import java.util.function.Function;
 
 import static org.fusesource.jansi.Ansi.Color.*;
 import static org.fusesource.jansi.Ansi.ansi;
@@ -40,9 +41,11 @@ public class Logger {
     private Level level = Level.Info;
 
     private Ansi console;
+    private boolean bright;
 
     public Logger () {
         this.console = ansi();
+        this.bright = false;
     }
 
     public void setLevel(Level level) {
@@ -57,17 +60,34 @@ public class Logger {
             }
 
             for (String formatted : outs.split("\n")) {
-                console.fg(color).a(formatted).newline();
+                Function<Ansi.Color, Ansi> fg = !this.bright ? console::fg : console::fgBright;
+                fg.apply(color).a(formatted).newline();
             }
             console.reset();
             stream.print(console);
             console = ansi();
+            bright = false;
         }
+        return this;
+    }
+
+    synchronized public Logger bright() {
+        this.bright = true;
         return this;
     }
 
     synchronized public Logger attr(Ansi.Attribute attribute) {
         console.a(attribute);
+        return this;
+    }
+
+    synchronized public Logger bold() {
+        console.a(Ansi.Attribute.INTENSITY_BOLD);
+        return this;
+    }
+
+    synchronized public Logger italic() {
+        console.a(Ansi.Attribute.ITALIC);
         return this;
     }
 

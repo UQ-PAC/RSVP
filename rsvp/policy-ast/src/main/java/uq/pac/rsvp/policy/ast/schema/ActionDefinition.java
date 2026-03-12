@@ -26,6 +26,10 @@ public class ActionDefinition implements SchemaItem {
             this.id = null;
             this.type = null;
         }
+
+        public String getName() {
+            return "%s::%s".formatted(type, id);
+        }
     }
 
     private static class ActionApplication {
@@ -156,6 +160,10 @@ public class ActionDefinition implements SchemaItem {
 
     public Set<ActionDefinition> getMemberOf() {
         return resolvedMemberOf != null ? Set.copyOf(resolvedMemberOf) : Collections.emptySet();
+    }
+
+    public Set<ActionReference> getMemberOfReferences() {
+        return Set.copyOf(unresolvedMemberOf);
     }
 
     public Set<EntityTypeDefinition> getAppliesToPrincipalTypes() {

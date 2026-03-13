@@ -72,10 +72,10 @@ public class TranslationVisitor extends TranslationVoidAdapter {
         typing.update(expr, negated);
         switch (expr.getOp()) {
             case Eq, Neq, Less, LessEq, Greater, GreaterEq -> {
-                TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, typing),
-                        rhs = new TranslationOperandVisitor(schema, typing);
-                DLTerm lhsOp = expr.getLeft().compute(lhs),
-                        rhsOp = expr.getRight().compute(rhs);
+                TypeContextVisitor.Context context = TypeContextVisitor.infer(expr);
+                OperandVisitor lhs = new OperandVisitor(), rhs = new OperandVisitor();
+                DLTerm lhsOp = TypeContextVisitor.normalise(expr.getLeft().compute(lhs), context),
+                        rhsOp = TypeContextVisitor.normalise(expr.getRight().compute(rhs), context);
 
                 expressions.addAll(lhs.getExpressions());
                 expressions.addAll(rhs.getExpressions());
@@ -83,7 +83,7 @@ public class TranslationVisitor extends TranslationVoidAdapter {
             }
             case BinaryExpression.BinaryOp.Is -> {
                 TypeExpression typeExpr = required(expr.getRight(), TypeExpression.class);
-                TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, typing);
+                OperandVisitor lhs = new OperandVisitor();
                 DLTerm var = expr.getLeft().compute(lhs);
                 expressions.addAll(lhs.getExpressions());
                 String relationName = schema.getTranslationEntityType(typeExpr.getValue())
@@ -92,8 +92,7 @@ public class TranslationVisitor extends TranslationVoidAdapter {
                 expressions.add(new DLAtom(relationName, negated, var));
             }
             case BinaryExpression.BinaryOp.In -> {
-                TranslationOperandVisitor lhs = new TranslationOperandVisitor(schema, typing),
-                        rhs = new TranslationOperandVisitor(schema, typing);
+                OperandVisitor lhs = new OperandVisitor(), rhs = new OperandVisitor();
                 DLTerm lhsOp = expr.getLeft().compute(lhs),
                         rhsOp = expr.getRight().compute(rhs);
 

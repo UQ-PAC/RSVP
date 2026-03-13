@@ -96,7 +96,6 @@ public class NFConverter extends ValueVisitorAdapter<Formula> {
         }).map(dis -> {
             return dis.stream()
                     .map(converter::toExpression)
-                    .sorted(Comparator.comparingInt(ExpressionOrdering::order))
                     .toList();
         }).toList();
     }

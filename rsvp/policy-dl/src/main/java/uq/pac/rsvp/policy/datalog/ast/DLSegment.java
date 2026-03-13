@@ -1,6 +1,4 @@
-package uq.pac.rsvp.policy.datalog.translation;
-
-import uq.pac.rsvp.policy.datalog.ast.*;
+package uq.pac.rsvp.policy.datalog.ast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,17 +8,17 @@ import java.util.List;
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
 /**
- * Helper class associating rule declarations with statements defining that rule
+ * Helper class associating a rule declaration with statements defining that rule
  */
-public class TranslationRule {
+public class DLSegment {
     private final DLRuleDecl decl;
     private final List<DLStatement> contents;
 
-    public TranslationRule(DLRuleDecl decl, DLStatement ...statements) {
+    public DLSegment(DLRuleDecl decl, DLStatement ...statements) {
         this(decl, Arrays.stream(statements).toList());
     }
 
-    public TranslationRule(DLRuleDecl decl, Collection<? extends DLStatement> statements) {
+    public DLSegment(DLRuleDecl decl, Collection<? extends DLStatement> statements) {
         this.decl = decl;
         statements.forEach(s -> {
             DLAtom atom = switch (s) {

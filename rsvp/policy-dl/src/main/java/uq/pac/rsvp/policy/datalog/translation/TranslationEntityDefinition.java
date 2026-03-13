@@ -3,11 +3,10 @@ package uq.pac.rsvp.policy.datalog.translation;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.common.*;
+import uq.pac.rsvp.policy.datalog.ast.DLFact;
 import uq.pac.rsvp.policy.datalog.ast.DLProgram;
 import uq.pac.rsvp.policy.datalog.ast.DLRuleDecl;
 import uq.pac.rsvp.policy.datalog.ast.DLStatement;
-import uq.pac.rsvp.policy.datalog.ast.DLType;
-import uq.pac.rsvp.policy.datalog.util.Util;
 
 import java.util.*;
 
@@ -46,68 +45,45 @@ public class TranslationEntityDefinition {
      */
     private final EntityTypeDefinition entity;
     /**
-     * Entity relation
+     * Entity relation declaration
      */
-    private final DLRuleDecl relation;
-    /**
-     * Named attribute relations. This map associates property names to
-     * translation attributes that capture details of attribute relations
-     */
-    private final Map<String, TranslationAttribute> attributes;
+    private final DLRuleDecl entityDecl;
+
+    private final static Set<Class<? extends CommonTypeDefinition>> SUPPORTED_TYPES = Set.of(
+            BooleanType.class,
+            StringType.class,
+            LongType.class,
+            EntityTypeReference.class);
+
+    private boolean isSupportedType(CommonTypeDefinition def) {
+        return SUPPORTED_TYPES.contains(def.getClass()) || def instanceof SetTypeDefinition set &&
+                        SUPPORTED_TYPES.contains(set.getElementType().getClass());
+    }
 
     public TranslationEntityDefinition(EntityTypeDefinition entity) {
         this.entity = entity;
         this.name = entity.getName();
-        this.relation = TranslationConstants.getEntityRuleDecl(entity);
-        this.attributes = new HashMap<>();
+        this.entityDecl = TranslationConstants.getEntityRuleDecl(entity);
 
+        List<DLFact> fasts = new ArrayList<>(entity.getShapeAttributeNames().size());
         entity.getShapeAttributeNames().forEach(attrName -> {
             CommonTypeDefinition attrType = entity.getShapeAttributeType(attrName);
-            DLType dlAttrType = switch (attrType) {
-                case BooleanType s -> DLType.SYMBOL;
-                case StringType s -> DLType.SYMBOL;
-                case LongType s -> DLType.NUMBER;
-                case EntityTypeReference r -> DLType.SYMBOL;
-                case SetTypeDefinition s -> {
-                    CommonTypeDefinition sub = s.getElementType();
-                    if (Util.instanceOf(s.getElementType(), LongType.class, StringType.class, EntityTypeReference.class)) {
-                        yield DLType.SYMBOL;
-                    } else {
-                        throw new RuntimeException("Unsupported set type: " + sub.getClass().getSimpleName());
-                    }
-                }
-                default -> throw new RuntimeException("Unsupported type: "
-                        + attrType.getClass().getSimpleName());
-            };
-
-            DLRuleDecl dlAttributeRelation =
-                    new DLRuleDecl(relation.getName() + "_attr_" + attrName, DLType.SYMBOL, dlAttrType);
-            attributes.put(attrName, new TranslationAttribute(attrName, attrType, dlAttributeRelation));
+            TranslationError.error(isSupportedType(attrType), "Unsupported type %s in %s.%s",
+                    attrType.getName(), entity.getName(), attrName);
         });
     }
 
     public DLRuleDecl getEntityRuleDecl() {
-        return relation;
-    }
-
-    public TranslationAttribute getAttribute(String attr) {
-        return attributes.get(attr);
+        return entityDecl;
     }
 
     public EntityTypeDefinition getEntityDefinition() {
         return entity;
     }
 
-    Collection<TranslationAttribute> getAttributes() {
-        return attributes.values();
-    }
-
     public List<DLStatement> getTranslation() {
         List<DLStatement> statements = new ArrayList<>();
-        statements.add(relation);
-        statements.addAll(attributes.values().stream()
-                .map(TranslationAttribute::getRuleDecl)
-                .toList());
+        statements.add(entityDecl);
         return statements;
     }
 

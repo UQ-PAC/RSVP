@@ -37,7 +37,7 @@ public class TranslationEntity {
     private void getTerms(Value value, List<DLTerm> terms) {
         switch (value) {
             case PrimString s -> terms.add(DLTerm.lit(s.toString()));
-            case PrimLong l -> terms.add(DLTerm.lit(l.getValue()));
+            case PrimLong l -> terms.add(DLTerm.lit(Long.toString(l.getValue())));
             case PrimBool b -> terms.add(DLTerm.lit(b.toString()));
             case EntityUID e -> terms.add(getEUIDLiteral(e));
             case CedarList l -> {
@@ -82,10 +82,8 @@ public class TranslationEntity {
         statements.add(new DLFact(decl, euid));
 
         entity.attrs.forEach((attr, value) -> {
-            List<DLTerm> terms = getTerms(value);
-            terms.forEach(term -> {
-                DLRuleDecl ad = definition.getAttribute(attr).getRuleDecl();
-                statements.add(new DLFact(ad, euid, term));
+            getTerms(value).forEach(term -> {
+                statements.add(new DLFact(TranslationConstants.AttributeRuleDecl, euid, DLTerm.lit(attr), term));
             });
         });
 

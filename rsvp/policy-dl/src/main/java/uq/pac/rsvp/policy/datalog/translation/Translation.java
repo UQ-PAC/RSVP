@@ -81,14 +81,12 @@ public class Translation {
             builder.comment("Entity: " + type.getName())
                 .add(type.getEntityRuleDecl())
                 .add(facts.get(type.getEntityRuleDecl().getName()));
-
-            // Entity attribute facts
-            for (TranslationAttribute attr : type.getAttributes()) {
-                builder.comment("Attribute: " + type.getName() + "." + attr.getName())
-                    .add(attr.getRuleDecl())
-                    .add(facts.get(attr.getRuleDecl().getName()));
-            }
         }
+
+        // Attribute relation
+        builder.comment("Attribute")
+                .add(AttributeRuleDecl)
+                .add(facts.get(AttributeRuleDecl.getName()));
 
         TranslationAction actions = new TranslationAction(translationSchema);
         builder.comment("Actions")

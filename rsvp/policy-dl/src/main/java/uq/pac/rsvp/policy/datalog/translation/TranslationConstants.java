@@ -182,4 +182,14 @@ public class TranslationConstants {
     public static DLRuleDecl getEntityRuleDecl(EntityTypeDefinition entity) {
         return new DLRuleDecl("Entity_" + entity.getName().replace(':', '_'), DLType.SYMBOL);
     }
+
+	/**
+     * Declaration for a ternary attribute relation that associates
+	 * entities to attribute names and respective values 
+	*/
+    public static DLRuleDecl AttributeRuleDecl =
+            new DLRuleDecl("Attribute",
+                    DLDeclTerm.symbolic("uid"),
+                    DLDeclTerm.symbolic("attr"),
+                    DLDeclTerm.symbolic("value"));
 }

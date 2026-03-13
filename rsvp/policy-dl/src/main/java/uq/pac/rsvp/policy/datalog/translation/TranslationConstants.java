@@ -129,11 +129,11 @@ public class TranslationConstants {
      *     Permit(action, principal, resource),
      *     !Forbid(action, principal, resource).
      */
-    public static TranslationRule makePermittedRequestsRule() {
+    public static DLSegment makePermittedRequestsRule() {
         DLRule rule = new DLRule(makeStandardAtom(PermittedRequestsRuleDecl),
                 makeStandardAtom(PermitRuleDecl),
                 makeNegatedStandardAtom(ForbidRuleDecl));
-        return new TranslationRule(PermittedRequestsRuleDecl, rule);
+        return new DLSegment(PermittedRequestsRuleDecl, rule);
     }
 
     /**
@@ -147,11 +147,11 @@ public class TranslationConstants {
      *      AllRequests(action, principal, resource),
      *      !PermittedRequests(action, principal, resource).
      */
-    public static TranslationRule makeForbiddenRequestsRule() {
+    public static DLSegment makeForbiddenRequestsRule() {
         DLRule rule = new DLRule(makeStandardAtom(ForbiddenRequestsRuleDecl),
                 makeStandardAtom(ActionableRequestsRuleDecl),
                 makeNegatedStandardAtom(PermittedRequestsRuleDecl));
-        return new TranslationRule(ForbiddenRequestsRuleDecl, rule);
+        return new DLSegment(ForbiddenRequestsRuleDecl, rule);
     }
 
     /**

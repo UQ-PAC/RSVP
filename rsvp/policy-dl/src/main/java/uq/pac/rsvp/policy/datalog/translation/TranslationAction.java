@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * Translation of actions defined in Cedar Schema to datalog.
- * The translation consists of 4 relations
+ * The translation consists of the following
  *
  * <ul>
  *     <li> Action relation: a unary relation named 'Action' over action names in the input schema </li>
@@ -20,23 +20,24 @@ import java.util.List;
  *     <li> Action/Resource relation: a binary relation mapping actions to resource entities the action applies to </li>
  *     <li> Actionable Requests: a ternary relation over principals, resources and actions that defines
  *            the space of all valid requests according to 'appliesTo' part of actions in the schema </li>
+ *     <li> Facts contributing to the parentOf relation </li>
  * </ul>
  */
 public class TranslationAction {
     /** Action relation */
-    private final TranslationRule action;
+    private final DLSegment action;
     /**
      * Action/Principal relation
      */
-    private final TranslationRule actionPrincipal;
+    private final DLSegment actionPrincipal;
     /**
      * Action/Resource relation
      */
-    private final TranslationRule actionResource;
+    private final DLSegment actionResource;
     /**
      * All actionable requests relation
     */
-    private final TranslationRule actionableRequests;
+    private final DLSegment actionableRequests;
     /**
      * Facts belonging to ParentOf rule
      */
@@ -83,10 +84,10 @@ public class TranslationAction {
                 new DLAtom(ActionPrincipalRuleDecl, ActionVar, PrincipalVar),
                 new DLAtom(ActionResourceRuleDecl, ActionVar, ResourceVar));
 
-        this.action = new TranslationRule(ActionRuleDecl, actionFacts);
-        this.actionPrincipal = new TranslationRule(ActionPrincipalRuleDecl, actionPrincipalRules);
-        this.actionResource = new TranslationRule(ActionResourceRuleDecl, actionResourceRules);
-        this.actionableRequests = new TranslationRule(ActionableRequestsRuleDecl, actionableRequestRule);
+        this.action = new DLSegment(ActionRuleDecl, actionFacts);
+        this.actionPrincipal = new DLSegment(ActionPrincipalRuleDecl, actionPrincipalRules);
+        this.actionResource = new DLSegment(ActionResourceRuleDecl, actionResourceRules);
+        this.actionableRequests = new DLSegment(ActionableRequestsRuleDecl, actionableRequestRule);
         this.actionParent = Collections.unmodifiableList(actionParents);
     }
 
@@ -94,19 +95,19 @@ public class TranslationAction {
         return actionParent;
     }
 
-    public TranslationRule getAction() {
+    public DLSegment getAction() {
         return action;
     }
 
-    public TranslationRule getActionPrincipal() {
+    public DLSegment getActionPrincipal() {
         return actionPrincipal;
     }
 
-    public TranslationRule getActionResource() {
+    public DLSegment getActionResource() {
         return actionResource;
     }
 
-    public TranslationRule getActionableRequests() {
+    public DLSegment getActionableRequests() {
         return actionableRequests;
     }
 }

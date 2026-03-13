@@ -32,11 +32,10 @@ public class TranslationTest {
 
     @BeforeAll
     static void configure() {
-        logger.setLevel(Logger.Level.Info);
+        logger.setLevel(Logger.Level.Warning);
     }
 
     private static class TestInput {
-        public final String policyName;
         public final Path policy;
         public final Path schema;
         public final Path entities;
@@ -49,8 +48,7 @@ public class TranslationTest {
             this.schema = schema;
             this.entities = entities;
             this.testDir = testDir;
-            this.policyName = policy.getFileName().toString().replaceAll("\\.cedar$", "");
-            this.datalogDir = TestUtil.getDatalogDir(testDir.getFileName().toString(), policyName);
+            this.datalogDir = TestUtil.getDatalogDir(testDir.getFileName().toString(), getPolicyName());
             this.testName = testDir.getFileName().toString();
         }
 
@@ -67,6 +65,14 @@ public class TranslationTest {
                     .stream()
                     .map(policy -> new TestInput(testDir, policy, schema, entities))
                     .toList();
+        }
+
+        public String getName() {
+            return testName + "-" + getPolicyName();
+        }
+
+        public String getPolicyName() {
+            return policy.getFileName().toString().replaceAll("\\.cedar$", "");
         }
     }
 
@@ -94,9 +100,9 @@ public class TranslationTest {
 
     // Get a collection of differential dynamic tests from a directory
     Collection<DynamicTest> dynamicTests(String name) {
-        return TestInput.load(name).stream().map(t -> {
-            return DynamicTest.dynamicTest(t.testName + "-" + t.policyName, () -> differentialTest(t));
-        }).toList();
+        return TestInput.load(name).stream()
+                .map(t -> DynamicTest.dynamicTest(t.getName(), () -> differentialTest(t)))
+                .toList();
     }
 
     /**

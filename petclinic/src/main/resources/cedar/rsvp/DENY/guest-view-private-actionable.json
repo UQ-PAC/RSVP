@@ -1,7 +1,7 @@
 {
-    "principal": "PetClinic::User::\"Unknown\"",
+    "principal": "PetClinic::User::\"Guest\"",
     "action": "PetClinic::Action::\"ViewWebPage\"",
-    "resource": "PetClinic::WebPage::\"Owners\"",
+    "resource": "PetClinic::WebPage::\"FindOwners\"",
     "context": { },
     "validateRequest": true
 }

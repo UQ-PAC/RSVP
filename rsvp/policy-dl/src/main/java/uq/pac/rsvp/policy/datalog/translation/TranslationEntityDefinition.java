@@ -58,8 +58,7 @@ public class TranslationEntityDefinition {
     public TranslationEntityDefinition(EntityTypeDefinition entity) {
         this.entity = entity;
         this.name = entity.getName();
-        String relationName = name.replace(':', '_');
-        this.relation = new DLRuleDecl(relationName, DLType.SYMBOL);
+        this.relation = TranslationConstants.getEntityRuleDecl(entity);
         this.attributes = new HashMap<>();
 
         entity.getShapeAttributeNames().forEach(attrName -> {
@@ -82,7 +81,7 @@ public class TranslationEntityDefinition {
             };
 
             DLRuleDecl dlAttributeRelation =
-                    new DLRuleDecl(relationName + "_attr_" + attrName, DLType.SYMBOL, dlAttrType);
+                    new DLRuleDecl(relation.getName() + "_attr_" + attrName, DLType.SYMBOL, dlAttrType);
             attributes.put(attrName, new TranslationAttribute(attrName, attrType, dlAttributeRelation));
         });
     }

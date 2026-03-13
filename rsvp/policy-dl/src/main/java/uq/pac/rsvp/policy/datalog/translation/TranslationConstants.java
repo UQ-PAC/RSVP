@@ -2,10 +2,12 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import com.cedarpolicy.value.EntityUID;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
+import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -172,5 +174,12 @@ public class TranslationConstants {
                 ForbiddenRequestsRuleDecl,
                 ActionableRequestsRuleDecl));
         return output.stream().map(DLOutputDirective::new).toList();
+    }
+
+	/**
+	 * Get a declaration for an unary entity relation
+	*/
+    public static DLRuleDecl getEntityRuleDecl(EntityTypeDefinition entity) {
+        return new DLRuleDecl("Entity_" + entity.getName().replace(':', '_'), DLType.SYMBOL);
     }
 }

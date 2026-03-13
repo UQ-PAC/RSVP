@@ -1,0 +1,76 @@
+[
+    {
+        "uid": { "type": "Partition", "id": "sda" },
+        "attrs": {
+            "kind": "ext4",
+            "size": 256000
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "Partition", "id": "sdb" },
+        "attrs": {
+            "kind": "ext4",
+            "size": 512000
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "Directory", "id": "/usr/bin" },
+        "attrs": {
+            "private": false
+        },
+        "parents": [
+            { "type": "Partition", "id" : "sda"  }
+        ]
+    },
+    {
+        "uid": { "type": "Directory", "id": "/usr/sbin" },
+        "attrs": {
+            "private": true
+        },
+        "parents": [
+            { "type": "Partition", "id" : "sda" }
+        ]
+    },
+    {
+        "uid": { "type": "File", "id": "ls" },
+        "attrs": {
+            "kind": "executable",
+            "size": 128
+        },
+        "parents": [
+            { "type": "Directory", "id" : "/usr/bin" }
+        ]
+    },
+    {
+        "uid": { "type": "Link", "id": "gvim" },
+        "attrs": {
+            "kind": "executable",
+            "size": true
+        },
+        "parents": [
+            { "type": "Directory", "id" : "/usr/bin" }
+        ]
+    },
+    {
+        "uid": { "type": "Device", "id": "/dev/null" },
+        "attrs": {
+            "block": false,
+            "character": true
+        },
+        "parents": [
+            { "type": "Directory", "id" : "/usr/bin" }
+        ]
+    },
+    {
+        "uid": { "type": "File", "id": "mkfs" },
+        "attrs": {
+            "kind": "executable",
+            "size": 128
+        },
+        "parents": [
+            { "type": "Directory", "id" : "/usr/sbin" }
+        ]
+    }
+]

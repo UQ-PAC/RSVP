@@ -32,7 +32,7 @@ public class TranslationTest {
 
     @BeforeAll
     static void configure() {
-        logger.setLevel(Logger.Level.Warning);
+        logger.setLevel(Logger.Level.Info);
     }
 
     private static class TestInput {
@@ -76,7 +76,7 @@ public class TranslationTest {
         }
     }
 
-    private final static String ONE_OFF = "has";
+    private final static String ONE_OFF = "enum";
 
     // Running tests for one directory separately for no particular
     // reason apart from being able to launch it separately

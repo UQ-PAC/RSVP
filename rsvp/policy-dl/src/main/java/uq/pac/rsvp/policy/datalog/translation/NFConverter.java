@@ -48,9 +48,8 @@ public class NFConverter extends ValueVisitorAdapter<Formula> {
     @Override
     public Formula visitUnaryExpr(UnaryExpression expr) {
         return switch (expr.getOp()) {
-            case UnaryExpression.UnaryOp.Not ->
-                factory.not(expr.getExpression().compute(this));
-            default -> getVar(expr);
+            case UnaryExpression.UnaryOp.Not -> factory.not(expr.getExpression().compute(this));
+            case UnaryExpression.UnaryOp.Neg -> getVar(expr);
         };
     }
 

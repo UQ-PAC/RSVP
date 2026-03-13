@@ -39,10 +39,6 @@ public class TranslationRule {
         return decl;
     }
 
-    public List<DLStatement> getContents() {
-        return contents;
-    }
-
     public List<DLStatement> getStatements() {
         List<DLStatement> statements = new ArrayList<>(contents.size() + 1);
         statements.add(decl);

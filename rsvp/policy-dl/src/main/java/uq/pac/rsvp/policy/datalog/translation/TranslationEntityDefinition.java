@@ -3,7 +3,6 @@ package uq.pac.rsvp.policy.datalog.translation;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.common.*;
-import uq.pac.rsvp.policy.datalog.ast.DLFact;
 import uq.pac.rsvp.policy.datalog.ast.DLProgram;
 import uq.pac.rsvp.policy.datalog.ast.DLRuleDecl;
 import uq.pac.rsvp.policy.datalog.ast.DLStatement;
@@ -65,7 +64,6 @@ public class TranslationEntityDefinition {
         this.name = entity.getName();
         this.entityDecl = TranslationConstants.getEntityRuleDecl(entity);
 
-        List<DLFact> fasts = new ArrayList<>(entity.getShapeAttributeNames().size());
         entity.getShapeAttributeNames().forEach(attrName -> {
             CommonTypeDefinition attrType = entity.getShapeAttributeType(attrName);
             TranslationError.error(isSupportedType(attrType), "Unsupported type %s in %s.%s",

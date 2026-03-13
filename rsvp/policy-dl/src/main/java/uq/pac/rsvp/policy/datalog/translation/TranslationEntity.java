@@ -108,8 +108,4 @@ public class TranslationEntity {
                 .toList();
         return new DLProgram(statements).toString();
     }
-
-    public TranslationEntityDefinition getEntityTypeDefinition() {
-        return definition;
-    }
 }

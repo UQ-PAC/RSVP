@@ -3,7 +3,6 @@ package uq.pac.rsvp.policy.datalog.translation;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -11,7 +10,6 @@ import java.util.List;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 import static uq.pac.rsvp.policy.datalog.util.Util.required;
-import static uq.pac.rsvp.policy.ast.expr.VariableExpression.Reference.*;
 
 /**
  * Main translation visitor converting a Cedar expression to a set of rules
@@ -96,8 +94,9 @@ public class TranslationVisitor extends VoidVisitorAdapter {
                 expressions.add(new DLAtom(ParentOfRuleDecl, negated, rhs, lhs));
             }
             case HasAttr -> {
-                // Has attr is implicit. The attribute relation will filter out
-                // entities that have no specified attributes
+                DLTerm lhs = getOperand(expr.getLeft()),
+                    rhs = getOperand(expr.getRight());
+                expressions.add(new DLAtom(AttributeRuleDecl, lhs, rhs, DLTerm.var("_")));
             }
             case And, Or -> throw new TranslationError("Unreachable");
             default -> throw new TranslationError("Unsupported: " + expr.getOp());

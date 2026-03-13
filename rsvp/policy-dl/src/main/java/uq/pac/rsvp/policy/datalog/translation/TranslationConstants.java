@@ -7,7 +7,6 @@ import uq.pac.rsvp.policy.datalog.ast.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -177,7 +176,7 @@ public class TranslationConstants {
     }
 
 	/**
-	 * Get a declaration for an unary entity relation
+	 * Get a declaration for a unary entity relation
 	*/
     public static DLRuleDecl getEntityRuleDecl(EntityTypeDefinition entity) {
         return new DLRuleDecl("Entity_" + entity.getName().replace(':', '_'), DLType.SYMBOL);

@@ -32,7 +32,7 @@ public class TranslationTest {
 
     @BeforeAll
     static void configure() {
-        logger.setLevel(Logger.Level.Warning);
+        logger.setLevel(Logger.Level.Info);
     }
 
     private static class TestInput {
@@ -145,12 +145,12 @@ public class TranslationTest {
 
             if (cedarDecision == AuthorizationSuccessResponse.Decision.Allow &&
                     rsvpDecision == RequestAuth.Decision.Allow) {
-                logger.info(GREEN, rsvpRequest + ":  " + rsvpDecision + "/" + cedarDecision);
+                logger.info(GREEN, rsvpRequest + ":  " + rsvpDecision);
             } else if (cedarDecision == AuthorizationSuccessResponse.Decision.Deny &&
                     rsvpDecision == RequestAuth.Decision.Deny) {
-                logger.info(BLUE, rsvpRequest + ":  " + rsvpDecision + "/" + cedarDecision);
+                logger.info(BLUE, rsvpRequest + ":  " + rsvpDecision);
             } else {
-                logger.error(rsvpRequest + ":  " + rsvpDecision + "/" + cedarDecision);
+                logger.error(rsvpRequest + ":  RSVP: " + rsvpDecision + " | Cedar:" + cedarDecision);
             }
             cedarRequestCounter[cedarDecision.ordinal()]++;
             rsvpRequestCounter[rsvpDecision.ordinal()]++;

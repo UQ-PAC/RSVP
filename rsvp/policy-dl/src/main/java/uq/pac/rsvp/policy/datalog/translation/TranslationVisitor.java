@@ -80,20 +80,24 @@ public class TranslationVisitor extends VoidVisitorAdapter {
         switch (expr.getOp()) {
             case Eq, Neq, Less, LessEq, Greater, GreaterEq -> {
                 TypeContextVisitor.Context context = TypeContextVisitor.infer(expr);
-                DLTerm lhsOp = TypeContextVisitor.normalise(getOperand(expr.getLeft()), context),
-                        rhsOp = TypeContextVisitor.normalise(getOperand(expr.getRight()), context);
-                expressions.add(new DLConstraint(lhsOp, rhsOp, getOperator(expr.getOp(), negated)));
+                DLTerm lhs = TypeContextVisitor.normalise(getOperand(expr.getLeft()), context),
+                        rhs = TypeContextVisitor.normalise(getOperand(expr.getRight()), context);
+                expressions.add(new DLConstraint(lhs, rhs, getOperator(expr.getOp(), negated)));
             }
-            case BinaryExpression.BinaryOp.Is -> {
+            case Is -> {
                 TypeExpression typeExpr = required(expr.getRight(), TypeExpression.class);
                 DLTerm var = getOperand(expr.getLeft());
                 DLRuleDecl decl = schema.getTranslationEntityType(typeExpr.getValue()).getEntityRuleDecl();
                 expressions.add(new DLAtom(decl, negated, var));
             }
-            case BinaryExpression.BinaryOp.In -> {
-                DLTerm lhsOp = getOperand(expr.getLeft()),
-                        rhsOp = getOperand(expr.getRight());
-                expressions.add(new DLAtom(ParentOfRuleDecl, negated, rhsOp, lhsOp));
+            case In -> {
+                DLTerm lhs = getOperand(expr.getLeft()),
+                        rhs = getOperand(expr.getRight());
+                expressions.add(new DLAtom(ParentOfRuleDecl, negated, rhs, lhs));
+            }
+            case HasAttr -> {
+                // Has attr is implicit. The attribute relation will filter out
+                // entities that have no specified attributes
             }
             case And, Or -> throw new TranslationError("Unreachable");
             default -> throw new TranslationError("Unsupported: " + expr.getOp());

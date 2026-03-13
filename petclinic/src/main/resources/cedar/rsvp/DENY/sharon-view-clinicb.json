@@ -3,7 +3,10 @@
     "action": "PetClinic::Action::\"ViewWebPage\"",
     "resource": "PetClinic::WebPage::\"Owner\"",
     "context": {
-        "database": { "__entity": { "type": "PetClinic::Database", "id": "Owners (B)" } },
+        "databases": [
+            { "__entity": { "type": "PetClinic::Database", "id": "Owners (B)" } },
+            { "__entity": { "type": "PetClinic::Database", "id": "Clinic B" } }
+        ],
         "readAction": { "__entity": { "type": "PetClinic::Action", "id": "ReadFromDatabase" } }
     },
     "validateRequest": true

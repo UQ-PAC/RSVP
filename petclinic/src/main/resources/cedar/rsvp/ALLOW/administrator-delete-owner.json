@@ -1,0 +1,14 @@
+{
+    "principal": "PetClinic::User::\"Administrator\"",
+    "action": "PetClinic::Action::\"DeleteOwner\"",
+    "resource": "PetClinic::WebPage::\"EditOwner\"",
+    "context": {
+        "databases": [
+            { "__entity": { "type": "PetClinic::Database", "id": "Owners (A)" } },
+            { "__entity": { "type": "PetClinic::Database", "id": "Clinic A" } }
+        ],
+        "readAction": { "__entity": { "type": "PetClinic::Action", "id": "ReadFromDatabase" } },
+        "writeAction": { "__entity": { "type": "PetClinic::Action", "id": "DeleteFromDatabase" } }
+    },
+    "validateRequest": true
+}

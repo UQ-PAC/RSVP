@@ -36,7 +36,7 @@ public class CedarService {
 			throw new RuntimeException("Failed to parse Cedar Policy.", e);
 		}
 		try {
-			this.entities = Entities.parse(Path.of("src/main/resources/cedar/rsvp/petclinic-rsvp-entities-java.json"));
+			this.entities = Entities.parse(Path.of("src/main/resources/cedar/rsvp/petclinic-rsvp-entities.json"));
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Failed to parse Cedar Entities.", e);

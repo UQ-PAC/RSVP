@@ -19,12 +19,12 @@ namespace PetClinic {
         name: String,
 		birthDate: datetime,
         owner: Owner,
-        veterinarian: Set<Veterinarian>
+        veterinarians: Set<Veterinarian>
     };
 
     entity Visit in Database = {
         pet: Pet,
-        veterinarian: Set<Veterinarian>
+        veterinarians: Set<Veterinarian>
     };
 
     entity WebPage = {
@@ -82,7 +82,7 @@ namespace PetClinic {
         principal: User,
         resource: WebPage,
         context: {
-            database: Database,
+            databases: Set<Database>,
             readAction: Action
         }
     };
@@ -91,7 +91,7 @@ namespace PetClinic {
         principal: User,
         resource: WebPage,
         context: {
-            database: Database,
+            databases: Set<Database>,
             readAction: Action,
             writeAction: Action
         }
@@ -101,7 +101,7 @@ namespace PetClinic {
         principal: User,
         resource: WebPage,
         context: {
-            database: Database,
+            databases: Set<Database>,
             readAction: Action,
             writeAction: Action
         }
@@ -111,7 +111,7 @@ namespace PetClinic {
         principal: User,
         resource: WebPage,
         context: {
-            database: Database,
+            databases: Set<Database>,
             readAction: Action,
             writeAction: Action
         }
@@ -121,7 +121,7 @@ namespace PetClinic {
         principal: User,
         resource: WebPage,
         context: {
-            database: Database,
+            databases: Set<Database>,
             readAction: Action,
             writeAction: Action
         }
@@ -131,7 +131,7 @@ namespace PetClinic {
         principal: User,
         resource: WebPage,
         context: {
-            database: Database,
+            databases: Set<Database>,
             readAction: Action,
             writeAction: Action
         }
@@ -141,7 +141,7 @@ namespace PetClinic {
         principal: User,
         resource: WebPage,
         context: {
-            database: Database,
+            databases: Set<Database>,
             readAction: Action,
             writeAction: Action
         }
@@ -151,7 +151,7 @@ namespace PetClinic {
         principal: User,
         resource: WebPage,
         context: {
-            database: Database,
+            databases: Set<Database>,
             readAction: Action,
             writeAction: Action
         }
@@ -161,7 +161,7 @@ namespace PetClinic {
         principal: User,
         resource: WebPage,
         context: {
-            database: Database,
+            databases: Set<Database>,
             readAction: Action,
             writeAction: Action
         }
@@ -171,7 +171,7 @@ namespace PetClinic {
         principal: User,
         resource: WebPage,
         context: {
-            database: Database,
+            databases: Set<Database>,
             readAction: Action,
             writeAction: Action
         }
@@ -181,7 +181,7 @@ namespace PetClinic {
         principal: User,
         resource: WebPage,
         context: {
-            database: Database,
+            databases: Set<Database>,
             readAction: Action,
             writeAction: Action
         }
@@ -191,7 +191,7 @@ namespace PetClinic {
         principal: User,
         resource: WebPage,
         context: {
-            database: Database,
+            databases: Set<Database>,
             readAction: Action,
             writeAction: Action
         }
@@ -201,7 +201,7 @@ namespace PetClinic {
         principal: User,
         resource: WebPage,
         context: {
-            database: Database,
+            databases: Set<Database>,
             readAction: Action,
             writeAction: Action
         }

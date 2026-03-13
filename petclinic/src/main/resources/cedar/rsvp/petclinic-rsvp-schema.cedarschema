@@ -1,0 +1,209 @@
+namespace PetClinic {
+    entity Database in Database;
+
+    entity Administrator;
+
+    entity Veterinarian in Database;
+
+    entity Guest;
+
+    entity User in [Database, Administrator, Veterinarian, Guest] = {
+        name: String
+    };
+
+    entity Owner in Database = {
+        name: String
+    };
+
+    entity Pet in Database = {
+        name: String,
+		birthDate: datetime,
+        owner: Owner,
+        veterinarians: Set<Veterinarian>
+    };
+
+    entity Visit in Database = {
+        pet: Pet,
+        veterinarians: Set<Veterinarian>
+    };
+
+    entity WebPage = {
+        public: Bool,
+        actionable: Bool
+    };
+
+    action DatabaseOperations;
+    action DestructiveOperations;
+
+    action WebPageOperations;
+
+    action ReadFromDatabase in DatabaseOperations appliesTo {
+        principal: User,
+        resource: Database,
+        context: {
+            webPage: WebPage
+        }
+    };
+
+    action AddToDatabase in DatabaseOperations appliesTo {
+        principal: User,
+        resource: Database,
+        context: {
+            webPage: WebPage
+        }
+    };
+
+    action EditOnDatabase in [DatabaseOperations, DestructiveOperations] appliesTo {
+        principal: User,
+        resource: Database,
+        context: {
+            webPage: WebPage
+        }
+    };
+
+    action DeleteFromDatabase in [DatabaseOperations, DestructiveOperations] appliesTo {
+        principal: User,
+        resource: Database,
+        context: {
+            webPage: WebPage
+        }
+    };
+
+    action ViewWebPage in WebPageOperations appliesTo {
+        principal: User,
+        resource: WebPage,
+        context: {
+            databases?: Set<Database>,
+            readAction?: Action
+        }
+    };
+
+    action FindOwner in WebPageOperations appliesTo {
+        principal: User,
+        resource: WebPage,
+        context: {
+            databases: Set<Database>,
+            readAction: Action
+        }
+    };
+
+    action AddOwner in WebPageOperations appliesTo {
+        principal: User,
+        resource: WebPage,
+        context: {
+            databases: Set<Database>,
+            readAction: Action,
+            writeAction: Action
+        }
+    };
+
+    action EditOwner in WebPageOperations appliesTo {
+        principal: User,
+        resource: WebPage,
+        context: {
+            databases: Set<Database>,
+            readAction: Action,
+            writeAction: Action
+        }
+    };
+
+    action DeleteOwner in WebPageOperations appliesTo {
+        principal: User,
+        resource: WebPage,
+        context: {
+            databases: Set<Database>,
+            readAction: Action,
+            writeAction: Action
+        }
+    };
+
+    action AddPet in WebPageOperations appliesTo {
+        principal: User,
+        resource: WebPage,
+        context: {
+            databases: Set<Database>,
+            readAction: Action,
+            writeAction: Action
+        }
+    };
+
+    action EditPet in WebPageOperations appliesTo {
+        principal: User,
+        resource: WebPage,
+        context: {
+            databases: Set<Database>,
+            readAction: Action,
+            writeAction: Action
+        }
+    };
+
+    action DeletePet in WebPageOperations appliesTo {
+        principal: User,
+        resource: WebPage,
+        context: {
+            databases: Set<Database>,
+            readAction: Action,
+            writeAction: Action
+        }
+    };
+
+    action AddVisit in WebPageOperations appliesTo {
+        principal: User,
+        resource: WebPage,
+        context: {
+            databases: Set<Database>,
+            readAction: Action,
+            writeAction: Action
+        }
+    };
+
+    action EditVisit in WebPageOperations appliesTo {
+        principal: User,
+        resource: WebPage,
+        context: {
+            databases: Set<Database>,
+            readAction: Action,
+            writeAction: Action
+        }
+    };
+
+    action DeleteVisit in WebPageOperations appliesTo {
+        principal: User,
+        resource: WebPage,
+        context: {
+            databases: Set<Database>,
+            readAction: Action,
+            writeAction: Action
+        }
+    };
+
+    action AddVeterinarian in WebPageOperations appliesTo {
+        principal: User,
+        resource: WebPage,
+        context: {
+            databases: Set<Database>,
+            readAction: Action,
+            writeAction: Action
+        }
+    };
+
+    action EditVeterinarian in WebPageOperations appliesTo {
+        principal: User,
+        resource: WebPage,
+        context: {
+            databases: Set<Database>,
+            readAction: Action,
+            writeAction: Action
+        }
+    };
+
+    action DeleteVeterinarian in WebPageOperations appliesTo {
+        principal: User,
+        resource: WebPage,
+        context: {
+            databases: Set<Database>,
+            readAction: Action,
+            writeAction: Action
+        }
+    };
+}

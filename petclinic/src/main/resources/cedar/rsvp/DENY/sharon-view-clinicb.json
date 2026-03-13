@@ -1,0 +1,13 @@
+{
+    "principal": "PetClinic::User::\"Sharon Jenkins\"",
+    "action": "PetClinic::Action::\"ViewWebPage\"",
+    "resource": "PetClinic::WebPage::\"Owner\"",
+    "context": {
+        "databases": [
+            { "__entity": { "type": "PetClinic::Database", "id": "Owners (B)" } },
+            { "__entity": { "type": "PetClinic::Database", "id": "Clinic B" } }
+        ],
+        "readAction": { "__entity": { "type": "PetClinic::Action", "id": "ReadFromDatabase" } }
+    },
+    "validateRequest": true
+}

@@ -56,8 +56,7 @@ public class TranslationAction {
             ActionDefinition def = schema.getAction(name);
 
             actionParents.add(new DLFact(ParentOfRuleDecl, term, term));
-            def.getMemberOfReferences().forEach(aref -> {
-                ActionDefinition ad = schema.getAction(aref.getName());
+            def.getMemberOf().forEach(ad -> {
                 actionParents.add(new DLFact(ParentOfRuleDecl, DLTerm.lit(ad.getName()), term));
             });
 

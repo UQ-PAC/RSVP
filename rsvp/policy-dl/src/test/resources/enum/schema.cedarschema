@@ -1,0 +1,10 @@
+entity Role enum [ "User", "Admin" ];
+
+entity Account = {
+    role: Role
+};
+
+action auth appliesTo {
+    principal: Account,
+    resource: Account
+};

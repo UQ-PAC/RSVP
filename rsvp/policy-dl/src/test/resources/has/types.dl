@@ -1,3 +1,0 @@
-.type Sym <: symbol
-.type Num <: number
-.type Union = Sym | Num

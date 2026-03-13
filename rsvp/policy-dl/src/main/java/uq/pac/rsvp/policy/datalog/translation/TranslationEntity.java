@@ -43,12 +43,12 @@ public class TranslationEntity {
             case CedarList l -> {
                 for (Value v : l) {
                     if (v instanceof CedarList) {
-                        throw new RuntimeException("Unsupported value: " + l);
+                        throw new RuntimeException("Unsupported value: " + l.getClass());
                     }
                     getTerms(v, terms);
                 }
             }
-            default -> throw new RuntimeException("Unsupported value: " + value);
+            default -> throw new RuntimeException("Unsupported value: " + value.getClass());
         }
     }
 

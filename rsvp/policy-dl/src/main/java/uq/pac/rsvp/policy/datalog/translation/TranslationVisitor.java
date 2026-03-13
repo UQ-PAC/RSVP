@@ -3,6 +3,8 @@ package uq.pac.rsvp.policy.datalog.translation;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -18,16 +20,21 @@ import static uq.pac.rsvp.policy.ast.expr.VariableExpression.Reference.*;
  *  - An expression is a predicate boolean expression, there are no conjunctions or disjunctions
  *  - An expression can be negated but once only
  */
-public class TranslationVisitor extends TranslationVoidAdapter {
-
+public class TranslationVisitor extends VoidVisitorAdapter {
+    private final TranslationSchema schema;
+    private final List<DLRuleExpr> expressions;
+    private final OperandVisitor operandVisitor;
     private boolean negated = false;
 
     private TranslationVisitor(TranslationSchema schema) {
-        super(schema, new TranslationTyping(schema.getSchema()));
+        this.schema = schema;
+        this.expressions = new ArrayList<>();
+        this.operandVisitor = new OperandVisitor();
     }
 
     public static DLRule translate(TranslationSchema schema, Collection<Expression> exprs, DLRuleDecl decl) {
         TranslationVisitor visitor = new TranslationVisitor(schema);
+        exprs.forEach(e -> e.accept(visitor));
 
         // Ground terms
         visitor.expressions.addAll(List.of(
@@ -35,12 +42,13 @@ public class TranslationVisitor extends TranslationVoidAdapter {
                 new DLAtom(ActionResourceRuleDecl, ActionVar, ResourceVar),
                 new DLAtom(ActionRuleDecl, ActionVar)));
 
-        exprs.forEach(e -> e.accept(visitor));
-        DLAtom atom = new DLAtom(decl.getName(),
-                DLTerm.var(Principal.getValue()),
-                DLTerm.var(Resource.getValue()),
-                DLTerm.var(Action.getValue()));
-        return new DLRule(atom, visitor.expressions);
+        // Add side effects from operands
+        visitor.expressions.addAll(visitor.operandVisitor.getExpressions());
+        return new DLRule(makeStandardAtom(decl), visitor.expressions);
+    }
+
+    private DLTerm getOperand(Expression expr) {
+        return expr.compute(operandVisitor);
     }
 
     DLConstraint.Operator getOperator(BinaryExpression.BinaryOp op, boolean negated) {
@@ -69,35 +77,22 @@ public class TranslationVisitor extends TranslationVoidAdapter {
 
     @Override
     public void visitBinaryExpr(BinaryExpression expr) {
-        typing.update(expr, negated);
         switch (expr.getOp()) {
             case Eq, Neq, Less, LessEq, Greater, GreaterEq -> {
                 TypeContextVisitor.Context context = TypeContextVisitor.infer(expr);
-                OperandVisitor lhs = new OperandVisitor(), rhs = new OperandVisitor();
-                DLTerm lhsOp = TypeContextVisitor.normalise(expr.getLeft().compute(lhs), context),
-                        rhsOp = TypeContextVisitor.normalise(expr.getRight().compute(rhs), context);
-
-                expressions.addAll(lhs.getExpressions());
-                expressions.addAll(rhs.getExpressions());
+                DLTerm lhsOp = TypeContextVisitor.normalise(getOperand(expr.getLeft()), context),
+                        rhsOp = TypeContextVisitor.normalise(getOperand(expr.getRight()), context);
                 expressions.add(new DLConstraint(lhsOp, rhsOp, getOperator(expr.getOp(), negated)));
             }
             case BinaryExpression.BinaryOp.Is -> {
                 TypeExpression typeExpr = required(expr.getRight(), TypeExpression.class);
-                OperandVisitor lhs = new OperandVisitor();
-                DLTerm var = expr.getLeft().compute(lhs);
-                expressions.addAll(lhs.getExpressions());
-                String relationName = schema.getTranslationEntityType(typeExpr.getValue())
-                        .getEntityRuleDecl()
-                        .getName();
-                expressions.add(new DLAtom(relationName, negated, var));
+                DLTerm var = getOperand(expr.getLeft());
+                DLRuleDecl decl = schema.getTranslationEntityType(typeExpr.getValue()).getEntityRuleDecl();
+                expressions.add(new DLAtom(decl, negated, var));
             }
             case BinaryExpression.BinaryOp.In -> {
-                OperandVisitor lhs = new OperandVisitor(), rhs = new OperandVisitor();
-                DLTerm lhsOp = expr.getLeft().compute(lhs),
-                        rhsOp = expr.getRight().compute(rhs);
-
-                expressions.addAll(lhs.getExpressions());
-                expressions.addAll(rhs.getExpressions());
+                DLTerm lhsOp = getOperand(expr.getLeft()),
+                        rhsOp = getOperand(expr.getRight());
                 expressions.add(new DLAtom(ParentOfRuleDecl, negated, rhsOp, lhsOp));
             }
             case And, Or -> throw new TranslationError("Unreachable");

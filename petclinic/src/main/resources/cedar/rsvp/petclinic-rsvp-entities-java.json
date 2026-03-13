@@ -213,7 +213,7 @@
             "name": "Leo",
             "birthDate": { "__extn": { "fn": "datetime", "arg": "2010-09-07" } },
             "owner": { "type": "PetClinic::Owner", "id": "George Franklin" },
-            "veterinarian": [
+            "veterinarians": [
                 { "type": "PetClinic::Veterinarian", "id": "James Carter" }
             ]
         },
@@ -228,7 +228,7 @@
             "name": "Rosy",
             "birthDate": { "__extn": { "fn": "datetime", "arg": "2011-04-17" } },
             "owner": { "type": "PetClinic::Owner", "id": "Eduardo Rodriquez" },
-            "veterinarian": [
+            "veterinarians": [
                 { "type": "PetClinic::Veterinarian", "id": "James Carter" }
             ]
         },
@@ -242,7 +242,7 @@
             "name": "Jewel",
             "birthDate": { "__extn": { "fn": "datetime", "arg": "2010-03-07" } },
             "owner": { "type": "PetClinic::Owner", "id": "Eduardo Rodriquez" },
-            "veterinarian": [
+            "veterinarians": [
                 { "type": "PetClinic::Veterinarian", "id": "James Carter" }
             ]
         },
@@ -256,7 +256,7 @@
             "name": "Samantha",
             "birthDate": { "__extn": { "fn": "datetime", "arg": "2012-09-04" } },
             "owner": { "type": "PetClinic::Owner", "id": "Jean Coleman" },
-            "veterinarian": [
+            "veterinarians": [
                 { "type": "PetClinic::Veterinarian", "id": "Sharon Jenkins" },
                 { "type": "PetClinic::Veterinarian", "id": "Linda Douglas" }
             ]
@@ -271,7 +271,7 @@
             "name": "Max",
             "birthDate": { "__extn": { "fn": "datetime", "arg": "2012-09-04" } },
             "owner": { "type": "PetClinic::Owner", "id": "Jean Coleman" },
-            "veterinarian": [
+            "veterinarians": [
                 { "type": "PetClinic::Veterinarian", "id": "Sharon Jenkins" },
                 { "type": "PetClinic::Veterinarian", "id": "Linda Douglas" }
             ]
@@ -286,7 +286,7 @@
             "name": "Lucky",
             "birthDate": { "__extn": { "fn": "datetime", "arg": "2010-06-24" } },
             "owner": { "type": "PetClinic::Owner", "id": "Carlos Estaban" },
-            "veterinarian": [
+            "veterinarians": [
                 { "type": "PetClinic::Veterinarian", "id": "James Carter" }
             ]
         },
@@ -300,7 +300,7 @@
             "name": "Sly",
             "birthDate": { "__extn": { "fn": "datetime", "arg": "2012-06-08" } },
             "owner": { "type": "PetClinic::Owner", "id": "Carlos Estaban" },
-            "veterinarian": [
+            "veterinarians": [
                 { "type": "PetClinic::Veterinarian", "id": "James Carter" }
             ]
         },
@@ -313,7 +313,7 @@
         "uid": { "type": "PetClinic::Visit", "id": "Samantha 1" },
         "attrs": {
             "pet": { "type": "PetClinic::Pet", "id": "Samantha" },
-            "veterinarian": [
+            "veterinarians": [
                 { "type": "PetClinic::Veterinarian", "id": "Sharon Jenkins" }
             ]
         },
@@ -325,7 +325,7 @@
         "uid": { "type": "PetClinic::Visit", "id": "Max 1" },
         "attrs": {
             "pet": { "type": "PetClinic::Pet", "id": "Max" },
-            "veterinarian": [
+            "veterinarians": [
                 { "type": "PetClinic::Veterinarian", "id": "Sharon Jenkins" }
             ]
         },
@@ -337,7 +337,7 @@
         "uid": { "type": "PetClinic::Visit", "id": "Max 2" },
         "attrs": {
             "pet": { "type": "PetClinic::Pet", "id": "Max" },
-            "veterinarian": [
+            "veterinarians": [
                 { "type": "PetClinic::Veterinarian", "id": "Sharon Jenkins" },
                 { "type": "PetClinic::Veterinarian", "id": "Linda Douglas" }
             ]
@@ -350,7 +350,7 @@
         "uid": { "type": "PetClinic::Visit", "id": "Samantha 2" },
         "attrs": {
             "pet": { "type": "PetClinic::Pet", "id": "Samantha" },
-            "veterinarian": [
+            "veterinarians": [
                 { "type": "PetClinic::Veterinarian", "id": "Sharon Jenkins" },
                 { "type": "PetClinic::Veterinarian", "id": "Linda Douglas" }
             ]
@@ -363,7 +363,7 @@
         "uid": { "type": "PetClinic::Visit", "id": "Rosy 1" },
         "attrs": {
             "pet": { "type": "PetClinic::Pet", "id": "Rosy" },
-            "veterinarian": [
+            "veterinarians": [
                 { "type": "PetClinic::Veterinarian", "id": "James Carter" }
             ]
         },
@@ -375,7 +375,7 @@
         "uid": { "type": "PetClinic::Visit", "id": "Jewel 1" },
         "attrs": {
             "pet": { "type": "PetClinic::Pet", "id": "Jewel" },
-            "veterinarian": [
+            "veterinarians": [
                 { "type": "PetClinic::Veterinarian", "id": "James Carter" }
             ]
         },
@@ -387,7 +387,7 @@
         "uid": { "type": "PetClinic::Visit", "id": "Lucky 1" },
         "attrs": {
             "pet": { "type": "PetClinic::Pet", "id": "Lucky" },
-            "veterinarian": [
+            "veterinarians": [
                 { "type": "PetClinic::Veterinarian", "id": "James Carter" }
             ]
         },
@@ -399,7 +399,7 @@
         "uid": { "type": "PetClinic::Visit", "id": "Sly 1" },
         "attrs": {
             "pet": { "type": "PetClinic::Pet", "id": "Sly" },
-            "veterinarian": [
+            "veterinarians": [
                 { "type": "PetClinic::Veterinarian", "id": "James Carter" }
             ]
         },

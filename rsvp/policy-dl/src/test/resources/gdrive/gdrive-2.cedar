@@ -1,6 +1,6 @@
-permit (
-    principal,
-    action == Action::"read",
-    resource
-)
-when { resource.isPublic };
+// permit (
+//     principal,
+//     action == Action::"read",
+//     resource
+// )
+// when { resource.isPublic };

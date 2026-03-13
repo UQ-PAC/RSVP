@@ -70,29 +70,33 @@ public class TranslationTest {
         }
     }
 
-    // Sample test for development
+    private final static String ONE_OFF = "has";
+
+    // Running tests for one directory separately for no particular
+    // reason apart from being able to launch it separately
     @TestFactory
     Collection<DynamicTest> oneOff() {
-        return dynamicTests("tinytodo");
+        return dynamicTests(ONE_OFF);
     }
 
     @TestFactory
     Collection<DynamicTest> test() throws IOException {
         List<DynamicTest> tests = new ArrayList<>();
         try (Stream<Path> dirs = Files.list(TestUtil.RESOURCEDIR)) {
-            for (Path p : dirs.filter(Files::isDirectory).toList()) {
+            for (Path p : dirs.filter(Files::isDirectory)
+                    .filter(d -> !d.getFileName().toString().equals(ONE_OFF))
+                    .toList()) {
                 tests.addAll(dynamicTests(p.getFileName().toString()));
             }
         }
         return tests;
     }
 
+    // Get a collection of differential dynamic tests from a directory
     Collection<DynamicTest> dynamicTests(String name) {
-        Collection<DynamicTest> tests = new ArrayList<>();
-        TestInput.load(name).forEach(t -> {
-            tests.add(DynamicTest.dynamicTest(t.testName + "-" + t.policyName, () -> differentialTest(t)));
-        });
-        return tests;
+        return TestInput.load(name).stream().map(t -> {
+            return DynamicTest.dynamicTest(t.testName + "-" + t.policyName, () -> differentialTest(t));
+        }).toList();
     }
 
     /**

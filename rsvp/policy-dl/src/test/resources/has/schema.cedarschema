@@ -1,0 +1,45 @@
+entity Partition = {
+    kind: String,
+    size: Long
+};
+
+entity Directory in Partition = {
+    private: Bool
+};
+
+entity File in Directory = {
+    kind: String,
+    size: Long
+};
+
+entity Link in Directory = {
+    kind: String,
+    size: Bool
+};
+
+entity Device in Directory = {
+    block: Bool,
+    character: Bool
+};
+
+action manage appliesTo {
+    principal: [ File, Link, Device ],
+    resource: [ Directory ]
+};
+
+action write in [Action::"manage"] appliesTo {
+    principal: [File, Link, Device],
+    resource: [ Directory ]
+};
+
+action read in [Action::"write"] appliesTo {
+    principal: [File, Link, Device],
+    resource: [ Directory ]
+};
+
+action introspect appliesTo {
+    principal: [File, Link, Device],
+    resource: [ Directory ]
+};
+
+

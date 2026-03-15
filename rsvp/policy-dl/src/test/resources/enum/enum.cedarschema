@@ -1,10 +1,11 @@
 entity Role enum [ "User", "Admin" ];
+entity User enum [ "Carl", "Tim" ];
 
 entity Account = {
     role: Role
 };
 
 action auth appliesTo {
-    principal: Account,
+    principal: [ Account, User ],
     resource: Account
 };

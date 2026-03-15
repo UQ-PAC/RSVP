@@ -45,7 +45,7 @@ public class OperandVisitor extends ValueVisitorAdapter<DLTerm> {
     public DLTerm visitPropertyAccessExpr(PropertyAccessExpression expr) {
         DLTerm lhs = expr.getObject().compute(this);
         DLTerm attr = DLTerm.lit(expr.getProperty());
-        DLVar rhs = TranslationNameGenerator.getVar();
+        DLVar rhs = Naming.getDLVar();
         this.expressions.add(new DLAtom(AttributeRuleDecl, lhs, attr, rhs));
         return rhs;
     }

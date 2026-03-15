@@ -8,7 +8,9 @@ import uq.pac.rsvp.policy.datalog.ast.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.AttributeRuleDecl;
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
 /**
@@ -26,36 +28,36 @@ public class TranslationEntity {
      */
     private final TranslationEntityDefinition definition;
 
-    public static DLTerm getEUIDLiteral(EntityUID id) {
+    public static String getEUIDString(EntityUID id) {
         String prefix = id.getType().toString();
         if (!prefix.isEmpty()) {
             prefix += "::";
         }
-        return DLTerm.lit(prefix + id.getId().toString());
+        return prefix + id.getId().toString();
     }
 
-    private void getTerms(Value value, List<DLTerm> terms) {
+    public static DLTerm getEUIDLiteral(EntityUID id) {
+        return DLTerm.lit(getEUIDString(id));
+    }
+
+    private void addAttributeFacts(Value value, DLTerm euid, String attr, List<DLFact> statements) {
+        Consumer<DLTerm> addFact = vt ->
+                statements.add(new DLFact(AttributeRuleDecl, euid, DLTerm.lit(attr), vt));
+
         switch (value) {
-            case PrimString s -> terms.add(DLTerm.lit(s.toString()));
-            case PrimLong l -> terms.add(DLTerm.lit(Long.toString(l.getValue())));
-            case PrimBool b -> terms.add(DLTerm.lit(b.toString()));
-            case EntityUID e -> terms.add(getEUIDLiteral(e));
-            case CedarList l -> {
-                for (Value v : l) {
-                    if (v instanceof CedarList) {
-                        throw new RuntimeException("Unsupported value: " + l.getClass());
-                    }
-                    getTerms(v, terms);
-                }
+            case PrimString s -> addFact.accept(DLTerm.lit(s.toString()));
+            case PrimLong l -> addFact.accept(DLTerm.lit(Long.toString(l.getValue())));
+            case PrimBool b -> addFact.accept(DLTerm.lit(b.toString()));
+            case EntityUID e -> addFact.accept(DLTerm.lit(getEUIDString(e)));
+            case CedarList lst -> lst.forEach(v -> addAttributeFacts(v, euid, attr, statements));
+            case CedarMap map -> {
+                EntityUID recEuid = Naming.getEUID();
+                DLTerm recTerm = getEUIDLiteral(recEuid);
+                addAttributeFacts(recEuid, euid, attr, statements);
+                map.forEach((at, vl) -> addAttributeFacts(vl, recTerm, at, statements));
             }
-            default -> throw new RuntimeException("Unsupported value: " + value.getClass());
+            default -> throw new TranslationError("Unsupported value: " + value.getClass());
         }
-    }
-
-    private List<DLTerm> getTerms(Value value) {
-        List<DLTerm> terms = new ArrayList<>();
-        getTerms(value, terms);
-        return terms;
     }
 
     /**
@@ -82,9 +84,7 @@ public class TranslationEntity {
         statements.add(new DLFact(decl, euid));
 
         entity.attrs.forEach((attr, value) -> {
-            getTerms(value).forEach(term -> {
-                statements.add(new DLFact(TranslationConstants.AttributeRuleDecl, euid, DLTerm.lit(attr), term));
-            });
+            addAttributeFacts(value, getEUIDLiteral(entity.getEUID()), attr, statements);
         });
 
 		// Generate facts for parent hierarchy

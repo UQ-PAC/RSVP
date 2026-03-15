@@ -63,12 +63,6 @@ public class TranslationEntityDefinition {
         this.entity = entity;
         this.name = entity.getName();
         this.entityDecl = TranslationConstants.getEntityRuleDecl(entity);
-
-        entity.getShapeAttributeNames().forEach(attrName -> {
-            CommonTypeDefinition attrType = entity.getShapeAttributeType(attrName);
-            TranslationError.error(isSupportedType(attrType), "Unsupported type %s in %s.%s",
-                    attrType.getName(), entity.getName(), attrName);
-        });
     }
 
     public DLRuleDecl getEntityRuleDecl() {

@@ -1,0 +1,70 @@
+[
+    {
+        "uid": { "type": "User", "id": "Alice" },
+        "attrs": { },
+        "parents": []
+    },
+    {
+        "uid": { "type": "User", "id": "Bob" },
+        "attrs": { },
+        "parents": []
+    },
+    {
+        "uid": { "type": "File", "id": "ls" },
+        "attrs": {
+            "attributes": {
+                "size": 256,
+                "ext": "",
+                "permission" : {
+                    "read" : true,
+                    "write" : true
+                },
+                "location" : {
+                    "partition": { "__entity": { "type" : "Partition", "id" : "SDA" } }
+                }
+
+            }
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "File", "id": "mkdir" },
+        "attrs": {
+            "attributes": {
+                "size": 256,
+                "ext": "",
+                "permission" : {
+                    "read" : true,
+                    "write" : true
+                },
+                "location" : {
+                    "partition": { "__entity": { "type" : "Partition", "id" : "SDB" } }
+                }
+
+            }
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "ChrDev", "id": "/dev/null" },
+        "attrs": {
+            "attr": {
+                "name" : {
+                    "val" : "null"
+                }
+            }
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "BlkDev", "id": "/dev/loop0" },
+        "attrs": {
+            "prop": {
+                "name" : {
+                    "val" : "loop0"
+                }
+            }
+        },
+        "parents": [ ]
+    }
+]

@@ -7,7 +7,9 @@ import com.cedarpolicy.model.EntityValidationRequest;
 import com.cedarpolicy.model.ValidationRequest;
 import com.cedarpolicy.model.ValidationResponse;
 import com.cedarpolicy.model.entity.Entities;
+import com.cedarpolicy.model.entity.Entity;
 import com.cedarpolicy.model.exception.AuthException;
+import com.cedarpolicy.value.EntityUID;
 import com.google.common.collect.Multimap;
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.PolicySet;
@@ -17,9 +19,7 @@ import uq.pac.rsvp.policy.datalog.ast.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
@@ -58,11 +58,29 @@ public class Translation {
 
     public static DLProgram translate(Path schemaFile, Path policiesFile, Path entitiesFile) throws IOException, AuthException, RsvpException {
         validate(schemaFile, policiesFile, entitiesFile);
-
         Schema schema = Schema.parseCedarSchema(schemaFile);
         Entities entities = Entities.parse(entitiesFile);
-        PolicySet policies = PolicySet.parseCedarPolicySet(policiesFile);
 
+        // Strictly speaking we expect a complete closed world in that we operate on the set of provided entities.
+        // One exception is the enum-style definition of entities. The translation assumes they exist as well,
+        // but here we allow them to be generated if they are not provided.
+        Set<EntityUID> entitiesEuids = entities.getEntities().stream().map(Entity::getEUID).collect(Collectors.toSet());
+        Set<Entity> newEntities = new HashSet<>();
+        schema.entityTypeNames().stream().map(schema::getEntityType).forEach(ed -> {
+            ed.getEntityNamesEnum().forEach(en -> {
+                EntityUID uid = EntityUID.parse("%s::\"%s\"".formatted(ed.getName(), en)).orElseThrow();
+                if (!entitiesEuids.contains(uid)) {
+                    newEntities.add(new Entity(uid));
+                }
+            });
+        });
+
+        if (!newEntities.isEmpty()) {
+            newEntities.addAll(entities.getEntities());
+            entities = new Entities(newEntities);
+        }
+
+        PolicySet policies = PolicySet.parseCedarPolicySet(policiesFile);
         return translate(schema, policies, entities);
     }
 

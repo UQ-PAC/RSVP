@@ -47,7 +47,7 @@ dependencies {
   implementation 'javax.cache:cache-api'
   implementation 'jakarta.xml.bind:jakarta.xml.bind-api'
   // implementation 'com.cedarpolicy:cedar-java:4.8.0:uber'
-  implementation 'com.cedarpolicy:cedar-java:4.8.0-rsvp-3:uber'
+  implementation 'com.cedarpolicy:cedar-java:4.8.0-rsvp-4:uber'
   implementation 'com.fasterxml.jackson.core:jackson-databind:2.20.0'
   implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.20.0'
   runtimeOnly 'org.springframework.boot:spring-boot-starter-actuator'

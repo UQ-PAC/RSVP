@@ -32,9 +32,13 @@ public class TranslationVisitor extends VoidVisitorAdapter {
 
     public static DLRule translate(TranslationSchema schema, Collection<Expression> exprs, DLRuleDecl decl) {
         TranslationVisitor visitor = new TranslationVisitor(schema);
-        exprs.forEach(e -> e.accept(visitor));
+        exprs.forEach(e -> {
+            visitor.expressions.add(new DLInlineComment(e.toString()));
+            e.accept(visitor);
+        });
 
         // Ground terms
+        visitor.expressions.add(new DLInlineComment("Ground terms"));
         visitor.expressions.addAll(List.of(
                 new DLAtom(ActionPrincipalRuleDecl, ActionVar, PrincipalVar),
                 new DLAtom(ActionResourceRuleDecl, ActionVar, ResourceVar),

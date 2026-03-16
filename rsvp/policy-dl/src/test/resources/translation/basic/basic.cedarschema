@@ -10,6 +10,5 @@ entity Child = {
 
 action "Talk" appliesTo {
   principal: [Child],
-  resource: Parent,
-  context: {}
+  resource: Parent
 };

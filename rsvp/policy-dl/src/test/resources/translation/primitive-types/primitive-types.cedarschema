@@ -10,9 +10,8 @@ entity File = {
     execute: Bool
 };
 
-action "Use" appliesTo {
+action Use appliesTo {
   principal: User,
-  resource: File,
-  context: {}
+  resource: File
 };
 

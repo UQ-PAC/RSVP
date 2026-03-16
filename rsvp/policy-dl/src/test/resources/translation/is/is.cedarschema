@@ -19,7 +19,6 @@ entity Socket = {
 
 action "Use" appliesTo {
   principal: User,
-  resource: [ File, Link, Socket ],
-  context: {}
+  resource: [ File, Link, Socket ]
 };
 

@@ -15,25 +15,21 @@ entity File in Directory = {
 
 action "manage" appliesTo {
     principal: File,
-    resource: [ Directory ],
-    context: { }
+    resource: [ Directory ]
 };
 
 action "write" in [Action::"manage"] appliesTo {
     principal: File,
-    resource: [ Directory ],
-    context: { }
+    resource: [ Directory ]
 };
 
 action "read" in [Action::"write"] appliesTo {
     principal: File,
-    resource: [ Directory ],
-    context: { }
+    resource: [ Directory ]
 };
 
 action "act" in [Action::"manage"] appliesTo {
     principal: File,
-    resource: [ Directory ],
-    context: { }
+    resource: [ Directory ]
 };
 

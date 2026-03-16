@@ -1,0 +1,16 @@
+entity Role enum [ "User", "Admin" ];
+
+entity Account = {
+    name: String,
+    age: Long,
+    role: Role,
+    friends: Set<Account>,
+};
+
+action introspect appliesTo {
+    principal: Account,
+    resource: Account,
+    context: { }
+};
+
+

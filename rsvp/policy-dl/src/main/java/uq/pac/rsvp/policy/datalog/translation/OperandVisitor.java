@@ -23,12 +23,12 @@ public class OperandVisitor extends ValueVisitorAdapter<DLTerm> {
 
     @Override
     public DLTerm visitActionExpr(ActionExpression expr) {
-        return new DLString(expr.getQualifiedId());
+        return new DLString(expr.getQualifiedName());
     }
 
     @Override
     public DLTerm visitEntityExpr(EntityExpression expr) {
-        return new DLString(expr.getQualifiedEid());
+        return new DLString(expr.getQualifiedName());
     }
 
     @Override

@@ -29,11 +29,7 @@ public class TranslationEntity {
     private final TranslationEntityDefinition definition;
 
     public static String getEUIDString(EntityUID id) {
-        String prefix = id.getType().toString();
-        if (!prefix.isEmpty()) {
-            prefix += "::";
-        }
-        return prefix + id.getId().toString();
+        return id.toCedarExpr();
     }
 
     public static DLTerm getEUIDLiteral(EntityUID id) {

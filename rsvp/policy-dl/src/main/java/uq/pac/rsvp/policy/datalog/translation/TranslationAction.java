@@ -51,17 +51,16 @@ public class TranslationAction {
                 actionResourceRules = new ArrayList<>();
         List<DLFact> actionParents = new ArrayList<>();
 
-        for (String name : schema.actionNames()) {
-            DLTerm term = DLTerm.lit(name);
+        for (ActionDefinition def : schema.actions()) {
+            DLTerm term = DLTerm.lit(def.getQualifiedName());
             actionFacts.add(new DLFact(ActionRuleDecl, term));
-            ActionDefinition def = schema.getAction(name);
 
             actionParents.add(new DLFact(ParentOfRuleDecl, term, term));
             def.getMemberOf().forEach(ad -> {
-                actionParents.add(new DLFact(ParentOfRuleDecl, DLTerm.lit(ad.getName()), term));
+                actionParents.add(new DLFact(ParentOfRuleDecl, DLTerm.lit(ad.getQualifiedName()), term));
             });
 
-            DLAtom headWP = new DLAtom(ActionPrincipalRuleDecl, DLTerm.lit(name), PrincipalVar);
+            DLAtom headWP = new DLAtom(ActionPrincipalRuleDecl, term, PrincipalVar);
             List<DLStatement> apRules = def.getAppliesToPrincipalTypes().stream()
                     .map(e -> {
                         DLRuleDecl tn = translationSchema.getTranslationEntityType(e.getName()).getEntityRuleDecl();
@@ -70,7 +69,7 @@ public class TranslationAction {
                     }).toList();
             actionPrincipalRules.addAll(apRules);
 
-            DLAtom headWR = new DLAtom(ActionResourceRuleDecl, DLTerm.lit(name), PrincipalVar);
+            DLAtom headWR = new DLAtom(ActionResourceRuleDecl, term, PrincipalVar);
             List<DLStatement> arRules = def.getAppliesToResourceTypes().stream()
                     .map(e -> {
                         DLRuleDecl tn = translationSchema.getTranslationEntityType(e.getName()).getEntityRuleDecl();

@@ -162,7 +162,7 @@ public class TranslationConstants {
                     DLDeclTerm.symbolic("parent"),
                     DLDeclTerm.symbolic("child"));
 
-    public final static String OUTPUT_DELIMITER = "\t";
+    public final static Character OUTPUT_DELIMITER = '\t';
 
     public static List<DLOutputDirective> makeIODirectives(Collection<DLRuleDecl> decls) {
         List<DLRuleDecl> output = new ArrayList<>(decls);

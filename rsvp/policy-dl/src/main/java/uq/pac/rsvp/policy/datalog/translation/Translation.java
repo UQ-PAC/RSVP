@@ -58,13 +58,26 @@ public class Translation {
         // For the moment we do not support arbitrary action names as Cedar does,
         // just standard non-empty identifiers
         Schema rsvpSchema = Schema.parseCedarSchema(schemaFile);
-        rsvpSchema.actionNames().stream().map(rsvpSchema::getAction).forEach(a -> {
+        rsvpSchema.actions().forEach(a -> {
             Arrays.stream(a.getName().split("::")).forEach(s -> {
                 if (!s.matches("^[A-ZA-z_][A-Za-z_0-9]+$")) {
                     throw new TranslationError("Unsupported action name: " + a.getName());
                 }
             });
         });
+
+        // For the moment we also do not support entity names that have the same
+        // delimiter that is used for datalog output (\t)
+        List<String> entityNames = entities.getEntities().stream()
+                .map(e -> e.getEUID().getId().getRepr())
+                .collect(Collectors.toCollection(ArrayList::new));
+        rsvpSchema.entityTypes()
+                .forEach(et -> entityNames.addAll(et.getEntityNamesEnum()));
+        for (String en : entityNames) {
+            if (en.indexOf(OUTPUT_DELIMITER) != -1) {
+                throw new TranslationError("Unsupported entity name: " + en);
+            }
+        }
     }
 
     public static DLProgram translate(Path schemaFile, Path policiesFile, Path entitiesFile) throws IOException, AuthException, RsvpException {

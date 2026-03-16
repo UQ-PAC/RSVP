@@ -25,7 +25,7 @@ public class Request {
 
     public Request(String id) {
         this.id = id;
-        String [] components = id.split(OUTPUT_DELIMITER);
+        String [] components = id.split(OUTPUT_DELIMITER.toString());
         if (components.length != 3) {
             throw new TranslationError("Invalid request format: %s", id);
         }
@@ -62,25 +62,14 @@ public class Request {
         return false;
     }
 
-    private EntityUID toCedarFormat(String entity) {
-        int i = entity.lastIndexOf(':');
-        String cedarForm = entity.substring(0, i + 1) + "\"" + entity.substring(i + 1) + "\"";
-        return EntityUID.parse(cedarForm).orElseThrow(TranslationError::new);
-    }
-
-    public boolean isDefined() {
-        String undef = "::" + TranslationConstants.UndefinedEntityUIDName;
-        return !principal.endsWith(undef) && !resource.endsWith(undef);
-    }
-
     /**
      * Construct a cedar-level authorisation request out of this one
      */
     public AuthorizationRequest getCedarRequest(com.cedarpolicy.model.schema.Schema schema) {
         return new AuthorizationRequest(
-                toCedarFormat(principal),
-                toCedarFormat(action),
-                toCedarFormat(resource),
+                EntityUID.parse(principal).orElseThrow(),
+                EntityUID.parse(action).orElseThrow(),
+                EntityUID.parse(resource).orElseThrow(),
                 Optional.of(Map.of()),
                 Optional.of(schema),
                 true);

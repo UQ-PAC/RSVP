@@ -1,0 +1,1 @@
+entity Partition enum [ "SDA1", "SD\tB2" ];

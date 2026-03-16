@@ -4,10 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import com.cedarpolicy.model.exception.InternalException;
 import com.cedarpolicy.model.schema.Schema.JsonOrCedar;
@@ -61,6 +58,10 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
         return Set.copyOf(entityTypes.keySet());
     }
 
+    public Collection<EntityTypeDefinition> entityTypes() {
+        return Set.copyOf(entityTypes.values());
+    }
+
     public EntityTypeDefinition getEntityType(String name) {
         return entityTypes.get(name);
     }
@@ -91,6 +92,14 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
         }
 
         return null;
+    }
+
+    public Collection<ActionDefinition> actions() {
+        List<ActionDefinition> definitions = new ArrayList<>();
+        actions.forEach((a, m) -> {
+            definitions.addAll(m.values());
+        });
+        return definitions;
     }
 
     public void addAction(ActionDefinition action) {
@@ -131,8 +140,6 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
             String json = com.cedarpolicy.model.schema.Schema.parse(JsonOrCedar.Cedar,
                     cedar).toJsonFormat().toString();
             return parseJsonSchema(json);
-        } catch (RsvpException e) {
-            throw e;
         } catch (IOException | InternalException | NullPointerException | IllegalStateException e) {
             throw new RsvpException("Error parsing schema in " + schemaFile, e);
         }
@@ -147,8 +154,6 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
     public static Schema parseJsonSchema(Path schemaFile) throws RsvpException {
         try {
             return parseJsonSchema(Files.readString(schemaFile));
-        } catch (RsvpException e) {
-            throw e;
         } catch (IOException | NullPointerException | IllegalStateException e) {
             throw new RsvpException("Error parsing schema in " + schemaFile, e);
         }

@@ -1,9 +1,12 @@
 package uq.pac.rsvp.policy.datalog.ast;
 
+import com.google.gson.Gson;
+
 /**
  * String literal term (double-quoted)
  */
 public final class DLString extends DLTerm {
+    private final static Gson GSON = new Gson();
     private final String value;
 
     public DLString(String value) {
@@ -12,7 +15,7 @@ public final class DLString extends DLTerm {
 
     @Override
     protected String stringify() {
-        return "\"" +  value + "\"";
+        return GSON.toJson(value);
     }
 
     @Override

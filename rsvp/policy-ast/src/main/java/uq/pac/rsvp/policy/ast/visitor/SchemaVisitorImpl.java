@@ -23,8 +23,10 @@ public class SchemaVisitorImpl implements SchemaVisitor {
             schema.getEntityType(entityType).accept(this);
         }
 
-        for (String action : schema.actionNames()) {
-            schema.getAction(action).accept(this);
+        for (String type : schema.actionTypes()) {
+            for (String action : schema.actionNames(type)) {
+                schema.getAction(type, action).accept(this);
+            }
         }
 
         for (String commonType : schema.commonTypeNames()) {

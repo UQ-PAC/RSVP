@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.ast.schema;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -72,18 +73,11 @@ public class EntityTypeDefinitionTest {
         @Test
         @DisplayName("Handles missing types")
         void unresolved() throws IOException {
-            URL url = ClassLoader.getSystemResource("entity-refs.cedarschema.json");
+            URL url = ClassLoader.getSystemResource("missing-refs.cedarschema.json");
             String json = Files.readString(Path.of(url.getPath()));
             Schema schema = JsonParser.parseSchema(json);
 
-            schema.accept(new SchemaResolutionVisitor());
-
-            EntityTypeDefinition loser = schema.getEntityType("App::Loser");
-            EntityTypeDefinition role = schema.getEntityType("Lib::Role");
-
-            assertEquals(1, loser.getMemberOfTypes().size());
-
-            assertTrue(loser.getMemberOfTypes().contains(role));
+            assertThrows(SchemaResolutionException.class, () -> schema.accept(new SchemaResolutionVisitor()));
         }
 
     }
@@ -183,17 +177,7 @@ public class EntityTypeDefinitionTest {
             Namespace lib = new Namespace("Lib", libEntities, null);
             schema.add(lib);
 
-            schema.accept(new SchemaResolutionVisitor());
-
-            EntityTypeDefinition loser = schema.getEntityType("App::Loser");
-            EntityTypeDefinition role = schema.getEntityType("Lib::Role");
-
-            assertNotNull(loser);
-            assertNotNull(role);
-
-            assertEquals(1, loser.getMemberOfTypes().size());
-
-            assertTrue(loser.getMemberOfTypes().contains(role));
+            assertThrows(SchemaResolutionException.class, () -> schema.accept(new SchemaResolutionVisitor()));
         }
 
         @Test

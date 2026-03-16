@@ -6,7 +6,7 @@
         "memberOfTypes": ["Lib::Role", "Item"]
       },
       "Loser": {
-        "memberOfTypes": ["Lib::Role"]
+        "memberOfTypes": ["Lib::Role", "Lib::Invalid"]
       }
     },
     "actions": {}

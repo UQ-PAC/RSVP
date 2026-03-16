@@ -61,9 +61,11 @@ public class EntityTypeDefinition implements SchemaItem {
         for (String entityType : unresolvedMemberOfTypes) {
             EntityTypeDefinition resolved = Schema.resolveEntityType(entityType, schema, local);
 
-            if (resolved != null) {
-                resolvedMemberOfDefinitions.add(resolved);
+            if (resolved == null) {
+                throw new SchemaResolutionException("Could not resolve memberOf entity type: " + entityType);
             }
+
+            resolvedMemberOfDefinitions.add(resolved);
         }
     }
 

@@ -1,9 +1,9 @@
 package uq.pac.rsvp.policy.ast.schema;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -190,7 +190,7 @@ public class SchemaTest {
             String json = Files.readString(Path.of(url.getPath()));
             Schema schema = JsonParser.parseSchema(json);
 
-            assertDoesNotThrow(() -> schema.accept(new SchemaResolutionVisitor()));
+            assertThrows(SchemaResolutionException.class, () -> schema.accept(new SchemaResolutionVisitor()));
         }
 
         @Test
@@ -328,11 +328,14 @@ public class SchemaTest {
             assertNull(Schema.resolveCommonType(null, schema, namespace));
             assertNull(Schema.resolveCommonType("Missing::Type", schema, namespace));
             assertNull(Schema.resolveActionType(null, null, schema, namespace));
-            assertNull(Schema.resolveActionType("id", null, schema, namespace));
-            assertNull(Schema.resolveActionType("id", "bad type", schema, namespace));
-            assertNull(Schema.resolveActionType("id", "Missing::Action", schema, namespace));
+            assertNull(Schema.resolveActionType(null, "id", schema, namespace));
+            assertThrows(SchemaResolutionException.class,
+                    () -> Schema.resolveActionType("bad type", "id", schema, namespace));
+            assertThrows(SchemaResolutionException.class,
+                    () -> Schema.resolveActionType("Missing::Action", "id", schema, namespace));
 
-            assertNull(Schema.resolveTypeReference(new UnresolvedTypeReference("nonsense"), schema, namespace));
+            assertThrows(SchemaResolutionException.class,
+                    () -> Schema.resolveTypeReference(new UnresolvedTypeReference("nonsense"), schema, namespace));
 
         }
 
@@ -357,8 +360,9 @@ public class SchemaTest {
             actionAnnotations.put("AnActionAnnotation", "with a totally different value?");
 
             Set<String> appliesTo = Set.copyOf(Arrays.asList("App::SomeEntity"));
-            actions.put("someAction", new ActionDefinition("App::Action::someAction", null, appliesTo, appliesTo, null,
-                    actionAnnotations));
+            actions.put("someAction",
+                    new ActionDefinition("App::Action", "someAction", null, appliesTo, appliesTo, null,
+                            actionAnnotations));
 
             Map<String, CommonTypeDefinition> types = new HashMap<>();
 
@@ -436,14 +440,16 @@ public class SchemaTest {
         assertEquals(user, ((EntityTypeReference) patient).getDefinition());
 
         assertEquals(4, healthcareApp.actionNames().size());
-        assertEquals(4, schema.actionNames().size());
+        assertEquals(1, schema.actionTypes().size());
+        assertEquals(4, schema.actionNames("HealthCareApp::Action").size());
 
         assertTrue(healthcareApp.actionNames().containsAll(
                 Arrays.asList("createAppointment", "updateAppointment", "deleteAppointment", "listAppointments")));
-        assertTrue(schema.actionNames()
-                .containsAll(Arrays.asList("HealthCareApp::Action::createAppointment",
-                        "HealthCareApp::Action::updateAppointment", "HealthCareApp::Action::deleteAppointment",
-                        "HealthCareApp::Action::listAppointments")));
+        assertTrue(schema.actionTypes().contains("HealthCareApp::Action"));
+
+        assertTrue(schema.actionNames("HealthCareApp::Action")
+                .containsAll(Arrays.asList("createAppointment", "updateAppointment", "deleteAppointment",
+                        "listAppointments")));
 
         ActionDefinition create = healthcareApp.getAction("createAppointment");
         ActionDefinition update = healthcareApp.getAction("updateAppointment");
@@ -451,13 +457,13 @@ public class SchemaTest {
         ActionDefinition list = healthcareApp.getAction("listAppointments");
 
         assertEquals(create,
-                Schema.resolveActionType("createAppointment", "HealthCareApp::Action", schema, healthcareApp));
-        assertEquals(create, schema.getAction("HealthCareApp::Action::createAppointment"));
+                Schema.resolveActionType("HealthCareApp::Action", "createAppointment", schema, healthcareApp));
+        assertEquals(create, schema.getAction("HealthCareApp::Action", "createAppointment"));
 
-        assertEquals("HealthCareApp::Action::createAppointment", create.getName());
-        assertEquals("HealthCareApp::Action::updateAppointment", update.getName());
-        assertEquals("HealthCareApp::Action::deleteAppointment", delete.getName());
-        assertEquals("HealthCareApp::Action::listAppointments", list.getName());
+        assertEquals("HealthCareApp::Action::\"createAppointment\"", create.getQualifiedName());
+        assertEquals("HealthCareApp::Action::\"updateAppointment\"", update.getQualifiedName());
+        assertEquals("HealthCareApp::Action::\"deleteAppointment\"", delete.getQualifiedName());
+        assertEquals("HealthCareApp::Action::\"listAppointments\"", list.getQualifiedName());
 
         assertEquals(1, create.getMemberOf().size());
         assertEquals(0, update.getMemberOf().size());
@@ -555,9 +561,11 @@ public class SchemaTest {
         assertEquals("Person", person.getName());
         assertEquals(person, namespace.getEntityType("Person"));
 
-        ActionDefinition slap = schema.getAction("Action::slap");
+        ActionDefinition slap = schema.getAction("Action", "slap");
         assertNotNull(slap);
-        assertEquals("Action::slap", slap.getName());
+        assertEquals("Action::\"slap\"", slap.getQualifiedName());
+        assertEquals("slap", slap.getName());
+        assertEquals("Action", slap.getType());
         assertEquals(slap, namespace.getAction("slap"));
 
         Set<EntityTypeDefinition> principals = slap.getAppliesToPrincipalTypes();
@@ -667,7 +675,7 @@ public class SchemaTest {
         assertEquals(1, entity.getAnnotations().size());
         assertEquals("with a value!", entity.getAnnotations().get("AnEntityAnnotation"));
 
-        ActionDefinition action = schema.getAction("App::Action::someAction");
+        ActionDefinition action = schema.getAction("App::Action", "someAction");
 
         assertNotNull(action);
         assertEquals(1, action.getAnnotations().size());

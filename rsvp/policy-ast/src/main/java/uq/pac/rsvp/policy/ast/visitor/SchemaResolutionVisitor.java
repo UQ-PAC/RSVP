@@ -41,11 +41,6 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
                 if (commonType instanceof UnresolvedTypeReference) {
                     commonType = Schema.resolveTypeReference((UnresolvedTypeReference) commonType, schema,
                             this.namespace);
-
-                    if (commonType == null) {
-                        continue; // TODO: error reporting
-                    }
-
                     this.namespace.resolveCommonType(name, commonType);
                 }
 
@@ -64,11 +59,6 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
 
             if (attribute instanceof UnresolvedTypeReference) {
                 attribute = Schema.resolveTypeReference((UnresolvedTypeReference) attribute, schema, namespace);
-
-                if (attribute == null) {
-                    continue; // TODO: error reporting
-                }
-
                 type.resolveShapeAttributeType(name, attribute);
             }
 
@@ -92,11 +82,6 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
 
             if (prop instanceof UnresolvedTypeReference) {
                 prop = Schema.resolveTypeReference((UnresolvedTypeReference) prop, schema, namespace);
-
-                if (prop == null) {
-                    continue; // TODO: error reporting
-                }
-
                 type.resolveAttributeType(name, prop);
             }
 
@@ -110,11 +95,6 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
 
         if (element instanceof UnresolvedTypeReference) {
             element = Schema.resolveTypeReference((UnresolvedTypeReference) element, schema, namespace);
-
-            if (element == null) {
-                return; // TODO: error reporting
-            }
-
             type.resolveElementType(element);
 
         }

@@ -5,9 +5,9 @@ import com.google.gson.GsonBuilder;
 
 import uq.pac.rsvp.policy.ast.expr.ActionExpression;
 import uq.pac.rsvp.policy.ast.expr.EntityExpression;
-import uq.pac.rsvp.policy.ast.expr.EntityExpression.EntityExpressionDeserialiser;
+import uq.pac.rsvp.policy.ast.expr.EuidExpression;
+import uq.pac.rsvp.policy.ast.expr.EuidExpression.EuidExpressionDeserialiser;
 import uq.pac.rsvp.policy.ast.expr.Expression;
-import uq.pac.rsvp.policy.ast.expr.ActionExpression.ActionExpressionDeserialiser;
 import uq.pac.rsvp.policy.ast.expr.Expression.ExpressionDeserialiser;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition.CommonTypeDefinitionDeserialiser;
@@ -23,8 +23,8 @@ public class JsonParser {
         if (singleton == null) {
             singleton = new GsonBuilder()
                     .registerTypeAdapter(Expression.class, new ExpressionDeserialiser())
-                    .registerTypeAdapter(ActionExpression.class, new ActionExpressionDeserialiser())
-                    .registerTypeAdapter(EntityExpression.class, new EntityExpressionDeserialiser())
+                    .registerTypeAdapter(ActionExpression.class, new EuidExpressionDeserialiser())
+                    .registerTypeAdapter(EntityExpression.class, new EuidExpressionDeserialiser())
                     .registerTypeAdapter(CommonTypeDefinition.class, new CommonTypeDefinitionDeserialiser())
                     .registerTypeAdapter(Schema.class, new SchemaDeserialiser())
                     .disableJdkUnsafe()

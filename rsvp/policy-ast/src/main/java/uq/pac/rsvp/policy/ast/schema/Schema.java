@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +36,7 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 public class Schema extends HashMap<String, Namespace> implements SchemaItem {
 
     private final Map<String, EntityTypeDefinition> entityTypes;
-    private final Map<String, ActionDefinition> actions;
+    private final Map<String, Map<String, ActionDefinition>> actions;
     private final Map<String, CommonTypeDefinition> commonTypes;
 
     public Schema(Map<String, Namespace> other) {
@@ -68,16 +69,40 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
         entityTypes.put(type.getName(), type);
     }
 
-    public Set<String> actionNames() {
+    public Set<String> actionTypes() {
         return Set.copyOf(actions.keySet());
     }
 
-    public ActionDefinition getAction(String name) {
-        return actions.get(name);
+    public Set<String> actionNames(String type) {
+        Map<String, ActionDefinition> typedActions = actions.get(type);
+
+        if (typedActions == null) {
+            return Collections.emptySet();
+        }
+
+        return Set.copyOf(typedActions.keySet());
+    }
+
+    public ActionDefinition getAction(String type, String id) {
+        Map<String, ActionDefinition> typedActions = actions.get(type);
+
+        if (typedActions != null) {
+            return typedActions.get(id);
+        }
+
+        return null;
     }
 
     public void addAction(ActionDefinition action) {
-        actions.put(action.getName(), action);
+
+        Map<String, ActionDefinition> typedActions = actions.get(action.getType());
+
+        if (typedActions == null) {
+            typedActions = new HashMap<>();
+            actions.put(action.getType(), typedActions);
+        }
+
+        typedActions.put(action.getName(), action);
     }
 
     public Set<String> commonTypeNames() {
@@ -146,11 +171,33 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
         }
     }
 
-    // Cedar docs say type resolution order is:
-    // common type > entity type > primitive/extension type
+    /**
+     * Resolve a type reference with respect to the namespace where the reference
+     * was defined, based on Cedar type resolution rules.
+     * In the case of shadowed type names, resolution will occur in the following
+     * order:
+     * <ol>
+     * <li>Common type</li>
+     * <li>Entity type</li>
+     * <li>Primitive or extension type</li>
+     * </ol>
+     * 
+     * To specify that a type should definitely be a primitive or extension type,
+     * the prefix {@code __cedar::} can be prepended to the type name, in which case
+     * this resolution will not be executed.
+     * 
+     * @param unresolved the {@code UnresolvedTypeReference} node to resolve based
+     *                   on name
+     * @param schema     the schema to query
+     * @param local      the local namespace where the unresolved reference was
+     *                   defined
+     * @return A resolved type node
+     * @throws SchemaResolutionException if the type could not be resolved
+     */
     public static CommonTypeDefinition resolveTypeReference(UnresolvedTypeReference unresolved, Schema schema,
             Namespace local) {
-
+        // Cedar docs say type resolution order is:
+        // common type > entity type > primitive/extension type
         if (unresolved == null) {
             return null;
         }
@@ -158,7 +205,7 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
         String referenceTypeName = unresolved.getRawTypeName();
 
         if (referenceTypeName == null) {
-            return null;
+            throw new SchemaResolutionException("Reference type name was undefined");
         }
 
         String definitionName = unresolved.getName();
@@ -185,64 +232,126 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
             case "decimal" -> new DecimalType(definitionName, unresolved.isRequired(), unresolved.getAnnotations());
             case "duration" -> new DurationType(definitionName, unresolved.isRequired(), unresolved.getAnnotations());
             case "ipaddr" -> new IpAddressType(definitionName, unresolved.isRequired(), unresolved.getAnnotations());
-            default -> null;
+            default -> throw new SchemaResolutionException("Could not resolve type: " + referenceTypeName);
         };
 
     }
 
+    /**
+     * Get the definition corresponding to an entity type reference based on Cedar
+     * type resolution rules.
+     * 
+     * @param entityType the name of the referenced entity to be resolved
+     * @param schema     the schema to query
+     * @param local      the namespace containing the reference
+     * @return the entity definition referenced by the supplied name with respect to
+     *         the supplied namespace, or {@code null} if none could be found
+     */
     public static EntityTypeDefinition resolveEntityType(String entityType, Schema schema, Namespace local) {
+
+        EntityTypeDefinition result = null;
+
         if (entityType != null) {
             if (entityType.contains("::")) {
                 String[] entityNameParts = entityType.split("::");
                 if (schema.containsKey(entityNameParts[0])) {
-                    return schema.get(entityNameParts[0]).getEntityType(entityNameParts[1]);
+                    result = schema.get(entityNameParts[0]).getEntityType(entityNameParts[1]);
                 }
             } else {
-                return local.getEntityType(entityType);
+                result = local.getEntityType(entityType);
+
+                if (result == null) {
+                    // Try top-level namespace
+                    result = schema.getEntityType(entityType);
+                }
             }
         }
 
-        return null;
+        return result;
     }
 
-    public static ActionDefinition resolveActionType(String id, String type, Schema schema, Namespace local) {
+    /**
+     * Get the definition corresponding to an action reference based on Cedar type
+     * resolution rules.
+     * Note that actions cannot be shadowed. If an action is defined in the global
+     * namespace, it cannot
+     * also be defined in any other namespace.
+     * 
+     * @param type   the type of the referenced action to be resolved (e.g.
+     *               {@code Namespace::Action})
+     * @param id     the name of the referenced action to be resolved
+     * @param schema the schema to query
+     * @param local  the namespace containing the reference
+     * @return the action definition referenced by the supplied name with respect to
+     *         the supplied namespace, or {@code null} if none could be found
+     * @throws SchemaResolutionException if the action type is malformed or the
+     *                                   type's namespace cannot be resolved
+     */
+    public static ActionDefinition resolveActionType(String type, String id, Schema schema, Namespace local) {
 
         if (id == null) {
             return null;
         }
 
-        if (type != null) {
-            if (!type.equals("Action") && !type.endsWith("::Action")) {
-                return null;
+        ActionDefinition result = null;
+
+        if (type == null || type.equals("Action")) {
+            result = local.getAction(id);
+
+            if (result == null) {
+                // Try top-level namespace
+                result = schema.getAction("Action", id);
             }
-
-            Namespace namespace = schema.get(type.substring(0, Math.max(0, type.length() - 8)));
-
-            if (namespace == null) {
-                return null;
-            }
-
-            return namespace.getAction(id);
 
         } else {
-            return local.getAction(id);
+            if (!type.endsWith("::Action")) {
+                throw new SchemaResolutionException("Malformed action type: " + type);
+            }
+
+            String localName = type.substring(0, Math.max(0, type.length() - 8));
+            Namespace namespace = schema.get(localName);
+
+            if (namespace == null) {
+                throw new SchemaResolutionException("Unknown namespace: " + localName);
+            }
+
+            result = namespace.getAction(id);
         }
+
+        return result;
 
     }
 
+    /**
+     * Get the definition corresponding to an common type reference based on Cedar
+     * type resolution rules.
+     * 
+     * @param attributeType the name of the referenced type to be resolved
+     * @param schema        the schema to query
+     * @param local         the namespace containing the reference
+     * @return the type definition referenced by the supplied name with respect to
+     *         the supplied namespace, or {@code null} if none could be found
+     */
     public static CommonTypeDefinition resolveCommonType(String attributeType, Schema schema, Namespace local) {
+        CommonTypeDefinition result = null;
+
         if (attributeType != null) {
             if (attributeType.contains("::")) {
                 String[] entityNameParts = attributeType.split("::");
                 if (schema.containsKey(entityNameParts[0])) {
-                    return schema.get(entityNameParts[0]).getCommonType(entityNameParts[1]);
+                    result = schema.get(entityNameParts[0]).getCommonType(entityNameParts[1]);
                 }
             } else {
-                return local.getCommonType(attributeType);
+                result = local.getCommonType(attributeType);
+
+                if (result == null) {
+                    // Try top-level namespace
+                    result = schema.getCommonType(attributeType);
+                }
             }
         }
 
-        return null;
+        return result;
     }
 
     @Override
@@ -283,9 +392,9 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
                             for (Map.Entry<String, JsonElement> entityType : entityTypes.getAsJsonObject().entrySet()) {
                                 if (entityType.getValue().isJsonObject()) {
                                     JsonObject type = entityType.getValue().getAsJsonObject();
+                                    String typeName = entityType.getKey();
 
-                                    type.addProperty("name",
-                                            name.isEmpty() ? entityType.getKey() : name + "::" + entityType.getKey());
+                                    type.addProperty("name", name.isEmpty() ? typeName : name + "::" + typeName);
                                 }
                             }
                         }
@@ -296,10 +405,10 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
                             for (Map.Entry<String, JsonElement> action : actions.getAsJsonObject().entrySet()) {
                                 if (action.getValue().isJsonObject()) {
                                     JsonObject type = action.getValue().getAsJsonObject();
+                                    String id = action.getKey();
 
-                                    type.addProperty("name",
-                                            name.isEmpty() ? "Action::" + action.getKey()
-                                                    : name + "::Action::" + action.getKey());
+                                    type.addProperty("type", name.isEmpty() ? "Action" : name + "::Action");
+                                    type.addProperty("eid", id);
                                 }
                             }
                         }
@@ -310,9 +419,10 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
                             for (Map.Entry<String, JsonElement> commonType : commonTypes.getAsJsonObject().entrySet()) {
                                 if (commonType.getValue().isJsonObject()) {
                                     JsonObject type = commonType.getValue().getAsJsonObject();
+                                    String typeName = commonType.getKey();
 
                                     type.addProperty("definitionName",
-                                            name.isEmpty() ? commonType.getKey() : name + "::" + commonType.getKey());
+                                            name.isEmpty() ? typeName : name + "::" + typeName);
                                 }
                             }
                         }

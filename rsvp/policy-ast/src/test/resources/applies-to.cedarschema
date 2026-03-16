@@ -1,0 +1,20 @@
+entity Role enum [ "User", "Admin" ];
+entity User enum [ "Carl", "Tim" ];
+
+entity Account = {
+    role: Role
+};
+
+action auth appliesTo {
+    principal: [ Account, User ],
+    resource: Account
+};
+
+namespace Foo::Bar {
+    entity Baz enum [ "X", "Y" ];
+
+    action read appliesTo {
+        principal: [ Baz ],
+        resource: Account
+    };
+}

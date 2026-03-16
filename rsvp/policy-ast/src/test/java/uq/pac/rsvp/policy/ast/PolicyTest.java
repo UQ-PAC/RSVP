@@ -35,7 +35,8 @@ public class PolicyTest {
         @DisplayName("handles permit all")
         void testDeserialisation() {
             String json = "{ \"effect\": \"permit\", \"condition\": { \"type\": \"bool\", \"value\": \"true\" }}";
-            Gson gson = new GsonBuilder().registerTypeAdapter(Expression.class, new ExpressionDeserialiser())
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(Expression.class, new ExpressionDeserialiser())
                     .disableJdkUnsafe()
                     .create();
             Policy policy = gson.fromJson(json, Policy.class);
@@ -89,7 +90,7 @@ public class PolicyTest {
         @DisplayName("handles simple deny")
         void denyHacker() {
             Policy policy = new Policy(Effect.Forbid, new BinaryExpression(new VariableExpression(Reference.Principal),
-                    BinaryOp.Eq, new StringExpression("hacker")));
+                    BinaryOp.Eq, new StringExpression("hacker", true)));
 
             assertFalse(policy.isPermit());
             assertTrue(policy.isForbid());

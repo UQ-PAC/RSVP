@@ -58,7 +58,8 @@ public class ActionDefinition implements SchemaItem {
         }
     }
 
-    private final String name;
+    private final String type;
+    private final String eid;
 
     @SerializedName("memberOf")
     private final Set<ActionReference> unresolvedMemberOf;
@@ -70,21 +71,22 @@ public class ActionDefinition implements SchemaItem {
     // Set during type resolution
     private Set<ActionDefinition> resolvedMemberOf;
 
-    public ActionDefinition(String name, Set<ActionReference> memberOf, Set<String> principalTypes,
+    public ActionDefinition(String type, String eid, Set<ActionReference> memberOf, Set<String> principalTypes,
             Set<String> resourceTypes,
             RecordTypeDefinition context, Map<String, String> annotations) {
-        this.name = name;
+        this.type = type;
+        this.eid = eid;
         this.unresolvedMemberOf = memberOf != null ? Set.copyOf(memberOf) : Collections.emptySet();
         this.appliesTo = new ActionApplication(principalTypes, resourceTypes, context);
         this.annotations = annotations != null ? Map.copyOf(annotations) : Collections.emptyMap();
     }
 
-    public ActionDefinition(String name) {
-        this(name, null, null, null, null, null);
+    public ActionDefinition(String type, String eid) {
+        this(type, eid, null, null, null, null, null);
     }
 
     public ActionDefinition() {
-        this(null, null, null, null, null, null);
+        this(null, null, null, null, null, null, null);
     }
 
     public void resolveReferences(Schema schema, Namespace local) {
@@ -92,7 +94,7 @@ public class ActionDefinition implements SchemaItem {
         resolvedMemberOf = new HashSet<>();
 
         for (ActionReference ref : unresolvedMemberOf) {
-            ActionDefinition resolved = Schema.resolveActionType(ref.id, ref.type, schema, local);
+            ActionDefinition resolved = Schema.resolveActionType(ref.type, ref.id, schema, local);
 
             if (resolved != null) {
                 resolvedMemberOf.add(resolved);
@@ -107,6 +109,8 @@ public class ActionDefinition implements SchemaItem {
 
             if (resolved != null) {
                 appliesTo.resolvedPrincipalDefinitions.add(resolved);
+            } else {
+                throw new SchemaResolutionException("Error resolving principal applies to: " + entityType);
             }
         }
 
@@ -115,20 +119,39 @@ public class ActionDefinition implements SchemaItem {
 
             if (resolved != null) {
                 appliesTo.resolvedResourceDefinitions.add(resolved);
+            } else {
+                throw new SchemaResolutionException("Error resolving resource applies to: " + entityType);
             }
         }
 
     }
 
     /**
-     * Return the fully qualified name of this action definition in the format
-     * {@code Namespace::Action::actionName}
+     * Get the type of this action in the format {@code Namespace::Action}.
      * 
-     * @return The fully qualified name of this action if this action is defined
-     *         within a resolved namespace, {@code null} otherwise.
+     * @return the qualified type of this action
      */
-    public String getName() {
-        return name;
+    public final String getType() {
+        return type;
+    }
+
+    /**
+     * Get the unquoted, unqualified EID of this action.
+     * 
+     * @return the EID of this action
+     */
+    public final String getName() {
+        return eid;
+    }
+
+    /**
+     * Return the fully qualified name of this action definition in the format
+     * {@code Namespace::Action::"actionName"}
+     * 
+     * @return The fully qualified name of this action
+     */
+    public final String getQualifiedName() {
+        return type + "::\"" + eid + "\"";
     }
 
     public Set<ActionDefinition> getMemberOf() {

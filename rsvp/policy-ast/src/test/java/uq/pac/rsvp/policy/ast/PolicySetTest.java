@@ -1,6 +1,7 @@
 package uq.pac.rsvp.policy.ast;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.net.URL;
@@ -15,6 +16,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
+import uq.pac.rsvp.policy.ast.expr.CallExpression;
+import uq.pac.rsvp.policy.ast.expr.PropertyAccessExpression;
+import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitorImpl;
 
@@ -55,25 +59,24 @@ public class PolicySetTest {
             URL url = ClassLoader.getSystemResource("policy-with-has.cedar");
             PolicySet policies = PolicySet.parseCedarPolicySet(Path.of(url.getPath()));
             Policy policy = policies.getFirst();
-            int stage[] = new int[] {0};
+            int stage[] = new int[] { 0 };
             PolicyVisitor pv = new PolicyVisitorImpl() {
                 @Override
                 public void visitBinaryExpr(BinaryExpression expr) {
                     // First we will see '&&' and then the 'has', i.e.:
                     //
                     // (resource has owner) && ...
-                    //            |          |
-                    //            |       stage 0
-                    //         stage 1
+                    // | |
+                    // | stage 0
+                    // stage 1
                     //
                     // But we actually see a bunch of '&&' because the (tautological) conditions
                     // from (resource, owner, principal) are apparently included.
                     if (stage[0] == 0) {
                         assertEquals(expr.getOp(), BinaryExpression.BinaryOp.And);
                         stage[0] = 1;
-                    }
-                    else if (stage[0] == 1) {
-                        if(expr.getOp() == BinaryExpression.BinaryOp.HasAttr) {
+                    } else if (stage[0] == 1) {
+                        if (expr.getOp() == BinaryExpression.BinaryOp.HasAttr) {
                             assertEquals(44, expr.getSourceLoc().offset);
                             assertEquals(18, expr.getSourceLoc().len);
                             stage[0] = 2;
@@ -86,6 +89,23 @@ public class PolicySetTest {
             };
             policy.getCondition().accept(pv);
             assertEquals(2, stage[0]);
+        }
+
+        @Test
+        @DisplayName("handles contains")
+        void testContains() throws RsvpException {
+            URL url = ClassLoader.getSystemResource("contains.cedar");
+            PolicySet policies = PolicySet.parseCedarPolicySet(Path.of(url.getPath()));
+            policies.accept(new PolicyVisitorImpl() {
+                @Override
+                public void visitCallExpr(CallExpression expr) {
+
+                    super.visitCallExpr(expr);
+                    assertTrue(expr.getSelf() instanceof PropertyAccessExpression);
+                    assertEquals("contains", expr.getFunc());
+                    assertTrue(expr.getArgs().getFirst() instanceof VariableExpression);
+                }
+            });
         }
     }
 

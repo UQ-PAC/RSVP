@@ -3,7 +3,7 @@ publishing {
         mavenJava(MavenPublication) {
             groupId "uq.pac.rsvp"
             artifactId "policy-ast"
-            version "2.0.2-SNAPSHOT"
+            version "3.0.0"
             from components.java
         }
     }

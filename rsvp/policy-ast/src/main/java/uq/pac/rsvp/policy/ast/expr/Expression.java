@@ -59,23 +59,6 @@ public abstract class Expression extends PolicyFileEntry {
             JsonObject jsonObject = json.getAsJsonObject();
             String type = jsonObject.get("type").getAsString();
 
-            if (type.equals("binary")) {
-                String op = jsonObject.get("op").getAsString();
-                if (op.equals("has") && jsonObject.get("right").isJsonPrimitive()) {
-                    if (jsonObject.get("right").getAsJsonPrimitive().isString()) {
-                        // 'has' is a special case because RHS can be an attribute name
-                        Expression lhs = context.deserialize(json.getAsJsonObject().get("left"), typeOfT);
-                        Expression rhs = new StringExpression(jsonObject.get("right").getAsString());
-                        SourceLoc sourceLoc = null;
-                        if (jsonObject.has("source")) {
-                            sourceLoc = context.deserialize(jsonObject.get("source"), SourceLoc.class);
-                        }
-                        Expression result = new BinaryExpression(lhs, BinaryExpression.BinaryOp.HasAttr, rhs, sourceLoc);
-                        return result;
-                    }
-                }
-            }
-
             Type expressionType = switch (type) {
                 case "binary" -> BinaryExpression.class;
                 case "unary" -> UnaryExpression.class;

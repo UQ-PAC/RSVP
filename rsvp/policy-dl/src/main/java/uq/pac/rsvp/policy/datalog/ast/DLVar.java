@@ -9,19 +9,6 @@ package uq.pac.rsvp.policy.datalog.ast;
 public final class DLVar extends DLTerm {
     private final String name;
 
-    public enum Functor {
-        TO_NUMBER("to_number"),
-        TO_STRING("to_string"),
-        TO_FLOAT("to_float"),
-        ORD("ord");
-
-        private final String functor;
-
-        Functor(String fn) {
-            this.functor = fn;
-        }
-    }
-
     public DLVar(String name) {
         this.name = name;
     }
@@ -37,15 +24,6 @@ public final class DLVar extends DLTerm {
             return s.name.equals(name);
         }
         return false;
-    }
-
-    public DLVar functor(Functor functor) {
-        return new DLVar("%s(%s)".formatted(functor.functor, name));
-    }
-
-    // FIXME: subclass for a term
-    public static DLVar aggregate(String aggregate, DLAtom atom) {
-        return new DLVar("%s : { %s }".formatted(aggregate, atom));
     }
 
     public String getName() {

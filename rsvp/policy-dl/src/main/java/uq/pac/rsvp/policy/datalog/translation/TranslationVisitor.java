@@ -136,7 +136,7 @@ public class TranslationVisitor extends VoidVisitorAdapter {
 
                 if (expr.getSelf() instanceof PropertyAccessExpression pe) {
                     DLTerm set = getOperand(pe.getObject());
-                    DLVar aggregate = DLVar.aggregate("count",
+                    DLTerm aggregate = new DLAggregate(DLAggregate.Aggregate.COUNT,
                             new DLAtom(AttributeRuleDecl, set, DLTerm.lit(pe.getProperty()), argument));
                     expressions.add(new DLConstraint(aggregate, DLTerm.lit(1), DLConstraint.Operator.GTE));
                 } else {

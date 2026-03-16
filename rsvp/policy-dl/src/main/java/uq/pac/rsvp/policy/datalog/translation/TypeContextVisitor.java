@@ -27,7 +27,7 @@ public class TypeContextVisitor extends ValueVisitorAdapter<TypeContextVisitor.C
 
     public static DLTerm normalise(DLTerm term, Context context) {
         if (term instanceof DLVar var && context == Context.NUMERIC) {
-            return var.functor(DLVar.Functor.TO_NUMBER);
+            return new DLFunctor(DLFunctor.Functor.TO_NUMBER, var);
         }
         return term;
     }

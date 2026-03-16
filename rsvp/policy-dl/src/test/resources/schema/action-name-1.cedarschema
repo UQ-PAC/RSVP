@@ -1,0 +1,6 @@
+entity Partition enum [ "SDA1", "SDB2" ];
+
+action "123" appliesTo {
+    principal: Partition,
+    resource: Partition
+};

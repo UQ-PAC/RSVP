@@ -1,0 +1,6 @@
+entity Partition enum [ "SDA1", "SDB2" ];
+
+action "\t" appliesTo {
+    principal: Partition,
+    resource: Partition
+};

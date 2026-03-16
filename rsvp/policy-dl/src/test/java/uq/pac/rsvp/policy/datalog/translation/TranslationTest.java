@@ -30,6 +30,8 @@ public class TranslationTest {
 
     private final static Logger logger = new Logger();
 
+    private final static Path TESTDIR = Path.of(TestUtil.RESOURCEDIR.toString(), "translation");
+
     @BeforeAll
     static void configure() {
         logger.setLevel(Logger.Level.Info);
@@ -53,7 +55,7 @@ public class TranslationTest {
         }
 
         public static List<TestInput> load(String dir) {
-            Path testDir = Path.of(TranslationTest.class.getClassLoader().getResource(dir).getFile());
+            Path testDir = Path.of(TESTDIR.toString(), dir);
             Path schema = TestUtil.findFile(testDir, ".cedarschema");
             Path entities = TestUtil.findFile(testDir, ".json");
 
@@ -88,7 +90,7 @@ public class TranslationTest {
     @TestFactory
     Collection<DynamicTest> test() throws IOException {
         List<DynamicTest> tests = new ArrayList<>();
-        try (Stream<Path> dirs = Files.list(TestUtil.RESOURCEDIR)) {
+        try (Stream<Path> dirs = Files.list(TESTDIR)) {
             for (Path p : dirs.filter(Files::isDirectory)
                     .filter(d -> !d.getFileName().toString().equals(ONE_OFF))
                     .toList()) {

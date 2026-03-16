@@ -25,13 +25,13 @@ import java.util.stream.Collectors;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
 
 /**
- * Putting translation of the cedar schema, entries, context and policies together
+ * Putting translation of the cedar schema, entities, policies and context together
  */
 public class Translation {
 
     private Translation() {}
 
-    private static void validate(Path schemaFile, Path policyFile, Path entityFile) throws IOException, AuthException {
+    static void validate(Path schemaFile, Path policyFile, Path entityFile) throws IOException, AuthException, RsvpException {
         Entities entities = Entities.parse(entityFile);
         com.cedarpolicy.model.schema.Schema schema =
                 new com.cedarpolicy.model.schema.Schema(Files.readString(schemaFile));
@@ -54,6 +54,17 @@ public class Translation {
         EntityValidationRequest eReq =
                 new EntityValidationRequest(schema, entities.getEntities().stream().toList());
         engine.validateEntities(eReq);
+
+        // For the moment we do not support arbitrary action names as Cedar does,
+        // just standard non-empty identifiers
+        Schema rsvpSchema = Schema.parseCedarSchema(schemaFile);
+        rsvpSchema.actionNames().stream().map(rsvpSchema::getAction).forEach(a -> {
+            Arrays.stream(a.getName().split("::")).forEach(s -> {
+                if (!s.matches("^[A-ZA-z_][A-Za-z_0-9]+$")) {
+                    throw new TranslationError("Unsupported action name: " + a.getName());
+                }
+            });
+        });
     }
 
     public static DLProgram translate(Path schemaFile, Path policiesFile, Path entitiesFile) throws IOException, AuthException, RsvpException {
@@ -119,7 +130,7 @@ public class Translation {
                 .add(NullifiedRequestsRuleDecl);
 
         // ParentOf relation
-        builder.comment("Parents")
+        builder.comment("ParentOf")
                 .add(ParentOfRuleDecl)
                 .add(facts.get(ParentOfRuleDecl.getName()))
                 .add(actions.getParentOfFacts());
@@ -128,7 +139,7 @@ public class Translation {
         DLRule rpt = new DLRule(new DLAtom(ParentOfRuleDecl, DLTerm.var("x"), DLTerm.var("z")),
                 new DLAtom(ParentOfRuleDecl, DLTerm.var("x"), DLTerm.var("y")),
                 new DLAtom(ParentOfRuleDecl, DLTerm.var("y"), DLTerm.var("z")));
-        builder.comment("Transitive Parents")
+        builder.comment("Add transitivity to ParentOf")
                 .add(rpt);
 
         for (TranslationPolicy policy : translationPolicies.getPermitTranslation()) {

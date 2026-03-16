@@ -9,9 +9,13 @@ import uq.pac.rsvp.policy.datalog.ast.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
+import static uq.pac.rsvp.policy.ast.expr.BinaryExpression.BinaryOp.*;
+import static uq.pac.rsvp.policy.ast.expr.UnaryExpression.UnaryOp.*;
 /**
  * Pre-analysis policy transformations
  * - Convert expressions of the form 'e in [e1, e2]' to 'e in e1 || e in e2'
+ * - Translate if-conditionals to boolean logic
  */
 public class TranslationTransformer implements PolicyComputationVisitor<Expression> {
 
@@ -112,7 +116,16 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
 
     @Override
     public Expression visitConditionalExpr(ConditionalExpression expr) {
-        throw new TranslationError("Unsupported transformation for: " + expr);
+        // Transform expressions of the form
+        ///  if x then y else z to
+        // (x && y) || (!x && z)
+        Expression cond = expr.getCondition().compute(this),
+            then = expr.getThen().compute(this),
+            els = expr.getElse().compute(this);
+
+        Expression notCond = new UnaryExpression(Not, cond);
+        return new BinaryExpression(new BinaryExpression(cond, And, then), Or,
+                new BinaryExpression(notCond, And, els));
     }
 
     @Override

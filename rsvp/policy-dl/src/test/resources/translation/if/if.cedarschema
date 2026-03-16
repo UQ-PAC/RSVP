@@ -1,0 +1,16 @@
+entity Kind enum [ "File", "Folder" ];
+
+entity Link = {
+    kind: Kind,
+    permission: {
+        read: Bool,
+        write: Bool,
+        exec: Bool
+    }
+};
+
+action "introspect" appliesTo {
+    principal: Link,
+    resource: Link
+};
+

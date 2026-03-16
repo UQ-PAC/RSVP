@@ -1,0 +1,38 @@
+[
+    {
+        "uid": { "type": "Link", "id": "/etc" },
+        "attrs": {
+            "kind": { "__entity": { "id": "Folder", "type": "Kind" } },
+            "permission": {
+                "read" : false,
+                "write": false,
+                "exec" : true
+            }
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "Link", "id": "/etc/apt.conf" },
+        "attrs": {
+            "kind": { "__entity": { "id": "File", "type": "Kind" } },
+            "permission": {
+                "read" : true,
+                "write": true,
+                "exec" : false
+            }
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "Link", "id": "/etc/passwd" },
+        "attrs": {
+            "kind": { "__entity": { "id": "File", "type": "Kind" } },
+            "permission": {
+                "read" : false,
+                "write": false,
+                "exec" : false
+            }
+        },
+        "parents": [ ]
+    }
+]

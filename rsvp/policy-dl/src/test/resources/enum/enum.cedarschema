@@ -9,3 +9,12 @@ action auth appliesTo {
     principal: [ Account, User ],
     resource: Account
 };
+
+namespace Foo::Bar {
+    entity Baz enum [ "X", "Y" ];
+
+    action read appliesTo {
+        principal: [ Baz ],
+        resource: Account
+    };
+}

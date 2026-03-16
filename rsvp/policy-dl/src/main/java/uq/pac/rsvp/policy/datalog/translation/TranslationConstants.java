@@ -98,7 +98,7 @@ public class TranslationConstants {
 
 
     public final static DLRuleDecl ActionableRequestsRuleDecl =
-            makeStandardRuleDecl("AllActionableRequests");
+            makeStandardRuleDecl("ActionableRequests");
 
     /**
      * Empty relation indicating no solutions
@@ -167,6 +167,8 @@ public class TranslationConstants {
     public static List<DLOutputDirective> makeIODirectives(Collection<DLRuleDecl> decls) {
         List<DLRuleDecl> output = new ArrayList<>(decls);
         output.addAll(List.of(
+                ActionPrincipalRuleDecl,
+                ActionResourceRuleDecl,
                 PermitRuleDecl,
                 ForbidRuleDecl,
                 PermittedRequestsRuleDecl,

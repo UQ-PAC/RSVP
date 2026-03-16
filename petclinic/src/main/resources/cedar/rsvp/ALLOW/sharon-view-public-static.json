@@ -1,7 +1,0 @@
-{
-    "principal": "PetClinic::User::\"Sharon Jenkins\"",
-    "action": "PetClinic::Action::\"ViewWebPage\"",
-    "resource": "PetClinic::WebPage::\"Home\"",
-    "context": { },
-    "validateRequest": true
-}

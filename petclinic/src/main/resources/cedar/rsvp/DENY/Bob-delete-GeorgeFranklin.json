@@ -1,0 +1,7 @@
+{
+    "principal": "PetClinic::Secretary::\"Bob\"",
+    "action": "PetClinic::Action::\"DeleteOwner\"",
+    "resource": "PetClinic::Owner::\"George Franklin\"",
+    "context": { },
+    "validateRequest": true
+}

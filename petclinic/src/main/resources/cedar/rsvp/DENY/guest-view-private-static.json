@@ -1,7 +1,0 @@
-{
-    "principal": "PetClinic::User::\"Guest\"",
-    "action": "PetClinic::Action::\"ViewWebPage\"",
-    "resource": "PetClinic::WebPage::\"Owners\"",
-    "context": { },
-    "validateRequest": true
-}

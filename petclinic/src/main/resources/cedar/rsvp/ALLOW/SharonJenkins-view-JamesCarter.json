@@ -1,0 +1,7 @@
+{
+    "principal": "PetClinic::Veterinarian::\"Sharon Jenkins\"",
+    "action": "PetClinic::Action::\"ViewVeterinarian\"",
+    "resource": "PetClinic::Veterinarian::\"James Carter\"",
+    "context": { },
+    "validateRequest": true
+}

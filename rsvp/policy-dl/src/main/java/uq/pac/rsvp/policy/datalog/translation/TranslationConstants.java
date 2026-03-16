@@ -80,8 +80,6 @@ public class TranslationConstants {
     public final static DLRuleDecl ActionRuleDecl =
             new DLRuleDecl("Action", ActionVarDecl);
 
-    // FIXME: Add unique prefixes
-
     /**
      * Rule that captures relation between actions and principals,
      * ActionPrincipal(A, P) means that some action 'A' considers 'P' be a principal

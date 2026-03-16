@@ -5,6 +5,7 @@ import uq.pac.rsvp.policy.datalog.ast.DLVar;
 
 /**
  * FIXME: Need to ensure the names are unique WRT provided program
+ * FIXME: Move to constants
  * Unique name generator
  */
 public class Naming {
@@ -15,6 +16,6 @@ public class Naming {
     }
 
     public static synchronized EntityUID getEUID() {
-        return EntityUID.parse("Tmp::Record::\"%d\"".formatted(INDEX[1]++)).orElseThrow();
+        return EntityUID.parse("Tmp::RSVP::Record::\"%d\"".formatted(INDEX[1]++)).orElseThrow();
     }
 }

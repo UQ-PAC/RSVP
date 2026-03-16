@@ -41,6 +41,11 @@ public class NFConverter extends ValueVisitorAdapter<Formula> {
     }
 
     @Override
+    public Formula visitCallExpr(CallExpression expr) {
+        return getVar(expr);
+    }
+
+    @Override
     public Formula visitPropertyAccessExpr(PropertyAccessExpression expr) {
         return getVar(expr);
     }

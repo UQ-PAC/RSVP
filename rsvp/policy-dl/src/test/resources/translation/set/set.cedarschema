@@ -4,13 +4,12 @@ entity Account = {
     name: String,
     age: Long,
     role: Role,
-    friends: Set<Account>,
+    friends: Set<Account>
 };
 
 action introspect appliesTo {
     principal: Account,
-    resource: Account,
-    context: { }
+    resource: Account
 };
 
 

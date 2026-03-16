@@ -126,4 +126,25 @@ public class TranslationVisitor extends VoidVisitorAdapter {
         StringExpression value = new StringExpression(Boolean.toString(!negated));
         new BinaryExpression(expr, BinaryExpression.BinaryOp.Eq, value).accept(this);
     }
+
+    @Override
+    public void visitCallExpr(CallExpression expr) {
+        switch (expr.getFunc()) {
+            case "contains" -> {
+                require(expr.getArgs().size() == 1);
+                DLTerm argument = getOperand(expr.getArgs().getFirst());
+
+                if (expr.getSelf() instanceof PropertyAccessExpression pe) {
+                    DLTerm set = getOperand(pe.getObject());
+                    DLVar aggregate = DLVar.aggregate("count",
+                            new DLAtom(AttributeRuleDecl, set, DLTerm.lit(pe.getProperty()), argument));
+                    expressions.add(new DLConstraint(aggregate, DLTerm.lit(1), DLConstraint.Operator.GTE));
+                } else {
+                    throw new TranslationError("Unsupported set.contains() form: " + expr);
+                }
+
+            }
+            default -> throw new TranslationError("Unsupported function: " + expr.getFunc());
+        }
+    }
 }

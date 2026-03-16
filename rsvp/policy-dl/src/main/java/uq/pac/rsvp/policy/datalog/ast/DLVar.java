@@ -43,6 +43,11 @@ public final class DLVar extends DLTerm {
         return new DLVar("%s(%s)".formatted(functor.functor, name));
     }
 
+    // FIXME: subclass for a term
+    public static DLVar aggregate(String aggregate, DLAtom atom) {
+        return new DLVar("%s : { %s }".formatted(aggregate, atom));
+    }
+
     public String getName() {
         return name;
     }

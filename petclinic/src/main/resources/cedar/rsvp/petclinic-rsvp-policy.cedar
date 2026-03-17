@@ -1,100 +1,138 @@
 // 'policy0'
-// Every User can view any public page.
-@id("Policy: Public page.")
+// Anyone can view any Veterinarian.
+// > > Could conflict with 'policy2'.
+@id("Policy: Public Veterinarian data.")
 permit (
-    principal is PetClinic::User,
-    action == PetClinic::Action::"ViewWebPage",
-    resource is PetClinic::WebPage
-)
-when {
-    resource.public
-};
+    principal,
+    action == PetClinic::Action::"ViewVeterinarian",
+    resource is PetClinic::Veterinarian
+);
 
 // 'policy1'
-// No Guest User can view any actionable page.
-@id("Policy: No Guest on actionable page.")
-forbid (
-    principal is PetClinic::User,
-    action == PetClinic::Action::"ViewWebPage",
-    resource is PetClinic::WebPage
-)
-when {
-    principal in PetClinic::Guest::"Guest" &&
-    resource.actionable
-};
+// Anyone can view any Secretary.
+// > > Could conflict with 'policy2'.
+@id("Policy: Public Secretary data.")
+permit (
+    principal,
+    action == PetClinic::Action::"ViewSecretary",
+    resource is PetClinic::Secretary
+);
 
 // 'policy2'
-// No Guest User can view any private page.
-@id("Policy: No Guest on private page.")
+// No Guest can view any customer data.
+// > > Could conflict with 'policy0' and 'policy1'.
+@id("Policy: Guest cannot view customer data.")
 forbid (
-    principal is PetClinic::User,
-    action == PetClinic::Action::"ViewWebPage",
-    resource is PetClinic::WebPage
+    principal is PetClinic::Guest,
+    action,
+    resource
 )
-when {
-    principal in PetClinic::Guest::"Guest" &&
-    !resource.public
+unless {
+    (
+        action == PetClinic::Action::"ViewVeterinarian" &&
+        resource is PetClinic::Veterinarian
+    ) ||
+    (
+        action == PetClinic::Action::"ViewSecretary" &&
+        resource is PetClinic::Secretary
+    )
 };
 
 // 'policy3'
 // Every Administrator can do anything, anywhere.
 @id("Policy: Administrator.")
 permit (
-    principal is PetClinic::User,
+    principal is PetClinic::Administrator,
+    action,
+    resource
+);
+
+// 'policy4'
+// Any Secretary can view and edit their Clinics' data.
+@id("Policy: Secretary can view and edit in their Clinics.")
+permit (
+    principal is PetClinic::Secretary,
     action,
     resource
 )
 when {
-    principal in PetClinic::Administrator::"Administrator"
-};
-
-// 'policy4'
-// Every registered User (i.e. in a Users database) can view any private page.
-// > > Too permissive! < <
-@id("Policy: Registered User on private page.")
-permit (
-    principal is PetClinic::User,
-    action == PetClinic::Action::"ViewWebPage",
-    resource is PetClinic::WebPage
-)
-when {
-    (
-        principal in PetClinic::Database::"Clinic A" ||
-        principal in PetClinic::Database::"Clinic B"
-    ) &&
-    !resource.public
+    resource has clinics &&
+    resource.clinics.containsAny(principal.clinics)
+}
+unless {
+    action in PetClinic::Action::"DeleteOperations"
 };
 
 // 'policy5'
-// Every registered User (i.e. in a Users database) can view any actionable page.
-// > > Too permissive! < <
-@id("Policy: Registered User on actionable page.")
+// Every Veterinarian can view and edit their clients' data.
+@id("Policy: Veterinarian can view and edit their clients.")
 permit (
-    principal is PetClinic::User,
-    action == PetClinic::Action::"ViewWebPage",
-    resource is PetClinic::WebPage
+    principal is PetClinic::Veterinarian,
+    action,
+    resource
 )
 when {
+    resource has veterinarians &&
+    principal in resource.veterinarians &&
     (
-        principal in PetClinic::Database::"Clinic (A)" ||
-        principal in PetClinic::Database::"Clinic (B)"
-    ) &&
-    resource.actionable
+        action in PetClinic::Action::"OwnerOperations" ||
+        action in PetClinic::Action::"PetOperations" ||
+        action in PetClinic::Action::"VisitOperations"
+    )
 }
 unless {
-    context has databases &&
-    !(principal in context.databases)
+    action in PetClinic::Action::"DeleteOperations"
 };
 
 // 'policy6'
-// Sharon Jenkins (Clinic A) cannot view data from Clinic B.
-// >> She should be able to see George Franklin, but cannot! <<
-@id("Policy: Sharon Jenkins on Clinic B.")
+// No Intern Veterinarian can edit their clients' data.
+// > > Could have unintended consequences since "EditOperations"
+// > > is also used for "VeterinarianOperations".
+@id("Policy: Intern Veterinarian cannot edit their clients.")
 forbid (
-    principal == PetClinic::User::"Sharon Jenkins",
-    action == PetClinic::Action::"ViewWebPage",
-    resource == PetClinic::WebPage::"Owner"
-) when {
-    context has databases &&
-    context.databases.contains(PetClinic::Database::"Clinic B")
+    principal is PetClinic::Veterinarian,
+    action in PetClinic::Action::"EditOperations",
+    resource
+)
+when {
+    principal.level == PetClinic::Level::"Intern"
+};
+
+// 'policy7'
+// Only a Senior or Specialist Veterinarian can delete their clients' data.
+@id("Policy: Senior or Specialist Veterinarian can delete their clients.")
+permit (
+    principal is PetClinic::Veterinarian,
+    action in PetClinic::Action::"DeleteOperations",
+    resource
+)
+when {
+    resource has veterinarians &&
+    principal in resource.veterinarians &&
+    (
+        principal.level == PetClinic::Level::"Senior" ||
+        principal.level == PetClinic::Level::"Specialist"
+    ) &&
+    (
+        action in PetClinic::Action::"OwnerOperations" ||
+        action in PetClinic::Action::"PetOperations" ||
+        action in PetClinic::Action::"VisitOperations"
+    )
+};
+
+// 'policy8'
+// No Principal can view data from a Clinic they are not assigned to.
+@id("Policy: Principal cannot view data from another Clinic.")
+forbid (
+    principal,
+    action,
+    resource
+)
+when {
+    principal has clinics &&
+    resource has clinics &&
+    !resource.clinics.containsAny(principal.clinics)
+}
+unless {
+    principal is PetClinic::Administrator
 };

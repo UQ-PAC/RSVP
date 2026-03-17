@@ -19,6 +19,17 @@ You can start the application on the command-line as follows:
 
 You can then access the Petclinic at <http://localhost:8080/>.
 
+The command above will load the default Cedar files:
+- Schema: `src/main/resources/cedar/rsvp/petclinic-rsvp-schema.cedarschema`
+- Entities: `src/main/resources/cedar/rsvp/petclinic-rsvp-entities.json`
+- Policy: `src/main/resources/cedar/rsvp/petclinic-rsvp-policy.cedar`
+
+You can change the default Cedar Policy by running, instead:
+
+```bash
+./gradlew bootRun --no-daemon --args="--policy.file=<another-policy.cedar>"
+```
+
 ## Database configuration
 
 In its default configuration, Petclinic uses an in-memory database (H2) which gets populated at startup with data.

@@ -143,7 +143,6 @@
         "uid": { "type": "PetClinic::Pet", "id": "Leo" },
         "attrs": {
             "name": "Leo",
-            "birthDate": { "__extn": { "fn": "datetime", "arg": "2010-09-07" } },
             "owner": { "__entity": { "type": "PetClinic::Owner", "id": "George Franklin" } },
             "clinic": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } },
@@ -159,7 +158,6 @@
         "uid": { "type": "PetClinic::Pet", "id": "Rosy" },
         "attrs": {
             "name": "Rosy",
-            "birthDate": { "__extn": { "fn": "datetime", "arg": "2011-04-17" } },
             "owner": { "__entity": { "type": "PetClinic::Owner", "id": "Eduardo Rodriquez" } },
             "clinic": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "B" } }
@@ -174,7 +172,6 @@
         "uid": { "type": "PetClinic::Pet", "id": "Jewel" },
         "attrs": {
             "name": "Jewel",
-            "birthDate": { "__extn": { "fn": "datetime", "arg": "2010-03-07" } },
             "owner": { "__entity": { "type": "PetClinic::Owner", "id": "Eduardo Rodriquez" } },
             "clinic": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "B" } }
@@ -189,7 +186,6 @@
         "uid": { "type": "PetClinic::Pet", "id": "Samantha" },
         "attrs": {
             "name": "Samantha",
-            "birthDate": { "__extn": { "fn": "datetime", "arg": "2012-09-04" } },
             "owner": { "__entity": { "type": "PetClinic::Owner", "id": "Jean Coleman" } },
             "clinic": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } }
@@ -205,7 +201,6 @@
         "uid": { "type": "PetClinic::Pet", "id": "Max" },
         "attrs": {
             "name": "Max",
-            "birthDate": { "__extn": { "fn": "datetime", "arg": "2012-09-04" } },
             "owner": { "__entity": { "type": "PetClinic::Owner", "id": "Jean Coleman" } },
             "clinic": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } }
@@ -221,7 +216,6 @@
         "uid": { "type": "PetClinic::Pet", "id": "Lucky" },
         "attrs": {
             "name": "Lucky",
-            "birthDate": { "__extn": { "fn": "datetime", "arg": "2010-06-24" } },
             "owner": { "__entity": { "type": "PetClinic::Owner", "id": "Carlos Estaban" } },
             "clinic": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } }
@@ -236,7 +230,6 @@
         "uid": { "type": "PetClinic::Pet", "id": "Sly" },
         "attrs": {
             "name": "Sly",
-            "birthDate": { "__extn": { "fn": "datetime", "arg": "2012-06-08" } },
             "owner": { "__entity": { "type": "PetClinic::Owner", "id": "Carlos Estaban" } },
             "clinic": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } }

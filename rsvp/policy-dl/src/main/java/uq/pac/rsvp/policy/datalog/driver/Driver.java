@@ -1,26 +1,37 @@
 package uq.pac.rsvp.policy.datalog.driver;
 
+import com.cedarpolicy.AuthorizationEngine;
+import com.cedarpolicy.BasicAuthorizationEngine;
+import com.cedarpolicy.model.AuthorizationRequest;
+import com.cedarpolicy.model.AuthorizationResponse;
+import com.cedarpolicy.model.AuthorizationSuccessResponse;
+import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.exception.AuthException;
+import com.cedarpolicy.model.policy.PolicySet;
+import com.cedarpolicy.model.schema.Schema;
 import com.google.devtools.common.options.OptionsParser;
 import org.fusesource.jansi.Ansi;
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestAuth;
+import uq.pac.rsvp.policy.datalog.util.Logger;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import static org.fusesource.jansi.Ansi.Color.*;
-import static org.fusesource.jansi.Ansi.ansi;
+import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
 public class Driver {
 
+    private static final Logger logger = new Logger();
+
     private static void error(String message) {
-        System.err.println(colour(RED, "ERROR: ") + message);
+        logger.error(message);
         System.exit(1);
     }
 
@@ -54,10 +65,6 @@ public class Driver {
         return null;
     }
 
-    public static String colour(Ansi.Color color, Object text) {
-        return ansi().fg(color).a(text).reset().toString();
-    }
-
     record ExpectedRequest(Request request, RequestAuth.Decision expectation) {}
 
     public static void main(String[] args) throws IOException, AuthException, InterruptedException, RsvpException {
@@ -70,52 +77,55 @@ public class Driver {
         Path policyFile = requiredFile(optionsMap, "policies");
         Path entitiesFile = requiredFile(optionsMap, "entities");
         String dlDir = requiredOpt(optionsMap, "datalog-dir", String.class);
-
-        Path authRequests = requiredFile(optionsMap, "requests");
-        List<ExpectedRequest> requests = Files.readAllLines(authRequests).stream()
-                .map(String::trim)
-                .filter(s -> !s.isEmpty() && !s.startsWith("#"))
-                .map(s -> {
-                    String [] parts = s.split("\\s+");
-                    if (parts.length != 4) {
-                        error("Malformed request string (expected 4 items): " + s);
-                    }
-                    Request req = new Request(parts[0], parts[1], parts[2]);
-                    RequestAuth.Decision exp = null;
-                    try {
-                        exp = RequestAuth.Decision.valueOf(parts[3].toUpperCase());
-                    } catch (IllegalArgumentException e) {
-                        error("Malformed request string (invalid expected name): " + s);
-                    }
-                    return new ExpectedRequest(req, exp);
-                })
-                .toList();
-
         Path dlPath = Path.of(dlDir);
-        RequestAuth auth = RequestAuth.load(schemaFile, policyFile, entitiesFile, dlPath);
 
-        if (requests.isEmpty()) {
-            System.out.println(colour(RED, "No requests found"));
-        } else {
-            System.out.println(ansi().bold().fgBlue()
-                    .a("Principal\tResource\tAction\n===============================")
-                    .reset());
-        }
+        RequestAuth rsvpAuth = RequestAuth.load(schemaFile, policyFile, entitiesFile, dlPath);
+        AuthorizationEngine cedarAuth = new BasicAuthorizationEngine();
+        Entities cedarEntities = Entities.parse(entitiesFile);
 
-        for (ExpectedRequest req : requests) {
-            RequestAuth.Decision result = auth.authorize(req.request);
-            Ansi.Color colour;
-            String resultStr;
-            if (req.expectation == result) {
-                colour = GREEN;
-                resultStr = "OK";
-            } else {
-                colour = RED;
-                resultStr = "FAIL: expected %s, got %s".formatted(req.expectation, result);
+        Schema cedarSchema = Schema.parse(Schema.JsonOrCedar.Cedar, Files.readString(schemaFile));
+        PolicySet cedarPolicies = PolicySet.parsePolicies(policyFile);
+
+        int [] rsvpRequestCounter = new int [2];
+        int [] cedarRequestCounter = new int [2];
+        for (Request rsvpRequest : rsvpAuth.getActionableRequests()) {
+            RequestAuth.Decision rsvpDecision = rsvpAuth.authorize(rsvpRequest);
+            require(rsvpDecision == RequestAuth.Decision.Deny ||
+                    rsvpDecision == RequestAuth.Decision.Allow);
+
+            AuthorizationRequest cedarRequest = rsvpRequest.getCedarRequest(cedarSchema);
+            AuthorizationResponse cedarResponse =
+                    cedarAuth.isAuthorized(cedarRequest, cedarPolicies, cedarEntities);
+
+            if (!cedarResponse.type.equals(AuthorizationResponse.SuccessOrFailure.Success)) {
+                error(cedarResponse.errors.orElseThrow(AssertionError::new).toString());
             }
-            resultStr = colour(colour, resultStr);
-            System.out.println(colour(YELLOW, req.request) + ": " + resultStr);
+
+            AuthorizationSuccessResponse cedarSuccess =
+                    cedarResponse.success.orElseThrow(AssertionError::new);
+            AuthorizationSuccessResponse.Decision cedarDecision = cedarSuccess.getDecision();
+
+            if (cedarDecision == AuthorizationSuccessResponse.Decision.Allow &&
+                    rsvpDecision == RequestAuth.Decision.Allow) {
+                logger.info(GREEN, rsvpRequest + ":  " + rsvpDecision);
+            } else if (cedarDecision == AuthorizationSuccessResponse.Decision.Deny &&
+                    rsvpDecision == RequestAuth.Decision.Deny) {
+                logger.info(RED, rsvpRequest + ":  " + rsvpDecision);
+            } else {
+                logger.error(rsvpRequest + ":  RSVP: " + rsvpDecision + " / Cedar:" + cedarDecision);
+            }
+            cedarRequestCounter[cedarDecision.ordinal()]++;
+            rsvpRequestCounter[rsvpDecision.ordinal()]++;
         }
+        logger.bold().info(GREEN, "RSVP Requests (allow/deny): %d/%d\n",
+                        rsvpAuth.getActionableRequests().size(), rsvpRequestCounter[0], rsvpRequestCounter[1]);
+        logger.bold().info(BLUE, "Cedar Requests (allow/deny): %d/%d\n",
+                        rsvpAuth.getActionableRequests().size(), cedarRequestCounter[0], cedarRequestCounter[1]);
+
+        if (!Arrays.equals(rsvpRequestCounter, cedarRequestCounter)) {
+            error("Mismatched requests decisions found");
+        }
+
         System.exit(0);
     }
 }

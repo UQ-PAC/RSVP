@@ -8,6 +8,7 @@ import com.cedarpolicy.model.schema.Schema;
 import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.policy.PolicySet;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,10 +28,11 @@ public class CedarService {
 
 	private final Schema schema;
 
-	public CedarService() {
+	public CedarService(@Value("${policy.file:petclinic-rsvp-policy.cedar}") String policyFile) {
 		try {
 			this.policySet = PolicySet
-				.parsePolicies(Path.of("src/main/resources/cedar/rsvp/petclinic-rsvp-policy.cedar"));
+				.parsePolicies(Path.of("src/main/resources/cedar/rsvp/" + policyFile));
+			System.out.println(System.lineSeparator() + "Cedar Policy loaded: " + policyFile + System.lineSeparator());
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Failed to parse Cedar Policy.", e);

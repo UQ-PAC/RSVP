@@ -34,7 +34,7 @@ public class TranslationTest {
 
     @BeforeAll
     static void configure() {
-        logger.setLevel(Logger.Level.Info);
+        logger.setLevel(Logger.Level.Warning);
     }
 
     private static class TestInput {
@@ -78,7 +78,7 @@ public class TranslationTest {
         }
     }
 
-    private final static String ONE_OFF = "set";
+    private final static String ONE_OFF = "gdrive";
 
     // Running tests for one directory separately for no particular
     // reason apart from being able to launch it separately

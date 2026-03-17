@@ -27,7 +27,6 @@ namespace PetClinic {
 
     entity Pet = {
         name: String,
-		birthDate: datetime,
         owner: Owner,
         clinic: Set<Clinic>,
         veterinarians: Set<Veterinarian>

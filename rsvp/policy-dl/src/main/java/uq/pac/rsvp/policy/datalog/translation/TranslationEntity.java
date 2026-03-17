@@ -47,7 +47,7 @@ public class TranslationEntity {
             case EntityUID e -> addFact.accept(DLTerm.lit(getEUIDString(e)));
             case CedarList lst -> lst.forEach(v -> addAttributeFacts(v, euid, attr, statements));
             case CedarMap map -> {
-                EntityUID recEuid = Naming.getEUID();
+                EntityUID recEuid = TranslationConstants.getRandomTmpEUID();
                 DLTerm recTerm = getEUIDLiteral(recEuid);
                 addAttributeFacts(recEuid, euid, attr, statements);
                 map.forEach((at, vl) -> addAttributeFacts(vl, recTerm, at, statements));

@@ -11,6 +11,16 @@ import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.Attrib
 import static uq.pac.rsvp.policy.datalog.translation.TranslationError.error;
 
 public class OperandVisitor extends ValueVisitorAdapter<DLTerm> {
+
+    // Get a temporary variable. Here we assume that we are generating policies
+    // over input variables 'principal', 'resource' and 'action', any variable names
+    // other than that should be fine
+    private int varCounter = 0;
+    private final static String VAR_PREFIX = "var";
+    private DLTerm getTmpVar() {
+        return DLTerm.var(VAR_PREFIX + varCounter++);
+    }
+
     private final List<DLRuleExpr> expressions;
 
     public OperandVisitor() {
@@ -43,9 +53,9 @@ public class OperandVisitor extends ValueVisitorAdapter<DLTerm> {
 
     @Override
     public DLTerm visitPropertyAccessExpr(PropertyAccessExpression expr) {
-        DLTerm lhs = expr.getObject().compute(this);
-        DLTerm attr = DLTerm.lit(expr.getProperty());
-        DLVar rhs = Naming.getDLVar();
+        DLTerm lhs = expr.getObject().compute(this),
+                attr = DLTerm.lit(expr.getProperty()),
+                rhs = getTmpVar();
         this.expressions.add(new DLAtom(AttributeRuleDecl, lhs, attr, rhs));
         return rhs;
     }

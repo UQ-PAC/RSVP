@@ -78,6 +78,13 @@ public class Translation {
                 throw new TranslationError("Unsupported entity name: " + en);
             }
         }
+
+        // Make sure that the name of the internal record type used for processing records is not used in the schema
+        rsvpSchema.entityTypes().forEach(et -> {
+            if (et.getName().equals(TmpRecordType.getName())) {
+                throw new TranslationError("Internal record type: " + et.getName() + "in schema");
+            }
+        });
     }
 
     public static DLProgram translate(Path schemaFile, Path policiesFile, Path entitiesFile) throws IOException, AuthException, RsvpException {

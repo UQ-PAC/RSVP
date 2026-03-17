@@ -1,5 +1,6 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
+import com.cedarpolicy.value.EntityTypeName;
 import com.cedarpolicy.value.EntityUID;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
@@ -8,6 +9,7 @@ import uq.pac.rsvp.policy.datalog.ast.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Constants used throughout the translation of Cedar to datalog
@@ -191,4 +193,19 @@ public class TranslationConstants {
                     DLDeclTerm.symbolic("uid"),
                     DLDeclTerm.symbolic("attr"),
                     DLDeclTerm.symbolic("value"));
+
+    /**
+     * Temporary entity type. This type is used to generate internal EUID's
+     * to aid with record/atribute processing
+     */
+    public static EntityTypeDefinition TmpRecordType =
+            new EntityTypeDefinition("RSVP::DL::Tmp::Record::Attr::Type");
+
+    /**
+     * Generate a random EUID based on the {@link TranslationConstants#TmpRecordType}
+     */
+    public static EntityUID getRandomTmpEUID() {
+        return EntityUID.parse("%s::\"%s\"".formatted(TranslationConstants.TmpRecordType.getName(), UUID.randomUUID()))
+                .orElseThrow();
+    }
 }

@@ -135,28 +135,48 @@ public class TranslationVisitor extends VoidVisitorAdapter {
     public void visitCallExpr(CallExpression expr) {
         switch (expr.getFunc()) {
             case "contains" -> {
+                // Contains uses a single argument
                 require(expr.getArgs().size() == 1);
                 DLTerm argument = getOperand(expr.getArgs().getFirst());
 
+                // x.y.contains(z) form ->
+                //    count : { Attribute(x, y, z) } >= 1 (positive)
+                //    count : { Attribute(x, y, z) } < 1  (negative)
+                // In addition, we are adding HasAttribute(x, y), as otherwise
+                // the negated form counts in undefined entities
                 if (expr.getSelf() instanceof PropertyAccessExpression pe) {
+                    DLTerm propertyTerm = DLTerm.lit(pe.getProperty());
                     DLTerm set = getOperand(pe.getObject());
+                    // Count term
                     DLTerm aggregate = new DLAggregate(DLAggregate.Aggregate.COUNT,
-                            new DLAtom(AttributeRuleDecl, set, DLTerm.lit(pe.getProperty()), argument));
+                            new DLAtom(AttributeRuleDecl, set, propertyTerm, argument));
+                    // Negation-based operator
                     DLConstraint.Operator op = negated ? DLConstraint.Operator.LT : DLConstraint.Operator.GTE;
+                    expressions.add(new DLAtom(HasAttributeRuleDecl, set, propertyTerm));
                     expressions.add(new DLConstraint(aggregate, DLTerm.lit(1), op));
                 } else {
                     throw new TranslationError("Unsupported set.contains() form: " + expr);
                 }
             }
             case "isEmpty" -> {
+                // isEmpty has no arguments
                 require(expr.getArgs().isEmpty());
+
+                // x.y.isEmpty() form ->
+                //    count : { Attribute(x, y, z) } = 0 (positive)
+                //    count : { Attribute(x, y, z) } > 0 (negative)
+                // In addition, we are adding HasAttribute(x, y), as otherwise
+                // the negated form counts in undefined entities
                 if (expr.getSelf() instanceof PropertyAccessExpression pe) {
+                    DLTerm propertyTerm = DLTerm.lit(pe.getProperty());
                     DLTerm set = getOperand(pe.getObject());
                     DLTerm aggregate = new DLAggregate(DLAggregate.Aggregate.COUNT,
                             new DLAtom(AttributeRuleDecl, set, DLTerm.lit(pe.getProperty()), new DLVar("_")));
-                    expressions.add(new DLConstraint(aggregate, DLTerm.lit(0), DLConstraint.Operator.EQ));
+                    DLConstraint.Operator op = negated ? DLConstraint.Operator.GT : DLConstraint.Operator.EQ;
+                    expressions.add(new DLAtom(HasAttributeRuleDecl, set, propertyTerm));
+                    expressions.add(new DLConstraint(aggregate, DLTerm.lit(0), op));
                 } else {
-                    throw new TranslationError("Unsupported set.contains() form: " + expr);
+                    throw new TranslationError("Unsupported set.isEmpty() form: " + expr);
                 }
             }
             default -> throw new TranslationError("Unsupported function: " + expr.getFunc());

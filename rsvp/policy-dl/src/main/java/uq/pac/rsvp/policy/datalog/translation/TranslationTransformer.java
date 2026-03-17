@@ -27,6 +27,14 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
         return expr.compute(TRANSFORMER);
     }
 
+    Expression compute(Expression expr) {
+        return expr.compute(this);
+    }
+
+    List<Expression> compute(List<Expression> expr) {
+        return expr.stream().map(this::compute).toList();
+    }
+
     @Override
     public Expression visitBinaryExpr(BinaryExpression expr) {
         Expression lhs = expr.getLeft().compute(this);
@@ -43,24 +51,38 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
             }
             return result;
         } else {
-            return new BinaryExpression(lhs, expr.getOp(), expr.getRight().compute(this));
+            return new BinaryExpression(lhs, expr.getOp(), compute(expr.getRight()));
         }
     }
 
     @Override
     public Expression visitUnaryExpr(UnaryExpression expr) {
-        return expr;
+        return new UnaryExpression(expr.getOp(), compute(expr.getExpression()));
     }
 
     // Atomic predicate expressions
     @Override
     public Expression visitCallExpr(CallExpression expr) {
-        return expr;
+        return new CallExpression(compute(expr.getSelf()), expr.getFunc(), compute(expr.getArgs()));
     }
 
     @Override
     public Expression visitPropertyAccessExpr(PropertyAccessExpression expr) {
-        return expr;
+        return new PropertyAccessExpression(compute(expr.getObject()), expr.getProperty());
+    }
+
+    @Override
+    public Expression visitConditionalExpr(ConditionalExpression expr) {
+        // Transform expressions of the form
+        ///  if x then y else z to
+        // (x && y) || (!x && z)
+        Expression cond = compute(expr.getCondition()),
+                then = compute(expr.getThen()),
+                els = compute(expr.getElse());
+
+        Expression notCond = new UnaryExpression(Not, cond);
+        return new BinaryExpression(new BinaryExpression(cond, And, then), Or,
+                new BinaryExpression(notCond, And, els));
     }
 
     @Override
@@ -112,20 +134,6 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
     @Override
     public Expression visitPolicy(Policy policy) {
         throw new TranslationError("Unsupported transformation for: " + policy);
-    }
-
-    @Override
-    public Expression visitConditionalExpr(ConditionalExpression expr) {
-        // Transform expressions of the form
-        ///  if x then y else z to
-        // (x && y) || (!x && z)
-        Expression cond = expr.getCondition().compute(this),
-            then = expr.getThen().compute(this),
-            els = expr.getElse().compute(this);
-
-        Expression notCond = new UnaryExpression(Not, cond);
-        return new BinaryExpression(new BinaryExpression(cond, And, then), Or,
-                new BinaryExpression(notCond, And, els));
     }
 
     @Override

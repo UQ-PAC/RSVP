@@ -9,10 +9,6 @@ import uq.pac.rsvp.policy.datalog.ast.*;
  * needs to be converted to numeric using built-in to_number functor of souffle.
  * This visitor determines symbolic or numeric context and provides functionality to
  * add functors based on the context.
- *
- * FIXME: For the moment strings cab be mixed up with datalog entity names at the datalog level
- *        One way aroud it is to add unique prefixes, say 'uid:' for entity identifiers and
- *        'str:' for strings. These prefixes can further be extended to capture types
  */
 public class TypeContextVisitor extends ValueVisitorAdapter<TypeContextVisitor.Context> {
 

@@ -64,7 +64,7 @@ public class TranslationAction {
             List<DLStatement> apRules = def.getAppliesToPrincipalTypes().stream()
                     .map(e -> {
                         DLRuleDecl tn = translationSchema.getTranslationEntityType(e.getName()).getEntityRuleDecl();
-                        DLAtom tail = new DLAtom(tn.getName(), PrincipalVar);
+                        DLAtom tail = new DLAtom(tn, PrincipalVar);
                         return (DLStatement) new DLRule(headWP, tail);
                     }).toList();
             actionPrincipalRules.addAll(apRules);
@@ -73,7 +73,7 @@ public class TranslationAction {
             List<DLStatement> arRules = def.getAppliesToResourceTypes().stream()
                     .map(e -> {
                         DLRuleDecl tn = translationSchema.getTranslationEntityType(e.getName()).getEntityRuleDecl();
-                        DLAtom tail = new DLAtom(tn.getName(), PrincipalVar);
+                        DLAtom tail = new DLAtom(tn, PrincipalVar);
                         return (DLStatement) new DLRule(headWR, tail);
                     }).toList();
             actionResourceRules.addAll(arRules);

@@ -187,7 +187,7 @@ public class Translation {
                 .add(PermitRuleDecl);
         DLAtom permit = makeStandardAtom(PermitRuleDecl);
         for (TranslationPolicy policy : translationPolicies.getPermitTranslation()) {
-            DLAtom policyPermit = makeStandardAtom(policy.getName());
+            DLAtom policyPermit = makeStandardAtom(policy.getDeclaration());
             builder.add(new DLRule(permit, policyPermit));
         }
 
@@ -195,7 +195,7 @@ public class Translation {
                 .add(ForbidRuleDecl);
         DLAtom forbid = makeStandardAtom(ForbidRuleDecl);
         for (TranslationPolicy policy : translationPolicies.getForbidTranslation()) {
-            DLAtom policyForbid = makeStandardAtom(policy.getName());
+            DLAtom policyForbid = makeStandardAtom(policy.getDeclaration());
             builder.add(new DLRule(forbid, policyForbid));
         }
 

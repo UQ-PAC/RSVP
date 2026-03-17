@@ -27,10 +27,6 @@ public class DLProgram extends DLNode {
         this(null, statements);
     }
 
-    public static Builder builder(String name) {
-        return new Builder(name);
-    }
-
     @Override
     public String stringify() {
         return String.join("\n", statements.stream().map(DLStatement::toString).toList());
@@ -44,7 +40,7 @@ public class DLProgram extends DLNode {
         return false;
     }
 
-    Stream<DLStatement> statements() {
+    public Stream<DLStatement> statements() {
         return statements.stream();
     }
 
@@ -75,17 +71,12 @@ public class DLProgram extends DLNode {
             return this;
         }
 
-        public Builder fact(String relation, DLTerm ...terms) {
-            return add(new DLFact(new DLAtom(relation, Arrays.stream(terms).toList())));
+        public Builder fact(DLRuleDecl decl, DLTerm ...terms) {
+            return add(new DLFact(decl, terms));
         }
 
         public DLProgram build() {
             return new DLProgram(name, statements);
-        }
-
-        public Builder reset() {
-            statements.clear();
-            return this;
         }
     }
 

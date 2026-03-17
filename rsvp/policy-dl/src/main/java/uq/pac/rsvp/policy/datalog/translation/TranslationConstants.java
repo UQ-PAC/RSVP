@@ -40,20 +40,12 @@ public class TranslationConstants {
     /**
      * Make an atom of the form <name>(principal, resource, action)
     */
-    public static DLAtom makeStandardAtom(String name) {
-        return new DLAtom(name, PrincipalVar, ResourceVar, ActionVar);
-    }
-
-    public static DLAtom makeStandardAtom(DLRuleDecl decl, boolean negate) {
-        return new DLAtom(decl.getName(), negate, PrincipalVar, ResourceVar, ActionVar);
-    }
-
     public static DLAtom makeStandardAtom(DLRuleDecl decl) {
         return makeStandardAtom(decl, false);
     }
 
-    public static DLAtom makeNegatedStandardAtom(DLRuleDecl decl) {
-        return makeStandardAtom(decl, true);
+    public static DLAtom makeStandardAtom(DLRuleDecl decl, boolean negate) {
+        return new DLAtom(decl, negate, PrincipalVar, ResourceVar, ActionVar);
     }
 
     /**
@@ -120,7 +112,7 @@ public class TranslationConstants {
     public static DLSegment makePermittedRequestsRule() {
         DLRule rule = new DLRule(makeStandardAtom(PermittedRequestsRuleDecl),
                 makeStandardAtom(PermitRuleDecl),
-                makeNegatedStandardAtom(ForbidRuleDecl));
+                makeStandardAtom(ForbidRuleDecl, true));
         return new DLSegment(PermittedRequestsRuleDecl, rule);
     }
 
@@ -138,7 +130,7 @@ public class TranslationConstants {
     public static DLSegment makeForbiddenRequestsRule() {
         DLRule rule = new DLRule(makeStandardAtom(ForbiddenRequestsRuleDecl),
                 makeStandardAtom(ActionableRequestsRuleDecl),
-                makeNegatedStandardAtom(PermittedRequestsRuleDecl));
+                makeStandardAtom(PermittedRequestsRuleDecl, true));
         return new DLSegment(ForbiddenRequestsRuleDecl, rule);
     }
 

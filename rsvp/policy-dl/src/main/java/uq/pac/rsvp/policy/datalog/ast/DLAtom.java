@@ -11,44 +11,35 @@ import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
  *   Atom := IDENT '(' Term [ ',' Term ]* ')'
  * </code>
  */
-public final class DLAtom extends DLRuleExpr {
-    private final String name;
+public class DLAtom extends DLRuleExpr {
+    private final DLRuleDecl decl;
     private final List<DLTerm> terms;
-    // FIXME: Break atoms into expression/non-expression
-    private final boolean negate;
+    private final boolean negated;
 
-    public DLAtom(String name, boolean negate, List<DLTerm> terms) {
-        this.name = name;
+    public DLAtom(DLRuleDecl decl, boolean negated, List<DLTerm> terms) {
+        this.decl = decl;
         this.terms = terms.stream().toList();
-        this.negate = negate;
+        this.negated = negated;
         require(!terms.isEmpty());
     }
 
-    public DLAtom(DLRuleDecl decl, boolean negate, DLTerm ...terms) {
-        this(decl.getName(), negate, Arrays.stream(terms).toList());
+    public DLAtom(DLRuleDecl decl, List<DLTerm> terms) {
+        this(decl, false, terms);
     }
 
-    public DLAtom(String name, boolean negate, DLTerm ...terms) {
-        this(name, negate, Arrays.stream(terms).toList());
+    public DLAtom(DLRuleDecl decl, boolean negate, DLTerm ...terms) {
+        this(decl, negate, Arrays.stream(terms).toList());
     }
 
     public DLAtom(DLRuleDecl decl, DLTerm ...terms) {
-        this(decl.getName(), Arrays.stream(terms).toList());
-    }
-
-    public DLAtom(String name, DLTerm ...terms) {
-        this(name, Arrays.stream(terms).toList());
-    }
-
-    public DLAtom(String name, List<DLTerm> terms) {
-        this(name, false, terms);
+        this(decl, false, Arrays.stream(terms).toList());
     }
 
     public List<DLTerm> getTerms() {
         return terms;
     }
 
-    DLTerm get(int index) {
+    public DLTerm getTerm(int index) {
         return terms.get(index);
     }
 
@@ -56,19 +47,21 @@ public final class DLAtom extends DLRuleExpr {
         return terms.size();
     }
 
+    public DLRuleDecl getDecl() {
+        return decl;
+    }
+
     public String getName() {
-        return name;
+        return decl.getName();
     }
 
     public boolean isNegated() {
-        return negate;
+        return negated;
     }
 
     @Override
     protected String stringify() {
-        return  (negate ? "!" : "") +
-                name +
+        return (isNegated() ? "!" : "") +  decl.getName() +
                 "(" + String.join(", ", terms.stream().map(DLTerm::toString).toList()) + ")";
     }
-
 }

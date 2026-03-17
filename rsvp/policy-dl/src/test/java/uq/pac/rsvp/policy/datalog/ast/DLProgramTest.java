@@ -44,17 +44,17 @@ public class DLProgramTest {
 
         builder.comment("Facts")
             .add(edge)
-            .fact("edge", DLTerm.lit(1), DLTerm.lit(2))
-            .fact("edge", DLTerm.lit(2), DLTerm.lit(3))
+            .fact(edge, DLTerm.lit(1), DLTerm.lit(2))
+            .fact(edge, DLTerm.lit(2), DLTerm.lit(3))
             .comment("Closure")
             .add(path)
             .add(new DLRule(
-                new DLAtom("path", DLTerm.var("x"), DLTerm.var("y")),
-                new DLAtom("edge", DLTerm.var("x"), DLTerm.var("y"))))
+                new DLAtom(path, DLTerm.var("x"), DLTerm.var("y")),
+                new DLAtom(edge, DLTerm.var("x"), DLTerm.var("y"))))
             .add(new DLRule(
-                new DLAtom("path", DLTerm.var("x"), DLTerm.var("y")),
-                new DLAtom("path", DLTerm.var("x"), DLTerm.var("z")),
-                new DLAtom("path", DLTerm.var("z"), DLTerm.var("y"))))
+                new DLAtom(path, DLTerm.var("x"), DLTerm.var("y")),
+                new DLAtom(path, DLTerm.var("x"), DLTerm.var("z")),
+                new DLAtom(path, DLTerm.var("z"), DLTerm.var("y"))))
             .comment("Output")
             .add(new DLOutputDirective(path));
 

@@ -388,83 +388,159 @@
     },
 
     {
-        "uid": { "type": "PetClinic::Action", "id": "ViewOwner" },
+        "uid": { "type": "PetClinic::Action", "id": "OwnerOperations" },
         "attrs": { },
         "parents": [ ]
+    },
+    {
+        "uid": { "type": "PetClinic::Action", "id": "PetOperations" },
+        "attrs": { },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "PetClinic::Action", "id": "VisitOperations" },
+        "attrs": { },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "PetClinic::Action", "id": "VeterinarianOperations" },
+        "attrs": { },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "PetClinic::Action", "id": "SecretaryOperations" },
+        "attrs": { },
+        "parents": [ ]
+    },
+
+    {
+        "uid": { "type": "PetClinic::Action", "id": "ViewOwner" },
+        "attrs": { },
+        "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "OwnerOperations" } }
+        ]
     },{
         "uid": { "type": "PetClinic::Action", "id": "AddOwner" },
         "attrs": { },
-        "parents": [ ]
+        "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "OwnerOperations" } }
+        ]
     },{
         "uid": { "type": "PetClinic::Action", "id": "EditOwner" },
         "attrs": { },
         "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "OwnerOperations" } },
             { "__entity": { "type": "PetClinic::Action", "id": "EditOperations" } }
         ]
     },{
         "uid": { "type": "PetClinic::Action", "id": "DeleteOwner" },
         "attrs": { },
         "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "OwnerOperations" } },
             { "__entity": { "type": "PetClinic::Action", "id": "DeleteOperations" } }
         ]
     },{
         "uid": { "type": "PetClinic::Action", "id": "ViewPet" },
         "attrs": { },
-        "parents": [ ]
+        "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "PetOperations" } }
+        ]
     },{
         "uid": { "type": "PetClinic::Action", "id": "AddPet" },
         "attrs": { },
-        "parents": [ ]
+        "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "PetOperations" } }
+        ]
     },{
         "uid": { "type": "PetClinic::Action", "id": "EditPet" },
         "attrs": { },
         "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "PetOperations" } },
             { "__entity": { "type": "PetClinic::Action", "id": "EditOperations" } }
         ]
     },{
         "uid": { "type": "PetClinic::Action", "id": "DeletePet" },
         "attrs": { },
         "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "PetOperations" } },
             { "__entity": { "type": "PetClinic::Action", "id": "DeleteOperations" } }
         ]
     },{
         "uid": { "type": "PetClinic::Action", "id": "ViewVisit" },
         "attrs": { },
-        "parents": [ ]
+        "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "VisitOperations" } }
+        ]
     },{
         "uid": { "type": "PetClinic::Action", "id": "AddVisit" },
         "attrs": { },
-        "parents": [ ]
+        "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "VisitOperations" } }
+        ]
     },{
         "uid": { "type": "PetClinic::Action", "id": "EditVisit" },
         "attrs": { },
         "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "VisitOperations" } },
             { "__entity": { "type": "PetClinic::Action", "id": "EditOperations" } }
         ]
     },{
         "uid": { "type": "PetClinic::Action", "id": "DeleteVisit" },
         "attrs": { },
         "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "VisitOperations" } },
             { "__entity": { "type": "PetClinic::Action", "id": "DeleteOperations" } }
         ]
     },{
         "uid": { "type": "PetClinic::Action", "id": "ViewVeterinarian" },
         "attrs": { },
-        "parents": [ ]
+        "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "VeterinarianOperations" } }
+        ]
     },{
         "uid": { "type": "PetClinic::Action", "id": "AddVeterinarian" },
         "attrs": { },
-        "parents": [ ]
+        "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "VeterinarianOperations" } }
+        ]
     },{
         "uid": { "type": "PetClinic::Action", "id": "EditVeterinarian" },
         "attrs": { },
         "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "VeterinarianOperations" } },
             { "__entity": { "type": "PetClinic::Action", "id": "EditOperations" } }
         ]
     },{
         "uid": { "type": "PetClinic::Action", "id": "DeleteVeterinarian" },
         "attrs": { },
         "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "VeterinarianOperations" } },
+            { "__entity": { "type": "PetClinic::Action", "id": "DeleteOperations" } }
+        ]
+    },{
+        "uid": { "type": "PetClinic::Action", "id": "ViewSecretary" },
+        "attrs": { },
+        "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "SecretaryOperations" } }
+        ]
+    },{
+        "uid": { "type": "PetClinic::Action", "id": "AddSecretary" },
+        "attrs": { },
+        "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "SecretaryOperations" } }
+        ]
+    },{
+        "uid": { "type": "PetClinic::Action", "id": "EditSecretary" },
+        "attrs": { },
+        "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "SecretaryOperations" } },
+            { "__entity": { "type": "PetClinic::Action", "id": "EditOperations" } }
+        ]
+    },{
+        "uid": { "type": "PetClinic::Action", "id": "DeleteSecretary" },
+        "attrs": { },
+        "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "SecretaryOperations" } },
             { "__entity": { "type": "PetClinic::Action", "id": "DeleteOperations" } }
         ]
     }

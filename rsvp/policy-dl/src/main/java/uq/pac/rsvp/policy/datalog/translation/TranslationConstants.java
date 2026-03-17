@@ -1,6 +1,5 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import com.cedarpolicy.value.EntityTypeName;
 import com.cedarpolicy.value.EntityUID;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;

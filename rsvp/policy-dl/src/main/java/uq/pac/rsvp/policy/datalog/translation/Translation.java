@@ -69,7 +69,7 @@ public class Translation {
         // For the moment we also do not support entity names that have the same
         // delimiter that is used for datalog output (\t)
         List<String> entityNames = entities.getEntities().stream()
-                .map(e -> e.getEUID().getId().getRepr())
+                .map(e -> e.getEUID().getId().toString())
                 .collect(Collectors.toCollection(ArrayList::new));
         rsvpSchema.entityTypes()
                 .forEach(et -> entityNames.addAll(et.getEntityNamesEnum()));

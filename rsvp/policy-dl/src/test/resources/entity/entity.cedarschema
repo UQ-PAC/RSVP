@@ -1,0 +1,8 @@
+entity User enum [ "Alice", "Bob" ];
+entity File;
+
+action introspect appliesTo {
+    principal: [ File ],
+    resource: [ User ]
+};
+

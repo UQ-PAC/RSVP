@@ -107,6 +107,9 @@
             "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } },
                 { "__entity": { "type": "PetClinic::Clinic", "id": "B" } }
+            ],
+            "veterinarians": [
+                { "__entity": { "type": "PetClinic::Veterinarian", "id": "James Carter" } }
             ]
         },
         "parents": [ ]
@@ -121,6 +124,9 @@
             ],
             "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "B" } }
+            ],
+            "veterinarians": [
+                { "__entity": { "type": "PetClinic::Veterinarian", "id": "James Carter" } }
             ]
         },
         "parents": [ ]
@@ -135,6 +141,10 @@
             ],
             "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } }
+            ],
+            "veterinarians": [
+                { "__entity": { "type": "PetClinic::Veterinarian", "id": "Sharon Jenkins" } },
+                { "__entity": { "type": "PetClinic::Veterinarian", "id": "Linda Douglas" } }
             ]
         },
         "parents": [ ]
@@ -149,6 +159,9 @@
             ],
             "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "B" } }
+            ],
+            "veterinarians": [
+                { "__entity": { "type": "PetClinic::Veterinarian", "id": "James Carter" } }
             ]
         },
         "parents": [ ]

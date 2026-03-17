@@ -101,6 +101,9 @@
         "uid": { "type": "PetClinic::Owner", "id": "George Franklin" },
         "attrs": {
             "name": "George Franklin",
+            "pets": [
+                { "__entity": { "type": "PetClinic::Pet", "id": "Leo" } }
+            ],
             "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } },
                 { "__entity": { "type": "PetClinic::Clinic", "id": "B" } }
@@ -112,6 +115,10 @@
         "uid": { "type": "PetClinic::Owner", "id": "Eduardo Rodriquez" },
         "attrs": {
             "name": "Eduardo Rodriquez",
+            "pets": [
+                { "__entity": { "type": "PetClinic::Pet", "id": "Rosy" } },
+                { "__entity": { "type": "PetClinic::Pet", "id": "Jewel" } }
+            ],
             "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "B" } }
             ]
@@ -122,6 +129,10 @@
         "uid": { "type": "PetClinic::Owner", "id": "Jean Coleman" },
         "attrs": {
             "name": "Jean Coleman",
+            "pets": [
+                { "__entity": { "type": "PetClinic::Pet", "id": "Samantha" } },
+                { "__entity": { "type": "PetClinic::Pet", "id": "Max" } }
+            ],
             "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } }
             ]
@@ -132,6 +143,10 @@
         "uid": { "type": "PetClinic::Owner", "id": "Carlos Estaban" },
         "attrs": {
             "name": "Carlos Estaban",
+            "pets": [
+                { "__entity": { "type": "PetClinic::Pet", "id": "Lucky" } },
+                { "__entity": { "type": "PetClinic::Pet", "id": "Sly" } }
+            ],
             "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "B" } }
             ]

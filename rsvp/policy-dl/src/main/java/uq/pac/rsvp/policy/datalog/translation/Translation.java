@@ -77,6 +77,9 @@ public class Translation {
             if (en.indexOf(OUTPUT_DELIMITER) != -1) {
                 throw new TranslationError("Unsupported entity name: " + en);
             }
+            if (en.equals(UndefinedEntityUIDName)) {
+                throw new TranslationError("Internal entity name in schema: " + en);
+            }
         }
 
         // Make sure that the name of the internal record type used for processing records is not used in the schema

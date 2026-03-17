@@ -15,17 +15,6 @@ import java.util.UUID;
  * Constants used throughout the translation of Cedar to datalog
  */
 public class TranslationConstants {
-    // FIXME: Potential clashes
-    public static String UndefinedEntityUIDName = "???";
-
-	/** 
-	 * Get an unknown entity (UID) only. Abstraction over entities that can be given for
-	 * authorisation but are not in the provided list of entities
-	*/	
-    public static EntityUID getUndefinedEUID(TranslationEntityDefinition def) {
-        return EntityUID.parse("%s::\"%s\"".formatted(def.getName(), UndefinedEntityUIDName)).orElseThrow();
-    }
-
     /**
      * The translation revolves around rules of the form using principal, resource
      * and action cedar variables.
@@ -205,7 +194,27 @@ public class TranslationConstants {
      * Generate a random EUID based on the {@link TranslationConstants#TmpRecordType}
      */
     public static EntityUID getRandomTmpEUID() {
-        return EntityUID.parse("%s::\"%s\"".formatted(TranslationConstants.TmpRecordType.getName(), UUID.randomUUID()))
-                .orElseThrow();
+        return getEUID(TmpRecordType, UUID.randomUUID().toString());
     }
+
+    /**
+     * Get a UID from a definition
+     */
+    public static EntityUID getEUID(EntityTypeDefinition def, String uid) {
+        return EntityUID.parse("%s::\"%s\"".formatted(def.getName(), uid)).orElseThrow();
+    }
+
+    /**
+     * UID name denoting an "unknown entity"
+     */
+    public static String UndefinedEntityUIDName = "???";
+
+    /**
+     * Get an unknown entity (UID) only. Abstraction over entities that can be given for
+     * authorisation but are not in the provided list of entities
+     */
+    public static EntityUID getUndefinedEUID(TranslationEntityDefinition def) {
+        return getEUID(def.getEntityDefinition(), UndefinedEntityUIDName);
+    }
+
 }

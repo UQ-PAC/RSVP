@@ -1,7 +1,7 @@
 {
     "principal": "PetClinic::Veterinarian::\"Sharon Jenkins\"",
-    "action": "PetClinic::Action::\"ViewOwner\"",
-    "resource": "PetClinic::Owner::\"George Franklin\"",
+    "action": "PetClinic::Action::\"ViewPet\"",
+    "resource": "PetClinic::Pet::\"Samantha\"",
     "context": { },
     "validateRequest": true
 }

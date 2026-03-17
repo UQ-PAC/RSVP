@@ -23,7 +23,8 @@ namespace PetClinic {
     entity Owner = {
         name: String,
         pets: Set<Pet>,
-        clinics: Set<Clinic>
+        clinics: Set<Clinic>,
+        veterinarians: Set<Veterinarian>
     };
 
     entity Pet = {

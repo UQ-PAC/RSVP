@@ -1,8 +1,6 @@
 package uq.pac.rsvp.policy.datalog.util;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;

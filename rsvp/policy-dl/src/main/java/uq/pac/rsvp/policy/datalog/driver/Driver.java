@@ -10,7 +10,6 @@ import com.cedarpolicy.model.exception.AuthException;
 import com.cedarpolicy.model.policy.PolicySet;
 import com.cedarpolicy.model.schema.Schema;
 import com.google.devtools.common.options.OptionsParser;
-import org.fusesource.jansi.Ansi;
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestAuth;
@@ -20,7 +19,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Map;
 
 import static org.fusesource.jansi.Ansi.Color.*;
@@ -33,11 +31,6 @@ public class Driver {
     private static void error(String message) {
         logger.error(message);
         System.exit(1);
-    }
-
-    private static void printUsage(OptionsParser parser) {
-        System.out.println(parser.describeOptions(Collections.emptyMap(), OptionsParser.HelpVerbosity.LONG));
-        System.exit(2);
     }
 
     private static <E> E requiredOpt(Map<String, Object> options, String option, Class<E> cls) {
@@ -64,8 +57,6 @@ public class Driver {
         }
         return null;
     }
-
-    record ExpectedRequest(Request request, RequestAuth.Decision expectation) {}
 
     public static void main(String[] args) throws IOException, AuthException, InterruptedException, RsvpException {
         OptionsParser parser = OptionsParser.newOptionsParser(DriverOptions.class);

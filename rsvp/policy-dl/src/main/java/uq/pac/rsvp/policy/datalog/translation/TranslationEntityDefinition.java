@@ -1,6 +1,5 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.common.*;
 import uq.pac.rsvp.policy.datalog.ast.DLProgram;
@@ -47,17 +46,6 @@ public class TranslationEntityDefinition {
      * Entity relation declaration
      */
     private final DLRuleDecl entityDecl;
-
-    private final static Set<Class<? extends CommonTypeDefinition>> SUPPORTED_TYPES = Set.of(
-            BooleanType.class,
-            StringType.class,
-            LongType.class,
-            EntityTypeReference.class);
-
-    private boolean isSupportedType(CommonTypeDefinition def) {
-        return SUPPORTED_TYPES.contains(def.getClass()) || def instanceof SetTypeDefinition set &&
-                        SUPPORTED_TYPES.contains(set.getElementType().getClass());
-    }
 
     public TranslationEntityDefinition(EntityTypeDefinition entity) {
         this.entity = entity;

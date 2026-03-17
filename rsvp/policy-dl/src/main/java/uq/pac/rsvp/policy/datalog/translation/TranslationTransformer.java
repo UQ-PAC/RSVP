@@ -9,13 +9,15 @@ import uq.pac.rsvp.policy.datalog.ast.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 import static uq.pac.rsvp.policy.ast.expr.BinaryExpression.BinaryOp.*;
 import static uq.pac.rsvp.policy.ast.expr.UnaryExpression.UnaryOp.*;
+import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
+
 /**
  * Pre-analysis policy transformations
  * - Convert expressions of the form 'e in [e1, e2]' to 'e in e1 || e in e2'
  * - Translate if-conditionals to boolean logic
+ * - Translate set.containsAny/set.containsAll to disjunctions/conjunctions
  */
 public class TranslationTransformer implements PolicyComputationVisitor<Expression> {
 
@@ -32,24 +34,17 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
     }
 
     List<Expression> compute(List<Expression> expr) {
-        return expr.stream().map(this::compute).toList();
+        return expr.stream().map(this::compute).collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override
     public Expression visitBinaryExpr(BinaryExpression expr) {
         Expression lhs = expr.getLeft().compute(this);
         if (expr.getOp() == BinaryExpression.BinaryOp.In && expr.getRight() instanceof SetExpression set) {
-            if (set.getElements().isEmpty()) {
-                return new BooleanExpression(false);
-            }
-            Deque<Expression> deque = set.getElements().stream().map(e -> {
-                return new BinaryExpression(lhs, BinaryExpression.BinaryOp.In, e);
-            }).collect(Collectors.toCollection(LinkedList::new));
-            Expression result = deque.removeFirst();
-            while (!deque.isEmpty()) {
-                result = new BinaryExpression(result, BinaryExpression.BinaryOp.Or, deque.removeFirst());
-            }
-            return result;
+            Expression init = new BooleanExpression(false);
+            return set.getElements().stream()
+                    .map(e ->  (Expression) new BinaryExpression(lhs, In, e))
+                    .reduce(init, (l, r) -> new BinaryExpression(l, Or, r));
         } else {
             return new BinaryExpression(lhs, expr.getOp(), compute(expr.getRight()));
         }
@@ -60,10 +55,38 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
         return new UnaryExpression(expr.getOp(), compute(expr.getExpression()));
     }
 
-    // Atomic predicate expressions
     @Override
     public Expression visitCallExpr(CallExpression expr) {
-        return new CallExpression(compute(expr.getSelf()), expr.getFunc(), compute(expr.getArgs()));
+        Expression self = compute(expr.getSelf());
+        List<Expression> args = compute(expr.getArgs());
+        String fun = expr.getFunc();
+
+        // set.containsAll([a, b]) -> set.contains(a) && set.contains(b)
+        // set.containsAny([a, b]) -> set.contains(a) || set.contains(b)
+        if (fun.equals("containsAll") || fun.contains("containsAny")) {
+            require(expr.getArgs().size() == 1);
+            BinaryExpression.BinaryOp op = fun.equals("containsAny") ? Or : And;
+            if (expr.getArgs().getFirst() instanceof SetExpression set) {
+                List<Expression> elements = new ArrayList<>(set.getElements());
+                if (elements.isEmpty()) {
+                    return new BooleanExpression(false);
+                } else {
+                    Expression init = new CallExpression(self, "contains", List.of(elements.removeFirst()));
+                    return elements.stream()
+                            .map(e -> (Expression) new CallExpression(self, "contains", List.of(e)))
+                            .reduce(init, (l, r) -> new BinaryExpression(l, op, r));
+                }
+            } else {
+                throw new TranslationError("Unsupported arguments for %s: %s"
+                        .formatted(fun, expr.getArgs().toString()));
+            }
+        }
+        return new CallExpression(self, expr.getFunc(), args);
+    }
+
+    @Override
+    public Expression visitSetExpr(SetExpression expr) {
+        return new SetExpression(expr.getElements().stream().map(this::compute).collect(Collectors.toSet()));
     }
 
     @Override
@@ -138,11 +161,6 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
 
     @Override
     public Expression visitSlotExpr(SlotExpression expr) {
-        throw new TranslationError("Unsupported transformation for: " + expr);
-    }
-
-    @Override
-    public Expression visitSetExpr(SetExpression expr) {
         throw new TranslationError("Unsupported transformation for: " + expr);
     }
 }

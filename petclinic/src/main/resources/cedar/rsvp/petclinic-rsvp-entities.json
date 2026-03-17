@@ -40,7 +40,7 @@
         "uid": { "type": "PetClinic::Veterinarian", "id": "James Carter" },
         "attrs": {
             "name": "James Carter",
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } },
                 { "__entity": { "type": "PetClinic::Clinic", "id": "B" } }
             ],
@@ -52,7 +52,7 @@
         "uid": { "type": "PetClinic::Veterinarian", "id": "Linda Douglas" },
         "attrs": {
             "name": "Linda Douglas",
-            "clinic" : [
+            "clinics" : [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } }
             ],
             "level": { "__entity": { "type": "PetClinic::Level", "id": "Specialist" } }
@@ -63,7 +63,7 @@
         "uid": { "type": "PetClinic::Veterinarian", "id": "Sharon Jenkins" },
         "attrs": {
             "name": "Sharon Jenkins",
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } }
             ],
             "level": { "__entity": { "type": "PetClinic::Level", "id": "Resident" } }
@@ -75,7 +75,7 @@
         "uid": { "type": "PetClinic::Secretary", "id": "Bob" },
         "attrs": {
             "name": "Bob",
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } },
                 { "__entity": { "type": "PetClinic::Clinic", "id": "B" } }
             ]
@@ -101,7 +101,7 @@
         "uid": { "type": "PetClinic::Owner", "id": "George Franklin" },
         "attrs": {
             "name": "George Franklin",
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } },
                 { "__entity": { "type": "PetClinic::Clinic", "id": "B" } }
             ]
@@ -112,7 +112,7 @@
         "uid": { "type": "PetClinic::Owner", "id": "Eduardo Rodriquez" },
         "attrs": {
             "name": "Eduardo Rodriquez",
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "B" } }
             ]
         },
@@ -122,7 +122,7 @@
         "uid": { "type": "PetClinic::Owner", "id": "Jean Coleman" },
         "attrs": {
             "name": "Jean Coleman",
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } }
             ]
         },
@@ -132,7 +132,7 @@
         "uid": { "type": "PetClinic::Owner", "id": "Carlos Estaban" },
         "attrs": {
             "name": "Carlos Estaban",
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "B" } }
             ]
         },
@@ -144,7 +144,7 @@
         "attrs": {
             "name": "Leo",
             "owner": { "__entity": { "type": "PetClinic::Owner", "id": "George Franklin" } },
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } },
                 { "__entity": { "type": "PetClinic::Clinic", "id": "B" } }
             ],
@@ -159,7 +159,7 @@
         "attrs": {
             "name": "Rosy",
             "owner": { "__entity": { "type": "PetClinic::Owner", "id": "Eduardo Rodriquez" } },
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "B" } }
             ],
             "veterinarians": [
@@ -173,7 +173,7 @@
         "attrs": {
             "name": "Jewel",
             "owner": { "__entity": { "type": "PetClinic::Owner", "id": "Eduardo Rodriquez" } },
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "B" } }
             ],
             "veterinarians": [
@@ -187,7 +187,7 @@
         "attrs": {
             "name": "Samantha",
             "owner": { "__entity": { "type": "PetClinic::Owner", "id": "Jean Coleman" } },
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } }
             ],
             "veterinarians": [
@@ -202,7 +202,7 @@
         "attrs": {
             "name": "Max",
             "owner": { "__entity": { "type": "PetClinic::Owner", "id": "Jean Coleman" } },
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } }
             ],
             "veterinarians": [
@@ -217,7 +217,7 @@
         "attrs": {
             "name": "Lucky",
             "owner": { "__entity": { "type": "PetClinic::Owner", "id": "Carlos Estaban" } },
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } }
             ],
             "veterinarians": [
@@ -231,7 +231,7 @@
         "attrs": {
             "name": "Sly",
             "owner": { "__entity": { "type": "PetClinic::Owner", "id": "Carlos Estaban" } },
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } }
             ],
             "veterinarians": [
@@ -245,7 +245,7 @@
         "uid": { "type": "PetClinic::Visit", "id": "Samantha 1" },
         "attrs": {
             "pet": { "__entity": { "type": "PetClinic::Pet", "id": "Samantha" } },
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } }
             ],
             "veterinarians": [
@@ -258,7 +258,7 @@
         "uid": { "type": "PetClinic::Visit", "id": "Max 1" },
         "attrs": {
             "pet": { "__entity": { "type": "PetClinic::Pet", "id": "Max" } },
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } }
             ],
             "veterinarians": [
@@ -271,7 +271,7 @@
         "uid": { "type": "PetClinic::Visit", "id": "Max 2" },
         "attrs": {
             "pet": { "__entity": { "type": "PetClinic::Pet", "id": "Max" } },
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } }
             ],
             "veterinarians": [
@@ -285,7 +285,7 @@
         "uid": { "type": "PetClinic::Visit", "id": "Samantha 2" },
         "attrs": {
             "pet": { "__entity": { "type": "PetClinic::Pet", "id": "Samantha" } },
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } }
             ],
             "veterinarians": [
@@ -299,7 +299,7 @@
         "uid": { "type": "PetClinic::Visit", "id": "Rosy 1" },
         "attrs": {
             "pet": { "__entity": { "type": "PetClinic::Pet", "id": "Rosy" } },
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "B" } }
             ],
             "veterinarians": [
@@ -312,7 +312,7 @@
         "uid": { "type": "PetClinic::Visit", "id": "Jewel 1" },
         "attrs": {
             "pet": { "__entity": { "type": "PetClinic::Pet", "id": "Jewel" } },
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "B" } }
             ],
             "veterinarians": [
@@ -325,7 +325,7 @@
         "uid": { "type": "PetClinic::Visit", "id": "Lucky 1" },
         "attrs": {
             "pet": { "__entity": { "type": "PetClinic::Pet", "id": "Lucky" } },
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } }
             ],
             "veterinarians": [
@@ -338,7 +338,7 @@
         "uid": { "type": "PetClinic::Visit", "id": "Sly 1" },
         "attrs": {
             "pet": { "__entity": { "type": "PetClinic::Pet", "id": "Sly" } },
-            "clinic": [
+            "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } }
             ],
             "veterinarians": [

@@ -5,13 +5,13 @@ namespace PetClinic {
 
     entity Veterinarian = {
         name: String,
-        clinic: Set<Clinic>,
+        clinics: Set<Clinic>,
         level: Level
     };
 
     entity Secretary = {
         name: String,
-        clinic: Set<Clinic>
+        clinics: Set<Clinic>
     };
 
     entity Administrator = {
@@ -22,19 +22,19 @@ namespace PetClinic {
 
     entity Owner = {
         name: String,
-        clinic: Set<Clinic>
+        clinics: Set<Clinic>
     };
 
     entity Pet = {
         name: String,
         owner: Owner,
-        clinic: Set<Clinic>,
+        clinics: Set<Clinic>,
         veterinarians: Set<Veterinarian>
     };
 
     entity Visit = {
         pet: Pet,
-        clinic: Set<Clinic>,
+        clinics: Set<Clinic>,
         veterinarians: Set<Veterinarian>
     };
 

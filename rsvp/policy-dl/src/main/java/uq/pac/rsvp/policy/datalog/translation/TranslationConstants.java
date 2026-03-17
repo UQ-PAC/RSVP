@@ -15,6 +15,11 @@ import java.util.UUID;
  */
 public class TranslationConstants {
     /**
+     * Name for the datalog specification the translation to generate
+     */
+    public static String ProgramName = "auth.dl";
+
+    /**
      * The translation revolves around rules of the form using principal, resource
      * and action cedar variables.
      */
@@ -166,13 +171,25 @@ public class TranslationConstants {
 
 	/**
      * Declaration for a ternary attribute relation that associates
-	 * entities to attribute names and respective values 
+	 * entities to attribute names and respective values. Notably, this relation only records
+     * attributes if there are associated values. For instance, for the case when an attribute is
+     * mapped to an empty list it will not be tracked.
 	*/
     public static DLRuleDecl AttributeRuleDecl =
             new DLRuleDecl("Attribute",
                     DLDeclTerm.symbolic("uid"),
                     DLDeclTerm.symbolic("attr"),
                     DLDeclTerm.symbolic("value"));
+
+    /**
+     * As per above Attribute relation we need to be able to tell whether an entity
+     * has an attribute regardless if there are associated values or not. The below
+     * declaration does exactly that. It maps EUIDs to the attributes it has
+     */
+    public static DLRuleDecl HasAttributeRuleDecl =
+            new DLRuleDecl("HasAttribute",
+                    DLDeclTerm.symbolic("uid"),
+                    DLDeclTerm.symbolic("attr"));
 
     /**
      * Temporary entity type. This type is used to generate internal EUID's

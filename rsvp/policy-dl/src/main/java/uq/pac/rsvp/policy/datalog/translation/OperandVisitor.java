@@ -8,6 +8,7 @@ import java.util.List;
 
 import static uq.pac.rsvp.policy.ast.expr.VariableExpression.Reference.Context;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.AttributeRuleDecl;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.HasAttributeRuleDecl;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationError.error;
 
 public class OperandVisitor extends ValueVisitorAdapter<DLTerm> {

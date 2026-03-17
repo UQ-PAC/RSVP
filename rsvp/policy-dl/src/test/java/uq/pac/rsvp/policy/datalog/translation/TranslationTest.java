@@ -113,8 +113,9 @@ public class TranslationTest {
      */
     void differentialTest(TestInput test) throws IOException, AuthException, InterruptedException, RsvpException {
         logger.info(YELLOW, "Policy: " + test.policy)
-                .info(CYAN, Files.readString(test.policy))
-                .info(MAGENTA, "Datalog directory: " + test.datalogDir);
+                .info(MAGENTA, "Datalog specification: " + test.datalogDir + "/" + TranslationConstants.ProgramName)
+                .info(CYAN, Files.readString(test.policy));
+
 
         long lines = Files.readAllLines(test.policy).stream()
                 .map(String::trim)

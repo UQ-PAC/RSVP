@@ -100,7 +100,7 @@ public class TranslationVisitor extends VoidVisitorAdapter {
             case HasAttr -> {
                 DLTerm lhs = getOperand(expr.getLeft()),
                     rhs = getOperand(expr.getRight());
-                expressions.add(new DLAtom(AttributeRuleDecl, lhs, rhs, DLTerm.var("_")));
+                expressions.add(new DLAtom(HasAttributeRuleDecl, lhs, rhs));
             }
             case And, Or -> throw new TranslationError("Unreachable");
             default -> throw new TranslationError("Unsupported: " + expr.getOp());
@@ -142,11 +142,22 @@ public class TranslationVisitor extends VoidVisitorAdapter {
                     DLTerm set = getOperand(pe.getObject());
                     DLTerm aggregate = new DLAggregate(DLAggregate.Aggregate.COUNT,
                             new DLAtom(AttributeRuleDecl, set, DLTerm.lit(pe.getProperty()), argument));
-                    expressions.add(new DLConstraint(aggregate, DLTerm.lit(1), DLConstraint.Operator.GTE));
+                    DLConstraint.Operator op = negated ? DLConstraint.Operator.LT : DLConstraint.Operator.GTE;
+                    expressions.add(new DLConstraint(aggregate, DLTerm.lit(1), op));
                 } else {
                     throw new TranslationError("Unsupported set.contains() form: " + expr);
                 }
-
+            }
+            case "isEmpty" -> {
+                require(expr.getArgs().isEmpty());
+                if (expr.getSelf() instanceof PropertyAccessExpression pe) {
+                    DLTerm set = getOperand(pe.getObject());
+                    DLTerm aggregate = new DLAggregate(DLAggregate.Aggregate.COUNT,
+                            new DLAtom(AttributeRuleDecl, set, DLTerm.lit(pe.getProperty()), new DLVar("_")));
+                    expressions.add(new DLConstraint(aggregate, DLTerm.lit(0), DLConstraint.Operator.EQ));
+                } else {
+                    throw new TranslationError("Unsupported set.contains() form: " + expr);
+                }
             }
             default -> throw new TranslationError("Unsupported function: " + expr.getFunc());
         }

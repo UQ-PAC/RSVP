@@ -122,7 +122,7 @@ public class Translation {
         TranslationSchema translationSchema = new TranslationSchema(schema);
         TranslationEntitySet translationEntities = new TranslationEntitySet(entities, translationSchema);
         TranslationPolicySet translationPolicies = new TranslationPolicySet(policies, translationSchema);
-        DLProgram.Builder builder = new DLProgram.Builder("auth.dl");
+        DLProgram.Builder builder = new DLProgram.Builder(ProgramName);
         List<DLRuleDecl> output = new ArrayList<>();
 
         // All facts gathered from entities
@@ -136,9 +136,14 @@ public class Translation {
         }
 
         // Attribute relation
-        builder.comment("Attribute")
+        builder.comment("Attribute values")
                 .add(AttributeRuleDecl)
                 .add(facts.get(AttributeRuleDecl.getName()));
+
+        // Attribute relation
+        builder.comment("Attribute existence")
+                .add(HasAttributeRuleDecl)
+                .add(facts.get(HasAttributeRuleDecl.getName()));
 
         TranslationAction actions = new TranslationAction(translationSchema);
         builder.comment("Actions")

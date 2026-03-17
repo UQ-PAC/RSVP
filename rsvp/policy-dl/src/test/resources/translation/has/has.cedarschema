@@ -1,6 +1,10 @@
 entity Partition = {
     kind: String,
-    size: Long
+    size: Long,
+    directories: Set<Directory>,
+    files: {
+        files: Set<File>
+    }
 };
 
 entity Directory in Partition = {
@@ -39,6 +43,11 @@ action read in [Action::"write"] appliesTo {
 
 action introspect appliesTo {
     principal: [File, Link, Device],
+    resource: [ Directory ]
+};
+
+action lookup appliesTo {
+    principal: [ Partition ],
     resource: [ Directory ]
 };
 

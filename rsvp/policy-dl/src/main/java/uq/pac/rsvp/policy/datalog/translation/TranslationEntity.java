@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.AttributeRuleDecl;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.HasAttributeRuleDecl;
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
 /**
@@ -39,6 +40,8 @@ public class TranslationEntity {
     private void addAttributeFacts(Value value, DLTerm euid, String attr, List<DLFact> statements) {
         Consumer<DLTerm> addFact = vt ->
                 statements.add(new DLFact(AttributeRuleDecl, euid, DLTerm.lit(attr), vt));
+
+        statements.add(new DLFact(HasAttributeRuleDecl, euid, DLTerm.lit(attr)));
 
         switch (value) {
             case PrimString s -> addFact.accept(DLTerm.lit(s.toString()));

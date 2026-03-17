@@ -3,7 +3,14 @@
         "uid": { "type": "Partition", "id": "sda" },
         "attrs": {
             "kind": "ext4",
-            "size": 256000
+            "size": 256000,
+            "directories": [
+                { "__entity": { "type": "Directory", "id": "/usr/bin" }},
+                { "__entity": { "type": "Directory", "id": "/usr/sbin" }}
+            ],
+            "files" : {
+                "files" : []
+            }
         },
         "parents": [ ]
     },
@@ -11,7 +18,14 @@
         "uid": { "type": "Partition", "id": "sdb" },
         "attrs": {
             "kind": "ext4",
-            "size": 512000
+            "size": 512000,
+            "directories": [ ],
+            "files" : {
+                "files" : [
+                    { "__entity": { "type": "File", "id": "ls" } },
+                    { "__entity": { "type": "File", "id": "gvim" } }
+                ]
+            }
         },
         "parents": [ ]
     },

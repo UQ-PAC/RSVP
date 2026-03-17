@@ -12,9 +12,9 @@
     {
         "uid": { "type": "Account", "id": "Alice" },
         "attrs": {
-            "name" : "Alice",
-            "age" : 22,
-            "role" : { "__entity": { "type": "Role", "id": "User" } },
+            "permissions": {
+                "roles" : [ { "__entity": { "type": "Role", "id": "User" } } ]
+            },
             "friends" : [
                 { "__entity": { "type": "Account", "id": "Bob" } }
             ]
@@ -24,9 +24,9 @@
     {
         "uid": { "type": "Account", "id": "Bob" },
         "attrs": {
-            "name" : "Bob",
-            "age" : 25,
-            "role" : { "__entity": { "type": "Role", "id": "User" } },
+            "permissions": {
+                "roles" : [ { "__entity": { "type": "Role", "id": "User" } } ]
+            },
             "friends" : [
                 { "__entity": { "type": "Account", "id": "Alice" } },
                 { "__entity": { "type": "Account", "id": "Carl" } }
@@ -37,9 +37,9 @@
     {
         "uid": { "type": "Account", "id": "Carl" },
         "attrs": {
-            "name" : "Carl",
-            "age" : 27,
-            "role" : { "__entity": { "type": "Role", "id": "User" } },
+            "permissions": {
+                "roles" : [ { "__entity": { "type": "Role", "id": "User" } } ]
+            },
             "friends" : [
                 { "__entity": { "type": "Account", "id": "Bob" } }
             ]
@@ -49,12 +49,25 @@
     {
         "uid": { "type": "Account", "id": "Tim" },
         "attrs": {
-            "name" : "Tim",
-            "age" : 34,
-            "role" : { "__entity": { "type": "Role", "id": "Admin" } },
+            "permissions": {
+                "roles" :[
+                    { "__entity": { "type": "Role", "id": "User" } },
+                    { "__entity": { "type": "Role", "id": "Admin" } }
+                ]
+            },
             "friends" : [
                 { "__entity": { "type": "Account", "id": "Carl" } }
             ]
+        },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Account", "id": "Jack" },
+        "attrs": {
+            "permissions": {
+                "roles": []
+            },
+            "friends" : [ ]
         },
         "parents": []
     }

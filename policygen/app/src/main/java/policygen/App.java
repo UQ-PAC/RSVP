@@ -160,21 +160,37 @@ public class App {
         boolean isPermit = randomChance(60);
         String policyStr = isPermit ? "permit (\n" : "forbid (\n";
 
+        // Choose an action first, as this dictates what principal and resource types will be applicable
+        // TODO support multiple actions ("in") and unconstrained action
+        List<CedarAction> actions = schema.getActions();
+        int actionIndex = random.nextInt(actions.size());
+        CedarAction chosenAction = actions.get(actionIndex);
+        while (chosenAction.getApplicablePrincipals().isEmpty() || chosenAction.getApplicableResources().isEmpty()) {
+            // If we have a parent action it may not be specified as applicable to any particular
+            // principal/resource types, so choose another:
+            chosenAction = actions.get(actionIndex);
+        }
+
         // Need principal, action, resource, conditions
-        String principal = randomPrincipal(entities, schema);
+        CedarEntityRef[] principalType = new CedarEntityRef[1];
+        String principal = randomMultiple("principal", chosenAction.getApplicablePrincipals(),
+                entities, schema, principalType);
+
         policyStr += "    " + principal + ",\n";
 
-        String action = randomAction(schema);
-        policyStr += "    " + action + ",\n";
+        policyStr += "    action == " + chosenAction.getName() + ",\n";
 
-        String resource = randomResource(entities, schema);
+        CedarEntityRef[] resourceType = new CedarEntityRef[1];
+        String resource = randomMultiple("resource", chosenAction.getApplicableResources(),
+                entities, schema, resourceType);
+
         policyStr += "    " + resource + "\n";
 
         policyStr += ")";
 
         int conditionChance = 70;
         while (randomChance(conditionChance)) {
-            policyStr += "\n" + generateCondition(entities, schema);
+            policyStr += "\n" + generateCondition(entities, schema, principalType[0], resourceType[0]);
             conditionChance = 25; // reduced chance of additional conditions
         }
 
@@ -182,59 +198,54 @@ public class App {
         output.println(policyStr);
     }
 
-    private static String randomPrincipal(EntityPool entities, SchemaWrapper schema) {
-        return randomMultiple("principal", schema.getPrincipalType(), entities, schema);
-    }
-
-    private static String randomResource(EntityPool entities, SchemaWrapper schema) {
-        return randomMultiple("resource", schema.getResourceType(), entities, schema);
-    }
-
-    private static String randomMultiple(String varName, CedarEntityRef entityType,
-            EntityPool entities, SchemaWrapper schema) {
+    private static String randomMultiple(String varName, List<CedarEntityRef> entityTypes,
+            EntityPool entities, SchemaWrapper schema, CedarEntityRef[] chosenType /*OUT*/) {
         // Can be a specific principal ('principal == User::"boo_radley"'), an "is" clause
         // (type check),  or a membership check ('principal in Group::"fun_llamas"') optionally
         // combined with "is" clause
 
+        // TODO return multiple types (or a type representing multiple possible types)
         // TODO: generate "is" clauses.
 
         int principalForm = random.nextInt(100);
         if (principalForm >= 50) {
-            Collection<CedarEntityRef> ancestorTypes = getAncestorTypes(entityType);
+            ArrayList<CedarEntityRef> ancestorTypes = new ArrayList<>();
+            Set<CedarEntityRef> ancestorTypesSet = new HashSet<>();
+
+            // Collect the possible ancestor types
+            for (CedarEntityRef entityType : entityTypes) {
+                Collection<CedarEntityRef> immediateAncestorTypes = getAncestorTypes(entityType);
+                for (CedarEntityRef immediateAncestorType : immediateAncestorTypes) {
+                    if (ancestorTypesSet.add(immediateAncestorType)) {
+                        ancestorTypes.add(immediateAncestorType);
+                    }
+                }
+            }
+
             if (!ancestorTypes.isEmpty()) {
-                int chosenIndex = random.nextInt(ancestorTypes.size());
-                Iterator<CedarEntityRef> iter = ancestorTypes.iterator();
-                for (int i = 0; i < chosenIndex; i++)
-                    iter.next();
-                CedarEntityRef chosenType = iter.next();
-                Entity chosenEntity = entities.getRandomEntityOfType(chosenType, random);
+                // TODO the chosen type should be the sum of all types in entityTypes which may
+                // have the chosen ancestor type
+                chosenType[0] = entityTypes.get(random.nextInt(entityTypes.size()));
+                Entity chosenEntity = entities.getRandomEntityOfType(chosenType[0], random);
                 return varName + " in " + chosenEntity.toEntityString();
             }
             principalForm -= 50; // reduce to [0, 50)
         }
 
         if (principalForm < 25) {
+            chosenType[0] = entityTypes.getFirst(); // TODO return sum type
             return varName;
         }
 
         // else (principalForm < 50)
-        Entity entity = entities.getRandomEntityOfType(entityType, random);
+        chosenType[0] = entityTypes.get(random.nextInt(entityTypes.size()));
+        Entity entity = entities.getRandomEntityOfType(chosenType[0], random);
         if (entity == null) {
             // No known entities of the given type, so can't constrain
             // TODO maybe convert to "is"?
             return varName;
         }
         return varName + " == " + entity.toEntityString();
-    }
-
-    private static String randomAction(SchemaWrapper schema) {
-        // FIXME make sure to use actions applicable to the principal/resource
-        List<CedarAction> actions = schema.getActions();
-        int actionIndex = random.nextInt(actions.size() + 1);
-        if (actionIndex == actions.size()) {
-            return "action"; // no constraint
-        }
-        return "action == " + actions.get(actionIndex).getName();
     }
 
     private static class ExpressionWithType {
@@ -246,7 +257,7 @@ public class App {
      * Generate an expression with a value of arbitrary type.
      */
     private static ExpressionWithType generateValueExpr(EntityPool entities, SchemaWrapper schema,
-            boolean allowLiterals) {
+            boolean allowLiterals, CedarEntityRef selectedPrincipalType, CedarEntityRef selectedResourceType) {
 
         Expression valueExpr = null;
         CedarType valueType = null;
@@ -255,22 +266,23 @@ public class App {
         // 35% principal, 35% resources, 30% context
         if (valueTypeIndex >= 70) {
             // context
-            valueType = schema.getRequestType();
+            valueType = schema.getRequestType(); // TODO fix; dependent on action
             if (valueType != null) {
                 valueExpr = VariableExpression.createContextRef(null);
+            } else {
+                valueTypeIndex = random.nextInt(70);
             }
-            valueTypeIndex = random.nextInt(70);
         }
 
         if (valueTypeIndex < 35) {
             // principal.
             valueExpr = VariableExpression.createPrincipalRef(null);
-            valueType = schema.getPrincipalType();
+            valueType = selectedPrincipalType;
         }
         else if (valueTypeIndex < 70) {
             // resource
             valueExpr = VariableExpression.createResourceRef(null);
-            valueType = schema.getResourceType();
+            valueType = selectedResourceType;
         }
 
         // Potentially drill down, i.e. select a field
@@ -302,13 +314,18 @@ public class App {
         return result;
     }
 
+    /**
+     * Try to generate an expression with a specified type, may return null on failure
+     */
     private static ExpressionWithType generateValueOfType(CedarType requiredType,
-            EntityPool entities, SchemaWrapper schema) {
+            EntityPool entities, SchemaWrapper schema,
+            CedarEntityRef selectedPrincipalType, CedarEntityRef selectedResourceType) {
 
         if (randomChance(75) || requiredType.getTypeId() == CedarType.TypeId.BOOL) {
             // Crude but, hopefully, effective: just generate expressions until we get one with the right type.
             for (int i = 0; i < 20; i++) {
-                ExpressionWithType attempt = generateValueExpr(entities, schema, false);
+                ExpressionWithType attempt = generateValueExpr(entities, schema, false,
+                        selectedPrincipalType, selectedResourceType);
                 if (attempt.exprType.equals(requiredType)) {
                     return attempt;
                 }
@@ -318,14 +335,15 @@ public class App {
         // Generate a literal of the required type:
 
         if (requiredType.getTypeId() == CedarType.TypeId.ENTITY) {
+            ExpressionWithType result = new ExpressionWithType();
             Entity entity = entities.getRandomEntityOfType((CedarEntityRef)requiredType, random);
             if (entity != null) {
-                ExpressionWithType result = new ExpressionWithType();
                 result.expression = new EntityExpression(entity.getEntityId(),
                         Arrays.asList(entity.getEntityType()), null);
                 result.exprType = requiredType;
                 return result;
             }
+            return null;
         }
         else if (requiredType.getTypeId() == CedarType.TypeId.LONG) {
             int value = random.nextInt(100); // number from 0-99
@@ -358,7 +376,8 @@ public class App {
         throw new UnsupportedOperationException("Can't handle: " + requiredType.getTypeId().toString());
     }
 
-    private static String generateCondition(EntityPool entities, SchemaWrapper schema) {
+    private static String generateCondition(EntityPool entities, SchemaWrapper schema,
+            CedarEntityRef selectedPrincipalType, CedarEntityRef selectedResourceType) {
         String result;
         if (randomChance(50)) {
             result = "unless {\n";
@@ -366,14 +385,15 @@ public class App {
             result = "when {\n";
         }
 
-        result += "    " + generateConditionExpression(entities, schema);
+        result += "    " + generateConditionExpression(entities, schema, selectedPrincipalType, selectedResourceType);
         result += "\n}";
 
         return result;
     }
 
     // TODO support multiple principal/resource types; combine with type tests ("is"/"has") to avoid errors
-    private static Expression generateConditionExpression(EntityPool entities, SchemaWrapper schema) {
+    private static Expression generateConditionExpression(EntityPool entities, SchemaWrapper schema,
+            CedarEntityRef selectedPrincipalType, CedarEntityRef selectedResourceType) {
         // x in y
         // x == y (constant or other)
         // arithmetic:  x < y, x > y
@@ -387,7 +407,7 @@ public class App {
         boolean skipBinOp;
 
         while (true) {
-            value = generateValueExpr(entities, schema, false);
+            value = generateValueExpr(entities, schema, false, selectedPrincipalType, selectedResourceType);
 
             skipBinOp = false;
             if (value.exprType.getTypeId() == CedarType.TypeId.BOOL) {
@@ -407,43 +427,56 @@ public class App {
                 // We now need a comparison or other operator, to another value of appropriate type
                 ExpressionWithType otherValue;
                 do {
-                    otherValue = generateValueOfType(value.exprType, entities, schema);
+                    otherValue = generateValueOfType(value.exprType, entities, schema,
+                            selectedPrincipalType, selectedResourceType);
+                    if (otherValue == null) {
+                        break;
+                    }
                 } while (value.expression.toString().equals(otherValue.expression.toString()));
 
                 // TODO set membership ("in"), type tests ("is")
 
-                BinaryExpression.BinaryOp operation = null;
-
-                if (value.exprType.getTypeId() == CedarType.TypeId.LONG && randomChance(50)) {
-                    // For numbers we can do relational comparisons as well as equality
-                    int opIndex = random.nextInt(6);
-                    switch (opIndex) {
-                    case 0:
-                        operation = BinaryExpression.BinaryOp.LessEq; break;
-                    case 1:
-                        operation = BinaryExpression.BinaryOp.Less; break;
-                    case 2:
-                        operation = BinaryExpression.BinaryOp.Eq; break;
-                    case 3:
-                        operation = BinaryExpression.BinaryOp.Neq; break;
-                    case 4:
-                        operation = BinaryExpression.BinaryOp.Greater; break;
-                    case 5:
-                        operation = BinaryExpression.BinaryOp.GreaterEq; break;
-                    }
-                }
-                else {
-                    int opIndex = random.nextInt(2);
-                    switch (opIndex) {
-                    case 0:
-                        operation = BinaryExpression.BinaryOp.Eq; break;
-                    case 1:
-                        operation = BinaryExpression.BinaryOp.Neq; break;
+                if (otherValue == null) {
+                    // Can't produce anything to compare with
+                    if (value.exprType.getTypeId() != CedarType.TypeId.BOOL) {
+                        continue; // give up on trying to use this value
                     }
                 }
 
-                value.expression = new BinaryExpression(value.expression, operation, otherValue.expression, null);
-                value.exprType = CedarPrimitive.BOOL;
+                if (otherValue != null) {
+                    BinaryExpression.BinaryOp operation = null;
+
+                    if (value.exprType.getTypeId() == CedarType.TypeId.LONG && randomChance(50)) {
+                        // For numbers we can do relational comparisons as well as equality
+                        int opIndex = random.nextInt(6);
+                        switch (opIndex) {
+                        case 0:
+                            operation = BinaryExpression.BinaryOp.LessEq; break;
+                        case 1:
+                            operation = BinaryExpression.BinaryOp.Less; break;
+                        case 2:
+                            operation = BinaryExpression.BinaryOp.Eq; break;
+                        case 3:
+                            operation = BinaryExpression.BinaryOp.Neq; break;
+                        case 4:
+                            operation = BinaryExpression.BinaryOp.Greater; break;
+                        case 5:
+                            operation = BinaryExpression.BinaryOp.GreaterEq; break;
+                        }
+                    }
+                    else {
+                        int opIndex = random.nextInt(2);
+                        switch (opIndex) {
+                        case 0:
+                            operation = BinaryExpression.BinaryOp.Eq; break;
+                        case 1:
+                            operation = BinaryExpression.BinaryOp.Neq; break;
+                        }
+                    }
+
+                    value.expression = new BinaryExpression(value.expression, operation, otherValue.expression, null);
+                    value.exprType = CedarPrimitive.BOOL;
+                }
             }
 
             if (combineValue != null) {
@@ -466,4 +499,5 @@ public class App {
 
         return value.expression;
     }
+
 }

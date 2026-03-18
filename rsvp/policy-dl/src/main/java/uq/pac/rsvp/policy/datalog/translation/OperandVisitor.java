@@ -5,10 +5,12 @@ import uq.pac.rsvp.policy.datalog.ast.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import static uq.pac.rsvp.policy.ast.expr.VariableExpression.Reference.Context;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.AttributeRuleDecl;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationError.error;
+import static uq.pac.rsvp.policy.datalog.util.Util.required;
 
 public class OperandVisitor extends ValueVisitorAdapter<DLTerm> {
 
@@ -34,6 +36,28 @@ public class OperandVisitor extends ValueVisitorAdapter<DLTerm> {
     @Override
     public DLTerm visitActionExpr(ActionExpression expr) {
         return new DLString(expr.getQualifiedName());
+    }
+
+    @Override
+    public DLTerm visitBinaryExpr(BinaryExpression expr) {
+        DLTerm lhs = compute(expr.getLeft()),
+                rhs = compute(expr.getRight());
+        DLArithmeticTerm.Operator op = switch (expr.getOp()) {
+            case Add -> DLArithmeticTerm.Operator.ADD;
+            case Sub -> DLArithmeticTerm.Operator.SUB;
+            case Mul -> DLArithmeticTerm.Operator.MUL;
+            default -> throw new TranslationError("Unsupported binary operator: " + expr.getOp());
+        };
+
+        Function<DLTerm, DLTerm> normalise = t ->
+                switch (t) {
+                    case DLNumber n -> n;
+                    case DLVar v -> new DLFunctor(DLFunctor.Functor.TO_NUMBER, v);
+                    case DLArithmeticTerm a -> a;
+                    default -> throw new TranslationError("Unsupported term: " + t + "[" + t.getClass().getSimpleName() + "]");
+                };
+
+        return new DLArithmeticTerm(normalise.apply(lhs), normalise.apply(rhs), op);
     }
 
     @Override

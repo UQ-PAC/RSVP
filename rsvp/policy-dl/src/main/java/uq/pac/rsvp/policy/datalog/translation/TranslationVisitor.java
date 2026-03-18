@@ -53,6 +53,9 @@ public class TranslationVisitor extends VoidVisitorAdapter {
         return expr.compute(operandVisitor);
     }
 
+    /**
+     * Translation between cedar to souffle operators in presence of negation
+     */
     DLConstraint.Operator getOperator(BinaryExpression.BinaryOp op, boolean negated) {
         DLConstraint.Operator dlOp = switch (op) {
             case Eq -> DLConstraint.Operator.EQ;

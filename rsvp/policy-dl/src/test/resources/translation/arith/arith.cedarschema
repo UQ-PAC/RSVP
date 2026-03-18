@@ -1,0 +1,13 @@
+entity Numeric = {
+    a: Long,
+    b: Long,
+    c: Long,
+    d: Long
+};
+
+action compute appliesTo {
+    principal: Numeric,
+    resource: Numeric
+};
+
+

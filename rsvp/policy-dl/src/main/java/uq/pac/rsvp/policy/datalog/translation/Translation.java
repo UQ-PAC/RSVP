@@ -95,27 +95,30 @@ public class Translation {
         Schema schema = Schema.parseCedarSchema(schemaFile);
         Entities entities = Entities.parse(entitiesFile);
 
+        // When we are given an entity set it can also include actions,
+        // remove those from the set of entities, as we treat them differently
+        // and pull action-related information from the schema
+        Set<Entity> entitySet = entities.getEntities().stream()
+                .filter(e -> {
+                    String type = e.getEUID().getType().toString();
+                    return !type.equals("Action") && !type.endsWith("::Action");
+                }).collect(Collectors.toCollection(HashSet::new));
+
         // Strictly speaking we expect a complete closed world in that we operate on the set of provided entities.
         // One exception is the enum-style definition of entities. The translation assumes they exist as well,
         // but here we allow them to be generated if they are not provided.
-        Set<EntityUID> entitiesEuids = entities.getEntities().stream().map(Entity::getEUID).collect(Collectors.toSet());
-        Set<Entity> newEntities = new HashSet<>();
+        Set<EntityUID> entitiesEuids = entitySet.stream().map(Entity::getEUID).collect(Collectors.toSet());
         schema.entityTypeNames().stream().map(schema::getEntityType).forEach(ed -> {
             ed.getEntityNamesEnum().forEach(en -> {
                 EntityUID uid = EntityUID.parse("%s::\"%s\"".formatted(ed.getName(), en)).orElseThrow();
                 if (!entitiesEuids.contains(uid)) {
-                    newEntities.add(new Entity(uid));
+                    entitySet.add(new Entity(uid));
                 }
             });
         });
 
-        if (!newEntities.isEmpty()) {
-            newEntities.addAll(entities.getEntities());
-            entities = new Entities(newEntities);
-        }
-
         PolicySet policies = PolicySet.parseCedarPolicySet(policiesFile);
-        return translate(schema, policies, entities);
+        return translate(schema, policies, new Entities(entitySet));
     }
 
     private static DLProgram translate(Schema schema, PolicySet policies, Entities entities) {

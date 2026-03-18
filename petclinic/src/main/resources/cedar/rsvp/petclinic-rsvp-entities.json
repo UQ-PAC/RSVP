@@ -11,27 +11,27 @@
     },
 
     {
-        "uid": { "type": "PetClinic::Level", "id": "Intern" },
+        "uid": { "type": "PetClinic::Role", "id": "Intern" },
         "attrs": { },
         "parents": [ ]
     },
     {
-        "uid": { "type": "PetClinic::Level", "id": "Resident" },
+        "uid": { "type": "PetClinic::Role", "id": "Resident" },
         "attrs": { },
         "parents": [ ]
     },
     {
-        "uid": { "type": "PetClinic::Level", "id": "Senior" },
+        "uid": { "type": "PetClinic::Role", "id": "Senior" },
         "attrs": { },
         "parents": [ ]
     },
     {
-        "uid": { "type": "PetClinic::Level", "id": "Registrar" },
+        "uid": { "type": "PetClinic::Role", "id": "Registrar" },
         "attrs": { },
         "parents": [ ]
     },
     {
-        "uid": { "type": "PetClinic::Level", "id": "Specialist" },
+        "uid": { "type": "PetClinic::Role", "id": "Specialist" },
         "attrs": { },
         "parents": [ ]
     },
@@ -44,7 +44,7 @@
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } },
                 { "__entity": { "type": "PetClinic::Clinic", "id": "B" } }
             ],
-            "level": { "__entity": { "type": "PetClinic::Level", "id": "Senior" } }
+            "role": { "__entity": { "type": "PetClinic::Role", "id": "Senior" } }
         },
         "parents": [ ]
     },
@@ -55,7 +55,7 @@
             "clinics" : [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } }
             ],
-            "level": { "__entity": { "type": "PetClinic::Level", "id": "Specialist" } }
+            "role": { "__entity": { "type": "PetClinic::Role", "id": "Specialist" } }
         },
         "parents": [ ]
     },
@@ -66,7 +66,7 @@
             "clinics": [
                 { "__entity": { "type": "PetClinic::Clinic", "id": "A" } }
             ],
-            "level": { "__entity": { "type": "PetClinic::Level", "id": "Resident" } }
+            "role": { "__entity": { "type": "PetClinic::Role", "id": "Resident" } }
         },
         "parents": [ ]
     },

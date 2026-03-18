@@ -1,12 +1,12 @@
 namespace PetClinic {
     entity Clinic;
 
-    entity Level enum ["Intern", "Resident", "Senior", "Registrar", "Specialist"];
+    entity Role enum ["Intern", "Resident", "Senior", "Registrar", "Specialist"];
 
     entity Veterinarian = {
         name: String,
         clinics: Set<Clinic>,
-        level: Level
+        role: Role
     };
 
     entity Secretary = {

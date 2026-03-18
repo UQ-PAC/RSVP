@@ -103,7 +103,7 @@ public class TranslationVisitor extends VoidVisitorAdapter {
             case HasAttr -> {
                 DLTerm lhs = getOperand(expr.getLeft()),
                     rhs = getOperand(expr.getRight());
-                expressions.add(new DLAtom(HasAttributeRuleDecl, lhs, rhs));
+                expressions.add(new DLAtom(HasAttributeRuleDecl, negated, lhs, rhs));
             }
             case And, Or -> throw new TranslationError("Unreachable");
             default -> throw new TranslationError("Unsupported: " + expr.getOp());

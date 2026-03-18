@@ -176,32 +176,32 @@ when {
 
 // 'policy11'
 // Every Senior or Specialist Veterinarian can view all clients' data.
-//@id("Policy: Senior or Specialist Veterinarian can view all clients.")
-//permit (
-//    principal is PetClinic::Veterinarian,
-//    action,
-//    resource
-//)
-//when {
-//    resource has veterinarians &&
-//    principal has role &&
-//    (
-//        principal.role == PetClinic::Role::"Senior" ||
-//        principal.role == PetClinic::Role::"Specialist"
-//    ) &&
-//    (
-//        action in PetClinic::Action::"OwnerOperations" ||
-//        action in PetClinic::Action::"PetOperations" ||
-//        action in PetClinic::Action::"VisitOperations"
-//    )
-//}
-//unless {
-//    action in PetClinic::Action::"DeleteOperations" ||
-//    (
-//        resource has confidentiality &&
-//        resource.confidentiality == PetClinic::Confidentiality::"Protected"
-//    )
-//};
+@id("Policy: Senior or Specialist Veterinarian can view all clients.")
+permit (
+    principal is PetClinic::Veterinarian,
+    action,
+    resource
+)
+when {
+    resource has veterinarians &&
+    principal has role &&
+    (
+        principal.role == PetClinic::Role::"Senior" ||
+        principal.role == PetClinic::Role::"Specialist"
+    ) &&
+    (
+        action in PetClinic::Action::"OwnerOperations" ||
+        action in PetClinic::Action::"PetOperations" ||
+        action in PetClinic::Action::"VisitOperations"
+    )
+}
+unless {
+    action in PetClinic::Action::"DeleteOperations" ||
+    (
+        resource has confidentiality &&
+        resource.confidentiality == PetClinic::Confidentiality::"Protected"
+    )
+};
 
 // 'policy12'
 // No Principal can view data from a Clinic they are not assigned to.

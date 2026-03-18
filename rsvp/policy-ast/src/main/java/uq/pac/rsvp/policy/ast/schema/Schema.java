@@ -19,7 +19,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
-import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.JsonParser;
 import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.policy.ast.schema.common.CommonTypeReference;
@@ -34,6 +33,7 @@ import uq.pac.rsvp.policy.ast.schema.common.UnresolvedTypeReference;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaResolutionVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
+import uq.pac.rsvp.support.RsvpException;
 
 public class Schema extends HashMap<String, Namespace> implements SchemaItem {
 

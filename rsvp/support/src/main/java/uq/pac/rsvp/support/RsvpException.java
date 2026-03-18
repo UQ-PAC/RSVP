@@ -1,4 +1,4 @@
-package uq.pac.rsvp;
+package uq.pac.rsvp.support;
 
 public class RsvpException extends Exception {
 

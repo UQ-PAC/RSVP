@@ -14,13 +14,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.cedarpolicy.model.exception.InternalException;
 import com.google.gson.JsonParseException;
 
-import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.JsonParser;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
+import uq.pac.rsvp.support.RsvpException;
 import uq.pac.rsvp.support.SourceLoc;
 
 @DisplayName("Policy condition AST")

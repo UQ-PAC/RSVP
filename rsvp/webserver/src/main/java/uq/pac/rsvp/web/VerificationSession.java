@@ -1,4 +1,4 @@
-package uq.pac.rsvp.webapp;
+package uq.pac.rsvp.web;
 
 
 import org.springframework.web.context.WebApplicationContext;
@@ -7,6 +7,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -32,6 +33,10 @@ public class VerificationSession {
 
     public Path removeFile(String hash) {
         return files.remove(hash);
+    }
+
+    public Set<String> getHashes() {
+        return Set.copyOf(files.keySet());
     }
     
 }

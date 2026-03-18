@@ -77,6 +77,7 @@ subprojects {
 
         implementation 'com.google.code.gson:gson:2.13.2'
         implementation libs.guava
+        implementation 'com.fasterxml.jackson.core:jackson-databind:2.20.0'
 
         // Use JUnit Jupiter for testing.
         testImplementation libs.junit.jupiter

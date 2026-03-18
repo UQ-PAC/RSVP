@@ -1,12 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
-// Import React FilePond
 import { FilePond } from "react-filepond";
-
-// Import FilePond styles
-import "filepond/dist/filepond.min.css";
 import type { FilePondErrorDescription, FilePondFile } from "filepond";
 import {
   SourceFileInfo,
@@ -17,10 +12,25 @@ import { Report } from "./components/SourceFile";
 import { VerifyButton } from "./components/VerifyButton";
 import { Header } from "./components/Header";
 
+import "filepond/dist/filepond.min.css";
+import { ReportViewer } from "./components/ReportViewer";
+
 export default function Home() {
   const [files, setFiles] = useState([] as FilePondFile[]);
   const [sources, setSources] = useState([] as SourceFileInfo[]);
   const [reports, setReports] = useState([] as Report[]);
+  const [selected, setSelected] = useState("");
+  const [active, setActive] = useState("");
+
+  const toggleSelected = (id: string) => {
+    setSelected(id === selected ? "" : id);
+  };
+
+  const unsetActive = (id: string) => {
+    if (active === id) {
+      setActive("");
+    }
+  };
 
   const add = (error: FilePondErrorDescription | null, file: FilePondFile) => {
     if (error) {
@@ -58,12 +68,8 @@ export default function Home() {
       .then(setReports);
   };
 
-  // fetch("/hello")
-  //   .then((res) => res.text())
-  //   .then((text) => console.log(text));
-
   return (
-    <div className="App">
+    <div className="app">
       <Header>Policy Verification</Header>
       <FilePond
         files={files.map((item) => item.file)}
@@ -168,7 +174,25 @@ export default function Home() {
         labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
       />
       <VerifyButton onclick={verify} />
-      <SourceFileViewer sources={sources} />
+      <div className="side-by-side">
+        <SourceFileViewer
+          sources={sources}
+          reports={reports}
+          selected={selected}
+          active={active}
+          onselect={toggleSelected}
+          onenter={setActive}
+          onleave={unsetActive}
+        />
+        <ReportViewer
+          reports={reports}
+          selected={selected}
+          active={active}
+          onselect={toggleSelected}
+          onenter={setActive}
+          onleave={unsetActive}
+        />
+      </div>
       <VerifyButton onclick={verify} />
     </div>
   );

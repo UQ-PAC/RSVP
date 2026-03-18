@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.policy.ast.schema.common.CommonTypeReference;
@@ -19,6 +18,7 @@ import uq.pac.rsvp.policy.ast.schema.common.EntityTypeReference;
 import uq.pac.rsvp.policy.ast.schema.common.IpAddressType;
 import uq.pac.rsvp.policy.ast.schema.common.LongType;
 import uq.pac.rsvp.policy.ast.schema.common.StringType;
+import uq.pac.rsvp.support.RsvpException;
 
 @DisplayName("Abstract schema visitor")
 public class SchemaVisitorImplTest {

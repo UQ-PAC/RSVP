@@ -56,6 +56,7 @@ permit (
     resource
 )
 when {
+    principal has clinics &&
     resource has clinics &&
     resource.clinics.containsAny(principal.clinics)
 }
@@ -64,6 +65,23 @@ unless {
 };
 
 // 'policy5'
+// Any Secretary can add to their Clinics' data.
+@id("Policy: Secretary can add to their Clinics.")
+permit (
+    principal is PetClinic::Secretary,
+    action,
+    resource is PetClinic::Clinic
+)
+when {
+    principal has clinics &&
+    principal.clinics.contains(resource)
+}
+unless {
+    action in PetClinic::Action::"EditOperations" ||
+    action in PetClinic::Action::"DeleteOperations"
+};
+
+// 'policy6'
 // Every Veterinarian can view and edit their clients' data.
 @id("Policy: Veterinarian can view and edit their clients.")
 permit (
@@ -84,10 +102,31 @@ unless {
     action in PetClinic::Action::"DeleteOperations"
 };
 
-// 'policy6'
+// 'policy7'
+// Every Veterinarian can add their clients' data.
+@id("Policy: Veterinarian can add their clients.")
+permit (
+    principal is PetClinic::Veterinarian,
+    action,
+    resource is PetClinic::Clinic
+)
+when {
+    principal has clinics &&
+    principal.clinics.contains(resource) &&
+    (
+        action in PetClinic::Action::"OwnerOperations" ||
+        action in PetClinic::Action::"PetOperations" ||
+        action in PetClinic::Action::"VisitOperations"
+    )
+}
+unless {
+    action in PetClinic::Action::"EditOperations" ||
+    action in PetClinic::Action::"DeleteOperations"
+};
+
+// 'policy8'
 // No Intern Veterinarian can edit their clients' data.
-// > > Could have unintended consequences since "EditOperations"
-// > > is also used for "VeterinarianOperations".
+// > > Could conflict with 'policy9'.
 @id("Policy: Intern Veterinarian cannot edit their clients.")
 forbid (
     principal is PetClinic::Veterinarian,
@@ -95,10 +134,24 @@ forbid (
     resource
 )
 when {
-    principal.level == PetClinic::Level::"Intern"
+    principal has role &&
+    principal.role == PetClinic::Role::"Intern"
 };
 
-// 'policy7'
+// 'policy9'
+// Every Veterinarian can edit their own data.
+// > > Could conflict with 'policy8'.
+@id("Policy: Veterinarian can edit their own data.")
+permit (
+    principal is PetClinic::Veterinarian,
+    action == PetClinic::Action::"EditVeterinarian",
+    resource is PetClinic::Veterinarian
+)
+when {
+    principal == resource
+};
+
+// 'policy10'
 // Only a Senior or Specialist Veterinarian can delete their clients' data.
 @id("Policy: Senior or Specialist Veterinarian can delete their clients.")
 permit (
@@ -109,9 +162,10 @@ permit (
 when {
     resource has veterinarians &&
     principal in resource.veterinarians &&
+    principal has role &&
     (
-        principal.level == PetClinic::Level::"Senior" ||
-        principal.level == PetClinic::Level::"Specialist"
+        principal.role == PetClinic::Role::"Senior" ||
+        principal.role == PetClinic::Role::"Specialist"
     ) &&
     (
         action in PetClinic::Action::"OwnerOperations" ||
@@ -120,7 +174,36 @@ when {
     )
 };
 
-// 'policy8'
+// 'policy11'
+// Every Senior or Specialist Veterinarian can view all clients' data.
+@id("Policy: Senior or Specialist Veterinarian can view all clients.")
+permit (
+    principal is PetClinic::Veterinarian,
+    action,
+    resource
+)
+when {
+    resource has veterinarians &&
+    principal has role &&
+    (
+        principal.role == PetClinic::Role::"Senior" ||
+        principal.role == PetClinic::Role::"Specialist"
+    ) &&
+    (
+        action in PetClinic::Action::"OwnerOperations" ||
+        action in PetClinic::Action::"PetOperations" ||
+        action in PetClinic::Action::"VisitOperations"
+    )
+}
+unless {
+    action in PetClinic::Action::"DeleteOperations" ||
+    (
+        resource has confidentiality &&
+        resource.confidentiality == PetClinic::Confidentiality::"Protected"
+    )
+};
+
+// 'policy12'
 // No Principal can view data from a Clinic they are not assigned to.
 @id("Policy: Principal cannot view data from another Clinic.")
 forbid (

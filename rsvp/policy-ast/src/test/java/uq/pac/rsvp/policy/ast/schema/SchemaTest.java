@@ -21,7 +21,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.JsonParser;
 import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.policy.ast.schema.common.CommonTypeReference;
@@ -36,6 +35,7 @@ import uq.pac.rsvp.policy.ast.schema.common.SetTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.common.StringType;
 import uq.pac.rsvp.policy.ast.schema.common.UnresolvedTypeReference;
 import uq.pac.rsvp.policy.ast.visitor.SchemaResolutionVisitor;
+import uq.pac.rsvp.support.RsvpException;
 
 @DisplayName("Schema AST")
 public class SchemaTest {

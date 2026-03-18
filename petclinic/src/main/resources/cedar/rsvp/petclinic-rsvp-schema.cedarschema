@@ -1,6 +1,8 @@
 namespace PetClinic {
     entity Clinic;
 
+    entity Confidentiality enum ["Official", "Sensitive", "Protected"];
+
     entity Role enum ["Intern", "Resident", "Senior", "Registrar", "Specialist"];
 
     entity Veterinarian = {
@@ -37,7 +39,8 @@ namespace PetClinic {
     entity Visit = {
         pet: Pet,
         clinics: Set<Clinic>,
-        veterinarians: Set<Veterinarian>
+        veterinarians: Set<Veterinarian>,
+        confidentiality: Confidentiality
     };
 
     action DeleteOperations;

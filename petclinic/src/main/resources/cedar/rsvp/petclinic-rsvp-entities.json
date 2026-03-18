@@ -11,6 +11,22 @@
     },
 
     {
+        "uid": { "type": "PetClinic::Confidentiality", "id": "Official" },
+        "attrs": { },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "PetClinic::Confidentiality", "id": "Sensitive" },
+        "attrs": { },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "PetClinic::Confidentiality", "id": "Protected" },
+        "attrs": { },
+        "parents": [ ]
+    },
+
+    {
         "uid": { "type": "PetClinic::Role", "id": "Intern" },
         "attrs": { },
         "parents": [ ]
@@ -278,7 +294,8 @@
             ],
             "veterinarians": [
                 { "__entity": { "type": "PetClinic::Veterinarian", "id": "Sharon Jenkins" } }
-            ]
+            ],
+            "confidentiality": { "__entity": { "type": "PetClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },
@@ -291,7 +308,8 @@
             ],
             "veterinarians": [
                 { "__entity": { "type": "PetClinic::Veterinarian", "id": "Sharon Jenkins" } }
-            ]
+            ],
+            "confidentiality": { "__entity": { "type": "PetClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },
@@ -305,7 +323,8 @@
             "veterinarians": [
                 { "__entity": { "type": "PetClinic::Veterinarian", "id": "Sharon Jenkins" } },
                 { "__entity": { "type": "PetClinic::Veterinarian", "id": "Linda Douglas" } }
-            ]
+            ],
+            "confidentiality": { "__entity": { "type": "PetClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },
@@ -319,7 +338,8 @@
             "veterinarians": [
                 { "__entity": { "type": "PetClinic::Veterinarian", "id": "Sharon Jenkins" } },
                 { "__entity": { "type": "PetClinic::Veterinarian", "id": "Linda Douglas" } }
-            ]
+            ],
+            "confidentiality": { "__entity": { "type": "PetClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },
@@ -332,7 +352,8 @@
             ],
             "veterinarians": [
                 { "__entity": { "type": "PetClinic::Veterinarian", "id": "James Carter" } }
-            ]
+            ],
+            "confidentiality": { "__entity": { "type": "PetClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },
@@ -345,7 +366,8 @@
             ],
             "veterinarians": [
                 { "__entity": { "type": "PetClinic::Veterinarian", "id": "James Carter" } }
-            ]
+            ],
+            "confidentiality": { "__entity": { "type": "PetClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },
@@ -358,7 +380,8 @@
             ],
             "veterinarians": [
                 { "__entity": { "type": "PetClinic::Veterinarian", "id": "James Carter" } }
-            ]
+            ],
+            "confidentiality": { "__entity": { "type": "PetClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },
@@ -371,7 +394,8 @@
             ],
             "veterinarians": [
                 { "__entity": { "type": "PetClinic::Veterinarian", "id": "James Carter" } }
-            ]
+            ],
+            "confidentiality": { "__entity": { "type": "PetClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },

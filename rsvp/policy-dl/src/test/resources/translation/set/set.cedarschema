@@ -7,9 +7,21 @@ entity Account = {
     }
 };
 
+entity Trait enum [ "A", "B", "C", "D" ];
+
+entity Person = {
+    trait: Trait,
+    traits: Set<Trait>
+};
+
 action introspect appliesTo {
     principal: Account,
     resource: Account
+};
+
+action act appliesTo {
+    principal: Person,
+    resource: Person
 };
 
 

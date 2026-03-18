@@ -76,11 +76,10 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
                             .map(e -> (Expression) new CallExpression(self, "contains", List.of(e)))
                             .reduce(init, (l, r) -> new BinaryExpression(l, op, r));
                 }
-            } else {
-                throw new TranslationError("Unsupported arguments for %s: %s"
-                        .formatted(fun, expr.getArgs().toString()));
             }
         }
+        // Here we only re-write the form where LHS is a literal set, another form, where the argument to
+        // containsAll/containsAny is a property is handled by code generation
         return new CallExpression(self, expr.getFunc(), args);
     }
 

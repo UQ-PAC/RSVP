@@ -62,7 +62,7 @@
         "parents": []
     },
     {
-        "uid": { "type": "Account", "id": "Jack" },
+        "uid": { "type": "Account", "id": "Mack" },
         "attrs": {
             "permissions": {
                 "roles": []
@@ -70,6 +70,52 @@
             "friends" : [ ]
         },
         "parents": []
-    }
+    },
 
+    {
+        "uid": { "type": "Person", "id": "Jill" },
+        "attrs": {
+            "trait" : { "__entity": { "type": "Trait", "id": "A" } },
+            "traits" :[
+                { "__entity": { "type": "Trait", "id": "A" } }
+            ]
+        },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Person", "id": "James" },
+        "attrs": {
+            "trait" : { "__entity": { "type": "Trait", "id": "B" } },
+            "traits" :[
+                { "__entity": { "type": "Trait", "id": "A" } },
+                { "__entity": { "type": "Trait", "id": "B" } }
+            ]
+        },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Person", "id": "Joe" },
+        "attrs": {
+            "trait" : { "__entity": { "type": "Trait", "id": "C" } },
+            "traits" :[
+                { "__entity": { "type": "Trait", "id": "A" } },
+                { "__entity": { "type": "Trait", "id": "B" } },
+                { "__entity": { "type": "Trait", "id": "C" } }
+            ]
+        },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Person", "id": "Jack" },
+        "attrs": {
+            "trait" : { "__entity": { "type": "Trait", "id": "D" } },
+            "traits" :[
+                { "__entity": { "type": "Trait", "id": "A" } },
+                { "__entity": { "type": "Trait", "id": "B" } },
+                { "__entity": { "type": "Trait", "id": "B" } },
+                { "__entity": { "type": "Trait", "id": "D" } }
+            ]
+        },
+        "parents": []
+    }
 ]

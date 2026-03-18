@@ -161,6 +161,64 @@ public class TranslationVisitor extends VoidVisitorAdapter {
                     throw new TranslationError("Unsupported set.contains() form: " + expr);
                 }
             }
+            case "containsAll" -> {
+                // Expect a single argument here and only in the form of property access
+                // Literal-set variation is re-written to disjunctions over contains
+                require(expr.getArgs().size() == 1);
+
+                Expression arg = expr.getArgs().getFirst();
+
+                if (expr.getSelf() instanceof PropertyAccessExpression lpe && arg instanceof PropertyAccessExpression rpe) {
+                    DLTerm leftPropertyTerm = DLTerm.lit(lpe.getProperty());
+                    DLTerm leftSet = getOperand(lpe.getObject());
+                    DLTerm rightPropertyTerm = DLTerm.lit(rpe.getProperty());
+                    DLTerm rightSet = getOperand(rpe.getObject());
+                    DLTerm connector = operandVisitor.getTmpVar();
+
+                    DLTerm aggregateLhs = new DLAggregate(DLAggregate.Aggregate.COUNT,
+                            new DLAtom(AttributeRuleDecl, leftSet, leftPropertyTerm, connector),
+                            new DLAtom(AttributeRuleDecl, rightSet, rightPropertyTerm, connector));
+
+                    DLTerm aggregateRhs = new DLAggregate(DLAggregate.Aggregate.COUNT,
+                            new DLAtom(AttributeRuleDecl, rightSet, rightPropertyTerm, new DLVar("_")));
+
+                    // Negation-based operator
+                    DLConstraint.Operator op = negated ? DLConstraint.Operator.NEQ : DLConstraint.Operator.EQ;
+                    expressions.add(new DLAtom(HasAttributeRuleDecl, leftSet, leftPropertyTerm));
+                    expressions.add(new DLAtom(HasAttributeRuleDecl, rightSet, rightPropertyTerm));
+                    expressions.add(new DLConstraint(aggregateLhs, aggregateRhs, op));
+                } else {
+                    throw new TranslationError("Unsupported set.contains() form: " + expr);
+                }
+            }
+            case "containsAny" -> {
+                // Expect a single argument here and only in the form of property access
+                // Literal-set variation is re-written to disjunctions over contains
+                require(expr.getArgs().size() == 1);
+
+                Expression arg = expr.getArgs().getFirst();
+
+                if (expr.getSelf() instanceof PropertyAccessExpression lpe && arg instanceof PropertyAccessExpression rpe) {
+                    DLTerm leftPropertyTerm = DLTerm.lit(lpe.getProperty());
+                    DLTerm leftSet = getOperand(lpe.getObject());
+                    DLTerm rightPropertyTerm = DLTerm.lit(rpe.getProperty());
+                    DLTerm rightSet = getOperand(rpe.getObject());
+                    DLTerm connector = operandVisitor.getTmpVar();
+
+                    // Count term
+                    DLTerm aggregate = new DLAggregate(DLAggregate.Aggregate.COUNT,
+                            new DLAtom(AttributeRuleDecl, leftSet, leftPropertyTerm, connector),
+                            new DLAtom(AttributeRuleDecl, rightSet, rightPropertyTerm, connector));
+
+                    // Negation-based operator
+                    DLConstraint.Operator op = negated ? DLConstraint.Operator.LT : DLConstraint.Operator.GTE;
+                    expressions.add(new DLAtom(HasAttributeRuleDecl, leftSet, leftPropertyTerm));
+                    expressions.add(new DLAtom(HasAttributeRuleDecl, rightSet, rightPropertyTerm));
+                    expressions.add(new DLConstraint(aggregate, DLTerm.lit(1), op));
+                } else {
+                    throw new TranslationError("Unsupported set.contains() form: " + expr);
+                }
+            }
             case "isEmpty" -> {
                 // isEmpty has no arguments
                 require(expr.getArgs().isEmpty());

@@ -19,7 +19,7 @@ public class OperandVisitor extends ValueVisitorAdapter<DLTerm> {
     // other than that should be fine
     private int varCounter = 0;
     private final static String VAR_PREFIX = "var";
-    private DLTerm getTmpVar() {
+    DLTerm getTmpVar() {
         return DLTerm.var(VAR_PREFIX + varCounter++);
     }
 

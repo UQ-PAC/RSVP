@@ -1,14 +1,18 @@
 package uq.pac.rsvp.policy.datalog.ast;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * Souffle aggregate function:
  * <code>
- *   Aggregate ::= IDENT : { Atom }
+ *   Aggregate ::= IDENT : { Atom [ ',' Atom]* }
  * </code>
  */
 public final class DLAggregate extends DLTerm {
     private final Aggregate aggregate;
-    private final DLAtom body;
+    private final List<DLAtom> body;
 
     public enum Aggregate {
         COUNT("count"),
@@ -23,14 +27,20 @@ public final class DLAggregate extends DLTerm {
         }
     }
 
-    public DLAggregate(Aggregate aggregate, DLAtom body) {
+    public DLAggregate(Aggregate aggregate, List<DLAtom> atoms) {
         this.aggregate = aggregate;
-        this.body = body;
+        this.body = List.copyOf(atoms);
+    }
+
+    public DLAggregate(Aggregate aggregate, DLAtom ...atoms) {
+        this.aggregate = aggregate;
+        this.body = Arrays.stream(atoms).toList();
     }
 
     @Override
     protected String stringify() {
-        return "%s : { %s }".formatted(aggregate.aggregate, body.stringify());
+        String atoms = body.stream().map(DLAtom::stringify).collect(Collectors.joining(", "));
+        return "%s : { %s }".formatted(aggregate.aggregate, atoms);
     }
 
     @Override
@@ -45,7 +55,7 @@ public final class DLAggregate extends DLTerm {
         return aggregate;
     }
 
-    public DLAtom getBody() {
+    public List<DLAtom> getBody() {
         return body;
     }
 }

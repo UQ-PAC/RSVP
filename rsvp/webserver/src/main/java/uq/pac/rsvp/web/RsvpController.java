@@ -1,11 +1,11 @@
-package uq.pac.rsvp.webapp;
+package uq.pac.rsvp.web;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import com.google.common.hash.Hashing;
 
+import uq.pac.rsvp.support.RsvpException;
+import uq.pac.rsvp.Verification;
+import uq.pac.rsvp.support.reporting.Report;
+
 @RestController
 @SpringBootApplication
 public class RsvpController {
@@ -32,7 +36,7 @@ public class RsvpController {
 
     @Autowired
     VerificationSession session;
-  
+
     @PostMapping(path = "/upload", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public String upload(@RequestPart MultipartFile document) throws IOException {
         logger.info("POST /upload (" + document.getOriginalFilename() + ")");
@@ -46,8 +50,8 @@ public class RsvpController {
         logger.info("Created: " + tmp.toString());
 
         String hash = Hashing.sha256()
-            .hashString(tmp.toString(), StandardCharsets.UTF_8)
-            .toString();
+                .hashString(tmp.toString(), StandardCharsets.UTF_8)
+                .toString();
 
         session.addFile(hash, tmp);
 
@@ -88,9 +92,27 @@ public class RsvpController {
     }
 
     @GetMapping("/reports")
-    public Map<String, String> verify() {
+    public List<Report> verify() throws RsvpException, IOException {
         logger.info("GET /reports");
-        return new HashMap<>();
+
+        List<Report> result = new ArrayList<>();
+
+        for (String hash : session.getHashes()) {
+            Path file = session.getFile(hash);
+            // logger.info(file.toString());
+
+            if (file.toString().endsWith(".cedar")) {
+                logger.info("Verifying: " + file);
+
+                result.addAll(Verification.verifyPolicies(hash, Files.readString(file)));
+
+                break;
+            }
+        }
+
+        logger.info(result.toString());
+
+        return result;
     }
 
     public static void main(String[] args) {

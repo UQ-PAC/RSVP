@@ -6,9 +6,9 @@ import java.util.LinkedHashSet;
 
 import com.cedarpolicy.model.exception.InternalException;
 
-import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
+import uq.pac.rsvp.support.RsvpException;
 
 public class PolicySet extends LinkedHashSet<Policy> implements PolicyItem {
 
@@ -25,7 +25,7 @@ public class PolicySet extends LinkedHashSet<Policy> implements PolicyItem {
     public static PolicySet parseCedarPolicySet(Path policyFile) throws RsvpException {
         try {
             String json = com.cedarpolicy.model.policy.PolicySet.parseToJsonAst(policyFile);
-            return JsonParser.parsePolicySet(json);
+            return JsonParser.parsePolicySet(policyFile.toString(), json);
         } catch (InternalException | IOException e) {
             throw new RsvpException("Error parsing policy set in " + policyFile.getFileName(), e);
         }
@@ -34,6 +34,9 @@ public class PolicySet extends LinkedHashSet<Policy> implements PolicyItem {
     /**
      * Parse a Cedar policy file and return the corresponding AST.
      * 
+     * @param filename the name of the file for reporting, if {@code null} then the
+     *                 source file for all resulting reports will be
+     *                 {@code "unknown"}
      * @param policies a string containing the Cedar policy file text
      * @return a new PolicySet instance corresponding to the parsed Cedar policy
      *         file
@@ -41,11 +44,10 @@ public class PolicySet extends LinkedHashSet<Policy> implements PolicyItem {
      *                           file
      * @throws IOException       If an IO error occurs while reading the policy file
      */
-    public static PolicySet parseCedarPolicySet(String policies) throws RsvpException {
+    public static PolicySet parseCedarPolicySet(String filename, String policies) throws RsvpException {
         try {
-
             String json = com.cedarpolicy.model.policy.PolicySet.parseStringToJsonAst(policies);
-            return JsonParser.parsePolicySet(json);
+            return JsonParser.parsePolicySet(filename, json);
         } catch (InternalException | IOException e) {
             throw new RsvpException("Error parsing policy set", e);
         }

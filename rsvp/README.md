@@ -86,6 +86,12 @@ Soufflé is required to build and run the `policy-dl` project, and can be instal
   ./gradlew run --args="optional string of space separated args"
   ```
 
+- Run web server:
+
+  ```
+  ./gradlew :webserver:bootRun
+  ```
+
 ## Import libraries in another project
 
 If you want to use the libraries in this project in another project you can either deploy them

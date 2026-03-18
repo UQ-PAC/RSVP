@@ -1,31 +1,128 @@
-/* @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+.side-by-side {
+  display: flex;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.side-by-side .source-files-container {
+  width: 65%;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.side-by-side .reports-container {
+  width: 35%;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-} */
+.source-files-container,
+.reports-container {
+  border: 1px solid #afafaf;
+  margin: 0.1rem;
+  padding: 0.5rem;
+}
+
+.source-file-render {
+  border: 1px solid #afafaf;
+  border-radius: 5px;
+  margin: 0.5rem;
+}
+
+.source-file-header {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #afafaf;
+  padding: 0.7rem;
+  cursor: pointer;
+  background-color: rgb(242, 241, 241);
+}
+
+.source-file-header:hover {
+  background-color: rgb(222, 220, 220);
+}
+
+.source-file-header h2 {
+  flex-grow: 1;
+  font-size: 1rem;
+  font-family:
+    "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  margin: 0;
+}
+
+.source-file-header .source-file-toggle {
+  font-size: 1rem;
+}
 
 .source-file-contents {
   font-family: "Courier New", Courier, monospace;
   white-space: pre-wrap;
+  padding: 1rem;
+}
+
+.source-report {
+  background-color: rgb(212, 212, 212);
+  position: relative;
+  cursor: pointer;
+}
+
+.source-report.source-report-info.active,
+.report-item.report-item-info.active {
+  background-color: rgb(172, 172, 253);
+}
+
+.source-report.source-report-warn.active,
+.report-item.report-item-warn.active {
+  background-color: rgb(249, 249, 193);
+}
+
+.source-report.source-report-err.active,
+.report-item.report-item-err.active {
+  background-color: rgb(254, 168, 168);
+}
+
+.source-report.source-report-info.selected,
+.report-item.report-item-info.selected {
+  background-color: rgb(191, 191, 250);
+}
+
+.source-report.source-report-warn.selected,
+.report-item.report-item-warn.selected {
+  background-color: rgb(253, 253, 212);
+}
+
+.source-report.source-report-err.selected,
+.report-item.report-item-err.selected {
+  background-color: rgb(254, 206, 206);
+}
+
+.reports-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.report-item {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.report-item .report-item-icon {
+  margin-right: 0.2rem;
+  margin-top: 0.2rem;
+}
+
+.report-item .report-item-message {
+  flex-grow: 1;
+}
+
+.verify-button {
+  width: 100%;
+  margin: 0.1rem;
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+.verify-button .verify-button-text {
+  font-weight: bold;
+}
+
+.verify-button .verify-button-icon {
+  margin-right: 0.3rem;
 }

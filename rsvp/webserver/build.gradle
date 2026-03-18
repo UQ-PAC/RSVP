@@ -6,5 +6,6 @@ apply plugin: 'io.spring.dependency-management'
 
 dependencies {
     implementation project(':app')
+    implementation project(':support')
     implementation 'org.springframework.boot:spring-boot-starter-web'
 }

@@ -8,7 +8,8 @@ namespace PetClinic {
     entity Veterinarian = {
         name: String,
         clinics: Set<Clinic>,
-        role: Role
+        role: Role,
+        manager?: Veterinarian
     };
 
     entity Secretary = {

@@ -23,29 +23,17 @@ jobs:
         name: Install pnpm
         with:
           version: 10
-          cache: true
-      - name: Install server dependencies
+      - name: Install dependencies
         run: pnpm install
         working-directory: webapp
-      - name: Install client dependencies
-        run: pnpm install
-        working-directory: webapp/client
       - name: Run Tests
         run: pnpm test
         working-directory: webapp
-      - name: Upload server test coverage
+      - name: Upload test coverage
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: server-coverage-report
+          name: coverage-report
           path: webapp/coverage/
-          if-no-files-found: error
-          retention-days: 7
-      - name: Upload client test coverage
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: client-coverage-report
-          path: webapp/client/coverage/
           if-no-files-found: error
           retention-days: 7

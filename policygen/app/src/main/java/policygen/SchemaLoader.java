@@ -149,7 +149,7 @@ public class SchemaLoader {
                     context = (CedarRecord) mapType(action.getAppliesToContext());
                 }
 
-                CedarAction newAction = new CedarAction(action.getName(), principals, resources, context);
+                CedarAction newAction = new CedarAction(action.getQualifiedName(), principals, resources, context);
                 actions.add(newAction);
             }
 

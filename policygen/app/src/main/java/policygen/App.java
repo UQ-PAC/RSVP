@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -339,7 +338,7 @@ public class App {
             Entity entity = entities.getRandomEntityOfType((CedarEntityRef)requiredType, random);
             if (entity != null) {
                 result.expression = new EntityExpression(entity.getEntityId(),
-                        Arrays.asList(entity.getEntityType()), null);
+                        entity.getEntityType(), null);
                 result.exprType = requiredType;
                 return result;
             }

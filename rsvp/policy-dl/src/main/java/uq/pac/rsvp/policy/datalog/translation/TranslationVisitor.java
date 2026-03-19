@@ -136,111 +136,13 @@ public class TranslationVisitor extends VoidVisitorAdapter {
 
     @Override
     public void visitCallExpr(CallExpression expr) {
-        switch (expr.getFunc()) {
-            case "contains" -> {
-                // Contains uses a single argument
-                require(expr.getArgs().size() == 1);
-                DLTerm argument = getOperand(expr.getArgs().getFirst());
-
-                // x.y.contains(z) form ->
-                //    count : { Attribute(x, y, z) } >= 1 (positive)
-                //    count : { Attribute(x, y, z) } < 1  (negative)
-                // In addition, we are adding HasAttribute(x, y), as otherwise
-                // the negated form counts in undefined entities
-                if (expr.getSelf() instanceof PropertyAccessExpression pe) {
-                    DLTerm propertyTerm = DLTerm.lit(pe.getProperty());
-                    DLTerm set = getOperand(pe.getObject());
-                    // Count term
-                    DLTerm aggregate = new DLAggregate(DLAggregate.Aggregate.COUNT,
-                            new DLAtom(AttributeRuleDecl, set, propertyTerm, argument));
-                    // Negation-based operator
-                    DLConstraint.Operator op = negated ? DLConstraint.Operator.LT : DLConstraint.Operator.GTE;
-                    expressions.add(new DLAtom(HasAttributeRuleDecl, set, propertyTerm));
-                    expressions.add(new DLConstraint(aggregate, DLTerm.lit(1), op));
-                } else {
-                    throw new TranslationError("Unsupported set.contains() form: " + expr);
-                }
-            }
-            case "containsAll" -> {
-                // Expect a single argument here and only in the form of property access
-                // Literal-set variation is re-written to disjunctions over contains
-                require(expr.getArgs().size() == 1);
-
-                Expression arg = expr.getArgs().getFirst();
-
-                if (expr.getSelf() instanceof PropertyAccessExpression lpe && arg instanceof PropertyAccessExpression rpe) {
-                    DLTerm leftPropertyTerm = DLTerm.lit(lpe.getProperty());
-                    DLTerm leftSet = getOperand(lpe.getObject());
-                    DLTerm rightPropertyTerm = DLTerm.lit(rpe.getProperty());
-                    DLTerm rightSet = getOperand(rpe.getObject());
-                    DLTerm connector = operandVisitor.getTmpVar();
-
-                    DLTerm aggregateLhs = new DLAggregate(DLAggregate.Aggregate.COUNT,
-                            new DLAtom(AttributeRuleDecl, leftSet, leftPropertyTerm, connector),
-                            new DLAtom(AttributeRuleDecl, rightSet, rightPropertyTerm, connector));
-
-                    DLTerm aggregateRhs = new DLAggregate(DLAggregate.Aggregate.COUNT,
-                            new DLAtom(AttributeRuleDecl, rightSet, rightPropertyTerm, new DLVar("_")));
-
-                    // Negation-based operator
-                    DLConstraint.Operator op = negated ? DLConstraint.Operator.NEQ : DLConstraint.Operator.EQ;
-                    expressions.add(new DLAtom(HasAttributeRuleDecl, leftSet, leftPropertyTerm));
-                    expressions.add(new DLAtom(HasAttributeRuleDecl, rightSet, rightPropertyTerm));
-                    expressions.add(new DLConstraint(aggregateLhs, aggregateRhs, op));
-                } else {
-                    throw new TranslationError("Unsupported set.contains() form: " + expr);
-                }
-            }
-            case "containsAny" -> {
-                // Expect a single argument here and only in the form of property access
-                // Literal-set variation is re-written to disjunctions over contains
-                require(expr.getArgs().size() == 1);
-
-                Expression arg = expr.getArgs().getFirst();
-
-                if (expr.getSelf() instanceof PropertyAccessExpression lpe && arg instanceof PropertyAccessExpression rpe) {
-                    DLTerm leftPropertyTerm = DLTerm.lit(lpe.getProperty());
-                    DLTerm leftSet = getOperand(lpe.getObject());
-                    DLTerm rightPropertyTerm = DLTerm.lit(rpe.getProperty());
-                    DLTerm rightSet = getOperand(rpe.getObject());
-                    DLTerm connector = operandVisitor.getTmpVar();
-
-                    // Count term
-                    DLTerm aggregate = new DLAggregate(DLAggregate.Aggregate.COUNT,
-                            new DLAtom(AttributeRuleDecl, leftSet, leftPropertyTerm, connector),
-                            new DLAtom(AttributeRuleDecl, rightSet, rightPropertyTerm, connector));
-
-                    // Negation-based operator
-                    DLConstraint.Operator op = negated ? DLConstraint.Operator.LT : DLConstraint.Operator.GTE;
-                    expressions.add(new DLAtom(HasAttributeRuleDecl, leftSet, leftPropertyTerm));
-                    expressions.add(new DLAtom(HasAttributeRuleDecl, rightSet, rightPropertyTerm));
-                    expressions.add(new DLConstraint(aggregate, DLTerm.lit(1), op));
-                } else {
-                    throw new TranslationError("Unsupported set.contains() form: " + expr);
-                }
-            }
-            case "isEmpty" -> {
-                // isEmpty has no arguments
-                require(expr.getArgs().isEmpty());
-
-                // x.y.isEmpty() form ->
-                //    count : { Attribute(x, y, z) } = 0 (positive)
-                //    count : { Attribute(x, y, z) } > 0 (negative)
-                // In addition, we are adding HasAttribute(x, y), as otherwise
-                // the negated form counts in undefined entities
-                if (expr.getSelf() instanceof PropertyAccessExpression pe) {
-                    DLTerm propertyTerm = DLTerm.lit(pe.getProperty());
-                    DLTerm set = getOperand(pe.getObject());
-                    DLTerm aggregate = new DLAggregate(DLAggregate.Aggregate.COUNT,
-                            new DLAtom(AttributeRuleDecl, set, DLTerm.lit(pe.getProperty()), new DLVar("_")));
-                    DLConstraint.Operator op = negated ? DLConstraint.Operator.GT : DLConstraint.Operator.EQ;
-                    expressions.add(new DLAtom(HasAttributeRuleDecl, set, propertyTerm));
-                    expressions.add(new DLConstraint(aggregate, DLTerm.lit(0), op));
-                } else {
-                    throw new TranslationError("Unsupported set.isEmpty() form: " + expr);
-                }
-            }
-            default -> throw new TranslationError("Unsupported function: " + expr.getFunc());
+        if (TranslationFunctions.isRegistered(expr.getFunc())) {
+            List<DLRuleExpr> exprs = TranslationFunctions
+                    .getFunction(expr.getFunc())
+                    .translate(expr, negated, operandVisitor);
+            expressions.addAll(exprs);
+        } else {
+            throw new TranslationError("Unsupported function: " + expr.getFunc());
         }
     }
 }

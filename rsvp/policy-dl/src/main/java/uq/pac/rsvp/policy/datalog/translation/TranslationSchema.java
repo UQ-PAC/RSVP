@@ -5,7 +5,7 @@ import uq.pac.rsvp.policy.ast.schema.Schema;
 import java.util.*;
 
 /**
- * Translation for the entire schema (presently a collection of entity type definitions)
+ * Translation for the entire schema as collection of entity type definitions
  */
 public class TranslationSchema {
     private final Map<String, TranslationEntityDefinition> entityTypes;

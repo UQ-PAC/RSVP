@@ -9,7 +9,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Converting a Cedar expression to DNF
+ * Converting a Cedar expression to DNF.
+ * <p>
+ * This conversion assumes that cedar expressions consist of conjunctions,
+ * disjunctions and negations of  boolean-valued predicate expressions.
+ * <p>
+ * Conversion generates a list of lists of expressions, where each expression
+ * list is a conjunctive clause. Each expression, in turn, is a potentially
+ * negated predicate expression
  */
 public class NFConverter extends ValueVisitorAdapter<Formula> {
     private final Map<String, Expression> cache;

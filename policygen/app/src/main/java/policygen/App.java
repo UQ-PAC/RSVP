@@ -367,7 +367,7 @@ public class App {
         else if (requiredType.getTypeId() == CedarType.TypeId.STRING) {
             ExpressionWithType result = new ExpressionWithType();
             String stringValue = "string" + random.nextInt(30);
-            result.expression = new StringExpression(stringValue, null);
+            result.expression = new StringExpression(stringValue, true, null);
             result.exprType = requiredType;
             return result;
         }

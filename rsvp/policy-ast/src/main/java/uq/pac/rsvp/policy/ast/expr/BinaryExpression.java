@@ -111,7 +111,7 @@ public class BinaryExpression extends Expression {
             case Add -> "+";
             case And -> "&&";
             case Eq -> "==";
-            case Greater -> "=";
+            case Greater -> ">";
             case GreaterEq -> ">=";
             case HasAttr -> "has";
             case In -> "in";

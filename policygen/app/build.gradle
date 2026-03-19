@@ -31,7 +31,7 @@ java {
 dependencies {
     //testImplementation libs.junit.jupiter
     //testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    implementation 'uq.pac.rsvp:policy-ast:3.0.0'
+    implementation 'uq.pac.rsvp:policy-ast:3.0.1'
     
     // These should be kept in sync version-wise with dependency of policy-ast:
     implementation 'com.cedarpolicy:cedar-java:4.8.0-rsvp-4:uber'

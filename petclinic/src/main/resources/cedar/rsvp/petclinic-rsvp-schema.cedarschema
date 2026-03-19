@@ -44,132 +44,27 @@ namespace PetClinic {
         confidentiality: Confidentiality
     };
 
-    action DeleteOperations;
-    action EditOperations;
-
-    action OwnerOperations;
-    action PetOperations;
-    action VisitOperations;
-    action VeterinarianOperations;
-    action SecretaryOperations;
-
-    action ViewOwner in OwnerOperations appliesTo {
-        principal: [Secretary, Veterinarian, Administrator, Guest],
-        resource: Owner,
+    action View appliesTo {
+        principal: [Veterinarian, Secretary, Administrator, Guest],
+        resource: [Clinic, Veterinarian, Secretary, Administrator, Owner, Pet, Visit],
         context: { }
     };
 
-    action AddOwner in OwnerOperations appliesTo {
-        principal: [Secretary, Veterinarian, Administrator, Guest],
-        resource: Clinic,
+    action Add appliesTo {
+        principal: [Veterinarian, Secretary, Administrator, Guest],
+        resource: [Clinic, Veterinarian, Secretary, Administrator, Owner, Pet, Visit],
         context: { }
     };
 
-    action EditOwner in [OwnerOperations, EditOperations] appliesTo {
-        principal: [Secretary, Veterinarian, Administrator, Guest],
-        resource: Owner,
+    action Edit appliesTo {
+        principal: [Veterinarian, Secretary, Administrator, Guest],
+        resource: [Clinic, Veterinarian, Secretary, Administrator, Owner, Pet, Visit],
         context: { }
     };
 
-    action DeleteOwner in [OwnerOperations, DeleteOperations] appliesTo {
-        principal: [Secretary, Veterinarian, Administrator, Guest],
-        resource: Owner,
-        context: { }
-    };
-
-    action ViewPet in PetOperations appliesTo {
-        principal: [Secretary, Veterinarian, Administrator, Guest],
-        resource: Pet,
-        context: { }
-    };
-
-    action AddPet in PetOperations appliesTo {
-        principal: [Secretary, Veterinarian, Administrator, Guest],
-        resource: Owner,
-        context: { }
-    };
-
-    action EditPet in [PetOperations, EditOperations] appliesTo {
-        principal: [Secretary, Veterinarian, Administrator, Guest],
-        resource: Pet,
-        context: { }
-    };
-
-    action DeletePet in [PetOperations, DeleteOperations] appliesTo {
-        principal: [Secretary, Veterinarian, Administrator, Guest],
-        resource: Pet,
-        context: { }
-    };
-
-    action ViewVisit in VisitOperations appliesTo {
-        principal: [Secretary, Veterinarian, Administrator, Guest],
-        resource: Visit,
-        context: { }
-    };
-
-    action AddVisit in VisitOperations appliesTo {
-        principal: [Secretary, Veterinarian, Administrator, Guest],
-        resource: Owner,
-        context: { }
-    };
-
-    action EditVisit in [VisitOperations, EditOperations] appliesTo {
-        principal: [Secretary, Veterinarian, Administrator, Guest],
-        resource: Visit,
-        context: { }
-    };
-
-    action DeleteVisit in [VisitOperations, DeleteOperations] appliesTo {
-        principal: [Secretary, Veterinarian, Administrator, Guest],
-        resource: Visit,
-        context: { }
-    };
-
-    action ViewVeterinarian in VeterinarianOperations appliesTo {
-        principal: [Secretary, Veterinarian, Administrator, Guest],
-        resource: Veterinarian,
-        context: { }
-    };
-
-    action AddVeterinarian in VeterinarianOperations appliesTo {
-        principal: [Secretary, Veterinarian, Administrator, Guest],
-        resource: Clinic,
-        context: { }
-    };
-
-    action EditVeterinarian in [VeterinarianOperations, EditOperations] appliesTo {
-        principal: [Secretary, Veterinarian, Administrator, Guest],
-        resource: Veterinarian,
-        context: { }
-    };
-
-    action DeleteVeterinarian in [VeterinarianOperations, DeleteOperations] appliesTo {
-        principal: [Secretary, Veterinarian, Administrator, Guest],
-        resource: Veterinarian,
-        context: { }
-    };
-
-    action ViewSecretary in SecretaryOperations appliesTo {
-        principal: [Secretary, Veterinarian, Administrator, Guest],
-        resource: Secretary,
-        context: { }
-    };
-
-    action AddSecretary in SecretaryOperations appliesTo {
-        principal: [Secretary, Veterinarian, Administrator, Guest],
-        resource: Clinic,
-        context: { }
-    };
-
-    action EditSecretary in [SecretaryOperations, EditOperations] appliesTo {
-        principal: [Secretary, Veterinarian, Administrator, Guest],
-        resource: Secretary,
-        context: { }
-    };
-
-    action DeleteSecretary in [SecretaryOperations, DeleteOperations] appliesTo {
-        principal: [Secretary, Veterinarian, Administrator, Guest],
-        resource: Secretary,
+    action Delete appliesTo {
+        principal: [Veterinarian, Secretary, Administrator, Guest],
+        resource: [Clinic, Veterinarian, Secretary, Administrator, Owner, Pet, Visit],
         context: { }
     };
 }

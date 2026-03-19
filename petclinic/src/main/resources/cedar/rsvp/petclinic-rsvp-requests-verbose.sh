@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 ERROR=
-ENTITIES=petclinic-rsvp-entities.json
-POLICY=petclinic-rsvp-policy.cedar
 SCHEMA=petclinic-rsvp-schema.cedarschema
+ENTITIES=petclinic-rsvp-entities.json
+POLICY="${1:-petclinic-rsvp-policy.cedar}"
 
 validate() {
     out=$(cedar validate \
@@ -15,6 +15,7 @@ validate() {
 
 authorise() {
     echo "$1"
+    cat "$1"
 
     mapfile -t out < <(cedar authorize \
                         --verbose \

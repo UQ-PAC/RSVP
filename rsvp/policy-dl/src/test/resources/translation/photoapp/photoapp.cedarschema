@@ -19,25 +19,25 @@ entity Photo = {
     type: String
 };
 
-action viewPhoto appliesTo {
+action "viewPhoto" appliesTo {
     principal: Account,
     resource: Photo,
     context: { }
 };
 
-action removeAlbum appliesTo {
+action "removeAlbum" appliesTo {
     principal: Account,
     resource: Album,
     context: { }
 };
 
-action uploadPhoto appliesTo {
+action "uploadPhoto" appliesTo {
     principal: Account,
     resource: Album,
     context: { }
 };
 
-action createAlbum appliesTo {
+action "createAlbum" appliesTo {
     principal: Account,
     resource: Account,
     context: { }

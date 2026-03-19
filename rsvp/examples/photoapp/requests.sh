@@ -4,8 +4,6 @@ ERROR=
 POLICY=policy.cedar
 ENTITIES=entities.json
 SCHEMA=schema.cedarschema
-CONTEXT=context.json
-
 
 if [ "$1" = "validate" ]; then
     cedar validate --schema $SCHEMA --policies $POLICY || exit 1
@@ -20,8 +18,7 @@ authorise() {
       --schema $SCHEMA \
       --principal "$1" \
       --action "$2" \
-      --resource "$3" \
-      --context $CONTEXT)
+      --resource "$3")
 
   out=$(echo $out)
 

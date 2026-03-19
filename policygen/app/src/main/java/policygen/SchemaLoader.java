@@ -17,6 +17,7 @@ import uq.pac.rsvp.policy.ast.schema.common.CommonTypeReference;
 import uq.pac.rsvp.policy.ast.schema.common.EntityTypeReference;
 import uq.pac.rsvp.policy.ast.schema.common.LongType;
 import uq.pac.rsvp.policy.ast.schema.common.RecordTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.common.SetTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.common.StringType;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitorImpl;
@@ -53,12 +54,6 @@ public class SchemaLoader {
 
                     @Override
                     public void visitCommonTypeReference(CommonTypeReference type) {
-                        // TODO Auto-generated method stub
-                        //visitCommonTypeReference(type);
-                        System.out.println("*** " + type.getName());
-                        if (type.getDefinition() == null) {
-                            System.out.println("*** definition is null");
-                        }
                         type.getDefinition().accept(this);
                     }
 
@@ -81,6 +76,17 @@ public class SchemaLoader {
                         }
 
                         resultType[0] = new CedarRecord(fields);
+                    }
+
+                    @Override
+                    public void visitSetTypeDefinition(SetTypeDefinition type) {
+                        CedarType elementTypeCT = null;
+                        if (type.getElementType() != null) {
+                            type.getElementType().accept(this);
+                            elementTypeCT = resultType[0];
+                        }
+
+                        resultType[0] = new CedarSet(elementTypeCT);
                     }
                 });
 

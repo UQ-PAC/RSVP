@@ -33,6 +33,7 @@ import uq.pac.rsvp.policy.ast.expr.Expression;
 import uq.pac.rsvp.policy.ast.expr.LongExpression;
 import uq.pac.rsvp.policy.ast.expr.PropertyAccessExpression;
 import uq.pac.rsvp.policy.ast.expr.RecordExpression;
+import uq.pac.rsvp.policy.ast.expr.SetExpression;
 import uq.pac.rsvp.policy.ast.expr.StringExpression;
 import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
@@ -368,6 +369,24 @@ public class App {
             ExpressionWithType result = new ExpressionWithType();
             String stringValue = "string" + random.nextInt(30);
             result.expression = new StringExpression(stringValue, true, null);
+            result.exprType = requiredType;
+            return result;
+        }
+        else if (requiredType.getTypeId() == CedarType.TypeId.SET) {
+            ExpressionWithType result = new ExpressionWithType();
+            Set<Expression> setElements = new HashSet<>();
+            int setSize = random.nextInt(5) + 1; // 1 - 6
+            for (int i = 0; i < setSize; i++) {
+                ExpressionWithType element = generateValueOfType(requiredType.getElementType(),
+                        entities, schema, selectedPrincipalType, selectedResourceType);
+                if (element != null) {
+                    setElements.add(element.expression);
+                }
+            }
+            if (setElements.isEmpty()) {
+                return null;
+            }
+            result.expression = new SetExpression(setElements);
             result.exprType = requiredType;
             return result;
         }

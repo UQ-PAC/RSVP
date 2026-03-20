@@ -1,10 +1,12 @@
 # Cedar to Datalog Translation
 
+This document describes elements of translation from Cedar policies to Souffle Datalog.
+
 ## Entities and actions
 
 Each cedar entity type is tracked via a unary relation, and the facts of that relation are 
-Cedar Entity Identifiers (EUID). Such entity relations are named `Entity_<T>`, where `N`
-is the name of the entity type. Actions are treated similarly all action UIDs belong to the 
+Cedar Entity Identifiers (EUID). These entity relations are named `Entity_<T>`, where `N`
+is the name of the entity type. Actions are treated similarly: all action UIDs belong to the 
 unary `Action` relation. For instance, the following cedar fragment
 
 ```
@@ -37,8 +39,7 @@ Action("Action::view").
 
 assuming there exist entities `Account::"Bob"` and `Account::"Alice"`.
 Special EUID `"???"` is added for any non-enum entity definition and
-denotes an _unknown_ (or open-world) entity that does not belong to the
-input entity set.
+denotes an _unknown_ entity that does not belong to the input entity set.
 Since cedar assumes that all actions are _fixed_, such _unknown_ 
 actions are omitted from the action relation.
 
@@ -46,8 +47,8 @@ actions are omitted from the action relation.
 
 Entity attributes are tracked via relations
 
-+ `.decl HasAttribute(euid: symbol, attr: symbol)`, and 
 + `.decl Attribute(euid: symbol, attr: symbol, value: symbol)`
++ `.decl HasAttribute(euid: symbol, attr: symbol)`, and 
 
 ### Attribute relation
 
@@ -82,7 +83,7 @@ Attribute("File::ls", "prtmissions", "x")
 converted via Souffle functors as needed.</em>
 
 Since Datalog facts have linear structure, to track record structure we create temporary
-EUIDs on and use them as references. For example, consider the following cedar entity type 
+EUIDs on and use them as references. Consider the following entity type 
 ```
 entity Fiie = {
     attrs: {
@@ -107,9 +108,9 @@ and its instance
 }
 ```
 
-To capture these attributes we first generate a unique EUID `Tmp::EUID::File::"ls"`
-that maps to `read` and `write` attributes and then map EUID `File::"ls"` to attribute
-`permissions` as follows:
+To capture record attribute structure temporary unique EUIDs are generated.
+For instance, in the example below a EUID `Tmp::EUID::File::"ls"` is created
+to enable access to the `permission` record:
 
 ```
 Attribute("File::ls", "permissions", "Tmp::EUID::File::"ls")
@@ -131,13 +132,13 @@ HasAttribute("Tmp::EUID::File::"ls", "write")
 
 `HasAttribute` allows to identify whether an entity has a given attribute or not.
 This cannot be always achieved through the `Attribute` relation alone because an attribute
-can be mapped to an empty set have not associated `Attribute` relation facts.
+can be mapped to an empty set and have no associated facts.
 
 ## Actions
 
-Cedar actions provide limits for their application with respect to principals and resources 
-they can apply to, e.g., in the following example action `Action::"view"` can only apply to 
-principals of type `Account` and resources of type `Role`.
+Cedar actions provide limits for their application with respect to principals and resources. 
+In the following example action `Action::"view"` can only apply to principals of type 
+`Account` and resources of type `Role`.
 
 ```
 action "view" appliesTo {
@@ -162,7 +163,7 @@ ActionResource("Action::view", resource) :- Entity_Role(resource).
 ## Actionable requests
 
 `ActionPrincipal` and `ActionResource` actions can then be used to construct the set of
-`(principal, resource, action)` triples that form the set of all valid (or actionable requests)
+`(principal, resource, action)` triples that form the set of all valid (_actionable_ requests)
 for which a definitive permit ot forbid decision can be made. These actionable requests
 are captured via the `ActionableRequests` rule defined as follows:
 

@@ -1,6 +1,6 @@
 # Datalog (Soufflé) Encoding of Cedar Policies
 
-This project describes a prototype that translates Cedar policies to datalog aiming to generate
+This project describes a prototype that translates Cedar policies to Datalog aiming to generate
 sets of all requests permitted/forbidden by the policies with respect to schema and provided set
 of entities.
 
@@ -17,22 +17,25 @@ For the moment the tool accepts the following arguments:
 + `--schema`: Cedar schema (Cedar)
 + `--policies`: Cedar policies (Cedar)
 + `--entities`: Cedar entities (Json)
-+ `--datalog-dir`: An (optional) directory for datalog outputs 
++ `--datalog-dir`: A directory for Datalog outputs 
 
 The tool translates Cedar components to Souffle Datalog specification
 (see [translation details](Translation.md) for further information), 
 executes it and loads the results back to Java. This computation generates
 the list of all valid Cedar-level requests (as (`principal`, `action`, `resource`) triples)
-that can either be permitted or forbidden by the supplied policy. The tool further cross-checks
-all generated requests with Cedar and reports whether any discrepancies between Cedar and RSVP
-authorisation engines have been found.
+that can either be permitted or forbidden by the supplied policy. 
+
+The tool further has an ability to validate all generated requests using Cedar and report 
+whether any discrepancies between Cedar and RSVP authorisation engines have been found.
+This functionality can be enabled via the `--validate` option.
+
 
 ## Datalog output
 
-Outputs at the datalog level are written into TAB-separated CSV files, where each line 
+Outputs at the Datalog level are written into TAB-separated CSV files, where each line 
 captures `principal`, `resource` and `action`.
 
-+ auth.dl - datalog specification
++ auth.dl - Datalog specification
 + Forbid<PolicyName>.csv - requests explicitly forbidden by a given permit policy
 + Permit<PolicyName>.csv - requests explicitly permitted by a given permit policy
 + Permit.csv - requests explicitly permitted all policies in the supplied policy set

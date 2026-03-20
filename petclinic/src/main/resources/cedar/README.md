@@ -18,18 +18,20 @@ Folder `./rsvp`.
 
 To run all tests: `./petclinic-rsvp-requests.sh`.
 
-To run all tests with verbose output: `./petclinic-rsvp-requests-verbose.sh`.
-
 The commands above will load the default Cedar files:
 - Schema: `petclinic-rsvp-schema.cedarschema`
 - Entities: `petclinic-rsvp-entities.json`
 - Policy: `petclinic-rsvp-policy.cedar`
 
 You can change the default Cedar Policy by running, instead:
-- `./petclinic-rsvp-requests.sh <another-policy.cedar>`
-- `./petclinic-rsvp-requests-verbose.sh <another-policy.cedar>`
+- `./petclinic-rsvp-requests.sh -p <another-policy.cedar>`
 
-Request JSON files are named following the convention: `<principal>-<action>-<resource>.json`.
+Available flags:
+- `-t`: to read requests from the `./ALLOW-TEST` and `./DENY-TEST` folders instead of from the `./ALLOW` and `./DENY` folders.
+- `-v`: to get verbose output, which includes the actual resquest.
+- `-p`: to load another Cedar policy instead.
+
+Request JSON files in the `./ALLOW-TEST` and `./DENY-TEST` folders are named following the convention: `<principal>-<action>-<resource>.json`.
 
 ## Graphviz Visualisation of Entities
 

@@ -10,15 +10,20 @@ import com.cedarpolicy.model.exception.AuthException;
 import com.cedarpolicy.model.policy.PolicySet;
 import com.cedarpolicy.model.schema.Schema;
 import com.google.devtools.common.options.OptionsParser;
+import com.google.gson.*;
+import com.google.gson.stream.JsonWriter;
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestAuth;
 import uq.pac.rsvp.policy.datalog.util.Logger;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 import static org.fusesource.jansi.Ansi.Color.*;
@@ -58,19 +63,7 @@ public class Driver {
         return null;
     }
 
-    public static void main(String[] args) throws IOException, AuthException, InterruptedException, RsvpException {
-        OptionsParser parser = OptionsParser.newOptionsParser(DriverOptions.class);
-        parser.parseAndExitUponError(args);
-        DriverOptions options = parser.getOptions(DriverOptions.class);
-        Map<String, Object> optionsMap = options.asMap();
-
-        Path schemaFile = requiredFile(optionsMap, "schema");
-        Path policyFile = requiredFile(optionsMap, "policies");
-        Path entitiesFile = requiredFile(optionsMap, "entities");
-        String dlDir = requiredOpt(optionsMap, "datalog-dir", String.class);
-        Path dlPath = Path.of(dlDir);
-
-        RequestAuth rsvpAuth = RequestAuth.load(schemaFile, policyFile, entitiesFile, dlPath, false);
+    private static void validate(RequestAuth rsvpAuth, Path schemaFile, Path policyFile, Path entitiesFile) throws IOException, AuthException {
         AuthorizationEngine cedarAuth = new BasicAuthorizationEngine();
         Entities cedarEntities = Entities.parse(entitiesFile);
 
@@ -109,12 +102,70 @@ public class Driver {
             rsvpRequestCounter[rsvpDecision.ordinal()]++;
         }
         logger.bold().info(GREEN, "RSVP Requests (allow/deny): %d/%d\n",
-                        rsvpAuth.getActionableRequests().size(), rsvpRequestCounter[0], rsvpRequestCounter[1]);
+                rsvpAuth.getActionableRequests().size(), rsvpRequestCounter[0], rsvpRequestCounter[1]);
         logger.bold().info(BLUE, "Cedar Requests (allow/deny): %d/%d\n",
-                        rsvpAuth.getActionableRequests().size(), cedarRequestCounter[0], cedarRequestCounter[1]);
+                rsvpAuth.getActionableRequests().size(), cedarRequestCounter[0], cedarRequestCounter[1]);
 
         if (!Arrays.equals(rsvpRequestCounter, cedarRequestCounter)) {
-            error("Mismatched requests decisions found");
+            error("Validation failed");
+        } else {
+            logger.bold().info(GREEN, "All requests validated");
+        }
+    }
+
+    private static void writeRequests(JsonWriter writer, Collection<Request> requests, String name) throws IOException {
+        writer.name("name");
+        writer.beginArray();
+        for (Request r : requests) {
+            writer.beginObject();
+            writer.name("principal");
+            writer.value(r.getPrincipal());
+            writer.name("resource");
+            writer.value(r.getResource());
+            writer.name("action");
+            writer.value(r.getAction());
+            writer.endObject();
+        }
+        writer.endArray();
+    }
+
+    public static void writeRequests(Path file, RequestAuth auth) throws IOException {
+        JsonWriter writer = new JsonWriter(new FileWriter(file.toFile()));
+        writer.setFormattingStyle(FormattingStyle.PRETTY);
+        writer.beginObject();
+        writeRequests(writer, auth.getPermittedRequests(), "permitted");
+        writeRequests(writer, auth.getForbiddenRequests(), "forbidden");
+        writer.endObject();
+        writer.close();
+    }
+
+    public static void main(String[] args) throws IOException, AuthException, InterruptedException, RsvpException {
+        OptionsParser parser = OptionsParser.newOptionsParser(DriverOptions.class);
+        parser.parseAndExitUponError(args);
+        DriverOptions options = parser.getOptions(DriverOptions.class);
+        Map<String, Object> optionsMap = options.asMap();
+
+        if (options.help) {
+            logger.info(DEFAULT, parser.describeOptions(Collections.emptyMap(), OptionsParser.HelpVerbosity.LONG));
+            System.exit(2);
+        }
+
+        Path schemaFile = requiredFile(optionsMap, "schema");
+        Path policyFile = requiredFile(optionsMap, "policies");
+        Path entitiesFile = requiredFile(optionsMap, "entities");
+        String dlDir = requiredOpt(optionsMap, "datalog-dir", String.class);
+        Path dlPath = Path.of(dlDir);
+
+        if (Files.exists(dlPath) && !Files.isDirectory(dlPath)) {
+            error("Datalog destination: " + dlPath + " is not a directory");
+        }
+
+        RequestAuth rsvpAuth = RequestAuth.load(schemaFile, policyFile, entitiesFile, dlPath, false);
+        logger.info(YELLOW, "Datalog output written to directory: " + dlPath.toAbsolutePath());
+        writeRequests(Path.of(dlPath.toString(), "auth.json"), rsvpAuth);
+
+        if (options.validate) {
+            validate(rsvpAuth, schemaFile, policyFile, entitiesFile);
         }
 
         System.exit(0);

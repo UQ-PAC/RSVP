@@ -8,7 +8,7 @@ public class DriverOptions extends OptionsBase {
             name = "help",
             abbrev = 'h',
             help = "Prints usage info.",
-            defaultValue = "true")
+            defaultValue = "false")
     public boolean help;
 
     @Option(
@@ -36,18 +36,18 @@ public class DriverOptions extends OptionsBase {
     public String entitiesFile;
 
     @Option(
-            name = "requests",
-            abbrev = 'r',
-            help = "Authorisation requests",
-            category = "input",
-            defaultValue = "null")
-    public String queriesFile;
-
-    @Option(
             name = "datalog-dir",
             abbrev = 'D',
             help = "A directory with Datalog outputs",
             category = "input",
-            defaultValue = "rsvp-tmp")
+            defaultValue = "null")
     public String datalogDir;
+
+    @Option(
+            name = "validate",
+            abbrev = 'v',
+            help = "Validate against cedar",
+            category = "input",
+            defaultValue = "false")
+    public boolean validate;
 }

@@ -1,6 +1,6 @@
 {
     "principal": "PetClinic::Guest::\"Unknown\"",
-    "action": "PetClinic::Action::\"ViewOwner\"",
+    "action": "PetClinic::Action::\"ViewClient\"",
     "resource": "PetClinic::Owner::\"Jean Coleman\"",
     "context": { },
     "validateRequest": true

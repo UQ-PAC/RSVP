@@ -10,8 +10,8 @@ permit (
     resource is PetClinic::Employee
 )
 when {
-    resource.roles.containsAny([PetClinic::Role::"Secretary",
-                                PetClinic::Role::"Veterinarian"])
+    resource.roles.containsAny([PetClinic::EmployeeRole::"Secretary",
+                                PetClinic::EmployeeRole::"Veterinarian"])
 };
 
 // 'policy1'
@@ -23,9 +23,9 @@ forbid (
     resource
 )
 when {
-    resource is PetClinic::Owner ||
+    resource is PetClinic::PetOwner ||
     resource is PetClinic::Pet ||
-    resource is PetClinic::Visit
+    resource is PetClinic::PetVisit
 };
 
 // 'policy2'
@@ -37,7 +37,7 @@ permit (
     resource
 )
 when {
-    principal.roles.contains(PetClinic::Role::"Administrator")
+    principal.roles.contains(PetClinic::EmployeeRole::"Administrator")
 };
 
 // 'policy3'
@@ -49,21 +49,23 @@ permit (
     resource
 )
 when {
-    principal.roles.contains(PetClinic::Role::"Secretary") &&
+    principal.roles.contains(PetClinic::EmployeeRole::"Secretary") &&
     (
         resource is PetClinic::Employee ||
-        resource is PetClinic::Owner ||
+        resource is PetClinic::PetOwner ||
         resource is PetClinic::Pet ||
-        resource is PetClinic::Visit
+        resource is PetClinic::PetVisit
     ) &&
     resource.clinics.containsAny(principal.clinics)
 }
 unless {
-    action in [PetClinic::Action::"AddClient", PetClinic::Action::"AddEmployee",
-               PetClinic::Action::"DeleteClient", PetClinic::Action::"DeleteEmployee"] ||
+    action in [PetClinic::Action::"AddClient",
+               PetClinic::Action::"AddEmployee",
+               PetClinic::Action::"DeleteClient",
+               PetClinic::Action::"DeleteEmployee"] ||
     (
         resource has roles &&
-        resource.roles.contains(PetClinic::Role::"Administrator")
+        resource.roles.contains(PetClinic::EmployeeRole::"Administrator")
     )
 };
 
@@ -76,7 +78,7 @@ permit (
     resource is PetClinic::Clinic
 )
 when {
-    principal.roles.contains(PetClinic::Role::"Secretary") &&
+    principal.roles.contains(PetClinic::EmployeeRole::"Secretary") &&
     principal.clinics.contains(resource)
 };
 
@@ -89,11 +91,11 @@ permit (
     resource
 )
 when {
-    principal.roles.contains(PetClinic::Role::"Veterinarian") &&
+    principal.roles.contains(PetClinic::EmployeeRole::"Veterinarian") &&
     (
-        resource is PetClinic::Owner ||
+        resource is PetClinic::PetOwner ||
         resource is PetClinic::Pet ||
-        resource is PetClinic::Visit
+        resource is PetClinic::PetVisit
     ) &&
     principal in resource.veterinarians
 }
@@ -110,7 +112,7 @@ permit (
     resource is PetClinic::Clinic
 )
 when {
-    principal.roles.contains(PetClinic::Role::"Veterinarian") &&
+    principal.roles.contains(PetClinic::EmployeeRole::"Veterinarian") &&
     principal.clinics.contains(resource)
 };
 
@@ -124,13 +126,13 @@ forbid (
     resource
 )
 when {
-    principal.roles.contains(PetClinic::Role::"Veterinarian") &&
+    principal.roles.contains(PetClinic::EmployeeRole::"Veterinarian") &&
     principal has level &&
-    principal.level == PetClinic::Level::"Intern" &&
+    principal.level == PetClinic::ProfessionalLevel::"Intern" &&
     (
-        resource is PetClinic::Owner ||
+        resource is PetClinic::PetOwner ||
         resource is PetClinic::Pet ||
-        resource is PetClinic::Visit
+        resource is PetClinic::PetVisit
     ) &&
     principal in resource.veterinarians
 };
@@ -157,16 +159,16 @@ permit (
     resource
 )
 when {
-    principal.roles.contains(PetClinic::Role::"Veterinarian") &&
+    principal.roles.contains(PetClinic::EmployeeRole::"Veterinarian") &&
     principal has level &&
     (
-        principal.level == PetClinic::Level::"Senior" ||
-        principal.level == PetClinic::Level::"Specialist"
+        principal.level == PetClinic::ProfessionalLevel::"Senior" ||
+        principal.level == PetClinic::ProfessionalLevel::"Specialist"
     ) &&
     (
-        resource is PetClinic::Owner ||
+        resource is PetClinic::PetOwner ||
         resource is PetClinic::Pet ||
-        resource is PetClinic::Visit
+        resource is PetClinic::PetVisit
     ) &&
     principal in resource.veterinarians
 };
@@ -180,16 +182,16 @@ permit (
     resource
 )
 when {
-    principal.roles.contains(PetClinic::Role::"Veterinarian") &&
+    principal.roles.contains(PetClinic::EmployeeRole::"Veterinarian") &&
     principal has level &&
     (
-        principal.level == PetClinic::Level::"Senior" ||
-        principal.level == PetClinic::Level::"Specialist"
+        principal.level == PetClinic::ProfessionalLevel::"Senior" ||
+        principal.level == PetClinic::ProfessionalLevel::"Specialist"
     ) &&
     (
-        resource is PetClinic::Owner ||
+        resource is PetClinic::PetOwner ||
         resource is PetClinic::Pet ||
-        resource is PetClinic::Visit
+        resource is PetClinic::PetVisit
     )
 }
 unless {
@@ -212,12 +214,5 @@ when {
 }
 unless {
     principal is PetClinic::Employee &&
-    principal.roles.contains(PetClinic::Role::"Administrator")
+    principal.roles.contains(PetClinic::EmployeeRole::"Administrator")
 };
-
-// 'policy12'
-// No Employee can be their own manager.
-
-// 'policy13'
-// Level with values Resident, Registrar, and Specialist are only used
-// in conjunction with Role Veterinarian.

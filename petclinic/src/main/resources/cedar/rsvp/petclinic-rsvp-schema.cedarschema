@@ -3,22 +3,16 @@ namespace PetClinic {
 
     entity Confidentiality enum ["Official", "Sensitive", "Protected"];
 
-    entity Level enum ["Intern", "Resident", "Senior", "Registrar", "Specialist"];
+    entity Role enum ["Administrator", "Secretary", "Veterinarian"];
 
-    entity Veterinarian = {
+    entity Level enum ["Intern", "Resident", "Staff", "Senior", "Registrar", "Specialist"];
+
+    entity Employee = {
         name: String,
         clinics: Set<Clinic>,
-        level: Level,
-        manager?: Veterinarian
-    };
-
-    entity Secretary = {
-        name: String,
-        clinics: Set<Clinic>
-    };
-
-    entity Administrator = {
-        name: String
+        roles: Set<Role>,
+        level?: Level,
+        manager?: Employee
     };
 
     entity Guest;
@@ -27,44 +21,71 @@ namespace PetClinic {
         name: String,
         pets: Set<Pet>,
         clinics: Set<Clinic>,
-        veterinarians: Set<Veterinarian>
+        veterinarians: Set<Employee>
     };
 
     entity Pet = {
         name: String,
         owner: Owner,
         clinics: Set<Clinic>,
-        veterinarians: Set<Veterinarian>
+        veterinarians: Set<Employee>
     };
 
     entity Visit = {
         pet: Pet,
         clinics: Set<Clinic>,
-        veterinarians: Set<Veterinarian>,
+        veterinarians: Set<Employee>,
         confidentiality: Confidentiality
     };
 
-    action View appliesTo {
-        principal: [Veterinarian, Secretary, Administrator, Guest],
-        resource: [Clinic, Veterinarian, Secretary, Administrator, Owner, Pet, Visit],
+    action ClientOperations;
+    action EmployeeOperations;
+
+    action ViewClient in ClientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: [Owner, Pet, Visit],
         context: { }
     };
 
-    action Add appliesTo {
-        principal: [Veterinarian, Secretary, Administrator, Guest],
-        resource: [Clinic, Veterinarian, Secretary, Administrator, Owner, Pet, Visit],
+    action AddClient in ClientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Clinic,
         context: { }
     };
 
-    action Edit appliesTo {
-        principal: [Veterinarian, Secretary, Administrator, Guest],
-        resource: [Clinic, Veterinarian, Secretary, Administrator, Owner, Pet, Visit],
+    action EditClient in ClientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: [Owner, Pet, Visit],
         context: { }
     };
 
-    action Delete appliesTo {
-        principal: [Veterinarian, Secretary, Administrator, Guest],
-        resource: [Clinic, Veterinarian, Secretary, Administrator, Owner, Pet, Visit],
+    action DeleteClient in ClientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: [Owner, Pet, Visit],
+        context: { }
+    };
+
+    action ViewEmployee in EmployeeOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Employee,
+        context: { }
+    };
+
+    action AddEmployee in EmployeeOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Clinic,
+        context: { }
+    };
+
+    action EditEmployee in EmployeeOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Employee,
+        context: { }
+    };
+
+    action DeleteEmployee in EmployeeOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Employee,
         context: { }
     };
 }

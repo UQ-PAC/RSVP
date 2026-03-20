@@ -1,7 +1,7 @@
 {
-    "principal": "PetClinic::Veterinarian::\"Sharon Jenkins\"",
-    "action": "PetClinic::Action::\"ViewVeterinarian\"",
-    "resource": "PetClinic::Veterinarian::\"James Carter\"",
+    "principal": "PetClinic::Employee::\"Sharon Jenkins\"",
+    "action": "PetClinic::Action::\"ViewEmployee\"",
+    "resource": "PetClinic::Employee::\"James Carter\"",
     "context": { },
     "validateRequest": true
 }

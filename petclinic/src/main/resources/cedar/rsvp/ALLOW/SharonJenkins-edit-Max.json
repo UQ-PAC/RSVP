@@ -1,7 +1,7 @@
 {
     "principal": "PetClinic::Employee::\"Sharon Jenkins\"",
-    "action": "PetClinic::Action::\"ViewClient\"",
-    "resource": "PetClinic::Owner::\"Jean Coleman\"",
+    "action": "PetClinic::Action::\"EditClient\"",
+    "resource": "PetClinic::Pet::\"Max\"",
     "context": { },
     "validateRequest": true
 }

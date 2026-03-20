@@ -214,3 +214,10 @@ unless {
     principal is PetClinic::Employee &&
     principal.roles.contains(PetClinic::Role::"Administrator")
 };
+
+// 'policy12'
+// No Employee can be their own manager.
+
+// 'policy13'
+// Level with values Resident, Registrar, and Specialist are only used
+// in conjunction with Role Veterinarian.

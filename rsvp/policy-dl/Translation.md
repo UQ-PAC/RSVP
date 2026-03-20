@@ -336,13 +336,13 @@ Cedar `in` hierarchy membership operator is implemented using `ParentOf` relatio
 
 ### Boolean literals
 
-`true` does nto translate to anything because we start with a complete set of actionable requests
-and then reduce it. `false` (that basically selects nothing) is translated to 
+`true` does not translate to anything because we start with a complete set of actionable requests
+and then reduce it. `false` (select nothing) is translated to 
 
 ```
 NullifiedRequests(principal, resource, action)
 ```
-with `NullifiedRequests` being an empty relation.
+with `NullifiedRequests` being an empty relation (declaration only).
 
 
 ### Set .contains

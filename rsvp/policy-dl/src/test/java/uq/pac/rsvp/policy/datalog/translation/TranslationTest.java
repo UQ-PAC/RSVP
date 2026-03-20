@@ -127,7 +127,7 @@ public class TranslationTest {
             logger.warning("Empty policy: " + test.policy);
         }
 
-        RequestAuth rsvpAuth = RequestAuth.load(test.schema, test.policy, test.entities, test.datalogDir);
+        RequestAuth rsvpAuth = RequestAuth.load(test.schema, test.policy, test.entities, test.datalogDir, true);
         assertTrue(Collections.disjoint(rsvpAuth.getForbiddenRequests(), rsvpAuth.getPermittedRequests()));
 
         AuthorizationEngine cedarAuth = new BasicAuthorizationEngine();

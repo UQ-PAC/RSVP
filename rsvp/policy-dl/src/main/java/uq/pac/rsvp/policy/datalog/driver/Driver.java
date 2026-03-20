@@ -70,7 +70,7 @@ public class Driver {
         String dlDir = requiredOpt(optionsMap, "datalog-dir", String.class);
         Path dlPath = Path.of(dlDir);
 
-        RequestAuth rsvpAuth = RequestAuth.load(schemaFile, policyFile, entitiesFile, dlPath);
+        RequestAuth rsvpAuth = RequestAuth.load(schemaFile, policyFile, entitiesFile, dlPath, false);
         AuthorizationEngine cedarAuth = new BasicAuthorizationEngine();
         Entities cedarEntities = Entities.parse(entitiesFile);
 

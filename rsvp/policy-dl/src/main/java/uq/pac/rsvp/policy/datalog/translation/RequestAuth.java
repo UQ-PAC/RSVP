@@ -8,8 +8,10 @@ import uq.pac.rsvp.policy.datalog.ast.DLRuleDecl;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -81,8 +83,15 @@ public class RequestAuth {
         return set;
     }
 
-    public static RequestAuth load(Path schema, Path policies, Path entities, Path dlDir) throws AuthException, IOException, InterruptedException, RsvpException {
+    public static RequestAuth load(Path schema, Path policies, Path entities, Path dlDir, boolean copySources) throws AuthException, IOException, InterruptedException, RsvpException {
         DLProgram program = Translation.translate(schema, policies, entities);
+
+        if (copySources) {
+            Files.copy(schema, Path.of(dlDir.toString(), schema.getFileName().toString()), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(policies, Path.of(dlDir.toString(), policies.getFileName().toString()), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(entities, Path.of(dlDir.toString(), entities.getFileName().toString()), StandardCopyOption.REPLACE_EXISTING);
+        }
+
         program.execute(dlDir);
         return RequestAuth.load(dlDir);
     }

@@ -23,14 +23,10 @@ public class OperandVisitor extends ValueVisitorAdapter<DLTerm> {
         return DLTerm.var(VAR_PREFIX + varCounter++);
     }
 
-    private final List<DLRuleExpr> expressions;
+    private final TranslationVisitor translation;
 
-    public OperandVisitor() {
-        this.expressions = new ArrayList<>();
-    }
-
-    public List<DLRuleExpr> getExpressions() {
-        return List.copyOf(expressions);
+    public OperandVisitor(TranslationVisitor translation) {
+        this.translation = translation;
     }
 
     @Override
@@ -80,7 +76,7 @@ public class OperandVisitor extends ValueVisitorAdapter<DLTerm> {
         DLTerm lhs = expr.getObject().compute(this),
                 attr = DLTerm.lit(expr.getProperty()),
                 rhs = getTmpVar();
-        this.expressions.add(new DLAtom(AttributeRuleDecl, lhs, attr, rhs));
+        translation.addExpression(new DLAtom(AttributeRuleDecl, lhs, attr, rhs));
         return rhs;
     }
 

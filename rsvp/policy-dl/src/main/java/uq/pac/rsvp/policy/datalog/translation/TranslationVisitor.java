@@ -27,15 +27,11 @@ public class TranslationVisitor extends VoidVisitorAdapter {
     private TranslationVisitor(TranslationSchema schema) {
         this.schema = schema;
         this.expressions = new ArrayList<>();
-        this.operandVisitor = new OperandVisitor();
+        this.operandVisitor = new OperandVisitor(this);
     }
 
     public static DLRule translate(TranslationSchema schema, Collection<Expression> exprs, DLRuleDecl decl) {
         TranslationVisitor visitor = new TranslationVisitor(schema);
-        exprs.forEach(e -> {
-            visitor.expressions.add(new DLInlineComment(e.toString()));
-            e.accept(visitor);
-        });
 
         // Ground terms
         visitor.expressions.add(new DLInlineComment("Ground terms"));
@@ -43,9 +39,15 @@ public class TranslationVisitor extends VoidVisitorAdapter {
                 new DLAtom(ActionPrincipalRuleDecl, ActionVar, PrincipalVar),
                 new DLAtom(ActionResourceRuleDecl, ActionVar, ResourceVar)));
 
-        // Add side effects from operands
-        visitor.expressions.addAll(visitor.operandVisitor.getExpressions());
+        exprs.forEach(e -> {
+            visitor.expressions.add(new DLInlineComment(e.toString()));
+            e.accept(visitor);
+        });
         return new DLRule(makeStandardAtom(decl), visitor.expressions);
+    }
+
+    void addExpression(DLRuleExpr expr) {
+        expressions.add(expr);
     }
 
     private DLTerm getOperand(Expression expr) {

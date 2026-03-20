@@ -334,6 +334,17 @@ Cedar `is` operator maps directly to entity relations, e.g.,
 Cedar `in` hierarchy membership operator is implemented using `ParentOf` relation.
 `principal in Account::"Alice"` translates to `ParentOf("Account::Alice", principal)`
 
+### Boolean literals
+
+`true` does nto translate to anything because we start with a complete set of actionable requests
+and then reduce it. `false` (that basically selects nothing) is translated to 
+
+```
+NullifiedRequests(principal, resource, action)
+```
+with `NullifiedRequests` being an empty relation.
+
+
 ### Set .contains
 
 Expression of the form `principal.friends.contains(resource)` translates to

@@ -114,7 +114,7 @@ public class Driver {
     }
 
     private static void writeRequests(JsonWriter writer, Collection<Request> requests, String name) throws IOException {
-        writer.name("name");
+        writer.name(name);
         writer.beginArray();
         for (Request r : requests) {
             writer.beginObject();

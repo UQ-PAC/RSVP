@@ -3,6 +3,6 @@ permit (
     action,
     resource is Person)
 when {
-    principal.traits.containsAll([resource.trait])
+    principal.traits.containsAll(resource.traits)
 };
 

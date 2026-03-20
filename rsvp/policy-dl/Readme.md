@@ -1,68 +1,55 @@
 # Datalog (Soufflé) Encoding of Cedar Policies
 
-## Closed-world Assumption
+This project describes a prototype that translates Cedar policies to datalog aiming to generate
+sets of all requests permitted/forbidden by the policies with respect to schema and provided set
+of entities.
 
-For this type of analysis we assume operating in a closed world with a
-finite set of entities. Consequently, facts and relations not given by entities,
-schema or policies are treated as _false_ rather than _undefined_.
-Under this assumption the precision of the analysis is limited by the world,
-however, the key intent is to reason about the model of the system
-(even if incomplete) and reduce the potential search space.
-
-## Cedar Extension for Invariant Checking
-
-A permit or forbid rule of Cedar policy language can be written as
-a boolean-valued expression over variables _principal_, _action_ and _resource_.
-A Cedar policy (say _P_), then can be written as `(A1 ∧ ... ∧ An) ∧ ¬(F1 ∨ ... ∨ Fk)`,
-where `<A1, ..., An>` and  `<F1, ... Fk>` are permit and forbid rules respectively.
-An input request _R_ (as a value triple `(a, p, r)`) is permitted
-as long as the instantiation of _P_ (wrt a given entity set) with
-the values of _R_ evaluates to _true_ and forbidden otherwise.
-The request _R_ can be seen as an additional constraint
-`principal == p ∧ action == a ∧ resource == r`.
-
-For a more general case we let Cedar expressions range over a set of arbitrary variables
-as long as their types are known and introduce the notion of quantification.
+## Build
 
 ```
-    (1) <expr> for all  p : Account, a : Action
-    (2) <expr> for some p : Account, a : Action
+./gradlew build
 ```
 
-The above example shows universal (1) and existential (2) quantification for some Cedar expression
-`<expr>` over variables `p` of type _Account_ and `a` of type `Action`. (1) holds if for any
-combination of `a` and `p` <expr> evaluates to _true_ (wrt some set of entities). Respectively,
-(2) holds as long as there exists at least one pair `(a, p)` for which `<expr>` is _true_.
-
-## Encoding
-
-A preliminary example of Datalog encoding using policies, schema an entities of an example application
-+ [Schema](examples/pohotoapp/schema.cedarschema)
-+ [Policies](examples/pohotoapp/policy.cedar)
-+ [Entities](examples/pohotoapp/entities.json)
-+ [Souffle Datalog Encoding](examples/pohotoapp/auth.dl)
-
-## Initial prototype 
+## Prototype Functionality
 
 The initial prototype tool is available via the `policy-dl-all.jar` shadow jar. 
 For the moment the tool accepts the following arguments:
 + `--schema`: Cedar schema (Cedar)
 + `--policies`: Cedar policies (Cedar)
 + `--entities`: Cedar entities (Json)
-+ `--requests`: Requests file ([see example](../examples/photoapp/requests.tx)) 
 + `--datalog-dir`: An (optional) directory for datalog outputs 
 
-The tool translates Cedar components to Souffle Datalog specification, executes it
-and loads the results back to Java. The resulting information contains all forbidden and
-permitted requests (under word assumption). Finally, the tool reads the provided requests
-and outputs the results (as well as comparison with specified expectations).
+The tool translates Cedar components to Souffle Datalog specification
+(see [translation details](Translation.md) for further information), 
+executes it and loads the results back to Java. This computation generates
+the list of all valid Cedar-level requests (as (`principal`, `action`, `resource`) triples)
+that can either be permitted or forbidden by the supplied policy. The tool further cross-checks
+all generated requests with Cedar and reports whether any discrepancies between Cedar and RSVP
+authorisation engines have been found.
+
+## Datalog output
+
+Outputs at the datalog level are written into TAB-separated CSV files, where each line 
+captures `principal`, `resource` and `action`.
+
++ auth.dl - datalog specification
++ Forbid<PolicyName>.csv - requests explicitly forbidden by a given permit policy
++ Permit<PolicyName>.csv - requests explicitly permitted by a given permit policy
++ Permit.csv - requests explicitly permitted all policies in the supplied policy set
++ Forbid.csv - requests explicitly forbidden all policies in the supplied policy set
++ PermittedRequests.csv - all requests permitted by the policy
++ ForbiddenRequests.csv - all requests forbidden by the policy
++ ActionableRequests.csv - all valid requests WRT to the supplied schema, policy and a list of entities
+
+## Example
 
 Example (assuming `RSVP/rsvp` as a current working directory):
+
 ```
 java -jar policy-dl/build/libs/policy-dl-all.jar \
-    --schema examples/photoapp/schema.cedarschema \
-    --policies examples/photoapp/policy.cedar \
-    --entities examples/photoapp/entities.json \
-    --requests examples/photoapp/requests.tx \
+    --schema  src/test/resources/translation/petclinic/petclinic.cedarschema \
+    --policies src/test/resources/translation/petclinic/petclinic.cedar \
+    --entities src/test/resources/translation/petclinic/entities.cedar \
     --datalog-dir /tmp/rsvp-dl
 ```
+

@@ -41,8 +41,7 @@ public class TranslationVisitor extends VoidVisitorAdapter {
         visitor.expressions.add(new DLInlineComment("Ground terms"));
         visitor.expressions.addAll(List.of(
                 new DLAtom(ActionPrincipalRuleDecl, ActionVar, PrincipalVar),
-                new DLAtom(ActionResourceRuleDecl, ActionVar, ResourceVar),
-                new DLAtom(ActionRuleDecl, ActionVar)));
+                new DLAtom(ActionResourceRuleDecl, ActionVar, ResourceVar)));
 
         // Add side effects from operands
         visitor.expressions.addAll(visitor.operandVisitor.getExpressions());

@@ -3,21 +3,21 @@ namespace PetClinic {
 
     entity Confidentiality enum ["Official", "Sensitive", "Protected"];
 
-    entity Role enum ["Administrator", "Secretary", "Veterinarian"];
+    entity EmployeeRole enum ["Administrator", "Secretary", "Veterinarian"];
 
-    entity Level enum ["Intern", "Resident", "Staff", "Senior", "Registrar", "Specialist"];
+    entity ProfessionalLevel enum ["Intern", "Resident", "Staff", "Senior", "Registrar", "Specialist"];
 
     entity Employee = {
         name: String,
         clinics: Set<Clinic>,
-        roles: Set<Role>,
-        level?: Level,
+        roles: Set<EmployeeRole>,
+        level?: ProfessionalLevel,
         manager?: Employee
     };
 
     entity Guest;
 
-    entity Owner = {
+    entity PetOwner = {
         name: String,
         pets: Set<Pet>,
         clinics: Set<Clinic>,
@@ -26,12 +26,12 @@ namespace PetClinic {
 
     entity Pet = {
         name: String,
-        owner: Owner,
+        owner: PetOwner,
         clinics: Set<Clinic>,
         veterinarians: Set<Employee>
     };
 
-    entity Visit = {
+    entity PetVisit = {
         pet: Pet,
         clinics: Set<Clinic>,
         veterinarians: Set<Employee>,
@@ -43,7 +43,7 @@ namespace PetClinic {
 
     action ViewClient in ClientOperations appliesTo {
         principal: [Employee, Guest],
-        resource: [Owner, Pet, Visit],
+        resource: [PetOwner, Pet, PetVisit],
         context: { }
     };
 
@@ -55,13 +55,13 @@ namespace PetClinic {
 
     action EditClient in ClientOperations appliesTo {
         principal: [Employee, Guest],
-        resource: [Owner, Pet, Visit],
+        resource: [PetOwner, Pet, PetVisit],
         context: { }
     };
 
     action DeleteClient in ClientOperations appliesTo {
         principal: [Employee, Guest],
-        resource: [Owner, Pet, Visit],
+        resource: [PetOwner, Pet, PetVisit],
         context: { }
     };
 

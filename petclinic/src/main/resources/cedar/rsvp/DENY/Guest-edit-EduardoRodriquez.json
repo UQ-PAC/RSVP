@@ -1,7 +1,7 @@
 {
     "principal": "PetClinic::Guest::\"Unknown\"",
     "action": "PetClinic::Action::\"EditClient\"",
-    "resource": "PetClinic::Owner::\"Eduardo Rodriquez\"",
+    "resource": "PetClinic::PetOwner::\"Eduardo Rodriquez\"",
     "context": { },
     "validateRequest": true
 }

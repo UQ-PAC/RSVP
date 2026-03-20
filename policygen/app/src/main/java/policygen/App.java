@@ -28,6 +28,7 @@ import policygen.entity.Group;
 import policygen.entity.User;
 import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
 import uq.pac.rsvp.policy.ast.expr.BooleanExpression;
+import uq.pac.rsvp.policy.ast.expr.CallExpression;
 import uq.pac.rsvp.policy.ast.expr.EntityExpression;
 import uq.pac.rsvp.policy.ast.expr.Expression;
 import uq.pac.rsvp.policy.ast.expr.LongExpression;
@@ -428,6 +429,37 @@ public class App {
             value = generateValueExpr(entities, schema, false, selectedPrincipalType, selectedResourceType);
 
             skipBinOp = false;
+
+            if (value.exprType.getTypeId() == CedarType.TypeId.SET) {
+                CedarType elementType = value.exprType.getElementType();
+                if (elementType == null) {
+                    // Unknown element type, generate string
+                    elementType = CedarPrimitive.STRING;
+                }
+
+                int opIndex = random.nextInt(100);
+                if (opIndex < 65) {
+                    // try "contains"
+                    ExpressionWithType singleVal = generateValueOfType(elementType, entities,
+                            schema, selectedPrincipalType, selectedResourceType);
+                    if (singleVal != null) {
+                        value.expression = new CallExpression(value.expression, "contains",
+                                List.of(singleVal.expression));
+                        value.exprType = CedarPrimitive.BOOL;
+                    } else {
+                        // reset opIndex; deliberately give a slightly higher chance of choosing isEmpty():
+                        opIndex = random.nextInt(30) + 65; // (range [65-90)).
+                    }
+                }
+
+                if (opIndex >= 65 && opIndex < 80) {
+                    // "isEmpty()"
+                    value.expression = new CallExpression(value.expression, "isEmpty",
+                            Collections.emptyList());
+                    value.exprType = CedarPrimitive.BOOL;
+                }
+            }
+
             if (value.exprType.getTypeId() == CedarType.TypeId.BOOL) {
                 if (randomChance(70)) {
                     // It's a boolean value so can be used as a condition:

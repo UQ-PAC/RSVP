@@ -160,7 +160,7 @@ public class Driver {
             error("Datalog destination: " + dlPath + " is not a directory");
         }
 
-        RequestAuth rsvpAuth = RequestAuth.load(schemaFile, policyFile, entitiesFile, dlPath, false);
+        RequestAuth rsvpAuth = RequestAuth.load(schemaFile, policyFile, entitiesFile, dlPath);
         logger.info(YELLOW, "Datalog output written to directory: " + dlPath.toAbsolutePath());
         writeRequests(Path.of(dlPath.toString(), "auth.json"), rsvpAuth);
 

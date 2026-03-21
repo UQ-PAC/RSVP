@@ -1,0 +1,7 @@
+{
+    "principal": "PetClinic::Guest::\"Unknown\"",
+    "action": "PetClinic::Action::\"ViewClient\"",
+    "resource": "PetClinic::PetOwner::\"Jean Coleman\"",
+    "context": { },
+    "validateRequest": true
+}

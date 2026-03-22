@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import com.google.common.hash.Hashing;
 
-import uq.pac.rsvp.support.RsvpException;
+import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.Verification;
 import uq.pac.rsvp.support.reporting.Report;
 

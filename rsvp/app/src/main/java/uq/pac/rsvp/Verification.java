@@ -10,7 +10,6 @@ import com.google.gson.Gson;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.schema.Schema;
-import uq.pac.rsvp.support.RsvpException;
 import uq.pac.rsvp.support.reporting.Report;
 import uq.pac.rsvp.support.reporting.Report.Severity;
 

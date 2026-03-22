@@ -1,6 +1,5 @@
 dependencies {
     implementation project(':support')
-    implementation 'com.cedarpolicy:cedar-java:4.8.0-rsvp-4:uber'
 }
 
 publishing {

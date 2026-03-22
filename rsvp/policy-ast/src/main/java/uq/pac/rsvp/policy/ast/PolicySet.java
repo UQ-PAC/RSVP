@@ -6,9 +6,9 @@ import java.util.LinkedHashSet;
 
 import com.cedarpolicy.model.exception.InternalException;
 
+import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
-import uq.pac.rsvp.support.RsvpException;
 
 public class PolicySet extends LinkedHashSet<Policy> implements PolicyItem {
 

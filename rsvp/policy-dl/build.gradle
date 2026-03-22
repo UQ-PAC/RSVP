@@ -4,6 +4,7 @@ plugins {
 }
 
 dependencies {
+    implementation project(':support')
     implementation project(':policy-ast')
     implementation 'org.logicng:logicng:2.6.0'
     implementation 'com.github.pcj:google-options:1.0.0'

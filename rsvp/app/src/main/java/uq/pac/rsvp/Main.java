@@ -7,7 +7,6 @@ import java.nio.file.Path;
 
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
-import uq.pac.rsvp.support.RsvpException;
 
 public class Main {
 

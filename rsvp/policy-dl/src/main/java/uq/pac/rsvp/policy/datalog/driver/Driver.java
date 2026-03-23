@@ -21,10 +21,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
 import static org.fusesource.jansi.Ansi.Color.*;
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
@@ -133,8 +130,8 @@ public class Driver {
         JsonWriter writer = new JsonWriter(new FileWriter(file.toFile()));
         writer.setFormattingStyle(FormattingStyle.PRETTY);
         writer.beginObject();
-        writeRequests(writer, auth.getPermittedRequests(), "permitted");
-        writeRequests(writer, auth.getForbiddenRequests(), "forbidden");
+        writeRequests(writer, auth.getPermittedRequests().getRequests(), "permitted");
+        writeRequests(writer, auth.getForbiddenRequests().getRequests(), "forbidden");
         writer.endObject();
         writer.close();
     }

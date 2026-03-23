@@ -27,8 +27,8 @@ public class TranslationPolicy {
      */
     private final List<DLRule> rules;
 
-    public TranslationPolicy(String name, Policy policy, TranslationSchema schema) {
-        this.declaration = TranslationConstants.makeStandardRuleDecl(name);
+    public TranslationPolicy(Policy policy, TranslationSchema schema) {
+        this.declaration = TranslationConstants.makePolicyRuleDecl(policy);
         Expression transformed = TranslationTransformer.transform(policy.getCondition());
         List<List<Expression>> disjunctions = NFConverter.toDNF(transformed);
         this.rules = disjunctions.stream()

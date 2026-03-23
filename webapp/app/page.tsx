@@ -12,10 +12,10 @@ import { Header } from "./components/Header";
 
 import "filepond/dist/filepond.min.css";
 import { ReportViewer } from "./components/ReportViewer";
-import { ReportsProvider } from "./components/ReportsProvider";
+import { SelectionProvider } from "./components/SelectionProvider";
 import { Drawer } from "./components/Drawer";
 import { Content } from "./components/Content";
-import { Report } from "./ReportsContext";
+import { Report } from "./SelectionContext";
 
 export default function Home() {
   const [files, setFiles] = useState<FilePondFile[]>([]);
@@ -67,7 +67,7 @@ export default function Home() {
 
   return (
     <div className="app">
-      <ReportsProvider>
+      <SelectionProvider>
         <Header
           heading="RSVP"
           subheading="Policy Verification"
@@ -193,7 +193,16 @@ export default function Home() {
               labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
             />
           </Drawer>
-          <SourceFileViewer sources={sources} reports={reports} />
+          <SourceFileViewer
+            sources={sources}
+            reports={reports}
+            openUploadDrawer={() => {
+              if (!uploadExpanded) {
+                setReportsExpanded(false);
+                setUploadExpanded(true);
+              }
+            }}
+          />
           <Drawer
             title="Reports"
             side="right"
@@ -203,7 +212,7 @@ export default function Home() {
             <ReportViewer reports={reports} />
           </Drawer>
         </Content>
-      </ReportsProvider>
+      </SelectionProvider>
     </div>
   );
 }

@@ -1,11 +1,9 @@
 package uq.pac.rsvp;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Random;
 
-import com.google.gson.Gson;
 
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
@@ -28,9 +26,15 @@ public class Verification {
     public static List<Report> verify(PolicySet policies, Schema schema) {
         List<Report> reports = new ArrayList<>();
 
+        Random r = new Random();
+
         for (Policy policy : policies) {
+            int num = r.nextInt(100);
+            System.err.println(policy.getName());
             reports.add(
-                    new Report(Severity.Info, "This is a fantastic policy. Well done Angus.", policy.getSourceLoc()));
+
+                    new Report(num < 34 ? Severity.Info : num < 67 ? Severity.Warning : Severity.Error,
+                            "This is a fantastic policy. Well done Angus.", policy.getSourceLoc()));
         }
 
         // Gson gson = new Gson();

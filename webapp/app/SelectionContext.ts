@@ -13,22 +13,33 @@ export interface Report {
   message: string;
 }
 
-interface ReportsState {
+interface SelectionState {
   selected?: string;
   hovered?: string;
+  scroll?: "source" | "report" | "none";
 }
 
 interface Action {
   type: "click" | "mouseEnter" | "mouseLeave" | "reports";
   id?: string;
+  source?: "source" | "report";
 }
 
-export function reducer(context: ReportsState, action: Action): ReportsState {
+export function reducer(
+  context: SelectionState,
+  action: Action,
+): SelectionState {
   switch (action.type) {
     case "click":
+      const selectionChanged = action.id !== context.selected;
       return {
         ...context,
-        selected: action.id === context.selected ? "" : action.id,
+        selected: !selectionChanged ? "" : action.id,
+        scroll: selectionChanged
+          ? action.source === "source"
+            ? "report"
+            : "source"
+          : "none",
       };
     case "mouseEnter":
       return {
@@ -46,18 +57,15 @@ export function reducer(context: ReportsState, action: Action): ReportsState {
   return context;
 }
 
-export const ReportsContext = createContext<ReportsState>({
-  selected: "",
-  hovered: "",
-});
-export const ReportsDispatchContext = createContext<Dispatch<Action>>(
+export const SelectionContext = createContext<SelectionState>({});
+export const SelectionDispatchContext = createContext<Dispatch<Action>>(
   (_: Action) => {},
 );
 
-export function useReports() {
-  return useContext(ReportsContext);
+export function useSelection() {
+  return useContext(SelectionContext);
 }
 
-export function useReportsDispatch() {
-  return useContext(ReportsDispatchContext);
+export function useSelectionDispatch() {
+  return useContext(SelectionDispatchContext);
 }

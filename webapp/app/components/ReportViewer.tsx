@@ -1,38 +1,24 @@
 import { ReportItem } from "./ReportItem";
-import { Report } from "./SourceFile";
+import { Report } from "../ReportsContext";
 
-interface ReportViewerParams {
-  reports: Report[];
-  selected?: string;
-  active?: string;
-  onselect: (id: string) => void;
-  onenter: (id: string) => void;
-  onleave: (id: string) => void;
+interface ReportViewerProps {
+  reports?: Report[];
 }
 
-export function ReportViewer({
-  reports,
-  selected,
-  active,
-  onselect,
-  onenter,
-  onleave,
-}: ReportViewerParams) {
+export function ReportViewer({ reports }: ReportViewerProps) {
   return (
     <div className="reports-container">
-      {reports?.length
-        ? reports.map((report) => (
-            <ReportItem
-              key={report.id}
-              report={report}
-              selected={selected === report.id}
-              active={active === report.id}
-              onclick={onselect}
-              onactivate={onenter}
-              ondeactivate={onleave}
-            />
-          ))
-        : "Run verification to see reports"}
+      {!reports && (
+        <p className="reports-instruction reports-not-run">
+          Run verification to see reports
+        </p>
+      )}
+      {reports && !reports.length && (
+        <p className="reports-instruction no-reports">No reports to display</p>
+      )}
+      {reports?.map((report) => (
+        <ReportItem key={report.id} report={report} />
+      ))}
     </div>
   );
 }

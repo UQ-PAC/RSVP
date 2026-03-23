@@ -2,64 +2,50 @@
 
 import cx from "classnames";
 
-import { faAngleDown, faAngleUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
+import { Roboto_Mono } from "next/font/google";
 
-interface SourceLoc {
-  file: string;
-  offset: number;
-  len: number;
-}
-export interface Report {
-  id: string;
-  source: SourceLoc;
-  severity: "info" | "warn" | "err";
-  message: string;
-}
+import { Report, useReports, useReportsDispatch } from "../ReportsContext";
+import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
+import { faFileLines } from "@fortawesome/free-regular-svg-icons/faFileLines";
+
 interface SourceFileParams {
   filename: string;
   content: string;
   reports: Report[];
-  selected?: string;
-  active?: string;
-  onclick: (id: string) => void;
-  onenter: (id: string) => void;
-  onleave: (id: string) => void;
 }
 
-export function SourceFile({
-  filename,
-  content,
-  reports,
-  selected,
-  active,
-  onclick,
-  onenter,
-  onleave,
-}: SourceFileParams) {
+const robotoMono = Roboto_Mono({
+  subsets: ["latin"],
+});
+
+export function SourceFile({ filename, content, reports }: SourceFileParams) {
   const [expand, setExpand] = useState(true);
+  const { selected, hovered } = useReports();
+  const dispatch = useReportsDispatch();
 
   const begin: string = content.slice(0, reports.at(0)?.source.offset);
 
   return (
     <div className="source-file-render">
       <div className="source-file-header" onClick={() => setExpand(!expand)}>
+        <FontAwesomeIcon className="source-file-icon" icon={faFileLines} />
         <h2 className="source-file-name">{filename}</h2>
         {expand ? (
           <FontAwesomeIcon
             className="source-file-toggle source-file-collapse"
-            icon={faAngleUp}
+            icon={faCaretUp}
           />
         ) : (
           <FontAwesomeIcon
             className="source-file-toggle source-file-expand"
-            icon={faAngleDown}
+            icon={faCaretDown}
           />
         )}
       </div>
       {expand ? (
-        <div className="source-file-contents">
+        <div className={`source-file-contents ${robotoMono.className}`}>
           {begin}
           {reports.map((report: Report, index) => (
             <span key={report.id}>
@@ -67,13 +53,17 @@ export function SourceFile({
                 className={cx(
                   "source-report",
                   `source-report-${report.severity}`,
-                  selected === report.id && active !== report.id && "selected",
-                  active === report.id && "active",
+                  selected === report.id && hovered !== report.id && "selected",
+                  hovered === report.id && "hovered",
                 )}
                 data-message={report.message}
-                onClick={() => onclick(report.id)}
-                onMouseEnter={() => onenter(report.id)}
-                onMouseLeave={() => onleave(report.id)}
+                onClick={() => dispatch({ type: "click", id: report.id })}
+                onMouseEnter={() =>
+                  dispatch({ type: "mouseEnter", id: report.id })
+                }
+                onMouseLeave={() =>
+                  dispatch({ type: "mouseLeave", id: report.id })
+                }
               >
                 {content.slice(
                   report.source.offset,

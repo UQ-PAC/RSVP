@@ -1,30 +1,17 @@
-import { SourceFile, Report } from "./SourceFile";
+import { SourceFile } from "./SourceFile";
+import { Report } from "../ReportsContext";
 
 export interface SourceFileInfo {
   filename: string;
   serverId: string;
   contents: string;
 }
-
 interface SourceFileViewerParams {
   sources: SourceFileInfo[];
-  reports: Report[];
-  selected?: string;
-  active?: string;
-  onselect: (id: string) => void;
-  onenter: (id: string) => void;
-  onleave: (id: string) => void;
+  reports?: Report[];
 }
 
-export function SourceFileViewer({
-  sources,
-  reports,
-  selected,
-  active,
-  onselect,
-  onenter,
-  onleave,
-}: SourceFileViewerParams) {
+export function SourceFileViewer({ sources, reports }: SourceFileViewerParams) {
   return (
     <div className="source-files-container">
       {sources.map((source) => (
@@ -32,14 +19,9 @@ export function SourceFileViewer({
           key={source.serverId}
           filename={source.filename}
           content={source.contents}
-          reports={reports
-            ?.filter((report) => report.source.file === source.serverId)
+          reports={(reports ?? [])
+            .filter((report) => report.source.file === source.serverId)
             .sort((a: Report, b: Report) => a.source.offset - b.source.offset)}
-          selected={selected}
-          active={active}
-          onclick={onselect}
-          onenter={onenter}
-          onleave={onleave}
         />
       ))}
     </div>

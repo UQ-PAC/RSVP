@@ -5,23 +5,25 @@ import {
   faCircleInfo,
   faCircleXmark,
 } from "@fortawesome/free-solid-svg-icons";
-import { Report, useReports, useReportsDispatch } from "../ReportsContext";
+import {
+  Report,
+  useSelection,
+  useSelectionDispatch,
+} from "../SelectionContext";
 
 interface ReportItemParams {
   report: Report;
 }
 
 export function ReportItem({ report }: ReportItemParams) {
-  const context = useReports();
-  const dispatch = useReportsDispatch();
+  const { selected, hovered } = useSelection();
+  const dispatch = useSelectionDispatch();
 
   const className = cx(
     "report-item",
     `report-item-${report.severity}`,
-    context.selected === report.id &&
-      context.hovered !== report.id &&
-      "selected",
-    context.hovered === report.id && "hovered",
+    selected === report.id && hovered !== report.id && "selected",
+    hovered === report.id && "hovered",
   );
 
   const icon =
@@ -33,10 +35,17 @@ export function ReportItem({ report }: ReportItemParams) {
 
   return (
     <div
+      id={`report-${report.id}`}
       className={className}
-      onClick={() => dispatch({ type: "click", id: report.id })}
-      onMouseEnter={() => dispatch({ type: "mouseEnter", id: report.id })}
-      onMouseLeave={() => dispatch({ type: "mouseLeave", id: report.id })}
+      onClick={() =>
+        dispatch({ type: "click", id: report.id, source: "report" })
+      }
+      onMouseEnter={() =>
+        dispatch({ type: "mouseEnter", id: report.id, source: "report" })
+      }
+      onMouseLeave={() =>
+        dispatch({ type: "mouseLeave", id: report.id, source: "report" })
+      }
     >
       <FontAwesomeIcon className="report-item-icon" icon={icon} />
       <span

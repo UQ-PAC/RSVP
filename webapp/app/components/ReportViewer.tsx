@@ -1,11 +1,20 @@
 import { ReportItem } from "./ReportItem";
-import { Report } from "../ReportsContext";
+import { Report, useSelection } from "../SelectionContext";
 
 interface ReportViewerProps {
   reports?: Report[];
 }
 
 export function ReportViewer({ reports }: ReportViewerProps) {
+  const info = reports?.filter((report) => report.severity === "info");
+  const warn = reports?.filter((report) => report.severity === "warn");
+  const err = reports?.filter((report) => report.severity === "err");
+
+  const { selected, scroll } = useSelection();
+  if (scroll === "report") {
+    console.log("SCROLL REPORTS");
+  }
+
   return (
     <div className="reports-container">
       {!reports && (
@@ -16,9 +25,30 @@ export function ReportViewer({ reports }: ReportViewerProps) {
       {reports && !reports.length && (
         <p className="reports-instruction no-reports">No reports to display</p>
       )}
-      {reports?.map((report) => (
-        <ReportItem key={report.id} report={report} />
-      ))}
+      {err?.length && (
+        <div className="reports-group reports-group-err">
+          <h4 className="reports-group-title">Errors</h4>
+          {err.map((report) => (
+            <ReportItem key={report.id} report={report} />
+          ))}
+        </div>
+      )}
+      {warn?.length && (
+        <div className="reports-group reports-group-warn">
+          <h4 className="reports-group-title">Warnings</h4>
+          {warn.map((report) => (
+            <ReportItem key={report.id} report={report} />
+          ))}
+        </div>
+      )}
+      {info?.length && (
+        <div className="reports-group reports-group-info">
+          <h4 className="reports-group-title">Information</h4>
+          {info.map((report) => (
+            <ReportItem key={report.id} report={report} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

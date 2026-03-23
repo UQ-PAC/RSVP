@@ -1,29 +1,49 @@
 import cx from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Report } from "./SourceFile";
 import {
+  faCaretDown,
+  faCaretUp,
   faCircleExclamation,
   faCircleInfo,
   faCircleXmark,
 } from "@fortawesome/free-solid-svg-icons";
+import {
+  Report,
+  useSelection,
+  useSelectionDispatch,
+} from "../SelectionContext";
+import { useEffect, useRef } from "react";
 
 interface ReportItemParams {
   report: Report;
-  selected: boolean;
-  active: boolean;
-  onclick: (id: string) => void;
-  onactivate: (id: string) => void;
-  ondeactivate: (id: string) => void;
 }
 
-export function ReportItem({
-  report,
-  selected,
-  active,
-  onclick,
-  onactivate,
-  ondeactivate,
-}: ReportItemParams) {
+export function ReportItem({ report }: ReportItemParams) {
+  const { selected, hovered, scroll } = useSelection();
+  const dispatch = useSelectionDispatch();
+
+  const element = useRef<HTMLDivElement>(null);
+
+  const isSelected = selected === report.id;
+  const isHovered = hovered === report.id;
+
+  useEffect(() => {
+    if (scroll === "report" && report.id === selected) {
+      element.current?.scrollIntoView({
+        block: "center",
+        inline: "center",
+        behavior: "smooth",
+      });
+    }
+  }, [scroll, element, report.id, selected]);
+
+  const className = cx(
+    "report-item",
+    `report-item-${report.severity}`,
+    isSelected && !isHovered && "selected",
+    isHovered && "hovered",
+  );
+
   const icon =
     report.severity === "err"
       ? faCircleXmark
@@ -33,22 +53,41 @@ export function ReportItem({
 
   return (
     <div
-      className={cx(
-        "report-item",
-        `report-item-${report.severity}`,
-        selected && !active && "selected",
-        active && "active",
-      )}
-      onClick={() => onclick(report.id)}
-      onMouseEnter={() => onactivate(report.id)}
-      onMouseLeave={() => ondeactivate(report.id)}
+      id={`report-${report.id}`}
+      ref={element}
+      className={className}
+      onMouseEnter={() =>
+        dispatch({ type: "mouseEnter", id: report.id, source: "report" })
+      }
+      onMouseLeave={() =>
+        dispatch({ type: "mouseLeave", id: report.id, source: "report" })
+      }
     >
-      <FontAwesomeIcon className="report-item-icon" icon={icon} />
-      <span
-        className={`report-item-message report-item-message-${report.severity}`}
+      <div
+        className="report-item-header"
+        onClick={() =>
+          dispatch({ type: "click", id: report.id, source: "report" })
+        }
       >
-        {report.message}
-      </span>
+        <FontAwesomeIcon
+          className="report-item-icon report-item-icon-severity"
+          icon={icon}
+        />
+        <span
+          className={`report-item-message report-item-message-${report.severity}`}
+        >
+          {report.message}
+        </span>
+        {!!report.messageDetail?.length && (
+          <FontAwesomeIcon
+            className="report-item-icon report-item-icon-expand"
+            icon={isSelected ? faCaretUp : faCaretDown}
+          />
+        )}
+      </div>
+      {isSelected && !!report.messageDetail?.length && (
+        <div className="report-item-message-detail">{report.messageDetail}</div>
+      )}
     </div>
   );
 }

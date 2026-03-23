@@ -9,31 +9,28 @@ on:
     paths:
       - "webapp/**"
       - ".github/workflows/webapp.yaml"
+  workflow_dispatch:
+
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22.x
+      - name: Checkout
+        uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 10
-      - name: Install dependencies
-        run: pnpm install
-        working-directory: webapp
-      - name: Run Tests
+          package_json_file: ./webapp/package.json
+          run_install: |
+            - cwd: ./webapp
+      - name: Build & Test
         run: pnpm test
-        working-directory: webapp
+        working-directory: ./webapp
       - name: Upload test coverage
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: webapp/coverage/
+          path: ./webapp/coverage/
           if-no-files-found: error
           retention-days: 7

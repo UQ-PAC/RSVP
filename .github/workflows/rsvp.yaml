@@ -24,8 +24,9 @@ jobs:
         run: |
           wget https://github.com/souffle-lang/souffle/releases/download/2.5/x86_64-ubuntu-2404-souffle-2.5-Linux.deb
           sudo apt install ./x86_64-ubuntu-2404-souffle-2.5-Linux.deb
-      - uses: actions/checkout@v4
-      - name: Build with Gradle Wrapper
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Build & Test
         run: ./gradlew build -Dpackages.user="${{ secrets.PACKAGES_USER }}" -Dpackages.token="${{ secrets.PACKAGES_TOKEN }}"
         working-directory: ./rsvp
         env:

@@ -14,11 +14,11 @@ public class StringExpression extends Expression {
     public StringExpression(String value, boolean quoted, SourceLoc source) {
         super(StringLiteral, source);
         this.value = value;
-        this.quoted = quoted;
+        this.quoted = quoted || !NICE_PROP_NAME.matcher(value).matches();
     }
 
     public StringExpression(String value, SourceLoc source) {
-        this(value, !NICE_PROP_NAME.matcher(value).matches(), source);
+        this(value, true, source);
     }
 
     public StringExpression(String value, boolean quoted) {

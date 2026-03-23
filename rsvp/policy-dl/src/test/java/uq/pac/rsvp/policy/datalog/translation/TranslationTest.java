@@ -12,6 +12,7 @@ import com.cedarpolicy.model.schema.Schema;
 import org.fusesource.jansi.Ansi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.datalog.TestUtil;
@@ -54,6 +55,13 @@ public class TranslationTest {
             this.testName = testDir.getFileName().toString();
         }
 
+        public static TestInput load(String dir, String policy) {
+            return TestInput.load(dir).stream()
+                    .filter(t -> t.getPolicyName().equals(policy))
+                    .findAny()
+                    .orElseThrow();
+        }
+
         public static List<TestInput> load(String dir) {
             Path testDir = Path.of(TESTDIR.toString(), dir);
             Path schema = TestUtil.findFile(testDir, ".cedarschema");
@@ -85,6 +93,11 @@ public class TranslationTest {
     @TestFactory
     Collection<DynamicTest> oneOff() {
         return dynamicTests(ONE_OFF);
+    }
+
+    @Test
+    void oneFileOff() throws RsvpException, AuthException, IOException, InterruptedException {
+        differentialTest(TestInput.load("photoapp", "policy-all"));
     }
 
     @TestFactory

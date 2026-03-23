@@ -1,14 +1,18 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
 import com.cedarpolicy.value.EntityUID;
+import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Constants used throughout the translation of Cedar to datalog
@@ -169,7 +173,44 @@ public class TranslationConstants {
         return new DLRuleDecl("Entity_" + entity.getName().replace(':', '_'), DLType.SYMBOL);
     }
 
-	/**
+    /**
+     * Extension for output files
+     */
+    public static final String OUTPUT_EXT = ".csv";
+
+    /**
+     * Prefixes for forbid and permit policies
+     */
+    public final static String PermitPolicyPrefix = "CedarPolicyPermit_";
+    public final static String ForbidPolicyPrefix = "CedarPolicyForbid_";
+
+    private static final Pattern POLICY_OUTPUT_PATTERN = Pattern.compile("(%s|%s)([a-zA-Z0-9_]+)(.csv)$"
+            .formatted(PermitPolicyPrefix, ForbidPolicyPrefix));
+
+    public record PolicyName (boolean permit, String name, Path csv) { }
+
+    /**
+     * Assuming {@code csv} is a csv output file for a particular policy
+     * extract cedar-level policy name. This name is extracted as 2 components:
+     * - Prefix
+     */
+    public static PolicyName getOutputPolicyName(Path csv) {
+        Matcher matcher = POLICY_OUTPUT_PATTERN.matcher(csv.getFileName().toString());
+        if (matcher.find()) {
+            return new PolicyName(matcher.group(1).equals(PermitPolicyPrefix), matcher.group(2), csv);
+        }
+        return null;
+    }
+
+    /**
+     * Get a declaration for a single policy rule
+     */
+    public static DLRuleDecl makePolicyRuleDecl(Policy policy) {
+        String name = policy.isPermit() ? PermitPolicyPrefix : ForbidPolicyPrefix;
+        return makeStandardRuleDecl(name + policy.getName());
+    }
+
+    /**
      * Declaration for a ternary attribute relation that associates
 	 * entities to attribute names and respective values. Notably, this relation only records
      * attributes if there are associated values. For instance, for the case when an attribute is

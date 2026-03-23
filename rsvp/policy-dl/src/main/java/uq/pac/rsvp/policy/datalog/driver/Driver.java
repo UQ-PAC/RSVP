@@ -9,10 +9,12 @@ import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.exception.AuthException;
 import com.cedarpolicy.model.policy.PolicySet;
 import com.cedarpolicy.model.schema.Schema;
+import com.google.common.collect.Multimap;
 import com.google.devtools.common.options.OptionsParser;
 import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
 import uq.pac.rsvp.RsvpException;
+import uq.pac.rsvp.policy.datalog.analysis.RequestIndex;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestAuth;
 import uq.pac.rsvp.policy.datalog.util.Logger;
@@ -167,6 +169,20 @@ public class Driver {
         if (options.validate) {
             validate(rsvpAuth, schemaFile, policyFile, entitiesFile);
         }
+
+        RequestIndex ri = new RequestIndex(rsvpAuth);
+        rsvpAuth.getPermitPolicies().forEach((name, requests) -> {
+            if (requests.isEmpty()) {
+                logger.info(RED, "Irrelevant policy: " + name);
+            } else {
+                Multimap<String, Request> corr = ri.correlation(name, requests);
+                if (!corr.isEmpty()) {
+                    logger.info(MAGENTA, "Correlated policy: " + name);
+                } else {
+                    logger.info(GREEN, "Distinct policy: " + name);
+                }
+            }
+        });
 
         System.exit(0);
     }

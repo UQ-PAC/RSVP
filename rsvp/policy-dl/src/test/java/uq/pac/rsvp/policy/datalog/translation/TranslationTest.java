@@ -141,7 +141,8 @@ public class TranslationTest {
         }
 
         RequestAuth rsvpAuth = RequestAuth.load(test.schema, test.policy, test.entities, test.datalogDir);
-        assertTrue(Collections.disjoint(rsvpAuth.getForbiddenRequests(), rsvpAuth.getPermittedRequests()));
+        assertTrue(Collections.disjoint(rsvpAuth.getForbiddenRequests().getRequests(),
+                rsvpAuth.getPermittedRequests().getRequests()));
 
         AuthorizationEngine cedarAuth = new BasicAuthorizationEngine();
         Entities cedarEntities = Entities.parse(test.entities);

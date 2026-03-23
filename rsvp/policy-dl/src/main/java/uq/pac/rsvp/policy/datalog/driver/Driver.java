@@ -14,19 +14,17 @@ import com.google.devtools.common.options.OptionsParser;
 import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
 import uq.pac.rsvp.RsvpException;
-import uq.pac.rsvp.policy.datalog.analysis.RequestIndex;
+import uq.pac.rsvp.policy.datalog.analysis.CorrelationIndex;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestAuth;
+import uq.pac.rsvp.policy.datalog.translation.RequestSet;
 import uq.pac.rsvp.policy.datalog.util.Logger;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
 import static org.fusesource.jansi.Ansi.Color.*;
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
@@ -135,8 +133,8 @@ public class Driver {
         JsonWriter writer = new JsonWriter(new FileWriter(file.toFile()));
         writer.setFormattingStyle(FormattingStyle.PRETTY);
         writer.beginObject();
-        writeRequests(writer, auth.getPermittedRequests(), "permitted");
-        writeRequests(writer, auth.getForbiddenRequests(), "forbidden");
+        writeRequests(writer, auth.getPermittedRequests().getRequests(), "permitted");
+        writeRequests(writer, auth.getForbiddenRequests().getRequests(), "forbidden");
         writer.endObject();
         writer.close();
     }
@@ -170,19 +168,29 @@ public class Driver {
             validate(rsvpAuth, schemaFile, policyFile, entitiesFile);
         }
 
-        RequestIndex ri = new RequestIndex(rsvpAuth);
-        rsvpAuth.getPermitPolicies().forEach((name, requests) -> {
-            if (requests.isEmpty()) {
-                logger.info(RED, "Irrelevant policy: " + name);
-            } else {
-                Multimap<String, Request> corr = ri.correlation(name, requests);
-                if (!corr.isEmpty()) {
-                    logger.info(MAGENTA, "Correlated policy: " + name);
+        if (options.correlate) {
+            CorrelationIndex ri = new CorrelationIndex(rsvpAuth);
+            Map<RequestSet, Boolean> policies = new HashMap<>();
+            rsvpAuth.getPermitPolicies().forEach(rs -> policies.put(rs, true));
+            rsvpAuth.getForbidPolicies().forEach(rs -> policies.put(rs, false));
+
+            policies.forEach((requests, permit) -> {
+                String polarity = permit ? "Permit" : "Forbid";
+                String name = requests.getName();
+                if (requests.isEmpty()) {
+                    logger.info(RED, "Irrelevant " + polarity + " policy: " + name);
                 } else {
-                    logger.info(GREEN, "Distinct policy: " + name);
+                    Multimap<Request, String> corr = ri.correlation(requests);
+                    if (!corr.isEmpty()) {
+                        String status = corr.size() == requests.size() ? "Subsumed" : "Correlated";
+                        logger.info(MAGENTA, status + " " + polarity + " policy: " + name);
+                        logger.info(MAGENTA, "  with " + corr.values().stream().distinct().toList());
+                    } else {
+                        logger.info(GREEN, "Distinct " + polarity + " policy: " + name);
+                    }
                 }
-            }
-        });
+            });
+        }
 
         System.exit(0);
     }

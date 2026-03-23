@@ -1,6 +1,0 @@
-{
-  "principal": "PetClinic::Employee::\"James Carter\"",
-  "resource": "PetClinic::PetVisit::\"Samantha 2\"",
-  "action": "PetClinic::Action::\"EditClient\"",
-  "context": {}
-}

@@ -1,6 +1,0 @@
-{
-  "principal": "PetClinic::Guest::\"???\"",
-  "resource": "PetClinic::Pet::\"Lucky\"",
-  "action": "PetClinic::Action::\"DeleteClient\"",
-  "context": {}
-}

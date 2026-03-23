@@ -6,7 +6,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { Roboto_Mono } from "next/font/google";
 
-import { Report, useReports, useReportsDispatch } from "../ReportsContext";
+import {
+  Report,
+  useSelection,
+  useSelectionDispatch,
+} from "../SelectionContext";
 import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 import { faFileLines } from "@fortawesome/free-regular-svg-icons/faFileLines";
 
@@ -22,8 +26,8 @@ const robotoMono = Roboto_Mono({
 
 export function SourceFile({ filename, content, reports }: SourceFileParams) {
   const [expand, setExpand] = useState(true);
-  const { selected, hovered } = useReports();
-  const dispatch = useReportsDispatch();
+  const { selected, hovered } = useSelection();
+  const dispatch = useSelectionDispatch();
 
   const begin: string = content.slice(0, reports.at(0)?.source.offset);
 
@@ -50,6 +54,7 @@ export function SourceFile({ filename, content, reports }: SourceFileParams) {
           {reports.map((report: Report, index) => (
             <span key={report.id}>
               <span
+                id={`source-report-${report.id}`}
                 className={cx(
                   "source-report",
                   `source-report-${report.severity}`,
@@ -57,12 +62,22 @@ export function SourceFile({ filename, content, reports }: SourceFileParams) {
                   hovered === report.id && "hovered",
                 )}
                 data-message={report.message}
-                onClick={() => dispatch({ type: "click", id: report.id })}
+                onClick={() =>
+                  dispatch({ type: "click", id: report.id, source: "source" })
+                }
                 onMouseEnter={() =>
-                  dispatch({ type: "mouseEnter", id: report.id })
+                  dispatch({
+                    type: "mouseEnter",
+                    id: report.id,
+                    source: "source",
+                  })
                 }
                 onMouseLeave={() =>
-                  dispatch({ type: "mouseLeave", id: report.id })
+                  dispatch({
+                    type: "mouseLeave",
+                    id: report.id,
+                    source: "source",
+                  })
                 }
               >
                 {content.slice(

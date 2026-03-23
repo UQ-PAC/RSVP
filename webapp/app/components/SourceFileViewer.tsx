@@ -1,5 +1,5 @@
 import { SourceFile } from "./SourceFile";
-import { Report } from "../ReportsContext";
+import { Report, useSelection } from "../SelectionContext";
 
 export interface SourceFileInfo {
   filename: string;
@@ -9,11 +9,29 @@ export interface SourceFileInfo {
 interface SourceFileViewerParams {
   sources: SourceFileInfo[];
   reports?: Report[];
+  openUploadDrawer: () => void;
 }
 
-export function SourceFileViewer({ sources, reports }: SourceFileViewerParams) {
+export function SourceFileViewer({
+  sources,
+  reports,
+  openUploadDrawer,
+}: SourceFileViewerParams) {
+  const { scroll } = useSelection();
+  if (scroll === "source") {
+    console.log("SCROLL SOURCE");
+  }
+
   return (
     <div className="source-files-container">
+      {!sources.length && (
+        <p className="source-files-instruction">
+          <a className="source-files-upload-link" onClick={openUploadDrawer}>
+            Upload Cedar policy and schema files
+          </a>{" "}
+          to run verification.
+        </p>
+      )}
       {sources.map((source) => (
         <SourceFile
           key={source.serverId}

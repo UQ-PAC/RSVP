@@ -8,6 +8,9 @@ NONE: 'none';
 IS:   'is';
 IN:   'in';
 
+TRUE:  'true';
+FALSE: 'false';
+
 // Comments
 COMMENT: '//' ~[\r\n]* -> skip;
 
@@ -20,19 +23,26 @@ WS: [ \r\n\t]+ -> skip;
 // Identifier
 ID: [A-Za-z][A-Za-z0-9_]*;
 
-Literal: 'true' | 'false';
-Variable: ID;
-Attribute: ID ('.' ID)*;
-Path: ID ('::' ID)*;
-Entity: Path '::' STRING;
+literal: TRUE | FALSE;
+variable: ID;
+property: ID ('.' ID)*;
+type: ID ('::' ID)*;
+entity: type '::' STRING;
 
 expression :
-      Literal                       # literalExpr
-    | Variable                      # variableExpr
-    | Attribute                     # propertyExpr
-    | '!' expression                # negationExpr
-    | expression '&&' expression    # conjunctionExpr
-    | expression '||' expression    # disjunctionExpr
+      literal                                                          # literalExpr
+    | variable                                                         # variableExpr
+    | property                                                         # propertyExpr
+    | type                                                             # typeExpr
+    | entity                                                           # entityExpr
+    | expression 'in' entity                                           # inExpr
+    | expression 'is' type                                             # isExpr
+    | expression 'has' ID                                              # hasExpr
+    | '(' expression ')'                                               # groupingExpr
+    | '!' expression                                                   # negationExpr
+    | expression op=('==' | '!=' | '>' | '<' | '>=' | '<=') expression # comparisonExpr
+    | expression '&&' expression                                       # conjunctionExpr
+    | expression '||' expression                                       # disjunctionExpr
 ;
 
 invariant:

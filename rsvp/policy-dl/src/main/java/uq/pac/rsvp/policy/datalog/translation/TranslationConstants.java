@@ -2,7 +2,6 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import com.cedarpolicy.value.EntityUID;
 import uq.pac.rsvp.policy.ast.Policy;
-import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
@@ -27,12 +26,9 @@ public class TranslationConstants {
      * The translation revolves around rules of the form using principal, resource
      * and action cedar variables.
      */
-    public final static DLVar PrincipalVar =
-            new DLVar(VariableExpression.Reference.Principal.getValue());
-    public final static DLVar ResourceVar =
-            new DLVar(VariableExpression.Reference.Resource.getValue());
-    public final static DLVar ActionVar =
-            new DLVar(VariableExpression.Reference.Action.getValue());
+    public final static DLVar PrincipalVar = new DLVar("principal");
+    public final static DLVar ResourceVar = new DLVar("resource");
+    public final static DLVar ActionVar = new DLVar("action");
 
     /**
      * Variable declarations. For simplicity, we use symbolic Datalog types.

@@ -23,7 +23,6 @@ import uq.pac.rsvp.policy.ast.expr.Expression.ExpressionDeserialiser;
 import uq.pac.rsvp.policy.ast.expr.StringExpression;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 import uq.pac.rsvp.policy.ast.expr.BinaryExpression.BinaryOp;
-import uq.pac.rsvp.policy.ast.expr.VariableExpression.Reference;
 
 @DisplayName("Policy AST")
 public class PolicyTest {
@@ -89,7 +88,7 @@ public class PolicyTest {
         @Test
         @DisplayName("handles simple deny")
         void denyHacker() {
-            Policy policy = new Policy(Effect.Forbid, new BinaryExpression(new VariableExpression(Reference.Principal),
+            Policy policy = new Policy(Effect.Forbid, new BinaryExpression(new VariableExpression("principal"),
                     BinaryOp.Eq, new StringExpression("hacker", true)));
 
             assertFalse(policy.isPermit());

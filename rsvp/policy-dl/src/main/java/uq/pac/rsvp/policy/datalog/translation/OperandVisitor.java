@@ -3,14 +3,10 @@ package uq.pac.rsvp.policy.datalog.translation;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
-import static uq.pac.rsvp.policy.ast.expr.VariableExpression.Reference.Context;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationError.error;
-import static uq.pac.rsvp.policy.datalog.util.Util.required;
 
 public class OperandVisitor extends ValueVisitorAdapter<DLTerm> {
 
@@ -52,7 +48,6 @@ public class OperandVisitor extends ValueVisitorAdapter<DLTerm> {
                     case DLArithmeticTerm a -> a;
                     default -> throw new TranslationError("Unsupported term: " + t + "[" + t.getClass().getSimpleName() + "]");
                 };
-
         return new DLArithmeticTerm(normalise.apply(lhs), normalise.apply(rhs), op);
     }
 
@@ -82,7 +77,11 @@ public class OperandVisitor extends ValueVisitorAdapter<DLTerm> {
 
     @Override
     public DLTerm visitVariableExpr(VariableExpression expr) {
-        error(expr.getReference() != Context, "Unsupported variable: " + expr.getReference());
+        Set<String> supported = Set.of("principal", "resource", "action");
+        String var = expr.getReference();
+        if (!supported.contains(var)) {
+            throw new TranslationError("Unsupported variable: " + var);
+        }
         return DLTerm.var(expr.toString());
     }
 }

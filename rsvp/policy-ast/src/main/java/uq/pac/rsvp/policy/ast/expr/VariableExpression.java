@@ -2,47 +2,20 @@ package uq.pac.rsvp.policy.ast.expr;
 
 import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Variable;
 
-import com.google.gson.annotations.SerializedName;
-
 import uq.pac.rsvp.policy.ast.SourceLoc;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
 public class VariableExpression extends Expression {
 
-    public static enum Reference {
+    private final String ref;
 
-        @SerializedName("principal")
-        Principal("principal"),
-
-        @SerializedName("resource")
-        Resource("resource"),
-
-        @SerializedName("action")
-        Action("action"),
-
-        @SerializedName("context")
-        Context("context");
-
-        private final String value;
-
-        Reference(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
-
-    private final Reference ref;
-
-    public VariableExpression(Reference ref, SourceLoc source) {
+    public VariableExpression(String ref, SourceLoc source) {
         super(Variable, source);
         this.ref = ref;
     }
 
-    public VariableExpression(Reference ref) {
+    public VariableExpression(String ref) {
         this(ref, SourceLoc.MISSING);
     }
 
@@ -52,23 +25,7 @@ public class VariableExpression extends Expression {
         this(null, SourceLoc.MISSING);
     }
 
-    public static VariableExpression createPrincipalRef(SourceLoc source) {
-        return new VariableExpression(Reference.Principal, source);
-    }
-
-    public static VariableExpression createResourceRef(SourceLoc source) {
-        return new VariableExpression(Reference.Resource, source);
-    }
-
-    public static VariableExpression createActionRef(SourceLoc source) {
-        return new VariableExpression(Reference.Action, source);
-    }
-
-    public static VariableExpression createContextRef(SourceLoc source) {
-        return new VariableExpression(Reference.Context, source);
-    }
-
-    public Reference getReference() {
+    public String getReference() {
         return ref;
     }
 
@@ -84,6 +41,6 @@ public class VariableExpression extends Expression {
 
     @Override
     public String toString() {
-        return ref.getValue();
+        return ref;
     }
 }

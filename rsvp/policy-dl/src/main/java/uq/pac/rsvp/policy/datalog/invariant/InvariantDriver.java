@@ -10,7 +10,21 @@ import java.util.Locale;
 public class InvariantDriver {
 
    static String INPUT = """
-        for all principal.foo && resource.bar;
+        for all true;
+        for all false;
+        for all principal;
+        for some principal.album.photo;
+        for some Principal::Album::Photo;
+        for some Resource::Picture::Kind::"Forest";
+        for some principal.album.photo && resource;
+        for some principal.album.photo || resource;
+        for some (principal.album.photo || resource);
+        for some !principal.album.photo;
+        for some !(principal.album.photo || resource);
+        for some a == b && c != d;
+        for some resource has foo || principal has bar;
+        for some resource is Resource::Picture::Kind;
+        for some resource in Resource::Picture::Kind::"Forest";
     """;
 
     public static class ThrowingErrorListener extends BaseErrorListener {
@@ -35,11 +49,12 @@ public class InvariantDriver {
         InvariantExpressionVisitor sv = new InvariantExpressionVisitor();
         return new InvariantBaseVisitor<List<Invariant>> () {
             @Override
-            public List<Invariant> visitInvariant(InvariantParser.InvariantContext ctx) {
-                Quantifier quantifier = Quantifier.valueOf(ctx.op.getText().toUpperCase(Locale.ROOT));
-                Expression expr = sv.visit(ctx.expression());
-                Invariant in = new Invariant(quantifier, expr);
-                return List.of();
+            public List<Invariant> visitProgram(InvariantParser.ProgramContext ctx) {
+                return ctx.invariant().stream().map(i -> {
+                    Quantifier quantifier = Quantifier.valueOf(i.op.getText().toUpperCase(Locale.ROOT));
+                    Expression expr = sv.visit(i.expression());
+                    return new Invariant(quantifier, expr);
+                }).toList();
             }
         }.visit(parser.program());
     }
@@ -47,5 +62,4 @@ public class InvariantDriver {
     public static void main(String [] args) {
         parse(INPUT).forEach(System.out::println);
     }
-
 }

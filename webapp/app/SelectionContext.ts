@@ -8,9 +8,11 @@ interface SourceLoc {
 
 export interface Report {
   id: string;
-  source: SourceLoc;
+  primarySourceLocation: SourceLoc;
+  sourceLocations: SourceLoc[];
   severity: "info" | "warn" | "err";
   message: string;
+  messageDetail?: string;
 }
 
 interface SelectionState {

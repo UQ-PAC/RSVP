@@ -71,7 +71,7 @@ public class Report {
         return message;
     }
 
-    public String getDetailMessage() {
+    public String getMessageDetail() {
         return detail;
     }
 
@@ -79,7 +79,7 @@ public class Report {
         return primary;
     }
 
-    public Set<SourceLoc> getNonPrimarySourceLocations() {
+    public Set<SourceLoc> getSourceLocations() {
         return Set.copyOf(locations);
     }
 

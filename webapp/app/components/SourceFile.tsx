@@ -29,7 +29,10 @@ export function SourceFile({ filename, content, reports }: SourceFileParams) {
   const { selected, hovered } = useSelection();
   const dispatch = useSelectionDispatch();
 
-  const begin: string = content.slice(0, reports.at(0)?.source.offset);
+  const begin: string = content.slice(
+    0,
+    reports.at(0)?.primarySourceLocation.offset,
+  );
 
   return (
     <div className="source-file-render">
@@ -81,15 +84,17 @@ export function SourceFile({ filename, content, reports }: SourceFileParams) {
                 }
               >
                 {content.slice(
-                  report.source.offset,
-                  report.source.offset + report.source.len,
+                  report.primarySourceLocation.offset,
+                  report.primarySourceLocation.offset +
+                    report.primarySourceLocation.len,
                 )}
               </span>
               {content.slice(
-                report.source.offset + report.source.len,
+                report.primarySourceLocation.offset +
+                  report.primarySourceLocation.len,
                 index == reports.length - 1
                   ? content.length
-                  : reports.at(index + 1)?.source.offset,
+                  : reports.at(index + 1)?.primarySourceLocation.offset,
               )}
             </span>
           ))}

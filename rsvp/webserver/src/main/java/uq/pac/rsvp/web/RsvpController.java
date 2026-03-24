@@ -110,8 +110,6 @@ public class RsvpController {
             }
         }
 
-        logger.info(result.toString());
-
         return result;
     }
 

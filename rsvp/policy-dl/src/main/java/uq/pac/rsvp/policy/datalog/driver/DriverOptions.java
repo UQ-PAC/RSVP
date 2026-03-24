@@ -44,11 +44,4 @@ public class DriverOptions extends OptionsBase {
             category = "input",
             defaultValue = "false")
     public boolean validate;
-
-    @Option(name = "correlate",
-            abbrev = 'c',
-            help = "Show policy correlation WRT allowed/permitted requests",
-            category = "input",
-            defaultValue = "false")
-    public boolean correlate;
 }

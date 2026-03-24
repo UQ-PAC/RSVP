@@ -18,19 +18,6 @@ when {
         && principal in resource.album.owner.friends
 };
 
-
-// === View
-//   + Owner's friends can see protected photos
-permit (
-    principal is Account,
-    action == Action::"viewPhoto",
-    resource is Photo)
-when {
-    resource.album.visibility == Visibility::"Protected"
-
-};
-
-
 // === Upload
 //  + Users can upload photos to their albums
 //     (Implicitly admins cannot upload photos for

@@ -9,15 +9,12 @@ import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.exception.AuthException;
 import com.cedarpolicy.model.policy.PolicySet;
 import com.cedarpolicy.model.schema.Schema;
-import com.google.common.collect.Multimap;
 import com.google.devtools.common.options.OptionsParser;
 import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
 import uq.pac.rsvp.RsvpException;
-import uq.pac.rsvp.policy.datalog.analysis.CorrelationIndex;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestAuth;
-import uq.pac.rsvp.policy.datalog.translation.RequestSet;
 import uq.pac.rsvp.policy.datalog.util.Logger;
 
 import java.io.FileWriter;
@@ -166,30 +163,6 @@ public class Driver {
 
         if (options.validate) {
             validate(rsvpAuth, schemaFile, policyFile, entitiesFile);
-        }
-
-        if (options.correlate) {
-            CorrelationIndex ri = new CorrelationIndex(rsvpAuth);
-            Map<RequestSet, Boolean> policies = new HashMap<>();
-            rsvpAuth.getPermitPolicies().forEach(rs -> policies.put(rs, true));
-            rsvpAuth.getForbidPolicies().forEach(rs -> policies.put(rs, false));
-
-            policies.forEach((requests, permit) -> {
-                String polarity = permit ? "Permit" : "Forbid";
-                String name = requests.getName();
-                if (requests.isEmpty()) {
-                    logger.info(RED, "Irrelevant " + polarity + " policy: " + name);
-                } else {
-                    Multimap<Request, String> corr = ri.correlation(requests);
-                    if (!corr.isEmpty()) {
-                        String status = corr.size() == requests.size() ? "Subsumed" : "Correlated";
-                        logger.info(MAGENTA, status + " " + polarity + " policy: " + name);
-                        logger.info(MAGENTA, "  with " + corr.values().stream().distinct().toList());
-                    } else {
-                        logger.info(GREEN, "Distinct " + polarity + " policy: " + name);
-                    }
-                }
-            });
         }
 
         System.exit(0);

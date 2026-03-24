@@ -4,6 +4,11 @@ import Home from "./page";
 
 // Mock CSS so that Jest doesn't try to parse it as JS
 jest.mock("filepond/dist/filepond.min.css", () => "");
+jest.mock("next/font/google", () => ({
+  Roboto_Mono: jest.fn().mockReturnValue({ className: "" }),
+  Lexend_Deca: jest.fn().mockReturnValue({ className: "" }),
+  Lexend_Giga: jest.fn().mockReturnValue({ className: "" }),
+}));
 
 describe("App", () => {
   // test("renders correctly", () => {

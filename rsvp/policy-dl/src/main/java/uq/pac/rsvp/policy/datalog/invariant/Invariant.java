@@ -1,15 +1,22 @@
 package uq.pac.rsvp.policy.datalog.invariant;
 
 import uq.pac.rsvp.policy.ast.expr.Expression;
+import uq.pac.rsvp.policy.ast.expr.TypeExpression;
+
+import java.util.Comparator;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Invariant {
 
     private final Quantifier quantifier;
     private final Expression expression;
+    private final Map<String, TypeExpression> types;
 
-    public Invariant(Quantifier quantifier, Expression expression) {
+    public Invariant(Quantifier quantifier, Expression expression, Map<String, TypeExpression> types) {
         this.quantifier = quantifier;
         this.expression = expression;
+        this.types = Map.copyOf(types);
     }
 
     public Quantifier getQuantifier() {
@@ -20,8 +27,30 @@ public class Invariant {
         return expression;
     }
 
+    public Map<String, TypeExpression> getTypes() {
+        return types;
+    }
+
+    public TypeExpression getType(String var) {
+        return types.get(var);
+    }
+
     @Override
     public String toString() {
-        return "for %s %s".formatted(quantifier, expression);
+        StringBuilder sb = new StringBuilder();
+        sb.append("for ")
+                .append(quantifier)
+                .append(" ")
+                .append(expression);
+
+
+        String vars = types.keySet().stream()
+                .sorted()
+                .map(e -> e + " is " + types.get(e))
+                .collect(Collectors.joining(", "));
+        if (!vars.isEmpty()) {
+            sb.append(" where ").append(vars);
+        }
+        return sb.toString();
     }
 }

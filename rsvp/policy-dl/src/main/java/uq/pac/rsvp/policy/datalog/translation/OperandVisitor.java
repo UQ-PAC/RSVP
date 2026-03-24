@@ -77,6 +77,7 @@ public class OperandVisitor extends ValueVisitorAdapter<DLTerm> {
 
     @Override
     public DLTerm visitVariableExpr(VariableExpression expr) {
+        // FIXME: Need to move it somewhere else
         Set<String> supported = Set.of("principal", "resource", "action");
         String var = expr.getReference();
         if (!supported.contains(var)) {

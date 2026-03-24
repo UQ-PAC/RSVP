@@ -8,9 +8,9 @@ import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class InvariantExpressionVisitor extends InvariantBaseVisitor<Expression> {
+class ExpressionVisitor extends InvariantBaseVisitor<Expression> {
 
-    public InvariantExpressionVisitor() {}
+    public ExpressionVisitor() {}
 
     static TypeExpression getTypeExpression(InvariantParser.TypeContext ctx) {
         String type = ctx.ID().stream()
@@ -28,6 +28,17 @@ class InvariantExpressionVisitor extends InvariantBaseVisitor<Expression> {
     @Override
     public Expression visitVariableExpr(InvariantParser.VariableExprContext ctx) {
         return new VariableExpression(ctx.getText());
+    }
+
+    @Override
+    public Expression visitStringExpr(InvariantParser.StringExprContext ctx) {
+        String value = ctx.STRING().getText();
+        return new StringExpression(value.substring(1, value.length() - 1));
+    }
+
+    @Override
+    public Expression visitLongExpr(InvariantParser.LongExprContext ctx) {
+        return new LongExpression(Long.parseLong(ctx.LONG().getText()));
     }
 
     @Override

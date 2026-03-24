@@ -38,8 +38,13 @@ export function SourceFileViewer({
           filename={source.filename}
           content={source.contents}
           reports={(reports ?? [])
-            .filter((report) => report.source.file === source.serverId)
-            .sort((a: Report, b: Report) => a.source.offset - b.source.offset)}
+            .filter(
+              (report) => report.primarySourceLocation.file === source.serverId,
+            )
+            .sort(
+              (a: Report, b: Report) =>
+                a.primarySourceLocation.offset - b.primarySourceLocation.offset,
+            )}
         />
       ))}
     </div>

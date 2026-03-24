@@ -1,13 +1,21 @@
 plugins {
     id "application"
     id("com.gradleup.shadow") version "9.3.0"
+    id "antlr"
 }
 
 dependencies {
+    // Cedar AST
     implementation project(':policy-ast')
+    // LogicNG
     implementation 'org.logicng:logicng:2.6.0'
+    // Google options (driver)
     implementation 'com.github.pcj:google-options:1.0.0'
+    // Ansi colours
     implementation 'org.fusesource.jansi:jansi:2.4.2'
+    // Antlr
+    antlr 'org.antlr:antlr4:4.13.2'
+    implementation 'org.antlr:antlr4-runtime:4.13.2'
 }
 
 application {
@@ -22,4 +30,22 @@ test {
     systemProperties 'test.builddir': layout.buildDirectory.asFile.get()
     systemProperties 'test.rootdir': layout.projectDirectory.toString()
     systemProperties 'test.oracles.generate': project.findProperty('test.oracles.generate')
+}
+
+generateGrammarSource {
+    maxHeapSize = "64m"
+    arguments += [ "-visitor",
+                   "-long-messages",
+                   "-package", "uq.pac.rsvp.policy.datalog.invariant" ]
+    outputDirectory = file("${projectDir}/build/generated/java")
+}
+
+sourceSets {
+    main {
+        java.srcDirs += "${projectDir}/build/generated/java/"
+    }
+}
+
+compileJava {
+	dependsOn 'generateGrammarSource'
 }

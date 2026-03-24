@@ -3,7 +3,6 @@ package uq.pac.rsvp.policy.datalog.invariant;
 import uq.pac.rsvp.policy.ast.expr.Expression;
 import uq.pac.rsvp.policy.ast.expr.TypeExpression;
 
-import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -38,18 +37,16 @@ public class Invariant {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("for ")
-                .append(quantifier)
-                .append(" ")
-                .append(expression);
-
-
+        sb.append(expression);
         String vars = types.keySet().stream()
                 .sorted()
-                .map(e -> e + " is " + types.get(e))
+                .map(e -> e + ": " + types.get(e))
                 .collect(Collectors.joining(", "));
         if (!vars.isEmpty()) {
-            sb.append(" where ").append(vars);
+            sb.append(" for ")
+                    .append(quantifier)
+                    .append(" ")
+                    .append(vars);
         }
         return sb.toString();
     }

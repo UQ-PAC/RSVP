@@ -7,7 +7,6 @@ import uq.pac.rsvp.policy.ast.expr.TypeExpression;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class InvariantDriver {
@@ -36,12 +35,17 @@ public class InvariantDriver {
             @Override
             public List<Invariant> visitProgram(InvariantParser.ProgramContext ctx) {
                 return ctx.invariant().stream().map(inv -> {
-                    Quantifier quantifier = Quantifier.valueOf(inv.op.getText().toUpperCase(Locale.ROOT));
+                    // Invariant expression
                     Expression expr = sv.visit(inv.expression());
+                    // Quantifier is optional (defaults to ALL) unless variables are specified,
+                    // since then this is basically a constant expression
+                    Quantifier quantifier = Quantifier.ALL;
+                    // Types
                     Map<String, TypeExpression> types = new HashMap<>();
 
-                    if (inv.typedVariableList() != null) {
-                        inv.typedVariableList().typedVariable().forEach(tv -> {
+                    if (inv.quantifier() != null) {
+                        quantifier = Quantifier.valueOf(inv.quantifier().quant.getText().toUpperCase());
+                        inv.quantifier().typedVariable().forEach(tv -> {
                             String var = tv.variable().getText();
                             types.put(var, ExpressionVisitor.getTypeExpression(tv.type()));
                         });

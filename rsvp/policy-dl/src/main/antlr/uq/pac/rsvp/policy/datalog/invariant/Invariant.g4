@@ -51,11 +51,13 @@ expression :
     | expression '||' expression                                       # disjunctionExpr
 ;
 
-typedVariable: variable IS type;
-typedVariableList: typedVariable (',' typedVariable)*;
+typedVariable: variable ':' type;
+quantifier:
+    FOR quant=(ALL|SOME|NONE) typedVariable (',' typedVariable)*
+;
 
 invariant:
-    FOR op=(ALL|SOME|NONE) expression (WHERE typedVariableList)? ';'
+    expression quantifier? ';'
 ;
 
 program : invariant*;

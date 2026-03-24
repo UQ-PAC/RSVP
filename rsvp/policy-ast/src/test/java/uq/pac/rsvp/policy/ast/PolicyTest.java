@@ -89,7 +89,7 @@ public class PolicyTest {
         @DisplayName("handles simple deny")
         void denyHacker() {
             Policy policy = new Policy(Effect.Forbid, new BinaryExpression(new VariableExpression("principal"),
-                    BinaryOp.Eq, new StringExpression("hacker", true)));
+                    BinaryOp.Eq, new StringExpression("hacker")));
 
             assertFalse(policy.isPermit());
             assertTrue(policy.isForbid());

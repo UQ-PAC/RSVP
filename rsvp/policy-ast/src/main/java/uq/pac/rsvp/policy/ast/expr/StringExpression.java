@@ -9,20 +9,10 @@ import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;;
 public class StringExpression extends Expression {
 
     private final String value;
-    private final boolean quoted;
-
-    public StringExpression(String value, boolean quoted, SourceLoc source) {
-        super(StringLiteral, source);
-        this.value = value;
-        this.quoted = quoted;
-    }
 
     public StringExpression(String value, SourceLoc source) {
-        this(value, !NICE_PROP_NAME.matcher(value).matches(), source);
-    }
-
-    public StringExpression(String value, boolean quoted) {
-        this(value, quoted, SourceLoc.MISSING);
+        super(StringLiteral, source);
+        this.value = value;
     }
 
     public StringExpression(String value) {
@@ -49,7 +39,7 @@ public class StringExpression extends Expression {
 
     @Override
     public String toString() {
-        return quoted || !NICE_PROP_NAME.matcher(value).matches() ? "\"" + value + "\"" : value;
+        return "\"" + value + "\"";
     }
 
 }

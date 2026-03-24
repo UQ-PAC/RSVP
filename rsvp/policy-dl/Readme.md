@@ -36,8 +36,8 @@ Outputs at the Datalog level are written into TAB-separated CSV files, where eac
 captures `principal`, `resource` and `action`.
 
 + auth.dl - Datalog specification
-+ Forbid<PolicyName>.csv - requests explicitly forbidden by a given permit policy
-+ Permit<PolicyName>.csv - requests explicitly permitted by a given permit policy
++ Forbid\<PolicyName\>.csv - requests explicitly forbidden by a given permit policy
++ Permit\<PolicyName\>.csv - requests explicitly permitted by a given permit policy
 + Permit.csv - requests explicitly permitted all policies in the supplied policy set
 + Forbid.csv - requests explicitly forbidden all policies in the supplied policy set
 + PermittedRequests.csv - all requests permitted by the policy

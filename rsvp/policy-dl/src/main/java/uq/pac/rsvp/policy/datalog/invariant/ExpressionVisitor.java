@@ -12,14 +12,14 @@ class InvariantExpressionVisitor extends InvariantBaseVisitor<Expression> {
 
     public InvariantExpressionVisitor() {}
 
-    private TypeExpression getTypeExpression(InvariantParser.TypeContext ctx) {
+    static TypeExpression getTypeExpression(InvariantParser.TypeContext ctx) {
         String type = ctx.ID().stream()
                 .map(ParseTree::getText)
                 .collect(Collectors.joining("::"));
         return new TypeExpression(type);
     }
 
-    private EntityExpression getEntityExpression(InvariantParser.EntityContext ctx) {
+    static EntityExpression getEntityExpression(InvariantParser.EntityContext ctx) {
         String type = getTypeExpression(ctx.type()).getValue();
         String eid = ctx.STRING().getText();
         return new EntityExpression(eid.substring(1, eid.length() - 1), type);

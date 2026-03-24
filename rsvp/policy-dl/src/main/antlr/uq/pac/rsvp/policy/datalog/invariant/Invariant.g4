@@ -1,27 +1,31 @@
 grammar Invariant;
 
-// Keywords
-FOR:  'for';
-ALL:  'all';
-SOME: 'some';
-NONE: 'none';
-IS:   'is';
-IN:   'in';
-
+// Reserved Keywords
+FOR:   'for';
+ALL:   'all';
+SOME:  'some';
+NONE:  'none';
+IS:    'is';
+IN:    'in';
+HAS:   'has';
+WHERE: 'where';
 TRUE:  'true';
 FALSE: 'false';
+
+// Identifier
+ID: [A-Za-z][A-Za-z0-9_]*;
 
 // Comments
 COMMENT: '//' ~[\r\n]* -> skip;
 
-// Double-quoted string (no escapes of '"')
+// Double-quoted string (no escapes or '"' as of now)
 STRING : '"' ( ~["\r\n])* '"' ;
+
+// Number
+LONG: [-]? [0-9]+;
 
 // White space
 WS: [ \r\n\t]+ -> skip;
-
-// Identifier
-ID: [A-Za-z][A-Za-z0-9_]*;
 
 literal: TRUE | FALSE;
 variable: ID;
@@ -35,9 +39,11 @@ expression :
     | property                                                         # propertyExpr
     | type                                                             # typeExpr
     | entity                                                           # entityExpr
-    | expression 'in' entity                                           # inExpr
-    | expression 'is' type                                             # isExpr
-    | expression 'has' ID                                              # hasExpr
+    | STRING                                                           # stringExpr
+    | LONG                                                             # longExpr
+    | expression IN entity                                             # inExpr
+    | expression IS type                                               # isExpr
+    | expression HAS ID                                                # hasExpr
     | '(' expression ')'                                               # groupingExpr
     | '!' expression                                                   # negationExpr
     | expression op=('==' | '!=' | '>' | '<' | '>=' | '<=') expression # comparisonExpr
@@ -45,8 +51,11 @@ expression :
     | expression '||' expression                                       # disjunctionExpr
 ;
 
+typedVariable: variable IS type;
+typedVariableList: typedVariable (',' typedVariable)*;
+
 invariant:
-    FOR op=(ALL|SOME|NONE) expression ';'
+    FOR op=(ALL|SOME|NONE) expression (WHERE typedVariableList)? ';'
 ;
 
 program : invariant*;

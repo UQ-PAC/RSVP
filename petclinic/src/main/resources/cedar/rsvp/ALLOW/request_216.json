@@ -1,6 +1,6 @@
 {
   "principal": "PetClinic::Employee::\"James Carter\"",
-  "resource": "PetClinic::Pet::\"Jewel\"",
-  "action": "PetClinic::Action::\"ViewClient\"",
+  "resource": "PetClinic::PetOwner::\"George Franklin\"",
+  "action": "PetClinic::Action::\"EditClient\"",
   "context": {}
 }

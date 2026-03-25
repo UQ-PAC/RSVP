@@ -1,0 +1,6 @@
+{
+  "principal": "PetClinic::Employee::\"Sharon Jenkins\"",
+  "resource": "PetClinic::Employee::\"Linda Douglas\"",
+  "action": "PetClinic::Action::\"DeleteEmployee\"",
+  "context": {}
+}

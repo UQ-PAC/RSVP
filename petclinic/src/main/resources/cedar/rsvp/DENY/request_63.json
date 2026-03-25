@@ -1,6 +1,0 @@
-{
-  "principal": "PetClinic::Guest::\"Unknown\"",
-  "resource": "PetClinic::PetVisit::\"Max 2\"",
-  "action": "PetClinic::Action::\"ViewClient\"",
-  "context": {}
-}

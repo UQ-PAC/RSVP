@@ -1,6 +1,6 @@
 {
-  "principal": "PetClinic::Guest::\"Unknown\"",
-  "resource": "PetClinic::PetOwner::\"Carlos Estaban\"",
+  "principal": "PetClinic::Employee::\"Bob\"",
+  "resource": "PetClinic::PetOwner::\"Eduardo Rodriquez\"",
   "action": "PetClinic::Action::\"DeleteClient\"",
   "context": {}
 }

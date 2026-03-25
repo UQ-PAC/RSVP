@@ -1,5 +1,10 @@
+"use client";
+
 import { SourceFile } from "./SourceFile";
 import { Report, SourceFileInfo } from "../SelectionContext";
+import { useEffect } from "react";
+import hljs from "highlight.js";
+import { CedarHighlight } from "../CedarHighlight";
 interface SourceFileViewerParams {
   sources: SourceFileInfo[];
   reports?: Report[];
@@ -13,6 +18,12 @@ export function SourceFileViewer({
   openUploadDrawer,
   openReportsDrawer,
 }: SourceFileViewerParams) {
+  useEffect(() => {
+    hljs.debugMode();
+    hljs.registerLanguage("cedar", () => CedarHighlight);
+    hljs.configure({ ignoreUnescapedHTML: true });
+  }, []);
+
   return (
     <div className="source-files-container">
       {!sources.length && (
@@ -29,14 +40,9 @@ export function SourceFileViewer({
           filename={source.filename}
           content={source.contents}
           openReportsDrawer={openReportsDrawer}
-          reports={(reports ?? [])
-            .filter(
-              (report) => report.primarySourceLocation.file === source.serverId,
-            )
-            .sort(
-              (a: Report, b: Report) =>
-                a.primarySourceLocation.offset - b.primarySourceLocation.offset,
-            )}
+          reports={(reports ?? []).filter(
+            (report) => report.primarySourceLocation.file === source.serverId,
+          )}
         />
       ))}
     </div>

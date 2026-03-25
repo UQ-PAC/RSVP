@@ -16,30 +16,38 @@ public class SourceLoc {
     public final int offset;
     public final int len;
 
-    public SourceLoc(String file, int offset, int len) {
+    public final int line;
+    public final int col;
+
+    public SourceLoc(String file, int offset, int len, int line, int col) {
         this.file = file;
         this.offset = offset;
         this.len = len;
+        this.line = line;
+        this.col = col;
     }
 
     public SourceLoc() {
-        this.file = "unknown";
-        this.offset = -1;
-        this.len = 0;
+        file = "unknown";
+        offset = -1;
+        len = 0;
+        line = -1;
+        col = -1;
     }
 
     @Override
     public String toString() {
-        // FIXME: figure out line and char???
-        return file + ":" + offset + ":" + len;
+        return file + ":" + line + ":" + col + ":" + len;
     }
 
     public static class SourceLocDeserializer implements JsonDeserializer<SourceLoc> {
 
         private final String filename;
+        private final String content;
 
-        public SourceLocDeserializer(String filename) {
+        public SourceLocDeserializer(String filename, String content) {
             this.filename = filename;
+            this.content = content;
         }
 
         @Override
@@ -47,18 +55,39 @@ public class SourceLoc {
                 throws JsonParseException {
 
             JsonObject sourceObject = json.getAsJsonObject();
-
             JsonElement configuiredFilename = sourceObject.get("file");
 
             int offset = sourceObject.get("offset").getAsInt();
             int len = sourceObject.get("len").getAsInt();
 
+            int line = 1;
+            int col = 1;
+
+            boolean found = false;
+
+            for (int i = 0; i < content.length(); i++) {
+                if (i == offset) {
+                    found = true;
+                    break;
+                } else if (content.charAt(i) == '\n') {
+                    line++;
+                    col = 1;
+                } else {
+                    col++;
+                }
+            }
+
+            if (!found) {
+                line = -1;
+                col = -1;
+            }
+
             if (configuiredFilename != null) {
-                return new SourceLoc(configuiredFilename.getAsString(), offset, len);
+                return new SourceLoc(configuiredFilename.getAsString(), offset, len, line, col);
             } else if (filename != null) {
-                return new SourceLoc(filename, offset, len);
+                return new SourceLoc(filename, offset, len, line, col);
             } else {
-                return new SourceLoc("unknown", offset, len);
+                return new SourceLoc("unknown", offset, len, line, col);
             }
         }
     }

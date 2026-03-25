@@ -300,11 +300,62 @@
   .source-file .source-file-render {
     border: 1px solid var(--color-gray-200);
     border-radius: 0.1rem;
+    padding: 1rem;
+  }
+
+  /* line number rendering source: https://jaseg.de/blog/css-only-code-blocks/ */
+  .source-file .source-file-render .code {
     font-family: var(--font-mono);
     white-space: pre-wrap;
     text-align: left;
     overflow-wrap: anywhere;
-    padding: 1rem;
+
+    display: grid;
+    align-items: start;
+    grid-template-columns: min-content 1fr;
+  }
+
+  .source-file .source-file-render .code::before {
+    counter-reset: lineno;
+  }
+
+  .source-file .source-file-render .code > .source-file-line-number {
+    counter-increment: lineno;
+    word-break: keep-all;
+    margin: 0;
+    padding-left: 0.2rem;
+    padding-right: 0.5rem;
+    overflow: clip;
+    position: relative;
+    text-align: right;
+    color: var(--color-gray-500);
+    border-right: 1px solid var(--color-gray-500);
+    align-self: stretch;
+    line-height: 1.5rem;
+  }
+
+  .source-file .source-file-render .code > .source-file-line-number::before {
+    content: counter(lineno);
+    white-space: pre;
+    font-size: 0.8rem;
+  }
+
+  .source-file .source-file-render .code > .source-file-line-number::after {
+    position: absolute;
+    right: 0.5rem;
+    content: "\a↳\a↳\a↳\a↳\a↳\a↳\a↳\a↳\a↳\a↳\a↳\a↳\a↳\a↳\a↳\a↳\a↳\a↳";
+    white-space: pre;
+    /* font-size: 0.8rem; */
+    /* line-height: 1rem; */
+    /* color: var(--c-text-muted); */
+  }
+
+  .source-file .source-file-render .code > .source-file-line-content {
+    padding-left: 1rem;
+    text-indent: -0.2rem;
+    line-height: 1.5rem;
+    /* padding-top: 0.1rem; */
+    /* min-width: 15em; */
   }
 
   .source-report {
@@ -374,6 +425,13 @@
 
   .report-item .report-item-message {
     color: var(--color-gray-600);
+  }
+
+  .report-item .report-item-message .report-item-line-info {
+    color: var(--color-gray-700);
+    font-size: 0.7rem;
+    line-height: 1rem;
+    font-weight: 400;
   }
   .report-item.report-item-info.selected .report-item-message,
   .report-item.report-item-info.hovered .report-item-message {

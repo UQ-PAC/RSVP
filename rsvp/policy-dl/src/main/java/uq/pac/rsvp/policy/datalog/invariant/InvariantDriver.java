@@ -3,7 +3,6 @@ package uq.pac.rsvp.policy.datalog.invariant;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import uq.pac.rsvp.policy.ast.expr.Expression;
-import uq.pac.rsvp.policy.ast.expr.TypeExpression;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,18 +38,18 @@ public class InvariantDriver {
                     Expression expr = sv.visit(inv.expression());
                     // Quantifier is optional (defaults to ALL) unless variables are specified,
                     // since then this is basically a constant expression
-                    Quantifier quantifier = Quantifier.ALL;
-                    // Types
-                    Map<String, TypeExpression> types = new HashMap<>();
+                    Quantifier quantifier = null;
+
 
                     if (inv.quantifier() != null) {
-                        quantifier = Quantifier.valueOf(inv.quantifier().quant.getText().toUpperCase());
+                        Quantifier.Scope scope = Quantifier.Scope.valueOf(inv.quantifier().quant.getText().toUpperCase());
+                        Map<String, String> variables = new HashMap<>();
                         inv.quantifier().typedVariable().forEach(tv -> {
-                            String var = tv.variable().getText();
-                            types.put(var, ExpressionVisitor.getTypeExpression(tv.type()));
+                            variables.put(tv.variable().getText(), ExpressionVisitor.getTypeExpression(tv.type()).getValue());
                         });
+                        quantifier = new Quantifier(scope, variables);
                     }
-                    return new Invariant(quantifier, expr, types);
+                    return new Invariant(quantifier, expr);
                 }).toList();
             }
         }.visit(parser.program());

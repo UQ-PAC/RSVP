@@ -14,11 +14,13 @@ interface SourceLoc {
   col: number;
 }
 
+export type ReportSeverity = "info" | "warn" | "err";
+
 export interface Report {
   id: string;
   primarySourceLocation: SourceLoc;
   sourceLocations: SourceLoc[];
-  severity: "info" | "warn" | "err";
+  severity: ReportSeverity;
   message: string;
   messageDetail?: string;
 }

@@ -30,7 +30,7 @@ public class TranslationVisitor extends VoidVisitorAdapter {
         this.operandVisitor = new OperandVisitor(this);
     }
 
-    public static DLRule translate(TranslationSchema schema, Collection<Expression> exprs, DLRuleDecl decl) {
+    public static DLRule translatePolicy(TranslationSchema schema, Collection<Expression> exprs, DLRuleDecl decl) {
         TranslationVisitor visitor = new TranslationVisitor(schema);
 
         // Ground terms
@@ -43,7 +43,12 @@ public class TranslationVisitor extends VoidVisitorAdapter {
             visitor.expressions.add(new DLInlineComment(e.toString()));
             e.accept(visitor);
         });
-        return new DLRule(makeStandardAtom(decl), visitor.expressions);
+        return new DLRule(makeAtom(decl), visitor.expressions);
+    }
+
+    public static DLRule translateInvariant(TranslationSchema schema, Collection<Expression> exprs, DLRuleDecl decl) {
+		// FIXME
+		return null;
     }
 
     void addExpression(DLRuleExpr expr) {
@@ -125,7 +130,7 @@ public class TranslationVisitor extends VoidVisitorAdapter {
     @Override
     public void visitBooleanExpr(BooleanExpression expr) {
         if (!expr.getValue()) {
-            expressions.add(makeStandardAtom(NullifiedRequestsRuleDecl));
+            expressions.add(makeAtom(NullifiedRequestsRuleDecl));
         }
     }
 

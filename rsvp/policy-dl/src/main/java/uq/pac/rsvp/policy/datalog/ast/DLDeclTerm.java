@@ -35,4 +35,12 @@ public class DLDeclTerm extends DLNode {
     public static DLDeclTerm numeric(String name) {
         return new DLDeclTerm(name, DLType.NUMBER);
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public DLType getType() {
+        return type;
+    }
 }

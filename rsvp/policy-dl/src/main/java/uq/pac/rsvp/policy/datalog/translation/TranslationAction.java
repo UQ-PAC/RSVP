@@ -79,7 +79,7 @@ public class TranslationAction {
             actionResourceRules.addAll(arRules);
         }
 
-        DLRule actionableRequestRule = new DLRule(makeStandardAtom(ActionableRequestsRuleDecl),
+        DLRule actionableRequestRule = new DLRule(makeAtom(ActionableRequestsRuleDecl),
                 new DLAtom(ActionPrincipalRuleDecl, ActionVar, PrincipalVar),
                 new DLAtom(ActionResourceRuleDecl, ActionVar, ResourceVar));
 

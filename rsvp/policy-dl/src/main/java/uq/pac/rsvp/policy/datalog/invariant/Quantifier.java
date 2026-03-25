@@ -1,9 +1,14 @@
 package uq.pac.rsvp.policy.datalog.invariant;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+/**
+ * Representation of a quantifier for invariant that captures
+ */
 public class Quantifier {
     public enum Scope {
         ALL("all"),
@@ -25,6 +30,11 @@ public class Quantifier {
     private final Map<String, String> variables;
     private final Scope scope;
 
+
+    public Quantifier() {
+        this(Scope.ALL, Collections.emptyMap());
+    }
+
     public Quantifier(Scope scope, Map<String, String> variables) {
         this.variables = Map.copyOf(variables);
         this.scope = scope;
@@ -38,8 +48,16 @@ public class Quantifier {
         return variables.keySet();
     }
 
+    public Stream<String> variables() {
+        return variables.keySet().stream();
+    }
+
     public String getType(String var) {
         return variables.get(var);
+    }
+
+    public boolean isEmpty() {
+        return variables.isEmpty();
     }
 
     @Override

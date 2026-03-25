@@ -193,17 +193,17 @@ public class Translation {
 
         builder.comment("General Permit Rule (requests explicitly allowed by the policy)")
                 .add(PermitRuleDecl);
-        DLAtom permit = makeStandardAtom(PermitRuleDecl);
+        DLAtom permit = makeAtom(PermitRuleDecl);
         for (TranslationPolicy policy : translationPolicies.getPermitTranslation()) {
-            DLAtom policyPermit = makeStandardAtom(policy.getDeclaration());
+            DLAtom policyPermit = makeAtom(policy.getDeclaration());
             builder.add(new DLRule(permit, policyPermit));
         }
 
         builder.comment("General Forbid Rule (requests explicitly forbidden by the policy)")
                 .add(ForbidRuleDecl);
-        DLAtom forbid = makeStandardAtom(ForbidRuleDecl);
+        DLAtom forbid = makeAtom(ForbidRuleDecl);
         for (TranslationPolicy policy : translationPolicies.getForbidTranslation()) {
-            DLAtom policyForbid = makeStandardAtom(policy.getDeclaration());
+            DLAtom policyForbid = makeAtom(policy.getDeclaration());
             builder.add(new DLRule(forbid, policyForbid));
         }
 

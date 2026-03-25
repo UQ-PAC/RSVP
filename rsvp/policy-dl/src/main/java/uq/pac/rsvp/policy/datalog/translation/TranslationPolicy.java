@@ -32,7 +32,7 @@ public class TranslationPolicy {
         Expression transformed = TranslationTransformer.transform(policy.getCondition());
         List<List<Expression>> disjunctions = NFConverter.toDNF(transformed);
         this.rules = disjunctions.stream()
-                .map(disjunction -> TranslationVisitor.translate(schema, disjunction, declaration))
+                .map(disjunction -> TranslationVisitor.translatePolicy(schema, disjunction, declaration))
                 .toList();
     }
 

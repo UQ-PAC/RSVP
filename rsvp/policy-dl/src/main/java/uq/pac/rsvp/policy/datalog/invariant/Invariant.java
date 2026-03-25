@@ -2,6 +2,8 @@ package uq.pac.rsvp.policy.datalog.invariant;
 
 import uq.pac.rsvp.policy.ast.expr.Expression;
 
+import java.util.Collections;
+
 
 public class Invariant {
     private final String name;
@@ -10,7 +12,7 @@ public class Invariant {
 
     public Invariant(String name, Quantifier quantifier, Expression expression) {
         this.name = name;
-        this.quantifier = quantifier;
+        this.quantifier = quantifier == null ? new Quantifier() : quantifier;
         this.expression = expression;
     }
 
@@ -28,6 +30,6 @@ public class Invariant {
 
     @Override
     public String toString() {
-        return "@invariant(\"" + name + "\")\n" + expression + (quantifier == null ? "" : "\n    " + quantifier);
+        return "@invariant(\"" + name + "\")\n" + expression + (quantifier.isEmpty() ? "" : "\n    " + quantifier);
     }
 }

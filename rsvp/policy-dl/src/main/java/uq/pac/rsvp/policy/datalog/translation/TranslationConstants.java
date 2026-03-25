@@ -4,6 +4,7 @@ import com.cedarpolicy.value.EntityUID;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.datalog.ast.*;
+import uq.pac.rsvp.policy.datalog.invariant.Invariant;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -35,29 +36,28 @@ public class TranslationConstants {
      * Perhaps it could be better to type variables based on types of entities
      * and actions.
      */
-    public final static DLDeclTerm PrincipalVarDecl =
-            DLDeclTerm.symbolic(PrincipalVar.getName());
-    public final static DLDeclTerm ResourceVarDecl =
-            DLDeclTerm.symbolic(ResourceVar.getName());
-    public final static DLDeclTerm ActionVarDecl =
-            DLDeclTerm.symbolic(ActionVar.getName());
+    public final static DLDeclTerm PrincipalVarDecl = DLDeclTerm.symbolic(PrincipalVar.getName());
+    public final static DLDeclTerm ResourceVarDecl = DLDeclTerm.symbolic(ResourceVar.getName());
+    public final static DLDeclTerm ActionVarDecl = DLDeclTerm.symbolic(ActionVar.getName());
 
     /**
-     * Make an atom of the form <name>(principal, resource, action)
-    */
-    public static DLAtom makeStandardAtom(DLRuleDecl decl) {
-        return makeStandardAtom(decl, false);
+     * Make a (potentially negated) atom over the terms of the declaration
+     */
+    public static DLAtom makeAtom(DLRuleDecl decl, boolean negated) {
+        List<DLTerm> terms =
+                decl.getDeclTerms().stream().map(t -> DLTerm.var(t.getName())).toList();
+        return new DLAtom(decl, negated, terms);
     }
 
-    public static DLAtom makeStandardAtom(DLRuleDecl decl, boolean negate) {
-        return new DLAtom(decl, negate, PrincipalVar, ResourceVar, ActionVar);
+    public static DLAtom makeAtom(DLRuleDecl decl) {
+        return makeAtom(decl, false);
     }
 
     /**
      * Make a relation declaration of the form
      * .decl name(principal: symbol, resource: symbol, action: symbol)
      */
-    public static DLRuleDecl makeStandardRuleDecl(String name) {
+    public static DLRuleDecl makePolicyRuleDecl(String name) {
         return new DLRuleDecl(name, PrincipalVarDecl, ResourceVarDecl, ActionVarDecl);
     }
 
@@ -83,31 +83,31 @@ public class TranslationConstants {
 
 
     public final static DLRuleDecl ActionableRequestsRuleDecl =
-            makeStandardRuleDecl("ActionableRequests");
+            makePolicyRuleDecl("ActionableRequests");
 
     /**
      * Empty relation indicating no solutions
      */
     public final static DLRuleDecl NullifiedRequestsRuleDecl =
-            makeStandardRuleDecl("NullifiedRequests");
+            makePolicyRuleDecl("NullifiedRequests");
 
     /**
      * Rule that describes all explicitly permitted requests
      */
     public final static DLRuleDecl PermitRuleDecl =
-            makeStandardRuleDecl("Permit");
+            makePolicyRuleDecl("Permit");
 
     /**
      * Rule that describes all explicitly forbidden requests
      */
     public final static DLRuleDecl ForbidRuleDecl =
-            makeStandardRuleDecl("Forbid");
+            makePolicyRuleDecl("Forbid");
 
     /**
      * All requests forbidden by the policy
      */
     public final static DLRuleDecl PermittedRequestsRuleDecl =
-            makeStandardRuleDecl("PermittedRequests");
+            makePolicyRuleDecl("PermittedRequests");
 
     /**
      * PermittedRequests(action, principal, resource) :-
@@ -115,9 +115,9 @@ public class TranslationConstants {
      *     !Forbid(action, principal, resource).
      */
     public static DLSegment makePermittedRequestsRule() {
-        DLRule rule = new DLRule(makeStandardAtom(PermittedRequestsRuleDecl),
-                makeStandardAtom(PermitRuleDecl),
-                makeStandardAtom(ForbidRuleDecl, true));
+        DLRule rule = new DLRule(makeAtom(PermittedRequestsRuleDecl),
+                makeAtom(PermitRuleDecl),
+                makeAtom(ForbidRuleDecl, true));
         return new DLSegment(PermittedRequestsRuleDecl, rule);
     }
 
@@ -125,7 +125,7 @@ public class TranslationConstants {
      * All requests forbidden by the policy
      */
     public final static DLRuleDecl ForbiddenRequestsRuleDecl =
-            makeStandardRuleDecl("ForbiddenRequests");
+            makePolicyRuleDecl("ForbiddenRequests");
 
     /**
      *  ForbiddenRequests(action, principal, resource) :-
@@ -133,9 +133,9 @@ public class TranslationConstants {
      *      !PermittedRequests(action, principal, resource).
      */
     public static DLSegment makeForbiddenRequestsRule() {
-        DLRule rule = new DLRule(makeStandardAtom(ForbiddenRequestsRuleDecl),
-                makeStandardAtom(ActionableRequestsRuleDecl),
-                makeStandardAtom(PermittedRequestsRuleDecl, true));
+        DLRule rule = new DLRule(makeAtom(ForbiddenRequestsRuleDecl),
+                makeAtom(ActionableRequestsRuleDecl),
+                makeAtom(PermittedRequestsRuleDecl, true));
         return new DLSegment(ForbiddenRequestsRuleDecl, rule);
     }
 
@@ -166,7 +166,9 @@ public class TranslationConstants {
 	 * Get a declaration for a unary entity relation
 	*/
     public static DLRuleDecl getEntityRuleDecl(EntityTypeDefinition entity) {
-        return new DLRuleDecl("Entity_" + entity.getName().replace(':', '_'), DLType.SYMBOL);
+        String name = "Entity_" + entity.getName().replace(':', '_');
+        DLDeclTerm term = new DLDeclTerm("euid", DLType.SYMBOL);
+        return new DLRuleDecl(name, term);
     }
 
     /**
@@ -203,7 +205,18 @@ public class TranslationConstants {
      */
     public static DLRuleDecl makePolicyRuleDecl(Policy policy) {
         String name = policy.isPermit() ? PermitPolicyPrefix : ForbidPolicyPrefix;
-        return makeStandardRuleDecl(name + policy.getName());
+        return makePolicyRuleDecl(name + policy.getName());
+    }
+
+    /**
+     * Get a declaration for an invariant
+     */
+    public static DLRuleDecl makeInvariantRuleDecl(Invariant invariant) {
+        String name = "Invariant" + invariant.getName();
+        List<DLDeclTerm> terms = invariant.getQuantifier().variables()
+                .map(v -> new DLDeclTerm(v, DLType.SYMBOL))
+                .toList();
+        return new DLRuleDecl(name, terms);
     }
 
     /**

@@ -3,10 +3,7 @@
 import { useState } from "react";
 import { FilePond } from "react-filepond";
 import type { FilePondErrorDescription, FilePondFile } from "filepond";
-import {
-  SourceFileInfo,
-  SourceFileViewer,
-} from "./components/SourceFileViewer";
+import { SourceFileViewer } from "./components/SourceFileViewer";
 
 import { Header } from "./components/Header";
 
@@ -15,7 +12,7 @@ import { ReportViewer } from "./components/ReportViewer";
 import { SelectionProvider } from "./components/SelectionProvider";
 import { Drawer } from "./components/Drawer";
 import { Content } from "./components/Content";
-import { Report } from "./SelectionContext";
+import { Report, SourceFileInfo } from "./SelectionContext";
 
 export default function Home() {
   const [files, setFiles] = useState<FilePondFile[]>([]);
@@ -77,6 +74,12 @@ export default function Home() {
     fetch("/api/reports")
       .then((res) => res.json())
       .then((reports) => reports.map(resolveFilenames))
+      .then((reports) =>
+        reports.sort(
+          (a: Report, b: Report) =>
+            a.primarySourceLocation.offset - b.primarySourceLocation.offset,
+        ),
+      )
       .then((reports) => {
         setReports(reports);
         setUploadExpanded(false);

@@ -73,6 +73,59 @@
   .centered-text {
     text-align: center;
   }
+
+  /********  Highlight.js syntax highlighting  ********/
+
+  .hljs-keyword {
+    font-weight: 500;
+    color: var(--color-pink-800);
+  }
+  .hljs-operator {
+    font-weight: 800;
+    color: var(--color-pink-800);
+  }
+
+  .hljs-literal {
+    font-weight: 500;
+    color: var(--color-cyan-700);
+  }
+
+  .hljs-pragma {
+    font-weight: 500;
+    color: var(--color-blue-500);
+  }
+
+  .hljs-type {
+    color: var(--color-cyan-700);
+  }
+
+  .hljs-annotation {
+    font-weight: 500;
+    color: var(--color-amber-600);
+  }
+
+  .hljs-string {
+    font-weight: 400;
+    color: var(--color-taupe-500);
+  }
+
+  .hljs-number {
+    font-weight: 500;
+    color: var(--color-lime-500);
+  }
+
+  .hljs-comment {
+    font-weight: 200;
+    color: var(--color-gray-600);
+  }
+
+  .hljs-function {
+    color: var(--color-violet-800);
+  }
+
+  .hljs-property {
+    color: var(--color-gray-600);
+  }
 }
 
 @layer components {

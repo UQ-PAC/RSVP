@@ -3,7 +3,7 @@
 import cx from "classnames";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Roboto_Mono } from "next/font/google";
 
 import {
@@ -18,16 +18,34 @@ interface SourceFileParams {
   filename: string;
   content: string;
   reports: Report[];
+  openReportsDrawer: () => void;
 }
 
 const robotoMono = Roboto_Mono({
   subsets: ["latin"],
 });
 
-export function SourceFile({ filename, content, reports }: SourceFileParams) {
+export function SourceFile({
+  filename,
+  content,
+  reports,
+  openReportsDrawer,
+}: SourceFileParams) {
   const [expand, setExpand] = useState(true);
-  const { selected, hovered } = useSelection();
+  const { selected, hovered, scroll } = useSelection();
   const dispatch = useSelectionDispatch();
+
+  const element = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scroll === "source") {
+      element.current?.scrollIntoView({
+        block: "center",
+        inline: "center",
+        behavior: "smooth",
+      });
+    }
+  }, [scroll, element, selected]);
 
   const begin: string = content.slice(
     0,
@@ -35,7 +53,7 @@ export function SourceFile({ filename, content, reports }: SourceFileParams) {
   );
 
   return (
-    <div className="source-file-render">
+    <div className="source-file">
       <div className="source-file-header" onClick={() => setExpand(!expand)}>
         <FontAwesomeIcon className="source-file-icon" icon={faFileLines} />
         <h2 className="source-file-name">{filename}</h2>
@@ -52,12 +70,13 @@ export function SourceFile({ filename, content, reports }: SourceFileParams) {
         )}
       </div>
       {expand ? (
-        <div className={`source-file-contents ${robotoMono.className}`}>
+        <div className={`source-file-render ${robotoMono.className}`}>
           {begin}
           {reports.map((report: Report, index) => (
             <span key={report.id}>
               <span
                 id={`source-report-${report.id}`}
+                ref={selected === report.id ? element : null}
                 className={cx(
                   "source-report",
                   `source-report-${report.severity}`,
@@ -65,9 +84,10 @@ export function SourceFile({ filename, content, reports }: SourceFileParams) {
                   hovered === report.id && "hovered",
                 )}
                 data-message={report.message}
-                onClick={() =>
-                  dispatch({ type: "click", id: report.id, source: "source" })
-                }
+                onClick={() => {
+                  openReportsDrawer();
+                  dispatch({ type: "click", id: report.id, source: "source" });
+                }}
                 onMouseEnter={() =>
                   dispatch({
                     type: "mouseEnter",

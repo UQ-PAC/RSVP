@@ -5,7 +5,7 @@ import java.util.Set;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
-import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -85,7 +85,7 @@ public class Report {
 
     @Override
     public String toString() {
-        return new Gson().toJson(this);
+        return new GsonBuilder().setPrettyPrinting().create().toJson(this);
     }
 
     @Override

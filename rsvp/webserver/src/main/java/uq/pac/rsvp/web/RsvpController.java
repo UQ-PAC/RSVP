@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -106,7 +104,7 @@ public class RsvpController {
             if (file.toString().endsWith(".cedar")) {
                 logger.info("Verifying: " + file);
 
-                List<Report> all = Verification.verifyPolicies(hash, Files.readString(file));
+                Set<Report> all = Verification.verifyPolicies(hash, Files.readString(file));
                 logger.info(all.toString());
 
                 result.addAll(all);

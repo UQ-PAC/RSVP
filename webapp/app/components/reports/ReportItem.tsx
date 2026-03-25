@@ -8,11 +8,12 @@ import {
   faCircleXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import {
-  Report,
   useSelection,
   useSelectionDispatch,
-} from "../SelectionContext";
+} from "../providers/SelectionContext";
+import { Report } from "../../types";
 import { useEffect, useRef } from "react";
+import { ExpansionState, useFocusDispatch } from "../providers/FocusContext";
 
 interface ReportItemParams {
   report: Report;
@@ -20,7 +21,8 @@ interface ReportItemParams {
 
 export function ReportItem({ report }: ReportItemParams) {
   const { selected, hovered, scroll } = useSelection();
-  const dispatch = useSelectionDispatch();
+  const selectionDispatch = useSelectionDispatch();
+  const focusDispatch = useFocusDispatch();
 
   const element = useRef<HTMLDivElement>(null);
 
@@ -51,23 +53,44 @@ export function ReportItem({ report }: ReportItemParams) {
         ? faCircleExclamation
         : faCircleInfo;
 
+  // line info || entire file
+  // need version info for policy file reports (only if more than one version exists)
+
   return (
     <div
       id={`report-${report.id}`}
       ref={element}
       className={className}
       onMouseEnter={() =>
-        dispatch({ type: "mouseEnter", id: report.id, source: "report" })
+        selectionDispatch({
+          type: "mouseEnter",
+          id: report.id,
+          scroll: "none",
+        })
       }
       onMouseLeave={() =>
-        dispatch({ type: "mouseLeave", id: report.id, source: "report" })
+        selectionDispatch({
+          type: "mouseLeave",
+          id: report.id,
+          scroll: "none",
+        })
       }
     >
       <div
         className="report-item-header"
-        onClick={() =>
-          dispatch({ type: "click", id: report.id, source: "report" })
-        }
+        onClick={() => {
+          if (!isSelected) {
+            const filename = report.primarySourceLocation.source?.filename;
+            if (filename) {
+              focusDispatch({
+                type: "source-file",
+                key: filename,
+                value: ExpansionState.Expanded,
+              });
+            }
+          }
+          selectionDispatch({ type: "click", id: report.id, scroll: "source" });
+        }}
       >
         <FontAwesomeIcon
           className="report-item-icon report-item-icon-severity"
@@ -77,7 +100,11 @@ export function ReportItem({ report }: ReportItemParams) {
           className={`report-item-message report-item-message-${report.severity}`}
         >
           {report.message}
+          <span className="report-item-line-info">
+            {`  (${report.primarySourceLocation.source?.filename}:${report.primarySourceLocation.line}:${report.primarySourceLocation.col})`}
+          </span>
         </span>
+
         {!!report.messageDetail?.length && (
           <FontAwesomeIcon
             className="report-item-icon report-item-icon-expand"

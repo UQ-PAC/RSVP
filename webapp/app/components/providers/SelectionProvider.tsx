@@ -1,12 +1,13 @@
 import { useReducer } from "react";
 import {
+  emptySelection,
   reducer,
   SelectionContext,
   SelectionDispatchContext,
-} from "../SelectionContext";
+} from "./SelectionContext";
 
 export function SelectionProvider({ children }) {
-  const [context, dispatch] = useReducer(reducer, {});
+  const [context, dispatch] = useReducer(reducer, emptySelection);
 
   return (
     <SelectionContext value={context}>

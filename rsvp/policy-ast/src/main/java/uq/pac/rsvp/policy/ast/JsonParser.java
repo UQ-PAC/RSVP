@@ -17,7 +17,7 @@ import uq.pac.rsvp.support.SourceLoc.SourceLocDeserializer;
 
 public class JsonParser {
 
-    private static Gson getGson(String filename) {
+    private static Gson getGson(String filename, String content) {
 
         return new GsonBuilder()
                 .registerTypeAdapter(Expression.class, new ExpressionDeserialiser())
@@ -25,7 +25,7 @@ public class JsonParser {
                 .registerTypeAdapter(EntityExpression.class, new EuidExpressionDeserialiser())
                 .registerTypeAdapter(CommonTypeDefinition.class, new CommonTypeDefinitionDeserialiser())
                 .registerTypeAdapter(Schema.class, new SchemaDeserialiser())
-                .registerTypeAdapter(SourceLoc.class, new SourceLocDeserializer(filename))
+                .registerTypeAdapter(SourceLoc.class, new SourceLocDeserializer(filename, content))
                 .disableJdkUnsafe()
                 .create();
 
@@ -35,15 +35,12 @@ public class JsonParser {
         return parseSchema(null, json);
     }
 
+    // FIXME: no schema line numbers anyway
     public static Schema parseSchema(String filename, String json) {
-        return getGson(filename).fromJson(json, Schema.class);
+        return getGson(filename, json).fromJson(json, Schema.class);
     }
 
-    public static PolicySet parsePolicySet(String json) {
-        return parsePolicySet(null, json);
-    }
-
-    public static PolicySet parsePolicySet(String filename, String json) {
-        return getGson(filename).fromJson(json, PolicySet.class);
+    public static PolicySet parsePolicySet(String filename, String json, String cedar) {
+        return getGson(filename, cedar).fromJson(json, PolicySet.class);
     }
 }

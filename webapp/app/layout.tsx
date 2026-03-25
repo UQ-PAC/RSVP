@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Roboto_Flex } from "next/font/google";
 import "./globals.css";
+import "./components/files/CedarHighlight";
 
 const robotoFlex = Roboto_Flex({
   subsets: ["latin"],

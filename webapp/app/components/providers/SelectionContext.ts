@@ -1,52 +1,31 @@
 import { createContext, Dispatch, useContext } from "react";
 
-interface SourceLoc {
-  file: string;
-  offset: number;
-  len: number;
-}
-
-export interface Report {
-  id: string;
-  primarySourceLocation: SourceLoc;
-  sourceLocations: SourceLoc[];
-  severity: "info" | "warn" | "err";
-  message: string;
-  messageDetail?: string;
-}
-
 interface SelectionState {
   selected?: string;
   hovered?: string;
   scroll?: "source" | "report" | "none";
 }
 
-interface Action {
-  type: "click" | "mouseEnter" | "mouseLeave" | "reports";
+export const emptySelection = {};
+
+interface SelectionAction {
+  type: "click" | "mouseEnter" | "mouseLeave" | "other";
   id?: string;
-  source?: "source" | "report";
+  scroll: "source" | "report" | "none";
 }
 
 export function reducer(
   context: SelectionState,
-  action: Action,
+  action: SelectionAction,
 ): SelectionState {
   switch (action.type) {
     case "click":
       const selectionChanged = action.id !== context.selected;
 
-      if (selectionChanged) {
-        console.log("SELECTION CHANGED");
-      }
-
       return {
         ...context,
         selected: !selectionChanged ? "" : action.id,
-        scroll: selectionChanged
-          ? action.source === "source"
-            ? "report"
-            : "source"
-          : "none",
+        scroll: action.scroll,
       };
     case "mouseEnter":
       return {
@@ -60,14 +39,20 @@ export function reducer(
           hovered: "",
         };
       }
+    case "other":
+      return {
+        ...context,
+        selected: action.id ?? context.selected,
+        scroll: action.scroll,
+      };
   }
   return context;
 }
 
-export const SelectionContext = createContext<SelectionState>({});
-export const SelectionDispatchContext = createContext<Dispatch<Action>>(
-  (_: Action) => {},
-);
+export const SelectionContext = createContext<SelectionState>(emptySelection);
+export const SelectionDispatchContext = createContext<
+  Dispatch<SelectionAction>
+>(() => {});
 
 export function useSelection() {
   return useContext(SelectionContext);

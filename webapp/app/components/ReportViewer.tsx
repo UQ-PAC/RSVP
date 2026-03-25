@@ -1,8 +1,7 @@
 "use client";
 
 import { ReportItem } from "./ReportItem";
-import { Report, useSelection } from "../SelectionContext";
-import { useRef } from "react";
+import { Report } from "../SelectionContext";
 
 interface ReportViewerProps {
   reports?: Report[];

@@ -58,9 +58,25 @@ export default function Home() {
     status?: any,
   ) => console.error(error.body);
 
+  // Resolve serverIds to actual source files
+  const resolveFilenames = (report: Report): Report => ({
+    ...report,
+    primarySourceLocation: {
+      ...report.primarySourceLocation,
+      source: sources.find(
+        (source) => source.serverId === report.primarySourceLocation.file,
+      ),
+    },
+    sourceLocations: report.sourceLocations.map((sourceLoc) => ({
+      ...sourceLoc,
+      source: sources.find((source) => source.serverId === sourceLoc.file),
+    })),
+  });
+
   const verify = () => {
     fetch("/api/reports")
       .then((res) => res.json())
+      .then((reports) => reports.map(resolveFilenames))
       .then((reports) => {
         setReports(reports);
         setUploadExpanded(false);

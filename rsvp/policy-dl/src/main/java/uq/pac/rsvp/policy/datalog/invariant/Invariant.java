@@ -22,6 +22,6 @@ public class Invariant {
 
     @Override
     public String toString() {
-        return expression + " " + quantifier;
+        return expression + (quantifier == null ? "" : " " + quantifier);
     }
 }

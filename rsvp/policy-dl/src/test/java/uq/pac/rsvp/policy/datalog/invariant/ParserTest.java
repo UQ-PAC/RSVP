@@ -30,13 +30,17 @@ public class ParserTest {
         a == b && c != d;
         a == "a" && c != "c";
         a == 1 && c != 2;
+        principal.friends.isEmpty();
+        principal.friends.contains(resource);
+        principal.friends.contains(resource, action);
+        allowedRequests(principal, resource, action);
         resource has foo || principal has bar;
         resource is Resource::Picture::Kind;
         resource in Resource::Picture::Kind::"Forest";
         resource == Resource::Picture::Kind::"Forest"
-            for all resource: Resource::Picture::Kind;
+            for some resource: Resource::Picture::Kind;
         resource.foo == "foo" && principal.bar == "bar"
-            for some resource:  Resource::Picture, principal: Album::Photo;
+            for all resource:  Resource::Picture, principal: Album::Photo;
         """;
 
     private static final String EXPECTED = """
@@ -55,23 +59,26 @@ public class ParserTest {
         ((a == b) && (c != d));
         ((a == "a") && (c != "c"));
         ((a == 1) && (c != 2));
+        principal.friends.isEmpty();
+        principal.friends.contains(resource);
+        principal.friends.contains(resource, action);
+        allowedRequests(principal, resource, action);
         ((resource has "foo") || (principal has "bar"));
         (resource is Resource::Picture::Kind);
         (resource in Resource::Picture::Kind::"Forest");
         (resource == Resource::Picture::Kind::"Forest") for some resource: Resource::Picture::Kind;
-        ((resource.foo == "foo") && (principal.bar == "bar")) for all principal: Album::Photo, resource is Resource::Picture;
+        ((resource.foo == "foo") && (principal.bar == "bar")) for all principal: Album::Photo, resource: Resource::Picture;
         """;
 
     @Test
     @DisplayName("Invariant Parsing")
     void parseTest() {
         List<Invariant> invariants = InvariantDriver.parse(INPUT);
-        invariants.forEach(i -> logger.info(YELLOW, i.toString()));
-        // FIXME
-        // String text = invariants.stream()
-        //                .map(Invariant::toString)
-        //                .collect(Collectors.joining(";\n"));
-        // assertEquals(EXPECTED.trim(), text + ";");
+        invariants.forEach(i -> logger.info(YELLOW, i + ";"));
+         String text = invariants.stream()
+                        .map(Invariant::toString)
+                        .collect(Collectors.joining(";\n"));
+         assertEquals(EXPECTED.trim(), text + ";");
     }
 
 }

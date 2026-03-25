@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.datalog.invariant;
 
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import uq.pac.rsvp.policy.ast.SourceLoc;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 
@@ -100,6 +101,26 @@ class ExpressionVisitor extends InvariantBaseVisitor<Expression> {
         return new BinaryExpression(ctx.expression(0).accept(this), op,
                 ctx.expression(1).accept(this));
     }
+
+    @Override
+    public Expression visitCallExpr(InvariantParser.CallExprContext ctx) {
+        Expression object = null;
+        if (ctx.property() != null) {
+            List<TerminalNode> nodes = ctx.property().ID();
+            object = new VariableExpression(nodes.removeFirst().getText());
+            while (!nodes.isEmpty()) {
+                String prop = nodes.removeFirst().getText();
+                object = new PropertyAccessExpression(object, prop);
+            }
+        }
+        String fun = ctx.ID().getText();
+        List<Expression> args = ctx.callArguments().expression().stream()
+                .map(c -> c.accept(this))
+                .toList();
+
+        return new CallExpression(object, fun, args);
+    }
+
 
     @Override
     public Expression visitTypeExpr(InvariantParser.TypeExprContext ctx) {

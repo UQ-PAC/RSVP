@@ -37,6 +37,7 @@ expression :
       literal                                                          # literalExpr
     | variable                                                         # variableExpr
     | property                                                         # propertyExpr
+    | (property '.')? ID callArguments                                 # callExpr
     | type                                                             # typeExpr
     | entity                                                           # entityExpr
     | STRING                                                           # stringExpr
@@ -49,6 +50,11 @@ expression :
     | expression op=('==' | '!=' | '>' | '<' | '>=' | '<=') expression # comparisonExpr
     | expression '&&' expression                                       # conjunctionExpr
     | expression '||' expression                                       # disjunctionExpr
+;
+
+callArguments:
+    | '(' ')'
+    | '(' expression (',' expression)* ')'
 ;
 
 typedVariable: variable ':' type;

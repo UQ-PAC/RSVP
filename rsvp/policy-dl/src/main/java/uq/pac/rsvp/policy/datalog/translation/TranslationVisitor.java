@@ -20,21 +20,46 @@ import static uq.pac.rsvp.policy.datalog.util.Util.required;
  *  - An expression can be negated but once only
  */
 public class TranslationVisitor extends VoidVisitorAdapter {
+    /**
+     * Translation schema (entity definitions alongside with Datalog declarations)
+     */
     private final TranslationSchema schema;
+    /**
+     * A list of generated expressions forming the body of the generated rule
+     */
     private final List<DLRuleExpr> expressions;
+    /**
+     * Computing operands. A separated visitor generating side effects
+     * when inferring Datalog variables
+     */
     private final OperandVisitor operandVisitor;
+    /**
+     * {@code true} if the provided expression is negated
+     */
     private boolean negated = false;
+    /**
+     * Context of the translation (i.e., whether the translation is for policies or for invariants)
+     */
+    private final TranslationContext context;
 
-    private TranslationVisitor(TranslationSchema schema) {
+    private TranslationVisitor(TranslationSchema schema, TranslationContext context) {
         this.schema = schema;
         this.expressions = new ArrayList<>();
         this.operandVisitor = new OperandVisitor(this);
+        this.context = context;
+    }
+
+    TranslationContext getContext() {
+        return context;
     }
 
     public static DLRule translatePolicy(TranslationSchema schema, Collection<Expression> exprs, DLRuleDecl decl) {
-        TranslationVisitor visitor = new TranslationVisitor(schema);
+        TranslationVisitor visitor = new TranslationVisitor(schema, TranslationContext.Policy);
 
-        // Ground terms
+        // Ground terms. When translating policies the generated expressions
+        // are over principals, resources and actions. The boundaries of the above
+        // are obtained from the limits declared in actions (all actions declare
+        // which principals and resources they apply to)
         visitor.expressions.add(new DLInlineComment("Ground terms"));
         visitor.expressions.addAll(List.of(
                 new DLAtom(ActionPrincipalRuleDecl, ActionVar, PrincipalVar),
@@ -48,9 +73,10 @@ public class TranslationVisitor extends VoidVisitorAdapter {
     }
 
     public static DLRule translateInvariant(TranslationSchema schema, Collection<Expression> exprs, DLRuleDecl decl, Quantifier quantifier) {
-        TranslationVisitor visitor = new TranslationVisitor(schema);
+        TranslationVisitor visitor = new TranslationVisitor(schema, TranslationContext.Invariant);
 
-        // Ground terms
+        // Grounding terms for typed variables of is straightforward in that
+        // each variable belongs to the entity relation defined by its type
         visitor.expressions.add(new DLInlineComment("Ground terms"));
         quantifier.variables().forEach(var -> {
             String type = quantifier.getType(var);
@@ -156,10 +182,9 @@ public class TranslationVisitor extends VoidVisitorAdapter {
 
     @Override
     public void visitCallExpr(CallExpression expr) {
-        if (TranslationFunctions.isRegistered(expr.getFunc())) {
-            List<DLRuleExpr> exprs = TranslationFunctions
-                    .getFunction(expr.getFunc())
-                    .translate(expr, negated, operandVisitor);
+        TranslationFunctions.Function function = TranslationFunctions.getFunction(expr.getFunc(), context);
+        if (function != null) {
+            List<DLRuleExpr> exprs = function.translate(expr, negated, operandVisitor);
             expressions.addAll(exprs);
         } else {
             throw new TranslationError("Unsupported function: " + expr.getFunc());

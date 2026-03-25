@@ -90,6 +90,8 @@ public class Translation {
                 throw new TranslationError("Internal record type: " + et.getName() + "in schema");
             }
         });
+
+        // FIXME: Invariant validation
     }
 
     public static DLProgram translate(Path schemaFile, Path policiesFile, Path entitiesFile, Path invariantFile) throws IOException, AuthException, RsvpException {
@@ -215,8 +217,15 @@ public class Translation {
             .comment("All forbidden requests")
             .add(makeForbiddenRequestsRule().getStatements());
 
-        builder
-            .comment("I/O")
+        builder.comment("Invariants");
+        for (Invariant invariant : invariants.getInvariants()) {
+            TranslationInvariant ti = new TranslationInvariant(invariant, translationSchema);
+            builder.add(ti.getDeclaration());
+            output.add(ti.getDeclaration());
+            ti.getRules().forEach(builder::add);
+        }
+
+        builder.comment("I/O")
             .add(makeIODirectives(output));
 
         return builder.build();

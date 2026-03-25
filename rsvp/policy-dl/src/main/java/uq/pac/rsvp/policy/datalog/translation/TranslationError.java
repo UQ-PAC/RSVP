@@ -23,4 +23,10 @@ public class TranslationError extends RuntimeException {
     public static void error(String message) {
         throw new TranslationError("Translation error: " + message);
     }
+
+    public static void error(boolean cond, String message) {
+        if (!cond) {
+            throw new TranslationError("Translation error: " + message);
+        }
+    }
 }

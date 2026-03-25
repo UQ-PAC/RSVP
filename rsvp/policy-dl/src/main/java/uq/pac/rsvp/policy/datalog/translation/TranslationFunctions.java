@@ -8,10 +8,10 @@ import uq.pac.rsvp.policy.datalog.ast.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.AttributeRuleDecl;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.HasAttributeRuleDecl;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
 /**
@@ -19,7 +19,15 @@ import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
  */
 public abstract class TranslationFunctions {
     static abstract class Function {
+        /**
+         * Function implementation
+         */
         public abstract List<DLRuleExpr> translate(CallExpression expression, boolean negated, OperandVisitor operands);
+
+        /**
+         * Contexts in which the function is valid
+         */
+        public abstract Set<TranslationContext> getContext();
     }
 
     private static final Map<String, Supplier<? extends Function>> REGISTRY = new HashMap<>();
@@ -28,14 +36,33 @@ public abstract class TranslationFunctions {
         REGISTRY.put("contains", ContainsFunction::new);
         REGISTRY.put("containsAll", ContainsAllFunction::new);
         REGISTRY.put("containsAny", ContainsAnyFunction::new);
+        REGISTRY.put("deny", DenyFunction::new);
+        REGISTRY.put("allow", AllowFunction::new);
     }
 
-    static boolean isRegistered(String name) {
-        return REGISTRY.containsKey(name);
+    static Function getFunction(String name, TranslationContext context) {
+        Function fun = REGISTRY.get(name).get();
+        if (fun != null && fun.getContext().contains(context)) {
+            return fun;
+        }
+        return null;
     }
 
-    static Function getFunction(String name) {
-        return REGISTRY.get(name).get();
+    /**
+     * Validating call expressions
+     */
+    private static void validate(CallExpression expr, boolean object, int arguments) {
+        if (object && expr.getSelf() == null) {
+            throw new TranslationError("Function %s requires non-null self object".formatted(expr.getFunc()));
+        }
+
+        if (!object && expr.getSelf() != null) {
+            throw new TranslationError("Function %s requires null self object".formatted(expr.getFunc()));
+        }
+
+        if (expr.getArgs().size() != arguments) {
+            throw new TranslationError("Function %s expects %d arguments".formatted(expr.getFunc(), expr.getArgs().size()));
+        }
     }
 
     /**
@@ -49,8 +76,7 @@ public abstract class TranslationFunctions {
     static class IsEmptyFunction extends Function {
         @Override
         public List<DLRuleExpr> translate(CallExpression expr, boolean negated, OperandVisitor operands) {
-            // isEmpty has no arguments
-            require(expr.getArgs().isEmpty());
+            validate(expr, true, 0);
 
             if (expr.getSelf() instanceof PropertyAccessExpression pe) {
                 DLTerm propertyTerm = DLTerm.lit(pe.getProperty());
@@ -64,6 +90,11 @@ public abstract class TranslationFunctions {
             } else {
                 throw new TranslationError("Unsupported set.isEmpty() form: " + expr);
             }
+        }
+
+        @Override
+        public Set<TranslationContext> getContext() {
+            return Set.of(TranslationContext.Policy, TranslationContext.Invariant);
         }
     }
 
@@ -79,7 +110,8 @@ public abstract class TranslationFunctions {
         @Override
         public List<DLRuleExpr> translate(CallExpression expr, boolean negated, OperandVisitor operands) {
             // Contains uses a single argument
-            require(expr.getArgs().size() == 1);
+            validate(expr, true, 1);
+
             DLTerm argument = expr.getArgs().getFirst().compute(operands);
 
             if (expr.getSelf() instanceof PropertyAccessExpression pe) {
@@ -97,6 +129,11 @@ public abstract class TranslationFunctions {
                 throw new TranslationError("Unsupported set.contains() form: " + expr);
             }
         }
+
+        @Override
+        public Set<TranslationContext> getContext() {
+            return Set.of(TranslationContext.Policy, TranslationContext.Invariant);
+        }
     }
 
     static class ContainsAllFunction extends Function {
@@ -104,7 +141,7 @@ public abstract class TranslationFunctions {
         public List<DLRuleExpr> translate(CallExpression expr, boolean negated, OperandVisitor operands) {
             // Expect a single argument here and only in the form of property access
             // Literal-set variation is re-written to disjunctions over contains
-            require(expr.getArgs().size() == 1);
+            validate(expr, true, 1);
 
             Expression arg = expr.getArgs().getFirst();
 
@@ -132,6 +169,11 @@ public abstract class TranslationFunctions {
                 throw new TranslationError("Unsupported set.contains() form: " + expr);
             }
         }
+
+        @Override
+        public Set<TranslationContext> getContext() {
+            return Set.of(TranslationContext.Policy, TranslationContext.Invariant);
+        }
     }
 
     static class ContainsAnyFunction extends Function {
@@ -139,7 +181,7 @@ public abstract class TranslationFunctions {
         public List<DLRuleExpr> translate(CallExpression expr, boolean negated, OperandVisitor operands) {
             // Expect a single argument here and only in the form of property access
             // Literal-set variation is re-written to disjunctions over contains
-            require(expr.getArgs().size() == 1);
+            validate(expr, true, 1);
 
             Expression arg = expr.getArgs().getFirst();
 
@@ -164,6 +206,49 @@ public abstract class TranslationFunctions {
             } else {
                 throw new TranslationError("Unsupported set.contains() form: " + expr);
             }
+        }
+
+        @Override
+        public Set<TranslationContext> getContext() {
+            return Set.of(TranslationContext.Policy, TranslationContext.Invariant);
+        }
+    }
+
+    // deny(principal, resource, action)
+    // This function is equivalent of ForbiddenRequests(principal, resource, action)
+    // i.e., in Invariant context it allows to bring in all forbidden requests
+    static class DenyFunction extends Function {
+        @Override
+        public List<DLRuleExpr> translate(CallExpression expr, boolean negated, OperandVisitor operands) {
+            validate(expr, false, 3);
+            DLTerm principal = expr.getArgs().get(0).compute(operands),
+                    resource = expr.getArgs().get(1).compute(operands),
+                    action = expr.getArgs().get(2).compute(operands);
+            return List.of(new DLAtom(ForbiddenRequestsRuleDecl, negated, principal, resource, action));
+        }
+
+        @Override
+        public Set<TranslationContext> getContext() {
+            return Set.of(TranslationContext.Invariant);
+        }
+    }
+
+    // allow(principal, resource, action)
+    // This function is equivalent of PermittedRequests(principal, resource, action)
+    // i.e., in Invariant context it allows to bring in all permitted requests
+    static class AllowFunction extends Function {
+        @Override
+        public List<DLRuleExpr> translate(CallExpression expr, boolean negated, OperandVisitor operands) {
+            validate(expr, false, 3);
+            DLTerm principal = expr.getArgs().get(0).compute(operands),
+                    resource = expr.getArgs().get(1).compute(operands),
+                    action = expr.getArgs().get(2).compute(operands);
+            return List.of(new DLAtom(PermittedRequestsRuleDecl, negated, principal, resource, action));
+        }
+
+        @Override
+        public Set<TranslationContext> getContext() {
+            return Set.of(TranslationContext.Invariant);
         }
     }
 }

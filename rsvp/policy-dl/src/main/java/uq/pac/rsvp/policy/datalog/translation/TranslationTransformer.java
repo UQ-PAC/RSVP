@@ -57,7 +57,8 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
 
     @Override
     public Expression visitCallExpr(CallExpression expr) {
-        Expression self = compute(expr.getSelf());
+        // Call expressions can be standalone
+        Expression self = (expr.getSelf() == null) ? null : compute(expr.getSelf());
         List<Expression> args = compute(expr.getArgs());
         String fun = expr.getFunc();
 

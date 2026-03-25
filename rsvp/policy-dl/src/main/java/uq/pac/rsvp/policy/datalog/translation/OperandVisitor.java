@@ -77,11 +77,15 @@ public class OperandVisitor extends ValueVisitorAdapter<DLTerm> {
 
     @Override
     public DLTerm visitVariableExpr(VariableExpression expr) {
-        // FIXME: Need to move it somewhere else
-        Set<String> supported = Set.of("principal", "resource", "action");
         String var = expr.getReference();
-        if (!supported.contains(var)) {
-            throw new TranslationError("Unsupported variable: " + var);
+        switch (translation.getContext()) {
+            case Policy -> {
+                Set<String> supported = Set.of(PrincipalVar.getName(), ResourceVar.getName(), ActionVar.getName());
+                if (!supported.contains(var)) {
+                    throw new TranslationError("Unsupported variable: " + var);
+                }
+            }
+            case Invariant -> {}
         }
         return DLTerm.var(expr.toString());
     }

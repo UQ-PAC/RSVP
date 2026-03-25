@@ -1,6 +1,7 @@
 package uq.pac.rsvp.policy.ast;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
 
@@ -25,7 +26,7 @@ public class PolicySet extends LinkedHashSet<Policy> implements PolicyItem {
     public static PolicySet parseCedarPolicySet(Path policyFile) throws RsvpException {
         try {
             String json = com.cedarpolicy.model.policy.PolicySet.parseToJsonAst(policyFile);
-            return JsonParser.parsePolicySet(policyFile.toString(), json);
+            return JsonParser.parsePolicySet(policyFile.toString(), json, Files.readString(policyFile));
         } catch (InternalException | IOException e) {
             throw new RsvpException("Error parsing policy set in " + policyFile.getFileName(), e);
         }
@@ -48,7 +49,7 @@ public class PolicySet extends LinkedHashSet<Policy> implements PolicyItem {
         try {
             String json = com.cedarpolicy.model.policy.PolicySet.parseStringToJsonAst(policies);
             System.err.println(json);
-            return JsonParser.parsePolicySet(filename, json);
+            return JsonParser.parsePolicySet(filename, json, policies);
         } catch (InternalException | IOException e) {
             throw new RsvpException("Error parsing policy set", e);
         }

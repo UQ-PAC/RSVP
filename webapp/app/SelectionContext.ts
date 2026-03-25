@@ -1,9 +1,17 @@
 import { createContext, Dispatch, useContext } from "react";
 
+export interface SourceFileInfo {
+  filename: string;
+  serverId: string;
+  contents: string;
+}
 interface SourceLoc {
   file: string;
+  source?: SourceFileInfo;
   offset: number;
   len: number;
+  line: number;
+  col: number;
 }
 
 export interface Report {

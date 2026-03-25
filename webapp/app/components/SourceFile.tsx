@@ -4,9 +4,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 
 import { Report } from "../SelectionContext";
-import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 import { faFileLines } from "@fortawesome/free-regular-svg-icons/faFileLines";
 import { CodeRender } from "./CodeRender";
+import {
+  faSquareMinus,
+  faSquarePlus,
+} from "@fortawesome/free-regular-svg-icons";
 
 interface SourceFileParams {
   filename: string;
@@ -33,7 +36,7 @@ export function SourceFile({
         <h2 className="source-file-name">{filename}</h2>
         <FontAwesomeIcon
           className="source-file-toggle"
-          icon={expanded ? faCaretUp : faCaretDown}
+          icon={expanded ? faSquareMinus : faSquarePlus}
         />
       </div>
       {expanded && (

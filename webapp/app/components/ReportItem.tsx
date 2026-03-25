@@ -51,6 +51,9 @@ export function ReportItem({ report }: ReportItemParams) {
         ? faCircleExclamation
         : faCircleInfo;
 
+  // line info || entire file
+  // need version info for policy file reports (only if more than one version exists)
+
   return (
     <div
       id={`report-${report.id}`}
@@ -77,7 +80,11 @@ export function ReportItem({ report }: ReportItemParams) {
           className={`report-item-message report-item-message-${report.severity}`}
         >
           {report.message}
+          <span className="report-item-line-info">
+            {`  (${report.primarySourceLocation.source?.filename}:${report.primarySourceLocation.line}:${report.primarySourceLocation.col})`}
+          </span>
         </span>
+
         {!!report.messageDetail?.length && (
           <FontAwesomeIcon
             className="report-item-icon report-item-icon-expand"

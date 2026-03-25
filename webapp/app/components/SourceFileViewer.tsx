@@ -1,14 +1,5 @@
-"use client";
-
 import { SourceFile } from "./SourceFile";
-import { Report, useSelection } from "../SelectionContext";
-import { useRef } from "react";
-
-export interface SourceFileInfo {
-  filename: string;
-  serverId: string;
-  contents: string;
-}
+import { Report, SourceFileInfo } from "../SelectionContext";
 interface SourceFileViewerParams {
   sources: SourceFileInfo[];
   reports?: Report[];
@@ -22,15 +13,8 @@ export function SourceFileViewer({
   openUploadDrawer,
   openReportsDrawer,
 }: SourceFileViewerParams) {
-  const container = useRef(null);
-
-  // const { scroll } = useSelection();
-  // if (scroll === "source") {
-  //   console.log("SCROLL SOURCE");
-  // }
-
   return (
-    <div ref={container} className="source-files-container">
+    <div className="source-files-container">
       {!sources.length && (
         <p className="source-files-instruction">
           <a className="source-files-upload-link" onClick={openUploadDrawer}>

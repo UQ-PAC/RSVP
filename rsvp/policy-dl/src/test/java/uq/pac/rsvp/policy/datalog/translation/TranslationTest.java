@@ -111,11 +111,6 @@ public class TranslationTest {
         return dynamicTests(ONE_OFF);
     }
 
-    @Test
-    void oneFileOff() throws RsvpException, AuthException, IOException, InterruptedException {
-        differentialTest(TestInput.load("photoapp", "policy-all"));
-    }
-
     @TestFactory
     Collection<DynamicTest> test() throws IOException {
         List<DynamicTest> tests = new ArrayList<>();

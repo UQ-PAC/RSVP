@@ -19,9 +19,6 @@ import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 /**
  * A class representing a request authentication engine that checks whether a
  * given request is permitted, forbidden or inconclusive.
- * <p>
- * For the moment, internally, this engine tracks sets of forbidden
- * and permitted requests loaded from Datalog.
  */
 public class RequestAuth {
     /**
@@ -96,7 +93,8 @@ public class RequestAuth {
         return new RequestSet(set, name);
     }
 
-    public static RequestAuth load(Path schema, Path policies, Path entities, Path invariants, Path dlDir) throws AuthException, IOException, InterruptedException, RsvpException {
+    public static RequestAuth load(Path schema, Path policies, Path entities, Path invariants, Path dlDir)
+            throws AuthException, IOException, InterruptedException, RsvpException {
         DLProgram program = Translation.translate(schema, policies, entities, invariants);
         program.execute(dlDir);
         return RequestAuth.load(dlDir);

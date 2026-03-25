@@ -9,6 +9,11 @@ ALLOW="./ALLOW"
 DENY="./DENY"
 VERBOSE=false
 
+counter=0
+AtoD=0
+DtoA=0
+err=0
+
 while getopts "htvp:" opt; do
   case $opt in
     h)
@@ -80,7 +85,15 @@ authorise() {
     else
         echo -e "\e[1;31m FAIL [ "Expected: $2. Received: ${result[0]}". ] \e[0m"
         ERROR=1
+        if [[ "$2" == "ALLOW" && "${result[0]}" == "DENY" ]]; then
+          ((AtoD++))
+        elif [[ "$2" == "DENY" && "${result[0]}" == "ALLOW" ]]; then
+          ((DtoA++))
+        else
+          ((err++))
+        fi
     fi
+    ((counter++))
 
     total="${#result[@]}"
 
@@ -120,6 +133,10 @@ fi
 
 if [[ -n "$ERROR" ]]; then
     echo -e "\e[1;31m ERROR: There were failed tests! \e[0m"
+    echo -e "\e[1;31m ALLOW -> DENY: $AtoD. \e[0m"
+    echo -e "\e[1;31m DENY -> ALLOW: $DtoA. \e[0m"
+    echo -e "\e[1;31m TOTAL: $counter. \e[0m"
+    echo -e "\e[1;31m ERROR: $err. \e[0m"
 else
     echo -e "\e[1;32m ALL OK! \e[0m"
 fi

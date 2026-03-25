@@ -1,5 +1,8 @@
+"use client";
+
 import { ReportItem } from "./ReportItem";
 import { Report, useSelection } from "../SelectionContext";
+import { useRef } from "react";
 
 interface ReportViewerProps {
   reports?: Report[];
@@ -9,11 +12,6 @@ export function ReportViewer({ reports }: ReportViewerProps) {
   const info = reports?.filter((report) => report.severity === "info");
   const warn = reports?.filter((report) => report.severity === "warn");
   const err = reports?.filter((report) => report.severity === "err");
-
-  const { selected, scroll } = useSelection();
-  if (scroll === "report") {
-    console.log("SCROLL REPORTS");
-  }
 
   return (
     <div className="reports-container">
@@ -25,7 +23,7 @@ export function ReportViewer({ reports }: ReportViewerProps) {
       {reports && !reports.length && (
         <p className="reports-instruction no-reports">No reports to display</p>
       )}
-      {err?.length && (
+      {!!err?.length && (
         <div className="reports-group reports-group-err">
           <h4 className="reports-group-title">Errors</h4>
           {err.map((report) => (
@@ -33,7 +31,7 @@ export function ReportViewer({ reports }: ReportViewerProps) {
           ))}
         </div>
       )}
-      {warn?.length && (
+      {!!warn?.length && (
         <div className="reports-group reports-group-warn">
           <h4 className="reports-group-title">Warnings</h4>
           {warn.map((report) => (
@@ -41,7 +39,7 @@ export function ReportViewer({ reports }: ReportViewerProps) {
           ))}
         </div>
       )}
-      {info?.length && (
+      {!!info?.length && (
         <div className="reports-group reports-group-info">
           <h4 className="reports-group-title">Information</h4>
           {info.map((report) => (

@@ -43,6 +43,9 @@ export default function Home() {
   const remove = (id: string) => {
     fetch(`/api/file/${id}`, { method: "DELETE" }).then(() => {
       setSources(sources.filter((source) => source.serverId != id));
+      setReports(
+        reports?.filter((report) => report.primarySourceLocation.file != id),
+      );
     });
   };
 
@@ -200,6 +203,12 @@ export default function Home() {
               if (!uploadExpanded) {
                 setReportsExpanded(false);
                 setUploadExpanded(true);
+              }
+            }}
+            openReportsDrawer={() => {
+              if (!reportsExpanded) {
+                setUploadExpanded(false);
+                setReportsExpanded(true);
               }
             }}
           />

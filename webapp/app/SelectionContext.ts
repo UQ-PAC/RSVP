@@ -34,6 +34,11 @@ export function reducer(
   switch (action.type) {
     case "click":
       const selectionChanged = action.id !== context.selected;
+
+      if (selectionChanged) {
+        console.log("SELECTION CHANGED");
+      }
+
       return {
         ...context,
         selected: !selectionChanged ? "" : action.id,

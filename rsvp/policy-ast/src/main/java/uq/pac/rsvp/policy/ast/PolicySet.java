@@ -47,6 +47,7 @@ public class PolicySet extends LinkedHashSet<Policy> implements PolicyItem {
     public static PolicySet parseCedarPolicySet(String filename, String policies) throws RsvpException {
         try {
             String json = com.cedarpolicy.model.policy.PolicySet.parseStringToJsonAst(policies);
+            System.err.println(json);
             return JsonParser.parsePolicySet(filename, json);
         } catch (InternalException | IOException e) {
             throw new RsvpException("Error parsing policy set", e);

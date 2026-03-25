@@ -27,6 +27,18 @@ import java.util.stream.Stream;
 import static org.fusesource.jansi.Ansi.Color.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Souffle datalog translation testing
+ * <p>
+ * Translation tests are directory-based. Each test directory contains a
+ * single schema file, a single entities file, a single invariants file and multiple
+ * policy files. For each combination of thereof, a single translation test
+ * ({@code TestInput}) is run:
+ * - Translate to datalog
+ * - Generate {@code RequestAuth} object
+ * - Cross-check request acceptance/rejection with Cedar
+ * - Expect invariants to hold (TODO)
+ */
 public class TranslationTest {
 
     private final static Logger logger = new Logger();
@@ -42,14 +54,16 @@ public class TranslationTest {
         public final Path policy;
         public final Path schema;
         public final Path entities;
+        public final Path invariants;
         public final Path datalogDir;
         public final Path testDir;
         public final String testName;
 
-        private TestInput(Path testDir, Path policy, Path schema, Path entities) {
+        private TestInput(Path testDir, Path policy, Path schema, Path entities, Path invariants) {
             this.policy = policy;
             this.schema = schema;
             this.entities = entities;
+            this.invariants = invariants;
             this.testDir = testDir;
             this.datalogDir = TestUtil.getDatalogDir(testDir.getFileName().toString(), getPolicyName());
             this.testName = testDir.getFileName().toString();
@@ -66,14 +80,16 @@ public class TranslationTest {
             Path testDir = Path.of(TESTDIR.toString(), dir);
             Path schema = TestUtil.findFile(testDir, ".cedarschema");
             Path entities = TestUtil.findFile(testDir, ".json");
+            Path invariants = TestUtil.findFile(testDir, ".invariant");
 
             assertTrue(Files.exists(testDir) && Files.isDirectory(testDir));
             assertTrue(Files.exists(schema) && Files.isRegularFile(schema));
             assertTrue(Files.exists(entities) && Files.isRegularFile(entities));
+            assertTrue(Files.exists(invariants) && Files.isRegularFile(entities));
 
             return TestUtil.findFiles(testDir, ".cedar")
                     .stream()
-                    .map(policy -> new TestInput(testDir, policy, schema, entities))
+                    .map(policy -> new TestInput(testDir, policy, schema, entities, invariants))
                     .toList();
         }
 
@@ -140,7 +156,7 @@ public class TranslationTest {
             logger.warning("Empty policy: " + test.policy);
         }
 
-        RequestAuth rsvpAuth = RequestAuth.load(test.schema, test.policy, test.entities, test.datalogDir);
+        RequestAuth rsvpAuth = RequestAuth.load(test.schema, test.policy, test.entities, test.invariants, test.datalogDir);
         assertTrue(Collections.disjoint(rsvpAuth.getForbiddenRequests().getRequests(),
                 rsvpAuth.getPermittedRequests().getRequests()));
 

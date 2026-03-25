@@ -15,6 +15,8 @@ import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.ast.*;
+import uq.pac.rsvp.policy.datalog.invariant.Invariant;
+import uq.pac.rsvp.policy.datalog.invariant.InvariantSet;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -90,7 +92,7 @@ public class Translation {
         });
     }
 
-    public static DLProgram translate(Path schemaFile, Path policiesFile, Path entitiesFile) throws IOException, AuthException, RsvpException {
+    public static DLProgram translate(Path schemaFile, Path policiesFile, Path entitiesFile, Path invariantFile) throws IOException, AuthException, RsvpException {
         validate(schemaFile, policiesFile, entitiesFile);
         Schema schema = Schema.parseCedarSchema(schemaFile);
         Entities entities = Entities.parse(entitiesFile);
@@ -118,10 +120,11 @@ public class Translation {
         });
 
         PolicySet policies = PolicySet.parseCedarPolicySet(policiesFile);
-        return translate(schema, policies, new Entities(entitySet));
+        InvariantSet invariants = invariantFile == null ? InvariantSet.parse("") : InvariantSet.parse(invariantFile);
+        return translate(schema, policies, new Entities(entitySet), invariants);
     }
 
-    private static DLProgram translate(Schema schema, PolicySet policies, Entities entities) {
+    private static DLProgram translate(Schema schema, PolicySet policies, Entities entities, InvariantSet invariants) {
         TranslationSchema translationSchema = new TranslationSchema(schema);
         TranslationEntitySet translationEntities = new TranslationEntitySet(entities, translationSchema);
         TranslationPolicySet translationPolicies = new TranslationPolicySet(policies, translationSchema);

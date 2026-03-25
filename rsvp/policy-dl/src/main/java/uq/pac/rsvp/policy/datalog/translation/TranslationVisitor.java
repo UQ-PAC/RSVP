@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.datalog.ast.*;
+import uq.pac.rsvp.policy.datalog.invariant.Quantifier;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,9 +47,22 @@ public class TranslationVisitor extends VoidVisitorAdapter {
         return new DLRule(makeAtom(decl), visitor.expressions);
     }
 
-    public static DLRule translateInvariant(TranslationSchema schema, Collection<Expression> exprs, DLRuleDecl decl) {
-		// FIXME
-		return null;
+    public static DLRule translateInvariant(TranslationSchema schema, Collection<Expression> exprs, DLRuleDecl decl, Quantifier quantifier) {
+        TranslationVisitor visitor = new TranslationVisitor(schema);
+
+        // Ground terms
+        visitor.expressions.add(new DLInlineComment("Ground terms"));
+        quantifier.variables().forEach(var -> {
+            String type = quantifier.getType(var);
+            DLRuleDecl entityDecl = schema.getTranslationEntityType(type).getEntityRuleDecl();
+            visitor.expressions.add(new DLAtom(entityDecl, DLTerm.var(var)));
+        });
+
+        exprs.forEach(e -> {
+            visitor.expressions.add(new DLInlineComment(e.toString()));
+            e.accept(visitor);
+        });
+        return new DLRule(makeAtom(decl), visitor.expressions);
     }
 
     void addExpression(DLRuleExpr expr) {

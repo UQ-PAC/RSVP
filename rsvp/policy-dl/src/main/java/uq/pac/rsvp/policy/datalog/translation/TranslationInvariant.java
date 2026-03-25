@@ -28,7 +28,7 @@ public class TranslationInvariant {
         Expression transformed = TranslationTransformer.transform(invariant.getExpression());
         List<List<Expression>> disjunctions = NFConverter.toDNF(transformed);
         this.rules = disjunctions.stream()
-                .map(disjunction -> TranslationVisitor.translateInvariant(schema, disjunction, declaration))
+                .map(disjunction -> TranslationVisitor.translateInvariant(schema, disjunction, declaration, invariant.getQuantifier()))
                 .toList();
     }
 

@@ -150,6 +150,7 @@ public class Driver {
         Path schemaFile = requiredFile(optionsMap, "schema");
         Path policyFile = requiredFile(optionsMap, "policies");
         Path entitiesFile = requiredFile(optionsMap, "entities");
+        Path invariantFile = requiredFile(optionsMap, "invariants");
         String dlDir = requiredOpt(optionsMap, "datalog-dir", String.class);
         Path dlPath = Path.of(dlDir);
 
@@ -157,7 +158,7 @@ public class Driver {
             error("Datalog destination: " + dlPath + " is not a directory");
         }
 
-        RequestAuth rsvpAuth = RequestAuth.load(schemaFile, policyFile, entitiesFile, dlPath);
+        RequestAuth rsvpAuth = RequestAuth.load(schemaFile, policyFile, entitiesFile, invariantFile, dlPath);
         logger.info(YELLOW, "Datalog output written to directory: " + dlPath.toAbsolutePath());
         writeRequests(Path.of(dlPath.toString(), "auth.json"), rsvpAuth);
 

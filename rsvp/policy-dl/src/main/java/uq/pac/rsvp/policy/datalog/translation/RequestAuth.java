@@ -96,8 +96,8 @@ public class RequestAuth {
         return new RequestSet(set, name);
     }
 
-    public static RequestAuth load(Path schema, Path policies, Path entities, Path dlDir) throws AuthException, IOException, InterruptedException, RsvpException {
-        DLProgram program = Translation.translate(schema, policies, entities);
+    public static RequestAuth load(Path schema, Path policies, Path entities, Path invariants, Path dlDir) throws AuthException, IOException, InterruptedException, RsvpException {
+        DLProgram program = Translation.translate(schema, policies, entities, invariants);
         program.execute(dlDir);
         return RequestAuth.load(dlDir);
     }

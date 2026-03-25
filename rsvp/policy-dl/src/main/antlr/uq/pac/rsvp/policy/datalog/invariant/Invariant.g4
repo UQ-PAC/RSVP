@@ -63,7 +63,7 @@ quantifier:
 ;
 
 invariant:
-    expression quantifier? ';'
+    '@' 'invariant' '(' STRING ')' expression quantifier? ';'
 ;
 
 program : invariant*;

@@ -15,59 +15,109 @@ public class ParserTest {
     Logger logger = new Logger();
 
     private static final String INPUT = """
+        @invariant("foo")
         true;
+        @invariant("foo")
         false;
+        @invariant("foo")
         false && false || !true;
+        @invariant("foo")
         principal;
+        @invariant("foo")
         principal.album.photo;
+        @invariant("foo")
         Principal::Album::Photo;
+        @invariant("foo")
         Resource::Picture::Kind::"Forest";
+        @invariant("foo")
         principal.album.photo && resource;
+        @invariant("foo")
         principal.album.photo || resource;
+        @invariant("foo")
         (principal.album.photo || resource);
+        @invariant("foo")
         !principal.album.photo;
+        @invariant("foo")
         !(principal.album.photo || resource);
+        @invariant("foo")
         a == b && c != d;
+        @invariant("foo")
         a == "a" && c != "c";
+        @invariant("foo")
         a == 1 && c != 2;
+        @invariant("foo")
         principal.friends.isEmpty();
+        @invariant("foo")
         principal.friends.contains(resource);
+        @invariant("foo")
         principal.friends.contains(resource, action);
+        @invariant("foo")
         allowedRequests(principal, resource, action);
+        @invariant("foo")
         resource has foo || principal has bar;
+        @invariant("foo")
         resource is Resource::Picture::Kind;
+        @invariant("foo")
         resource in Resource::Picture::Kind::"Forest";
+        @invariant("foo")
         resource == Resource::Picture::Kind::"Forest"
             for some resource: Resource::Picture::Kind;
+        @invariant("foo")
         resource.foo == "foo" && principal.bar == "bar"
             for all resource:  Resource::Picture, principal: Album::Photo;
         """;
 
     private static final String EXPECTED = """
+        @invariant("foo")
         true;
+        @invariant("foo")
         false;
+        @invariant("foo")
         ((false && false) || !true);
+        @invariant("foo")
         principal;
+        @invariant("foo")
         principal.album.photo;
+        @invariant("foo")
         Principal::Album::Photo;
+        @invariant("foo")
         Resource::Picture::Kind::"Forest";
+        @invariant("foo")
         (principal.album.photo && resource);
+        @invariant("foo")
         (principal.album.photo || resource);
+        @invariant("foo")
         (principal.album.photo || resource);
+        @invariant("foo")
         !principal.album.photo;
+        @invariant("foo")
         !(principal.album.photo || resource);
+        @invariant("foo")
         ((a == b) && (c != d));
+        @invariant("foo")
         ((a == "a") && (c != "c"));
+        @invariant("foo")
         ((a == 1) && (c != 2));
+        @invariant("foo")
         principal.friends.isEmpty();
+        @invariant("foo")
         principal.friends.contains(resource);
+        @invariant("foo")
         principal.friends.contains(resource, action);
+        @invariant("foo")
         allowedRequests(principal, resource, action);
+        @invariant("foo")
         ((resource has "foo") || (principal has "bar"));
+        @invariant("foo")
         (resource is Resource::Picture::Kind);
+        @invariant("foo")
         (resource in Resource::Picture::Kind::"Forest");
-        (resource == Resource::Picture::Kind::"Forest") for some resource: Resource::Picture::Kind;
-        ((resource.foo == "foo") && (principal.bar == "bar")) for all principal: Album::Photo, resource: Resource::Picture;
+        @invariant("foo")
+        (resource == Resource::Picture::Kind::"Forest")
+            for some resource: Resource::Picture::Kind;
+        @invariant("foo")
+        ((resource.foo == "foo") && (principal.bar == "bar"))
+            for all principal: Album::Photo, resource: Resource::Picture;
         """;
 
     @Test

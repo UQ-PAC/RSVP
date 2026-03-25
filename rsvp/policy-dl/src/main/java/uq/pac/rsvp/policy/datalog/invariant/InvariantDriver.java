@@ -39,8 +39,8 @@ public class InvariantDriver {
                     // Quantifier is optional (defaults to ALL) unless variables are specified,
                     // since then this is basically a constant expression
                     Quantifier quantifier = null;
-
-
+                    String str = inv.STRING().getText();
+                    String name = str.substring(1, str.length() - 1);
                     if (inv.quantifier() != null) {
                         Quantifier.Scope scope = Quantifier.Scope.valueOf(inv.quantifier().quant.getText().toUpperCase());
                         Map<String, String> variables = new HashMap<>();
@@ -49,7 +49,7 @@ public class InvariantDriver {
                         });
                         quantifier = new Quantifier(scope, variables);
                     }
-                    return new Invariant(quantifier, expr);
+                    return new Invariant(name, quantifier, expr);
                 }).toList();
             }
         }.visit(parser.program());

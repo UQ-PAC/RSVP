@@ -1,5 +1,5 @@
 {
-  "principal": "PetClinic::Employee::\"???\"",
+  "principal": "PetClinic::Employee::\"Bob\"",
   "resource": "PetClinic::Clinic::\"???\"",
   "action": "PetClinic::Action::\"AddClient\"",
   "context": {}

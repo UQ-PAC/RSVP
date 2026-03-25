@@ -6,6 +6,8 @@ import java.util.Random;
 
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
+import uq.pac.rsvp.policy.ast.expr.Expression;
+import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.support.reporting.Report;
@@ -32,19 +34,36 @@ public class Verification {
         int i = 0;
 
         for (Policy policy : policies) {
-            int num = r.nextInt(100);
+
+            // if (i % 4 == 3) {
+            // i++;
+            // continue;
+            // }
+
+            int severity = r.nextInt(100);
             int detail = r.nextInt(100);
+            int loc = r.nextInt(100);
+
             if (i < 2) {
                 locations[i] = policy.getSourceLoc();
             }
 
+            Expression cond = policy.getCondition();
+
+            // if (cond instanceof BinaryExpression) {
+            //     cond = ((BinaryExpression) cond).getLeft();
+            // }
+
             reports.add(
 
-                    new Report(num < 34 ? Severity.Info : num < 67 ? Severity.Warning : Severity.Error,
-                            "This is a fantastic policy. Well done Angus.",
-                            detail < 50 ? ""
-                                    : "This is a very detailed report on your policy. Your policy is truly a thing of beauty, and we should all aspire to emulate this policy.",
-                            policy.getSourceLoc(), i == 2 ? locations : new SourceLoc[0]));
+                    new Report(severity < 34 ? Severity.Info : severity < 67 ? Severity.Warning : Severity.Error,
+                            loc < 50 ? "This is a fantastic policy. Well done Angus."
+                                    : "This is an amazing policy condition. Congratulations.",
+                            cond.getSourceLoc() == SourceLoc.MISSING ? cond.toString()
+                                    : detail < 50 ? ""
+                                            : "This is a very detailed report on your policy. Your policy is truly a thing of beauty, and we should all aspire to emulate this policy.",
+                            loc < 50 ? policy.getSourceLoc() : cond.getSourceLoc(),
+                            i == 2 ? locations : new SourceLoc[0]));
             i++;
         }
 

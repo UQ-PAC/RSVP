@@ -5,7 +5,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,10 +94,10 @@ public class RsvpController {
     }
 
     @GetMapping("/reports")
-    public List<Report> verify() throws RsvpException, IOException {
+    public Set<Report> verify() throws RsvpException, IOException {
         logger.info("GET /reports");
 
-        List<Report> result = new ArrayList<>();
+        Set<Report> result = new HashSet<>();
 
         for (String hash : session.getHashes()) {
             Path file = session.getFile(hash);
@@ -104,11 +106,16 @@ public class RsvpController {
             if (file.toString().endsWith(".cedar")) {
                 logger.info("Verifying: " + file);
 
-                result.addAll(Verification.verifyPolicies(hash, Files.readString(file)));
+                List<Report> all = Verification.verifyPolicies(hash, Files.readString(file));
+                logger.info(all.toString());
+
+                result.addAll(all);
 
                 break;
             }
         }
+
+        logger.info("Generated " + result.size() + " reports");
 
         return result;
     }

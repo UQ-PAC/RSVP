@@ -107,6 +107,32 @@ public class PolicySetTest {
                 }
             });
         }
+
+        @Test
+        @DisplayName("handles source locations of argument conditions")
+        void testArgConditions() throws RsvpException {
+            String policy = "permit (\n" + //
+                    "    principal in Group::\"cool group\",\n" + //
+                    "    action == Action::\"coolAction\",\n" + //
+                    "    resource\n" + //
+                    ");";
+
+            PolicySet policies = PolicySet.parseCedarPolicySet("test.cedar", policy);
+
+            policies.accept(new PolicyVisitorImpl() {
+                @Override
+                public void visitBinaryExpr(BinaryExpression expr) {
+                    System.err.println(expr.toString());
+                    System.err.println(expr.getSourceLoc().toString());
+                    expr.getLeft().accept(this);
+                    expr.getRight().accept(this);
+                }
+            });
+
+            policy = "permit (principal, action, resource);";
+            policies = PolicySet.parseCedarPolicySet("test.cedar", policy);
+
+        }
     }
 
     @Nested

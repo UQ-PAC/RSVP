@@ -1,0 +1,6 @@
+{
+  "principal": "PetClinic::Employee::\"Kathaleen Tramonte\"",
+  "resource": "PetClinic::Pet::\"Max\"",
+  "action": "PetClinic::Action::\"DeleteClient\"",
+  "context": {}
+}

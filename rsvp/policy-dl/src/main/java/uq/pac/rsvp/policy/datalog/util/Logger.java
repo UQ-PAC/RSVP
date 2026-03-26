@@ -91,6 +91,18 @@ public class Logger {
         return this;
     }
 
+    public Logger finest(Ansi.Color color, String format, Object ...args) {
+        return log(System.out, color, Level.Finest, format, args);
+    }
+
+    public Logger finer(Ansi.Color color, String format, Object ...args) {
+        return log(System.out, color, Level.Finer, format, args);
+    }
+
+    public Logger fine(Ansi.Color color, String format, Object ...args) {
+        return log(System.out, color, Level.Fine, format, args);
+    }
+
     public Logger info(Ansi.Color color, String format, Object ...args) {
         return log(System.out, color, Level.Info, format, args);
     }

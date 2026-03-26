@@ -1,20 +1,6 @@
 # Cedar Authorization Files
 
-This folder contains the Cedar files for both the original and RSVP's versions of PetClinic, including request files for testing.
-
-## Original
-
-Folder `./original`.
-
-To run all tests: `./petclinic-original-requests.sh`.
-
-All tests should return `ALLOW`.
-
-Request JSON files are named following the convention: `<principal>-<action>-<resource>.json`.
-
-## RSVP
-
-Folder `./rsvp`.
+This folder contains the Cedar files for the RSVP version of PetClinic, including request files for testing.
 
 To run all tests: `./petclinic-rsvp-requests.sh`.
 

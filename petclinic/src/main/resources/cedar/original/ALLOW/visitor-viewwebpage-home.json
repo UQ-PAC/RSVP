@@ -1,6 +1,0 @@
-{
-    "principal": "PetClinic::Visitor::\"Anonymous\"",
-    "action": "PetClinic::Action::\"ViewWebPage\"",
-    "resource": "PetClinic::WebPage::\"Home\"",
-    "context": { }
-}

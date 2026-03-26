@@ -224,7 +224,10 @@ public abstract class TranslationFunctions {
             DLTerm principal = expr.getArgs().get(0).compute(operands),
                     resource = expr.getArgs().get(1).compute(operands),
                     action = expr.getArgs().get(2).compute(operands);
-            return List.of(new DLAtom(ForbiddenRequestsRuleDecl, negated, principal, resource, action));
+            DLRuleDecl decl = negated ? PermittedRequestsRuleDecl : ForbiddenRequestsRuleDecl;
+            return List.of(
+                    new DLAtom(ActionableRequestsRuleDecl, principal, resource, action),
+                    new DLAtom(decl, principal, resource, action));
         }
 
         @Override
@@ -243,7 +246,10 @@ public abstract class TranslationFunctions {
             DLTerm principal = expr.getArgs().get(0).compute(operands),
                     resource = expr.getArgs().get(1).compute(operands),
                     action = expr.getArgs().get(2).compute(operands);
-            return List.of(new DLAtom(PermittedRequestsRuleDecl, negated, principal, resource, action));
+            DLRuleDecl decl = negated ? ForbiddenRequestsRuleDecl : PermittedRequestsRuleDecl;
+            return List.of(
+                    new DLAtom(ActionableRequestsRuleDecl, principal, resource, action),
+                    new DLAtom(decl, principal, resource, action));
         }
 
         @Override

@@ -154,7 +154,7 @@ public class TranslationTest {
         // Check if invariants hold
         Map<Invariant, InvariantResult> invariantResults = translation.getInvariantResult();
         invariantResults.forEach((invariant, result) -> {
-            logger.bright().info(CYAN, invariant.toString());
+            logger.info(YELLOW, invariant.toString());
             logger.bright().bold().info(CYAN, "Holds: " + result.holds());
             logger.bright().bold().info(CYAN, "Assignments: " + result.getAssignments());
             assertTrue(result.holds());

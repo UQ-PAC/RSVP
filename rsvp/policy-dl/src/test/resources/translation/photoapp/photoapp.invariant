@@ -1,20 +1,25 @@
 // 1. There exists at least one admin in the system
 @invariant("ThereBeAdmins")
 principal.role == Role::"Admin"
-      for some principal: Account;
+    for some principal: Account;
 
 // 2. Admin accounts should not have albums
 @invariant("NoAlbums")
 principal.type == Role::"Admin" && !principal.albums.isEmpty()
-   for none principal : Account;
+    for none principal : Account;
 
+// 3. Photos should exceed 10 MB
 @invariant("PhotoSizeLimit")
 photo.size > 10
     for none photo: Photo;
 
 // 4. All admins can see all photos of users
-@invariant("AdminRights")
-principal.type == Role::"Admin" &&
-    deny(Action::"viewPhoto", principal, resource)
-        for none  principal: Account, resource: Photo;
+ @invariant("AdminRights")
+principal.role == Role::"Admin" && deny(principal, resource, Action::"viewPhoto")
+    for none  principal: Account, resource: Photo;
+
+// 5. Reformulation of the above with for all instead of for none
+@invariant("AdminRights2")
+principal.role != Role::"Admin" || allow(principal, resource, Action::"viewPhoto")
+    for all principal: Account, resource: Photo;
 

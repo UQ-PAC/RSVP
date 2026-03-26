@@ -1,3 +1,4 @@
+// === View
 //   + Anyone can see public photos
 permit (
     principal is Account,
@@ -7,7 +8,6 @@ when {
     resource.album.visibility == Visibility::"Public"
 };
 
-// === View
 //   + Owner's friends can see protected photos
 permit (
     principal is Account,
@@ -16,6 +16,15 @@ permit (
 when {
     resource.album.visibility == Visibility::"Protected"
         && principal in resource.album.owner.friends
+};
+
+//   + Admins can see any photos
+permit (
+    principal is Account,
+    action == Action::"viewPhoto",
+    resource is Photo)
+when {
+    principal.role == Role::"Admin"
 };
 
 // === Upload

@@ -30,7 +30,6 @@ public class Quantifier {
     private final Map<String, String> variables;
     private final Scope scope;
 
-
     public Quantifier() {
         this(Scope.ALL, Collections.emptyMap());
     }
@@ -44,8 +43,8 @@ public class Quantifier {
         return scope;
     }
 
-    public Set<String> getVariables() {
-        return variables.keySet();
+    public Map<String, String> getVariables() {
+        return variables;
     }
 
     public Stream<String> variables() {

@@ -8,6 +8,7 @@ import uq.pac.rsvp.policy.datalog.ast.DLDeclTerm;
 import uq.pac.rsvp.policy.datalog.ast.DLProgram;
 import uq.pac.rsvp.policy.datalog.ast.DLRuleDecl;
 import uq.pac.rsvp.policy.datalog.invariant.Invariant;
+import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantSet;
 
 import java.io.BufferedReader;
@@ -130,7 +131,7 @@ public class TranslationResult {
         return new Relation(headers, rows);
     }
 
-    Relation loadRelation(Path dir, Invariant invariant) {
+    Relation loadRelation(Invariant invariant) {
         return loadRelation(makeInvariantRuleDecl(invariant));
     }
 
@@ -142,17 +143,15 @@ public class TranslationResult {
 
     Map<Policy, RequestSet> getPolicyResult() {
         Map<Policy, RequestSet> requests = new HashMap<>();
-        policies.forEach(policy -> {
-            requests.put(policy, loadRequests(policy));
-        });
+        policies.forEach(policy -> requests.put(policy, loadRequests(policy)));
         return requests;
     }
 
-    Map<Invariant, Relation> getInvariantRelations() {
-        Map<Invariant, Relation> relations = new HashMap<>();
+    Map<Invariant, InvariantResult> getInvariantResult() {
+        Map<Invariant, InvariantResult> result = new HashMap<>();
         invariants.getInvariants().forEach(invariant -> {
-            relations.put(invariant, loadRelation(datalogDir, invariant));
+            result.put(invariant, new InvariantResult(invariant, loadRelation(invariant)));
         });
-        return relations;
+        return result;
     }
 }

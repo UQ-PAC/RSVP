@@ -1,10 +1,10 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.expr.Expression;
 import uq.pac.rsvp.policy.datalog.ast.DLRule;
 import uq.pac.rsvp.policy.datalog.ast.DLRuleDecl;
 import uq.pac.rsvp.policy.datalog.invariant.Invariant;
+import uq.pac.rsvp.policy.datalog.invariant.InvariantTransformer;
 
 import java.util.List;
 
@@ -25,10 +25,11 @@ public class TranslationInvariant {
 
     public TranslationInvariant(Invariant invariant, TranslationSchema schema) {
         this.declaration = TranslationConstants.makeInvariantRuleDecl(invariant);
+        Invariant i = InvariantTransformer.transform(invariant);
         Expression transformed = TranslationTransformer.transform(invariant.getExpression());
         List<List<Expression>> disjunctions = NFConverter.toDNF(transformed);
         this.rules = disjunctions.stream()
-                .map(disjunction -> TranslationVisitor.translateInvariant(schema, disjunction, declaration, invariant.getQuantifier()))
+                .map(disjunction -> TranslationVisitor.translateInvariant(schema, disjunction, declaration, i.getQuantifier()))
                 .toList();
     }
 

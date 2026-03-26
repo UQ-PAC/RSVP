@@ -19,11 +19,8 @@ public class InvariantResult {
         this.assignments = Assignment.getAssignments(relation);
         Quantifier.Scope scope = invariant.getQuantifier().getScope();
         switch (invariant.getQuantifier().getScope()) {
-            case ALL ->
-                // Invariants using `ALL` quantifiers scope are rewritten to NONE
-                throw new TranslationError("Unexpected invariant scope: " + scope);
             case SOME -> this.holds = !relation.isEmpty();
-            case NONE -> this.holds = relation.isEmpty();
+            case NONE, ALL -> this.holds = relation.isEmpty();
             default -> throw new TranslationError("Unreachable");
         }
     }
@@ -32,51 +29,16 @@ public class InvariantResult {
         return invariant;
     }
 
+    /**
+     * Get assignments. Note that for the `for all` invariant we generate no assignments because
+     * the `for all` variant is rewritten to `for none`. If the assignments for the `for all`
+     * invariant are needed they can be generated with the `for some` quantifier scope instead
+     */
     public Set<Assignment> getAssignments() {
-        if (!holds) {
-            throw new TranslationError("Assignments cannot be extracted for a failing invariant");
-        }
-
-        switch (invariant.getQuantifier().getScope()) {
-            case NONE -> {
-                if (!assignments.isEmpty()) {
-                    throw new TranslationError("Expected no counterexamples but found some");
-
-                }
-            }
-            case SOME -> {
-                if (assignments.isEmpty()) {
-                    throw new TranslationError("Expected counterexamples but found none");
-                }
-            }
-            default -> throw new TranslationError("Unreachable");
-        }
-
         return assignments;
     }
 
     public boolean holds() {
         return holds;
-    }
-
-    public Set<Assignment> getCounterExamples() {
-        if (holds) {
-            throw new TranslationError("Counterexample cannot be extracted for a passing invariant");
-        }
-
-        switch (invariant.getQuantifier().getScope()) {
-            case NONE -> {
-                if (assignments.isEmpty()) {
-                    throw new TranslationError("Expected counterexamples but found none");
-                }
-            }
-            case SOME -> {
-                if (!assignments.isEmpty()) {
-                    throw new TranslationError("Expected no counterexamples but found some");
-                }
-            }
-            default -> throw new TranslationError("Unreachable");
-        }
-        return assignments;
     }
 }

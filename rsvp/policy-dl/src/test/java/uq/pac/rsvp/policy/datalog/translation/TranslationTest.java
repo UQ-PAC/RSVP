@@ -15,6 +15,8 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.datalog.TestUtil;
+import uq.pac.rsvp.policy.datalog.invariant.Invariant;
+import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 import uq.pac.rsvp.policy.datalog.util.Logger;
 
 import java.io.IOException;
@@ -36,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * - Translate to datalog
  * - Generate {@code RequestAuth} object
  * - Cross-check request acceptance/rejection with Cedar
- * - Expect invariants to hold (TODO)
+ * - Expect invariants to hold
  */
 public class TranslationTest {
 
@@ -46,7 +48,7 @@ public class TranslationTest {
 
     @BeforeAll
     static void configure() {
-        logger.setLevel(Logger.Level.Warning);
+        logger.setLevel(Logger.Level.Info);
     }
 
     private static class TestInput {
@@ -130,8 +132,7 @@ public class TranslationTest {
     void differentialTest(TestInput test) throws IOException, AuthException, InterruptedException, RsvpException {
         logger.info(YELLOW, "Policy: " + test.policy)
                 .info(MAGENTA, "Datalog specification: " + test.datalogDir + "/" + TranslationConstants.ProgramName)
-                .info(CYAN, Files.readString(test.policy));
-
+                .fine(CYAN, Files.readString(test.policy));
 
         long lines = Files.readAllLines(test.policy).stream()
                 .map(String::trim)
@@ -145,9 +146,19 @@ public class TranslationTest {
 
         TranslationResult translation = Translation.translate(test.schema, test.policy,
                 test.entities, test.invariants, test.datalogDir);
+
         RequestAuth rsvpAuth = new RequestAuth(translation);
         assertTrue(Collections.disjoint(rsvpAuth.getForbiddenRequests().getRequests(),
                 rsvpAuth.getPermittedRequests().getRequests()));
+
+        // Check if invariants hold
+        Map<Invariant, InvariantResult> invariantResults = translation.getInvariantResult();
+        invariantResults.forEach((invariant, result) -> {
+            logger.bright().info(CYAN, invariant.toString());
+            logger.bright().bold().info(CYAN, "Holds: " + result.holds());
+            logger.bright().bold().info(CYAN, "Assignments: " + result.getAssignments());
+            assertTrue(result.holds());
+        });
 
         AuthorizationEngine cedarAuth = new BasicAuthorizationEngine();
         Entities cedarEntities = Entities.parse(test.entities);
@@ -173,10 +184,10 @@ public class TranslationTest {
 
             if (cedarDecision == AuthorizationSuccessResponse.Decision.Allow &&
                     rsvpDecision == RequestAuth.Decision.Allow) {
-                logger.info(GREEN, rsvpRequest + ":  " + rsvpDecision);
+                logger.fine(GREEN, rsvpRequest + ":  " + rsvpDecision);
             } else if (cedarDecision == AuthorizationSuccessResponse.Decision.Deny &&
                     rsvpDecision == RequestAuth.Decision.Deny) {
-                logger.info(BLUE, rsvpRequest + ":  " + rsvpDecision);
+                logger.fine(BLUE, rsvpRequest + ":  " + rsvpDecision);
             } else {
                 logger.error(rsvpRequest + ":  RSVP: " + rsvpDecision + " | Cedar:" + cedarDecision);
             }

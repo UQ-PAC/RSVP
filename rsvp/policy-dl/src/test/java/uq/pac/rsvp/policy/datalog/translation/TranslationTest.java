@@ -12,7 +12,6 @@ import com.cedarpolicy.model.schema.Schema;
 import org.fusesource.jansi.Ansi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.datalog.TestUtil;
@@ -67,13 +66,6 @@ public class TranslationTest {
             this.testDir = testDir;
             this.datalogDir = TestUtil.getDatalogDir(testDir.getFileName().toString(), getPolicyName());
             this.testName = testDir.getFileName().toString();
-        }
-
-        public static TestInput load(String dir, String policy) {
-            return TestInput.load(dir).stream()
-                    .filter(t -> t.getPolicyName().equals(policy))
-                    .findAny()
-                    .orElseThrow();
         }
 
         public static List<TestInput> load(String dir) {
@@ -151,7 +143,9 @@ public class TranslationTest {
             logger.warning("Empty policy: " + test.policy);
         }
 
-        RequestAuth rsvpAuth = RequestAuth.load(test.schema, test.policy, test.entities, test.invariants, test.datalogDir);
+        TranslationResult translation = Translation.translate(test.schema, test.policy,
+                test.entities, test.invariants, test.datalogDir);
+        RequestAuth rsvpAuth = new RequestAuth(translation);
         assertTrue(Collections.disjoint(rsvpAuth.getForbiddenRequests().getRequests(),
                 rsvpAuth.getPermittedRequests().getRequests()));
 

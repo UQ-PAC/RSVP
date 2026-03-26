@@ -6,13 +6,10 @@ import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.datalog.ast.*;
 import uq.pac.rsvp.policy.datalog.invariant.Invariant;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Constants used throughout the translation of Cedar to datalog
@@ -49,6 +46,9 @@ public class TranslationConstants {
         return new DLAtom(decl, negated, terms);
     }
 
+    /**
+     * Make an atom over the terms of the declaration
+     */
     public static DLAtom makeAtom(DLRuleDecl decl) {
         return makeAtom(decl, false);
     }
@@ -147,7 +147,7 @@ public class TranslationConstants {
                     DLDeclTerm.symbolic("parent"),
                     DLDeclTerm.symbolic("child"));
 
-    public final static Character OUTPUT_DELIMITER = '\t';
+    public final static String OUTPUT_DELIMITER = "\t";
 
     public static List<DLOutputDirective> makeIODirectives(Collection<DLRuleDecl> decls) {
         List<DLRuleDecl> output = new ArrayList<>(decls);
@@ -177,42 +177,27 @@ public class TranslationConstants {
     public static final String OUTPUT_EXT = ".csv";
 
     /**
-     * Prefixes for forbid and permit policies
+     * Prefix for datalog-level policy relations
      */
-    public final static String PermitPolicyPrefix = "CedarPolicyPermit_";
-    public final static String ForbidPolicyPrefix = "CedarPolicyForbid_";
-
-    private static final Pattern POLICY_OUTPUT_PATTERN = Pattern.compile("(%s|%s)([a-zA-Z0-9_]+)(.csv)$"
-            .formatted(PermitPolicyPrefix, ForbidPolicyPrefix));
-
-    public record PolicyName (boolean permit, String name, Path csv) { }
-
-    /**
-     * Assuming {@code csv} is a csv output file for a particular policy
-     * extract cedar-level policy name. This name is extracted as 2 components:
-     * - Prefix
-     */
-    public static PolicyName getOutputPolicyName(Path csv) {
-        Matcher matcher = POLICY_OUTPUT_PATTERN.matcher(csv.getFileName().toString());
-        if (matcher.find()) {
-            return new PolicyName(matcher.group(1).equals(PermitPolicyPrefix), matcher.group(2), csv);
-        }
-        return null;
-    }
+    private final static String PolicyFormat = "Policy_";
 
     /**
      * Get a declaration for a single policy rule
      */
     public static DLRuleDecl makePolicyRuleDecl(Policy policy) {
-        String name = policy.isPermit() ? PermitPolicyPrefix : ForbidPolicyPrefix;
-        return makePolicyRuleDecl(name + policy.getName());
+        return makePolicyRuleDecl(PolicyFormat + policy.getName());
     }
+
+    /**
+     * Prefix for datalog-level invariant relations
+     */
+    private final static String InvariantPrefix = "Invariant_";
 
     /**
      * Get a declaration for an invariant
      */
     public static DLRuleDecl makeInvariantRuleDecl(Invariant invariant) {
-        String name = "Invariant" + invariant.getName();
+        String name = InvariantPrefix + invariant.getName();
         List<DLDeclTerm> terms = invariant.getQuantifier().variables()
                 .map(v -> new DLDeclTerm(v, DLType.SYMBOL))
                 .toList();

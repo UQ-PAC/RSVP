@@ -94,7 +94,8 @@ public class Translation {
         // FIXME: Invariant validation
     }
 
-    public static DLProgram translate(Path schemaFile, Path policiesFile, Path entitiesFile, Path invariantFile) throws IOException, AuthException, RsvpException {
+    public static TranslationResult translate(Path schemaFile, Path policiesFile, Path entitiesFile, Path invariantFile, Path datalogDir)
+            throws IOException, AuthException, RsvpException, InterruptedException {
         validate(schemaFile, policiesFile, entitiesFile);
         Schema schema = Schema.parseCedarSchema(schemaFile);
         Entities entities = Entities.parse(entitiesFile);
@@ -123,7 +124,10 @@ public class Translation {
 
         PolicySet policies = PolicySet.parseCedarPolicySet(policiesFile);
         InvariantSet invariants = invariantFile == null ? InvariantSet.parse("") : InvariantSet.parse(invariantFile);
-        return translate(schema, policies, new Entities(entitySet), invariants);
+        entities = new Entities(entitySet);
+        DLProgram translation = translate(schema, policies, entities, invariants);
+        translation.execute(datalogDir);
+        return new TranslationResult(schema, policies, entities, invariants, translation, datalogDir);
     }
 
     private static DLProgram translate(Schema schema, PolicySet policies, Entities entities, InvariantSet invariants) {

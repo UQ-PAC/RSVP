@@ -124,8 +124,6 @@ public class ParserTest {
     @DisplayName("Invariant Parsing")
     void parseTest() {
         InvariantSet invariants = InvariantSet.parse(INPUT);
-
-        System.out.println(invariants.getInvariants());
         invariants.stream().forEach(i -> logger.info(YELLOW, i + ";"));
         String text = invariants.stream()
                         .map(Invariant::toString)

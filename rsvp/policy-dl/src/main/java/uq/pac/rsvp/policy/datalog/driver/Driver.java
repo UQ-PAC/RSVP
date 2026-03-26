@@ -15,6 +15,8 @@ import com.google.gson.stream.JsonWriter;
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestAuth;
+import uq.pac.rsvp.policy.datalog.translation.Translation;
+import uq.pac.rsvp.policy.datalog.translation.TranslationResult;
 import uq.pac.rsvp.policy.datalog.util.Logger;
 
 import java.io.FileWriter;
@@ -158,7 +160,8 @@ public class Driver {
             error("Datalog destination: " + dlPath + " is not a directory");
         }
 
-        RequestAuth rsvpAuth = RequestAuth.load(schemaFile, policyFile, entitiesFile, invariantFile, dlPath);
+        TranslationResult translation = Translation.translate(schemaFile, policyFile, entitiesFile, invariantFile, dlPath);
+        RequestAuth rsvpAuth = new RequestAuth(translation);
         logger.info(YELLOW, "Datalog output written to directory: " + dlPath.toAbsolutePath());
         writeRequests(Path.of(dlPath.toString(), "auth.json"), rsvpAuth);
 

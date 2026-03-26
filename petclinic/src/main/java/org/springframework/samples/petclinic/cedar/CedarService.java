@@ -31,21 +31,21 @@ public class CedarService {
 	public CedarService(@Value("${policy.file:petclinic-rsvp-policy.cedar}") String policyFile) {
 		try {
 			this.policySet = PolicySet
-				.parsePolicies(Path.of("src/main/resources/cedar/rsvp/" + policyFile));
+				.parsePolicies(Path.of("src/main/resources/cedar/" + policyFile));
 			System.out.println(System.lineSeparator() + "Cedar Policy loaded: " + policyFile + System.lineSeparator());
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Failed to parse Cedar Policy.", e);
 		}
 		try {
-			this.entities = Entities.parse(Path.of("src/main/resources/cedar/rsvp/petclinic-rsvp-entities.json"));
+			this.entities = Entities.parse(Path.of("src/main/resources/cedar/petclinic-rsvp-entities.json"));
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Failed to parse Cedar Entities.", e);
 		}
 		try {
 			String schemaText = Files
-				.readString(Path.of("src/main/resources/cedar/rsvp/petclinic-rsvp-schema.cedarschema"));
+				.readString(Path.of("src/main/resources/cedar/petclinic-rsvp-schema.cedarschema"));
 			this.schema = Schema.parse(Schema.JsonOrCedar.Cedar, schemaText);
 		}
 		catch (Exception e) {

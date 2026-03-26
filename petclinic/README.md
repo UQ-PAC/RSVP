@@ -20,9 +20,9 @@ You can start the application on the command-line as follows:
 You can then access the Petclinic at <http://localhost:8080/>.
 
 The command above will load the default Cedar files:
-- Schema: `src/main/resources/cedar/rsvp/petclinic-rsvp-schema.cedarschema`
-- Entities: `src/main/resources/cedar/rsvp/petclinic-rsvp-entities.json`
-- Policy: `src/main/resources/cedar/rsvp/petclinic-rsvp-policy.cedar`
+- Schema: `src/main/resources/cedar/petclinic-rsvp-schema.cedarschema`
+- Entities: `src/main/resources/cedar/petclinic-rsvp-entities.json`
+- Policy: `src/main/resources/cedar/petclinic-rsvp-policy.cedar`
 
 You can change the default Cedar Policy by running, instead:
 

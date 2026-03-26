@@ -50,6 +50,7 @@ expression :
     | expression op=('==' | '!=' | '>' | '<' | '>=' | '<=') expression # comparisonExpr
     | expression '&&' expression                                       # conjunctionExpr
     | expression '||' expression                                       # disjunctionExpr
+    | expression '~>' expression                                       # implicationExpr
 ;
 
 callArguments:

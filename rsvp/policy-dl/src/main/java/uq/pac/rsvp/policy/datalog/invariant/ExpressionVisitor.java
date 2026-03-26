@@ -2,7 +2,6 @@ package uq.pac.rsvp.policy.datalog.invariant;
 
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import uq.pac.rsvp.policy.ast.SourceLoc;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 
@@ -57,6 +56,12 @@ class ExpressionVisitor extends InvariantBaseVisitor<Expression> {
     public Expression visitDisjunctionExpr(InvariantParser.DisjunctionExprContext ctx) {
         return new BinaryExpression(ctx.expression(0).accept(this),
                 BinaryExpression.BinaryOp.Or, ctx.expression(1).accept(this));
+    }
+
+    @Override
+    public Expression visitImplicationExpr(InvariantParser.ImplicationExprContext ctx) {
+        Expression left = new UnaryExpression(UnaryExpression.UnaryOp.Not, ctx.expression(0).accept(this));
+        return new BinaryExpression(left, BinaryExpression.BinaryOp.Or, ctx.expression(1).accept(this));
     }
 
     @Override

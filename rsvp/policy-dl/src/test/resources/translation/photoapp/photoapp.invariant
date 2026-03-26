@@ -14,12 +14,17 @@ photo.size > 10
     for none photo: Photo;
 
 // 4. All admins can see all photos of users
- @invariant("AdminRights")
+ @invariant("AdminRightsForNone")
 principal.role == Role::"Admin" && deny(principal, resource, Action::"viewPhoto")
     for none  principal: Account, resource: Photo;
 
 // 5. Reformulation of the above with for all instead of for none
-@invariant("AdminRights2")
+@invariant("AdminRightsForAll")
 principal.role != Role::"Admin" || allow(principal, resource, Action::"viewPhoto")
+    for all principal: Account, resource: Photo;
+
+// 6. Reformulation of the above with for all instead of for none and using implies
+@invariant("AdminRightsForAllImplication")
+principal.role == Role::"Admin" ~> allow(principal, resource, Action::"viewPhoto")
     for all principal: Account, resource: Photo;
 

@@ -118,7 +118,6 @@ when {
 
 // 'policy7'
 // No Intern Veterinarian can edit their clients' data.
-// > > Could conflict with 'policy8'.
 @id("Policy: Intern Veterinarian cannot edit their clients.")
 forbid (
     principal is PetClinic::Employee,
@@ -139,7 +138,6 @@ when {
 
 // 'policy8'
 // Every Employee can edit their own data.
-// > > Could conflict with 'policy7'.
 @id("Policy: Employee can edit their own data.")
 permit (
     principal is PetClinic::Employee,

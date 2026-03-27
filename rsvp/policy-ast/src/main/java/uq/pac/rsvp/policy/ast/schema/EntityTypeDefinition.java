@@ -38,6 +38,10 @@ public class EntityTypeDefinition implements SchemaItem {
         this.entityNamesEnum = entityNamesEnum != null ? Set.copyOf(entityNamesEnum) : Collections.emptySet();
     }
 
+    public RecordTypeDefinition getShape() {
+        return shape;
+    }
+
     public EntityTypeDefinition(String name, Set<String> memberOfTypes, Map<String, CommonTypeDefinition> shape,
             Set<String> entityNamesEnum) {
         this(name, memberOfTypes, shape, entityNamesEnum, null);

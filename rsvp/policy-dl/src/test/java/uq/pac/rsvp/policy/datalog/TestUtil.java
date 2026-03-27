@@ -63,6 +63,10 @@ public class TestUtil {
         return Path.of(DLTESTDIR.toString(), names);
     }
 
+    public static Path getResourceDir(String ...names) {
+        return Path.of(RESOURCEDIR.toString(), names);
+    }
+
     /**
      * Remove a directory with contents assuming the contents of a directory
      * are regular files

@@ -3,7 +3,7 @@ import { Lexend_Giga } from "next/font/google";
 interface HeaderParams {
   heading: string;
   subheading?: string;
-  verify: () => void;
+  verify: () => Promise<void>;
 }
 
 const lexendGiga = Lexend_Giga({
@@ -20,7 +20,7 @@ export function Header({ heading, subheading, verify }: HeaderParams) {
         {subheading && <h2 className="subtitle med-text">{subheading}</h2>}
       </div>
       <div className="header-right-align">
-        <VerifyButton onclick={verify} />
+        <VerifyButton verify={verify} />
       </div>
     </div>
   );

@@ -1,22 +1,20 @@
 import { faCaretLeft, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import cx from "classnames";
+import { useFocus, useFocusDispatch } from "./providers/FocusContext";
 
 interface DrawerProps {
   title: string;
   side: "left" | "right";
-  expanded?: boolean;
-  setExpanded: (boolean) => void;
   children?: React.ReactNode;
 }
 
-export function Drawer({
-  title,
-  side,
-  expanded,
-  setExpanded,
-  children,
-}: DrawerProps) {
+export function Drawer({ title, side, children }: DrawerProps) {
+  const { drawer } = useFocus();
+  const dispatch = useFocusDispatch();
+
+  const expanded = !!drawer[side];
+
   const className = cx(
     "drawer-container",
     `drawer-container-${side}`,
@@ -30,7 +28,12 @@ export function Drawer({
 
   return (
     <div className={className}>
-      <div className="drawer-tab" onClick={() => setExpanded(!expanded)}>
+      <div
+        className="drawer-tab"
+        onClick={() =>
+          dispatch({ type: "drawer", key: side, value: !expanded })
+        }
+      >
         <FontAwesomeIcon className="drawer-tab-icon" icon={icon} />
       </div>
       <div className="drawer-content">

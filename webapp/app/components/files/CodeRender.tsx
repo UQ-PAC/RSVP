@@ -1,23 +1,21 @@
 "use client";
 
 import cx from "classnames";
+import hljs from "highlight.js";
 
 import { JSX, useEffect, useRef } from "react";
 import { Roboto_Mono } from "next/font/google";
 
+import { Report } from "../../types";
 import {
-  Report,
-  ReportSeverity,
   useSelection,
   useSelectionDispatch,
-} from "../SelectionContext";
-import hljs from "highlight.js";
-import { renderToString } from "react-dom/server";
+} from "../providers/SelectionContext";
+import { useFocus, useFocusDispatch } from "../providers/FocusContext";
 
 interface CodeRenderParams {
   content: string;
   reports: Report[];
-  openReportsDrawer: () => void;
 }
 
 const robotoMono = Roboto_Mono({
@@ -29,13 +27,12 @@ const robotoMono = Roboto_Mono({
 //     block-based highlight (surrounded by /n)
 //     scroll to primary or top unless explicitely clicked on line
 // FIXME: multiple reports per line....?
-export function CodeRender({
-  content,
-  reports,
-  openReportsDrawer,
-}: CodeRenderParams) {
+export function CodeRender({ content, reports }: CodeRenderParams) {
   const { selected, hovered, scroll } = useSelection();
-  const dispatch = useSelectionDispatch();
+  const selectionDispatch = useSelectionDispatch();
+
+  const { drawer: drawerFocus } = useFocus();
+  const focusDispatch = useFocusDispatch();
 
   // Scroll selected policy into view
   const focus = useRef<HTMLDivElement>(null);
@@ -86,15 +83,16 @@ export function CodeRender({
         }
       });
 
+      const isSelected =
+        relevant && hovered !== relevant.id && selected === relevant.id;
+      const isHovered = relevant && hovered === relevant.id;
+
       const className = cx(
         "source-file-line-content",
         report?.length && "source-report",
         relevant?.severity && `source-report-${relevant.severity}`,
-        relevant && hovered === relevant.id && "hovered",
-        relevant &&
-          hovered !== relevant.id &&
-          selected === relevant.id &&
-          "selected",
+        isHovered && "hovered",
+        isSelected && "selected",
       );
 
       code.push(
@@ -114,11 +112,31 @@ export function CodeRender({
           onClick={
             relevant
               ? () => {
-                  openReportsDrawer();
-                  dispatch({
+                  if (selected !== relevant?.id) {
+                    if (!drawerFocus["right"]) {
+                      focusDispatch({
+                        type: "drawer",
+                        key: "left",
+                        value: false,
+                      });
+                      focusDispatch({
+                        type: "drawer",
+                        key: "right",
+                        value: true,
+                      });
+                    }
+
+                    focusDispatch({
+                      type: "report-group",
+                      key: `${relevant?.severity}-${relevant?.primarySourceLocation.source?.filename}`,
+                      value: true,
+                    });
+                  }
+
+                  selectionDispatch({
                     type: "click",
                     id: relevant?.id,
-                    source: "source",
+                    scroll: selected !== relevant?.id ? "report" : "none",
                   });
                 }
               : undefined
@@ -126,20 +144,20 @@ export function CodeRender({
           onMouseEnter={
             relevant
               ? () =>
-                  dispatch({
+                  selectionDispatch({
                     type: "mouseEnter",
                     id: relevant?.id,
-                    source: "source",
+                    scroll: "none",
                   })
               : undefined
           }
           onMouseLeave={
             relevant
               ? () =>
-                  dispatch({
+                  selectionDispatch({
                     type: "mouseLeave",
                     id: relevant?.id,
-                    source: "source",
+                    scroll: "none",
                   })
               : undefined
           }

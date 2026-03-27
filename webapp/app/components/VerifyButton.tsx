@@ -1,16 +1,30 @@
+"use client";
+
 import { faFileShield } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Lexend_Deca } from "next/font/google";
+import { useFocus, useFocusDispatch } from "./providers/FocusContext";
 
 const lexendDeca = Lexend_Deca({
   subsets: ["latin"],
 });
 
 interface VerifyButtonParams {
-  onclick: () => void;
+  verify: () => Promise<void>;
 }
 
-export function VerifyButton({ onclick }: VerifyButtonParams) {
+export function VerifyButton({ verify }: VerifyButtonParams) {
+  const { drawer: drawerFocus } = useFocus();
+  const focusDispatch = useFocusDispatch();
+
+  const onclick = () =>
+    verify().then(() => {
+      if (!drawerFocus["right"]) {
+        focusDispatch({ type: "drawer", key: "left", value: false });
+        focusDispatch({ type: "drawer", key: "right", value: true });
+      }
+    });
+
   return (
     <button className="verify-button" onClick={onclick}>
       <FontAwesomeIcon className="verify-button-icon" icon={faFileShield} />

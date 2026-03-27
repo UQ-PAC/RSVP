@@ -8,11 +8,12 @@ import {
   faCircleXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import {
-  Report,
   useSelection,
   useSelectionDispatch,
-} from "../SelectionContext";
+} from "../providers/SelectionContext";
+import { Report } from "../../types";
 import { useEffect, useRef } from "react";
+import { useFocusDispatch } from "../providers/FocusContext";
 
 interface ReportItemParams {
   report: Report;
@@ -20,7 +21,8 @@ interface ReportItemParams {
 
 export function ReportItem({ report }: ReportItemParams) {
   const { selected, hovered, scroll } = useSelection();
-  const dispatch = useSelectionDispatch();
+  const selectionDispatch = useSelectionDispatch();
+  const focusDispatch = useFocusDispatch();
 
   const element = useRef<HTMLDivElement>(null);
 
@@ -60,17 +62,35 @@ export function ReportItem({ report }: ReportItemParams) {
       ref={element}
       className={className}
       onMouseEnter={() =>
-        dispatch({ type: "mouseEnter", id: report.id, source: "report" })
+        selectionDispatch({
+          type: "mouseEnter",
+          id: report.id,
+          scroll: "none",
+        })
       }
       onMouseLeave={() =>
-        dispatch({ type: "mouseLeave", id: report.id, source: "report" })
+        selectionDispatch({
+          type: "mouseLeave",
+          id: report.id,
+          scroll: "none",
+        })
       }
     >
       <div
         className="report-item-header"
-        onClick={() =>
-          dispatch({ type: "click", id: report.id, source: "report" })
-        }
+        onClick={() => {
+          if (!isSelected) {
+            const filename = report.primarySourceLocation.source?.filename;
+            if (filename) {
+              focusDispatch({
+                type: "source-file",
+                key: filename,
+                value: true,
+              });
+            }
+          }
+          selectionDispatch({ type: "click", id: report.id, scroll: "source" });
+        }}
       >
         <FontAwesomeIcon
           className="report-item-icon report-item-icon-severity"

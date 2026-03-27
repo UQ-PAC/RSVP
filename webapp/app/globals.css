@@ -111,7 +111,7 @@
 
   .hljs-number {
     font-weight: 500;
-    color: var(--color-lime-500);
+    color: var(--color-lime-600);
   }
 
   .hljs-comment {
@@ -318,15 +318,23 @@
     border-radius: 0.5rem;
   }
 
-  .source-file-header {
+  .source-file .source-file-header {
     display: flex;
     align-items: center;
     cursor: pointer;
     background-color: var(--color-gray-200);
-    border-bottom: 1px solid var(--color-gray-300);
     font-weight: 600;
-    font-size: 0.7rem;
+    font-size: 1rem;
+    line-height: 3rem;
+  }
+
+  .source-file.expanded .source-file-header {
     border-radius: 0.5rem 0.5rem 0 0;
+    border-bottom: 1px solid var(--color-gray-300);
+  }
+
+  .source-file.collapsed .source-file-header {
+    border-radius: 0.5rem;
   }
 
   .source-file-header:hover {
@@ -335,27 +343,22 @@
 
   .source-file-header .source-file-name {
     flex-grow: 1;
-    font-size: 1rem;
     font-family: var(--font-sans);
-    margin: 0.7rem 0 0.5rem 0.2rem;
     color: var(--color-gray-600);
   }
 
   .source-file-header .source-file-icon {
-    font-size: 1rem;
-    margin-top: 0.2rem;
-    margin-left: 0.2rem;
+    margin: 0.2rem 0.5rem 0.2rem 1rem;
     color: var(--color-gray-400);
   }
 
   .source-file-header .source-file-toggle {
-    font-size: 1rem;
     margin-right: 1rem;
     color: var(--color-gray-400);
   }
 
   .source-file .source-file-render {
-    padding: 1rem;
+    padding: 1rem 0 1rem 1rem;
   }
 
   /* line number rendering source: https://jaseg.de/blog/css-only-code-blocks/ */
@@ -403,7 +406,7 @@
   }
 
   .source-file .source-file-render .code > .source-file-line-content {
-    padding-left: 1rem;
+    padding: 0 1rem;
     text-indent: -0.2rem;
     line-height: 1.5rem;
     border-left: 0.2rem solid var(--color-gray-100);
@@ -420,8 +423,6 @@
     background-color: var(--color-filepond-bg);
     border: 1px solid var(--color-gray-200);
     border-radius: 0.5rem;
-    margin: 0.1rem;
-    padding: 0.5rem;
     flex-grow: 1;
     overflow-y: scroll;
   }
@@ -430,16 +431,59 @@
     color: #505050;
   }
 
-  .reports-group .reports-group-title {
+  .reports-section .reports-section-header {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+  }
+
+  .reports-section .reports-section-header .reports-section-toggle {
+    font-size: 0.6rem;
+    color: var(--color-gray-400);
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .reports-section .reports-section-header .reports-section-toggle > a {
+    cursor: pointer;
+  }
+
+  .reports-section .reports-section-title {
     font-weight: 600;
-    margin-top: 0.5rem;
+    flex-grow: 1;
+  }
+
+  .reports-group-header {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 0.2rem 0.5rem 0.1rem 0.5rem;
+    line-height: 1.5rem;
+  }
+
+  .reports-group-content {
+    margin-left: 0.5rem;
+  }
+
+  .reports-group-header:hover {
+    background-color: var(--color-gray-200);
+  }
+
+  .reports-group-header .reports-group-toggle {
+    font-size: 0.8rem;
+    margin-right: 0.4rem;
+    color: var(--color-gray-500);
+  }
+
+  .reports-group-header .reports-group-title {
+    margin-bottom: 0.1rem;
   }
 
   .report-item {
     display: flex;
     flex-direction: column;
-    padding: 0.5rem;
-    margin-left: 0.1rem;
+    padding: 0.5rem 1rem 0.5rem 0.5rem;
+    margin-left: 0.4rem;
   }
 
   .report-item .report-item-header {

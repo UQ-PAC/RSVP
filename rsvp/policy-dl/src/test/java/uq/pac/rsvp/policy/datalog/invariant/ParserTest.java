@@ -65,6 +65,8 @@ public class ParserTest {
         @invariant("foo23")
         resource.foo == "foo" && principal.bar == "bar"
             for all resource:  Resource::Picture, principal: Album::Photo;
+        @invariant("foo24")
+        -1 + 2 * 3 == 6 * 7 + 8;
         """;
 
     private static final String EXPECTED = """
@@ -118,6 +120,8 @@ public class ParserTest {
         @invariant("foo23")
         ((resource.foo == "foo") && (principal.bar == "bar"))
             for all principal: Album::Photo, resource: Resource::Picture;
+        @invariant("foo24")
+        ((-1 + (2 * 3)) == ((6 * 7) + 8));
         """;
 
     @Test

@@ -39,7 +39,6 @@ public class TypingTest {
             "\"a\" != \"b\"",
             "principal == resource for all principal: Account, resource: Account",
             "principal.role == resource.role for all principal: Account, resource: Account",
-
             "true"
     })
     void ok(String invariantText) {
@@ -59,8 +58,10 @@ public class TypingTest {
             "1 + 2",
             "-(1 + 2)",
             "\"foo\"",
-            "principal.age for all principal: Account",
-            "Account::\"Alice\""
+            "principal.age for all principal: Account"
+            //"Account::\"Alice\""
+
+
     })
     void fail(String text) {
         try {

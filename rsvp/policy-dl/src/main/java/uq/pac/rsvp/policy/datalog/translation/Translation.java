@@ -94,12 +94,12 @@ public class Translation {
         // FIXME: Invariant validation
     }
 
-    public static TranslationResult translate(Path schemaFile, Path policiesFile, Path entitiesFile, Path invariantFile, Path datalogDir)
-            throws IOException, AuthException, RsvpException, InterruptedException {
-        validate(schemaFile, policiesFile, entitiesFile);
-        Schema schema = Schema.parseCedarSchema(schemaFile);
-        Entities entities = Entities.parse(entitiesFile);
-
+    /**
+     * Update the initial set of entities to
+     * - remove actions (as entities)
+     * - add implicit entities from enums
+     */
+    static Entities updateEntities(Entities entities, Schema schema) {
         // When we are given an entity set it can also include actions,
         // remove those from the set of entities, as we treat them differently
         // and pull action-related information from the schema
@@ -121,10 +121,18 @@ public class Translation {
                 }
             });
         });
+        return new Entities(entitySet);
+    }
+
+    public static TranslationResult translate(Path schemaFile, Path policiesFile, Path entitiesFile, Path invariantFile, Path datalogDir)
+            throws IOException, AuthException, RsvpException, InterruptedException {
+        validate(schemaFile, policiesFile, entitiesFile);
+        Schema schema = Schema.parseCedarSchema(schemaFile);
+        Entities entities = updateEntities(Entities.parse(entitiesFile), schema);
 
         PolicySet policies = PolicySet.parseCedarPolicySet(policiesFile);
         InvariantSet invariants = invariantFile == null ? InvariantSet.parse("") : InvariantSet.parse(invariantFile);
-        entities = new Entities(entitySet);
+
         DLProgram translation = translate(schema, policies, entities, invariants);
         translation.execute(datalogDir);
         return new TranslationResult(schema, policies, entities, invariants, translation, datalogDir);

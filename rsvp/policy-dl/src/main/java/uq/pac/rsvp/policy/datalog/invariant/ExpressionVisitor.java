@@ -53,6 +53,11 @@ class ExpressionVisitor extends InvariantBaseVisitor<Expression> {
     }
 
     @Override
+    public Expression visitArithNegationExpr(InvariantParser.ArithNegationExprContext ctx) {
+        return new UnaryExpression(UnaryExpression.UnaryOp.Neg, ctx.expression().accept(this));
+    }
+
+    @Override
     public Expression visitDisjunctionExpr(InvariantParser.DisjunctionExprContext ctx) {
         return new BinaryExpression(ctx.expression(0).accept(this),
                 BinaryExpression.BinaryOp.Or, ctx.expression(1).accept(this));
@@ -101,6 +106,18 @@ class ExpressionVisitor extends InvariantBaseVisitor<Expression> {
             case "<" -> BinaryExpression.BinaryOp.Less;
             case ">=" -> BinaryExpression.BinaryOp.GreaterEq;
             case "<=" -> BinaryExpression.BinaryOp.LessEq;
+            default -> throw new AssertionError("unreachable");
+        };
+        return new BinaryExpression(ctx.expression(0).accept(this), op,
+                ctx.expression(1).accept(this));
+    }
+
+    @Override
+    public Expression visitArithExpr(InvariantParser.ArithExprContext ctx) {
+        BinaryExpression.BinaryOp op = switch (ctx.op.getText()) {
+            case "+" -> BinaryExpression.BinaryOp.Add;
+            case "-" -> BinaryExpression.BinaryOp.Sub;
+            case "*" -> BinaryExpression.BinaryOp.Mul;
             default -> throw new AssertionError("unreachable");
         };
         return new BinaryExpression(ctx.expression(0).accept(this), op,

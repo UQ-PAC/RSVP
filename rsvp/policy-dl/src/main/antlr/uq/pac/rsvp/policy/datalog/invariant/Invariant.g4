@@ -47,6 +47,9 @@ expression :
     | expression HAS ID                                                # hasExpr
     | '(' expression ')'                                               # groupingExpr
     | '!' expression                                                   # negationExpr
+    | '-' expression                                                   # arithNegationExpr
+    | expression op='*' expression                                     # arithExpr
+    | expression op=('-' | '+') expression                             # arithExpr
     | expression op=('==' | '!=' | '>' | '<' | '>=' | '<=') expression # comparisonExpr
     | expression '&&' expression                                       # conjunctionExpr
     | expression '||' expression                                       # disjunctionExpr

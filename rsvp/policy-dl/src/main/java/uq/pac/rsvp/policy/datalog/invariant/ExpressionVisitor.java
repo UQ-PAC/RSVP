@@ -6,6 +6,7 @@ import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 class ExpressionVisitor extends InvariantBaseVisitor<Expression> {
@@ -19,10 +20,12 @@ class ExpressionVisitor extends InvariantBaseVisitor<Expression> {
         return new TypeExpression(type);
     }
 
-    static EntityExpression getEntityExpression(InvariantParser.EntityContext ctx) {
+    static Expression getActionOrEntityExpression(InvariantParser.EntityContext ctx) {
         String type = getTypeExpression(ctx.type()).getValue();
         String eid = ctx.STRING().getText();
-        return new EntityExpression(eid.substring(1, eid.length() - 1), type);
+        BiFunction<String, String, Expression> supplier = type.equals("Action") || type.endsWith("::Action") ?
+                ActionExpression::new : EntityExpression::new;
+        return supplier.apply(eid.substring(1, eid.length() - 1), type);
     }
 
     @Override
@@ -88,13 +91,17 @@ class ExpressionVisitor extends InvariantBaseVisitor<Expression> {
     @Override
     public Expression visitInExpr(InvariantParser.InExprContext ctx) {
         return new BinaryExpression(ctx.expression().accept(this),
-                BinaryExpression.BinaryOp.In, getEntityExpression(ctx.entity()));
+                BinaryExpression.BinaryOp.In, getActionOrEntityExpression(ctx.entity()));
     }
 
     @Override
     public Expression visitHasExpr(InvariantParser.HasExprContext ctx) {
+        String attr = ctx.attr.getText();
+        if (attr.startsWith("\"")) {
+            attr = attr.substring(1, attr.length() - 1);
+        }
         return new BinaryExpression(ctx.expression().accept(this),
-                BinaryExpression.BinaryOp.HasAttr, new StringExpression(ctx.ID().getText()));
+                BinaryExpression.BinaryOp.HasAttr, new StringExpression(attr));
     }
 
     @Override
@@ -143,7 +150,6 @@ class ExpressionVisitor extends InvariantBaseVisitor<Expression> {
         return new CallExpression(object, fun, args);
     }
 
-
     @Override
     public Expression visitTypeExpr(InvariantParser.TypeExprContext ctx) {
         return getTypeExpression(ctx.type());
@@ -152,7 +158,8 @@ class ExpressionVisitor extends InvariantBaseVisitor<Expression> {
     @Override
     public Expression visitEntityExpr(InvariantParser.EntityExprContext ctx) {
         // FIXME: Entity expression via Type expression, not string
-        return getEntityExpression(ctx.entity());
+        String type = ctx.entity().type().getText();
+        return getActionOrEntityExpression(ctx.entity());
     }
 
     @Override

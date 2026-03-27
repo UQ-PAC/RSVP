@@ -44,7 +44,7 @@ expression :
     | LONG                                                             # longExpr
     | expression IN entity                                             # inExpr
     | expression IS type                                               # isExpr
-    | expression HAS ID                                                # hasExpr
+    | expression HAS attr=(ID | STRING)                                # hasExpr
     | '(' expression ')'                                               # groupingExpr
     | '!' expression                                                   # negationExpr
     | '-' expression                                                   # arithNegationExpr

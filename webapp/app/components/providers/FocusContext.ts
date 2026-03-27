@@ -1,16 +1,21 @@
 import { createContext, Dispatch, useContext } from "react";
 
 type FocusTarget = "drawer" | "report-group" | "source-file";
-type ExpansionMap = { [key: string]: boolean };
 
+export enum ExpansionState {
+  Expanded = 0,
+  Collapsed = 1,
+}
+
+type ExpansionMap = { [key: string]: ExpansionState };
 interface FocusState {
   [target: string]: ExpansionMap;
 }
 
 export const emptyFocus: FocusState = {
   drawer: {
-    left: true,
-    right: false,
+    left: ExpansionState.Expanded,
+    right: ExpansionState.Collapsed,
   },
   "report-group": {},
   "source-file": {},
@@ -19,7 +24,7 @@ export const emptyFocus: FocusState = {
 interface FocusAction {
   type: FocusTarget;
   key: string;
-  value: boolean;
+  value: ExpansionState;
 }
 
 export function reducer(context: FocusState, action: FocusAction): FocusState {

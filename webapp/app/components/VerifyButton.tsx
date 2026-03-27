@@ -3,7 +3,11 @@
 import { faFileShield } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Lexend_Deca } from "next/font/google";
-import { useFocus, useFocusDispatch } from "./providers/FocusContext";
+import {
+  ExpansionState,
+  useFocus,
+  useFocusDispatch,
+} from "./providers/FocusContext";
 
 const lexendDeca = Lexend_Deca({
   subsets: ["latin"],
@@ -19,9 +23,17 @@ export function VerifyButton({ verify }: VerifyButtonParams) {
 
   const onclick = () =>
     verify().then(() => {
-      if (!drawerFocus["right"]) {
-        focusDispatch({ type: "drawer", key: "left", value: false });
-        focusDispatch({ type: "drawer", key: "right", value: true });
+      if (drawerFocus["right"] === ExpansionState.Collapsed) {
+        focusDispatch({
+          type: "drawer",
+          key: "left",
+          value: ExpansionState.Collapsed,
+        });
+        focusDispatch({
+          type: "drawer",
+          key: "right",
+          value: ExpansionState.Expanded,
+        });
       }
     });
 

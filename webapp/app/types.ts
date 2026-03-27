@@ -1,3 +1,5 @@
+export type filetype = "policy" | "schema" | "entity" | "invariant";
+
 export interface SourceFileInfo {
   filename: string;
   serverId: string;

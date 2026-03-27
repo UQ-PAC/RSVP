@@ -7,7 +7,11 @@ import {
   faMinusSquare,
   faPlusSquare,
 } from "@fortawesome/free-regular-svg-icons";
-import { useFocus, useFocusDispatch } from "../providers/FocusContext";
+import {
+  ExpansionState,
+  useFocus,
+  useFocusDispatch,
+} from "../providers/FocusContext";
 import { useSelectionDispatch } from "../providers/SelectionContext";
 
 interface ReportsGroupProps {
@@ -23,7 +27,7 @@ export function ReportsGroup({ section, name, reports }: ReportsGroupProps) {
   const selectionDispatch = useSelectionDispatch();
 
   const groupKey = `${section}-${name}`;
-  const expanded = !!groupFocus[groupKey];
+  const expanded = !groupFocus[groupKey];
 
   return (
     <div className="reports-group">
@@ -34,7 +38,9 @@ export function ReportsGroup({ section, name, reports }: ReportsGroupProps) {
           focusDispatch({
             type: "report-group",
             key: groupKey,
-            value: !expanded,
+            value: expanded
+              ? ExpansionState.Collapsed
+              : ExpansionState.Expanded,
           });
         }}
       >

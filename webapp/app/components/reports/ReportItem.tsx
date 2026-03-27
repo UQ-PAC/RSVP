@@ -13,7 +13,7 @@ import {
 } from "../providers/SelectionContext";
 import { Report } from "../../types";
 import { useEffect, useRef } from "react";
-import { useFocusDispatch } from "../providers/FocusContext";
+import { ExpansionState, useFocusDispatch } from "../providers/FocusContext";
 
 interface ReportItemParams {
   report: Report;
@@ -85,7 +85,7 @@ export function ReportItem({ report }: ReportItemParams) {
               focusDispatch({
                 type: "source-file",
                 key: filename,
-                value: true,
+                value: ExpansionState.Expanded,
               });
             }
           }

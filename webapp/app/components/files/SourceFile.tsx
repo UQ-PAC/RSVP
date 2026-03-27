@@ -9,7 +9,11 @@ import {
   faSquareMinus,
   faSquarePlus,
 } from "@fortawesome/free-regular-svg-icons";
-import { useFocus, useFocusDispatch } from "../providers/FocusContext";
+import {
+  ExpansionState,
+  useFocus,
+  useFocusDispatch,
+} from "../providers/FocusContext";
 import { useSelectionDispatch } from "../providers/SelectionContext";
 
 interface SourceFileParams {
@@ -23,7 +27,7 @@ export function SourceFile({ filename, content, reports }: SourceFileParams) {
   const focusDispatch = useFocusDispatch();
   const selectionDispatch = useSelectionDispatch();
 
-  const expanded = !!focus[filename];
+  const expanded = !focus[filename];
 
   return (
     <div className={`source-file ${expanded ? "expanded" : "collapsed"}`}>
@@ -34,7 +38,9 @@ export function SourceFile({ filename, content, reports }: SourceFileParams) {
           focusDispatch({
             type: "source-file",
             key: filename,
-            value: !expanded,
+            value: expanded
+              ? ExpansionState.Collapsed
+              : ExpansionState.Expanded,
           });
         }}
       >

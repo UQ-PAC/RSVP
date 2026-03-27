@@ -11,7 +11,11 @@ import {
   useSelection,
   useSelectionDispatch,
 } from "../providers/SelectionContext";
-import { useFocus, useFocusDispatch } from "../providers/FocusContext";
+import {
+  ExpansionState,
+  useFocus,
+  useFocusDispatch,
+} from "../providers/FocusContext";
 
 interface CodeRenderParams {
   content: string;
@@ -117,19 +121,19 @@ export function CodeRender({ content, reports }: CodeRenderParams) {
                       focusDispatch({
                         type: "drawer",
                         key: "left",
-                        value: false,
+                        value: ExpansionState.Collapsed,
                       });
                       focusDispatch({
                         type: "drawer",
                         key: "right",
-                        value: true,
+                        value: ExpansionState.Expanded,
                       });
                     }
 
                     focusDispatch({
                       type: "report-group",
                       key: `${relevant?.severity}-${relevant?.primarySourceLocation.source?.filename}`,
-                      value: true,
+                      value: ExpansionState.Expanded,
                     });
                   }
 

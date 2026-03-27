@@ -2,7 +2,7 @@
 
 import { ReportsGroup } from "./ReportsGroup";
 import { Report, ReportSeverity } from "../../types";
-import { useFocusDispatch } from "../providers/FocusContext";
+import { ExpansionState, useFocusDispatch } from "../providers/FocusContext";
 
 interface ReportsSectionProps {
   title: string;
@@ -17,7 +17,7 @@ export function ReportsSection({
 }: ReportsSectionProps) {
   const focusDispatch = useFocusDispatch();
 
-  const toggleAll = (expand: boolean) => {
+  const toggleAll = (expand: ExpansionState) => {
     reports.forEach(([group]) => {
       focusDispatch({
         type: "report-group",
@@ -33,13 +33,16 @@ export function ReportsSection({
         <h4 className="reports-section-title">{title}</h4>
 
         <span className="reports-section-toggle">
-          <a className="reports-section-expand" onClick={() => toggleAll(true)}>
+          <a
+            className="reports-section-expand"
+            onClick={() => toggleAll(ExpansionState.Expanded)}
+          >
             EXPAND ALL
           </a>
           <span>|</span>
           <a
             className="reports-section-collapse"
-            onClick={() => toggleAll(false)}
+            onClick={() => toggleAll(ExpansionState.Collapsed)}
           >
             COLLAPSE ALL
           </a>

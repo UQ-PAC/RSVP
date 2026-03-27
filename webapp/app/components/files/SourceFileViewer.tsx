@@ -5,7 +5,11 @@ import { Report, SourceFileInfo } from "../../types";
 import { useEffect } from "react";
 import hljs from "highlight.js";
 import { CedarHighlight } from "./CedarHighlight";
-import { useFocus, useFocusDispatch } from "../providers/FocusContext";
+import {
+  ExpansionState,
+  useFocus,
+  useFocusDispatch,
+} from "../providers/FocusContext";
 interface SourceFileViewerParams {
   sources: SourceFileInfo[];
   reports?: Report[];
@@ -28,9 +32,17 @@ export function SourceFileViewer({ sources, reports }: SourceFileViewerParams) {
           <a
             className="source-files-upload-link"
             onClick={() => {
-              if (!drawerFocus["left"]) {
-                focusDispatch({ type: "drawer", key: "left", value: true });
-                focusDispatch({ type: "drawer", key: "right", value: false });
+              if (drawerFocus["left"] == ExpansionState.Collapsed) {
+                focusDispatch({
+                  type: "drawer",
+                  key: "left",
+                  value: ExpansionState.Expanded,
+                });
+                focusDispatch({
+                  type: "drawer",
+                  key: "right",
+                  value: ExpansionState.Collapsed,
+                });
               }
             }}
           >

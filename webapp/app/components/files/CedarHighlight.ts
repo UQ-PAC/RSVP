@@ -70,13 +70,5 @@ export const CedarHighlight = {
       scope: "operator",
       begin: /(\|\||&&|==|!=|>=|<=|>|<|!|-|\*|\+)/,
     },
-    {
-      scope: "function",
-      begin: /(?<=(\.|\s))(?!(permit|forbid))(\w+)(?=\s*\()/,
-    },
-    {
-      scope: "property",
-      begin: /(?<=(\.|\shas\s+))(\w+)(?=[\s\.\]\)])(?!\s?\()/,
-    },
   ],
 };

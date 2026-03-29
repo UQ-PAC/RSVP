@@ -1,21 +1,28 @@
 package uq.pac.rsvp;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.HashSet;
 
 import uq.pac.rsvp.policy.ast.Policy;
+import uq.pac.rsvp.policy.ast.PolicyFileEntry;
 import uq.pac.rsvp.policy.ast.PolicySet;
-import uq.pac.rsvp.policy.ast.expr.Expression;
+import uq.pac.rsvp.policy.ast.expr.PropertyAccessExpression;
+import uq.pac.rsvp.policy.ast.expr.RecordExpression;
+import uq.pac.rsvp.policy.ast.expr.SetExpression;
+import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
 import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
+import uq.pac.rsvp.policy.ast.expr.CallExpression;
+import uq.pac.rsvp.policy.ast.expr.ConditionalExpression;
 import uq.pac.rsvp.policy.ast.schema.Schema;
+import uq.pac.rsvp.policy.ast.visitor.PolicyVisitorImpl;
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.support.reporting.Report;
 import uq.pac.rsvp.support.reporting.Report.Severity;
 
 public class Verification {
 
-    public static List<Report> verifyPolicies(String filename, String policies) throws RsvpException {
+    public static Set<Report> verifyPolicies(String filename, String policies) throws RsvpException {
         return verify(PolicySet.parseCedarPolicySet(filename, policies), null);
     }
 
@@ -25,49 +32,96 @@ public class Verification {
     // Schema.parseCedarSchema(schema));
     // }
 
-    public static List<Report> verify(PolicySet policies, Schema schema) {
-        List<Report> reports = new ArrayList<>();
+    public static Set<Report> verify(PolicySet policies, Schema schema) {
+        RandomReportGenerator generator = new RandomReportGenerator();
 
-        Random r = new Random();
+        policies.accept(generator);
 
-        SourceLoc[] locations = new SourceLoc[2];
-        int i = 0;
+        return generator.reports;
+    }
 
-        for (Policy policy : policies) {
+    private static class RandomReportGenerator extends PolicyVisitorImpl {
 
-            // if (i % 4 == 3) {
-            // i++;
-            // continue;
-            // }
+        public final Set<Report> reports;
 
-            int severity = r.nextInt(100);
-            int detail = r.nextInt(100);
-            int loc = r.nextInt(100);
+        private final Random random;
 
-            if (i < 2) {
-                locations[i] = policy.getSourceLoc();
-            }
-
-            Expression cond = policy.getCondition();
-
-            // if (cond instanceof BinaryExpression) {
-            //     cond = ((BinaryExpression) cond).getLeft();
-            // }
-
-            reports.add(
-
-                    new Report(severity < 34 ? Severity.Info : severity < 67 ? Severity.Warning : Severity.Error,
-                            loc < 50 ? "This is a fantastic policy. Well done Angus."
-                                    : "This is an amazing policy condition. Congratulations.",
-                            cond.getSourceLoc() == SourceLoc.MISSING ? cond.toString()
-                                    : detail < 50 ? ""
-                                            : "This is a very detailed report on your policy. Your policy is truly a thing of beauty, and we should all aspire to emulate this policy.",
-                            loc < 50 ? policy.getSourceLoc() : cond.getSourceLoc(),
-                            i == 2 ? locations : new SourceLoc[0]));
-            i++;
+        RandomReportGenerator() {
+            reports = new HashSet<>();
+            random = new Random();
         }
 
-        return reports;
+        @Override
+        public void visitPolicy(Policy policy) {
+            maybeAddRandomReport(policy, 20);
+            super.visitPolicy(policy);
+        }
+
+        @Override
+        public void visitBinaryExpr(BinaryExpression expr) {
+            maybeAddRandomReport(expr, 5);
+            super.visitBinaryExpr(expr);
+        }
+
+        @Override
+        public void visitCallExpr(CallExpression expr) {
+            maybeAddRandomReport(expr, 5);
+            super.visitCallExpr(expr);
+        }
+
+        @Override
+        public void visitConditionalExpr(ConditionalExpression expr) {
+            maybeAddRandomReport(expr, 5);
+            super.visitConditionalExpr(expr);
+        }
+
+        @Override
+        public void visitPropertyAccessExpr(PropertyAccessExpression expr) {
+            maybeAddRandomReport(expr, 5);
+            super.visitPropertyAccessExpr(expr);
+        }
+
+        @Override
+        public void visitRecordExpr(RecordExpression expr) {
+            maybeAddRandomReport(expr, 5);
+            super.visitRecordExpr(expr);
+        }
+
+        @Override
+        public void visitSetExpr(SetExpression expr) {
+            maybeAddRandomReport(expr, 5);
+            super.visitSetExpr(expr);
+        }
+
+        @Override
+        public void visitUnaryExpr(UnaryExpression expr) {
+            maybeAddRandomReport(expr, 5);
+            super.visitUnaryExpr(expr);
+        }
+
+        private void maybeAddRandomReport(PolicyFileEntry entry, int probability) {
+            int p = random.nextInt(100);
+            SourceLoc loc = entry.getSourceLoc();
+            if (p <= probability && loc != SourceLoc.MISSING) {
+                reports.add(generateRandomReport(loc));
+            }        
+        }
+
+        private Report generateRandomReport(SourceLoc loc) {
+            int s = random.nextInt(100);
+            int m = random.nextInt(100);
+            int d = random.nextInt(100);
+
+            Severity severity = s < 34 ? Severity.Info : s < 67 ? Severity.Warning : Severity.Error;
+            String message = m < 34 ? "Fantastic. Great move. Well done Angus."
+                    : m < 67 ? "Ugly implementation" : "Who thought this was a good idea?";
+            String detail = d < 50 ? "" : "This is a very detailed report. "
+                            + "Look at all of the details that are included here. "
+                            + "So many details that need to be included in the report so that you can fully understand it.";
+
+            return new Report(severity, message, detail, loc);
+        }
+
     }
 
 }

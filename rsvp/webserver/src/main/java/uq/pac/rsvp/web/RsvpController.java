@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -14,11 +15,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.ErrorResponseException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +30,7 @@ import com.google.common.hash.Hashing;
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.Verification;
 import uq.pac.rsvp.support.reporting.Report;
+import uq.pac.rsvp.web.VerificationFileset.VersionedPolicy;
 
 @RestController
 @SpringBootApplication
@@ -91,25 +95,35 @@ public class RsvpController {
         return new String();
     }
 
-    @GetMapping("/reports")
-    public Set<Report> verify() throws RsvpException, IOException {
-        logger.info("GET /reports");
+    @PostMapping("/verify")
+    public Set<Report> verify(@Validated @RequestBody Set<VerificationFileset> verifications) throws RsvpException, IOException {
+        logger.info("POST /verify");
 
         Set<Report> result = new HashSet<>();
 
-        for (String hash : session.getHashes()) {
-            Path file = session.getFile(hash);
-            // logger.info(file.toString());
+        for (VerificationFileset verification : verifications) {
+            Set<List<VersionedPolicy>> versionedPolicies = verification.getPolicyFiles();
 
-            if (file.toString().endsWith(".cedar")) {
-                logger.info("Verifying: " + file);
+            for (List<VersionedPolicy> policy : versionedPolicies) {
+                if (policy.size() > 0) {
+                    // TODO: enable multiple files parsed to single policy set
+                    // TODO: handle multiple versions
+                    String fileId = policy.get(0).getId();
+                    Path file = session.getFile(policy.get(0).getId());
 
-                Set<Report> all = Verification.verifyPolicies(hash, Files.readString(file));
-                logger.info(all.toString());
+                    if (!file.toString().endsWith(".cedar")) {
+                        logger.error("Bad request: " + file.toString() + " is not a Cedar policy file.");
+                        throw new ErrorResponseException(HttpStatus.BAD_REQUEST);
+                    }
 
-                result.addAll(all);
+                    logger.info("Verifying: " + file);
 
-                break;
+                    Set<Report> all = Verification.verifyPolicies(fileId, Files.readString(file));
+                    logger.info(all.toString());
+
+                    result.addAll(all);
+
+                }
             }
         }
 

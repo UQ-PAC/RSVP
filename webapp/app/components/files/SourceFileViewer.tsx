@@ -19,7 +19,7 @@ export function SourceFileViewer({ sources, reports }: SourceFileViewerParams) {
   useEffect(() => {
     hljs.debugMode();
     hljs.registerLanguage("cedar", () => CedarHighlight);
-    hljs.configure({ ignoreUnescapedHTML: true });
+    // hljs.configure({ ignoreUnescapedHTML: true });
   }, []);
 
   const { drawer: drawerFocus } = useFocus();

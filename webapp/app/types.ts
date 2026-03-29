@@ -1,5 +1,3 @@
-export type filetype = "policy" | "schema" | "entity" | "invariant";
-
 export interface SourceFileInfo {
   filename: string;
   serverId: string;
@@ -24,6 +22,17 @@ export interface Report {
   severity: ReportSeverity;
   message: string;
   messageDetail?: string;
+}
+
+export type VersionedPolicy = {
+  version: string;
+  id: string;
+}[];
+export interface VerificationFileset {
+  policyFiles: VersionedPolicy[];
+  schemas: string[];
+  entities: string[];
+  invariants: string[];
 }
 
 export const sortReports = (reports: Report[]) =>

@@ -12,7 +12,12 @@ import { ReportViewer } from "./components/reports/ReportViewer";
 import { SelectionProvider } from "./components/providers/SelectionProvider";
 import { Drawer } from "./components/Drawer";
 import { Content } from "./components/Content";
-import { Report, sortReports, SourceFileInfo } from "./types";
+import {
+  Report,
+  sortReports,
+  SourceFileInfo,
+  VerificationFileset,
+} from "./types";
 import { FocusProvider } from "./components/providers/FocusProvider";
 
 export default function Home() {
@@ -68,12 +73,38 @@ export default function Home() {
     })),
   });
 
-  const verify = () =>
-    fetch("/api/reports")
+  const verify = () => {
+    const body = JSON.stringify(
+      sources.map(
+        (source) =>
+          ({
+            policyFiles: [[{ version: "v1", id: source.serverId }]],
+            schemas: [],
+            entities: [],
+            invariants: [],
+          }) as VerificationFileset,
+      ),
+    );
+
+    console.log(body);
+
+    // TODO: check if response is OK
+    return fetch("/api/verify", {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body,
+    })
       .then((res) => res.json())
       .then((reports) => reports.map(resolveFilenames))
       .then(sortReports)
-      .then(setReports);
+      .then(setReports)
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   return (
     <div className="app">

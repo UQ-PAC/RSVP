@@ -60,29 +60,39 @@ export function CodeRender({ content, reports }: CodeRenderParams) {
     const lines = content.slice(loc.offset, loc.offset + loc.len).split("\n");
     const nLines = lines.length;
 
-    let offset = 0;
+    let offset = loc.offset;
+
+    const partial =
+      report.primarySourceLocation.col !== 1 ||
+      content.charAt(loc.offset + loc.len) !== "\n";
 
     for (let line = loc.line; line < loc.line + nLines; line++) {
       if (!reportsByLine[line]) {
         reportsByLine[line] = [];
       }
 
+      const lineContent = lines[line - loc.line];
+
       let start: number | undefined = undefined;
       let end: number | undefined = undefined;
 
-      if (line === loc.line && loc.col !== 1) {
-        start = loc.col - 1;
-      }
+      if (partial) {
+        if (line === loc.line && loc.col !== 1) {
+          start = loc.col - 1;
+        } else {
+          const trimmed = lineContent.trimStart();
+          start = lineContent.length - trimmed.length || 1;
+        }
 
-      if (
-        line === loc.line + nLines &&
-        content.charAt(loc.offset + loc.len) !== "\n"
-      ) {
-        end = loc.offset + loc.len - offset - 1;
+        if (line === loc.line + nLines - 1) {
+          end = loc.offset + loc.len - offset + start;
+        } else {
+          end = start + lineContent.length;
+        }
       }
 
       reportsByLine[line].push({ report, start, end });
-      offset += lines[line - loc.line].length + 1;
+      offset += lineContent.length + 1;
     }
   });
 

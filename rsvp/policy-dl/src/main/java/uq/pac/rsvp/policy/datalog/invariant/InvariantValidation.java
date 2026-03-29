@@ -1,24 +1,28 @@
 package uq.pac.rsvp.policy.datalog.invariant;
 
+import com.cedarpolicy.model.entity.Entities;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.expr.*;
+import uq.pac.rsvp.policy.ast.schema.ActionDefinition;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.Schema;
-import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
-import uq.pac.rsvp.policy.ast.schema.common.LongType;
-import uq.pac.rsvp.policy.ast.schema.common.RecordTypeDefinition;
-import uq.pac.rsvp.policy.ast.schema.common.StringType;
+import uq.pac.rsvp.policy.ast.schema.common.*;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static uq.pac.rsvp.policy.datalog.invariant.Typing.*;
+
 public class InvariantValidation implements PolicyComputationVisitor<CommonTypeDefinition> {
 
+    private final Typing typing = new Typing();
     private final Map<String, RecordTypeDefinition> types;
     private final Map<String, RecordTypeDefinition> variables;
+    private final Map<String, RecordTypeDefinition> entities;
+    private final Map<String, RecordTypeDefinition> actions;
     private final Invariant invariant;
 
     public static class Error extends RuntimeException {
@@ -27,17 +31,24 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
         }
     }
 
-    public InvariantValidation(Schema schema, Invariant invariant) {
+    private CommonTypeDefinition collect(Expression expr) {
+        return Objects.requireNonNull(expr.compute(this));
+    }
+
+    public InvariantValidation(Schema schema, Entities entities, Invariant invariant) {
         this.types = new HashMap<>();
         this.variables = new HashMap<>();
         this.invariant = invariant;
 
-        schema.entityTypes().forEach(e -> {
-            Map<String, CommonTypeDefinition> attributes = e.getShapeAttributeNames().stream()
-                    .collect(Collectors.toMap(attr -> attr, e::getShapeAttributeType));
-            types.put(e.getName(), new RecordTypeDefinition(e.getName(), attributes));
-        });
-
+        // Build types from entities
+        schema.entityTypes().stream()
+                .map(typing::convert)
+                .forEach(e -> types.put(e.getName(), e));
+        // Build types from actions
+        schema.actions().stream()
+                .map(typing::convert)
+                .forEach(e -> types.put(e.getName(), e));
+        // Build variables cross-checking types
         invariant.getQuantifier().getVariables().forEach((var, type) -> {
             if (!types.containsKey(type)) {
                 throw new Error("invalid type: %s in quantifier: %s\nAvailable types: %s",
@@ -45,43 +56,34 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
             }
             variables.put(var, types.get(type));
         });
-    }
 
-    private final static BooleanType TBoolean = new BooleanType();
-    private final static StringType TString = new StringType();
-    private final static LongType TLong = new LongType();
+        // FIXME: ensure entities and actions have types
+        this.entities = entities.getEntities().stream().collect(Collectors.toMap(
+                e -> e.getEUID().toCedarExpr(),
+                e -> types.get(e.getEUID().getType().toString())));
 
-    private String typename(CommonTypeDefinition type) {
-        return switch (type) {
-            case BooleanType b -> "Boolean";
-            case LongType l -> "Long";
-            case StringType s -> "String";
-            case RecordTypeDefinition r -> r.getName();
-            default -> throw new AssertionError("Unsupported type: " + type);
-        };
-    }
-
-    private CommonTypeDefinition unsupported(Object o) {
-        throw new AssertionError("unsupported element: " + o);
+        this.actions = schema.actions().stream().collect(Collectors.toMap(
+            ActionDefinition::getQualifiedName, a -> types.get(a.getType())
+        ));
     }
 
     private void expect(Expression expr, CommonTypeDefinition expectedType, CommonTypeDefinition ...actualTypes) {
         for (CommonTypeDefinition actualType : actualTypes) {
             if (!expectedType.equals(actualType)) {
                 throw new Error("Expected %s type, got %s in expression: %s",
-                        typename(expectedType), typename(actualType), expr);
+                        Typing.name(expectedType), Typing.name(actualType), expr);
             }
         }
     }
 
     public void validate(Invariant invariant) {
-        expect(invariant.getExpression(), TBoolean, invariant.getExpression().compute(this));
+        expect(invariant.getExpression(), TBoolean, collect(invariant.getExpression()));
     }
 
     @Override
     public CommonTypeDefinition visitBinaryExpr(BinaryExpression expr) {
-        CommonTypeDefinition lhs = expr.getLeft().compute(this);
-        CommonTypeDefinition rhs = expr.getRight().compute(this);
+        CommonTypeDefinition lhs = collect(expr.getLeft());
+        CommonTypeDefinition rhs = collect(expr.getRight());
 
         return switch (expr.getOp()) {
             case Add, Sub, Mul -> {
@@ -106,19 +108,19 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
 
     @Override
     public CommonTypeDefinition visitPropertyAccessExpr(PropertyAccessExpression expr) {
-        CommonTypeDefinition objectType = expr.getObject().compute(this);
+        CommonTypeDefinition objectType = collect(expr.getObject());
         if (objectType instanceof RecordTypeDefinition rec) {
             CommonTypeDefinition attrType = rec.getAttributeType(expr.getProperty());
             if (attrType != null) {
                 return attrType;
             }
         }
-        throw new Error("Invalid property access: %s [%s: %s]", expr, expr.getObject(), typename(objectType));
+        throw new Error("Invalid property access: %s [%s: %s]", expr, expr.getObject(), Typing.name(objectType));
     }
 
     @Override
     public CommonTypeDefinition visitUnaryExpr(UnaryExpression expr) {
-        CommonTypeDefinition type = expr.getExpression().compute(this);
+        CommonTypeDefinition type = collect(expr.getExpression());
         return switch (expr.getOp()) {
             case Not -> {
                 expect(expr, TBoolean, type);
@@ -155,55 +157,63 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
         return TString;
     }
 
-
-    @Override
-    public CommonTypeDefinition visitCallExpr(CallExpression expr) {
-        return unsupported(expr);
-    }
-
-    @Override
-    public CommonTypeDefinition visitConditionalExpr(ConditionalExpression expr) {
-        return unsupported(expr);
-    }
-
-    @Override
-    public CommonTypeDefinition visitSetExpr(SetExpression expr) {
-        return unsupported(expr);
-    }
-
     @Override
     public CommonTypeDefinition visitEntityExpr(EntityExpression expr) {
-        return unsupported(expr);
+        String name = expr.getQualifiedName();
+        if (entities.containsKey(name)) {
+            return entities.get(name);
+        }
+        throw new Error("invalid type reference: %s", name);
     }
 
     @Override
     public CommonTypeDefinition visitActionExpr(ActionExpression expr) {
-        return unsupported(expr);
+        String name = expr.getQualifiedName();
+        if (actions.containsKey(name)) {
+            return actions.get(name);
+        }
+        throw new Error("invalid type reference: %s", name);
+    }
+
+    // == Unsupported
+
+    @Override
+    public CommonTypeDefinition visitCallExpr(CallExpression expr) {
+        throw new TranslationError("unsupported element: " + expr);
+    }
+
+    @Override
+    public CommonTypeDefinition visitConditionalExpr(ConditionalExpression expr) {
+        throw new TranslationError("unsupported element: " + expr);
+    }
+
+    @Override
+    public CommonTypeDefinition visitSetExpr(SetExpression expr) {
+        throw new TranslationError("unsupported element: " + expr);
     }
 
     @Override
     public CommonTypeDefinition visitTypeExpr(TypeExpression expr) {
-        return unsupported(expr);
+        throw new TranslationError("unsupported element: " + expr);
     }
 
-    // == Unsupported
     @Override
     public CommonTypeDefinition visitSlotExpr(SlotExpression expr) {
-        return unsupported(expr);
+        throw new TranslationError("unsupported element: " + expr);
     }
 
     @Override
     public CommonTypeDefinition visitPolicySet(PolicySet policies) {
-        return unsupported(policies);
+        throw new TranslationError("unsupported element: " + policies);
     }
 
     @Override
     public CommonTypeDefinition visitPolicy(Policy policy) {
-        return unsupported(policy);
+        throw new TranslationError("unsupported element: " + policy);
     }
 
     @Override
     public CommonTypeDefinition visitRecordExpr(RecordExpression expr) {
-        return unsupported(expr);
+        throw new TranslationError("unsupported element: " + expr);
     }
 }

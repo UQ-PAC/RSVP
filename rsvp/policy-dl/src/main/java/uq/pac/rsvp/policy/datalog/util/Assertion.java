@@ -24,7 +24,7 @@ public class Assertion {
 
     public static void requireNonNull(Object ...objects) {
         for (Object o : objects) {
-            require(o == null, "Unexpected nullified object");
+            require(o != null, "Unexpected nullified object");
         }
     }
 

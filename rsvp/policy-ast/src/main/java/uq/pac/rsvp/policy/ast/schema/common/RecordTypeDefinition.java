@@ -59,6 +59,10 @@ public class RecordTypeDefinition extends CommonTypeDefinition {
         return Set.copyOf(attributes.keySet());
     }
 
+    public Map<String, CommonTypeDefinition> getAttributes() {
+        return Map.copyOf(attributes);
+    }
+
     public CommonTypeDefinition getAttributeType(String name) {
         return attributes.get(name);
     }

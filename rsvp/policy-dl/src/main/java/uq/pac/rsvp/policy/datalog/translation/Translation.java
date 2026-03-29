@@ -99,7 +99,7 @@ public class Translation {
      * - remove actions (as entities)
      * - add implicit entities from enums
      */
-    static Entities updateEntities(Entities entities, Schema schema) {
+    public static Entities updateEntities(Entities entities, Schema schema) {
         // When we are given an entity set it can also include actions,
         // remove those from the set of entities, as we treat them differently
         // and pull action-related information from the schema

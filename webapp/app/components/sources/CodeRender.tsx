@@ -6,7 +6,7 @@ import hljs from "highlight.js";
 import { JSX, useEffect, useRef } from "react";
 import { Roboto_Mono } from "next/font/google";
 
-import { Report } from "../../types";
+import { FileSyntax, Report } from "../../types";
 import {
   useSelection,
   useSelectionDispatch,
@@ -16,10 +16,10 @@ import {
   useFocus,
   useFocusDispatch,
 } from "../providers/FocusContext";
-import { renderToString } from "react-dom/server";
 
 interface CodeRenderParams {
   content: string;
+  syntax: FileSyntax;
   reports: Report[];
 }
 
@@ -31,7 +31,7 @@ const robotoMono = Roboto_Mono({
 //     line-based highlight (starts or ends mid-line)
 //     scroll to primary or top unless explicitely clicked on line
 // FIXME: multiple reports per line....?
-export function CodeRender({ content, reports }: CodeRenderParams) {
+export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
   const { selected, hovered, scroll } = useSelection();
   const selectionDispatch = useSelectionDispatch();
 
@@ -55,34 +55,49 @@ export function CodeRender({ content, reports }: CodeRenderParams) {
     [line: number]: { report: Report; start?: number; end?: number }[];
   } = {};
 
+  const highlight = (text: string) =>
+    hljs.highlight(text, {
+      language: syntax,
+    }).value;
+
   reports.forEach((report) => {
     const loc = report.primarySourceLocation;
     const lines = content.slice(loc.offset, loc.offset + loc.len).split("\n");
     const nLines = lines.length;
 
-    let offset = 0;
+    let offset = loc.offset;
+
+    const partial =
+      report.primarySourceLocation.col !== 1 ||
+      content.charAt(loc.offset + loc.len) !== "\n";
 
     for (let line = loc.line; line < loc.line + nLines; line++) {
       if (!reportsByLine[line]) {
         reportsByLine[line] = [];
       }
 
+      const lineContent = lines[line - loc.line];
+
       let start: number | undefined = undefined;
       let end: number | undefined = undefined;
 
-      if (line === loc.line && loc.col !== 1) {
-        start = loc.col - 1;
-      }
+      if (partial) {
+        if (line === loc.line && loc.col !== 1) {
+          start = loc.col - 1;
+        } else {
+          const trimmed = lineContent.trimStart();
+          start = lineContent.length - trimmed.length || 1;
+        }
 
-      if (
-        line === loc.line + nLines &&
-        content.charAt(loc.offset + loc.len) !== "\n"
-      ) {
-        end = loc.offset + loc.len - offset - 1;
+        if (line === loc.line + nLines - 1) {
+          end = loc.offset + loc.len - offset + start;
+        } else {
+          end = start + lineContent.length;
+        }
       }
 
       reportsByLine[line].push({ report, start, end });
-      offset += lines[line - loc.line].length + 1;
+      offset += lineContent.length + 1;
     }
   });
 
@@ -120,31 +135,20 @@ export function CodeRender({ content, reports }: CodeRenderParams) {
 
     if (relevant?.start || relevant?.end) {
       const begin = relevant?.start
-        ? hljs.highlight(line.slice(0, relevant.start), {
-            language: "cedar",
-          }).value
+        ? highlight(line.slice(0, relevant.start))
         : "";
       const mid =
         `<span class="source-report-text-highlight source-report-text-highlight-${relevant?.report.severity}"` +
-        `data-report="${relevant?.report.id}">${
-          hljs.highlight(line.slice(relevant?.start ?? 0, relevant?.end), {
-            language: "cedar",
-          }).value
-        }</span>`;
-      const end = relevant?.end
-        ? hljs.highlight(line.slice(relevant.end), {
-            language: "cedar",
-          }).value
-        : "";
+        `data-report="${relevant?.report.id}">${highlight(
+          line.slice(relevant?.start ?? 0, relevant?.end),
+        )}</span>`;
+      const end = relevant?.end ? highlight(line.slice(relevant.end)) : "";
 
       highlighted = begin + mid + end;
     } else {
-      highlighted = hljs.highlight(line, {
-        language: "cedar",
-      }).value;
+      highlighted = highlight(line);
     }
 
-    // console.log(line);
     code.push(
       <span key={`line-${n}`} className="source-file-line-number"></span>,
       <span
@@ -178,7 +182,7 @@ export function CodeRender({ content, reports }: CodeRenderParams) {
 
                   focusDispatch({
                     type: "report-group",
-                    key: `${relevant?.report.severity}-${relevant?.report.primarySourceLocation.source?.filename}`,
+                    key: `${relevant?.report.severity}-${relevant?.report.primarySourceLocation.source?.file.name}`,
                     value: ExpansionState.Expanded,
                   });
                 }

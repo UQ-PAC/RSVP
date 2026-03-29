@@ -80,7 +80,7 @@ export function ReportItem({ report }: ReportItemParams) {
         className="report-item-header"
         onClick={() => {
           if (!isSelected) {
-            const filename = report.primarySourceLocation.source?.filename;
+            const filename = report.primarySourceLocation.source?.file.name;
             if (filename) {
               focusDispatch({
                 type: "source-file",
@@ -101,7 +101,7 @@ export function ReportItem({ report }: ReportItemParams) {
         >
           {report.message}
           <span className="report-item-line-info">
-            {`  (${report.primarySourceLocation.source?.filename}:${report.primarySourceLocation.line}:${report.primarySourceLocation.col})`}
+            {`  (${report.primarySourceLocation.source?.file.name}:${report.primarySourceLocation.line}:${report.primarySourceLocation.col})`}
           </span>
         </span>
 

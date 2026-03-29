@@ -27,9 +27,10 @@ interface FocusAction {
   value: ExpansionState;
 }
 
-export function reducer(context: FocusState, action: FocusAction): FocusState {
-  console.log(JSON.stringify(action));
-
+export function focusReducer(
+  context: FocusState,
+  action: FocusAction,
+): FocusState {
   const updatedContext = { ...context };
   const updatedTarget = { ...context[action.type] };
 

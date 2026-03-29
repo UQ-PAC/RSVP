@@ -2,24 +2,9 @@ import hljs, { Mode } from "highlight.js";
 
 const IDENT = "[a-zA-Z_$][a-zA-Z_$0-9]*";
 
-export const CedarHighlight = {
-  // or with an array
+export const InvariantHighlight = {
   keywords: {
-    keyword: [
-      "permit",
-      "forbid",
-      "appliesTo",
-      "when",
-      "unless",
-      "is",
-      "in",
-      "if",
-      "then",
-      "else",
-      "has",
-      "like",
-      "__cedar",
-    ],
+    keyword: ["allow", "deny", "for", "none", "some", "all"],
     literal: ["true", "false"],
     pragma: [
       "principal",
@@ -48,7 +33,7 @@ export const CedarHighlight = {
     hljs.REGEXP_MODE,
     {
       scope: "annotation",
-      begin: "@" + IDENT,
+      begin: "@invariant",
       contains: [
         {
           begin: /\(/,
@@ -67,8 +52,12 @@ export const CedarHighlight = {
       ] as ("self" | Mode)[],
     },
     {
+      scope: "type",
+      begin: "(?<=:)\s*" + IDENT + "(?=[,;])",
+    },
+    {
       scope: "operator",
-      begin: /(\|\||&&|==|!=|>=|<=|>|<|!|-|\*|\+)/,
+      begin: /(\|\||-->|&&|==|!=|>=|<=|>|<|!|-|\*|\+)/,
     },
   ],
 };

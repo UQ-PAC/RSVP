@@ -2,7 +2,7 @@
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { Report } from "../../types";
+import { FileSyntax, FileType, Report } from "../../types";
 import { faFileLines } from "@fortawesome/free-regular-svg-icons/faFileLines";
 import { CodeRender } from "./CodeRender";
 import {
@@ -15,19 +15,51 @@ import {
   useFocusDispatch,
 } from "../providers/FocusContext";
 import { useSelectionDispatch } from "../providers/SelectionContext";
+import { useEffect, useState } from "react";
 
 interface SourceFileParams {
   filename: string;
-  content: string;
-  reports: Report[];
+  filetype: FileType;
+  content: Promise<string>;
+  reports: Promise<Report[]>;
 }
 
-export function SourceFile({ filename, content, reports }: SourceFileParams) {
+export function SourceFile({
+  filename,
+  filetype,
+  content,
+  reports,
+}: SourceFileParams) {
+  const [code, setCode] = useState("");
+  const [resolvedReports, setResolvedReports] = useState<Report[]>([]);
+
   const { "source-file": focus } = useFocus();
   const focusDispatch = useFocusDispatch();
   const selectionDispatch = useSelectionDispatch();
 
   const expanded = !focus[filename];
+
+  let syntax: FileSyntax | undefined = undefined;
+
+  switch (filetype) {
+    case "cedar":
+    case "cedarschema":
+      syntax = "cedar";
+      break;
+    case "entities":
+      syntax = "entities";
+      break;
+    case "invariant":
+      syntax = "invariant";
+  }
+
+  useEffect(() => {
+    content.then((code) => setCode(code));
+  }, [content]);
+
+  useEffect(() => {
+    reports.then((resolved) => setResolvedReports(resolved));
+  }, [reports]);
 
   return (
     <div className={`source-file ${expanded ? "expanded" : "collapsed"}`}>
@@ -51,7 +83,9 @@ export function SourceFile({ filename, content, reports }: SourceFileParams) {
           icon={expanded ? faSquareMinus : faSquarePlus}
         />
       </div>
-      {expanded && <CodeRender content={content} reports={reports} />}
+      {expanded && (
+        <CodeRender content={code} syntax={syntax} reports={resolvedReports} />
+      )}
     </div>
   );
 }

@@ -13,7 +13,7 @@ entity has name && entity has clinics && entity has roles
 // 3. Veterinarian should have level.
 @invariant("Veterinarian data.")
 entity.roles.contains(PetClinic::EmployeeRole::"Veterinarian") --> entity has level
-    for all entity: petclinic::Employee;
+    for all entity: PetClinic::Employee;
 
 // 4. Only Veterinarian can be "Resident", "Registrar", or "Specialist".
 @invariant("Resident, Registrar, or Specialist.")
@@ -22,7 +22,7 @@ entity.roles.contains(PetClinic::EmployeeRole::"Veterinarian") --> entity has le
     entity.level == PetClinic::ProfessionalLevel::"Registrar" ||
     entity.level == PetClinic::ProfessionalLevel::"Specialist"
 ) --> entity.roles.contains(PetClinic::EmployeeRole::"Veterinarian")
-    for all entity: petclinic::Employee;
+    for all entity: PetClinic::Employee;
 
 // 5. Every "Intern" and "Registrar" must have a manager.
 @invariant("Intern and Registrar manager.")

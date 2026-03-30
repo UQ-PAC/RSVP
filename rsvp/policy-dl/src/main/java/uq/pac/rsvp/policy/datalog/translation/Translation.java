@@ -61,7 +61,7 @@ public class Translation {
             this.policyDeclarations = HashBiMap.create();
             int index = 1;
             for (Policy p : policies) {
-                policyDeclarations.put(p, TranslationConstants.makePolicyRuleDecl(p, index++));
+                policyDeclarations.put(p, TranslationConstants.makePolicyRuleDecl(index++));
             }
 
             this.invariantDeclarations = HashBiMap.create();

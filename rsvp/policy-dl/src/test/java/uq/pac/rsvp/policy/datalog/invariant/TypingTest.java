@@ -7,6 +7,7 @@ import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.TestUtil;
 import uq.pac.rsvp.policy.datalog.translation.Translation;
+import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 import uq.pac.rsvp.policy.datalog.util.Logger;
 
 import java.io.IOException;
@@ -49,6 +50,15 @@ public class TypingTest {
 
             // +, -, * are only over numeric types
             "alice.age == (bob.age - 1)  for all alice: Account, bob: Account",
+
+            // Equality, inequality over Long, String, Bool or Entity is ok
+            "alice == bob for all alice: Account, bob: Account",
+            "alice == bob for all alice: Action, bob: Action",
+            "alice.age == bob.age for all alice: Account, bob: Account",
+            "alice.age == bob.age for all alice: Account, bob: Account",
+            "one.code == another.code for all one: PhotoPermission, another: PhotoPermission",
+            "one.permission.read == another.permission.write for all one: PhotoPermission, another: PhotoPermission",
+
     })
     void ok(String invariantText) {
         String text = """
@@ -70,26 +80,57 @@ public class TypingTest {
             "principal.age for all principal: Account",
             "Account::\"Alice\"",
 
-            // Invalid entity name
+            // Invalid entity name (type reference)
             "principal == Accounts::\"Alice\" for all principal: Account",
             "principal == Account::\"Alic\" for all principal: Account",
 
-            // Invalid action name
+            // Invalid action name (type reference)
             "action == Action::\"createAlbu\" for all action: Action",
             "action == Actions::\"createAlbum\" for all action: Action",
 
+            // Invalid property access
+            "one.codes == another.code for all one: PhotoPermission, another: PhotoPermission",
+            "one.permissions.read == another.permission.read for all one: PhotoPermission, another: PhotoPermission",
+            "one.permission.reads == another.permission.read for all one: PhotoPermission, another: PhotoPermission",
+
             // Arithmetic negation is only over numeric types
             "-action == Actions::\"createAlbum\" for all action: Action",
+
             // Logical negation is only over boolean types
             "!action == Actions::\"createAlbum\" for all action: Action",
 
             // +, -, * are only over numeric types
-            "alice.age == (bob.age - 1)  for all alice: Account, bob: Account",
+            "alice.age == (bob.name - 1)  for all alice: Account, bob: Account",
+            "alice.age == (bob.name * 1)  for all alice: Account, bob: Account",
+            "alice.age == (bob.name + 1)  for all alice: Account, bob: Account",
 
+            // ==/!= can cannot be over records or sets
+            "alice.friends == bob.friends for all alice: Account, bob: Account",
+            "one.permission == another.permission for all one: PhotoPermission, another: PhotoPermission",
+
+            // && only over boolean types
+            "alice.age && bob.name  for all alice: Account, bob: Account",
+            "alice.age || bob.name  for all alice: Account, bob: Account",
+
+            // Less/Greater operators only over boolean types
+            "alice.age > bob.name for all alice: Account, bob: Account",
+            "alice.age >= bob.name for all alice: Account, bob: Account",
+            "alice.age < bob.name for all alice: Account, bob: Account",
+            "alice.age <= bob.name for all alice: Account, bob: Account",
+
+            // Quantifier: Ungrounded variable
+            "actions == Action::\"createAlbum\" for all action: Action",
+
+            // Quantifier: duplicate variable name
+            "alice.age == alice.age for all alice: Account, alice: Account",
+
+            // Quantifier: type does not exist
+            "alice.age == alice.age for all alice: Accounts",
     })
     void fail(String text) {
         try {
             ok(text);
+            throw new TranslationError("Unexpected test pass for invariant: " + text);
         } catch (InvariantValidation.Error error) {
             logger.info(MAGENTA, "    Expected error: " + error.getMessage());
         }

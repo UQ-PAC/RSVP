@@ -78,10 +78,9 @@ public class TranslationVisitor extends VoidVisitorAdapter {
         // Grounding terms for typed variables of is straightforward in that
         // each variable belongs to the entity relation defined by its type
         visitor.expressions.add(new DLInlineComment("Ground terms"));
-        quantifier.variables().forEach(var -> {
-            String type = quantifier.getType(var);
-            DLRuleDecl entityDecl = schema.getTranslationEntityType(type).getEntityRuleDecl();
-            visitor.expressions.add(new DLAtom(entityDecl, DLTerm.var(var)));
+        quantifier.getVariables().forEach(var -> {
+            DLRuleDecl entityDecl = schema.getTranslationEntityType(var.type()).getEntityRuleDecl();
+            visitor.expressions.add(new DLAtom(entityDecl, DLTerm.var(var.name())));
         });
 
         exprs.forEach(e -> {

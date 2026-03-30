@@ -62,10 +62,11 @@ public class InvariantSet {
                     String name = str.substring(1, str.length() - 1);
                     if (inv.quantifier() != null) {
                         Quantifier.Scope scope = Quantifier.Scope.valueOf(inv.quantifier().quant.getText().toUpperCase());
-                        Map<String, String> variables = new HashMap<>();
-                        inv.quantifier().typedVariable().forEach(tv -> {
-                            variables.put(tv.variable().getText(), ExpressionVisitor.getTypeExpression(tv.type()).getValue());
-                        });
+                        List<Quantifier.Variable> variables =
+                                inv.quantifier().typedVariable().stream().map(tv ->
+                                        new Quantifier.Variable(tv.variable().getText(),
+                                                ExpressionVisitor.getTypeExpression(tv.type()).getValue()))
+                                .toList();
                         quantifier = new Quantifier(scope, variables);
                     }
                     return new Invariant(name, quantifier, expr);

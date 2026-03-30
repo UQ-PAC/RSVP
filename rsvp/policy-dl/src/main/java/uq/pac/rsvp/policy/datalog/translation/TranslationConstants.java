@@ -1,7 +1,6 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
 import com.cedarpolicy.value.EntityUID;
-import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.datalog.ast.*;
 import uq.pac.rsvp.policy.datalog.invariant.Invariant;
@@ -184,7 +183,7 @@ public class TranslationConstants {
     /**
      * Get a declaration for a single policy rule
      */
-    public static DLRuleDecl makePolicyRuleDecl(Policy policy, int index) {
+    public static DLRuleDecl makePolicyRuleDecl(int index) {
         return makePolicyRuleDecl(PolicyPrefix + index);
     }
 
@@ -198,8 +197,8 @@ public class TranslationConstants {
      */
     public static DLRuleDecl makeInvariantRuleDecl(Invariant invariant, int index) {
         String name = InvariantPrefix + index;
-        List<DLDeclTerm> terms = invariant.getQuantifier().variables()
-                .map(v -> new DLDeclTerm(v, DLType.SYMBOL))
+        List<DLDeclTerm> terms = invariant.getQuantifier().getVariables().stream()
+                .map(v -> new DLDeclTerm(v.name(), DLType.SYMBOL))
                 .toList();
         return new DLRuleDecl(name, terms);
     }

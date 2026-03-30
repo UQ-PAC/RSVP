@@ -5,6 +5,7 @@ import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.common.*;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
+import uq.pac.rsvp.policy.datalog.util.Util;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +35,7 @@ class Typing {
                 yield new RecordTypeDefinition(null, attrs);
             }
             case EntityTypeReference t -> {
-                EntityTypeReference ref = references.get(t.getName());
+                EntityTypeReference ref = references.get(t.getDefinition().getName());
                 if (ref == null) {
                     references.put(t.getName(), t);
                     ref = t;
@@ -56,13 +57,13 @@ class Typing {
 
     static String name(CommonTypeDefinition type) {
         return switch (type) {
-            case BooleanType b -> "Boolean";
-            case LongType l -> "Long";
-            case StringType s -> "String";
+            case BooleanType b -> "__cedar::Bool";
+            case LongType l -> "__cedar::Long";
+            case StringType s -> "__cedar::String";
+            case EntityTypeReference r -> r.getDefinition().getName();
             case RecordTypeDefinition r -> r.getName() == null ? "::AnonymousRecord" : r.getName();
             case SetTypeDefinition s -> "Set<" + name(s.getElementType()) + ">";
             default -> throw new AssertionError("Unsupported type: " + type);
         };
     }
-
 }

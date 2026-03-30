@@ -49,12 +49,16 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
                 .map(typing::convert)
                 .forEach(e -> types.put(e.getName(), e));
         // Build variables cross-checking types
-        invariant.getQuantifier().getVariables().forEach((var, type) -> {
-            if (!types.containsKey(type)) {
-                throw new Error("invalid type: %s in quantifier: %s\nAvailable types: %s",
-                        type, invariant.getQuantifier(), types.keySet());
+        invariant.getQuantifier().getVariables().forEach(var -> {
+            if (!types.containsKey(var.type())) {
+                throw new Error("invalid type: %s in quantifier: %s. Available types: %s",
+                        var.type(), invariant.getQuantifier(), types.keySet());
             }
-            variables.put(var, types.get(type));
+            if (variables.containsKey(var.name())) {
+                throw new Error("duplicate variable name: %s in quantifier: %s",
+                        var.name(), invariant.getQuantifier());
+            }
+            variables.put(var.name(), types.get(var.type()));
         });
 
         // FIXME: ensure entities and actions have types
@@ -65,6 +69,26 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
         this.actions = schema.actions().stream().collect(Collectors.toMap(
             ActionDefinition::getQualifiedName, a -> types.get(a.getType())
         ));
+    }
+
+
+    /**
+     * Types supported by the equality operator so far
+     */
+    private void expectEquatable(Expression expr, CommonTypeDefinition t) {
+        boolean eq =  switch (t) {
+            case BooleanType b -> true;
+            case LongType l -> true;
+            case StringType s -> true;
+            case EntityTypeReference r -> true;
+            case RecordTypeDefinition r -> r.getName() != null;
+            default -> false;
+        };
+
+        if (!eq) {
+            throw new Error("expected Bool, String, Long, Entity or Action, got "
+                    + Typing.name(t) + " in expression: " + expr);
+        }
     }
 
     private void expect(Expression expr, CommonTypeDefinition expectedType, CommonTypeDefinition ...actualTypes) {
@@ -96,6 +120,7 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
             }
             case Eq, Neq -> {
                 expect(expr, lhs, rhs);
+                expectEquatable(expr, lhs);
                 yield TBoolean;
             }
             case Or, And -> {

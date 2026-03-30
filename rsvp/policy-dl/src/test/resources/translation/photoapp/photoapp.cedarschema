@@ -19,6 +19,15 @@ entity Photo = {
     type: String
 };
 
+entity PhotoPermission = {
+    code: String,
+    index: Long,
+    permission: {
+        read: Bool,
+        write: Bool
+    }
+};
+
 action "viewPhoto" appliesTo {
     principal: Account,
     resource: Photo,

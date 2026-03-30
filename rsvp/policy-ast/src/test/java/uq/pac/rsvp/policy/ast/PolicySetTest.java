@@ -149,7 +149,7 @@ public class PolicySetTest {
         void testDeserialisation(String file, String expected) throws IOException {
             URL url = ClassLoader.getSystemResource(file);
             String json = Files.readString(Path.of(url.getPath()));
-            PolicySet policies = JsonParser.parsePolicySet(json);
+            PolicySet policies = JsonParser.parsePolicySet("file.json", json, "");
             assertEquals(expected, policies.toString());
         }
     }

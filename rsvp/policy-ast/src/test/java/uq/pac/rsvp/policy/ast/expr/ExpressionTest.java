@@ -56,7 +56,7 @@ public class ExpressionTest {
         void testDeserialisation() throws IOException, URISyntaxException {
             URL url = ClassLoader.getSystemResource("expr.ast.json");
             String json = Files.readString(Path.of(url.toURI()));
-            PolicySet policies = JsonParser.parsePolicySet(json);
+            PolicySet policies = JsonParser.parsePolicySet("file.json", json, "");
 
             String[] expected = {
                     "((principal.role == \"normie\") && ([\"secret\", \"top secret\"].contains(resource.access) || (resource has \"leaked\")))",
@@ -90,7 +90,7 @@ public class ExpressionTest {
         void testInvalidAstFile() throws IOException, URISyntaxException {
             URL url = ClassLoader.getSystemResource("invalid.ast.json");
             String json = Files.readString(Path.of(url.toURI()));
-            assertThrows(JsonParseException.class, () -> JsonParser.parsePolicySet(json));
+            assertThrows(JsonParseException.class, () -> JsonParser.parsePolicySet("file.json", json, ""));
         }
 
         @Test
@@ -99,7 +99,7 @@ public class ExpressionTest {
             URL url = ClassLoader.getSystemResource("is.ast.json");
             String json = Files.readString(Path.of(url.toURI()));
 
-            PolicySet policies = JsonParser.parsePolicySet(json);
+            PolicySet policies = JsonParser.parsePolicySet("file.json", json, "");
 
             Expression condition = policies.getFirst().getCondition();
             assertTrue(condition instanceof BinaryExpression);

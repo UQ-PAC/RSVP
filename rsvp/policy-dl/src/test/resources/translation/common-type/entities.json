@@ -1,0 +1,94 @@
+[
+    {
+        "uid": { "type": "Directory", "id": "/etc" },
+        "attrs": {
+            "path": "/etc",
+            "access": "readonly",
+            "permission": {
+                "read" : false,
+                "write": false,
+                "exec" : true
+            }
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "Directory", "id": "/bin" },
+        "attrs": {
+            "path": "/bin",
+            "access": "readonly",
+            "permission": {
+                "read" : true,
+                "write": false,
+                "exec" : true
+            }
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "File", "id": "/etc/apt.conf" },
+        "attrs": {
+            "path": "/etc/apt.conf",
+            "access": "readonly",
+            "permission": {
+                "read" : true,
+                "write": false,
+                "exec" : false
+            }
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "File", "id": "/etc/passwd" },
+        "attrs": {
+            "path": "/etc/passwd",
+            "access": "readonly",
+            "permission": {
+                "read" : false,
+                "write": false,
+                "exec" : false
+            }
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "File", "id": "/bin/ls" },
+        "attrs": {
+            "path": "/bin/ls",
+            "access": "readonly",
+            "permission": {
+                "read" : true,
+                "write": false,
+                "exec" : true
+            }
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "File", "id": "/bin/cat" },
+        "attrs": {
+            "path": "/bin/cat",
+            "access": "readonly",
+            "permission": {
+                "read" : true,
+                "write": false,
+                "exec" : true
+            }
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "File", "id": "/usr/local/bin/cedar" },
+        "attrs": {
+            "path": "/usr/local/bin/cedar",
+            "access": "readwrite",
+            "permission": {
+                "read" : true,
+                "write": false,
+                "exec" : true
+            }
+        },
+        "parents": [ ]
+    }
+
+]

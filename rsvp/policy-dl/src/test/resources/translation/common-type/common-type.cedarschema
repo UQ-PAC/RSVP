@@ -1,0 +1,34 @@
+entity File = {
+    path: Path,
+    access: FileAttr,
+    permission: FilePermission
+};
+
+entity Directory = {
+    access: DirAttr,
+    path: Path,
+    permission: DirPermission
+};
+
+type FileAttr = String;
+type DirAttr = String;
+type FilePermission = {
+    read: Bool,
+    write: Bool,
+    exec: Bool
+};
+
+type DirPermission = {
+    read: Bool,
+    write: Bool,
+    exec: Bool
+};
+
+type Path = String;
+
+action "introspect" appliesTo {
+    principal: [File, Directory],
+    resource: [File, Directory]
+};
+
+

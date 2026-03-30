@@ -5,4 +5,3 @@ permit (
 ) when {
     principal.ancestor == resource
 };
-

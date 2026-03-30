@@ -12,9 +12,11 @@ import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static uq.pac.rsvp.policy.datalog.invariant.Typing.*;
+import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
 public class InvariantValidation implements PolicyComputationVisitor<CommonTypeDefinition> {
 
@@ -72,6 +74,12 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
     }
 
 
+    private void expectRecord(Expression expr, CommonTypeDefinition t) {
+        if (!(t instanceof RecordTypeDefinition)) {
+            throw new Error("expected Record, Entity or Action, got " + Typing.name(t) + " in expression: " + expr);
+        }
+    }
+
     /**
      * Types supported by the equality operator so far
      */
@@ -125,6 +133,11 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
             }
             case Or, And -> {
                 expect(expr, TBoolean, lhs, rhs);
+                yield TBoolean;
+            }
+            case HasAttr -> {
+                expectRecord(expr, lhs);
+                expect(expr, TString, rhs);
                 yield TBoolean;
             }
             default -> throw new TranslationError("Unsupported");

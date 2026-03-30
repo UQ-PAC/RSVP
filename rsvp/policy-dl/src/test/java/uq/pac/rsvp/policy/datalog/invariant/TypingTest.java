@@ -126,6 +126,9 @@ public class TypingTest {
 
             // Quantifier: type does not exist
             "alice.age == alice.age for all alice: Accounts",
+
+            // has: expects record-like types
+            "alice.age has bar for all alice: Account",
     })
     void fail(String text) {
         try {

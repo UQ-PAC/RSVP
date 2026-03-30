@@ -124,7 +124,7 @@ public class ParserTest {
             for some resource: Resource::Picture::Kind;
         @invariant("i27")
         ((resource.foo == "foo") && (principal.bar == "bar"))
-            for all principal: Album::Photo, resource: Resource::Picture;
+            for all resource: Resource::Picture, principal: Album::Photo;
         @invariant("i28")
         ((-1 + (2 * 3)) == ((6 * 7) + 8));
         """;

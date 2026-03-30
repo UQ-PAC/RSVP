@@ -1,3 +1,5 @@
+export type FileType = "cedar" | "cedarschema" | "entities" | "invariant";
+export type FileSyntax = "cedar" | "json" | "invariant";
 export interface SourceFileInfo {
   filename: string;
   serverId: string;

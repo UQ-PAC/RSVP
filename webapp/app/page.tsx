@@ -116,7 +116,7 @@ export default function Home() {
             verify={verify}
           />
           <Content>
-            <Drawer title="Files" side="left">
+            <Drawer title="Policy sets" side="left">
               <FilePond
                 files={files.map((item) => item.file)}
                 // onupdatefiles={setFiles}

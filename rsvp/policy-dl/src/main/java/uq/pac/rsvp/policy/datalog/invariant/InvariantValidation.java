@@ -12,11 +12,9 @@ import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static uq.pac.rsvp.policy.datalog.invariant.Typing.*;
-import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
 public class InvariantValidation implements PolicyComputationVisitor<CommonTypeDefinition> {
 
@@ -73,6 +71,15 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
         ));
     }
 
+    private void expectEntityType(Expression expr, CommonTypeDefinition t) {
+        if (t instanceof RecordTypeDefinition rec) {
+            String type = rec.getName();
+            if (!type.endsWith("::Action") && !type.equals("Action")) {
+                return;
+            }
+        }
+        throw new Error("Expected entity type, got: " + Typing.name(t) + " in expression: " + expr);
+    }
 
     private void expectRecord(Expression expr, CommonTypeDefinition t) {
         if (!(t instanceof RecordTypeDefinition)) {
@@ -138,6 +145,18 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
             case HasAttr -> {
                 expectRecord(expr, lhs);
                 expect(expr, TString, rhs);
+                yield TBoolean;
+            }
+            // FIXME: Need to check how in behaves WRT to different types
+            case Is -> {
+                expectRecord(expr, lhs);
+                expect(expr, TEntityType, rhs);
+                yield TBoolean;
+            }
+            // FIXME: Need to check how in behaves WRT to different types
+            case In -> {
+                expectEntityType(expr, lhs);
+                expectEntityType(expr, rhs);
                 yield TBoolean;
             }
             default -> throw new TranslationError("Unsupported");
@@ -213,6 +232,15 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
         throw new Error("invalid type reference: %s", name);
     }
 
+    @Override
+    public CommonTypeDefinition visitTypeExpr(TypeExpression expr) {
+        if (types.containsKey(expr.getValue())) {
+            return TEntityType;
+        }
+        throw new Error("invalid type: %s in type expression: %s. Available types: %s",
+                expr.getValue(), expr, types.keySet());
+    }
+
     // == Unsupported
 
     @Override
@@ -227,11 +255,6 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
 
     @Override
     public CommonTypeDefinition visitSetExpr(SetExpression expr) {
-        throw new TranslationError("unsupported element: " + expr);
-    }
-
-    @Override
-    public CommonTypeDefinition visitTypeExpr(TypeExpression expr) {
         throw new TranslationError("unsupported element: " + expr);
     }
 

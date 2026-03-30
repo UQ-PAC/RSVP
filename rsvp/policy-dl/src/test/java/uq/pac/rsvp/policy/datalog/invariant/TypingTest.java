@@ -108,6 +108,10 @@ public class TypingTest {
             "alice.friends == bob.friends for all alice: Account, bob: Account",
             "one.permission == another.permission for all one: PhotoPermission, another: PhotoPermission",
 
+            // ==/!= should be over compatible types
+            "one.code == another.index for all one: PhotoPermission, another: PhotoPermission",
+            "one == another for all one: Action, another: Photo",
+
             // && only over boolean types
             "alice.age && bob.name  for all alice: Account, bob: Account",
             "alice.age || bob.name  for all alice: Account, bob: Account",
@@ -129,6 +133,15 @@ public class TypingTest {
 
             // has: expects record-like types
             "alice.age has bar for all alice: Account",
+
+            // is: expects valid record-like types
+            "alice is Accounts for all alice: Account",
+            "alice.age is Account for all alice: Account",
+
+            // in: expects valid entity types
+            "alice.age in Account::\"Alice\" for all alice: Account",
+            "alice in Account::\"Alice\" for all alice: Action",
+            "alice in Account::\"Alice\" for all alice: Photoapp::Action",
     })
     void fail(String text) {
         try {

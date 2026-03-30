@@ -15,6 +15,8 @@ class Typing {
     final static BooleanType TBoolean = new BooleanType();
     final static StringType TString = new StringType();
     final static LongType TLong = new LongType();
+    // Special type denoting type expressions
+    final static BooleanType TEntityType = new BooleanType();
 
     private final Map<String, EntityTypeReference> references;
 

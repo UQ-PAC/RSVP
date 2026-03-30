@@ -6,7 +6,7 @@ import hljs from "highlight.js";
 import { JSX, useEffect, useRef } from "react";
 import { Roboto_Mono } from "next/font/google";
 
-import { Report } from "../../types";
+import { FileSyntax, Report } from "../../types";
 import {
   useSelection,
   useSelectionDispatch,
@@ -16,10 +16,10 @@ import {
   useFocus,
   useFocusDispatch,
 } from "../providers/FocusContext";
-import { renderToString } from "react-dom/server";
 
 interface CodeRenderParams {
   content: string;
+  syntax: FileSyntax;
   reports: Report[];
 }
 
@@ -31,7 +31,7 @@ const robotoMono = Roboto_Mono({
 //     line-based highlight (starts or ends mid-line)
 //     scroll to primary or top unless explicitely clicked on line
 // FIXME: multiple reports per line....?
-export function CodeRender({ content, reports }: CodeRenderParams) {
+export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
   const { selected, hovered, scroll } = useSelection();
   const selectionDispatch = useSelectionDispatch();
 
@@ -54,6 +54,11 @@ export function CodeRender({ content, reports }: CodeRenderParams) {
   const reportsByLine: {
     [line: number]: { report: Report; start?: number; end?: number }[];
   } = {};
+
+  const highlight = (text: string) =>
+    hljs.highlight(text, {
+      language: syntax,
+    }).value;
 
   reports.forEach((report) => {
     const loc = report.primarySourceLocation;
@@ -130,28 +135,18 @@ export function CodeRender({ content, reports }: CodeRenderParams) {
 
     if (relevant?.start || relevant?.end) {
       const begin = relevant?.start
-        ? hljs.highlight(line.slice(0, relevant.start), {
-            language: "cedar",
-          }).value
+        ? highlight(line.slice(0, relevant.start))
         : "";
       const mid =
         `<span class="source-report-text-highlight source-report-text-highlight-${relevant?.report.severity}"` +
-        `data-report="${relevant?.report.id}">${
-          hljs.highlight(line.slice(relevant?.start ?? 0, relevant?.end), {
-            language: "cedar",
-          }).value
-        }</span>`;
-      const end = relevant?.end
-        ? hljs.highlight(line.slice(relevant.end), {
-            language: "cedar",
-          }).value
-        : "";
+        `data-report="${relevant?.report.id}">${highlight(
+          line.slice(relevant?.start ?? 0, relevant?.end),
+        )}</span>`;
+      const end = relevant?.end ? highlight(line.slice(relevant.end)) : "";
 
       highlighted = begin + mid + end;
     } else {
-      highlighted = hljs.highlight(line, {
-        language: "cedar",
-      }).value;
+      highlighted = highlight(line);
     }
 
     // console.log(line);

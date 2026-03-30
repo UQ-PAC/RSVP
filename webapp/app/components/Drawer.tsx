@@ -46,10 +46,8 @@ export function Drawer({ title, side, children }: DrawerProps) {
       >
         <FontAwesomeIcon className="drawer-tab-icon" icon={icon} />
       </div>
-      <div className="drawer-content">
-        <h3 className="drawer-title ">{title}</h3>
-        {children}
-      </div>
+      <h3 className="drawer-title">{title}</h3>
+      <div className="drawer-content">{children}</div>
     </div>
   );
 }

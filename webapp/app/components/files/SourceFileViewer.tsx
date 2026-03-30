@@ -10,6 +10,7 @@ import {
   useFocus,
   useFocusDispatch,
 } from "../providers/FocusContext";
+import { InvariantHighlight } from "./InvariantHighlight";
 interface SourceFileViewerParams {
   sources: SourceFileInfo[];
   reports?: Report[];
@@ -19,6 +20,7 @@ export function SourceFileViewer({ sources, reports }: SourceFileViewerParams) {
   useEffect(() => {
     hljs.debugMode();
     hljs.registerLanguage("cedar", () => CedarHighlight);
+    hljs.registerLanguage("invariant", () => InvariantHighlight);
     // hljs.configure({ ignoreUnescapedHTML: true });
   }, []);
 
@@ -55,6 +57,7 @@ export function SourceFileViewer({ sources, reports }: SourceFileViewerParams) {
         <SourceFile
           key={source.serverId}
           filename={source.filename}
+          filetype="cedar"
           content={source.contents}
           reports={(reports ?? []).filter(
             (report) => report.primarySourceLocation.file === source.serverId,

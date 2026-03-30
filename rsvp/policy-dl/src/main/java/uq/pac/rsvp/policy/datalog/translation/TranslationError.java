@@ -14,6 +14,10 @@ public class TranslationError extends RuntimeException {
         super(String.format(format, args));
     }
 
+    public TranslationError(Throwable e) {
+        super(e);
+    }
+
     public static void error(boolean condition, String format, Object ...args) {
         if (!condition) {
             throw new TranslationError("Translation error: " + format, args);

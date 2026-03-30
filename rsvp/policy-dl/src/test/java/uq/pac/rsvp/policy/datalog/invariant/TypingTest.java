@@ -56,7 +56,7 @@ public class TypingTest {
                         %s;
                 """.formatted(invariantText);
         logger.info(YELLOW, "Parsing invariant: " + invariantText);
-        Invariant invariant = InvariantSet.parse(text).getInvariant("test");
+        Invariant invariant = InvariantSet.parse(text).stream().findAny().orElseThrow();
         new InvariantValidation (schema, entities, invariant).validate(invariant);
     }
 

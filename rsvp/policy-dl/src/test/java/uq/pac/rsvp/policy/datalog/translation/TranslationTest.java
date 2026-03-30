@@ -13,7 +13,6 @@ import org.fusesource.jansi.Ansi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
-import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.datalog.TestUtil;
 import uq.pac.rsvp.policy.datalog.invariant.Invariant;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
@@ -96,7 +95,7 @@ public class TranslationTest {
         }
     }
 
-    private final static String ONE_OFF = "common-type";
+    private final static String ONE_OFF = "petclinic-v2";
 
     // Running tests for one directory separately for no particular
     // reason apart from being able to launch it separately
@@ -129,7 +128,7 @@ public class TranslationTest {
      * Differential test for Cedar and RSVP.
      * The test runs both, RSVP and Cedar authorisation engines and compares the results that should agree
      */
-    void differentialTest(TestInput test) throws IOException, AuthException, InterruptedException, RsvpException {
+    void differentialTest(TestInput test) throws IOException, AuthException {
         logger.info(YELLOW, "Policy: " + test.policy)
                 .info(MAGENTA, "Datalog specification: " + test.datalogDir + "/" + TranslationConstants.ProgramName)
                 .fine(CYAN, Files.readString(test.policy));
@@ -144,7 +143,7 @@ public class TranslationTest {
             logger.warning("Empty policy: " + test.policy);
         }
 
-        TranslationResult translation = Translation.translate(test.schema, test.policy,
+        Translation translation = new Translation(test.schema, test.policy,
                 test.entities, test.invariants, test.datalogDir);
 
         RequestAuth rsvpAuth = new RequestAuth(translation);

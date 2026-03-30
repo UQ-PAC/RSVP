@@ -3,7 +3,6 @@ package uq.pac.rsvp.policy.datalog.invariant;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import uq.pac.rsvp.policy.ast.expr.Expression;
-import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,29 +11,18 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class InvariantSet {
-    private final Map<String, Invariant> invariants;
+    private final Set<Invariant> invariants;
 
     private InvariantSet(Collection<Invariant> invariants) {
-        Map<String, Invariant> in = new LinkedHashMap<>();
-        for (Invariant i : invariants) {
-            if (in.containsKey(i.getName())) {
-                throw new TranslationError("Duplicate invariant name: " + i.getName());
-            }
-            in.put(i.getName(), i);
-        }
-        this.invariants = Collections.unmodifiableMap(in);
+        this.invariants = Collections.unmodifiableSet(new LinkedHashSet<>(invariants));
     }
 
     public Collection<Invariant> getInvariants() {
-        return invariants.values();
+        return invariants;
     }
 
     public Stream<Invariant> stream() {
-        return invariants.entrySet().stream().map(Map.Entry::getValue);
-    }
-
-    public Invariant getInvariant(String name) {
-        return invariants.get(name);
+        return invariants.stream();
     }
 
     private static class ThrowingErrorListener extends BaseErrorListener {

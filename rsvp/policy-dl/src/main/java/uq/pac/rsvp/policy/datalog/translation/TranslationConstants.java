@@ -179,25 +179,25 @@ public class TranslationConstants {
     /**
      * Prefix for datalog-level policy relations
      */
-    private final static String PolicyFormat = "Policy_";
+    final static String PolicyPrefix = "Policy_";
 
     /**
      * Get a declaration for a single policy rule
      */
-    public static DLRuleDecl makePolicyRuleDecl(Policy policy) {
-        return makePolicyRuleDecl(PolicyFormat + policy.getName());
+    public static DLRuleDecl makePolicyRuleDecl(Policy policy, int index) {
+        return makePolicyRuleDecl(PolicyPrefix + index);
     }
 
     /**
      * Prefix for datalog-level invariant relations
      */
-    private final static String InvariantPrefix = "Invariant_";
+    final static String InvariantPrefix = "Invariant_";
 
     /**
      * Get a declaration for an invariant
      */
-    public static DLRuleDecl makeInvariantRuleDecl(Invariant invariant) {
-        String name = InvariantPrefix + invariant.getName();
+    public static DLRuleDecl makeInvariantRuleDecl(Invariant invariant, int index) {
+        String name = InvariantPrefix + index;
         List<DLDeclTerm> terms = invariant.getQuantifier().variables()
                 .map(v -> new DLDeclTerm(v, DLType.SYMBOL))
                 .toList();

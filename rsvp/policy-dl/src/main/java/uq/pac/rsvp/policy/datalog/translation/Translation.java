@@ -10,28 +10,73 @@ import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.entity.Entity;
 import com.cedarpolicy.model.exception.AuthException;
 import com.cedarpolicy.value.EntityUID;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Multimap;
 import uq.pac.rsvp.RsvpException;
+import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.ast.*;
 import uq.pac.rsvp.policy.datalog.invariant.Invariant;
+import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantSet;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
+import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
 /**
  * Putting translation of the cedar schema, entities, policies and context together
  */
 public class Translation {
 
-    private Translation() {}
+    private final Schema schema;
+    private final PolicySet policies;
+    private final Entities entities;
+    private final InvariantSet invariants;
+    private final Path datalogDir;
+    private final DLProgram program;
+
+    private final BiMap<Policy, DLRuleDecl> policyDeclarations;
+    private final BiMap<Invariant, DLRuleDecl> invariantDeclarations;
+
+    public Translation(Path schemaFile, Path policiesFile, Path entitiesFile, Path invariantFile, Path datalogDir) {
+        this.datalogDir = datalogDir;
+        try {
+            validate(schemaFile, policiesFile, entitiesFile);
+            this.schema = Schema.parseCedarSchema(schemaFile);
+            this.entities = updateEntities(Entities.parse(entitiesFile), schema);
+            this.policies = PolicySet.parseCedarPolicySet(policiesFile);
+            this.invariants = invariantFile == null ? InvariantSet.parse("") : InvariantSet.parse(invariantFile);
+
+            this.policyDeclarations = HashBiMap.create();
+            int index = 1;
+            for (Policy p : policies) {
+                policyDeclarations.put(p, TranslationConstants.makePolicyRuleDecl(p, index++));
+            }
+
+            this.invariantDeclarations = HashBiMap.create();
+            index = 1;
+            for (Invariant i : invariants.getInvariants()) {
+                invariantDeclarations.put(i, TranslationConstants.makeInvariantRuleDecl(i, index++));
+            }
+
+            this.program = translate(schema, policies, entities, invariants);
+            program.execute(datalogDir);
+
+        } catch (RsvpException | AuthException | IOException | RuntimeException | InterruptedException e) {
+            throw new TranslationError(e);
+        }
+    }
 
     static void validate(Path schemaFile, Path policyFile, Path entityFile) throws IOException, AuthException, RsvpException {
         Entities entities = Entities.parse(entityFile);
@@ -76,7 +121,7 @@ public class Translation {
         rsvpSchema.entityTypes()
                 .forEach(et -> entityNames.addAll(et.getEntityNamesEnum()));
         for (String en : entityNames) {
-            if (en.indexOf(OUTPUT_DELIMITER) != -1) {
+            if (en.contains(OUTPUT_DELIMITER)) {
                 throw new TranslationError("Unsupported entity name: " + en);
             }
             if (en.equals(UndefinedEntityUIDName)) {
@@ -124,24 +169,18 @@ public class Translation {
         return new Entities(entitySet);
     }
 
-    public static TranslationResult translate(Path schemaFile, Path policiesFile, Path entitiesFile, Path invariantFile, Path datalogDir)
-            throws IOException, AuthException, RsvpException, InterruptedException {
-        validate(schemaFile, policiesFile, entitiesFile);
-        Schema schema = Schema.parseCedarSchema(schemaFile);
-        Entities entities = updateEntities(Entities.parse(entitiesFile), schema);
-
-        PolicySet policies = PolicySet.parseCedarPolicySet(policiesFile);
-        InvariantSet invariants = invariantFile == null ? InvariantSet.parse("") : InvariantSet.parse(invariantFile);
-
-        DLProgram translation = translate(schema, policies, entities, invariants);
-        translation.execute(datalogDir);
-        return new TranslationResult(schema, policies, entities, invariants, translation, datalogDir);
-    }
-
-    private static DLProgram translate(Schema schema, PolicySet policies, Entities entities, InvariantSet invariants) {
+    private DLProgram translate(Schema schema, PolicySet policies, Entities entities, InvariantSet invariants) {
         TranslationSchema translationSchema = new TranslationSchema(schema);
         TranslationEntitySet translationEntities = new TranslationEntitySet(entities, translationSchema);
-        TranslationPolicySet translationPolicies = new TranslationPolicySet(policies, translationSchema);
+        Collection<TranslationPolicy> translationPermitPolicies = policies.stream()
+                .filter(Policy::isPermit)
+                .map(p -> new TranslationPolicy(p, policyDeclarations.get(p), translationSchema))
+                .toList();
+        Collection<TranslationPolicy> translationForbidPolicies = policies.stream()
+                .filter(Policy::isForbid)
+                .map(p -> new TranslationPolicy(p, policyDeclarations.get(p), translationSchema))
+                .toList();
+
         DLProgram.Builder builder = new DLProgram.Builder(ProgramName);
         List<DLRuleDecl> output = new ArrayList<>();
 
@@ -190,7 +229,7 @@ public class Translation {
         builder.comment("Add transitivity to ParentOf")
                 .add(rpt);
 
-        for (TranslationPolicy policy : translationPolicies.getPermitTranslation()) {
+        for (TranslationPolicy policy : translationPermitPolicies) {
             builder.comment("Permit Policy: " + policy.getDeclaration().getName())
                     .add(policy.getDeclaration());
             output.add(policy.getDeclaration());
@@ -199,7 +238,7 @@ public class Translation {
             }
         }
 
-        for (TranslationPolicy policy : translationPolicies.getForbidTranslation()) {
+        for (TranslationPolicy policy : translationForbidPolicies) {
             builder.comment("Forbid Policy: " + policy.getDeclaration().getName())
                     .add(policy.getDeclaration());
             output.add(policy.getDeclaration());
@@ -211,7 +250,7 @@ public class Translation {
         builder.comment("General Permit Rule (requests explicitly allowed by the policy)")
                 .add(PermitRuleDecl);
         DLAtom permit = makeAtom(PermitRuleDecl);
-        for (TranslationPolicy policy : translationPolicies.getPermitTranslation()) {
+        for (TranslationPolicy policy : translationPermitPolicies) {
             DLAtom policyPermit = makeAtom(policy.getDeclaration());
             builder.add(new DLRule(permit, policyPermit));
         }
@@ -219,7 +258,7 @@ public class Translation {
         builder.comment("General Forbid Rule (requests explicitly forbidden by the policy)")
                 .add(ForbidRuleDecl);
         DLAtom forbid = makeAtom(ForbidRuleDecl);
-        for (TranslationPolicy policy : translationPolicies.getForbidTranslation()) {
+        for (TranslationPolicy policy : translationForbidPolicies) {
             DLAtom policyForbid = makeAtom(policy.getDeclaration());
             builder.add(new DLRule(forbid, policyForbid));
         }
@@ -231,7 +270,8 @@ public class Translation {
 
         builder.comment("Invariants");
         for (Invariant invariant : invariants.getInvariants()) {
-            TranslationInvariant ti = new TranslationInvariant(invariant, translationSchema);
+            TranslationInvariant ti = new TranslationInvariant(invariant,
+                    invariantDeclarations.get(invariant), translationSchema);
             builder.add(ti.getDeclaration());
             output.add(ti.getDeclaration());
             ti.getRules().forEach(builder::add);
@@ -241,5 +281,113 @@ public class Translation {
             .add(makeIODirectives(output));
 
         return builder.build();
+    }
+
+    /**
+     * Assuming the datalog output .csv file contains requests of the form {@code principal TAB resource TAB action}
+     * load them as a request set
+     *
+     * @param csv CSV results file within that directory
+     * @param name name of the policy that generated that result
+     */
+    private RequestSet loadRequests(Path csv, String name) {
+        Path dlOut = Path.of(datalogDir.toString(), csv.getFileName().toString());
+
+        if (!Files.exists(dlOut) || !Files.isRegularFile(dlOut)) {
+            throw new TranslationError("Target CSV file %s does not exist or not a directory".formatted(dlOut));
+        }
+
+        BufferedReader reader;
+        Set<Request> set = new HashSet<>();
+        try {
+            reader = new BufferedReader(new FileReader(dlOut.toFile()));
+            String line = reader.readLine();
+            while (line != null) {
+                set.add(new Request(line.trim()));
+                line = reader.readLine();
+            }
+            reader.close();
+        } catch (IOException e) {
+            throw new TranslationError(e.getMessage());
+        }
+        return new RequestSet(set, name);
+    }
+
+    RequestSet loadRequests(Policy policy) {
+        return loadRequests(policyDeclarations.get(policy));
+    }
+
+    Relation loadRelation(DLRuleDecl decl) {
+        List<String> headers = decl.getDeclTerms().stream().map(DLDeclTerm::getName).toList();
+        Path csv = Path.of(datalogDir.toString(), decl.getName() + OUTPUT_EXT);
+        if (!Files.exists(csv) || !Files.isRegularFile(csv)) {
+            throw new TranslationError("Target CSV file %s does not exist or not a directory".formatted(csv));
+        }
+
+        BufferedReader reader;
+        List<List<String>> rows = new ArrayList<>();
+        try {
+            reader = new BufferedReader(new FileReader(csv.toFile()));
+            String line = reader.readLine();
+            while (line != null) {
+                List<String> row = Pattern.compile("\\t")
+                        .splitAsStream(line)
+                        .toList();
+                rows.add(row);
+                line = reader.readLine();
+            }
+            reader.close();
+        } catch (IOException e) {
+            throw new TranslationError(e.getMessage());
+        }
+        return new Relation(headers, rows);
+    }
+
+    Relation loadRelation(Invariant invariant) {
+        return loadRelation(invariantDeclarations.get(invariant));
+    }
+
+    RequestSet loadRequests(DLRuleDecl decl) {
+        require(PermittedRequestsRuleDecl.getDeclTerms().equals(decl.getDeclTerms()));
+        Path csv = Path.of(decl.getName() + OUTPUT_EXT);
+        return loadRequests(csv, decl.getName());
+    }
+
+    Map<Policy, RequestSet> getPolicyResult() {
+        Map<Policy, RequestSet> requests = new HashMap<>();
+        policies.forEach(policy -> requests.put(policy, loadRequests(policy)));
+        return requests;
+    }
+
+    Map<Invariant, InvariantResult> getInvariantResult() {
+        Map<Invariant, InvariantResult> result = new HashMap<>();
+        invariants.getInvariants().forEach(invariant -> {
+            result.put(invariant, new InvariantResult(invariant, loadRelation(invariant)));
+        });
+        return result;
+    }
+
+    public Schema getSchema() {
+        return schema;
+    }
+
+    public PolicySet getPolicies() {
+        return policies;
+    }
+
+    public Entities getEntities() {
+        return entities;
+    }
+
+    public InvariantSet getInvariants() {
+        return invariants;
+    }
+
+    public DLProgram getProgram() {
+        return program;
+    }
+
+    public Path getDatalogDir() {
+        return datalogDir;
     }
 }

@@ -19,7 +19,7 @@ public class RequestAuth {
      */
     private final RequestSet forbidden;
 
-    public RequestAuth(TranslationResult result) {
+    public RequestAuth(Translation result) {
         this.permitted = result.loadRequests(TranslationConstants.PermittedRequestsRuleDecl);
         this.forbidden = result.loadRequests(TranslationConstants.ForbiddenRequestsRuleDecl);
         // Permitted and forbidden are disjoint sets

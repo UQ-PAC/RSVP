@@ -14,6 +14,7 @@ public class CedarExceptionHandler {
 	public ModelAndView handleAuthorizationDenial(CedarDeniedException exception) {
 		ModelAndView modelAndView = new ModelAndView("error");
 		modelAndView.addObject("message", exception.getMessage());
+		modelAndView.addObject("status", 403);
 		return modelAndView;
 	}
 

@@ -70,7 +70,8 @@ public class CedarAspect {
 		String principalId = extractPrincipalFromSession(request);
 
 		// Prints requests and cookie to console.
-		System.out.println("Cedar request resourceType: " + requiresAuthorization.resourceType());
+		System.out.println(System.lineSeparator() +
+						   "Cedar request resourceType: " + requiresAuthorization.resourceType());
 		System.out.println("HTTP request resourceId: " + extractResourceId(request));
 		System.out.println("Cookie principalId: " + principalId);
 
@@ -106,8 +107,16 @@ public class CedarAspect {
 		System.out.println("Cedar response body: " + response.getBody());
 
 		if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null
-				|| !response.getBody().equals("Access Granted.")) {
-			throw new CedarDeniedException("Access Denied by the Cedar Policy Engine.");
+				|| !response.getBody().startsWith("Access Granted.")) {
+			String prefix = """
+					Access Denied.
+					""";
+			String body = """
+					Access Denied by the Cedar Policy Engine.
+					
+					%s
+					""".formatted(response.getBody().replaceAll("(?m)^" + prefix, ""));
+			throw new CedarDeniedException(body);
 		}
 	}
 

@@ -3,8 +3,11 @@
 <html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'error')}">
 
 <body>
-  <img src="../static/resources/images/pets.png" th:src="@{/resources/images/pets.png}" />
-  <!-- Title: Something happened -->
+  <div class="row">
+    <div class="col-md-12">
+      <img class="img-responsive" src="../static/resources/images/Family-Practice.png" th:src="@{/resources/images/Family-Practice.png}" />
+    </div>
+  </div>
   <h2 th:text="#{somethingHappened}">Something happened...</h2>
 
   <!-- Status-specific error message -->
@@ -15,8 +18,14 @@
     <span th:case="*" th:text="#{error.general}">An unexpected error occurred.</span>
   </p>
 
+  <br>
+
   <!-- Exception message (for developers) -->
-  <p th:text="${message}">Exception message</p>
+  <div class="row">
+    <div class="col-12 text-center" style="white-space: pre-wrap; background-color: lightgray;">
+      <p style="color: red; font-weight: bold;" th:text="${message}">Exception message.</p>
+    </div>
+  </div>
 </body>
 
 </html>

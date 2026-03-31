@@ -100,12 +100,12 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
             }
             case HasAttr -> {
                 expect(lhs, TEntityOrAction, TRecord);
-                expect(rhs, StringType);
+                expect(rhs, TString);
                 yield BooleanType;
             }
             case Is -> {
                 expect(lhs, TEntityOrAction);
-                expect(rhs, TypeOfEntityType);
+                expect(rhs, TTypeOfEntity);
                 yield BooleanType;
             }
             case In -> {
@@ -119,6 +119,9 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
     @Override
     public CommonTypeDefinition visitPropertyAccessExpr(PropertyAccessExpression expr) {
         CommonTypeDefinition objectType = collect(expr.getObject());
+        if (objectType instanceof EntityTypeReference ref) {
+            objectType = types.get(ref.getDefinition().getName());
+        }
         if (objectType instanceof RecordTypeDefinition rec) {
             CommonTypeDefinition attrType = rec.getAttributeType(expr.getProperty());
             if (attrType != null) {

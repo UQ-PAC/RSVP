@@ -28,6 +28,10 @@ entity PhotoPermission = {
     }
 };
 
+entity Guest {
+    friend: Account
+};
+
 action "viewPhoto" appliesTo {
     principal: Account,
     resource: Photo,

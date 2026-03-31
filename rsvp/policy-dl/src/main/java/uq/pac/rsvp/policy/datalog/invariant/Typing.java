@@ -12,6 +12,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
+
 class Typing {
     final static BooleanType BooleanType = new BooleanType();
     final static StringType StringType = new StringType();
@@ -49,6 +51,7 @@ class Typing {
     }
 
     static TypeTest expect(CommonTypeDefinition actual, TypeTest ...tests) {
+        require(tests.length > 0);
         for (TypeTest test : tests) {
             if (test.test().apply(actual)) {
                 return test;

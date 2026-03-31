@@ -85,6 +85,10 @@ public abstract class CommonTypeDefinition implements SchemaItem {
         return definitionName;
     }
 
+    public final boolean hasName() {
+        return definitionName != null;
+    }
+
     @Override
     public abstract void accept(SchemaVisitor visitor);
 

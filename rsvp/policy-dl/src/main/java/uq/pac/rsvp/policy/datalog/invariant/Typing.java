@@ -5,18 +5,62 @@ import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.common.*;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
-import uq.pac.rsvp.policy.datalog.util.Util;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 class Typing {
-    final static BooleanType TBoolean = new BooleanType();
-    final static StringType TString = new StringType();
-    final static LongType TLong = new LongType();
-    // Special type denoting type expressions
-    final static BooleanType TEntityType = new BooleanType();
+    final static BooleanType BooleanType = new BooleanType();
+    final static StringType StringType = new StringType();
+    final static LongType LongType = new LongType();
+    final static BooleanType TypeOfEntityType = new BooleanType();
+
+    record TypeTest(Function<CommonTypeDefinition, Boolean> test, String expected) { }
+
+    final static TypeTest TBoolean = new TypeTest(t -> t == BooleanType, "Boolean");
+    final static TypeTest TLong = new TypeTest(t -> t == LongType, "Long");
+    final static TypeTest TString = new TypeTest(t -> t == StringType, "String");
+    final static TypeTest TTypeOfEntity = new TypeTest(t -> t == TypeOfEntityType, "Entity");
+    final static TypeTest TRecord = new TypeTest(
+            t -> t instanceof RecordTypeDefinition, "Record, Entity, Action");
+    final static TypeTest TEntityOrAction = new TypeTest(
+            t -> isEntity(t) || isAction(t), "Entity, Action");
+    final static TypeTest TEntity = new TypeTest(Typing::isEntity, "Entity");
+    final static TypeTest TAction = new TypeTest(Typing::isEntity, "Action");
+
+    private static boolean isActionName(String name) {
+        return name.equals("Action") || name.endsWith("::Action");
+    }
+
+    private static boolean isAction(CommonTypeDefinition def) {
+        return def instanceof RecordTypeDefinition rec
+                && rec.hasName()
+                && isActionName(rec.getName());
+    }
+
+    private static boolean isEntity(CommonTypeDefinition def) {
+        return def instanceof EntityTypeReference ref ||
+                def instanceof RecordTypeDefinition rec &&
+                rec.hasName() &&
+                !isActionName(rec.getName());
+    }
+
+    static TypeTest expect(CommonTypeDefinition actual, TypeTest ...tests) {
+        for (TypeTest test : tests) {
+            if (test.test().apply(actual)) {
+                return test;
+            }
+        }
+        String expected = Stream.of(tests).map(TypeTest::expected).toList().toString();
+        throw new InvariantValidation.Error("Expected one of %s, got %s", expected, Typing.name(actual));
+    }
+
+    static TypeTest expect(CommonTypeDefinition one, CommonTypeDefinition another, TypeTest ...tests) {
+        return expect(another,  expect(one, tests));
+    }
 
     private final Map<String, EntityTypeReference> references;
 
@@ -26,9 +70,9 @@ class Typing {
 
     CommonTypeDefinition convert(CommonTypeDefinition def) {
         return switch (def) {
-            case BooleanType t -> TBoolean;
-            case LongType t -> TLong;
-            case StringType t -> TString;
+            case BooleanType t -> BooleanType;
+            case LongType t -> LongType;
+            case StringType t -> StringType;
             case SetTypeDefinition t -> new SetTypeDefinition(convert(t.getElementType()));
             case RecordTypeDefinition t -> {
                 Map<String, CommonTypeDefinition> attrs = t.getAttributes().entrySet()

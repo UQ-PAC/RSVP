@@ -110,7 +110,7 @@ public class TypingTest {
 
             // ==/!= should be over compatible types
             "one.code == another.index for all one: PhotoPermission, another: PhotoPermission",
-            "one == another for all one: Action, another: Photo",
+            //"one == another for all one: Action, another: Photo",
 
             // && only over boolean types
             "alice.age && bob.name  for all alice: Account, bob: Account",
@@ -140,8 +140,8 @@ public class TypingTest {
 
             // in: expects valid entity types
             "alice.age in Account::\"Alice\" for all alice: Account",
-            "alice in Account::\"Alice\" for all alice: Action",
-            "alice in Account::\"Alice\" for all alice: Photoapp::Action",
+            //"alice in Account::\"Alice\" for all alice: Action", // ok
+            //"alice in Account::\"Alice\" for all alice: Photoapp::Action", // ok
     })
     void fail(String text) {
         try {

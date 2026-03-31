@@ -17,8 +17,6 @@ import java.util.stream.Collectors;
 import static uq.pac.rsvp.policy.datalog.invariant.Typing.*;
 
 public class InvariantValidation implements PolicyComputationVisitor<CommonTypeDefinition> {
-
-    private final Typing typing = new Typing();
     private final Map<String, RecordTypeDefinition> types;
     private final Map<String, RecordTypeDefinition> variables;
     private final Map<String, RecordTypeDefinition> entities;
@@ -39,6 +37,8 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
         this.types = new HashMap<>();
         this.variables = new HashMap<>();
         this.invariant = invariant;
+
+        Typing typing = new Typing();
 
         // Build types from entities
         schema.entityTypes().stream()
@@ -71,52 +71,8 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
         ));
     }
 
-    private void expectEntityType(Expression expr, CommonTypeDefinition t) {
-        if (t instanceof RecordTypeDefinition rec) {
-            String type = rec.getName();
-            if (!type.endsWith("::Action") && !type.equals("Action")) {
-                return;
-            }
-        }
-        throw new Error("Expected entity type, got: " + Typing.name(t) + " in expression: " + expr);
-    }
-
-    private void expectRecord(Expression expr, CommonTypeDefinition t) {
-        if (!(t instanceof RecordTypeDefinition)) {
-            throw new Error("expected Record, Entity or Action, got " + Typing.name(t) + " in expression: " + expr);
-        }
-    }
-
-    /**
-     * Types supported by the equality operator so far
-     */
-    private void expectEquatable(Expression expr, CommonTypeDefinition t) {
-        boolean eq =  switch (t) {
-            case BooleanType b -> true;
-            case LongType l -> true;
-            case StringType s -> true;
-            case EntityTypeReference r -> true;
-            case RecordTypeDefinition r -> r.getName() != null;
-            default -> false;
-        };
-
-        if (!eq) {
-            throw new Error("expected Bool, String, Long, Entity or Action, got "
-                    + Typing.name(t) + " in expression: " + expr);
-        }
-    }
-
-    private void expect(Expression expr, CommonTypeDefinition expectedType, CommonTypeDefinition ...actualTypes) {
-        for (CommonTypeDefinition actualType : actualTypes) {
-            if (!expectedType.equals(actualType)) {
-                throw new Error("Expected %s type, got %s in expression: %s",
-                        Typing.name(expectedType), Typing.name(actualType), expr);
-            }
-        }
-    }
-
     public void validate(Invariant invariant) {
-        expect(invariant.getExpression(), TBoolean, collect(invariant.getExpression()));
+        expect(collect(invariant.getExpression()), TBoolean);
     }
 
     @Override
@@ -126,38 +82,35 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
 
         return switch (expr.getOp()) {
             case Add, Sub, Mul -> {
-                expect(expr, TLong, lhs, rhs);
-                yield TLong;
+                expect(lhs, rhs, TLong);
+                yield LongType;
             }
             case Less, LessEq, Greater, GreaterEq -> {
-                expect(expr, TLong, lhs, rhs);
-                yield TBoolean;
+                expect(lhs, rhs, TLong);
+                yield BooleanType;
             }
             case Eq, Neq -> {
-                expect(expr, lhs, rhs);
-                expectEquatable(expr, lhs);
-                yield TBoolean;
+                // FIXME: we need record here as well
+                expect(lhs, rhs, TBoolean, TLong, TString, TEntityOrAction);
+                yield BooleanType;
             }
             case Or, And -> {
-                expect(expr, TBoolean, lhs, rhs);
-                yield TBoolean;
+                expect(lhs, rhs, TBoolean);
+                yield BooleanType;
             }
             case HasAttr -> {
-                expectRecord(expr, lhs);
-                expect(expr, TString, rhs);
-                yield TBoolean;
+                expect(lhs, TEntityOrAction, TRecord);
+                expect(rhs, StringType);
+                yield BooleanType;
             }
-            // FIXME: Need to check how in behaves WRT to different types
             case Is -> {
-                expectRecord(expr, lhs);
-                expect(expr, TEntityType, rhs);
-                yield TBoolean;
+                expect(lhs, TEntityOrAction);
+                expect(rhs, TypeOfEntityType);
+                yield BooleanType;
             }
-            // FIXME: Need to check how in behaves WRT to different types
             case In -> {
-                expectEntityType(expr, lhs);
-                expectEntityType(expr, rhs);
-                yield TBoolean;
+                expect(lhs, rhs, TEntityOrAction);
+                yield BooleanType;
             }
             default -> throw new TranslationError("Unsupported");
         };
@@ -180,19 +133,19 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
         CommonTypeDefinition type = collect(expr.getExpression());
         return switch (expr.getOp()) {
             case Not -> {
-                expect(expr, TBoolean, type);
-                yield TBoolean;
+                expect(type, TBoolean);
+                yield BooleanType;
             }
             case Neg -> {
-                expect(expr, TLong, type);
-                yield TLong;
+                expect(type, TLong);
+                yield LongType;
             }
         };
     }
 
     @Override
     public CommonTypeDefinition visitBooleanExpr(BooleanExpression expr) {
-        return TBoolean;
+        return BooleanType;
     }
 
     @Override
@@ -206,12 +159,12 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
 
     @Override
     public CommonTypeDefinition visitLongExpr(LongExpression expr) {
-        return TLong;
+        return LongType;
     }
 
     @Override
     public CommonTypeDefinition visitStringExpr(StringExpression expr) {
-        return TString;
+        return StringType;
     }
 
     @Override
@@ -235,7 +188,7 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
     @Override
     public CommonTypeDefinition visitTypeExpr(TypeExpression expr) {
         if (types.containsKey(expr.getValue())) {
-            return TEntityType;
+            return TypeOfEntityType;
         }
         throw new Error("invalid type: %s in type expression: %s. Available types: %s",
                 expr.getValue(), expr, types.keySet());

@@ -58,7 +58,7 @@ class Typing {
             }
         }
         String expected = Stream.of(tests).map(TypeTest::expected).toList().toString();
-        throw new InvariantValidation.Error("Expected one of %s, got %s", expected, Typing.name(actual));
+        throw new InvariantValidator.Error("Expected one of %s, got %s", expected, Typing.name(actual));
     }
 
     static TypeTest expect(CommonTypeDefinition one, CommonTypeDefinition another, TypeTest ...tests) {

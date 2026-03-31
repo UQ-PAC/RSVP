@@ -19,14 +19,14 @@ import static org.fusesource.jansi.Ansi.Color.*;
 public class TypingTest {
     Logger logger = new Logger();
 
-    private final Schema schema;
-    private final Entities entities;
+    private final InvariantValidator validator;
 
     public TypingTest() throws RsvpException, IOException {
         Path schemaPath = TestUtil.getResourceDir("translation", "photoapp", "photoapp.cedarschema");
-        this.schema = Schema.parseCedarSchema(schemaPath);
+        Schema schema = Schema.parseCedarSchema(schemaPath);
         Path entitiesPath = TestUtil.getResourceDir("translation", "photoapp", "entities.json");
-        this.entities = Translation.updateEntities(Entities.parse(entitiesPath), schema);
+        Entities entities = Translation.updateEntities(Entities.parse(entitiesPath), schema);
+        this.validator = new InvariantValidator(schema, entities);
     }
 
     @ParameterizedTest
@@ -159,13 +159,12 @@ public class TypingTest {
                 """.formatted(invariantText);
             Ansi.Color colour = pass ? GREEN : YELLOW;
             logger.info(colour, "[*] %s", invariantText);
-            Invariant invariant = InvariantSet.parse(text).stream().findAny().orElseThrow();
-            new InvariantValidation (schema, entities, invariant).validate(invariant);
+            validator.validate(InvariantSet.parse(text).stream().findAny().orElseThrow());
             if (!pass) {
                 throw new TranslationError("Unexpected test pass for invariant: " + invariantText);
             }
 
-        } catch (InvariantValidation.Error error) {
+        } catch (InvariantValidator.Error error) {
             if (!pass) {
                 logger.info(MAGENTA, "    Expected error: " + error.getMessage());
             } else {

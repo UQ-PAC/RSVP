@@ -15,28 +15,31 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static uq.pac.rsvp.policy.datalog.invariant.Typing.*;
+import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
-public class InvariantValidation implements PolicyComputationVisitor<CommonTypeDefinition> {
+public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDefinition> {
     private final Map<String, RecordTypeDefinition> types;
     private final Map<String, RecordTypeDefinition> variables;
     private final Map<String, RecordTypeDefinition> entities;
     private final Map<String, RecordTypeDefinition> actions;
-    private final Invariant invariant;
 
-    public static class Error extends RuntimeException {
-        public Error(Object format, Object ...args) {
-            super("Invariant validation error: " + String.format(format.toString(), args));
-        }
+    private InvariantValidator(InvariantValidator factory, Invariant invariant) {
+        this.types = Map.copyOf(factory.types);
+        this.entities = Map.copyOf(factory.entities);
+        this.actions = Map.copyOf(factory.actions);
+        this.variables = getVariables(invariant, types);
     }
 
-    private CommonTypeDefinition collect(Expression expr) {
-        return Objects.requireNonNull(expr.compute(this));
-    }
-
-    public InvariantValidation(Schema schema, Entities entities, Invariant invariant) {
+    /**
+     * Public constructor. Acts like a factory in that it builds internal structures,
+     * such as available types, entities and actions. It deliberately leaves invariant-specific
+     * structures (i.e., variables) nullified. Invariant validation is done via the private
+     * constructor that copies general data from this factory object, computes invariant-specific
+     * information and does validation.
+     */
+    public InvariantValidator(Schema schema, Entities entities) {
         this.types = new HashMap<>();
-        this.variables = new HashMap<>();
-        this.invariant = invariant;
+        this.variables = null;
 
         Typing typing = new Typing();
 
@@ -48,18 +51,6 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
         schema.actions().stream()
                 .map(typing::convert)
                 .forEach(e -> types.put(e.getName(), e));
-        // Build variables cross-checking types
-        invariant.getQuantifier().getVariables().forEach(var -> {
-            if (!types.containsKey(var.type())) {
-                throw new Error("invalid type: %s in quantifier: %s. Available types: %s",
-                        var.type(), invariant.getQuantifier(), types.keySet());
-            }
-            if (variables.containsKey(var.name())) {
-                throw new Error("duplicate variable name: %s in quantifier: %s",
-                        var.name(), invariant.getQuantifier());
-            }
-            variables.put(var.name(), types.get(var.type()));
-        });
 
         // FIXME: ensure entities and actions have types
         this.entities = entities.getEntities().stream().collect(Collectors.toMap(
@@ -71,8 +62,36 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
         ));
     }
 
+    private static Map<String, RecordTypeDefinition> getVariables(Invariant invariant, Map<String, RecordTypeDefinition> types) {
+        Map<String, RecordTypeDefinition> variables = new HashMap<>();
+        invariant.getQuantifier().getVariables().forEach(var -> {
+            if (!types.containsKey(var.type())) {
+                throw new Error("invalid type: %s in quantifier: %s. Available types: %s",
+                        var.type(), invariant.getQuantifier(), types.keySet());
+            }
+            if (variables.containsKey(var.name())) {
+                throw new Error("duplicate variable name: %s in quantifier: %s",
+                        var.name(), invariant.getQuantifier());
+            }
+            variables.put(var.name(), types.get(var.type()));
+        });
+        return variables;
+    }
+
+    public static class Error extends RuntimeException {
+        public Error(Object format, Object ...args) {
+            super("Invariant validation error: " + String.format(format.toString(), args));
+        }
+    }
+
+    private CommonTypeDefinition collect(Expression expr) {
+        return Objects.requireNonNull(expr.compute(this));
+    }
+
     public void validate(Invariant invariant) {
-        expect(collect(invariant.getExpression()), TBoolean);
+        require(this.variables == null);
+        InvariantValidator validator = new InvariantValidator(this, invariant);
+        expect(validator.collect(invariant.getExpression()), TBoolean);
     }
 
     @Override
@@ -157,7 +176,7 @@ public class InvariantValidation implements PolicyComputationVisitor<CommonTypeD
         if (variables.containsKey(ref)) {
             return variables.get(ref);
         }
-        throw new Error("Ungrounded variable: %s in %s", ref, invariant.getExpression());
+        throw new Error("Ungrounded variable: %s", ref);
     }
 
     @Override

@@ -3,8 +3,6 @@ package org.springframework.samples.petclinic.cedar;
 import com.cedarpolicy.value.PrimString;
 import com.cedarpolicy.value.EntityUID;
 import com.cedarpolicy.value.Value;
-import com.cedarpolicy.value.CedarList;
-import com.cedarpolicy.value.CedarMap;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -23,9 +21,8 @@ import org.springframework.web.servlet.HandlerMapping;
 
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
 @Aspect
 @Component
@@ -38,6 +35,27 @@ public class CedarAspect {
 	private static final String USER_ID_SESSION_ATTRIBUTE = "currentUser";
 
 	private static final String CONTEXT_PARAM_PREFIX = "cedar-context-";
+
+	private record ResourceMetadata(String sqlQuery, Function<Map<String, Object>, String> nameExtractor) {}
+
+	private static final Map<String, ResourceMetadata> RESOURCE_REGISTRY = Map.of(
+        "PetOwner", new ResourceMetadata(
+            "SELECT first_name, last_name FROM owners WHERE entity_id = ?", 
+            rs -> rs.get("first_name") + " " + rs.get("last_name")
+        ),
+        "Veterinarian", new ResourceMetadata(
+            "SELECT first_name, last_name FROM vets WHERE entity_id = ?", 
+            rs -> rs.get("first_name") + " " + rs.get("last_name")
+        ),
+        "Pet", new ResourceMetadata(
+            "SELECT name FROM pets WHERE entity_id = ?", 
+            rs -> rs.get("name").toString()
+        ),
+        "PetVisit", new ResourceMetadata(
+            "SELECT description FROM visits WHERE entity_id = ?", 
+            rs -> rs.get("description").toString()
+        )
+    );
 
 	public CedarAspect(CedarService cedarService, JdbcTemplate jdbcTemplate) {
 		this.cedarService = cedarService;
@@ -56,17 +74,23 @@ public class CedarAspect {
 		System.out.println("HTTP request resourceId: " + extractResourceId(request));
 		System.out.println("Cookie principalId: " + principalId);
 
-		EntityUID principal = EntityUID.parse("PetClinic::User::\"" + principalId + "\"")
-			.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
+		EntityUID principal;
+		if (principalId.equals("Guest")) {
+			principal = EntityUID.parse("PetClinic::Guest::\"Unknown\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
+		} else {
+			principal = EntityUID.parse("PetClinic::Employee::\"" + principalId + "\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
+		}
+
 		EntityUID action = EntityUID.parse("PetClinic::Action::\"" + requiresAuthorization.action() + "\"")
 			.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
-		EntityUID resource = EntityUID.parse("PetClinic::" + requiresAuthorization.resourceType())
-			.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
+
+		EntityUID resource = resolveResourceUid(request, requiresAuthorization);
 
 		// Populate context for Attribute-Based Access Control (ABAC).
 		Map<String, Value> contextMap = new HashMap<>();
-		contextMap.putAll(extractContextFromParameters(request));
-		enrichContextWithDatabaseData(request, contextMap);
+		contextMap.putAll(extractContextFromParameters(request, principalId));
 
 		// Prints Cedar context to console.
 		System.out.println("Cedar context: " + contextMap.toString());
@@ -101,7 +125,52 @@ public class CedarAspect {
 		return segments.length > 0 ? segments[segments.length - 1] : "global";
 	}
 
-	private Map<String, Value> extractContextFromParameters(HttpServletRequest request) {
+	private EntityUID resolveResourceUid(HttpServletRequest request, CedarAuthorization requiresAuthorization) {
+        String resourceType = requiresAuthorization.resourceType();
+        String resourceIdentifier = extractResourceId(request);
+
+		ResourceMetadata metadata = RESOURCE_REGISTRY.get(resourceType);
+
+        if (metadata != null) {
+            @SuppressWarnings("unchecked")
+            Map<String, String> pathVariables = (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+            
+            if (pathVariables != null && !pathVariables.isEmpty()) {
+                String expectedKey = resourceType.toLowerCase() + "Id";
+                String entityIdString = pathVariables.get(expectedKey);
+
+                if (entityIdString == null) {
+                    entityIdString = pathVariables.entrySet().stream()
+                            .filter(entry -> entry.getKey().toLowerCase().endsWith("id"))
+                            .map(Map.Entry::getValue)
+                            .findFirst()
+                            .orElse(null);
+                }
+
+                if (entityIdString != null) {
+                    try {
+                        int entityId = Integer.parseInt(entityIdString);
+                        
+                        Map<String, Object> queryResult = this.jdbcTemplate.queryForMap(metadata.sqlQuery(), entityId);
+                        String resolvedName = metadata.nameExtractor().apply(queryResult);
+                        
+                        if (resolvedName != null && !resolvedName.trim().isEmpty()) {
+                            resourceIdentifier = resolvedName.trim();
+                        }
+                    } catch (NumberFormatException | EmptyResultDataAccessException | NullPointerException exception) {
+                        // Retains the default numeric identifier if parsing, resolution, or formatting fails.
+                    }
+                }
+            }
+        }
+
+        final String finalResourceIdentifier = resourceIdentifier;
+
+        return EntityUID.parse("PetClinic::" + resourceType + "::\"" + finalResourceIdentifier + "\"")
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format generated for: " + finalResourceIdentifier));
+    }
+
+	private Map<String, Value> extractContextFromParameters(HttpServletRequest request, String principalId) {
 		Map<String, Value> context = new HashMap<>();
 		Enumeration<String> parameterNames = request.getParameterNames();
 
@@ -110,50 +179,27 @@ public class CedarAspect {
 				String paramName = parameterNames.nextElement();
 				if (paramName.regionMatches(true, 0, CONTEXT_PARAM_PREFIX, 0, CONTEXT_PARAM_PREFIX.length())) {
 					String contextKey = paramName.substring(CONTEXT_PARAM_PREFIX.length()).toLowerCase();
-					String paramValue = request.getParameter(paramName);
-					context.put(contextKey, new PrimString(paramValue));
+
+					if ("authenticated".equals(contextKey)) {
+						boolean isAuthenticated = false;
+						if (!"Guest".equals(principalId)) {
+							try {
+								String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
+								Integer count = this.jdbcTemplate.queryForObject(sql, Integer.class, principalId);
+								isAuthenticated = (count != null && count > 0);
+							} catch (Exception exception) {
+								isAuthenticated = false;
+							}
+						}
+						context.put(contextKey, new PrimString(String.valueOf(isAuthenticated)));
+					} else {
+						String paramValue = request.getParameter(paramName);
+						context.put(contextKey, new PrimString(paramValue));
+					}
 				}
 			}
 		}
 		return context;
-	}
-
-	private void enrichContextWithDatabaseData(HttpServletRequest request, Map<String, Value> contextMap) {
-		@SuppressWarnings("unchecked")
-		Map<String, String> pathVariables = (Map<String, String>) request
-			.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-
-		if (pathVariables == null) {
-			return;
-		}
-
-		// Extracts the identifier from the URI.
-		String entityIdString = pathVariables.getOrDefault("ownerId", pathVariables.get("vetId"));
-
-		if (entityIdString != null) {
-			try {
-				int entityId = Integer.parseInt(entityIdString);
-
-				String sql = "SELECT d.name FROM databases d JOIN entity_databases ed ON d.database_id = ed.database_id WHERE ed.entity_id = ?";
-				List<String> databaseNames = this.jdbcTemplate.queryForList(sql, String.class, entityId);
-
-				if (!databaseNames.isEmpty()) {
-					List<Value> databaseCedarMaps = databaseNames.stream().map(databaseName -> {
-						Map<String, Value> databaseMap = new HashMap<>();
-                        databaseMap.put("type", new PrimString("PetClinic::Database"));
-                        databaseMap.put("id", new PrimString(databaseName));
-                        return new CedarMap(databaseMap);
-					}).collect(Collectors.toList());
-					contextMap.put("databases", new CedarList(databaseCedarMaps));
-				}
-			}
-			catch (NumberFormatException exception) {
-				throw new IllegalArgumentException("Malformed entity identifier within URI path.", exception);
-			}
-			catch (EmptyResultDataAccessException exception) {
-				// The entity lacks a database assignment.
-			}
-		}
 	}
 
 }

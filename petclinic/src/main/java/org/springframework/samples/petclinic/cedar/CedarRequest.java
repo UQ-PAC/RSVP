@@ -4,20 +4,27 @@ import com.cedarpolicy.model.Context;
 import com.cedarpolicy.value.EntityUID;
 import com.cedarpolicy.value.Value;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class CedarRequest {
 
-	private EntityUID principal;
+	@JsonProperty("principal")
+	private final EntityUID principal;
 
-	private EntityUID action;
+	@JsonProperty("action")
+	private final EntityUID action;
 
-	private EntityUID resource;
+	@JsonProperty("resource")
+	private final EntityUID resource;
 
-	private Map<String, Value> context;
+	@JsonProperty("context")
+	private final Map<String, Value> context;
 
-	private boolean validateRequest;
+	@JsonProperty("validateRequest")
+	private final boolean validateRequest;
 
 	public CedarRequest(EntityUID principal, EntityUID action, EntityUID resource, Map<String, Value> context,
 			boolean validateRequest) {
@@ -32,24 +39,12 @@ public class CedarRequest {
 		return principal;
 	}
 
-	public void setPrincipal(EntityUID principal) {
-		this.principal = principal;
-	}
-
 	public EntityUID getAction() {
 		return action;
 	}
 
-	public void setAction(EntityUID action) {
-		this.action = action;
-	}
-
 	public EntityUID getResource() {
 		return resource;
-	}
-
-	public void setResource(EntityUID resource) {
-		this.resource = resource;
 	}
 
 	public Context getContext() {
@@ -59,16 +54,8 @@ public class CedarRequest {
 		return new Context(this.context);
 	}
 
-	public void setContext(Map<String, Value> context) {
-		this.context = context;
-	}
-
 	public boolean isValidateRequest() {
 		return validateRequest;
-	}
-
-	public void setValidateRequest(boolean validateRequest) {
-		this.validateRequest = validateRequest;
 	}
 
 }

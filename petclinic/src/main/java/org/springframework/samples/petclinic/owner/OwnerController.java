@@ -166,7 +166,7 @@ class OwnerController {
 	 * @return a ModelMap with the model attributes for the view
 	 */
 	@GetMapping("/owners/{ownerId}")
-	@CedarAuthorization(action = "ViewWebPage", resourceType = "WebPage::\"Owner\"", validate = true)
+	@CedarAuthorization(action = "ViewClient", resourceType = "PetOwner", validate = true)
 	public ModelAndView showOwner(@PathVariable("ownerId") int ownerId) {
 		ModelAndView mav = new ModelAndView("owners/ownerDetails");
 		Optional<Owner> optionalOwner = this.owners.findById(ownerId);

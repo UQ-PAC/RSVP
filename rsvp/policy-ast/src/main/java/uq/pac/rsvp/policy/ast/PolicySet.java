@@ -15,7 +15,7 @@ public class PolicySet extends LinkedHashSet<Policy> implements PolicyItem {
 
     /**
      * Parse a Cedar policy file and return the corresponding AST.
-     * 
+     *
      * @param policyFile the path to the Cedar policy file
      * @return a new PolicySet instance corresponding to the parsed Cedar policy
      *         file
@@ -34,7 +34,7 @@ public class PolicySet extends LinkedHashSet<Policy> implements PolicyItem {
 
     /**
      * Parse a Cedar policy file and return the corresponding AST.
-     * 
+     *
      * @param filename the name of the file for reporting, if {@code null} then the
      *                 source file for all resulting reports will be
      *                 {@code "unknown"}
@@ -48,7 +48,6 @@ public class PolicySet extends LinkedHashSet<Policy> implements PolicyItem {
     public static PolicySet parseCedarPolicySet(String filename, String policies) throws RsvpException {
         try {
             String json = com.cedarpolicy.model.policy.PolicySet.parseStringToJsonAst(policies);
-            System.err.println(json);
             return JsonParser.parsePolicySet(filename, json, policies);
         } catch (InternalException | IOException e) {
             throw new RsvpException("Error parsing policy set", e);

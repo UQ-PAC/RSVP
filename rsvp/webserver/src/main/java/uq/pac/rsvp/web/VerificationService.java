@@ -83,6 +83,19 @@ public class VerificationService {
         // for (VerificationFileset verification : verifications) {
         Set<List<VersionedPolicy>> versionedPolicies = verification.getPolicyFiles();
 
+        Set<String> schemas = verification.getSchemas();
+        if (schemas.isEmpty()) {
+            logger.error("Bad request: no schema included");
+            throw new ErrorResponseException(HttpStatus.BAD_REQUEST);
+        }
+        if (schemas.size() > 1) {
+            logger.error("Bad request: too many schemas");
+            throw new ErrorResponseException(HttpStatus.BAD_REQUEST);
+        }
+
+        Path schemaFile = session.getFile(schemas.iterator().next());
+        logger.info("Schema: {}", schemaFile);
+
         for (List<VersionedPolicy> policy : versionedPolicies) {
             if (policy.size() > 0) {
                 // TODO: enable multiple files parsed to single policy set
@@ -95,10 +108,11 @@ public class VerificationService {
                     throw new ErrorResponseException(HttpStatus.BAD_REQUEST);
                 }
 
-                logger.info("Verifying: {}", file);
+                // logger.info("Verifying: {}", file);
 
                 Set<Report> all = Verification.verifyPolicies(fileId, Files.readString(file));
-                logger.info(all.toString());
+                //Set<Report> all = Collections.emptySet();
+                // logger.info(all.toString());
 
                 result.addAll(all);
 

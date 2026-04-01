@@ -1,16 +1,16 @@
+import { useVerificationDispatch } from "./providers/VerificationContext";
 import { VerifyButton } from "./VerifyButton";
 import { Lexend_Giga } from "next/font/google";
 interface HeaderParams {
   heading: string;
   subheading?: string;
-  verify: () => Promise<void>;
 }
 
 const lexendGiga = Lexend_Giga({
   subsets: ["latin"],
 });
 
-export function Header({ heading, subheading, verify }: HeaderParams) {
+export function Header({ heading, subheading }: HeaderParams) {
   return (
     <div className="app-header">
       <div className="header-left-align">
@@ -20,7 +20,7 @@ export function Header({ heading, subheading, verify }: HeaderParams) {
         {subheading && <h2 className="subtitle med-text">{subheading}</h2>}
       </div>
       <div className="header-right-align">
-        <VerifyButton verify={verify} />
+        <VerifyButton />
       </div>
     </div>
   );

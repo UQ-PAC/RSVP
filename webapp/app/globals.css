@@ -181,7 +181,7 @@
 
   /********  Drawer  ********/
 
-  .drawer-container {
+  .drawer {
     max-width: 0;
     padding: 0;
     margin: 0;
@@ -197,13 +197,10 @@
     flex-direction: column;
     padding: 1rem 0;
     position: relative;
+    align-items: stretch;
   }
 
-  /* .drawer-container {
-    width: 0;
-  } */
-
-  .drawer-container.expanded {
+  .drawer.expanded {
     min-width: 33%;
     max-width: 33%;
     padding: 1rem;
@@ -211,22 +208,26 @@
     /* display: initial; */
   }
 
-  .drawer-container .drawer-content {
+  .drawer .drawer-container {
     display: none;
-    flex-grow: 1;
+  }
+
+  .drawer.expanded .drawer-container {
+    display: flex;
     flex-direction: column;
-    /* transition: all 200ms; */
+    overflow: hidden;
+    flex-grow: 1;
+  }
+
+  .drawer .drawer-content {
     overflow-y: scroll;
     background-color: var(--color-filepond-bg);
     border: 1px solid var(--color-gray-200);
     border-radius: 0.5rem;
+    flex-grow: 1;
   }
 
-  .drawer-container.expanded .drawer-content {
-    display: flex;
-  }
-
-  .drawer-container .drawer-tab {
+  .drawer .drawer-tab {
     position: absolute;
     top: 1rem;
     color: var(--color-gray-200);
@@ -238,48 +239,48 @@
       0 0.2rem 0.4rem 0 rgba(0, 0, 0, 0.2);
   }
 
-  .drawer-container.drawer-container-left .drawer-tab {
+  .drawer.drawer-left .drawer-tab {
     left: 0;
   }
 
-  .drawer-container.drawer-container-right .drawer-tab {
+  .drawer.drawer-right .drawer-tab {
     right: 0;
   }
 
-  .drawer-container.drawer-container-left.expanded .drawer-tab {
+  .drawer.drawer-left.expanded .drawer-tab {
     left: 100%;
   }
 
-  .drawer-container.drawer-container-right.expanded .drawer-tab {
+  .drawer.drawer-right.expanded .drawer-tab {
     right: 100%;
   }
 
   @media screen and (min-width: 590px) and (max-width: 825px) {
-    .drawer-container.expanded {
+    .drawer.expanded {
       min-width: 275px;
       max-width: 275px;
     }
 
-    .drawer-container.drawer-container-left.expanded .drawer-tab {
+    .drawer.drawer-left.expanded .drawer-tab {
       left: 275px;
     }
 
-    .drawer-container.drawer-container-right.expanded .drawer-tab {
+    .drawer.drawer-right.expanded .drawer-tab {
       right: 275px;
     }
   }
 
-  .drawer-container.drawer-container-left {
+  .drawer.drawer-left {
     left: 0;
     border-radius: 0 0.2rem 0.2rem 0;
   }
 
-  .drawer-container.drawer-container-right {
+  .drawer.drawer-right {
     right: 0;
     border-radius: 0.2rem 0 0 0.2rem;
   }
 
-  .drawer-container .drawer-title {
+  .drawer .drawer-title {
     margin: 0.5rem;
     color: var(--color-gray-200);
     font-size: 1rem;
@@ -418,6 +419,7 @@
 
   .reports-container .reports-instruction {
     color: #505050;
+    padding: 0.75rem 0.5rem 0;
   }
 
   .reports-section .reports-section-header {

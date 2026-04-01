@@ -14,7 +14,7 @@ interface SelectionAction {
   scroll: "source" | "report" | "none";
 }
 
-export function reducer(
+export function selectionReducer(
   context: SelectionState,
   action: SelectionAction,
 ): SelectionState {

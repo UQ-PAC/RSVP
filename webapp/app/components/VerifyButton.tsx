@@ -8,34 +8,33 @@ import {
   useFocus,
   useFocusDispatch,
 } from "./providers/FocusContext";
+import { useVerificationDispatch } from "./providers/VerificationContext";
 
 const lexendDeca = Lexend_Deca({
   subsets: ["latin"],
 });
 
-interface VerifyButtonParams {
-  verify: () => Promise<void>;
-}
-
-export function VerifyButton({ verify }: VerifyButtonParams) {
+export function VerifyButton() {
   const { drawer: drawerFocus } = useFocus();
   const focusDispatch = useFocusDispatch();
+  const verificationDispatch = useVerificationDispatch();
 
-  const onclick = () =>
-    verify().then(() => {
-      if (drawerFocus["right"] === ExpansionState.Collapsed) {
-        focusDispatch({
-          type: "drawer",
-          key: "left",
-          value: ExpansionState.Collapsed,
-        });
-        focusDispatch({
-          type: "drawer",
-          key: "right",
-          value: ExpansionState.Expanded,
-        });
-      }
-    });
+  const onclick = () => {
+    verificationDispatch({ type: "verify" });
+
+    if (drawerFocus["right"] === ExpansionState.Collapsed) {
+      focusDispatch({
+        type: "drawer",
+        key: "left",
+        value: ExpansionState.Collapsed,
+      });
+      focusDispatch({
+        type: "drawer",
+        key: "right",
+        value: ExpansionState.Expanded,
+      });
+    }
+  };
 
   return (
     <button className="verify-button" onClick={onclick}>

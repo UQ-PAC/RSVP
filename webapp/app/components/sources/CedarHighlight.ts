@@ -3,7 +3,6 @@ import hljs, { Mode } from "highlight.js";
 const IDENT = "[a-zA-Z_$][a-zA-Z_$0-9]*";
 
 export const CedarHighlight = {
-  // or with an array
   keywords: {
     keyword: [
       "permit",

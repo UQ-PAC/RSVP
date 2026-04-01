@@ -1,5 +1,40 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.AttributeRuleDecl;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.ForbidRuleDecl;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.HasAttributeRuleDecl;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.NullifiedRequestsRuleDecl;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.OUTPUT_DELIMITER;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.OUTPUT_EXT;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.ParentOfRuleDecl;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.PermitRuleDecl;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.PermittedRequestsRuleDecl;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.ProgramName;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.TmpRecordType;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.UndefinedEntityUIDName;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.makeAtom;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.makeForbiddenRequestsRule;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.makeIODirectives;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.makePermittedRequestsRule;
+import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import com.cedarpolicy.AuthorizationEngine;
 import com.cedarpolicy.BasicAuthorizationEngine;
 import com.cedarpolicy.model.DetailedError;
@@ -13,27 +48,22 @@ import com.cedarpolicy.value.EntityUID;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Multimap;
+
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.schema.Schema;
-import uq.pac.rsvp.policy.datalog.ast.*;
+import uq.pac.rsvp.policy.datalog.ast.DLAtom;
+import uq.pac.rsvp.policy.datalog.ast.DLDeclTerm;
+import uq.pac.rsvp.policy.datalog.ast.DLFact;
+import uq.pac.rsvp.policy.datalog.ast.DLProgram;
+import uq.pac.rsvp.policy.datalog.ast.DLRule;
+import uq.pac.rsvp.policy.datalog.ast.DLRuleDecl;
+import uq.pac.rsvp.policy.datalog.ast.DLTerm;
 import uq.pac.rsvp.policy.datalog.invariant.Invariant;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantSet;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantValidator;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
-import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
 /**
  * Putting translation of the cedar schema, entities, policies and context together
@@ -362,13 +392,13 @@ public class Translation {
         return loadRequests(csv, decl.getName());
     }
 
-    Map<Policy, RequestSet> getPolicyResult() {
+    public Map<Policy, RequestSet> getPolicyResult() {
         Map<Policy, RequestSet> requests = new HashMap<>();
         policies.forEach(policy -> requests.put(policy, loadRequests(policy)));
         return requests;
     }
 
-    Map<Invariant, InvariantResult> getInvariantResult() {
+    public Map<Invariant, InvariantResult> getInvariantResult() {
         Map<Invariant, InvariantResult> result = new HashMap<>();
         invariants.getInvariants().forEach(invariant -> {
             result.put(invariant, new InvariantResult(invariant, loadRelation(invariant)));

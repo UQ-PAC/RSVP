@@ -113,7 +113,7 @@ public class InvariantFunctionValidator {
             CommonTypeDefinition selfElement = ((SetTypeDefinition) actualSelf).getElementType();
             CommonTypeDefinition argElement = ((SetTypeDefinition) actualArguments.getFirst()).getElementType();
 
-            Typing.expectCompatible(selfElement, argElement, this.arguments.getFirst());
+            Typing.expectCompatible(selfElement, argElement, REGISTRY.get("contains").arguments.getFirst());
         }
     }
 

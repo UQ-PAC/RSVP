@@ -196,6 +196,21 @@ public class TypingTest {
             "no: a.friends.contains(a.role, a.role) for all a: Account",
             "no: a.friends.contains() for all a: Account",
 
+            // containsAll
+            "ok: a.friends.containsAll(b.friends) for all a: Account, b: Account",
+            "no: a.friends.containsAll(3) for all a: Account, c: Container",
+            "no: a.friends.containsAll(c.contents.booleans) for all a: Account, c: Container",
+            "no: containsAll(c.contents.booleans) for all a: Account, c: Container",
+            "no: a.friends.containsAll() for all a: Account, c: Container",
+            "no: containsAll(b, b) for all a: Account, b: Account",
+
+            // containsAny
+            "ok: a.friends.containsAny(b.friends) for all a: Account, b: Account",
+            "no: a.friends.containsAny(3) for all a: Account, c: Container",
+            "no: a.friends.containsAny(c.contents.booleans) for all a: Account, c: Container",
+            "no: containsAny(c.contents.booleans) for all a: Account, c: Container",
+            "no: a.friends.containsAny() for all a: Account, c: Container",
+            "no: containsAny(b, b) for all a: Account, b: Account",
     })
     void typeTest(String invariantText) {
         boolean pass = true;

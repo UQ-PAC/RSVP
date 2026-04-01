@@ -230,6 +230,8 @@ public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDe
         }
         CommonTypeDefinition self = expr.getSelf() == null ? null : collect(expr.getSelf());
         validator.validate(self, collect(expr.getArgs()));
+        // TODO: For the moment we are supporting boolean-valued functions only
+        //       This needs to be extended to arbitrary-valued functions
         return Typing.BooleanType;
     }
 

@@ -25,13 +25,13 @@ class Typing {
     final static TypeTest TLong = new TypeTest(t -> t == LongType, "Long");
     final static TypeTest TString = new TypeTest(t -> t == StringType, "String");
     final static TypeTest TTypeOfEntity = new TypeTest(t -> t == TypeOfEntityType, "Entity");
+    final static TypeTest TSet = new TypeTest(t -> t instanceof SetTypeDefinition, "Set<?>");
     final static TypeTest TRecord = new TypeTest(
             t -> t instanceof RecordTypeDefinition, "Record, Entity, Action");
     final static TypeTest TEntityOrAction = new TypeTest(
             t -> isEntity(t) || isAction(t), "Entity, Action");
     final static TypeTest TEntity = new TypeTest(Typing::isEntity, "Entity");
     final static TypeTest TAction = new TypeTest(Typing::isAction, "Action");
-
     private static boolean isActionName(String name) {
         return name.equals("Action") || name.endsWith("::Action");
     }
@@ -66,6 +66,10 @@ class Typing {
 
     static TypeTest expectCompatible(CommonTypeDefinition one, CommonTypeDefinition another, TypeTest ...tests) {
         return expect(another,  expect(one, tests));
+    }
+
+    static TypeTest expectCompatible(CommonTypeDefinition one, CommonTypeDefinition another, List<TypeTest> tests) {
+        return expectCompatible(one, another, tests.toArray(new TypeTest[0]));
     }
 
     private final Map<String, EntityTypeReference> references;

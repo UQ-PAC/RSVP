@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import static org.fusesource.jansi.Ansi.Color.*;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class TypingTest {
     Logger logger = new Logger();
@@ -172,6 +173,29 @@ public class TypingTest {
             "no: deny(p, r) for all a: Action, p: Account, r: Photo",
             "no: deny() for all a: Action, p: Account, r: Photo",
 
+            // isEmpty
+            "ok: a.friends.isEmpty() for all a: Account",
+            "ok: a.contents.strings.isEmpty() for all a: Container",
+            "no: a.friends.isEmpty(1) for all a: Account",
+            "no: isEmpty() for all a: Account",
+            "no: a.role.isEmpty() for all a: Account",
+
+            // contains
+            "ok: a.friends.contains(b) for all a: Account, b: Account",
+            "ok: a.friends.contains(b.role) for all a: Account, b: Account",
+            "ok: c.contents.booleans.contains(true) for all c: Container",
+            "ok: c.contents.numbers.contains(1) for all c: Container",
+            "ok: c.contents.numbers.contains(1) for all c: Container",
+            // allow entities/actions to be compared
+            "ok: a.friends.contains(a.role) for all a: Account",
+            "ok: a.friends.contains(Action::\"viewPhoto\") for all a: Account",
+            "no: a.friends.contains(1) for all a: Account",
+            "no: c.contents.numbers.contains(false) for all c: Container",
+            "no: c.contents.numbers.contains(\"a\") for all c: Container",
+            "no: contains(\"a\") for all c: Container",
+            "no: a.friends.contains(a.role, a.role) for all a: Account",
+            "no: a.friends.contains() for all a: Account",
+
     })
     void typeTest(String invariantText) {
         boolean pass = true;
@@ -180,7 +204,7 @@ public class TypingTest {
         } else if (invariantText.startsWith("no: ")) {
             pass = false;
         } else {
-            typeTest("Invalid prefix: " + invariantText);
+            fail("Invalid prefix: " + invariantText);
         }
 
         invariantText = invariantText.substring(4);

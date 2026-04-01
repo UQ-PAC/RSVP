@@ -32,6 +32,15 @@ entity Guest {
     friend: Account
 };
 
+entity Container = {
+    contents: {
+        strings: Set<String>,
+        booleans: Set<Bool>,
+        numbers: Set<Long>,
+        accounts: Set<Account>
+    }
+};
+
 action "viewPhoto" appliesTo {
     principal: Account,
     resource: Photo,

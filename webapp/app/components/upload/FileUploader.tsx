@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { VerificationContext } from "./VerificationContext";
+import { VerificationGroup } from "./VerificationGroup";
 import { CreateContextButton } from "./CreateContextButton";
 import { useVerificationDispatch } from "../providers/VerificationContext";
 import { upload } from "../../requests";
-import { FileType } from "@/app/types";
+import { FileType } from "../../types";
 
 export function FileUploader() {
   const [policySets, setPolicySets] = useState<string[]>([]);
@@ -13,16 +13,13 @@ export function FileUploader() {
   const dispatch = useVerificationDispatch();
 
   const createPolicySet = () => {
-    setPolicySets([
-      ...policySets,
-      "Verification context " + (policySets.length + 1),
-    ]);
+    setPolicySets([...policySets, "Policy set " + (policySets.length + 1)]);
   };
 
   return (
-    <div className="files-container">
+    <div className="upload-container">
       {policySets.map((policySet, i) => (
-        <VerificationContext
+        <VerificationGroup
           key={i}
           name={policySet}
           addFiles={(toAdd: File[]) => {
@@ -50,6 +47,9 @@ export function FileUploader() {
               });
             });
           }}
+          remove={() =>
+            setPolicySets(policySets.filter((name) => name !== policySet))
+          }
         />
       ))}
       <CreateContextButton onclick={createPolicySet} />

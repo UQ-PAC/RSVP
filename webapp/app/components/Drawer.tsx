@@ -19,11 +19,7 @@ export function Drawer({ title, side, children }: DrawerProps) {
 
   const expanded = !drawer[side];
 
-  const className = cx(
-    "drawer-container",
-    `drawer-container-${side}`,
-    expanded && "expanded",
-  );
+  const className = cx("drawer", `drawer-${side}`, expanded && "expanded");
 
   const icon =
     (side === "left" && expanded) || (side === "right" && !expanded)
@@ -46,8 +42,10 @@ export function Drawer({ title, side, children }: DrawerProps) {
       >
         <FontAwesomeIcon className="drawer-tab-icon" icon={icon} />
       </div>
-      <h3 className="drawer-title">{title}</h3>
-      <div className="drawer-content">{children}</div>
+      <div className="drawer-container">
+        <h3 className="drawer-title">{title}</h3>
+        <div className="drawer-content">{children}</div>
+      </div>
     </div>
   );
 }

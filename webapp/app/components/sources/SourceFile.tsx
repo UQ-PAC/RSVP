@@ -15,12 +15,13 @@ import {
   useFocusDispatch,
 } from "../providers/FocusContext";
 import { useSelectionDispatch } from "../providers/SelectionContext";
+import { useEffect, useState } from "react";
 
 interface SourceFileParams {
   filename: string;
   filetype: FileType;
-  content: string;
-  reports: Report[];
+  content: Promise<string>;
+  reports: Promise<Report[]>;
 }
 
 export function SourceFile({
@@ -29,6 +30,9 @@ export function SourceFile({
   content,
   reports,
 }: SourceFileParams) {
+  const [code, setCode] = useState("");
+  const [resolvedReports, setResolvedReports] = useState<Report[]>([]);
+
   const { "source-file": focus } = useFocus();
   const focusDispatch = useFocusDispatch();
   const selectionDispatch = useSelectionDispatch();
@@ -43,11 +47,19 @@ export function SourceFile({
       syntax = "cedar";
       break;
     case "entities":
-      syntax = "json";
+      syntax = "entities";
       break;
     case "invariant":
       syntax = "invariant";
   }
+
+  useEffect(() => {
+    content.then((code) => setCode(code));
+  }, [content]);
+
+  useEffect(() => {
+    reports.then((resolved) => setResolvedReports(resolved));
+  }, [reports]);
 
   return (
     <div className={`source-file ${expanded ? "expanded" : "collapsed"}`}>
@@ -72,7 +84,7 @@ export function SourceFile({
         />
       </div>
       {expanded && (
-        <CodeRender content={content} syntax={syntax} reports={reports} />
+        <CodeRender content={code} syntax={syntax} reports={resolvedReports} />
       )}
     </div>
   );

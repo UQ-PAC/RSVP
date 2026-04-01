@@ -149,7 +149,6 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
       highlighted = highlight(line);
     }
 
-    // console.log(line);
     code.push(
       <span key={`line-${n}`} className="source-file-line-number"></span>,
       <span
@@ -183,7 +182,7 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
 
                   focusDispatch({
                     type: "report-group",
-                    key: `${relevant?.report.severity}-${relevant?.report.primarySourceLocation.source?.filename}`,
+                    key: `${relevant?.report.severity}-${relevant?.report.primarySourceLocation.source?.file.name}`,
                     value: ExpansionState.Expanded,
                   });
                 }

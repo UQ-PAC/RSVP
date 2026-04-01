@@ -1,21 +1,15 @@
 export type FileType = "cedar" | "cedarschema" | "entities" | "invariant";
-export type FileSyntax = "cedar" | "json" | "invariant";
-export interface SourceFileInfo {
-  filename: string;
-  serverId: string;
-  contents: string;
-}
+export type FileSyntax = "cedar" | "entities" | "invariant";
+export type ReportSeverity = "info" | "warn" | "err";
 
 export interface SourceLoc {
   file: string;
-  source?: SourceFileInfo;
+  source?: VerificationFile;
   offset: number;
   len: number;
   line: number;
   col: number;
 }
-
-export type ReportSeverity = "info" | "warn" | "err";
 
 export interface Report {
   id: string;
@@ -30,11 +24,23 @@ export type VersionedPolicy = {
   version: string;
   id: string;
 }[];
-export interface VerificationFileset {
+
+export interface VerificationRequest {
   policyFiles: VersionedPolicy[];
   schemas: string[];
   entities: string[];
   invariants: string[];
+}
+
+export interface UploadedFile {
+  serverId: string;
+  content: Promise<string>;
+}
+
+export interface VerificationFile {
+  file: File;
+  filetype: FileType;
+  resolved: Promise<UploadedFile>;
 }
 
 export const sortReports = (reports: Report[]) =>

@@ -3,7 +3,6 @@ import hljs, { Mode } from "highlight.js";
 const IDENT = "[a-zA-Z_$][a-zA-Z_$0-9]*";
 
 export const InvariantHighlight = {
-  // or with an array
   keywords: {
     keyword: ["allow", "deny", "for", "none", "some", "all"],
     literal: ["true", "false"],

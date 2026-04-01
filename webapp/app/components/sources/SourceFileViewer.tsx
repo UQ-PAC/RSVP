@@ -1,7 +1,7 @@
 "use client";
 
 import { SourceFile } from "./SourceFile";
-import { Report, SourceFileInfo } from "../../types";
+import { Report, VerificationFile } from "../../types";
 import { useEffect } from "react";
 import hljs from "highlight.js";
 import { CedarHighlight } from "./CedarHighlight";
@@ -11,21 +11,49 @@ import {
   useFocusDispatch,
 } from "../providers/FocusContext";
 import { InvariantHighlight } from "./InvariantHighlight";
-interface SourceFileViewerParams {
-  sources: SourceFileInfo[];
-  reports?: Report[];
-}
+import { EntitiesHighlight } from "./EntitiesHighlight";
+import { useVerification } from "../providers/VerificationContext";
 
-export function SourceFileViewer({ sources, reports }: SourceFileViewerParams) {
+export function SourceFileViewer() {
   useEffect(() => {
     hljs.debugMode();
     hljs.registerLanguage("cedar", () => CedarHighlight);
     hljs.registerLanguage("invariant", () => InvariantHighlight);
-    // hljs.configure({ ignoreUnescapedHTML: true });
+    hljs.registerLanguage("entities", () => EntitiesHighlight);
   }, []);
 
   const { drawer: drawerFocus } = useFocus();
   const focusDispatch = useFocusDispatch();
+
+  const verificationContext = useVerification();
+
+  const filterReports = (
+    source: VerificationFile,
+    reports?: Promise<Report[]>,
+  ): { source: VerificationFile; reports: Promise<Report[]> } => ({
+    source,
+    reports:
+      reports?.then((reports) =>
+        reports.filter(
+          // TODO: multiple locations
+          (report) => report.primarySourceLocation.source === source,
+        ),
+      ) ?? Promise.resolve([]),
+  });
+
+  const sources = Object.entries(verificationContext).reduce<
+    { source: VerificationFile; reports: Promise<Report[]> }[]
+  >((all, [, group]) => {
+    const filterGroup = (source) => filterReports(source, group.reports);
+
+    return [
+      ...all,
+      ...group.cedar.map(filterGroup),
+      ...group.cedarschema.map(filterGroup),
+      ...group.entities.map(filterGroup),
+      ...group.invariant.map(filterGroup),
+    ];
+  }, []);
 
   return (
     <div className="source-files-container">
@@ -53,15 +81,13 @@ export function SourceFileViewer({ sources, reports }: SourceFileViewerParams) {
           to run verification.
         </p>
       )}
-      {sources.map((source) => (
+      {sources.map(({ source, reports }, i) => (
         <SourceFile
-          key={source.serverId}
-          filename={source.filename}
+          key={i}
+          filename={source.file.name}
           filetype="cedar"
-          content={source.contents}
-          reports={(reports ?? []).filter(
-            (report) => report.primarySourceLocation.file === source.serverId,
-          )}
+          content={source.resolved.then((uploaded) => uploaded.content)}
+          reports={reports}
         />
       ))}
     </div>

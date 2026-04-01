@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FileType, VerificationFile } from "../../types";
-import { faCircleMinus } from "@fortawesome/free-solid-svg-icons";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
 interface VerificationContextProps {
   title: string;
@@ -22,11 +22,11 @@ export function FileGroup({
       <h5 className="verification-file-group-title">{title}</h5>
       <div className="verification-file-group-contents">
         {files.map((file, i) => (
-          <span key={i}>
-            {file.file.name}
+          <span key={i} className="verification-file">
+            <span className="verification-file-name">{file.file.name}</span>
             <FontAwesomeIcon
-              className="verification-file-delete"
-              icon={faCircleMinus}
+              className="verification-file-delete-icon"
+              icon={faXmark}
               onClick={() => remove(file)}
             />
           </span>

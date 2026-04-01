@@ -31,30 +31,38 @@ export function VerificationFileList({ group }: VerificationFileListProps) {
 
   return (
     <div className="verification-context-filelist">
-      <FileGroup
-        title="Policies"
-        filetype="cedar"
-        files={policies}
-        remove={removeFile}
-      />
-      <FileGroup
-        title="Schemas"
-        filetype="cedarschema"
-        files={schemas}
-        remove={removeFile}
-      />
-      <FileGroup
-        title="Entities"
-        filetype="entities"
-        files={entities}
-        remove={removeFile}
-      />
-      <FileGroup
-        title="Invariants"
-        filetype="invariant"
-        files={invariants}
-        remove={removeFile}
-      />
+      {policies.length > 0 && (
+        <FileGroup
+          title="Policies"
+          filetype="cedar"
+          files={policies}
+          remove={removeFile}
+        />
+      )}
+      {schemas.length > 0 && (
+        <FileGroup
+          title="Schemas"
+          filetype="cedarschema"
+          files={schemas}
+          remove={removeFile}
+        />
+      )}
+      {entities.length > 0 && (
+        <FileGroup
+          title="Entities"
+          filetype="entities"
+          files={entities}
+          remove={removeFile}
+        />
+      )}
+      {invariants.length > 0 && (
+        <FileGroup
+          title="Invariants"
+          filetype="invariant"
+          files={invariants}
+          remove={removeFile}
+        />
+      )}
     </div>
   );
 }

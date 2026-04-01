@@ -140,6 +140,38 @@ public class TypingTest {
             "ok: alice in Account::\"Alice\" for all alice: Action",
             "ok: alice in Account::\"Alice\" for all alice: Photoapp::Action",
             "no: alice.age in Account::\"Alice\" for all alice: Account",
+
+            // Function validation
+
+            // unregistered function
+            "no: foobar(p, r, a) for all a: Action, p: Account, r: Photo",
+
+            // allow
+            "ok: allow(p, r, a) for all a: Action, p: Account, r: Photo",
+            "ok: allow(p, r, Action::\"viewPhoto\") for all p: Account, r: Photo",
+            "ok: allow(Account::\"Alice\", r, a) for all a: Action, r: Photo",
+            "ok: allow(p, Photo::\"AlicePassport\", a) for all a: Action, p: Account, r: Photo",
+            "no: allow(a, r, a) for all a: Action, p: Account, r: Photo",
+            "no: allow(1, r, a) for all a: Action, p: Account, r: Photo",
+            "no: allow(p, a, a) for all a: Action, p: Account, r: Photo",
+            "no: allow(p, r, r) for all a: Action, p: Account, r: Photo",
+            "no: p.allow(p, r, r) for all a: Action, p: Account, r: Photo",
+            "no: allow(p, r) for all a: Action, p: Account, r: Photo",
+            "no: allow() for all a: Action, p: Account, r: Photo",
+
+            // Deny
+            "ok: deny(p, r, a) for all a: Action, p: Account, r: Photo",
+            "ok: deny(p, r, Action::\"viewPhoto\") for all p: Account, r: Photo",
+            "ok: deny(Account::\"Alice\", r, a) for all a: Action, r: Photo",
+            "ok: deny(p, Photo::\"AlicePassport\", a) for all a: Action, p: Account, r: Photo",
+            "no: deny(a, r, a) for all a: Action, p: Account, r: Photo",
+            "no: deny(1, r, a) for all a: Action, p: Account, r: Photo",
+            "no: deny(p, a, a) for all a: Action, p: Account, r: Photo",
+            "no: deny(p, r, r) for all a: Action, p: Account, r: Photo",
+            "no: p.deny(p, r, r) for all a: Action, p: Account, r: Photo",
+            "no: deny(p, r) for all a: Action, p: Account, r: Photo",
+            "no: deny() for all a: Action, p: Account, r: Photo",
+
     })
     void typeTest(String invariantText) {
         boolean pass = true;

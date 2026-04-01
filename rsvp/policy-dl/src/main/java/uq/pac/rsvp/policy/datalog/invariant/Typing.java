@@ -7,12 +7,11 @@ import uq.pac.rsvp.policy.ast.schema.common.*;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
 class Typing {
     final static BooleanType BooleanType = new BooleanType();
@@ -31,7 +30,7 @@ class Typing {
     final static TypeTest TEntityOrAction = new TypeTest(
             t -> isEntity(t) || isAction(t), "Entity, Action");
     final static TypeTest TEntity = new TypeTest(Typing::isEntity, "Entity");
-    final static TypeTest TAction = new TypeTest(Typing::isEntity, "Action");
+    final static TypeTest TAction = new TypeTest(Typing::isAction, "Action");
 
     private static boolean isActionName(String name) {
         return name.equals("Action") || name.endsWith("::Action");
@@ -51,7 +50,6 @@ class Typing {
     }
 
     static TypeTest expect(CommonTypeDefinition actual, TypeTest ...tests) {
-        require(tests.length > 0);
         for (TypeTest test : tests) {
             if (test.test().apply(actual)) {
                 return test;
@@ -61,7 +59,12 @@ class Typing {
         throw new InvariantValidator.Error("Expected one of %s, got %s", expected, Typing.name(actual));
     }
 
-    static TypeTest expect(CommonTypeDefinition one, CommonTypeDefinition another, TypeTest ...tests) {
+
+    static TypeTest expect(CommonTypeDefinition actual, List<TypeTest> tests) {
+        return expect(actual, tests.toArray(new TypeTest[0]));
+    }
+
+    static TypeTest expectCompatible(CommonTypeDefinition one, CommonTypeDefinition another, TypeTest ...tests) {
         return expect(another,  expect(one, tests));
     }
 

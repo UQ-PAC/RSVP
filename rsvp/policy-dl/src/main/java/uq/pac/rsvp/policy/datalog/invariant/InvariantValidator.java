@@ -78,7 +78,7 @@ public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDe
         return variables;
     }
 
-    public static class Error extends RuntimeException {
+    static class Error extends RuntimeException {
         public Error(Object format, Object ...args) {
             super("Invariant validation error: " + String.format(format.toString(), args));
         }
@@ -86,6 +86,10 @@ public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDe
 
     private CommonTypeDefinition collect(Expression expr) {
         return Objects.requireNonNull(expr.compute(this));
+    }
+
+    private List<CommonTypeDefinition> collect(Collection<Expression> exprs) {
+        return exprs.stream().map(this::collect).toList();
     }
 
     public void validate(Invariant invariant) {
@@ -101,20 +105,20 @@ public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDe
 
         return switch (expr.getOp()) {
             case Add, Sub, Mul -> {
-                expect(lhs, rhs, TLong);
+                expectCompatible(lhs, rhs, TLong);
                 yield LongType;
             }
             case Less, LessEq, Greater, GreaterEq -> {
-                expect(lhs, rhs, TLong);
+                expectCompatible(lhs, rhs, TLong);
                 yield BooleanType;
             }
             case Eq, Neq -> {
                 // FIXME: we need record here as well
-                expect(lhs, rhs, TBoolean, TLong, TString, TEntityOrAction);
+                expectCompatible(lhs, rhs, TBoolean, TLong, TString, TEntityOrAction);
                 yield BooleanType;
             }
             case Or, And -> {
-                expect(lhs, rhs, TBoolean);
+                expectCompatible(lhs, rhs, TBoolean);
                 yield BooleanType;
             }
             case HasAttr -> {
@@ -128,7 +132,7 @@ public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDe
                 yield BooleanType;
             }
             case In -> {
-                expect(lhs, rhs, TEntityOrAction);
+                expectCompatible(lhs, rhs, TEntityOrAction);
                 yield BooleanType;
             }
             default -> throw new TranslationError("Unsupported");
@@ -216,13 +220,20 @@ public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDe
                 expr.getValue(), expr, types.keySet());
     }
 
-    // == Unsupported
-
     @Override
     public CommonTypeDefinition visitCallExpr(CallExpression expr) {
-        throw new TranslationError("unsupported element: " + expr);
+        String name = expr.getFunc();
+        InvariantFunctionValidator.FunctionValidator validator = InvariantFunctionValidator.getValidator(name);
+
+        if (validator == null) {
+            throw new Error("Function: %s not registered", name);
+        }
+        CommonTypeDefinition self = expr.getSelf() == null ? null : collect(expr.getSelf());
+        validator.validate(self, collect(expr.getArgs()));
+        return Typing.BooleanType;
     }
 
+    // == Unsupported
     @Override
     public CommonTypeDefinition visitConditionalExpr(ConditionalExpression expr) {
         throw new TranslationError("unsupported element: " + expr);

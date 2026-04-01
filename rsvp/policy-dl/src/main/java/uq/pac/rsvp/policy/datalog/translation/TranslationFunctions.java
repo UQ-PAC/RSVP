@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
-import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
 /**
  * Registry of classes for translating cedar-level functions to Datalog

@@ -1,0 +1,16 @@
+dependencies {
+    implementation project(':support')
+    implementation project(':policy-ast')
+    implementation project(':policy-dl')
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId "uq.pac.rsvp"
+            artifactId "rsvp-verification"
+            version "1.0.0-SNAPSHOT"
+            from components.java
+        }
+    }
+}

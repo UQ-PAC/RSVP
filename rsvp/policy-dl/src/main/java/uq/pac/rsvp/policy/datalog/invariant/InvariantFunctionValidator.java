@@ -16,10 +16,12 @@ public class InvariantFunctionValidator {
     private static final Map<String, FunctionValidator> REGISTRY;
     static {
         REGISTRY = new HashMap<>();
-        REGISTRY.put("allow", new AllowFunctionValidator());
-        REGISTRY.put("deny", new DenyFunctionValidator());
+        REGISTRY.put("allow", new PolicyFunctionValidator("allow"));
+        REGISTRY.put("deny", new PolicyFunctionValidator("deny"));
         REGISTRY.put("isEmpty", new SetIsEmptyFunctionValidator());
         REGISTRY.put("contains", new SetContainsFunctionValidator());
+        REGISTRY.put("containsAll", new SetContainsSetFunctionValidator("containsAll"));
+        REGISTRY.put("containsAny", new SetContainsSetFunctionValidator("containsAny"));
 
         // Ensure that names of the registered functions are the same as registration keys
         REGISTRY.forEach((key, value) -> require(key.equals(value.name)));
@@ -95,7 +97,27 @@ public class InvariantFunctionValidator {
         }
     }
 
-    static abstract class PolicyFunctionValidator extends FunctionValidator {
+
+    static class SetContainsSetFunctionValidator extends FunctionValidator {
+        SetContainsSetFunctionValidator(String name) {
+            super(name, List.of(TSet), List.of(List.of(TSet)));
+        }
+
+        @Override
+        void post(CommonTypeDefinition actualSelf, List<CommonTypeDefinition> actualArguments) {
+            require(actualSelf instanceof SetTypeDefinition);
+            require(actualArguments.size() == 1);
+            require(actualArguments.getFirst() instanceof SetTypeDefinition);
+            require(arguments.size() == 1);
+
+            CommonTypeDefinition selfElement = ((SetTypeDefinition) actualSelf).getElementType();
+            CommonTypeDefinition argElement = ((SetTypeDefinition) actualArguments.getFirst()).getElementType();
+
+            Typing.expectCompatible(selfElement, argElement, this.arguments.getFirst());
+        }
+    }
+
+    static class PolicyFunctionValidator extends FunctionValidator {
         PolicyFunctionValidator(String name) {
             super(name,
                     List.of(),
@@ -104,17 +126,4 @@ public class InvariantFunctionValidator {
                             List.of(Typing.TAction)));
         }
     }
-
-    static class AllowFunctionValidator extends PolicyFunctionValidator {
-        AllowFunctionValidator() {
-            super("allow");
-        }
-    }
-
-    static class DenyFunctionValidator extends PolicyFunctionValidator {
-        DenyFunctionValidator() {
-            super("deny");
-        }
-    }
-
 }

@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import org.junit.jupiter.api.Test;
 import uq.pac.rsvp.policy.datalog.TestUtil;
+import uq.pac.rsvp.policy.datalog.invariant.InvariantSet;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -17,8 +18,9 @@ public class SchemaTest {
         List<Path> schemas = TestUtil.findFiles(TESTDIR, ".cedarschema");
         Path policy = TestUtil.findFile(TESTDIR, ".cedar");
         Path entities = TestUtil.findFile(TESTDIR, ".json");
+        Path invariants = TestUtil.findFile(TESTDIR, ".invariant");
         for (Path schema : schemas) {
-            assertThrows(TranslationError.class, () -> Translation.validate(schema, policy, entities));
+            assertThrows(TranslationError.class, () -> Translation.validate(schema, policy, entities, invariants));
         }
     }
 }

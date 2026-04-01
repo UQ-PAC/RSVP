@@ -9,6 +9,7 @@ import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.common.*;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
+import uq.pac.rsvp.policy.datalog.translation.TranslationConstants;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 
 import java.util.*;
@@ -56,6 +57,12 @@ public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDe
         this.entities = entities.getEntities().stream().collect(Collectors.toMap(
                 e -> e.getEUID().toCedarExpr(),
                 e -> types.get(e.getEUID().getType().toString())));
+
+		// Put in undefined references
+        schema.entityTypes().stream()
+                .filter(e -> e.getEntityNamesEnum().isEmpty())
+                .map(TranslationConstants::getUndefinedEUID)
+                .forEach(uid -> this.entities.put(uid.toCedarExpr(), types.get(uid.getType().toString())));
 
         this.actions = schema.actions().stream().collect(Collectors.toMap(
             ActionDefinition::getQualifiedName, a -> types.get(a.getType())

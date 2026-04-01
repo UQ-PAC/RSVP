@@ -5,8 +5,8 @@ principal.role == Role::"Admin"
 
 // 2. Admin accounts should not have albums
 @invariant("NoAlbums")
-principal.type == Role::"Admin" && !principal.albums.isEmpty()
-    for none principal : Account;
+album.owner.role == Role::"Admin"
+    for none album : Album;
 
 // 3. Photos should exceed 10 MB
 @invariant("PhotoSizeLimit")
@@ -28,17 +28,12 @@ principal.role != Role::"Admin" || allow(principal, resource, Action::"viewPhoto
 principal.role == Role::"Admin" --> allow(principal, resource, Action::"viewPhoto")
     for all principal: Account, resource: Photo;
 
-// 7. Admins should not have any albums
-@invariant("AdminRightsAlbumFriends")
-principal.role == Role::"Admin" --> (principal.albums.isEmpty() && principal.friends.isEmpty())
-    for all principal: Account, resource: Photo;
-
-// 8. If a user can create an album for another user, then this is the same user
+// 7. If a user can create an album for another user, then this is the same user
 @invariant("UserRights")
 !(bob.role == Role::"User" && alice.role == Role::"User" && allow(bob, alice, Action::"createAlbum")) || bob == alice
     for all bob: Account, alice: Account;
 
-// 9. Admins cannot create albums for themselves
+// 8. Admins cannot create albums for themselves
 @invariant("AdminCreateAlbums")
 tim.role == Role::"Admin" && anyone.role == Role::"Admin" --> deny(tim, anyone, Action::"createAlbum")
     for all tim: Account, anyone: Account;

@@ -21,6 +21,7 @@ import uq.pac.rsvp.policy.datalog.ast.*;
 import uq.pac.rsvp.policy.datalog.invariant.Invariant;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantSet;
+import uq.pac.rsvp.policy.datalog.invariant.InvariantValidator;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -52,11 +53,11 @@ public class Translation {
     public Translation(Path schemaFile, Path policiesFile, Path entitiesFile, Path invariantFile, Path datalogDir) {
         this.datalogDir = datalogDir;
         try {
-            validate(schemaFile, policiesFile, entitiesFile);
-            this.schema = Schema.parseCedarSchema(schemaFile);
-            this.entities = updateEntities(Entities.parse(entitiesFile), schema);
-            this.policies = PolicySet.parseCedarPolicySet(policiesFile);
-            this.invariants = invariantFile == null ? InvariantSet.parse("") : InvariantSet.parse(invariantFile);
+            InputSet validated = validate(schemaFile, policiesFile, entitiesFile, invariantFile);
+            this.schema = validated.schema;
+            this.entities = validated.entities;
+            this.policies = validated.policies;
+            this.invariants = validated.invariants;
 
             this.policyDeclarations = HashBiMap.create();
             int index = 1;
@@ -78,14 +79,16 @@ public class Translation {
         }
     }
 
-    static void validate(Path schemaFile, Path policyFile, Path entityFile) throws IOException, AuthException, RsvpException {
+    record InputSet(Schema schema, PolicySet policies, Entities entities, InvariantSet invariants) {}
+
+    static InputSet validate(Path schemaFile, Path policyFile, Path entityFile, Path invariantsFile) throws IOException, AuthException, RsvpException {
         Entities entities = Entities.parse(entityFile);
-        com.cedarpolicy.model.schema.Schema schema =
+        com.cedarpolicy.model.schema.Schema cedarSchema =
                 new com.cedarpolicy.model.schema.Schema(Files.readString(schemaFile));
         com.cedarpolicy.model.policy.PolicySet policies =
                 com.cedarpolicy.model.policy.PolicySet.parsePolicies(policyFile);
 
-        ValidationRequest vReq = new ValidationRequest(schema, policies);
+        ValidationRequest vReq = new ValidationRequest(cedarSchema, policies);
         AuthorizationEngine engine = new BasicAuthorizationEngine();
         ValidationResponse vResp = engine.validate(vReq);
 
@@ -99,7 +102,7 @@ public class Translation {
         }
 
         EntityValidationRequest eReq =
-                new EntityValidationRequest(schema, entities.getEntities().stream().toList());
+                new EntityValidationRequest(cedarSchema, entities.getEntities().stream().toList());
         engine.validateEntities(eReq);
 
         // For the moment we do not support arbitrary action names as Cedar does,
@@ -114,7 +117,7 @@ public class Translation {
         });
 
         // For the moment we also do not support entity names that have the same
-        // delimiter that is used for datalog output (\t)
+        // delimiter that is used for Datalog output (\t)
         List<String> entityNames = entities.getEntities().stream()
                 .map(e -> e.getEUID().getId().toString())
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -136,7 +139,13 @@ public class Translation {
             }
         });
 
-        // FIXME: Invariant validation
+        entities = updateEntities(entities, rsvpSchema);
+        InvariantSet invariants =
+                invariantsFile == null ? InvariantSet.parse("") : InvariantSet.parse(invariantsFile);
+        InvariantValidator invariantValidator = new InvariantValidator(rsvpSchema, entities);
+        invariants.stream().forEach(invariantValidator::validate);
+
+        return new InputSet(rsvpSchema, PolicySet.parseCedarPolicySet(policyFile), entities, invariants);
     }
 
     /**

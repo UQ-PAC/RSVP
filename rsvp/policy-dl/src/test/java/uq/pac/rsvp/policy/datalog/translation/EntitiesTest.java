@@ -21,8 +21,9 @@ public class EntitiesTest {
     void unsupportedName(String name) {
         Path entity = TestUtil.findFile(TESTDIR, name + ".json"),
                 schema = TestUtil.findFile(TESTDIR, ".cedarschema"),
-                policy = TestUtil.findFile(TESTDIR, ".cedar");
-        assertThrows(TranslationError.class, () -> Translation.validate(schema, policy, entity));
+                policy = TestUtil.findFile(TESTDIR, ".cedar"),
+                invariants = TestUtil.findFile(TESTDIR, ".invariant");
+        assertThrows(TranslationError.class, () -> Translation.validate(schema, policy, entity, invariants));
     }
 
     @ParameterizedTest
@@ -30,7 +31,8 @@ public class EntitiesTest {
     void supported(String name) {
         Path entity = TestUtil.findFile(TESTDIR, name + ".json"),
                 schema = TestUtil.findFile(TESTDIR, ".cedarschema"),
-                policy = TestUtil.findFile(TESTDIR, ".cedar");
-        assertDoesNotThrow(() -> Translation.validate(schema, policy, entity));
+                policy = TestUtil.findFile(TESTDIR, ".cedar"),
+                invariants = TestUtil.findFile(TESTDIR, ".invariant");
+        assertDoesNotThrow(() -> Translation.validate(schema, policy, entity, invariants));
     }
 }

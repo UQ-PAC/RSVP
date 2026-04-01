@@ -259,4 +259,12 @@ public class TranslationConstants {
         return getEUID(def.getEntityDefinition(), UndefinedEntityUIDName);
     }
 
+    /**
+     * Get an unknown entity (UID) only. Abstraction over entities that can be given for
+     * authorisation but are not in the provided list of entities
+     */
+    public static EntityUID getUndefinedEUID(EntityTypeDefinition def) {
+        return getEUID(def, UndefinedEntityUIDName);
+    }
+
 }

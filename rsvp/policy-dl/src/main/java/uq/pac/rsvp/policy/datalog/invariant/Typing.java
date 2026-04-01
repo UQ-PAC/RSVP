@@ -90,6 +90,7 @@ class Typing {
                         .collect(Collectors.toMap(Map.Entry::getKey, v -> convert(v.getValue())));
                 yield new RecordTypeDefinition(null, attrs);
             }
+            case CommonTypeReference c -> c.getDefinition();
             case EntityTypeReference t -> {
                 EntityTypeReference ref = references.get(t.getDefinition().getName());
                 if (ref == null) {

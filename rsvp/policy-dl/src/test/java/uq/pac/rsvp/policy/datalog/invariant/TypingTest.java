@@ -142,6 +142,13 @@ public class TypingTest {
             "ok: alice in Account::\"Alice\" for all alice: Photoapp::Action",
             "no: alice.age in Account::\"Alice\" for all alice: Account",
 
+            // '???' entities
+            "ok: alice == Account::\"???\" for some alice: Photoapp::Action",
+            // No undefined entities for roles
+            "no: alice == Action::\"???\" for some alice: Photoapp::Action",
+            // Nor for enum-based entities
+            "no: alice == Role::\"???\" for some alice: Photoapp::Action",
+
             // Function validation
 
             // unregistered function

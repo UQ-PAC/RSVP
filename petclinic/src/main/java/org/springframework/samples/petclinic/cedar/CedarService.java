@@ -39,11 +39,9 @@ public class CedarService {
 
 	public CedarService(@Value("${policy.file:petclinic-rsvp-policy.cedar}") String policyFile) {
 		try {
-			this.policySet = PolicySet
-				.parsePolicies(Path.of("src/main/resources/cedar/" + policyFile));
-			System.out.println(System.lineSeparator() +
-							   "Cedar Policy file loaded: " + policyFile +
-							   System.lineSeparator());
+			this.policySet = PolicySet.parsePolicies(Path.of("src/main/resources/cedar/" + policyFile));
+			System.out
+				.println(System.lineSeparator() + "Cedar Policy file loaded: " + policyFile + System.lineSeparator());
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Failed to parse Cedar Policy.", e);
@@ -55,8 +53,7 @@ public class CedarService {
 			throw new RuntimeException("Failed to parse Cedar Entities.", e);
 		}
 		try {
-			String schemaText = Files
-				.readString(Path.of("src/main/resources/cedar/petclinic-rsvp-schema.cedarschema"));
+			String schemaText = Files.readString(Path.of("src/main/resources/cedar/petclinic-rsvp-schema.cedarschema"));
 			this.schema = Schema.parse(Schema.JsonOrCedar.Cedar, schemaText);
 		}
 		catch (Exception e) {
@@ -68,12 +65,13 @@ public class CedarService {
 		catch (Exception e) {
 			throw new RuntimeException("Failed to initialize Cedar Engine.", e);
 		}
-        try {
-            String policyContent = Files.readString(Path.of("src/main/resources/cedar/" + policyFile));
-            this.policyIdMap = CedarPolicyMapper.mapEngineIdsToAnnotations(policyContent);
-        } catch (IOException exception) {
-            throw new IllegalStateException("Failed to read Cedar policy file for annotations mapping.", exception);
-        }
+		try {
+			String policyContent = Files.readString(Path.of("src/main/resources/cedar/" + policyFile));
+			this.policyIdMap = CedarPolicyMapper.mapEngineIdsToAnnotations(policyContent);
+		}
+		catch (IOException exception) {
+			throw new IllegalStateException("Failed to read Cedar policy file for annotations mapping.", exception);
+		}
 	}
 
 	public ResponseEntity<String> checkAccess(@RequestBody CedarRequest parsedRequest) {
@@ -85,9 +83,8 @@ public class CedarService {
 			AuthorizationResponse response = engine.isAuthorized(request, this.policySet, this.entities);
 
 			// Prints Cedar decision to console.
-			System.out.println(System.lineSeparator() +
-							   "Cedar raw response: " + response.toString() +
-							   System.lineSeparator());
+			System.out.println(
+					System.lineSeparator() + "Cedar raw response: " + response.toString() + System.lineSeparator());
 
 			if (response.type == AuthorizationResponse.SuccessOrFailure.Success) {
 				boolean isAllowed = false;

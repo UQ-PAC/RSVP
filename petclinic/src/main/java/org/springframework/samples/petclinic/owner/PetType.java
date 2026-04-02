@@ -61,4 +61,10 @@ public class PetType implements Serializable, Identifiable {
 		this.name = name;
 	}
 
+	@Override
+	public String toString() {
+		String name = this.getName();
+		return (name != null) ? name : "<null>";
+	}
+
 }

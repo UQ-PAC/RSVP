@@ -1,0 +1,7 @@
+{
+    "principal": "PetClinic::Employee::\"Sharon Jenkins\"",
+    "action": "PetClinic::Action::\"ViewClient\"",
+    "resource": "PetClinic::PetOwner::\"Carlos Estaban\"",
+    "context": { },
+    "validateRequest": true
+}

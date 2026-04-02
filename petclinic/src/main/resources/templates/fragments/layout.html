@@ -70,7 +70,7 @@
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <li><h6 class="dropdown-header">System Users</h6></li>
-                <li><a class="dropdown-item" href="/switch-user?currentUser=Guest">Switch to Guest</a></li>
+                <li><a class="dropdown-item" href="/switch-user?currentUser=Guest">Guest</a></li>
 
                 <li><hr class="dropdown-divider"></li>
 
@@ -78,7 +78,7 @@
                 <li th:each="user : ${dynamicUsers}">
                     <a class="dropdown-item" 
                       th:href="@{/switch-user(currentUser=${user.username})}"
-                      th:text="'Switch to ' + ${user.username}">Dynamic User</a>
+                      th:text="${user.username + ' (' + user.getRoleDescriptions() + ')'}">Dynamic User</a>
                 </li>
             </ul>
           </li>

@@ -36,26 +36,18 @@ public class CedarAspect {
 
 	private static final String CONTEXT_PARAM_PREFIX = "cedar-context-";
 
-	private record ResourceMetadata(String sqlQuery, Function<Map<String, Object>, String> nameExtractor) {}
+	private record ResourceMetadata(String sqlQuery, Function<Map<String, Object>, String> nameExtractor) {
+	}
 
-	private static final Map<String, ResourceMetadata> RESOURCE_REGISTRY = Map.of(
-        "PetOwner", new ResourceMetadata(
-            "SELECT first_name, last_name FROM owners WHERE entity_id = ?", 
-            rs -> rs.get("first_name") + " " + rs.get("last_name")
-        ),
-        "Veterinarian", new ResourceMetadata(
-            "SELECT first_name, last_name FROM vets WHERE entity_id = ?", 
-            rs -> rs.get("first_name") + " " + rs.get("last_name")
-        ),
-        "Pet", new ResourceMetadata(
-            "SELECT name FROM pets WHERE entity_id = ?", 
-            rs -> rs.get("name").toString()
-        ),
-        "PetVisit", new ResourceMetadata(
-            "SELECT description FROM visits WHERE entity_id = ?", 
-            rs -> rs.get("description").toString()
-        )
-    );
+	private static final Map<String, ResourceMetadata> RESOURCE_REGISTRY = Map.of("PetOwner",
+			new ResourceMetadata("SELECT first_name, last_name FROM owners WHERE entity_id = ?",
+					rs -> rs.get("first_name") + " " + rs.get("last_name")),
+			"Veterinarian",
+			new ResourceMetadata("SELECT first_name, last_name FROM vets WHERE entity_id = ?",
+					rs -> rs.get("first_name") + " " + rs.get("last_name")),
+			"Pet", new ResourceMetadata("SELECT name FROM pets WHERE entity_id = ?", rs -> rs.get("name").toString()),
+			"PetVisit", new ResourceMetadata("SELECT description FROM visits WHERE entity_id = ?",
+					rs -> rs.get("description").toString()));
 
 	public CedarAspect(CedarService cedarService, JdbcTemplate jdbcTemplate) {
 		this.cedarService = cedarService;
@@ -70,8 +62,8 @@ public class CedarAspect {
 		String principalId = extractPrincipalFromSession(request);
 
 		// Prints requests and cookie to console.
-		System.out.println(System.lineSeparator() +
-						   "Cedar request resourceType: " + requiresAuthorization.resourceType());
+		System.out
+			.println(System.lineSeparator() + "Cedar request resourceType: " + requiresAuthorization.resourceType());
 		System.out.println("HTTP request resourceId: " + extractResourceId(request));
 		System.out.println("Cookie principalId: " + principalId);
 
@@ -79,7 +71,8 @@ public class CedarAspect {
 		if (principalId.equals("Guest")) {
 			principal = EntityUID.parse("PetClinic::Guest::\"Unknown\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
-		} else {
+		}
+		else {
 			principal = EntityUID.parse("PetClinic::Employee::\"" + principalId + "\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
@@ -113,7 +106,7 @@ public class CedarAspect {
 					""";
 			String body = """
 					Access Denied by the Cedar Policy Engine.
-					
+
 					%s
 					""".formatted(response.getBody().replaceAll("(?m)^" + prefix, ""));
 			throw new CedarDeniedException(body);
@@ -135,49 +128,54 @@ public class CedarAspect {
 	}
 
 	private EntityUID resolveResourceUid(HttpServletRequest request, CedarAuthorization requiresAuthorization) {
-        String resourceType = requiresAuthorization.resourceType();
-        String resourceIdentifier = extractResourceId(request);
+		String resourceType = requiresAuthorization.resourceType();
+		String resourceIdentifier = extractResourceId(request);
 
 		ResourceMetadata metadata = RESOURCE_REGISTRY.get(resourceType);
 
-        if (metadata != null) {
-            @SuppressWarnings("unchecked")
-            Map<String, String> pathVariables = (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-            
-            if (pathVariables != null && !pathVariables.isEmpty()) {
-                String expectedKey = resourceType.toLowerCase() + "Id";
-                String entityIdString = pathVariables.get(expectedKey);
+		if (metadata != null) {
+			@SuppressWarnings("unchecked")
+			Map<String, String> pathVariables = (Map<String, String>) request
+				.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
-                if (entityIdString == null) {
-                    entityIdString = pathVariables.entrySet().stream()
-                            .filter(entry -> entry.getKey().toLowerCase().endsWith("id"))
-                            .map(Map.Entry::getValue)
-                            .findFirst()
-                            .orElse(null);
-                }
+			if (pathVariables != null && !pathVariables.isEmpty()) {
+				String expectedKey = resourceType.toLowerCase() + "Id";
+				String entityIdString = pathVariables.get(expectedKey);
 
-                if (entityIdString != null) {
-                    try {
-                        int entityId = Integer.parseInt(entityIdString);
-                        
-                        Map<String, Object> queryResult = this.jdbcTemplate.queryForMap(metadata.sqlQuery(), entityId);
-                        String resolvedName = metadata.nameExtractor().apply(queryResult);
-                        
-                        if (resolvedName != null && !resolvedName.trim().isEmpty()) {
-                            resourceIdentifier = resolvedName.trim();
-                        }
-                    } catch (NumberFormatException | EmptyResultDataAccessException | NullPointerException exception) {
-                        // Retains the default numeric identifier if parsing, resolution, or formatting fails.
-                    }
-                }
-            }
-        }
+				if (entityIdString == null) {
+					entityIdString = pathVariables.entrySet()
+						.stream()
+						.filter(entry -> entry.getKey().toLowerCase().endsWith("id"))
+						.map(Map.Entry::getValue)
+						.findFirst()
+						.orElse(null);
+				}
 
-        final String finalResourceIdentifier = resourceIdentifier;
+				if (entityIdString != null) {
+					try {
+						int entityId = Integer.parseInt(entityIdString);
 
-        return EntityUID.parse("PetClinic::" + resourceType + "::\"" + finalResourceIdentifier + "\"")
-                .orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format generated for: " + finalResourceIdentifier));
-    }
+						Map<String, Object> queryResult = this.jdbcTemplate.queryForMap(metadata.sqlQuery(), entityId);
+						String resolvedName = metadata.nameExtractor().apply(queryResult);
+
+						if (resolvedName != null && !resolvedName.trim().isEmpty()) {
+							resourceIdentifier = resolvedName.trim();
+						}
+					}
+					catch (NumberFormatException | EmptyResultDataAccessException | NullPointerException exception) {
+						// Retains the default numeric identifier if parsing, resolution,
+						// or formatting fails.
+					}
+				}
+			}
+		}
+
+		final String finalResourceIdentifier = resourceIdentifier;
+
+		return EntityUID.parse("PetClinic::" + resourceType + "::\"" + finalResourceIdentifier + "\"")
+			.orElseThrow(() -> new IllegalArgumentException(
+					"Invalid Resource UID format generated for: " + finalResourceIdentifier));
+	}
 
 	private Map<String, Value> extractContextFromParameters(HttpServletRequest request, String principalId) {
 		Map<String, Value> context = new HashMap<>();
@@ -196,12 +194,14 @@ public class CedarAspect {
 								String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
 								Integer count = this.jdbcTemplate.queryForObject(sql, Integer.class, principalId);
 								isAuthenticated = (count != null && count > 0);
-							} catch (Exception exception) {
+							}
+							catch (Exception exception) {
 								isAuthenticated = false;
 							}
 						}
 						context.put(contextKey, new PrimString(String.valueOf(isAuthenticated)));
-					} else {
+					}
+					else {
 						String paramValue = request.getParameter(paramName);
 						context.put(contextKey, new PrimString(paramValue));
 					}

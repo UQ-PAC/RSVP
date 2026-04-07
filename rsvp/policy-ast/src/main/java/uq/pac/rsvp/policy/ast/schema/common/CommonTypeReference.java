@@ -9,24 +9,17 @@ public class CommonTypeReference extends CommonTypeDefinition {
 
     private final CommonTypeDefinition definition;
 
-    public CommonTypeReference(String name, CommonTypeDefinition definition, boolean required) {
-        super(name, required);
-        this.definition = definition;
-    }
-
-    public CommonTypeReference(CommonTypeDefinition definition, boolean required) {
-        super(required);
-        this.definition = definition;
-    }
-
     public CommonTypeReference(String name, CommonTypeDefinition definition) {
         super(name);
         this.definition = definition;
     }
 
     public CommonTypeReference(CommonTypeDefinition definition) {
-        super();
-        this.definition = definition;
+        this(null, definition);
+    }
+
+    public CommonTypeReference() {
+        this(null, null);
     }
 
     public CommonTypeDefinition getDefinition() {

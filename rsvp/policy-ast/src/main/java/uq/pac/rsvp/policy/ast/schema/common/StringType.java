@@ -5,14 +5,6 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class StringType extends CommonTypeDefinition {
-    public StringType(String name, boolean required) {
-        super(name, required);
-    }
-
-    public StringType(boolean required) {
-        super(required);
-    }
-
     public StringType(String name) {
         super(name);
     }

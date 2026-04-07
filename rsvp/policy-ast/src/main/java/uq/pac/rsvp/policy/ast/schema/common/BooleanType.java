@@ -6,14 +6,6 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class BooleanType extends CommonTypeDefinition {
 
-    public BooleanType(String name, boolean required) {
-        super(name, required);
-    }
-
-    public BooleanType(boolean required) {
-        super(required);
-    }
-
     public BooleanType(String name) {
         super(name);
     }

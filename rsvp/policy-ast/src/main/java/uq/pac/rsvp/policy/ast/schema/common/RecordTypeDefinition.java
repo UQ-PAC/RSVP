@@ -49,14 +49,9 @@ public class RecordTypeDefinition extends CommonTypeDefinition {
 
     private final Map<String, CommonTypeDefinition> attributes;
 
-    public RecordTypeDefinition(String name, Map<String, CommonTypeDefinition> attributes, boolean required) {
-        super(name, required);
-        this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
-    }
-
-
     public RecordTypeDefinition(String name, Map<String, CommonTypeDefinition> attributes) {
-        this(name, attributes, false);
+        super(name);
+        this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
     }
 
     public RecordTypeDefinition(Map<String, CommonTypeDefinition> attributes) {
@@ -64,7 +59,7 @@ public class RecordTypeDefinition extends CommonTypeDefinition {
     }
 
     public RecordTypeDefinition() {
-        this(null, null, false);
+        this(null, null);
     }
 
     public Set<String> getAttributeNames() {

@@ -225,7 +225,7 @@ public class SchemaTest {
 
             userShape.put("preferences", new RecordTypeDefinition(preferences));
 
-            userShape.put("consented", new BooleanType(false));
+            userShape.put("consented", new BooleanType());
             entityTypes.put("User", new EntityTypeDefinition("DataCollectionApp::User", new HashSet<>(), userShape));
 
             Set<String> colourEnum = Set.copyOf(Arrays.asList("red", "green", "blue", "purple", "pink", "yellow"));

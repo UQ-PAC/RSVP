@@ -6,10 +6,6 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class DecimalType extends CommonTypeDefinition {
 
-    public DecimalType(String name, boolean required) {
-        super(name, required);
-    }
-
     public DecimalType(String name) {
         super(name);
     }

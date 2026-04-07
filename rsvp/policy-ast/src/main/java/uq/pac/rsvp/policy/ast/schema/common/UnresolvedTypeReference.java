@@ -1,7 +1,5 @@
 package uq.pac.rsvp.policy.ast.schema.common;
 
-import java.util.Map;
-
 import com.google.gson.annotations.SerializedName;
 
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
@@ -18,11 +16,6 @@ public class UnresolvedTypeReference extends CommonTypeDefinition {
 
     public UnresolvedTypeReference(String definitionName, String typeName) {
         super(definitionName);
-        this.rawTypeName = typeName;
-    }
-
-    public UnresolvedTypeReference(String typeName, boolean required) {
-        super(required);
         this.rawTypeName = typeName;
     }
 

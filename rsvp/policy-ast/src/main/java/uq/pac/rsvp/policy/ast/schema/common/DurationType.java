@@ -6,8 +6,8 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class DurationType extends CommonTypeDefinition {
 
-    public DurationType(String name, boolean required) {
-        super(name, required);
+    public DurationType(String name) {
+        super(name);
     }
 
     public DurationType() {

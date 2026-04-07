@@ -96,21 +96,13 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
 
     public Collection<ActionDefinition> actions() {
         List<ActionDefinition> definitions = new ArrayList<>();
-        actions.forEach((a, m) -> {
-            definitions.addAll(m.values());
-        });
+        actions.forEach((a, m) -> definitions.addAll(m.values()));
         return definitions;
     }
 
     public void addAction(ActionDefinition action) {
-
-        Map<String, ActionDefinition> typedActions = actions.get(action.getType());
-
-        if (typedActions == null) {
-            typedActions = new HashMap<>();
-            actions.put(action.getType(), typedActions);
-        }
-
+        Map<String, ActionDefinition> typedActions =
+                actions.computeIfAbsent(action.getType(), k -> new HashMap<>());
         typedActions.put(action.getName(), action);
     }
 
@@ -224,17 +216,17 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
         EntityTypeDefinition entity = resolveEntityType(referenceTypeName, schema, local);
 
         if (entity != null) {
-            return new EntityTypeReference(definitionName, entity, unresolved.isRequired());
+            return new EntityTypeReference(definitionName, entity);
         }
 
         return switch (referenceTypeName) {
-            case "Bool" -> new BooleanType(definitionName, unresolved.isRequired());
-            case "Long" -> new LongType(definitionName, unresolved.isRequired());
-            case "String" -> new StringType(definitionName, unresolved.isRequired());
-            case "datetime" -> new DateTimeType(definitionName, unresolved.isRequired());
-            case "decimal" -> new DecimalType(definitionName, unresolved.isRequired());
-            case "duration" -> new DurationType(definitionName, unresolved.isRequired());
-            case "ipaddr" -> new IpAddressType(definitionName, unresolved.isRequired());
+            case "Bool" -> new BooleanType(definitionName);
+            case "Long" -> new LongType(definitionName);
+            case "String" -> new StringType(definitionName);
+            case "datetime" -> new DateTimeType(definitionName);
+            case "decimal" -> new DecimalType(definitionName);
+            case "duration" -> new DurationType(definitionName);
+            case "ipaddr" -> new IpAddressType(definitionName);
             default -> throw new SchemaResolutionException("Could not resolve type: " + referenceTypeName);
         };
 
@@ -296,7 +288,7 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
             return null;
         }
 
-        ActionDefinition result = null;
+        ActionDefinition result;
 
         if (type == null || type.equals("Action")) {
             result = local.getAction(id);
@@ -326,7 +318,7 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
     }
 
     /**
-     * Get the definition corresponding to an common type reference based on Cedar
+     * Get the definition corresponding to a common type reference based on Cedar
      * type resolution rules.
      * 
      * @param attributeType the name of the referenced type to be resolved

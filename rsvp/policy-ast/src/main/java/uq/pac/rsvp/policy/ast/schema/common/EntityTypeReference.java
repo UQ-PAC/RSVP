@@ -9,24 +9,17 @@ public class EntityTypeReference extends CommonTypeDefinition {
 
     private final EntityTypeDefinition definition;
 
-    public EntityTypeReference(String name, EntityTypeDefinition definition, boolean required) {
-        super(name, required);
-        this.definition = definition;
-    }
-
-    public EntityTypeReference(EntityTypeDefinition definition, boolean required) {
-        this(null, definition, required);
-    }
-
-
-    public EntityTypeReference(EntityTypeDefinition definition) {
-        super();
-        this.definition = definition;
-    }
-
     public EntityTypeReference(String name, EntityTypeDefinition definition) {
         super(name);
         this.definition = definition;
+    }
+
+    public EntityTypeReference(EntityTypeDefinition definition) {
+        this(null, definition);
+    }
+
+    public EntityTypeReference() {
+        this(null, null);
     }
 
     public EntityTypeDefinition getDefinition() {

@@ -6,10 +6,6 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class IpAddressType extends CommonTypeDefinition {
 
-    public IpAddressType(String name, boolean required) {
-        super(name, required);
-    }
-
     public IpAddressType(String name) {
         super(name);
     }

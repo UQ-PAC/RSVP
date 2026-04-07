@@ -26,29 +26,13 @@ public abstract class CommonTypeDefinition implements SchemaItem {
 
     private final String definitionName;
 
-    // If this type definition is a record property, this may be true. Otherwise,
-    // it will be false
-    private final boolean required;
-
-    protected CommonTypeDefinition(String name, boolean required) {
-        this.definitionName = name;
-        this.required = required;
-    }
-
-    protected CommonTypeDefinition(boolean required) {
-        this(null, required);
-    }
 
     protected CommonTypeDefinition(String name) {
-        this(name, false);
+        this.definitionName = name;
     }
 
     protected CommonTypeDefinition() {
         this(null);
-    }
-
-    public boolean isRequired() {
-        return required;
     }
 
     /**

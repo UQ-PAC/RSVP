@@ -6,10 +6,6 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class LongType extends CommonTypeDefinition {
 
-    public LongType(String name, boolean required) {
-        super(name, required);
-    }
-
     public LongType(String name) {
         super(name);
     }

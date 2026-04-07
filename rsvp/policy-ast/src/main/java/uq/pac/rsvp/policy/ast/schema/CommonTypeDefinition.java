@@ -1,7 +1,6 @@
 package uq.pac.rsvp.policy.ast.schema;
 
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.Map;
 
 import com.google.gson.JsonDeserializationContext;
@@ -31,44 +30,25 @@ public abstract class CommonTypeDefinition implements SchemaItem {
     // it will be false
     private final boolean required;
 
-    private final Map<String, String> annotations;
-
-    protected CommonTypeDefinition(String name, boolean required, Map<String, String> annotations) {
+    protected CommonTypeDefinition(String name, boolean required) {
         this.definitionName = name;
         this.required = required;
-        this.annotations = annotations != null ? Map.copyOf(annotations) : Collections.emptyMap();
-    }
-
-    protected CommonTypeDefinition(boolean required, Map<String, String> annotations) {
-        this(null, required, annotations);
     }
 
     protected CommonTypeDefinition(boolean required) {
-        this(null, required, null);
-    }
-
-    protected CommonTypeDefinition(String name, Map<String, String> annotations) {
-        this(name, false, annotations);
-    }
-
-    protected CommonTypeDefinition(Map<String, String> annotations) {
-        this(null, false, annotations);
+        this(null, required);
     }
 
     protected CommonTypeDefinition(String name) {
-        this(name, false, null);
+        this(name, false);
     }
 
     protected CommonTypeDefinition() {
-        this(null, false, null);
+        this(null);
     }
 
     public boolean isRequired() {
         return required;
-    }
-
-    public Map<String, String> getAnnotations() {
-        return annotations;
     }
 
     /**

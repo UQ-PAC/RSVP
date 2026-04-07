@@ -1,7 +1,5 @@
 package uq.pac.rsvp.policy.ast.schema.common;
 
-import java.util.Map;
-
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
@@ -11,39 +9,23 @@ public class EntityTypeReference extends CommonTypeDefinition {
 
     private final EntityTypeDefinition definition;
 
-    public EntityTypeReference(String name, EntityTypeDefinition definition, boolean required,
-            Map<String, String> annotations) {
-        super(name, required, annotations);
-        this.definition = definition;
-    }
-
-    public EntityTypeReference(EntityTypeDefinition definition, boolean required, Map<String, String> annotations) {
-        super(required, annotations);
-        this.definition = definition;
-    }
-
-    public EntityTypeReference(String name, EntityTypeDefinition definition, Map<String, String> annotations) {
-        super(name, annotations);
-        this.definition = definition;
-    }
-
-    public EntityTypeReference(EntityTypeDefinition definition, Map<String, String> annotations) {
-        super(annotations);
+    public EntityTypeReference(String name, EntityTypeDefinition definition, boolean required) {
+        super(name, required);
         this.definition = definition;
     }
 
     public EntityTypeReference(EntityTypeDefinition definition, boolean required) {
-        super(required);
+        this(null, definition, required);
+    }
+
+
+    public EntityTypeReference(EntityTypeDefinition definition) {
+        super();
         this.definition = definition;
     }
 
     public EntityTypeReference(String name, EntityTypeDefinition definition) {
         super(name);
-        this.definition = definition;
-    }
-
-    public EntityTypeReference(EntityTypeDefinition definition) {
-        super();
         this.definition = definition;
     }
 

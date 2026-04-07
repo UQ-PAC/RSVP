@@ -1,6 +1,5 @@
 package uq.pac.rsvp.policy.ast.schema.common;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -10,49 +9,62 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class RecordTypeDefinition extends CommonTypeDefinition {
+
+    public static class Attribute {
+        private final boolean required;
+        private final String name;
+
+        public Attribute(String name, boolean required) {
+            this.name = name;
+            this.required = required;
+        }
+
+        public Attribute(String name) {
+            this(name, true);
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public boolean isRequired() {
+            return required;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (other == this) {
+                return true;
+            } else if (other instanceof Attribute a) {
+                return a.name.equals(this.name);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return name.hashCode();
+        }
+    }
+
     private final Map<String, CommonTypeDefinition> attributes;
 
-    public RecordTypeDefinition(String name, Map<String, CommonTypeDefinition> attributes, boolean required,
-            Map<String, String> annotations) {
-        super(name, required, annotations);
+    public RecordTypeDefinition(String name, Map<String, CommonTypeDefinition> attributes, boolean required) {
+        super(name, required);
         this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
     }
 
-    public RecordTypeDefinition(Map<String, CommonTypeDefinition> attributes, boolean required,
-            Map<String, String> annotations) {
-        super(required, annotations);
-        this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
-    }
-
-    public RecordTypeDefinition(String name, Map<String, CommonTypeDefinition> attributes,
-            Map<String, String> annotations) {
-        super(name, annotations);
-        this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
-    }
-
-    public RecordTypeDefinition(Map<String, CommonTypeDefinition> attributes, Map<String, String> annotations) {
-        super(annotations);
-        this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
-    }
-
-    public RecordTypeDefinition(Map<String, CommonTypeDefinition> attributes, boolean required) {
-        super(required);
-        this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
-    }
 
     public RecordTypeDefinition(String name, Map<String, CommonTypeDefinition> attributes) {
-        super(name);
-        this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
+        this(name, attributes, false);
     }
 
     public RecordTypeDefinition(Map<String, CommonTypeDefinition> attributes) {
-        super();
-        this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
+        this(null, attributes);
     }
 
     public RecordTypeDefinition() {
-        super();
-        this.attributes = Collections.emptyMap();
+        this(null, null, false);
     }
 
     public Set<String> getAttributeNames() {

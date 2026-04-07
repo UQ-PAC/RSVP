@@ -1,12 +1,5 @@
 package uq.pac.rsvp.policy.ast.schema;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -36,6 +29,8 @@ import uq.pac.rsvp.policy.ast.schema.common.SetTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.common.StringType;
 import uq.pac.rsvp.policy.ast.schema.common.UnresolvedTypeReference;
 import uq.pac.rsvp.policy.ast.visitor.SchemaResolutionVisitor;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Schema AST")
 public class SchemaTest {
@@ -369,7 +364,7 @@ public class SchemaTest {
             Map<String, String> typeAnnotations = new HashMap<>();
             typeAnnotations.put("ATypeAnnotation", "enough annotations already...");
 
-            types.put("SomeType", new EntityTypeReference("App::SomeType", entity, typeAnnotations));
+            types.put("SomeType", new EntityTypeReference("App::SomeType", entity));
 
             Namespace app = new Namespace("App", entities, actions, types);
             schema.add(app);
@@ -684,9 +679,7 @@ public class SchemaTest {
         CommonTypeDefinition type = schema.getCommonType("App::SomeType");
 
         assertNotNull(type);
-        assertEquals(1, type.getAnnotations().size());
-        assertEquals("enough annotations already...", type.getAnnotations().get("ATypeAnnotation"));
-        assertTrue(type instanceof EntityTypeReference);
+        assertInstanceOf(EntityTypeReference.class, type);
         assertEquals(entity, ((EntityTypeReference) type).getDefinition());
     }
 }

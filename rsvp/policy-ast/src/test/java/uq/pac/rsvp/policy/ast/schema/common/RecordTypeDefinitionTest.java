@@ -102,10 +102,7 @@ public class RecordTypeDefinitionTest {
             RecordTypeDefinition empty = new RecordTypeDefinition();
             assertEquals(0, empty.getAttributeNames().size());
 
-            empty = new RecordTypeDefinition(null, false);
-            assertEquals(0, empty.getAttributeNames().size());
-
-            empty = new RecordTypeDefinition(Collections.emptyMap(), false);
+            empty = new RecordTypeDefinition();
             assertEquals(0, empty.getAttributeNames().size());
         }
     }

@@ -88,7 +88,7 @@ class Typing {
                 Map<String, CommonTypeDefinition> attrs = t.getAttributes().entrySet()
                         .stream()
                         .collect(Collectors.toMap(Map.Entry::getKey, v -> convert(v.getValue())));
-                yield new RecordTypeDefinition(null, attrs);
+                yield new RecordTypeDefinition(attrs);
             }
             case CommonTypeReference c -> c.getDefinition();
             case EntityTypeReference t -> {

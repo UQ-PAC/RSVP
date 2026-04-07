@@ -34,6 +34,14 @@ class ExpressionVisitor extends InvariantBaseVisitor<Expression> {
     }
 
     @Override
+    public Expression visitConditionalExpr(InvariantParser.ConditionalExprContext ctx) {
+        List<Expression> condition = ctx.expression().stream()
+                .map(e -> e.accept(this))
+                .toList();
+        return new ConditionalExpression(condition.get(0), condition.get(1), condition.get(2));
+    }
+
+    @Override
     public Expression visitStringExpr(InvariantParser.StringExprContext ctx) {
         String value = ctx.STRING().getText();
         return new StringExpression(value.substring(1, value.length() - 1));

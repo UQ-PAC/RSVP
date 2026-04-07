@@ -53,6 +53,7 @@ expression :
     | expression op=('==' | '!=' | '>' | '<' | '>=' | '<=') expression # comparisonExpr
     | expression '&&' expression                                       # conjunctionExpr
     | expression '||' expression                                       # disjunctionExpr
+    | 'if' expression 'then' expression 'else' expression              # conditionalExpr
     | expression '-->' expression                                      # implicationExpr
 ;
 

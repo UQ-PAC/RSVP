@@ -64,6 +64,8 @@ public class ParserTest {
         @invariant("i27") resource.foo == "foo" && principal.bar == "bar" for all resource:  Resource::Picture, principal: Album::Photo;
         // Arithmetic precedence
         @invariant("i28") -1 + 2 * 3 == 6 * 7 + 8;
+        // Conditional expressions
+        @invariant("i29") if true then false else true;
         """;
 
     private static final String EXPECTED = """
@@ -127,6 +129,8 @@ public class ParserTest {
             for all resource: Resource::Picture, principal: Album::Photo;
         @invariant("i28")
         ((-1 + (2 * 3)) == ((6 * 7) + 8));
+        @invariant("i29")
+        (if true; then false; else true);
         """;
 
     @Test

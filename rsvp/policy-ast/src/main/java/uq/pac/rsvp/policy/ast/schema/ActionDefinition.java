@@ -40,7 +40,7 @@ public class ActionDefinition implements SchemaItem {
         @SerializedName("resourceTypes")
         private final Set<String> unresolvedResourceTypes;
 
-        private final RecordTypeDefinition context;
+        private final CommonTypeDefinition context;
 
         // Resolved principal type references
         private Set<EntityTypeDefinition> resolvedPrincipalDefinitions;
@@ -179,7 +179,7 @@ public class ActionDefinition implements SchemaItem {
     }
 
     public RecordTypeDefinition getAppliesToContext() {
-        return appliesTo.context;
+        return (RecordTypeDefinition) appliesTo.context;
     }
 
     public Map<String, String> getAnnotations() {

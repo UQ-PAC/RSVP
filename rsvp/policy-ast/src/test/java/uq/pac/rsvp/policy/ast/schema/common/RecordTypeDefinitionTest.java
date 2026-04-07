@@ -1,15 +1,9 @@
 package uq.pac.rsvp.policy.ast.schema.common;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -25,6 +19,8 @@ import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition.CommonTypeDefinitionDeserialiser;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.visitor.SchemaResolutionVisitor;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Schema record type AST")
 public class RecordTypeDefinitionTest {
@@ -47,16 +43,22 @@ public class RecordTypeDefinitionTest {
         @DisplayName("Handles no attributes")
         void empty() {
             RecordTypeDefinition empty = gson.fromJson("{}", RecordTypeDefinition.class);
-            assertTrue(empty instanceof RecordTypeDefinition);
-            assertEquals(0, empty.getAttributeNames().size());
+            assertInstanceOf(RecordTypeDefinition.class, empty);
+            assertEquals(0, empty.getAttributes().size());
 
             empty = gson.fromJson("{ \"type\": \"Record\" }", RecordTypeDefinition.class);
-            assertTrue(empty instanceof RecordTypeDefinition);
-            assertEquals(0, empty.getAttributeNames().size());
+            assertInstanceOf(RecordTypeDefinition.class, empty);
+            assertEquals(0, empty.getAttributes().size());
 
             empty = gson.fromJson("{ \"type\": \"Record\", \"attributes\": {} }", RecordTypeDefinition.class);
-            assertTrue(empty instanceof RecordTypeDefinition);
-            assertEquals(0, empty.getAttributeNames().size());
+            assertInstanceOf(RecordTypeDefinition.class, empty);
+            assertEquals(0, empty.getAttributes().size());
+        }
+
+        private RecordTypeDefinition.Attribute getAttribute(RecordTypeDefinition def, String attr) {
+            return def.getAttributes().keySet().stream()
+                    .filter(a -> a.getName().equals(attr))
+                    .findFirst().orElseThrow();
         }
 
         @Test
@@ -73,21 +75,12 @@ public class RecordTypeDefinitionTest {
 
             assertNotNull(something);
             assertNotNull(sometype);
+            assertInstanceOf(RecordTypeDefinition.class, sometype);
 
-            assertTrue(something.getShapeAttributeNames().contains("optional"));
-
-            assertTrue(sometype instanceof RecordTypeDefinition);
-
-            RecordTypeDefinition record = (RecordTypeDefinition) sometype;
-// FIXME
-//            assertTrue(record.getAttributeNames().contains("default"));
-//            assertTrue(record.getAttributeType("default").isRequired());
-//            assertTrue(record.getAttributeNames().contains("explicit"));
-//            assertTrue(record.getAttributeType("explicit").isRequired());
-//            assertTrue(record.getAttributeNames().contains("optional"));
-//            assertFalse(record.getAttributeType("optional").isRequired());
+            assertFalse(getAttribute((RecordTypeDefinition) sometype, "optional").isRequired());
+            assertTrue(getAttribute((RecordTypeDefinition) sometype, "default").isRequired());
+            assertTrue(getAttribute((RecordTypeDefinition) sometype, "explicit").isRequired());
         }
-
     }
 
     @Nested
@@ -98,10 +91,10 @@ public class RecordTypeDefinitionTest {
         @DisplayName("Handles no attributes")
         void empty() {
             RecordTypeDefinition empty = new RecordTypeDefinition();
-            assertEquals(0, empty.getAttributeNames().size());
+            assertEquals(0, empty.getAttributes().size());
 
             empty = new RecordTypeDefinition();
-            assertEquals(0, empty.getAttributeNames().size());
+            assertEquals(0, empty.getAttributes().size());
         }
     }
 }

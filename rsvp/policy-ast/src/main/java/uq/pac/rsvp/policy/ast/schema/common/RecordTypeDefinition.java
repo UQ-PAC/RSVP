@@ -1,9 +1,10 @@
 package uq.pac.rsvp.policy.ast.schema.common;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
+import com.google.gson.*;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
@@ -21,6 +22,10 @@ public class RecordTypeDefinition extends CommonTypeDefinition {
 
         public Attribute(String name) {
             this(name, true);
+        }
+
+        private Attribute() {
+            this(null, true);
         }
 
         public String getName() {
@@ -45,16 +50,21 @@ public class RecordTypeDefinition extends CommonTypeDefinition {
         public int hashCode() {
             return name.hashCode();
         }
+
+        @Override
+        public String toString() {
+            return name + (required ? "" : "?");
+        }
     }
 
-    private final Map<String, CommonTypeDefinition> attributes;
+    private final Map<Attribute, CommonTypeDefinition> attributes;
 
-    public RecordTypeDefinition(String name, Map<String, CommonTypeDefinition> attributes) {
+    public RecordTypeDefinition(String name, Map<Attribute, CommonTypeDefinition> attributes) {
         super(name);
         this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
     }
 
-    public RecordTypeDefinition(Map<String, CommonTypeDefinition> attributes) {
+    public RecordTypeDefinition(Map<Attribute, CommonTypeDefinition> attributes) {
         this(null, attributes);
     }
 
@@ -62,19 +72,19 @@ public class RecordTypeDefinition extends CommonTypeDefinition {
         this(null, null);
     }
 
-    public Set<String> getAttributeNames() {
-        return Set.copyOf(attributes.keySet());
-    }
-
-    public Map<String, CommonTypeDefinition> getAttributes() {
+    public Map<Attribute, CommonTypeDefinition> getAttributes() {
         return Map.copyOf(attributes);
     }
 
-    public CommonTypeDefinition getAttributeType(String name) {
-        return attributes.get(name);
+    public CommonTypeDefinition getAttributeType(Attribute attr) {
+        return attributes.get(attr);
     }
 
-    public void resolveAttributeType(String name, CommonTypeDefinition attr) {
+    public CommonTypeDefinition getAttributeType(String attr) {
+        return attributes.get(new Attribute(attr));
+    }
+
+    public void resolveAttributeType(Attribute name, CommonTypeDefinition attr) {
         attributes.put(name, attr);
     }
 
@@ -86,6 +96,34 @@ public class RecordTypeDefinition extends CommonTypeDefinition {
     @Override
     public <T> T compute(SchemaComputationVisitor<T> visitor) {
         return visitor.visitRecordTypeDefinition(this);
+    }
+
+    public static class Builder {
+        private String name;
+        private final Map<Attribute, CommonTypeDefinition> attributes;
+
+        public Builder() {
+            name = null;
+            attributes = new HashMap<>();
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder attribute(String name, boolean required, CommonTypeDefinition val) {
+            attributes.put(new Attribute(name, required), val);
+            return this;
+        }
+
+        public Builder attribute(String name, CommonTypeDefinition val) {
+            return attribute(name, true, val);
+        }
+
+        public RecordTypeDefinition build() {
+            return new RecordTypeDefinition(name, attributes);
+        }
     }
 
 }

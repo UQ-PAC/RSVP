@@ -4,11 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -206,32 +202,45 @@ public class SchemaTest {
     @DisplayName("Construct schema manually")
     class TestManual {
 
+        /*
+        {
+            nicknames: Set<String>
+            preferences: {
+                diet: String,
+                colour: Unresolved(Colour)
+            }
+            consented: Bool
+        }
+
+         */
+
         @Test
         @DisplayName("handles collection types")
-        public void collections() throws IOException {
+        public void collections() {
             Schema schema = new Schema();
 
             Map<String, EntityTypeDefinition> entityTypes = new HashMap<>();
             Map<String, ActionDefinition> actions = new HashMap<>();
             Map<String, CommonTypeDefinition> commonTypes = new HashMap<>();
 
-            Map<String, CommonTypeDefinition> userShape = new HashMap<>();
+            RecordTypeDefinition preferences = new RecordTypeDefinition.Builder()
+                    .attribute("diet", new StringType())
+                    .attribute("colour", new UnresolvedTypeReference("Colour"))
+                    .build();
 
-            userShape.put("nicknames", new SetTypeDefinition(new StringType()));
+            RecordTypeDefinition userShape = new RecordTypeDefinition.Builder()
+                    .attribute("nicknames", new SetTypeDefinition(new StringType()))
+                    .attribute("preferences", preferences)
+                    .attribute("consented", new BooleanType())
+                    .build();
 
-            Map<String, CommonTypeDefinition> preferences = new HashMap<>();
-            preferences.put("diet", new StringType());
-            preferences.put("colour", new UnresolvedTypeReference("Colour"));
-
-            userShape.put("preferences", new RecordTypeDefinition(preferences));
-
-            userShape.put("consented", new BooleanType());
-            entityTypes.put("User", new EntityTypeDefinition("DataCollectionApp::User", new HashSet<>(), userShape));
+            entityTypes.put("User",
+                    new EntityTypeDefinition("DataCollectionApp::User", new HashSet<>(), userShape));
 
             Set<String> colourEnum = Set.copyOf(Arrays.asList("red", "green", "blue", "purple", "pink", "yellow"));
             entityTypes.put("Colour",
-                    new EntityTypeDefinition("DataCollectionApp::Colour", new HashSet<>(), new HashMap<>(),
-                            colourEnum, new HashMap<>()));
+                    new EntityTypeDefinition("DataCollectionApp::Colour", new HashSet<>(),
+                            new RecordTypeDefinition(), colourEnum, new HashMap<>()));
 
             Namespace dataCollection = new Namespace("DataCollectionApp", entityTypes, actions, commonTypes);
             schema.add(dataCollection);
@@ -250,9 +259,9 @@ public class SchemaTest {
             Map<String, ActionDefinition> actions = new HashMap<>();
             Map<String, CommonTypeDefinition> commonTypes = new HashMap<>();
 
-            Map<String, CommonTypeDefinition> accountShape = new HashMap<>();
-
-            accountShape.put("friend", new UnresolvedTypeReference("Account"));
+            RecordTypeDefinition accountShape = new RecordTypeDefinition.Builder()
+                    .attribute("friend", new UnresolvedTypeReference("Account"))
+                    .build();
             entityTypes.put("Account", new EntityTypeDefinition("App::Account", new HashSet<>(), accountShape));
 
             Namespace app = new Namespace("App", entityTypes, actions, commonTypes);
@@ -269,20 +278,20 @@ public class SchemaTest {
             Schema schema = new Schema();
 
             Map<String, EntityTypeDefinition> oneEntities = new HashMap<>();
-            oneEntities.put("A", new EntityTypeDefinition("One::A", new HashSet<>(), new HashMap<>()));
+            oneEntities.put("A", new EntityTypeDefinition("One::A", new HashSet<>(), new RecordTypeDefinition()));
 
             Namespace one = new Namespace("One", oneEntities, new HashMap<>(), new HashMap<>());
             schema.add(one);
 
             Map<String, EntityTypeDefinition> twoEntities = new HashMap<>();
 
-            twoEntities.put("A", new EntityTypeDefinition("Two::A", new HashSet<>(), new HashMap<>()));
+            twoEntities.put("A", new EntityTypeDefinition("Two::A", new HashSet<>(), new RecordTypeDefinition()));
 
-            Map<String, CommonTypeDefinition> shape = new HashMap<>();
-
-            shape.put("a", new UnresolvedTypeReference("One::A"));
-            shape.put("b", new UnresolvedTypeReference("Two::A"));
-            shape.put("c", new UnresolvedTypeReference("A"));
+            RecordTypeDefinition shape = new RecordTypeDefinition.Builder()
+                    .attribute("a", new UnresolvedTypeReference("One::A"))
+                    .attribute("b", new UnresolvedTypeReference("Two::A"))
+                    .attribute("c", new UnresolvedTypeReference("A"))
+                    .build();
             twoEntities.put("B", new EntityTypeDefinition("Two::B", new HashSet<>(), shape));
 
             Namespace two = new Namespace("Two", twoEntities, new HashMap<>(), new HashMap<>());
@@ -300,14 +309,14 @@ public class SchemaTest {
             Namespace namespace = new Namespace("App");
             schema.add(namespace);
 
-            assertTrue(Schema.resolveTypeReference(new UnresolvedTypeReference("datetime"), schema,
-                    namespace) instanceof DateTimeType);
-            assertTrue(Schema.resolveTypeReference(new UnresolvedTypeReference("decimal"), schema,
-                    namespace) instanceof DecimalType);
-            assertTrue(Schema.resolveTypeReference(new UnresolvedTypeReference("duration"), schema,
-                    namespace) instanceof DurationType);
-            assertTrue(Schema.resolveTypeReference(new UnresolvedTypeReference("ipaddr"), schema,
-                    namespace) instanceof IpAddressType);
+            assertInstanceOf(DateTimeType.class,
+                    Schema.resolveTypeReference(new UnresolvedTypeReference("datetime"), schema, namespace));
+            assertInstanceOf(DecimalType.class,
+                    Schema.resolveTypeReference(new UnresolvedTypeReference("decimal"), schema, namespace));
+            assertInstanceOf(DurationType.class,
+                    Schema.resolveTypeReference(new UnresolvedTypeReference("duration"), schema, namespace));
+            assertInstanceOf(IpAddressType.class,
+                    Schema.resolveTypeReference(new UnresolvedTypeReference("ipaddr"), schema, namespace));
 
         }
 
@@ -344,7 +353,7 @@ public class SchemaTest {
             Map<String, String> entityAnnotations = new HashMap<>();
             entityAnnotations.put("AnEntityAnnotation", "with a value!");
 
-            EntityTypeDefinition entity = new EntityTypeDefinition("App::SomeEntity", new HashSet<>(), new HashMap<>(),
+            EntityTypeDefinition entity = new EntityTypeDefinition("App::SomeEntity", new HashSet<>(), new RecordTypeDefinition(),
                     null,
                     entityAnnotations);
             entities.put("SomeEntity", entity);
@@ -354,15 +363,12 @@ public class SchemaTest {
             Map<String, String> actionAnnotations = new HashMap<>();
             actionAnnotations.put("AnActionAnnotation", "with a totally different value?");
 
-            Set<String> appliesTo = Set.copyOf(Arrays.asList("App::SomeEntity"));
+            Set<String> appliesTo = Set.copyOf(List.of("App::SomeEntity"));
             actions.put("someAction",
                     new ActionDefinition("App::Action", "someAction", null, appliesTo, appliesTo, null,
                             actionAnnotations));
 
             Map<String, CommonTypeDefinition> types = new HashMap<>();
-
-            Map<String, String> typeAnnotations = new HashMap<>();
-            typeAnnotations.put("ATypeAnnotation", "enough annotations already...");
 
             types.put("SomeType", new EntityTypeReference("App::SomeType", entity));
 
@@ -417,16 +423,16 @@ public class SchemaTest {
         assertTrue(user.getMemberOfTypes().contains(role));
         assertTrue(info.getMemberOfTypes().contains(infoType));
 
-        assertEquals(0, role.getShapeAttributeNames().size());
-        assertEquals(0, user.getShapeAttributeNames().size());
-        assertEquals(0, infoType.getShapeAttributeNames().size());
-        assertEquals(2, info.getShapeAttributeNames().size());
+        assertEquals(0, role.getShape().getAttributes().size());
+        assertEquals(0, user.getShape().getAttributes().size());
+        assertEquals(0, infoType.getShape().getAttributes().size());
+        assertEquals(2, info.getShape().getAttributes().size());
 
-        CommonTypeDefinition provider = info.getShapeAttributeType("provider");
-        CommonTypeDefinition patient = info.getShapeAttributeType("patient");
+        CommonTypeDefinition provider = info.getShape().getAttributeType("provider");
+        CommonTypeDefinition patient = info.getShape().getAttributeType("patient");
 
-        assertTrue(provider instanceof EntityTypeReference);
-        assertTrue(patient instanceof EntityTypeReference);
+        assertInstanceOf(EntityTypeReference.class, provider);
+        assertInstanceOf(EntityTypeReference.class, patient);
 
         assertNull(provider.getName());
         assertNull(patient.getName());
@@ -487,14 +493,14 @@ public class SchemaTest {
         assertTrue(delete.getAppliesToResourceTypes().contains(info));
         assertTrue(list.getAppliesToResourceTypes().contains(info));
 
-        assertEquals(2, create.getAppliesToContext().getAttributeNames().size());
+        assertEquals(2, create.getAppliesToContext().getAttributes().size());
         assertNull(update.getAppliesToContext());
         assertNull(delete.getAppliesToContext());
         assertNull(list.getAppliesToContext());
 
         CommonTypeDefinition referrer = create.getAppliesToContext().getAttributeType("referrer");
 
-        assertTrue(referrer instanceof EntityTypeReference);
+        assertInstanceOf(EntityTypeReference.class, referrer);
         assertNull(referrer.getName());
         assertEquals(user, ((EntityTypeReference) referrer).getDefinition());
 
@@ -506,18 +512,18 @@ public class SchemaTest {
         assertTrue(schema.commonTypeNames().contains("HealthCareApp::Diagnosis"));
 
         CommonTypeDefinition details = healthcareApp.getCommonType("AppointmentDetails");
-        assertTrue(details instanceof RecordTypeDefinition);
+        assertInstanceOf(RecordTypeDefinition.class, details);
 
         assertEquals(details, Schema.resolveCommonType("HealthCareApp::AppointmentDetails", schema, healthcareApp));
         assertEquals(details, schema.getCommonType("HealthCareApp::AppointmentDetails"));
 
         CommonTypeDefinition detailAttr = create.getAppliesToContext().getAttributeType("detail");
 
-        assertTrue(detailAttr instanceof CommonTypeReference);
+        assertInstanceOf(CommonTypeReference.class, detailAttr);
         assertEquals(details, ((CommonTypeReference) detailAttr).getDefinition());
 
         CommonTypeDefinition diagnosis = healthcareApp.getCommonType("Diagnosis");
-        assertTrue(diagnosis instanceof StringType);
+        assertInstanceOf(StringType.class, diagnosis);
 
         assertNull(healthcareApp.getAction("Missing"));
         assertNull(healthcareApp.getEntityType("Missing"));
@@ -535,14 +541,13 @@ public class SchemaTest {
         assertNotNull(user);
         assertNotNull(colour);
 
-        CommonTypeDefinition nicknames = user.getShapeAttributeType("nicknames");
-        CommonTypeDefinition preferences = user.getShapeAttributeType("preferences");
+        CommonTypeDefinition nicknames = user.getShape().getAttributeType("nicknames");
+        CommonTypeDefinition preferences = user.getShape().getAttributeType("preferences");
 
-        assertTrue(nicknames instanceof SetTypeDefinition);
-        assertTrue(preferences instanceof RecordTypeDefinition);
-
-        assertTrue(
-                ((RecordTypeDefinition) preferences).getAttributeNames().containsAll(Arrays.asList("diet", "colour")));
+        assertInstanceOf(SetTypeDefinition.class, nicknames);
+        assertInstanceOf(RecordTypeDefinition.class, preferences);
+        assertTrue(((RecordTypeDefinition) preferences).getAttributes().keySet().stream()
+                        .map(RecordTypeDefinition.Attribute::getName).toList().containsAll(Arrays.asList("diet", "colour")));
     }
 
     private void checkEmptyNamespace(Schema schema) {
@@ -583,10 +588,10 @@ public class SchemaTest {
         EntityTypeDefinition account = app.getEntityType("Account");
         assertNotNull(account);
 
-        CommonTypeDefinition friend = account.getShapeAttributeType("friend");
+        CommonTypeDefinition friend = account.getShape().getAttributeType("friend");
         assertNotNull(friend);
 
-        assertTrue(friend instanceof EntityTypeReference);
+        assertInstanceOf(EntityTypeReference.class, friend);
         assertEquals(account, ((EntityTypeReference) friend).getDefinition());
     }
 
@@ -601,30 +606,30 @@ public class SchemaTest {
         assertNotNull(person);
         assertNotNull(sleep);
 
-        CommonTypeDefinition name = person.getShapeAttributeType("name");
-        CommonTypeDefinition age = person.getShapeAttributeType("age");
-        CommonTypeDefinition worth = person.getShapeAttributeType("worth");
-        CommonTypeDefinition bedtime = person.getShapeAttributeType("bedtime");
-        CommonTypeDefinition address = person.getShapeAttributeType("address");
+        CommonTypeDefinition name = person.getShape().getAttributeType("name");
+        CommonTypeDefinition age = person.getShape().getAttributeType("age");
+        CommonTypeDefinition worth = person.getShape().getAttributeType("worth");
+        CommonTypeDefinition bedtime = person.getShape().getAttributeType("bedtime");
+        CommonTypeDefinition address = person.getShape().getAttributeType("address");
         assertNotNull(name);
         assertNotNull(age);
         assertNotNull(worth);
         assertNotNull(bedtime);
         assertNotNull(address);
 
-        assertTrue(name instanceof StringType);
-        assertTrue(age instanceof LongType);
-        assertTrue(worth instanceof DecimalType);
-        assertTrue(bedtime instanceof DateTimeType);
-        assertTrue(address instanceof IpAddressType);
+        assertInstanceOf(StringType.class, name);
+        assertInstanceOf(LongType.class, age);
+        assertInstanceOf(DecimalType.class, worth);
+        assertInstanceOf(DateTimeType.class, bedtime);
+        assertInstanceOf(IpAddressType.class, address);
 
-        CommonTypeDefinition duration = sleep.getShapeAttributeType("duration");
-        CommonTypeDefinition deep = sleep.getShapeAttributeType("deep");
+        CommonTypeDefinition duration = sleep.getShape().getAttributeType("duration");
+        CommonTypeDefinition deep = sleep.getShape().getAttributeType("deep");
         assertNotNull(duration);
         assertNotNull(deep);
 
-        assertTrue(duration instanceof DurationType);
-        assertTrue(deep instanceof BooleanType);
+        assertInstanceOf(DurationType.class, duration);
+        assertInstanceOf(BooleanType.class, deep);
     }
 
     private void checkShadowing(Schema schema) {
@@ -647,16 +652,17 @@ public class SchemaTest {
         assertEquals(twoA, schema.getEntityType("Two::A"));
         assertEquals(twoB, schema.getEntityType("Two::B"));
 
-        CommonTypeDefinition a = twoB.getShapeAttributeType("a");
-        CommonTypeDefinition b = twoB.getShapeAttributeType("b");
-        CommonTypeDefinition c = twoB.getShapeAttributeType("c");
+        CommonTypeDefinition a = twoB.getShape().getAttributeType("a");
+        CommonTypeDefinition b = twoB.getShape().getAttributeType("b");
+        CommonTypeDefinition c = twoB.getShape().getAttributeType("c");
+
         assertNotNull(a);
         assertNotNull(b);
         assertNotNull(c);
 
-        assertTrue(a instanceof EntityTypeReference);
-        assertTrue(b instanceof EntityTypeReference);
-        assertTrue(c instanceof EntityTypeReference);
+        assertInstanceOf(EntityTypeReference.class, a);
+        assertInstanceOf(EntityTypeReference.class, b);
+        assertInstanceOf(EntityTypeReference.class, c);
 
         assertEquals(oneA, ((EntityTypeReference) a).getDefinition());
         assertEquals(twoA, ((EntityTypeReference) b).getDefinition());

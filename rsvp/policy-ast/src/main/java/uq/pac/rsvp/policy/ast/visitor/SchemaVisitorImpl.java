@@ -35,10 +35,10 @@ public class SchemaVisitorImpl implements SchemaVisitor {
     }
 
     @Override
-    public void visitEntityTypeDefinition(EntityTypeDefinition type) {
-        for (String attributeType : type.getShapeAttributeNames()) {
-            type.getShapeAttributeType(attributeType).accept(this);
-        }
+    public void visitEntityTypeDefinition(EntityTypeDefinition entity) {
+        entity.getShape().getAttributes()
+                .values()
+                .forEach(v -> v.accept(this));
     }
 
     @Override
@@ -50,9 +50,7 @@ public class SchemaVisitorImpl implements SchemaVisitor {
 
     @Override
     public void visitRecordTypeDefinition(RecordTypeDefinition type) {
-        for (String attribute : type.getAttributeNames()) {
-            type.getAttributeType(attribute).accept(this);
-        }
+        type.getAttributes().values().forEach(v -> v.accept(this));
     }
 
     @Override

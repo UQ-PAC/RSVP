@@ -18,7 +18,7 @@ public class EntityTypeDefinition implements SchemaItem {
     @SerializedName("memberOfTypes")
     private final Set<String> unresolvedMemberOfTypes;
 
-    private final RecordTypeDefinition shape;
+    private final CommonTypeDefinition shape;
 
     @SerializedName("enum")
     private final Set<String> entityNamesEnum;
@@ -28,26 +28,26 @@ public class EntityTypeDefinition implements SchemaItem {
     // Set during type resolution
     private Set<EntityTypeDefinition> resolvedMemberOfDefinitions;
 
-    public EntityTypeDefinition(String name, Set<String> memberOfTypes, Map<String, CommonTypeDefinition> shape,
+    public EntityTypeDefinition(String name, Set<String> memberOfTypes, RecordTypeDefinition shape,
             Set<String> entityNamesEnum,
             Map<String, String> annotations) {
         this.name = name;
         this.unresolvedMemberOfTypes = memberOfTypes != null ? Set.copyOf(memberOfTypes) : Collections.emptySet();
-        this.shape = new RecordTypeDefinition(shape);
+        this.shape = new RecordTypeDefinition(shape == null ? Collections.emptyMap() : shape.getAttributes());
         this.annotations = annotations != null ? Map.copyOf(annotations) : Collections.emptyMap();
         this.entityNamesEnum = entityNamesEnum != null ? Set.copyOf(entityNamesEnum) : Collections.emptySet();
     }
 
     public RecordTypeDefinition getShape() {
-        return shape;
+        return (RecordTypeDefinition) shape;
     }
 
-    public EntityTypeDefinition(String name, Set<String> memberOfTypes, Map<String, CommonTypeDefinition> shape,
+    public EntityTypeDefinition(String name, Set<String> memberOfTypes, RecordTypeDefinition shape,
             Set<String> entityNamesEnum) {
         this(name, memberOfTypes, shape, entityNamesEnum, null);
     }
 
-    public EntityTypeDefinition(String name, Set<String> memberOfTypes, Map<String, CommonTypeDefinition> shape) {
+    public EntityTypeDefinition(String name, Set<String> memberOfTypes, RecordTypeDefinition shape) {
         this(name, memberOfTypes, shape, null, null);
     }
 
@@ -88,16 +88,8 @@ public class EntityTypeDefinition implements SchemaItem {
         return resolvedMemberOfDefinitions != null ? Set.copyOf(resolvedMemberOfDefinitions) : Collections.emptySet();
     }
 
-    public Set<String> getShapeAttributeNames() {
-        return shape.getAttributeNames();
-    }
-
-    public CommonTypeDefinition getShapeAttributeType(String name) {
-        return shape.getAttributeType(name);
-    }
-
-    public void resolveShapeAttributeType(String name, CommonTypeDefinition type) {
-        shape.resolveAttributeType(name, type);
+    public void resolveShapeAttributeType(RecordTypeDefinition.Attribute name, CommonTypeDefinition type) {
+        getShape().resolveAttributeType(name, type);
     }
 
     public Set<String> getEntityNamesEnum() {

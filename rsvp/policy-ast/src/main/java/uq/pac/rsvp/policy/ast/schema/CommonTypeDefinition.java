@@ -3,11 +3,7 @@ package uq.pac.rsvp.policy.ast.schema;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.google.gson.*;
 
 import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.policy.ast.schema.common.DateTimeType;
@@ -61,6 +57,24 @@ public abstract class CommonTypeDefinition implements SchemaItem {
 
     public static class CommonTypeDefinitionDeserialiser implements JsonDeserializer<CommonTypeDefinition> {
 
+        private JsonArray makeAttribute(String name, JsonObject attr) {
+            attr = attr.deepCopy();
+            boolean required = true;
+            if (attr.has("required")) {
+                required = attr.get("required").getAsBoolean();
+                attr.remove("required");
+            }
+
+            JsonObject key = new JsonObject();
+            key.addProperty("name", name);
+            key.addProperty("required", required);
+
+            JsonArray entry = new JsonArray();
+            entry.add(key);
+            entry.add(attr);
+            return entry;
+        }
+
         @Override
         public CommonTypeDefinition deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
                 throws JsonParseException {
@@ -82,16 +96,14 @@ public abstract class CommonTypeDefinition implements SchemaItem {
                     JsonElement attributes = definition.get("attributes");
 
                     if (attributes.isJsonObject()) {
+                        JsonArray complexAttributes = new JsonArray();
                         for (Map.Entry<String, JsonElement> attr : attributes.getAsJsonObject().entrySet()) {
-                            if (attr.getValue().isJsonObject()) {
-                                JsonObject value = attr.getValue().getAsJsonObject();
-                                if (!value.has("required")) {
-                                    value.addProperty("required", true);
-                                }
-                            }
+                            complexAttributes.add(makeAttribute(attr.getKey(), attr.getValue().getAsJsonObject()));
                         }
-                    }
 
+                        definition.remove("attributes");
+                        definition.add("attributes", complexAttributes);
+                    }
                     yield RecordTypeDefinition.class;
                 }
                 case "Set" -> SetTypeDefinition.class;

@@ -85,7 +85,7 @@ class Typing {
             case StringType t -> StringType;
             case SetTypeDefinition t -> new SetTypeDefinition(convert(t.getElementType()));
             case RecordTypeDefinition t -> {
-                Map<String, CommonTypeDefinition> attrs = t.getAttributes().entrySet()
+                Map<RecordTypeDefinition.Attribute, CommonTypeDefinition> attrs = t.getAttributes().entrySet()
                         .stream()
                         .collect(Collectors.toMap(Map.Entry::getKey, v -> convert(v.getValue())));
                 yield new RecordTypeDefinition(attrs);

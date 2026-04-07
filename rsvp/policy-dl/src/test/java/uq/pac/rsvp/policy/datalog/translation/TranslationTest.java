@@ -95,7 +95,7 @@ public class TranslationTest {
         }
     }
 
-    private final static String ONE_OFF = "petclinic-v2";
+    private final static String ONE_OFF = "photoapp";
 
     // Running tests for one directory separately for no particular
     // reason apart from being able to launch it separately

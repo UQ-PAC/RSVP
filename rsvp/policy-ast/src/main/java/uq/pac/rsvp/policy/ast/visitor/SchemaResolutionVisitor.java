@@ -53,18 +53,13 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
     @Override
     public void visitEntityTypeDefinition(EntityTypeDefinition type) {
         type.resolveMemberOfTypes(schema, namespace);
-
-        for (String name : type.getShapeAttributeNames()) {
-            CommonTypeDefinition attribute = type.getShapeAttributeType(name);
-
-            if (attribute instanceof UnresolvedTypeReference) {
-                attribute = Schema.resolveTypeReference((UnresolvedTypeReference) attribute, schema, namespace);
-                type.resolveShapeAttributeType(name, attribute);
+        type.getShape().getAttributes().forEach((attrName, attrType) -> {
+            if (attrType instanceof UnresolvedTypeReference) {
+                attrType = Schema.resolveTypeReference((UnresolvedTypeReference) attrType, schema, namespace);
+                type.resolveShapeAttributeType(attrName, attrType);
             }
-
-            attribute.accept(this);
-        }
-
+            attrType.accept(this);
+        });
     }
 
     @Override
@@ -77,28 +72,23 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
 
     @Override
     public void visitRecordTypeDefinition(RecordTypeDefinition type) {
-        for (String name : type.getAttributeNames()) {
-            CommonTypeDefinition prop = type.getAttributeType(name);
-
-            if (prop instanceof UnresolvedTypeReference) {
-                prop = Schema.resolveTypeReference((UnresolvedTypeReference) prop, schema, namespace);
-                type.resolveAttributeType(name, prop);
+        type.getAttributes().forEach((attrName, attrType) -> {
+            if (attrType instanceof UnresolvedTypeReference) {
+                attrType = Schema.resolveTypeReference((UnresolvedTypeReference) attrType, schema, namespace);
+                type.resolveAttributeType(attrName, attrType);
             }
-
-            prop.accept(this);
-        }
+            attrType.accept(this);
+        });
     }
 
     @Override
     public void visitSetTypeDefinition(SetTypeDefinition type) {
         CommonTypeDefinition element = type.getElementType();
-
         if (element instanceof UnresolvedTypeReference) {
             element = Schema.resolveTypeReference((UnresolvedTypeReference) element, schema, namespace);
             type.resolveElementType(element);
 
         }
-
         element.accept(this);
     }
 

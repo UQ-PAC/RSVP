@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import uq.pac.rsvp.policy.ast.JsonParser;
+import uq.pac.rsvp.policy.ast.schema.common.RecordTypeDefinition;
 import uq.pac.rsvp.policy.ast.visitor.SchemaResolutionVisitor;
 
 @DisplayName("Schema entity type AST")
@@ -42,12 +43,12 @@ public class EntityTypeDefinitionTest {
 
             assertEquals(0, some.getEntityNamesEnum().size());
             assertEquals(0, some.getMemberOfTypes().size());
-            assertEquals(0, some.getShapeAttributeNames().size());
+            assertEquals(0, some.getShape().getAttributes().size());
             assertEquals(0, some.getAnnotations().size());
 
             assertEquals(0, another.getEntityNamesEnum().size());
             assertEquals(0, another.getMemberOfTypes().size());
-            assertEquals(0, another.getShapeAttributeNames().size());
+            assertEquals(0, another.getShape().getAttributes().size());
             assertEquals(0, another.getAnnotations().size());
         }
 
@@ -95,7 +96,7 @@ public class EntityTypeDefinitionTest {
             Map<String, EntityTypeDefinition> entities = new HashMap<>();
             entities.put("SomeEntity", new EntityTypeDefinition("App::SomeEntity"));
             entities.put("AnotherEntity",
-                    new EntityTypeDefinition("App::AnotherEntity", Collections.emptySet(), Collections.emptyMap(),
+                    new EntityTypeDefinition("App::AnotherEntity", Collections.emptySet(), new RecordTypeDefinition(),
                             Collections.emptySet(), Collections.emptyMap()));
 
             Namespace app = new Namespace("App", entities, null);
@@ -111,12 +112,12 @@ public class EntityTypeDefinitionTest {
 
             assertEquals(0, some.getEntityNamesEnum().size());
             assertEquals(0, some.getMemberOfTypes().size());
-            assertEquals(0, some.getShapeAttributeNames().size());
+            assertEquals(0, some.getShape().getAttributes().size());
             assertEquals(0, some.getAnnotations().size());
 
             assertEquals(0, another.getEntityNamesEnum().size());
             assertEquals(0, another.getMemberOfTypes().size());
-            assertEquals(0, another.getShapeAttributeNames().size());
+            assertEquals(0, another.getShape().getAttributes().size());
             assertEquals(0, another.getAnnotations().size());
         }
 
@@ -128,7 +129,7 @@ public class EntityTypeDefinitionTest {
             Map<String, EntityTypeDefinition> appEntities = new HashMap<>();
             appEntities.put("Item", new EntityTypeDefinition("App::Item"));
             appEntities.put("User",
-                    new EntityTypeDefinition("App::User", Set.of("Lib::Role", "Item"), Collections.emptyMap(),
+                    new EntityTypeDefinition("App::User", Set.of("Lib::Role", "Item"), new RecordTypeDefinition(),
                             Collections.emptySet()));
 
             Namespace app = new Namespace("App", appEntities, null);
@@ -165,7 +166,7 @@ public class EntityTypeDefinitionTest {
 
             Map<String, EntityTypeDefinition> appEntities = new HashMap<>();
             appEntities.put("Loser",
-                    new EntityTypeDefinition("App::Loser", Set.of("Lib::Role", "Lib::Invalid"), Collections.emptyMap(),
+                    new EntityTypeDefinition("App::Loser", Set.of("Lib::Role", "Lib::Invalid"), new RecordTypeDefinition(),
                             Collections.emptySet()));
 
             Namespace app = new Namespace("App", appEntities, null);

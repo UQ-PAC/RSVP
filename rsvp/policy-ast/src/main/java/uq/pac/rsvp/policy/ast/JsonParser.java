@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 
 import uq.pac.rsvp.policy.ast.expr.ActionExpression;
 import uq.pac.rsvp.policy.ast.expr.EntityExpression;
-import uq.pac.rsvp.policy.ast.expr.EuidExpression;
 import uq.pac.rsvp.policy.ast.expr.EuidExpression.EuidExpressionDeserialiser;
 import uq.pac.rsvp.policy.ast.expr.Expression;
 import uq.pac.rsvp.policy.ast.expr.Expression.ExpressionDeserialiser;
@@ -27,6 +26,7 @@ public class JsonParser {
                     .registerTypeAdapter(EntityExpression.class, new EuidExpressionDeserialiser())
                     .registerTypeAdapter(CommonTypeDefinition.class, new CommonTypeDefinitionDeserialiser())
                     .registerTypeAdapter(Schema.class, new SchemaDeserialiser())
+                    .enableComplexMapKeySerialization()
                     .disableJdkUnsafe()
                     .create();
         }

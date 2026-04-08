@@ -15,9 +15,14 @@
  */
 package org.springframework.samples.petclinic.owner;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
@@ -26,9 +31,14 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-
-import jakarta.validation.Valid;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import org.springframework.samples.petclinic.cedar.CedarAuthorization;
+import org.springframework.samples.petclinic.cedar.CedarRequest;
+import org.springframework.samples.petclinic.cedar.CedarService;
+
+import com.cedarpolicy.value.EntityUID;
+import com.cedarpolicy.value.Value;
 
 /**
  * @author Juergen Hoeller
@@ -43,8 +53,11 @@ class VisitController {
 
 	private final OwnerRepository owners;
 
-	public VisitController(OwnerRepository owners) {
+	private final CedarService cedarService;
+
+	public VisitController(OwnerRepository owners, CedarService cedarService) {
 		this.owners = owners;
+		this.cedarService = cedarService;
 	}
 
 	@InitBinder
@@ -82,13 +95,43 @@ class VisitController {
 	// Spring MVC calls method loadPetWithVisit(...) before initNewVisitForm is
 	// called
 	@GetMapping("/owners/{ownerId}/pets/{petId}/visits/new")
-	public String initNewVisitForm() {
+	@CedarAuthorization(action = "AddClient", resourceType = "Pet", validate = true)
+	public String initNewVisitForm(Pet pet, HttpSession session) {
+		String principalId = (String) session.getAttribute("currentUser");
+		if (session.getAttribute("currentUser") == null) {
+			principalId = "Guest";
+		}
+
+		System.out.println("Cookie principalId: " + principalId);
+
+		EntityUID principal;
+		if (principalId.equals("Guest")) {
+			principal = EntityUID.parse("PetClinic::Guest::\"Unknown\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
+		}
+		else {
+			principal = EntityUID.parse("PetClinic::Employee::\"" + principalId + "\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
+		}
+
+		EntityUID action = EntityUID.parse("PetClinic::Action::\"" + "EditClient" + "\"")
+			.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
+		EntityUID resource = EntityUID.parse("PetClinic::Pet::\"" + pet.getName() + "\"")
+			.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
+		Map<String, Value> contextMap = new HashMap<>();
+		CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
+		ResponseEntity<String> response = cedarService.checkAccess(cedarReq);
+		if (!response.getBody().startsWith("Access Granted.")) {
+			throw new SecurityException("Access Denied to modify Pet.");
+		}
+
 		return "pets/createOrUpdateVisitForm";
 	}
 
 	// Spring MVC calls method loadPetWithVisit(...) before processNewVisitForm is
 	// called
 	@PostMapping("/owners/{ownerId}/pets/{petId}/visits/new")
+	@CedarAuthorization(action = "AddClient", resourceType = "Pet", validate = true)
 	public String processNewVisitForm(@ModelAttribute Owner owner, @PathVariable int petId, @Valid Visit visit,
 			BindingResult result, RedirectAttributes redirectAttributes) {
 		if (result.hasErrors()) {

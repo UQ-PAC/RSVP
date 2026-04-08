@@ -17,9 +17,15 @@ package org.springframework.samples.petclinic.owner;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.Assert;
@@ -32,10 +38,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import jakarta.validation.Valid;
-
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import org.springframework.samples.petclinic.cedar.CedarAuthorization;
+import org.springframework.samples.petclinic.cedar.CedarRequest;
+import org.springframework.samples.petclinic.cedar.CedarService;
+
+import com.cedarpolicy.value.EntityUID;
+import com.cedarpolicy.value.Value;
 
 /**
  * @author Juergen Hoeller
@@ -53,9 +63,12 @@ class PetController {
 
 	private final PetTypeRepository types;
 
-	public PetController(OwnerRepository owners, PetTypeRepository types) {
+	private final CedarService cedarService;
+
+	public PetController(OwnerRepository owners, PetTypeRepository types, CedarService cedarService) {
 		this.owners = owners;
 		this.types = types;
+		this.cedarService = cedarService;
 	}
 
 	@ModelAttribute("types")
@@ -96,13 +109,43 @@ class PetController {
 	}
 
 	@GetMapping("/pets/new")
-	public String initCreationForm(Owner owner, ModelMap model) {
+	@CedarAuthorization(action = "AddClient", resourceType = "PetOwner", validate = true)
+	public String initCreationForm(Owner owner, ModelMap model, HttpSession session) {
+		String principalId = (String) session.getAttribute("currentUser");
+		if (session.getAttribute("currentUser") == null) {
+			principalId = "Guest";
+		}
+
+		System.out.println("Cookie principalId: " + principalId);
+
+		EntityUID principal;
+		if (principalId.equals("Guest")) {
+			principal = EntityUID.parse("PetClinic::Guest::\"Unknown\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
+		}
+		else {
+			principal = EntityUID.parse("PetClinic::Employee::\"" + principalId + "\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
+		}
+
+		EntityUID action = EntityUID.parse("PetClinic::Action::\"" + "EditClient" + "\"")
+			.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
+		EntityUID resource = EntityUID.parse("PetClinic::PetOwner::\"" + owner.getFirstName() + " " + owner.getLastName() + "\"")
+			.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
+		Map<String, Value> contextMap = new HashMap<>();
+		CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
+		ResponseEntity<String> response = cedarService.checkAccess(cedarReq);
+		if (!response.getBody().startsWith("Access Granted.")) {
+			throw new SecurityException("Access Denied to modify Owner.");
+		}
+
 		Pet pet = new Pet();
 		owner.addPet(pet);
 		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
 	}
 
 	@PostMapping("/pets/new")
+	@CedarAuthorization(action = "AddClient", resourceType = "PetOwner", validate = true)
 	public String processCreationForm(Owner owner, @Valid Pet pet, BindingResult result,
 			RedirectAttributes redirectAttributes) {
 
@@ -125,11 +168,13 @@ class PetController {
 	}
 
 	@GetMapping("/pets/{petId}/edit")
+	@CedarAuthorization(action = "EditClient", resourceType = "Pet", validate = true)
 	public String initUpdateForm() {
 		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
 	}
 
 	@PostMapping("/pets/{petId}/edit")
+	@CedarAuthorization(action = "EditClient", resourceType = "Pet", validate = true)
 	public String processUpdateForm(Owner owner, @Valid Pet pet, BindingResult result,
 			RedirectAttributes redirectAttributes) {
 

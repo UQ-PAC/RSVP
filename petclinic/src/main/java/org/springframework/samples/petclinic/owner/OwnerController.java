@@ -15,13 +15,21 @@
  */
 package org.springframework.samples.petclinic.owner;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -33,12 +41,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-
-import jakarta.validation.Valid;
-
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import org.springframework.samples.petclinic.cedar.CedarAuthorization;
+import org.springframework.samples.petclinic.cedar.CedarRequest;
+import org.springframework.samples.petclinic.cedar.CedarService;
+
+import com.cedarpolicy.value.EntityUID;
+import com.cedarpolicy.value.Value;
+
 
 /**
  * @author Juergen Hoeller
@@ -54,8 +65,11 @@ class OwnerController {
 
 	private final OwnerRepository owners;
 
-	public OwnerController(OwnerRepository owners) {
+	private final CedarService cedarService;
+
+	public OwnerController(OwnerRepository owners, CedarService cedarService) {
 		this.owners = owners;
+		this.cedarService = cedarService;
 	}
 
 	@InitBinder
@@ -72,11 +86,13 @@ class OwnerController {
 	}
 
 	@GetMapping("/owners/new")
+	@CedarAuthorization(action = "AddClient", resourceType = "Clinic", validate = true)
 	public String initCreationForm() {
 		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
 	}
 
 	@PostMapping("/owners/new")
+	@CedarAuthorization(action = "AddClient", resourceType = "Clinic", validate = true)
 	public String processCreationForm(@Valid Owner owner, BindingResult result, RedirectAttributes redirectAttributes) {
 		if (result.hasErrors()) {
 			redirectAttributes.addFlashAttribute("error", "There was an error in creating the owner.");
@@ -89,35 +105,76 @@ class OwnerController {
 	}
 
 	@GetMapping("/owners/find")
+	@CedarAuthorization(action = "ListClients", resourceType = "Clinic", validate = true)
 	public String initFindForm() {
 		return "owners/findOwners";
 	}
 
 	@GetMapping("/owners")
+	@CedarAuthorization(action = "ListClients", resourceType = "Clinic", validate = true)
 	public String processFindForm(@RequestParam(defaultValue = "1") int page, Owner owner, BindingResult result,
-			Model model) {
+			Model model, HttpSession session) {
 		// allow parameterless GET request for /owners to return all records
 		String lastName = owner.getLastName();
 		if (lastName == null) {
 			lastName = ""; // empty string signifies broadest possible search
 		}
 
+		String principalId = (String) session.getAttribute("currentUser");
+		if (session.getAttribute("currentUser") == null) {
+			principalId = "Guest";
+		}
+
+		System.out.println("Cookie principalId: " + principalId);
+
+		EntityUID principal;
+		if (principalId.equals("Guest")) {
+			principal = EntityUID.parse("PetClinic::Guest::\"Unknown\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
+		}
+		else {
+			principal = EntityUID.parse("PetClinic::Employee::\"" + principalId + "\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
+		}
+
 		// find owners by last name
 		Page<Owner> ownersResults = findPaginatedForOwnersLastName(page, lastName);
-		if (ownersResults.isEmpty()) {
+		List<Owner> authorizedOwners = ownersResults.stream()
+				.filter(o -> {
+					EntityUID action = EntityUID.parse("PetClinic::Action::\"" + "ViewClient" + "\"")
+						.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
+					EntityUID resource = EntityUID.parse("PetClinic::PetOwner::\"" + o.getFirstName() + " " + o.getLastName() + "\"")
+						.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
+					Map<String, Value> contextMap = new HashMap<>();
+					CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
+					ResponseEntity<String> response = cedarService.checkAccess(cedarReq);
+					if (response.getBody().startsWith("Access Granted.")) {
+						return true;
+					} else {
+						return false;
+					}
+				})
+				.collect(Collectors.toList());
+
+		if (authorizedOwners.isEmpty()) {
 			// no owners found
 			result.rejectValue("lastName", "notFound", "No owners found.");
 			return "owners/findOwners";
 		}
 
-		if (ownersResults.getTotalElements() == 1) {
+		if (authorizedOwners.size() == 1 && ownersResults.getTotalElements() == 1) {
 			// 1 owner found
-			owner = ownersResults.iterator().next();
+			owner = authorizedOwners.iterator().next();
 			return "redirect:/owners/" + owner.getId();
 		}
 
 		// multiple owners found
-		return addPaginationModel(page, model, ownersResults);
+		Page<Owner> filteredPaginated = new PageImpl<>(
+				authorizedOwners, 
+				PageRequest.of(page - 1, 5), 
+				authorizedOwners.size()
+		);
+		return addPaginationModel(page, model, filteredPaginated);
 	}
 
 	private String addPaginationModel(int page, Model model, Page<Owner> paginated) {
@@ -136,11 +193,13 @@ class OwnerController {
 	}
 
 	@GetMapping("/owners/{ownerId}/edit")
+	@CedarAuthorization(action = "EditClient", resourceType = "PetOwner", validate = true)
 	public String initUpdateOwnerForm() {
 		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
 	}
 
 	@PostMapping("/owners/{ownerId}/edit")
+	@CedarAuthorization(action = "EditClient", resourceType = "PetOwner", validate = true)
 	public String processUpdateOwnerForm(@Valid Owner owner, BindingResult result, @PathVariable("ownerId") int ownerId,
 			RedirectAttributes redirectAttributes) {
 		if (result.hasErrors()) {

@@ -1,6 +1,6 @@
 {
   "principal": "PetClinic::Guest::\"???\"",
-  "resource": "PetClinic::PetVisit::\"Samantha 2\"",
-  "action": "PetClinic::Action::\"ViewClient\"",
+  "resource": "PetClinic::Pet::\"Basil\"",
+  "action": "PetClinic::Action::\"DeleteClient\"",
   "context": {}
 }

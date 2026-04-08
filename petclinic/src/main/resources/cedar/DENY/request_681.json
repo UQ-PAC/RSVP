@@ -1,6 +1,6 @@
 {
-  "principal": "PetClinic::Employee::\"Jestine Teixeira\"",
-  "resource": "PetClinic::Employee::\"???\"",
-  "action": "PetClinic::Action::\"DeleteEmployee\"",
+  "principal": "PetClinic::Employee::\"Bob\"",
+  "resource": "PetClinic::PetOwner::\"Jean Coleman\"",
+  "action": "PetClinic::Action::\"DeleteClient\"",
   "context": {}
 }

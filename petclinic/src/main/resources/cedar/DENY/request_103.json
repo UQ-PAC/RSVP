@@ -1,6 +1,6 @@
 {
   "principal": "PetClinic::Employee::\"Jestine Teixeira\"",
   "resource": "PetClinic::Pet::\"Leo\"",
-  "action": "PetClinic::Action::\"DeleteClient\"",
+  "action": "PetClinic::Action::\"AddClient\"",
   "context": {}
 }

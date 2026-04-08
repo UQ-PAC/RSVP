@@ -1,6 +1,6 @@
 {
-  "principal": "PetClinic::Guest::\"???\"",
-  "resource": "PetClinic::PetOwner::\"Eduardo Rodriquez\"",
-  "action": "PetClinic::Action::\"EditClient\"",
+  "principal": "PetClinic::Employee::\"???\"",
+  "resource": "PetClinic::Clinic::\"B\"",
+  "action": "PetClinic::Action::\"AddClient\"",
   "context": {}
 }

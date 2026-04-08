@@ -1,6 +1,6 @@
 {
-  "principal": "PetClinic::Employee::\"???\"",
-  "resource": "PetClinic::PetOwner::\"Carlos Estaban\"",
+  "principal": "PetClinic::Employee::\"Kathaleen Tramonte\"",
+  "resource": "PetClinic::PetVisit::\"???\"",
   "action": "PetClinic::Action::\"EditClient\"",
   "context": {}
 }

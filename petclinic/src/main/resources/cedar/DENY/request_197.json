@@ -1,6 +1,6 @@
 {
   "principal": "PetClinic::Employee::\"Kathaleen Tramonte\"",
-  "resource": "PetClinic::Pet::\"Basil\"",
-  "action": "PetClinic::Action::\"DeleteClient\"",
+  "resource": "PetClinic::Pet::\"Lucky\"",
+  "action": "PetClinic::Action::\"ListClients\"",
   "context": {}
 }

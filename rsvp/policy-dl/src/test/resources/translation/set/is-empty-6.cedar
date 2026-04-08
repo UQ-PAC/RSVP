@@ -3,6 +3,6 @@ permit (
     action,
     resource is Account)
 when {
-    principal.friends.isEmpty() == true
+    principal.friends.isEmpty() == resource.friends.isEmpty()
 };
 

@@ -6,10 +6,12 @@
 @id("Policy: Public Secretary and Veterinarian data.")
 permit (
     principal,
-    action == PetClinic::Action::"ViewEmployee",
+    action,
     resource is PetClinic::Employee
 )
 when {
+    action in [PetClinic::Action::"ListEmployees",
+               PetClinic::Action::"ViewEmployee"] &&
     resource.roles.containsAny([PetClinic::EmployeeRole::"Secretary",
                                 PetClinic::EmployeeRole::"Veterinarian"])
 };
@@ -137,14 +139,17 @@ when {
 };
 
 // 'policy8'
-// Every Employee can edit their own data.
+// Every Employee can view and edit their own data.
 @id("Policy: Employee can edit their own data.")
 permit (
     principal is PetClinic::Employee,
-    action == PetClinic::Action::"EditEmployee",
+    action,
     resource is PetClinic::Employee
 )
 when {
+    action in [PetClinic::Action::"ListEmployees",
+               PetClinic::Action::"ViewEmployee",
+               PetClinic::Action::"EditEmployee"] &&
     principal == resource
 };
 
@@ -176,10 +181,12 @@ when {
 @id("Policy: Senior or Specialist Veterinarian can view all clients.")
 permit (
     principal is PetClinic::Employee,
-    action == PetClinic::Action::"ViewClient",
+    action,
     resource
 )
 when {
+    action in [PetClinic::Action::"ListEmployees",
+               PetClinic::Action::"ViewEmployee"] &&
     principal.roles.contains(PetClinic::EmployeeRole::"Veterinarian") &&
     principal has level &&
     (
@@ -211,6 +218,14 @@ when {
     !resource.clinics.containsAny(principal.clinics)
 }
 unless {
-    principal is PetClinic::Employee &&
-    principal.roles.contains(PetClinic::EmployeeRole::"Administrator")
+    (
+        principal is PetClinic::Employee &&
+        principal.roles.contains(PetClinic::EmployeeRole::"Administrator")
+    ) ||
+    (
+        action in [PetClinic::Action::"ListEmployees",
+                   PetClinic::Action::"ViewEmployee"] &&
+        resource.roles.containsAny([PetClinic::EmployeeRole::"Secretary",
+                                    PetClinic::EmployeeRole::"Veterinarian"])
+    )
 };

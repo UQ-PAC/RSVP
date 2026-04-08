@@ -41,6 +41,12 @@ namespace PetClinic {
     action ClientOperations;
     action EmployeeOperations;
 
+    action ListClients in ClientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: [Clinic, PetOwner, Pet, PetVisit],
+        context: { }
+    };
+
     action ViewClient in ClientOperations appliesTo {
         principal: [Employee, Guest],
         resource: [PetOwner, Pet, PetVisit],
@@ -49,7 +55,7 @@ namespace PetClinic {
 
     action AddClient in ClientOperations appliesTo {
         principal: [Employee, Guest],
-        resource: Clinic,
+        resource: [Clinic, PetOwner, Pet],
         context: { }
     };
 
@@ -62,6 +68,12 @@ namespace PetClinic {
     action DeleteClient in ClientOperations appliesTo {
         principal: [Employee, Guest],
         resource: [PetOwner, Pet, PetVisit],
+        context: { }
+    };
+
+    action ListEmployees in EmployeeOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Clinic,
         context: { }
     };
 

@@ -542,6 +542,13 @@
     },
 
     {
+        "uid": { "type": "PetClinic::Action", "id": "ListClients" },
+        "attrs": { },
+        "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "ClientOperations" } }
+        ]
+    },
+    {
         "uid": { "type": "PetClinic::Action", "id": "ViewClient" },
         "attrs": { },
         "parents": [
@@ -570,6 +577,13 @@
         ]
     },
 
+    {
+        "uid": { "type": "PetClinic::Action", "id": "ListEmployees" },
+        "attrs": { },
+        "parents": [
+            { "__entity": { "type": "PetClinic::Action", "id": "EmployeeOperations" } }
+        ]
+    },
     {
         "uid": { "type": "PetClinic::Action", "id": "ViewEmployee" },
         "attrs": { },

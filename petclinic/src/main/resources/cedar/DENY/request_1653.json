@@ -1,0 +1,6 @@
+{
+  "principal": "PetClinic::Guest::\"Unknown\"",
+  "resource": "PetClinic::Clinic::\"B\"",
+  "action": "PetClinic::Action::\"ListClients\"",
+  "context": {}
+}

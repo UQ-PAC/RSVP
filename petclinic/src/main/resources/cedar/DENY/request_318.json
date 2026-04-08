@@ -1,6 +1,0 @@
-{
-  "principal": "PetClinic::Employee::\"Kathaleen Tramonte\"",
-  "resource": "PetClinic::PetOwner::\"Betty Davis\"",
-  "action": "PetClinic::Action::\"EditClient\"",
-  "context": {}
-}

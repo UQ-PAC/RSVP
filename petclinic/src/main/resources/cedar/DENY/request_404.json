@@ -1,6 +1,6 @@
 {
-  "principal": "PetClinic::Employee::\"Kathaleen Tramonte\"",
-  "resource": "PetClinic::Clinic::\"???\"",
-  "action": "PetClinic::Action::\"AddEmployee\"",
+  "principal": "PetClinic::Guest::\"???\"",
+  "resource": "PetClinic::PetVisit::\"Sly 1\"",
+  "action": "PetClinic::Action::\"ViewClient\"",
   "context": {}
 }

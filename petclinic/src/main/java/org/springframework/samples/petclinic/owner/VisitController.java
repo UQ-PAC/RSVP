@@ -64,7 +64,7 @@ class VisitController {
 			Map<String, Object> model) {
 		Optional<Owner> optionalOwner = owners.findById(ownerId);
 		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
-				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
+				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct."));
 
 		Pet pet = owner.getPet(petId);
 		if (pet == null) {
@@ -97,7 +97,7 @@ class VisitController {
 
 		owner.addVisit(petId, visit);
 		this.owners.save(owner);
-		redirectAttributes.addFlashAttribute("message", "Your visit has been booked");
+		redirectAttributes.addFlashAttribute("message", "Your visit has been booked.");
 		return "redirect:/owners/{ownerId}";
 	}
 

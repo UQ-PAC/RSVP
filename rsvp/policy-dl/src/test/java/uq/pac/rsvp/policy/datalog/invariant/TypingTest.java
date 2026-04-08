@@ -23,9 +23,9 @@ public class TypingTest {
     private final InvariantValidator validator;
 
     public TypingTest() throws RsvpException, IOException {
-        Path schemaPath = TestUtil.getResourceDir("translation", "photoapp", "photoapp.cedarschema");
+        Path schemaPath = TestUtil.getResourceDir( "invariant", "schema.cedarschema");
         Schema schema = Schema.parseCedarSchema(schemaPath);
-        Path entitiesPath = TestUtil.getResourceDir("translation", "photoapp", "entities.json");
+        Path entitiesPath = TestUtil.getResourceDir("invariant", "entities.json");
         Entities entities = Translation.updateEntities(Entities.parse(entitiesPath), schema);
         this.validator = new InvariantValidator(schema, entities);
     }

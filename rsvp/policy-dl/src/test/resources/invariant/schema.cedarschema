@@ -19,6 +19,28 @@ entity Photo = {
     type: String
 };
 
+entity PhotoPermission = {
+    code: String,
+    index: Long,
+    permission: {
+        read: Bool,
+        write: Bool
+    }
+};
+
+entity Guest {
+    friend: Account
+};
+
+entity Container = {
+    contents: {
+        strings: Set<String>,
+        booleans: Set<Bool>,
+        numbers: Set<Long>,
+        accounts: Set<Account>
+    }
+};
+
 action viewPhoto appliesTo {
     principal: Account,
     resource: Photo
@@ -39,3 +61,6 @@ action createAlbum appliesTo {
     resource: Account
 };
 
+namespace Photoapp {
+    action observe;
+}

@@ -1,29 +1,54 @@
 package uq.pac.rsvp;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.HashSet;
 
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicyFileEntry;
 import uq.pac.rsvp.policy.ast.PolicySet;
+import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
+import uq.pac.rsvp.policy.ast.expr.CallExpression;
+import uq.pac.rsvp.policy.ast.expr.ConditionalExpression;
 import uq.pac.rsvp.policy.ast.expr.PropertyAccessExpression;
 import uq.pac.rsvp.policy.ast.expr.RecordExpression;
 import uq.pac.rsvp.policy.ast.expr.SetExpression;
 import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
-import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
-import uq.pac.rsvp.policy.ast.expr.CallExpression;
-import uq.pac.rsvp.policy.ast.expr.ConditionalExpression;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitorImpl;
+import uq.pac.rsvp.policy.datalog.translation.RequestSet;
+import uq.pac.rsvp.policy.datalog.translation.Translation;
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.support.reporting.Report;
 import uq.pac.rsvp.support.reporting.Report.Severity;
 
 public class Verification {
 
-    public static Set<Report> verifyPolicies(String filename, String policies) throws RsvpException {
-        return verify(PolicySet.parseCedarPolicySet(filename, policies), null);
+    public static Set<Report> verifyPolicies(String policyFilename, Path policies, Path schema, Path entities)
+            throws RsvpException, IOException {
+
+        Set<Report> results = new HashSet<>();
+
+        Path dlPath = Files.createTempDirectory("rsvp-");
+
+        Translation translation =
+                new Translation(schema, policies, entities, null, dlPath);
+
+        Map<Policy, RequestSet> policyResults = translation.getPolicyResult();
+
+        policyResults.forEach((k, v) -> {
+            if (v.isEmpty()) {
+                Report r = new Report(Severity.Warning, "Policy '" + k.getName() + "' does not match any requests",
+                        k.getSourceLoc());
+                results.add(r);
+            }
+        });
+
+        return results;
     }
 
     // public static List<Report> verify(String policies, String schema) throws
@@ -104,7 +129,7 @@ public class Verification {
             SourceLoc loc = entry.getSourceLoc();
             if (p <= probability && loc != SourceLoc.MISSING) {
                 reports.add(generateRandomReport(loc));
-            }        
+            }
         }
 
         private Report generateRandomReport(SourceLoc loc) {

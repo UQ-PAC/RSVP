@@ -68,7 +68,7 @@ class OwnerController {
 		return ownerId == null ? new Owner()
 				: this.owners.findById(ownerId)
 					.orElseThrow(() -> new IllegalArgumentException("Owner not found with id: " + ownerId
-							+ ". Please ensure the ID is correct " + "and the owner exists in the database."));
+							+ ". Please ensure the ID is correct and the owner exists in the database."));
 	}
 
 	@GetMapping("/owners/new")
@@ -84,7 +84,7 @@ class OwnerController {
 		}
 
 		this.owners.save(owner);
-		redirectAttributes.addFlashAttribute("message", "New Owner Created");
+		redirectAttributes.addFlashAttribute("message", "New Owner Created.");
 		return "redirect:/owners/" + owner.getId();
 	}
 
@@ -106,7 +106,7 @@ class OwnerController {
 		Page<Owner> ownersResults = findPaginatedForOwnersLastName(page, lastName);
 		if (ownersResults.isEmpty()) {
 			// no owners found
-			result.rejectValue("lastName", "notFound", "not found");
+			result.rejectValue("lastName", "notFound", "No owners found.");
 			return "owners/findOwners";
 		}
 
@@ -156,7 +156,7 @@ class OwnerController {
 
 		owner.setId(ownerId);
 		this.owners.save(owner);
-		redirectAttributes.addFlashAttribute("message", "Owner Values Updated");
+		redirectAttributes.addFlashAttribute("message", "Owner Values Updated.");
 		return "redirect:/owners/{ownerId}";
 	}
 
@@ -171,7 +171,7 @@ class OwnerController {
 		ModelAndView mav = new ModelAndView("owners/ownerDetails");
 		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
 		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
-				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct "));
+				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct."));
 		mav.addObject(owner);
 		return mav;
 	}

@@ -7,7 +7,7 @@ import java.util.*;
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
 /**
- * Representation of variable assignment for an invariant
+ * Representation of variable assignment for an invariant quantifier
  */
 public class Assignment {
     private final Map<String, String> assignment;

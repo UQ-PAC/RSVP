@@ -231,15 +231,11 @@ public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDe
     public CommonTypeDefinition visitCallExpr(CallExpression expr) {
         String name = expr.getFunc();
         InvariantFunctionValidator.FunctionValidator validator = InvariantFunctionValidator.getValidator(name);
-
         if (validator == null) {
             throw new Error("Function: %s not registered", name);
         }
         CommonTypeDefinition self = expr.getSelf() == null ? null : collect(expr.getSelf());
-        validator.validate(self, collect(expr.getArgs()));
-        // TODO: For the moment we are supporting boolean-valued functions only
-        //       This needs to be extended to arbitrary-valued functions
-        return Typing.BooleanType;
+        return validator.validate(self, collect(expr.getArgs()));
     }
 
     // == Unsupported

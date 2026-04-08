@@ -35,15 +35,13 @@ public class InvariantFunctionValidator {
         protected final String name;
         protected final List<Typing.TypeTest> self;
         protected final List<List<Typing.TypeTest>> arguments;
+        protected final CommonTypeDefinition returnType;
 
-        FunctionValidator(String name, List<Typing.TypeTest> self, List<List<Typing.TypeTest>> arguments) {
+        FunctionValidator(String name, List<Typing.TypeTest> self, List<List<Typing.TypeTest>> arguments, CommonTypeDefinition returnType) {
             this.name = name;
             this.self = self == null ? List.of() : self;
             this.arguments = List.copyOf(arguments);
-        }
-
-        FunctionValidator(String name, List<List<Typing.TypeTest>> arguments) {
-            this(name, List.of(), arguments);
+            this.returnType = returnType;
         }
 
         String getName() {
@@ -52,7 +50,7 @@ public class InvariantFunctionValidator {
 
         void post(CommonTypeDefinition actualSelf, List<CommonTypeDefinition> actualArguments) { }
 
-        void validate(CommonTypeDefinition actualSelf, List<CommonTypeDefinition> actualArguments) {
+        CommonTypeDefinition validate(CommonTypeDefinition actualSelf, List<CommonTypeDefinition> actualArguments) {
             if (actualSelf != null && self.isEmpty()) {
                 throw new InvariantValidator.Error("Function %s requires no object application", getName());
             } else if (actualSelf == null && !self.isEmpty()) {
@@ -70,12 +68,13 @@ public class InvariantFunctionValidator {
                 expect(actualArguments.get(i), arguments.get(i));
             }
             post(actualSelf, actualArguments);
+            return returnType;
         }
     }
 
     static class SetIsEmptyFunctionValidator extends FunctionValidator {
         SetIsEmptyFunctionValidator() {
-            super("isEmpty", List.of(TSet), List.of());
+            super("isEmpty", List.of(TSet), List.of(), BooleanType);
         }
     }
 
@@ -83,7 +82,8 @@ public class InvariantFunctionValidator {
         SetContainsFunctionValidator() {
             super("contains",
                     List.of(TSet),
-                    List.of(List.of(TBoolean, TLong, TString, TEntityOrAction)));
+                    List.of(List.of(TBoolean, TLong, TString, TEntityOrAction)),
+                    BooleanType);
         }
 
         @Override
@@ -100,7 +100,7 @@ public class InvariantFunctionValidator {
 
     static class SetContainsSetFunctionValidator extends FunctionValidator {
         SetContainsSetFunctionValidator(String name) {
-            super(name, List.of(TSet), List.of(List.of(TSet)));
+            super(name, List.of(TSet), List.of(List.of(TSet)), BooleanType);
         }
 
         @Override
@@ -123,7 +123,8 @@ public class InvariantFunctionValidator {
                     List.of(),
                     List.of(List.of(Typing.TEntity),
                             List.of(Typing.TEntity),
-                            List.of(Typing.TAction)));
+                            List.of(Typing.TAction)),
+                    BooleanType);
         }
     }
 }

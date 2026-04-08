@@ -5,7 +5,7 @@ import uq.pac.rsvp.policy.ast.schema.common.SetTypeDefinition;
 
 import java.util.*;
 
-import static uq.pac.rsvp.policy.datalog.invariant.Typing.*;
+import static uq.pac.rsvp.policy.datalog.invariant.InvariantTyping.*;
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
 /**
@@ -27,17 +27,17 @@ public class InvariantFunctionValidator {
         REGISTRY.forEach((key, value) -> require(key.equals(value.name)));
     }
 
-    static FunctionValidator getValidator(String validator) {
+    public static FunctionValidator getValidator(String validator) {
         return REGISTRY.get(validator);
     }
 
-    abstract static class FunctionValidator {
+    public abstract static class FunctionValidator {
         protected final String name;
-        protected final List<Typing.TypeTest> self;
-        protected final List<List<Typing.TypeTest>> arguments;
+        protected final List<InvariantTyping.TypeTest> self;
+        protected final List<List<InvariantTyping.TypeTest>> arguments;
         protected final CommonTypeDefinition returnType;
 
-        FunctionValidator(String name, List<Typing.TypeTest> self, List<List<Typing.TypeTest>> arguments, CommonTypeDefinition returnType) {
+        FunctionValidator(String name, List<InvariantTyping.TypeTest> self, List<List<InvariantTyping.TypeTest>> arguments, CommonTypeDefinition returnType) {
             this.name = name;
             this.self = self == null ? List.of() : self;
             this.arguments = List.copyOf(arguments);
@@ -56,7 +56,7 @@ public class InvariantFunctionValidator {
             } else if (actualSelf == null && !self.isEmpty()) {
                 throw new InvariantValidator.Error("Function %s requires object application", getName());
             } else if (actualSelf != null) {
-                Typing.expect(actualSelf, self);
+                InvariantTyping.expect(actualSelf, self);
             }
 
             require(arguments != null);
@@ -68,6 +68,10 @@ public class InvariantFunctionValidator {
                 expect(actualArguments.get(i), arguments.get(i));
             }
             post(actualSelf, actualArguments);
+            return returnType;
+        }
+
+        public CommonTypeDefinition getReturnType() {
             return returnType;
         }
     }
@@ -93,7 +97,7 @@ public class InvariantFunctionValidator {
             require(arguments.size() == 1);
 
             CommonTypeDefinition element = ((SetTypeDefinition) actualSelf).getElementType();
-            Typing.expectCompatible(element, actualArguments.getFirst(), this.arguments.getFirst());
+            InvariantTyping.expectCompatible(element, actualArguments.getFirst(), this.arguments.getFirst());
         }
     }
 
@@ -113,7 +117,7 @@ public class InvariantFunctionValidator {
             CommonTypeDefinition selfElement = ((SetTypeDefinition) actualSelf).getElementType();
             CommonTypeDefinition argElement = ((SetTypeDefinition) actualArguments.getFirst()).getElementType();
 
-            Typing.expectCompatible(selfElement, argElement, REGISTRY.get("contains").arguments.getFirst());
+            InvariantTyping.expectCompatible(selfElement, argElement, REGISTRY.get("contains").arguments.getFirst());
         }
     }
 
@@ -121,9 +125,9 @@ public class InvariantFunctionValidator {
         PolicyFunctionValidator(String name) {
             super(name,
                     List.of(),
-                    List.of(List.of(Typing.TEntity),
-                            List.of(Typing.TEntity),
-                            List.of(Typing.TAction)),
+                    List.of(List.of(InvariantTyping.TEntity),
+                            List.of(InvariantTyping.TEntity),
+                            List.of(InvariantTyping.TAction)),
                     BooleanType);
         }
     }

@@ -13,13 +13,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-class Typing {
+class InvariantTyping {
     final static BooleanType BooleanType = new BooleanType();
     final static StringType StringType = new StringType();
     final static LongType LongType = new LongType();
     final static BooleanType TypeOfEntityType = new BooleanType();
 
-    record TypeTest(Function<CommonTypeDefinition, Boolean> test, String expected) { }
+    public record TypeTest(Function<CommonTypeDefinition, Boolean> test, String expected) { }
 
     final static TypeTest TBoolean = new TypeTest(t -> t == BooleanType, "Boolean");
     final static TypeTest TLong = new TypeTest(t -> t == LongType, "Long");
@@ -30,8 +30,8 @@ class Typing {
             t -> t instanceof RecordTypeDefinition, "Record, Entity, Action");
     final static TypeTest TEntityOrAction = new TypeTest(
             t -> isEntity(t) || isAction(t), "Entity, Action");
-    final static TypeTest TEntity = new TypeTest(Typing::isEntity, "Entity");
-    final static TypeTest TAction = new TypeTest(Typing::isAction, "Action");
+    final static TypeTest TEntity = new TypeTest(InvariantTyping::isEntity, "Entity");
+    final static TypeTest TAction = new TypeTest(InvariantTyping::isAction, "Action");
     private static boolean isActionName(String name) {
         return name.equals("Action") || name.endsWith("::Action");
     }
@@ -56,7 +56,7 @@ class Typing {
             }
         }
         String expected = Stream.of(tests).map(TypeTest::expected).toList().toString();
-        throw new InvariantValidator.Error("Expected one of %s, got %s", expected, Typing.name(actual));
+        throw new InvariantValidator.Error("Expected one of %s, got %s", expected, InvariantTyping.name(actual));
     }
 
 
@@ -74,7 +74,7 @@ class Typing {
 
     private final Map<String, EntityTypeReference> references;
 
-    Typing () {
+    InvariantTyping() {
         this.references = new HashMap<>();
     }
 

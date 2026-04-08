@@ -1,0 +1,47 @@
+entity Partition enum [ "SDA", "SDB" ];
+entity User enum [ "Alice", "Bob" ];
+
+entity File = {
+    attributes: {
+        size: Long,
+        ext: String,
+        permission: {
+            read: Bool,
+            write: Bool
+        },
+        location: {
+            partition: Partition
+        }
+    }
+};
+
+entity ChrDev = {
+    attr: {
+        name : {
+            val: String
+        }
+    }
+};
+
+entity BlkDev = {
+    prop: {
+        name : {
+            val: String,
+            sz: Long,
+            read: Bool
+        }
+    }
+};
+
+
+action introspect appliesTo {
+    principal: [ File ],
+    resource: [ User, File, BlkDev ]
+};
+
+action locate appliesTo {
+    principal: [ BlkDev ],
+    resource: [ User, File, BlkDev ]
+};
+
+

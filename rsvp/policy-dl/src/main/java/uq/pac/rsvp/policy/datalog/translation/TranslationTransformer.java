@@ -3,10 +3,14 @@ package uq.pac.rsvp.policy.datalog.translation;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.expr.*;
+import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.datalog.ast.*;
+import uq.pac.rsvp.policy.datalog.invariant.InvariantFunctionValidator;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static uq.pac.rsvp.policy.ast.expr.BinaryExpression.BinaryOp.*;
@@ -37,17 +41,49 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
         return expr.stream().map(this::compute).collect(Collectors.toCollection(ArrayList::new));
     }
 
+    private static Expression negate(Expression expr) {
+        return new UnaryExpression(Not, expr);
+    }
+
     @Override
     public Expression visitBinaryExpr(BinaryExpression expr) {
-        Expression lhs = expr.getLeft().compute(this);
-        if (expr.getOp() == BinaryExpression.BinaryOp.In && expr.getRight() instanceof SetExpression set) {
+        Expression lhs = expr.getLeft().compute(this),
+                rhs = expr.getRight().compute(this);
+
+        // Rewrite != to ==
+        if (expr.getOp() == Neq) {
+            return new UnaryExpression(Not, new BinaryExpression(expr.getLeft(), Eq, expr.getRight()));
+        // Booleans at the Datalog level are represented by strings, i.e., if we want to compare
+        // two boolean variables with == or != this is fine because the comparison will basically be
+        // over 'true' and 'false' strings. Comparison using literals is harder, because it mixes
+        // string and boolean representation in Souffle. To aid this situation expressions of the form
+        // x == y are rewritten to x && y || !x || !y.  This is done for the limited number of expressions,
+        // for the moment only literal boolean values and boolean-valued functions.
+        } else if (expr.getOp() == Eq) {
+            Predicate<Expression> isBoolean = e -> {
+                if (e instanceof BooleanExpression) {
+                    return true;
+                }
+                if (e instanceof CallExpression call) {
+                    InvariantFunctionValidator.FunctionValidator val =
+                            InvariantFunctionValidator.getValidator(call.getFunc());
+                    return val != null && val.getReturnType() instanceof BooleanType;
+                }
+                return false;
+            };
+            Function<Expression, Expression> negate = e -> new UnaryExpression(Not, e);
+
+            if (isBoolean.test(expr.getLeft()) || isBoolean.test(expr.getRight())) {
+                return new BinaryExpression(new BinaryExpression(lhs, And, rhs), Or,
+                        new BinaryExpression(negate.apply(lhs), And, negate.apply(rhs)));
+            }
+        } else if (expr.getOp() == BinaryExpression.BinaryOp.In && expr.getRight() instanceof SetExpression set) {
             Expression init = new BooleanExpression(false);
             return set.getElements().stream()
                     .map(e ->  (Expression) new BinaryExpression(lhs, In, e))
                     .reduce(init, (l, r) -> new BinaryExpression(l, Or, r));
-        } else {
-            return new BinaryExpression(lhs, expr.getOp(), compute(expr.getRight()));
         }
+        return new BinaryExpression(lhs, expr.getOp(), rhs);
     }
 
     @Override

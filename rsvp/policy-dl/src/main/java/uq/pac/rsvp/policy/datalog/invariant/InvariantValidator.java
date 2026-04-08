@@ -15,7 +15,7 @@ import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static uq.pac.rsvp.policy.datalog.invariant.Typing.*;
+import static uq.pac.rsvp.policy.datalog.invariant.InvariantTyping.*;
 import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
 
 public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDefinition> {
@@ -42,7 +42,7 @@ public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDe
         this.types = new HashMap<>();
         this.variables = null;
 
-        Typing typing = new Typing();
+        InvariantTyping typing = new InvariantTyping();
 
         // Build types from entities
         schema.entityTypes().stream()
@@ -158,7 +158,7 @@ public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDe
                 return attrType;
             }
         }
-        throw new Error("Invalid property access: %s [%s: %s]", expr, expr.getObject(), Typing.name(objectType));
+        throw new Error("Invalid property access: %s [%s: %s]", expr, expr.getObject(), InvariantTyping.name(objectType));
     }
 
     @Override

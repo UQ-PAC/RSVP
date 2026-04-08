@@ -1,9 +1,11 @@
 package uq.pac.rsvp.policy.datalog.invariant;
 
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
+import uq.pac.rsvp.policy.datalog.util.Util;
 
 import java.util.List;
 import java.util.function.BiFunction;
@@ -44,7 +46,7 @@ class ExpressionVisitor extends InvariantBaseVisitor<Expression> {
     @Override
     public Expression visitStringExpr(InvariantParser.StringExprContext ctx) {
         String value = ctx.STRING().getText();
-        return new StringExpression(value.substring(1, value.length() - 1));
+        return new StringExpression(StringExpression.unescape(value.substring(1, value.length() - 1)));
     }
 
     @Override

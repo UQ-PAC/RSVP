@@ -18,8 +18,10 @@ ID: [A-Za-z][A-Za-z0-9_]*;
 // Comments
 COMMENT: '//' ~[\r\n]* -> skip;
 
-// Double-quoted string (no escapes or '"' as of now)
-STRING : '"' ( ~["\r\n])* '"' ;
+fragment ESCAPE: '\\' [tbnr"\\];
+
+// Double-quoted string with standard escapes
+STRING : '"' ( ~["\r\n] | ESCAPE )* '"' ;
 
 // Number
 LONG: [-]? [0-9]+;

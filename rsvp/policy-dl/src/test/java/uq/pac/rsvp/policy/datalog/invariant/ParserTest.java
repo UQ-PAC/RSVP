@@ -66,6 +66,7 @@ public class ParserTest {
         @invariant("i28") -1 + 2 * 3 == 6 * 7 + 8;
         // Conditional expressions
         @invariant("i29") if true then false else true;
+        @invariant("i30") "a\\nb\\t\\"";
         """;
 
     private static final String EXPECTED = """
@@ -131,6 +132,8 @@ public class ParserTest {
         ((-1 + (2 * 3)) == ((6 * 7) + 8));
         @invariant("i29")
         (if true; then false; else true);
+        @invariant("i30") 
+        "a\\nb\\t\\"";
         """;
 
     @Test

@@ -22,6 +22,7 @@ import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
  * - Convert expressions of the form 'e in [e1, e2]' to 'e in e1 || e in e2'
  * - Translate if-conditionals to boolean logic
  * - Translate set.containsAny/set.containsAll to disjunctions/conjunctions
+ * - Translate a != b to !(a == b)
  */
 public class TranslationTransformer implements PolicyComputationVisitor<Expression> {
 

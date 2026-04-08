@@ -28,12 +28,15 @@ import uq.pac.rsvp.support.reporting.Report.Severity;
 
 public class Verification {
 
-    public static Set<Report> verifyPolicies(String policyFilename, Path policies, Path schema, Path entities)
+    public static Set<Report> verifyPolicies(String policyFilename, Path policiesPath, Path schemaPath, Path entities)
             throws RsvpException, IOException {
 
         Set<Report> results = new HashSet<>();
 
         Path dlPath = Files.createTempDirectory("rsvp-");
+
+        Schema schema = Schema.parseCedarSchema(schemaPath);
+        PolicySet policies = PolicySet.parseCedarPolicySet(policyFilename, Files.readString(policiesPath));
 
         Translation translation =
                 new Translation(schema, policies, entities, null, dlPath);

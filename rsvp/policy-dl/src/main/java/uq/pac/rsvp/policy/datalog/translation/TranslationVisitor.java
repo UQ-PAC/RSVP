@@ -129,7 +129,7 @@ public class TranslationVisitor extends VoidVisitorAdapter {
     public void visitBinaryExpr(BinaryExpression expr) {
         switch (expr.getOp()) {
             case Eq, Neq, Less, LessEq, Greater, GreaterEq -> {
-                TypeContextVisitor.Context context = TypeContextVisitor.infer(expr);
+                TypeContextVisitor.Context context = TypeContextVisitor.infer(expr, getContext());
                 DLTerm lhs = TypeContextVisitor.normalise(getOperand(expr.getLeft()), context),
                         rhs = TypeContextVisitor.normalise(getOperand(expr.getRight()), context);
                 expressions.add(new DLConstraint(lhs, rhs, getOperator(expr.getOp(), negated)));

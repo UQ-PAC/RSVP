@@ -24,9 +24,20 @@ public abstract class TranslationFunctions {
         public abstract List<DLRuleExpr> translate(CallExpression expression, boolean negated, OperandVisitor operands);
 
         /**
-         * Contexts in which the function is valid
+         * Contexts in which the function is valid. For the moment this is either Cedar policies
+         * or invariants. We need to separate the two because at the level of invariants there
+         * are more functions generated during policy computations.
          */
         public abstract Set<TranslationContext> getContext();
+
+        /**
+         * At the datalog level everything is encoded as strings. Sometimes, for instance
+         * for arithmetic operations, these strings need to be converted to numeric (or
+         * potentially other) types. This context values carries this information.
+         * <p>
+         * FIXME: Needs to be integrated with invariant type checking
+         */
+        public abstract TypeContextVisitor.Context getTypeContext();
     }
 
     private static final Map<String, Supplier<? extends Function>> REGISTRY = new HashMap<>();
@@ -95,6 +106,11 @@ public abstract class TranslationFunctions {
         public Set<TranslationContext> getContext() {
             return Set.of(TranslationContext.Policy, TranslationContext.Invariant);
         }
+
+        @Override
+        public TypeContextVisitor.Context getTypeContext() {
+            return TypeContextVisitor.Context.SYMBOLIC;
+        }
     }
 
     /**
@@ -132,6 +148,11 @@ public abstract class TranslationFunctions {
         @Override
         public Set<TranslationContext> getContext() {
             return Set.of(TranslationContext.Policy, TranslationContext.Invariant);
+        }
+
+        @Override
+        public TypeContextVisitor.Context getTypeContext() {
+            return TypeContextVisitor.Context.SYMBOLIC;
         }
     }
 
@@ -173,6 +194,11 @@ public abstract class TranslationFunctions {
         public Set<TranslationContext> getContext() {
             return Set.of(TranslationContext.Policy, TranslationContext.Invariant);
         }
+
+        @Override
+        public TypeContextVisitor.Context getTypeContext() {
+            return TypeContextVisitor.Context.SYMBOLIC;
+        }
     }
 
     static class ContainsAnyFunction extends Function {
@@ -211,6 +237,11 @@ public abstract class TranslationFunctions {
         public Set<TranslationContext> getContext() {
             return Set.of(TranslationContext.Policy, TranslationContext.Invariant);
         }
+
+        @Override
+        public TypeContextVisitor.Context getTypeContext() {
+            return TypeContextVisitor.Context.SYMBOLIC;
+        }
     }
 
     // deny(principal, resource, action)
@@ -233,6 +264,11 @@ public abstract class TranslationFunctions {
         public Set<TranslationContext> getContext() {
             return Set.of(TranslationContext.Invariant);
         }
+
+        @Override
+        public TypeContextVisitor.Context getTypeContext() {
+            return TypeContextVisitor.Context.SYMBOLIC;
+        }
     }
 
     // allow(principal, resource, action)
@@ -254,6 +290,11 @@ public abstract class TranslationFunctions {
         @Override
         public Set<TranslationContext> getContext() {
             return Set.of(TranslationContext.Invariant);
+        }
+
+        @Override
+        public TypeContextVisitor.Context getTypeContext() {
+            return TypeContextVisitor.Context.SYMBOLIC;
         }
     }
 }

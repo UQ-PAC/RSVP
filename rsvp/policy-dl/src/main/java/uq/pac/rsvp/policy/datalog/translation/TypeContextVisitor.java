@@ -3,12 +3,19 @@ package uq.pac.rsvp.policy.datalog.translation;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * At the datalog level the translation keeps pretty every bit of information as strings.
  * This works for most cases, but to accommodate cedar integer operations symbolic type
  * needs to be converted to numeric using built-in to_number functor of souffle.
  * This visitor determines symbolic or numeric context and provides functionality to
  * add functors based on the context.
+ * <p>
+ * FIXME: This is closely related to type-checking that is being done for invariants.
+ *        Tor the moment we cannot combine the two together because invariant type checking
+ *        does not support type inference, but it needs to be reworks to be able to do so.
  */
 public class TypeContextVisitor extends ValueVisitorAdapter<TypeContextVisitor.Context> {
 
@@ -16,12 +23,21 @@ public class TypeContextVisitor extends ValueVisitorAdapter<TypeContextVisitor.C
         NUMERIC, SYMBOLIC, UNDEFINED
     }
 
-    private final static TypeContextVisitor VISITOR = new TypeContextVisitor();
+    private final TranslationContext translationContext;
 
-    private TypeContextVisitor() { }
+    private final static Map<TranslationContext, TypeContextVisitor> VISITORS = new HashMap<>();
+    static {
+        VISITORS.put(TranslationContext.Policy, new TypeContextVisitor(TranslationContext.Policy));
+        VISITORS.put(TranslationContext.Invariant, new TypeContextVisitor(TranslationContext.Invariant));
+    }
 
-    public static Context infer(Expression expr) {
-        Context context = expr.compute(VISITOR);
+    private TypeContextVisitor(TranslationContext context) {
+        this.translationContext = context;
+    }
+
+    public static Context infer(Expression expr, TranslationContext translationContext) {
+        TypeContextVisitor visitor = VISITORS.get(translationContext);
+        Context context = expr.compute(visitor);
         return context == Context.UNDEFINED ? Context.SYMBOLIC : context;
     }
 
@@ -107,5 +123,10 @@ public class TypeContextVisitor extends ValueVisitorAdapter<TypeContextVisitor.C
     @Override
     public Context visitTypeExpr(TypeExpression expr) {
         return Context.SYMBOLIC;
+    }
+
+    @Override
+    public Context visitCallExpr(CallExpression expr) {
+        return TranslationFunctions.getFunction(expr.getFunc(), translationContext).getTypeContext();
     }
 }

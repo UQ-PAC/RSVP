@@ -108,6 +108,38 @@ public class Translation {
         }
     }
 
+    /**
+     * Create a translation from a previously-parsed schema and policy set (plus an entities file /
+     * invariant file). This overload will not perform schema validation.
+     */
+    public Translation(Schema schema, PolicySet policies, Path entitiesFile, Path invariantFile, Path datalogDir) {
+        this.datalogDir = datalogDir;
+        try {
+            this.schema = schema;
+            this.entities = updateEntities(Entities.parse(entitiesFile), schema);
+            this.policies = policies;
+            this.invariants = invariantFile == null ? InvariantSet.parse("") : InvariantSet.parse(invariantFile);
+
+            this.policyDeclarations = HashBiMap.create();
+            int index = 1;
+            for (Policy p : policies) {
+                policyDeclarations.put(p, TranslationConstants.makePolicyRuleDecl(p, index++));
+            }
+
+            this.invariantDeclarations = HashBiMap.create();
+            index = 1;
+            for (Invariant i : invariants.getInvariants()) {
+                invariantDeclarations.put(i, TranslationConstants.makeInvariantRuleDecl(i, index++));
+            }
+
+            this.program = translate(schema, policies, entities, invariants);
+            program.execute(datalogDir);
+
+        } catch (IOException | RuntimeException | InterruptedException e) {
+            throw new TranslationError(e);
+        }
+    }
+
     static void validate(Path schemaFile, Path policyFile, Path entityFile) throws IOException, AuthException, RsvpException {
         Entities entities = Entities.parse(entityFile);
         com.cedarpolicy.model.schema.Schema schema =

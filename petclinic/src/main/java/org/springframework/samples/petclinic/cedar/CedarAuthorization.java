@@ -13,6 +13,8 @@ public @interface CedarAuthorization {
 
 	String resourceType();
 
+	String resourceId() default "";
+
 	boolean validate() default true;
 
 }

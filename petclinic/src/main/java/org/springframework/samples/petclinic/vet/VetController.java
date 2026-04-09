@@ -59,7 +59,7 @@ class VetController {
 	}
 
 	@GetMapping("/vets.html")
-	@CedarAuthorization(action = "ListEmployees", resourceType = "Clinic", validate = true)
+	@CedarAuthorization(action = "ListEmployees", resourceType = "Clinic", resourceId = "Any", validate = true)
 	public String showVetList(@RequestParam(defaultValue = "1") int page, Model model, HttpSession session) {
 		// Here we are returning an object of type 'Vets' rather than a collection of Vet
 		// objects so it is simpler for Object-Xml mapping
@@ -127,7 +127,7 @@ class VetController {
 	}
 
 	@GetMapping({ "/vets" })
-	@CedarAuthorization(action = "ListEmployees", resourceType = "Clinic", validate = true)
+	@CedarAuthorization(action = "ListEmployees", resourceType = "Clinic", resourceId = "Any", validate = true)
 	public @ResponseBody Vets showResourcesVetList(HttpSession session) {
 		// Here we are returning an object of type 'Vets' rather than a collection of Vet
 		// objects so it is simpler for JSon/Object mapping

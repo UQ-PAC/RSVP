@@ -64,7 +64,13 @@ public class CedarAspect {
 		// Prints requests and cookie to console.
 		System.out
 			.println(System.lineSeparator() + "Cedar request resourceType: " + requiresAuthorization.resourceType());
-		System.out.println("HTTP request resourceId: " + extractResourceId(request));
+
+		if (requiresAuthorization.resourceId().equals("")) {
+			System.out.println("HTTP request resourceId: " + extractResourceId(request));
+		} else {
+			System.out.println("Cedar request resourceId: " + requiresAuthorization.resourceId());
+		}
+
 		System.out.println("Cookie principalId: " + principalId);
 
 		EntityUID principal;

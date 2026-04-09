@@ -17,9 +17,19 @@ public class GlobalModelAttributes {
 	}
 
 	@ModelAttribute("currentUser")
-	public String populateUser(HttpSession session) {
-		String currentUser = (String) session.getAttribute("currentUser");
-		return (currentUser != null) ? currentUser : "Guest";
+	public User populateUser(HttpSession session) {
+		String sessionUser = (String) session.getAttribute("currentUser");
+
+		final String activeUsername = (sessionUser != null) ? sessionUser : "Guest";
+
+		System.out.println("activeUsername: " + activeUsername);
+
+		return this.userRepository.findByUsername(activeUsername)
+			.orElseGet(() -> {
+				User transientUser = new User();
+				transientUser.setUsername(activeUsername);
+				return transientUser;
+			});
 	}
 
 	@ModelAttribute("dynamicUsers")

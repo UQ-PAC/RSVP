@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ContextController {
 
 	@GetMapping("/switch-user")
-	public String switchUser(@RequestParam String currentUser, HttpSession session) {
-		session.setAttribute("currentUser", currentUser);
+	public String switchUser(@RequestParam("username") String username, HttpSession session) {
+		session.setAttribute("currentUser", username);
 		return "redirect:/";
 	}
 

@@ -9,22 +9,32 @@
   <table id="owners" class="table table-striped">
     <thead>
       <tr>
-        <th th:text="#{name}" style="width: 150px;">Name</th>
-        <th th:text="#{address}" style="width: 200px;">Address</th>
+        <th th:text="#{name}">Name</th>
+        <th th:text="#{address}">Address</th>
         <th th:text="#{city}">City</th>
-        <th th:text="#{telephone}" style="width: 120px">Telephone</th>
+        <th th:text="#{telephone}">Telephone</th>
         <th th:text="#{pets}">Pets</th>
       </tr>
     </thead>
     <tbody>
-      <tr th:each="owner : ${listOwners}">
+      <tr th:each="owner : ${listOwners}" th:classappend="${!authMap[owner.id].startsWith('Access Granted.')} ? 'text-muted bg-light' : ''">
         <td>
-          <a th:href="@{/owners/__${owner.id}__}" th:text="${owner.firstName + ' ' + owner.lastName}" /></a>
+          <span th:if="${authMap[owner.id].startsWith('Access Granted.')}">
+            <i class="fa fa-unlock" aria-hidden="true" th:title="${authMap[owner.id]}"></i>
+            <a th:href="@{/owners/__${owner.id}__}" th:text="${owner.firstName + ' ' + owner.lastName}" /></a>
+          </span>
+          <span th:unless="${authMap[owner.id].startsWith('Access Granted.')}">
+            <i class="fa fa-lock" aria-hidden="true" th:title="${authMap[owner.id]}"></i>
+            <span th:text="${owner.firstName + ' ' + owner.lastName}"></span>
+          </span>
         </td>
-        <td th:text="${owner.address}" />
-        <td th:text="${owner.city}" />
-        <td th:text="${owner.telephone}" />
-        <td><span th:text="${#strings.listJoin(owner.pets, ', ')}" /></td>
+        <span th:if="${authMap[owner.id].startsWith('Access Granted.')}">
+          <td th:text="${owner.address}" />
+          <td th:text="${owner.city}" />
+          <td th:text="${owner.telephone}" />
+          <td><span th:text="${#strings.listJoin(owner.pets, ', ')}" /></td>
+        </span>
+        <span th:unless="${authMap[owner.id].startsWith('Access Granted.')}"></span>
       </tr>
     </tbody>
   </table>

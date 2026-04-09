@@ -61,7 +61,7 @@
 
         </ul>
 
-        <ul class="nav navbar-nav me-auto align-items-right">
+        <ul class="nav navbar-nav ms-auto align-items-right">
 
           <!-- <li class="nav-item d-flex align-items-center">
             <span class="navbar-text text-light ms-3" th:if="${currentUser != null and currentUser.username != 'Guest'}" th:text="${currentUser.username}"></span>
@@ -78,7 +78,7 @@
                 <span th:if="${currentUser != null and currentUser.username != 'Guest'}" th:text="${currentUser.username}"></span>
                 <span th:unless="${currentUser != null and currentUser.username != 'Guest'}" th:text="Guest"></span>
             </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarDropdown">
                 <li><h6 class="dropdown-header">System Users</h6></li>
                 <li><a class="dropdown-item" href="/switch-user?username=Guest">Guest</a></li>
 

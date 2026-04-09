@@ -1,6 +1,6 @@
 {
-  "principal": "PetClinic::Employee::\"???\"",
-  "resource": "PetClinic::Employee::\"Bob\"",
-  "action": "PetClinic::Action::\"EditEmployee\"",
+  "principal": "PetClinic::Guest::\"Unknown\"",
+  "resource": "PetClinic::Pet::\"Rosy\"",
+  "action": "PetClinic::Action::\"DeleteClient\"",
   "context": {}
 }

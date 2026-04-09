@@ -1,6 +1,6 @@
 {
-  "principal": "PetClinic::Employee::\"Jestine Teixeira\"",
-  "resource": "PetClinic::Pet::\"Samantha\"",
+  "principal": "PetClinic::Guest::\"???\"",
+  "resource": "PetClinic::PetOwner::\"Betty Davis\"",
   "action": "PetClinic::Action::\"ListClients\"",
   "context": {}
 }

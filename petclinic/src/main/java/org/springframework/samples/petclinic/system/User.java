@@ -21,6 +21,11 @@ public class User implements Serializable {
 	private String username;
 
 	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "entity_clinics", joinColumns = @JoinColumn(name = "entity_id"),
+			inverseJoinColumns = @JoinColumn(name = "clinic_id"))
+	private Set<Clinic> clinics;
+
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"),
 			inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles;
@@ -41,6 +46,21 @@ public class User implements Serializable {
 		this.username = username;
 	}
 
+	public Set<Clinic> getClinics() {
+		return clinics;
+	}
+
+	public void setClinics(Set<Clinic> clinics) {
+		this.clinics = clinics;
+	}
+
+	public String getClinicDescriptions() {
+		if (this.clinics == null || this.clinics.isEmpty()) {
+			return "No Additional Details.";
+		}
+		return this.clinics.stream().map(Clinic::getClinicName).sorted().collect(Collectors.joining(", "));
+	}
+
 	public Set<Role> getRoles() {
 		return roles;
 	}
@@ -51,9 +71,9 @@ public class User implements Serializable {
 
 	public String getRoleDescriptions() {
 		if (this.roles == null || this.roles.isEmpty()) {
-			return "No Additional Details";
+			return "No Additional Details.";
 		}
-		return this.roles.stream().map(Role::getName).collect(Collectors.joining(", "));
+		return this.roles.stream().map(Role::getName).sorted().collect(Collectors.joining(", "));
 	}
 
 }

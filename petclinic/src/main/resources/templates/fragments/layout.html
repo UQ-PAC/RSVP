@@ -63,22 +63,32 @@
 
         <ul class="nav navbar-nav me-auto align-items-right">
 
+          <!-- <li class="nav-item d-flex align-items-center">
+            <span class="navbar-text text-light ms-3" th:if="${currentUser != null and currentUser.username != 'Guest'}" th:text="${currentUser.username}"></span>
+            <span class="navbar-text text-light ms-3" th:unless="${currentUser != null and currentUser.username != 'Guest'}" th:text="Guest"></span>
+          </li> -->
+
+          <li class="nav-item d-flex align-items-center">
+            <span class="navbar-text text-light ms-3" th:if="${currentUser != null and currentUser.username != 'Guest'}" th:text="${currentUser.getRoleDescriptions() + ' @ ' + currentUser.getClinicDescriptions()}"></span>
+          </li>
+
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <span class="fa fa-user" aria-hidden="true"></span>
-                <span th:text="${currentUser}">Guest</span>
+                <span th:if="${currentUser != null and currentUser.username != 'Guest'}" th:text="${currentUser.username}"></span>
+                <span th:unless="${currentUser != null and currentUser.username != 'Guest'}" th:text="Guest"></span>
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <li><h6 class="dropdown-header">System Users</h6></li>
-                <li><a class="dropdown-item" href="/switch-user?currentUser=Guest">Guest</a></li>
+                <li><a class="dropdown-item" href="/switch-user?username=Guest">Guest</a></li>
 
                 <li><hr class="dropdown-divider"></li>
 
                 <li><h6 class="dropdown-header">Database Users</h6></li>
                 <li th:each="user : ${dynamicUsers}">
                     <a class="dropdown-item" 
-                      th:href="@{/switch-user(currentUser=${user.username})}"
-                      th:text="${user.username + ' (' + user.getRoleDescriptions() + ')'}">Dynamic User</a>
+                      th:href="@{/switch-user(username=${user.username})}"
+                      th:text="${user.username + ' (' + user.getRoleDescriptions() + ' @ ' + user.getClinicDescriptions() + ')'}">Dynamic User</a>
                 </li>
             </ul>
           </li>

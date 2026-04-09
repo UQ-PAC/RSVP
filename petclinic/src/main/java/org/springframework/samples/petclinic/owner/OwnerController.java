@@ -26,7 +26,6 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +48,6 @@ import org.springframework.samples.petclinic.cedar.CedarService;
 
 import com.cedarpolicy.value.EntityUID;
 import com.cedarpolicy.value.Value;
-
 
 /**
  * @author Juergen Hoeller
@@ -139,6 +137,7 @@ class OwnerController {
 
 		// find owners by last name
 		Page<Owner> ownersResults = findPaginatedForOwnersLastName(page, lastName);
+
 		List<Owner> authorizedOwners = ownersResults.stream()
 				.filter(o -> {
 					EntityUID action = EntityUID.parse("PetClinic::Action::\"" + "ViewClient" + "\"")
@@ -156,6 +155,21 @@ class OwnerController {
 				})
 				.collect(Collectors.toList());
 
+		Map<Integer, String> ownerAuthorizationMap = ownersResults.stream()
+			.collect(Collectors.toMap(
+				Owner::getId,
+				o -> {
+					EntityUID action = EntityUID.parse("PetClinic::Action::\"" + "ViewClient" + "\"")
+						.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
+					EntityUID resource = EntityUID.parse("PetClinic::PetOwner::\"" + o.getFirstName() + " " + o.getLastName() + "\"")
+						.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
+					Map<String, Value> contextMap = new HashMap<>();
+					CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
+					ResponseEntity<String> response = cedarService.checkAccess(cedarReq);
+					return response.getBody();
+				}
+		));
+
 		if (authorizedOwners.isEmpty()) {
 			// no owners found
 			result.rejectValue("lastName", "notFound", "No owners found.");
@@ -165,16 +179,14 @@ class OwnerController {
 		if (authorizedOwners.size() == 1 && ownersResults.getTotalElements() == 1) {
 			// 1 owner found
 			owner = authorizedOwners.iterator().next();
-			return "redirect:/owners/" + owner.getId();
+			if (ownerAuthorizationMap.get(owner.getId()).startsWith("Access Granted.")) {
+				return "redirect:/owners/" + owner.getId();
+			}
 		}
 
-		// multiple owners found
-		Page<Owner> filteredPaginated = new PageImpl<>(
-				authorizedOwners, 
-				PageRequest.of(page - 1, 5), 
-				authorizedOwners.size()
-		);
-		return addPaginationModel(page, model, filteredPaginated);
+		model.addAttribute("authMap", ownerAuthorizationMap);
+
+		return addPaginationModel(page, model, ownersResults);
 	}
 
 	private String addPaginationModel(int page, Model model, Page<Owner> paginated) {

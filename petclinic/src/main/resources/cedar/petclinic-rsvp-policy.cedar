@@ -2,21 +2,37 @@
 // Original version without introduced issues.
 
 // 'policy0'
+// Anyone can list the Employees they are allowed to view.
+@id("Policy: Anyone can list Employees.")
+permit (
+    principal,
+    action == PetClinic::Action::"ListEmployees",
+    resource is PetClinic::Clinic
+);
+
+// 'policy1'
+// Every Employee can list the Clients they are allowed to view.
+@id("Policy: Every Employee can list Clients.")
+permit (
+    principal is PetClinic::Employee,
+    action == PetClinic::Action::"ListClients",
+    resource is PetClinic::Clinic
+);
+
+// 'policy2'
 // Anyone can view any Secretary or Veterinarian.
 @id("Policy: Public Secretary and Veterinarian data.")
 permit (
     principal,
-    action,
+    action == PetClinic::Action::"ViewEmployee",
     resource is PetClinic::Employee
 )
 when {
-    action in [PetClinic::Action::"ListEmployees",
-               PetClinic::Action::"ViewEmployee"] &&
     resource.roles.containsAny([PetClinic::EmployeeRole::"Secretary",
                                 PetClinic::EmployeeRole::"Veterinarian"])
 };
 
-// 'policy1'
+// 'policy3'
 // No Guest can access any client data.
 @id("Policy: Guest cannot access client data.")
 forbid (
@@ -30,7 +46,7 @@ when {
     resource is PetClinic::PetVisit
 };
 
-// 'policy2'
+// 'policy4'
 // Every Administrator can do anything, anywhere.
 @id("Policy: Administrator.")
 permit (
@@ -42,7 +58,7 @@ when {
     principal.roles.contains(PetClinic::EmployeeRole::"Administrator")
 };
 
-// 'policy3'
+// 'policy5'
 // Every Secretary can view and edit their Clinics' data.
 @id("Policy: Secretary can view and edit in their Clinics.")
 permit (
@@ -71,7 +87,7 @@ unless {
     )
 };
 
-// 'policy4'
+// 'policy6'
 // Every Secretary can add clients to their Clinics' data.
 @id("Policy: Secretary can add clients to their Clinics.")
 permit (
@@ -84,7 +100,7 @@ when {
     principal.clinics.contains(resource)
 };
 
-// 'policy5'
+// 'policy7'
 // Every Veterinarian can view and edit their clients' data.
 @id("Policy: Veterinarian can view and edit their clients.")
 permit (
@@ -105,7 +121,7 @@ unless {
     action == PetClinic::Action::"DeleteClient"
 };
 
-// 'policy6'
+// 'policy8'
 // Every Veterinarian can add their clients' data.
 @id("Policy: Veterinarian can add their clients.")
 permit (
@@ -118,7 +134,7 @@ when {
     principal.clinics.contains(resource)
 };
 
-// 'policy7'
+// 'policy9'
 // No Intern Veterinarian can edit their clients' data.
 @id("Policy: Intern Veterinarian cannot edit their clients.")
 forbid (
@@ -138,7 +154,7 @@ when {
     principal in resource.veterinarians
 };
 
-// 'policy8'
+// 'policy10'
 // Every Employee can view and edit their own data.
 @id("Policy: Employee can edit their own data.")
 permit (
@@ -147,13 +163,12 @@ permit (
     resource is PetClinic::Employee
 )
 when {
-    action in [PetClinic::Action::"ListEmployees",
-               PetClinic::Action::"ViewEmployee",
+    action in [PetClinic::Action::"ViewEmployee",
                PetClinic::Action::"EditEmployee"] &&
     principal == resource
 };
 
-// 'policy9'
+// 'policy11'
 // Every Senior or Specialist Veterinarian can delete their clients' data.
 @id("Policy: Senior or Specialist Veterinarian can delete their clients.")
 permit (
@@ -176,17 +191,15 @@ when {
     principal in resource.veterinarians
 };
 
-// 'policy10'
+// 'policy12'
 // Every Senior or Specialist Veterinarian can view all clients' data.
 @id("Policy: Senior or Specialist Veterinarian can view all clients.")
 permit (
     principal is PetClinic::Employee,
-    action,
+    action == PetClinic::Action::"ViewClient",
     resource
 )
 when {
-    action in [PetClinic::Action::"ListEmployees",
-               PetClinic::Action::"ViewEmployee"] &&
     principal.roles.contains(PetClinic::EmployeeRole::"Veterinarian") &&
     principal has level &&
     (
@@ -204,7 +217,7 @@ unless {
     resource.confidentiality == PetClinic::Confidentiality::"Protected"
 };
 
-// 'policy11'
+// 'policy13'
 // No Principal can view data from a Clinic they are not assigned to.
 @id("Policy: Principal cannot view data from another Clinic.")
 forbid (
@@ -223,8 +236,7 @@ unless {
         principal.roles.contains(PetClinic::EmployeeRole::"Administrator")
     ) ||
     (
-        action in [PetClinic::Action::"ListEmployees",
-                   PetClinic::Action::"ViewEmployee"] &&
+        action == PetClinic::Action::"ViewEmployee" &&
         resource.roles.containsAny([PetClinic::EmployeeRole::"Secretary",
                                     PetClinic::EmployeeRole::"Veterinarian"])
     )

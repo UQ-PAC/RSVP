@@ -109,7 +109,7 @@ class OwnerController {
 	}
 
 	@GetMapping("/owners")
-	@CedarAuthorization(action = "ListClients", resourceType = "Clinic", resourceId = "Any" ,validate = true)
+	@CedarAuthorization(action = "ListClients", resourceType = "Clinic", resourceId = "Any", validate = true)
 	public String processFindForm(@RequestParam(defaultValue = "1") int page, Owner owner, BindingResult result,
 			Model model, HttpSession session) {
 		// allow parameterless GET request for /owners to return all records
@@ -138,37 +138,35 @@ class OwnerController {
 		// find owners by last name
 		Page<Owner> ownersResults = findPaginatedForOwnersLastName(page, lastName);
 
-		List<Owner> authorizedOwners = ownersResults.stream()
-				.filter(o -> {
-					EntityUID action = EntityUID.parse("PetClinic::Action::\"" + "ViewClient" + "\"")
-						.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
-					EntityUID resource = EntityUID.parse("PetClinic::PetOwner::\"" + o.getFirstName() + " " + o.getLastName() + "\"")
-						.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
-					Map<String, Value> contextMap = new HashMap<>();
-					CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
-					ResponseEntity<String> response = cedarService.checkAccess(cedarReq);
-					if (response.getBody().startsWith("Access Granted.")) {
-						return true;
-					} else {
-						return false;
-					}
-				})
-				.collect(Collectors.toList());
+		List<Owner> authorizedOwners = ownersResults.stream().filter(o -> {
+			EntityUID action = EntityUID.parse("PetClinic::Action::\"" + "ViewClient" + "\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
+			EntityUID resource = EntityUID
+				.parse("PetClinic::PetOwner::\"" + o.getFirstName() + " " + o.getLastName() + "\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
+			Map<String, Value> contextMap = new HashMap<>();
+			CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
+			ResponseEntity<String> response = cedarService.checkAccess(cedarReq);
+			if (response.getBody().startsWith("Access Granted.")) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}).collect(Collectors.toList());
 
 		Map<Integer, String> ownerAuthorizationMap = ownersResults.stream()
-			.collect(Collectors.toMap(
-				Owner::getId,
-				o -> {
-					EntityUID action = EntityUID.parse("PetClinic::Action::\"" + "ViewClient" + "\"")
-						.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
-					EntityUID resource = EntityUID.parse("PetClinic::PetOwner::\"" + o.getFirstName() + " " + o.getLastName() + "\"")
-						.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
-					Map<String, Value> contextMap = new HashMap<>();
-					CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
-					ResponseEntity<String> response = cedarService.checkAccess(cedarReq);
-					return response.getBody();
-				}
-		));
+			.collect(Collectors.toMap(Owner::getId, o -> {
+				EntityUID action = EntityUID.parse("PetClinic::Action::\"" + "ViewClient" + "\"")
+					.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
+				EntityUID resource = EntityUID
+					.parse("PetClinic::PetOwner::\"" + o.getFirstName() + " " + o.getLastName() + "\"")
+					.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
+				Map<String, Value> contextMap = new HashMap<>();
+				CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
+				ResponseEntity<String> response = cedarService.checkAccess(cedarReq);
+				return response.getBody();
+			}));
 
 		if (authorizedOwners.isEmpty()) {
 			// no owners found

@@ -67,7 +67,8 @@ public class CedarAspect {
 
 		if (requiresAuthorization.resourceId().equals("")) {
 			System.out.println("HTTP request resourceId: " + extractResourceId(request));
-		} else {
+		}
+		else {
 			System.out.println("Cedar request resourceId: " + requiresAuthorization.resourceId());
 		}
 

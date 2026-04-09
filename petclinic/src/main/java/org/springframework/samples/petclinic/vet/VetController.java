@@ -83,30 +83,27 @@ class VetController {
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 
-		List<Vet> authorizedVets = paginated.stream()
-				.filter(vet -> {
-					EntityUID action = EntityUID.parse("PetClinic::Action::\"" + "ViewEmployee" + "\"")
-						.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
-					EntityUID resource = EntityUID.parse("PetClinic::Employee::\"" + vet.getFirstName() + " " + vet.getLastName() + "\"")
-						.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
-					Map<String, Value> contextMap = new HashMap<>();
-					CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
-					ResponseEntity<String> response = cedarService.checkAccess(cedarReq);
-					if (response.getBody().startsWith("Access Granted.")) {
-						return true;
-					} else {
-						return false;
-					}
-				})
-				.collect(Collectors.toList());
+		List<Vet> authorizedVets = paginated.stream().filter(vet -> {
+			EntityUID action = EntityUID.parse("PetClinic::Action::\"" + "ViewEmployee" + "\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
+			EntityUID resource = EntityUID
+				.parse("PetClinic::Employee::\"" + vet.getFirstName() + " " + vet.getLastName() + "\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
+			Map<String, Value> contextMap = new HashMap<>();
+			CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
+			ResponseEntity<String> response = cedarService.checkAccess(cedarReq);
+			if (response.getBody().startsWith("Access Granted.")) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}).collect(Collectors.toList());
 
 		vets.getVetList().addAll(authorizedVets);
 
-		Page<Vet> filteredPaginated = new PageImpl<>(
-		        authorizedVets, 
-		        PageRequest.of(page - 1, 5), 
-		        authorizedVets.size()
-		);
+		Page<Vet> filteredPaginated = new PageImpl<>(authorizedVets, PageRequest.of(page - 1, 5),
+				authorizedVets.size());
 
 		return addPaginationModel(page, filteredPaginated, model);
 	}
@@ -144,22 +141,22 @@ class VetController {
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 
-		List<Vet> authorizedVets = this.vetRepository.findAll().stream()
-				.filter(vet -> {
-					EntityUID action = EntityUID.parse("PetClinic::Action::\"" + "ViewEmployee" + "\"")
-						.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
-					EntityUID resource = EntityUID.parse("PetClinic::Employee::\"" + vet.getFirstName() + " " + vet.getLastName() + "\"")
-						.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
-					Map<String, Value> contextMap = new HashMap<>();
-					CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
-					ResponseEntity<String> response = cedarService.checkAccess(cedarReq);
-					if (response.getBody().startsWith("Access Granted.")) {
-						return true;
-					} else {
-						return false;
-					}
-				})
-				.collect(Collectors.toList());
+		List<Vet> authorizedVets = this.vetRepository.findAll().stream().filter(vet -> {
+			EntityUID action = EntityUID.parse("PetClinic::Action::\"" + "ViewEmployee" + "\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
+			EntityUID resource = EntityUID
+				.parse("PetClinic::Employee::\"" + vet.getFirstName() + " " + vet.getLastName() + "\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
+			Map<String, Value> contextMap = new HashMap<>();
+			CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
+			ResponseEntity<String> response = cedarService.checkAccess(cedarReq);
+			if (response.getBody().startsWith("Access Granted.")) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}).collect(Collectors.toList());
 
 		vets.getVetList().addAll(authorizedVets);
 		return vets;

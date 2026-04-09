@@ -130,7 +130,8 @@ class PetController {
 
 		EntityUID action = EntityUID.parse("PetClinic::Action::\"" + "EditClient" + "\"")
 			.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
-		EntityUID resource = EntityUID.parse("PetClinic::PetOwner::\"" + owner.getFirstName() + " " + owner.getLastName() + "\"")
+		EntityUID resource = EntityUID
+			.parse("PetClinic::PetOwner::\"" + owner.getFirstName() + " " + owner.getLastName() + "\"")
 			.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
 		Map<String, Value> contextMap = new HashMap<>();
 		CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);

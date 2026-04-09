@@ -19,29 +19,29 @@ public class GlobalModelAttributes {
 	}
 
 	@ModelAttribute
-    public void populateLayoutData(HttpSession session, HttpServletRequest request, Model model) {
-        String sessionUser = (String) session.getAttribute("currentUser");
+	public void populateLayoutData(HttpSession session, HttpServletRequest request, Model model) {
+		String sessionUser = (String) session.getAttribute("currentUser");
 
-        final String activeUsername = (sessionUser != null) ? sessionUser : "Guest";
+		final String activeUsername = (sessionUser != null) ? sessionUser : "Guest";
 
 		System.out.println("activeUsername: " + activeUsername);
 
-        User currentUser = this.userRepository.findByUsername(activeUsername)
-            .orElseGet(() -> {
-                User transientUser = new User();
-                transientUser.setUsername(activeUsername); 
-                return transientUser;
-            });
+		User currentUser = this.userRepository.findByUsername(activeUsername).orElseGet(() -> {
+			User transientUser = new User();
+			transientUser.setUsername(activeUsername);
+			return transientUser;
+		});
 
-        Iterable<User> dynamicUsers = this.userRepository.findAll();
+		Iterable<User> dynamicUsers = this.userRepository.findAll();
 
-        // 1. Populate the Model for standard view rendering
-        model.addAttribute("currentUser", currentUser);
-        model.addAttribute("dynamicUsers", dynamicUsers);
+		// 1. Populate the Model for standard view rendering
+		model.addAttribute("currentUser", currentUser);
+		model.addAttribute("dynamicUsers", dynamicUsers);
 
-        // 2. Populate the Request Attributes to persist through exceptions and /error forwards
-        request.setAttribute("currentUser", currentUser);
-        request.setAttribute("dynamicUsers", dynamicUsers);
-    }
+		// 2. Populate the Request Attributes to persist through exceptions and /error
+		// forwards
+		request.setAttribute("currentUser", currentUser);
+		request.setAttribute("dynamicUsers", dynamicUsers);
+	}
 
 }

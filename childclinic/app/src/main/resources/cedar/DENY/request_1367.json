@@ -1,0 +1,6 @@
+{
+  "principal": "ChildClinic::Guest::\"???\"",
+  "resource": "ChildClinic::Parent::\"Betty Davis\"",
+  "action": "ChildClinic::Action::\"EditClient\"",
+  "context": {}
+}

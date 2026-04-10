@@ -1,0 +1,6 @@
+{
+  "principal": "ChildClinic::Employee::\"Carl\"",
+  "resource": "ChildClinic::Parent::\"George Franklin\"",
+  "action": "ChildClinic::Action::\"DeleteClient\"",
+  "context": {}
+}

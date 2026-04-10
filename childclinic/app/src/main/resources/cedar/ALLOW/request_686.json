@@ -1,0 +1,6 @@
+{
+  "principal": "ChildClinic::Employee::\"Alice\"",
+  "resource": "ChildClinic::Clinic::\"A\"",
+  "action": "ChildClinic::Action::\"ListClients\"",
+  "context": {}
+}

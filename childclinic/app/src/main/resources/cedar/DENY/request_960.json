@@ -1,0 +1,6 @@
+{
+  "principal": "ChildClinic::Guest::\"Unknown\"",
+  "resource": "ChildClinic::Child::\"Lucky\"",
+  "action": "ChildClinic::Action::\"EditClient\"",
+  "context": {}
+}

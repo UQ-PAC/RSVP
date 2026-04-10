@@ -1,0 +1,6 @@
+{
+  "principal": "ChildClinic::Guest::\"???\"",
+  "resource": "ChildClinic::Employee::\"???\"",
+  "action": "ChildClinic::Action::\"DeleteEmployee\"",
+  "context": {}
+}

@@ -1,0 +1,7 @@
+{
+    "principal": "ChildClinic::Employee::\"Sharon Jenkins\"",
+    "action": "ChildClinic::Action::\"ViewEmployee\"",
+    "resource": "ChildClinic::Employee::\"James Carter\"",
+    "context": { },
+    "validateRequest": true
+}

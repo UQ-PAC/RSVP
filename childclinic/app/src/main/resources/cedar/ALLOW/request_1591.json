@@ -1,0 +1,6 @@
+{
+  "principal": "ChildClinic::Employee::\"Sharon Jenkins\"",
+  "resource": "ChildClinic::Parent::\"Jean Coleman\"",
+  "action": "ChildClinic::Action::\"ListClients\"",
+  "context": {}
+}

@@ -1,0 +1,6 @@
+{
+  "principal": "ChildClinic::Guest::\"Unknown\"",
+  "resource": "ChildClinic::Parent::\"Carlos Estaban\"",
+  "action": "ChildClinic::Action::\"DeleteClient\"",
+  "context": {}
+}

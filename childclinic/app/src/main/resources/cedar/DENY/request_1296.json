@@ -1,0 +1,6 @@
+{
+  "principal": "ChildClinic::Guest::\"Unknown\"",
+  "resource": "ChildClinic::Employee::\"Kathaleen Tramonte\"",
+  "action": "ChildClinic::Action::\"EditEmployee\"",
+  "context": {}
+}

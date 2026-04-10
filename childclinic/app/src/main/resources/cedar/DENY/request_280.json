@@ -1,0 +1,6 @@
+{
+  "principal": "ChildClinic::Guest::\"???\"",
+  "resource": "ChildClinic::Child::\"Leo\"",
+  "action": "ChildClinic::Action::\"ListClients\"",
+  "context": {}
+}

@@ -1,0 +1,57 @@
+// ChildClinic RSVP Invariants
+
+// ALSO CONSIDER "OPEN-WORLD" SCENARIOS!
+
+// ALSO CONSIDER ASSERTIONS RELATED TO EXPECTED POLICY RESULTS!
+
+// 1. There is at least one Administrator.
+@invariant("Administrator existence.")
+entity.roles.contains(ChildClinic::EmployeeRole::"Administrator")
+    for some entity: ChildClinic::Employee;
+
+// 2. Employee should have name, clinics, and roles.
+@invariant("Employee data.")
+entity has name && entity has clinics && entity has roles
+    for all entity: ChildClinic::Employee;
+
+// 3. Doctor should have level.
+@invariant("Doctor data.")
+entity.roles.contains(ChildClinic::EmployeeRole::"Doctor") --> entity has level
+    for all entity: ChildClinic::Employee;
+
+// 4. Only Doctor can be "Resident", "Registrar", or "Specialist".
+@invariant("Resident, Registrar, or Specialist.")
+(
+    entity.level == ChildClinic::ProfessionalLevel::"Resident" ||
+    entity.level == ChildClinic::ProfessionalLevel::"Registrar" ||
+    entity.level == ChildClinic::ProfessionalLevel::"Specialist"
+) --> entity.roles.contains(ChildClinic::EmployeeRole::"Doctor")
+    for all entity: ChildClinic::Employee;
+
+// 5. Every "Intern" and "Registrar" must have a manager.
+@invariant("Intern and Registrar manager.")
+(
+    entity.level == ChildClinic::ProfessionalLevel::"Intern" ||
+    entity.level == ChildClinic::ProfessionalLevel::"Registrar"
+) --> entity has manager
+    for all entity: ChildClinic::Employee;
+
+// 6. No Employee can be their own manager.
+@invariant("No Employee can be their own manager.")
+entity has manager --> entity.manager != entity
+    for all entity: ChildClinic::Employee;
+
+// 7. Parent should have name, children, clinics, and doctors.
+@invariant("Parent data.")
+entity has name && entity has children && entity has clinics && entity has doctors
+    for all entity: ChildClinic::Parent;
+
+// 8. Child should have name, owner, clinics, and doctors
+@invariant("Child data.")
+entity has name && entity has owner && entity has clinics && entity has doctors
+    for all entity: ChildClinic::Child;
+
+// 9. Visit should have child, clinics, doctors, and confidentiality.
+@invariant("Visit data.")
+entity has child && entity has clinics && entity has doctors && entity has confidentiality
+    for all entity: ChildClinic::Visit;

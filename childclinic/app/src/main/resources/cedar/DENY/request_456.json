@@ -1,0 +1,6 @@
+{
+  "principal": "ChildClinic::Guest::\"???\"",
+  "resource": "ChildClinic::Parent::\"Eduardo Rodriquez\"",
+  "action": "ChildClinic::Action::\"EditClient\"",
+  "context": {}
+}

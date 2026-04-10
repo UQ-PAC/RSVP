@@ -1,0 +1,6 @@
+{
+  "principal": "ChildClinic::Guest::\"Unknown\"",
+  "resource": "ChildClinic::Employee::\"Jestine Teixeira\"",
+  "action": "ChildClinic::Action::\"EditEmployee\"",
+  "context": {}
+}

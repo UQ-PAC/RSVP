@@ -40,7 +40,7 @@ public class CedarAspect {
 	}
 
 	private static final Map<String, ResourceMetadata> RESOURCE_REGISTRY = Map.of("Parent",
-			new ResourceMetadata("SELECT first_name, last_name FROM owners WHERE entity_id = ?",
+			new ResourceMetadata("SELECT first_name, last_name FROM parents WHERE entity_id = ?",
 					rs -> rs.get("first_name") + " " + rs.get("last_name")),
 			"Doctor",
 			new ResourceMetadata("SELECT first_name, last_name FROM doctors WHERE entity_id = ?",

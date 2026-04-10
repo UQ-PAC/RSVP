@@ -1,6 +1,0 @@
-{
-  "principal": "PetClinic::Employee::\"Sharon Jenkins\"",
-  "resource": "PetClinic::Pet::\"???\"",
-  "action": "PetClinic::Action::\"DeleteClient\"",
-  "context": {}
-}

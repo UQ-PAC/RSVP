@@ -1,6 +1,0 @@
-{
-  "principal": "PetClinic::Employee::\"Bob\"",
-  "resource": "PetClinic::PetOwner::\"Jean Coleman\"",
-  "action": "PetClinic::Action::\"ViewClient\"",
-  "context": {}
-}

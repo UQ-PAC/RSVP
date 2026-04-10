@@ -1,6 +1,0 @@
-{
-  "principal": "PetClinic::Guest::\"???\"",
-  "resource": "PetClinic::PetOwner::\"George Franklin\"",
-  "action": "PetClinic::Action::\"DeleteClient\"",
-  "context": {}
-}

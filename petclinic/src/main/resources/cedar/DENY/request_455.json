@@ -1,6 +1,6 @@
 {
-  "principal": "PetClinic::Employee::\"Jestine Teixeira\"",
-  "resource": "PetClinic::PetOwner::\"???\"",
-  "action": "PetClinic::Action::\"EditClient\"",
+  "principal": "ChildClinic::Employee::\"Carl\"",
+  "resource": "ChildClinic::Child::\"Lucky\"",
+  "action": "ChildClinic::Action::\"ViewClient\"",
   "context": {}
 }

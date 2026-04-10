@@ -1,0 +1,6 @@
+{
+  "principal": "ChildClinic::Employee::\"Kathaleen Tramonte\"",
+  "resource": "ChildClinic::Parent::\"Jean Coleman\"",
+  "action": "ChildClinic::Action::\"EditClient\"",
+  "context": {}
+}

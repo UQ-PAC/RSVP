@@ -1,6 +1,0 @@
-{
-  "principal": "PetClinic::Guest::\"Unknown\"",
-  "resource": "PetClinic::Pet::\"Samantha\"",
-  "action": "PetClinic::Action::\"DeleteClient\"",
-  "context": {}
-}

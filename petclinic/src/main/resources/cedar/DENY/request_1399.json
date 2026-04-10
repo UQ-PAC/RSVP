@@ -1,6 +1,0 @@
-{
-  "principal": "PetClinic::Guest::\"???\"",
-  "resource": "PetClinic::PetVisit::\"Max 2\"",
-  "action": "PetClinic::Action::\"ListClients\"",
-  "context": {}
-}

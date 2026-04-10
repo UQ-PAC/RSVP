@@ -1,6 +1,0 @@
-{
-  "principal": "PetClinic::Guest::\"Unknown\"",
-  "resource": "PetClinic::PetOwner::\"Betty Davis\"",
-  "action": "PetClinic::Action::\"ViewClient\"",
-  "context": {}
-}

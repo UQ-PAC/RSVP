@@ -1,0 +1,6 @@
+{
+  "principal": "ChildClinic::Guest::\"Unknown\"",
+  "resource": "ChildClinic::Child::\"Basil\"",
+  "action": "ChildClinic::Action::\"ViewClient\"",
+  "context": {}
+}

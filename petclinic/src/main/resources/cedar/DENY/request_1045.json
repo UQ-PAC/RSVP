@@ -1,0 +1,6 @@
+{
+  "principal": "ChildClinic::Guest::\"???\"",
+  "resource": "ChildClinic::Visit::\"Samantha 2\"",
+  "action": "ChildClinic::Action::\"ListClients\"",
+  "context": {}
+}

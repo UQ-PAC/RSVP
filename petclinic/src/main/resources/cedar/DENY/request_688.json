@@ -1,6 +1,6 @@
 {
-  "principal": "PetClinic::Guest::\"???\"",
-  "resource": "PetClinic::Clinic::\"B\"",
-  "action": "PetClinic::Action::\"AddEmployee\"",
+  "principal": "ChildClinic::Guest::\"Unknown\"",
+  "resource": "ChildClinic::Parent::\"???\"",
+  "action": "ChildClinic::Action::\"AddClient\"",
   "context": {}
 }

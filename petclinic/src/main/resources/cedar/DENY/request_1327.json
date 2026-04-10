@@ -1,0 +1,6 @@
+{
+  "principal": "ChildClinic::Employee::\"Jestine Teixeira\"",
+  "resource": "ChildClinic::Child::\"Max\"",
+  "action": "ChildClinic::Action::\"ViewClient\"",
+  "context": {}
+}

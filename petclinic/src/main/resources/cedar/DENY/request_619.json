@@ -1,6 +1,0 @@
-{
-  "principal": "PetClinic::Employee::\"Sharon Jenkins\"",
-  "resource": "PetClinic::Employee::\"Jestine Teixeira\"",
-  "action": "PetClinic::Action::\"EditEmployee\"",
-  "context": {}
-}

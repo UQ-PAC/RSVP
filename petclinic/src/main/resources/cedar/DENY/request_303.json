@@ -1,6 +1,6 @@
 {
-  "principal": "PetClinic::Employee::\"Carl\"",
-  "resource": "PetClinic::PetVisit::\"Max 2\"",
-  "action": "PetClinic::Action::\"DeleteClient\"",
+  "principal": "ChildClinic::Employee::\"Linda Douglas\"",
+  "resource": "ChildClinic::Employee::\"Sharon Jenkins\"",
+  "action": "ChildClinic::Action::\"EditEmployee\"",
   "context": {}
 }

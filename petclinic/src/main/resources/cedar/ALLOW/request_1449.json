@@ -1,6 +1,0 @@
-{
-  "principal": "PetClinic::Guest::\"???\"",
-  "resource": "PetClinic::Employee::\"Sharon Jenkins\"",
-  "action": "PetClinic::Action::\"ViewEmployee\"",
-  "context": {}
-}

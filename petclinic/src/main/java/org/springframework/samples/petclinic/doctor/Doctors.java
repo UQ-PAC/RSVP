@@ -13,4 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.samples.petclinic.owner;
+package org.springframework.samples.petclinic.doctor;
+
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Simple domain object representing a list of doctors. Mostly here to be used for
+ * the 'doctors' {@link org.springframework.web.servlet.view.xml.MarshallingView}.
+ *
+ * @author Arjen Poutsma
+ */
+@XmlRootElement
+public class Doctors {
+
+	private List<Doctor> doctors;
+
+	@XmlElement
+	public List<Doctor> getDoctorsList() {
+		if (doctors == null) {
+			doctors = new ArrayList<>();
+		}
+		return doctors;
+	}
+
+}

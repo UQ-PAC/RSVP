@@ -15,14 +15,6 @@
  */
 package org.springframework.samples.petclinic.owner;
 
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.samples.petclinic.model.NamedEntity;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,6 +26,15 @@ import jakarta.persistence.OrderBy;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import org.springframework.samples.petclinic.model.NamedEntity;
+
 /**
  * Simple business object representing a pet.
  *
@@ -43,7 +44,7 @@ import jakarta.persistence.Table;
  * @author Wick Dynex
  */
 @Entity
-@Table(name = "pets")
+@Table(name = "children")
 @PrimaryKeyJoinColumn(name = "entity_id")
 public class Pet extends NamedEntity {
 
@@ -52,8 +53,8 @@ public class Pet extends NamedEntity {
 	private LocalDate birthDate;
 
 	@ManyToOne
-	@JoinColumn(name = "type_id")
-	private PetType type;
+	@JoinColumn(name = "gender_id")
+	private Gender gender;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "pet_id")
@@ -68,12 +69,12 @@ public class Pet extends NamedEntity {
 		return this.birthDate;
 	}
 
-	public PetType getType() {
-		return this.type;
+	public Gender getGender() {
+		return this.gender;
 	}
 
-	public void setType(PetType type) {
-		this.type = type;
+	public void setGender(Gender gender) {
+		this.gender = gender;
 	}
 
 	public Collection<Visit> getVisits() {

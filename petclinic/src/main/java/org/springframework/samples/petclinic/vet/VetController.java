@@ -15,17 +15,20 @@
  */
 package org.springframework.samples.petclinic.vet;
 
+import com.cedarpolicy.value.EntityUID;
+import com.cedarpolicy.value.Value;
+
+import jakarta.servlet.http.HttpSession;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import jakarta.servlet.http.HttpSession;
-
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,9 +40,6 @@ import org.springframework.samples.petclinic.cedar.CedarAuthorization;
 import org.springframework.samples.petclinic.cedar.CedarRequest;
 import org.springframework.samples.petclinic.cedar.CedarService;
 
-import com.cedarpolicy.value.EntityUID;
-import com.cedarpolicy.value.Value;
-
 /**
  * @author Juergen Hoeller
  * @author Mark Fisher
@@ -49,22 +49,22 @@ import com.cedarpolicy.value.Value;
 @Controller
 class VetController {
 
-	private final VetRepository vetRepository;
+	private final DoctorRepository doctorRepository;
 
 	private final CedarService cedarService;
 
-	public VetController(VetRepository vetRepository, CedarService cedarService) {
-		this.vetRepository = vetRepository;
+	public DoctorController(DoctorRepository doctorRepository, CedarService cedarService) {
+		this.doctorRepository = doctorRepository;
 		this.cedarService = cedarService;
 	}
 
-	@GetMapping("/vets.html")
+	@GetMapping("/doctors.html")
 	@CedarAuthorization(action = "ListEmployees", resourceType = "Clinic", resourceId = "Any", validate = true)
-	public String showVetList(@RequestParam(defaultValue = "1") int page, Model model, HttpSession session) {
-		// Here we are returning an object of type 'Vets' rather than a collection of Vet
+	public String showDoctorsList(@RequestParam(defaultValue = "1") int page, Model model, HttpSession session) {
+		// Here we are returning an object of type 'Doctors' rather than a collection of Doctor
 		// objects so it is simpler for Object-Xml mapping
-		Vets vets = new Vets();
-		Page<Vet> paginated = findPaginated(page);
+		Doctors doctors = new Doctors();
+		Page<Doctor> paginated = findPaginated(page);
 
 		String principalId = (String) session.getAttribute("currentUser");
 		if (session.getAttribute("currentUser") == null) {
@@ -75,19 +75,19 @@ class VetController {
 
 		EntityUID principal;
 		if (principalId.equals("Guest")) {
-			principal = EntityUID.parse("PetClinic::Guest::\"Unknown\"")
+			principal = EntityUID.parse("ChildClinic::Guest::\"Unknown\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 		else {
-			principal = EntityUID.parse("PetClinic::Employee::\"" + principalId + "\"")
+			principal = EntityUID.parse("ChildClinic::Employee::\"" + principalId + "\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 
-		List<Vet> authorizedVets = paginated.stream().filter(vet -> {
-			EntityUID action = EntityUID.parse("PetClinic::Action::\"" + "ViewEmployee" + "\"")
+		List<Doctor> authorizedDoctors = paginated.stream().filter(doctor -> {
+			EntityUID action = EntityUID.parse("ChildClinic::Action::\"" + "ViewEmployee" + "\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
 			EntityUID resource = EntityUID
-				.parse("PetClinic::Employee::\"" + vet.getFirstName() + " " + vet.getLastName() + "\"")
+				.parse("ChildClinic::Employee::\"" + doctor.getFirstName() + " " + doctor.getLastName() + "\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
 			Map<String, Value> contextMap = new HashMap<>();
 			CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
@@ -100,52 +100,52 @@ class VetController {
 			}
 		}).collect(Collectors.toList());
 
-		vets.getVetList().addAll(authorizedVets);
+		doctors.getDoctorsList().addAll(authorizedDoctors);
 
-		Page<Vet> filteredPaginated = new PageImpl<>(authorizedVets, PageRequest.of(page - 1, 5),
-				authorizedVets.size());
+		Page<Doctor> filteredPaginated = new PageImpl<>(authorizedDoctors, PageRequest.of(page - 1, 5),
+				authorizedDoctors.size());
 
 		return addPaginationModel(page, filteredPaginated, model);
 	}
 
-	private String addPaginationModel(int page, Page<Vet> paginated, Model model) {
-		List<Vet> listVets = paginated.getContent();
+	private String addPaginationModel(int page, Page<Doctor> paginated, Model model) {
+		List<Doctor> listDoctors = paginated.getContent();
 		model.addAttribute("currentPage", page);
 		model.addAttribute("totalPages", paginated.getTotalPages());
 		model.addAttribute("totalItems", paginated.getTotalElements());
-		model.addAttribute("listVets", listVets);
-		return "vets/vetList";
+		model.addAttribute("listDoctors", listDoctors);
+		return "doctors/doctorsList";
 	}
 
-	private Page<Vet> findPaginated(int page) {
+	private Page<Doctor> findPaginated(int page) {
 		int pageSize = 5;
 		Pageable pageable = PageRequest.of(page - 1, pageSize);
-		return vetRepository.findAll(pageable);
+		return doctorRepository.findAll(pageable);
 	}
 
-	@GetMapping({ "/vets" })
+	@GetMapping({ "/doctors" })
 	@CedarAuthorization(action = "ListEmployees", resourceType = "Clinic", resourceId = "Any", validate = true)
-	public @ResponseBody Vets showResourcesVetList(HttpSession session) {
-		// Here we are returning an object of type 'Vets' rather than a collection of Vet
+	public @ResponseBody Doctors showResourcesDoctorsList(HttpSession session) {
+		// Here we are returning an object of type 'Doctors' rather than a collection of Doctor
 		// objects so it is simpler for JSon/Object mapping
-		Vets vets = new Vets();
+		Doctors doctors = new Doctors();
 
 		String principalId = (String) session.getAttribute("currentUser");
 		EntityUID principal;
 		if (principalId.equals("Guest")) {
-			principal = EntityUID.parse("PetClinic::Guest::\"Unknown\"")
+			principal = EntityUID.parse("ChildClinic::Guest::\"Unknown\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 		else {
-			principal = EntityUID.parse("PetClinic::Employee::\"" + principalId + "\"")
+			principal = EntityUID.parse("ChildClinic::Employee::\"" + principalId + "\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 
-		List<Vet> authorizedVets = this.vetRepository.findAll().stream().filter(vet -> {
-			EntityUID action = EntityUID.parse("PetClinic::Action::\"" + "ViewEmployee" + "\"")
+		List<Doctor> authorizedDoctors = this.doctorRepository.findAll().stream().filter(doctor -> {
+			EntityUID action = EntityUID.parse("ChildClinic::Action::\"" + "ViewEmployee" + "\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
 			EntityUID resource = EntityUID
-				.parse("PetClinic::Employee::\"" + vet.getFirstName() + " " + vet.getLastName() + "\"")
+				.parse("ChildClinic::Employee::\"" + doctor.getFirstName() + " " + doctor.getLastName() + "\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
 			Map<String, Value> contextMap = new HashMap<>();
 			CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
@@ -158,8 +158,8 @@ class VetController {
 			}
 		}).collect(Collectors.toList());
 
-		vets.getVetList().addAll(authorizedVets);
-		return vets;
+		doctors.getDoctorsList().addAll(authorizedDoctors);
+		return doctors;
 	}
 
 }

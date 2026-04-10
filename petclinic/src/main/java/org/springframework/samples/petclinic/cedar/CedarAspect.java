@@ -1,11 +1,16 @@
 package org.springframework.samples.petclinic.cedar;
 
-import com.cedarpolicy.value.PrimString;
 import com.cedarpolicy.value.EntityUID;
+import com.cedarpolicy.value.PrimString;
 import com.cedarpolicy.value.Value;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -18,11 +23,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.HandlerMapping;
-
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
 
 @Aspect
 @Component
@@ -39,14 +39,14 @@ public class CedarAspect {
 	private record ResourceMetadata(String sqlQuery, Function<Map<String, Object>, String> nameExtractor) {
 	}
 
-	private static final Map<String, ResourceMetadata> RESOURCE_REGISTRY = Map.of("PetOwner",
+	private static final Map<String, ResourceMetadata> RESOURCE_REGISTRY = Map.of("Parent",
 			new ResourceMetadata("SELECT first_name, last_name FROM owners WHERE entity_id = ?",
 					rs -> rs.get("first_name") + " " + rs.get("last_name")),
-			"Veterinarian",
-			new ResourceMetadata("SELECT first_name, last_name FROM vets WHERE entity_id = ?",
+			"Doctor",
+			new ResourceMetadata("SELECT first_name, last_name FROM doctors WHERE entity_id = ?",
 					rs -> rs.get("first_name") + " " + rs.get("last_name")),
-			"Pet", new ResourceMetadata("SELECT name FROM pets WHERE entity_id = ?", rs -> rs.get("name").toString()),
-			"PetVisit", new ResourceMetadata("SELECT description FROM visits WHERE entity_id = ?",
+			"Child", new ResourceMetadata("SELECT name FROM children WHERE entity_id = ?", rs -> rs.get("name").toString()),
+			"Visit", new ResourceMetadata("SELECT description FROM visits WHERE entity_id = ?",
 					rs -> rs.get("description").toString()));
 
 	public CedarAspect(CedarService cedarService, JdbcTemplate jdbcTemplate) {
@@ -76,15 +76,15 @@ public class CedarAspect {
 
 		EntityUID principal;
 		if (principalId.equals("Guest")) {
-			principal = EntityUID.parse("PetClinic::Guest::\"Unknown\"")
+			principal = EntityUID.parse("ChildClinic::Guest::\"Unknown\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 		else {
-			principal = EntityUID.parse("PetClinic::Employee::\"" + principalId + "\"")
+			principal = EntityUID.parse("ChildClinic::Employee::\"" + principalId + "\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 
-		EntityUID action = EntityUID.parse("PetClinic::Action::\"" + requiresAuthorization.action() + "\"")
+		EntityUID action = EntityUID.parse("ChildClinic::Action::\"" + requiresAuthorization.action() + "\"")
 			.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
 
 		EntityUID resource = resolveResourceUid(request, requiresAuthorization);
@@ -179,7 +179,7 @@ public class CedarAspect {
 
 		final String finalResourceIdentifier = resourceIdentifier;
 
-		return EntityUID.parse("PetClinic::" + resourceType + "::\"" + finalResourceIdentifier + "\"")
+		return EntityUID.parse("ChildClinic::" + resourceType + "::\"" + finalResourceIdentifier + "\"")
 			.orElseThrow(() -> new IllegalArgumentException(
 					"Invalid Resource UID format generated for: " + finalResourceIdentifier));
 	}

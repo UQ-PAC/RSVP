@@ -1,7 +1,8 @@
 package org.springframework.samples.petclinic.system;
 
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 @Component("imageRandomizer")

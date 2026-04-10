@@ -15,30 +15,30 @@
  */
 package org.springframework.samples.petclinic.owner;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import com.cedarpolicy.value.EntityUID;
+import com.cedarpolicy.value.Value;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import org.springframework.samples.petclinic.cedar.CedarAuthorization;
 import org.springframework.samples.petclinic.cedar.CedarRequest;
 import org.springframework.samples.petclinic.cedar.CedarService;
-
-import com.cedarpolicy.value.EntityUID;
-import com.cedarpolicy.value.Value;
 
 /**
  * @author Juergen Hoeller
@@ -51,12 +51,12 @@ import com.cedarpolicy.value.Value;
 @Controller
 class VisitController {
 
-	private final OwnerRepository owners;
+	private final ParentRepository parents;
 
 	private final CedarService cedarService;
 
-	public VisitController(OwnerRepository owners, CedarService cedarService) {
-		this.owners = owners;
+	public VisitController(ParentRepository parents, CedarService cedarService) {
+		this.parents = parents;
 		this.cedarService = cedarService;
 	}
 
@@ -68,35 +68,35 @@ class VisitController {
 	/**
 	 * Called before each and every @RequestMapping annotated method. 2 goals: - Make sure
 	 * we always have fresh data - Since we do not use the session scope, make sure that
-	 * Pet object always has an id (Even though id is not part of the form fields)
-	 * @param petId
-	 * @return Pet
+	 * Child object always has an id (Even though id is not part of the form fields)
+	 * @param childId
+	 * @return Child
 	 */
 	@ModelAttribute("visit")
-	public Visit loadPetWithVisit(@PathVariable("ownerId") int ownerId, @PathVariable("petId") int petId,
+	public Visit loadChildWithVisit(@PathVariable("parentId") int parentId, @PathVariable("childId") int childId,
 			Map<String, Object> model) {
-		Optional<Owner> optionalOwner = owners.findById(ownerId);
-		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
-				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct."));
+		Optional<Parent> optionalParent = parents.findById(parentId);
+		Parent parent = optionalParent.orElseThrow(() -> new IllegalArgumentException(
+				"Parent not found with id: " + parentId + ". Please ensure the ID is correct."));
 
-		Pet pet = owner.getPet(petId);
-		if (pet == null) {
+		Child child = parent.getChild(childId);
+		if (child == null) {
 			throw new IllegalArgumentException(
-					"Pet with id " + petId + " not found for owner with id " + ownerId + ".");
+					"Child with id " + childId + " not found for parent with id " + parentId + ".");
 		}
-		model.put("pet", pet);
-		model.put("owner", owner);
+		model.put("child", child);
+		model.put("parent", parent);
 
 		Visit visit = new Visit();
-		pet.addVisit(visit);
+		child.addVisit(visit);
 		return visit;
 	}
 
-	// Spring MVC calls method loadPetWithVisit(...) before initNewVisitForm is
+	// Spring MVC calls method loadChildWithVisit(...) before initNewVisitForm is
 	// called
-	@GetMapping("/owners/{ownerId}/pets/{petId}/visits/new")
-	@CedarAuthorization(action = "AddClient", resourceType = "Pet", validate = true)
-	public String initNewVisitForm(Pet pet, HttpSession session) {
+	@GetMapping("/parents/{parentId}/children/{childId}/visits/new")
+	@CedarAuthorization(action = "AddClient", resourceType = "Child", validate = true)
+	public String initNewVisitForm(Child child, HttpSession session) {
 		String principalId = (String) session.getAttribute("currentUser");
 		if (session.getAttribute("currentUser") == null) {
 			principalId = "Guest";
@@ -106,42 +106,42 @@ class VisitController {
 
 		EntityUID principal;
 		if (principalId.equals("Guest")) {
-			principal = EntityUID.parse("PetClinic::Guest::\"Unknown\"")
+			principal = EntityUID.parse("ChildClinic::Guest::\"Unknown\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 		else {
-			principal = EntityUID.parse("PetClinic::Employee::\"" + principalId + "\"")
+			principal = EntityUID.parse("ChildClinic::Employee::\"" + principalId + "\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 
-		EntityUID action = EntityUID.parse("PetClinic::Action::\"" + "EditClient" + "\"")
+		EntityUID action = EntityUID.parse("ChildClinic::Action::\"" + "EditClient" + "\"")
 			.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
-		EntityUID resource = EntityUID.parse("PetClinic::Pet::\"" + pet.getName() + "\"")
+		EntityUID resource = EntityUID.parse("ChildClinic::Child::\"" + child.getName() + "\"")
 			.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
 		Map<String, Value> contextMap = new HashMap<>();
 		CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
 		ResponseEntity<String> response = cedarService.checkAccess(cedarReq);
 		if (!response.getBody().startsWith("Access Granted.")) {
-			throw new SecurityException("Access Denied to modify Pet.");
+			throw new SecurityException("Access Denied to modify Child.");
 		}
 
-		return "pets/createOrUpdateVisitForm";
+		return "children/createOrUpdateVisitForm";
 	}
 
-	// Spring MVC calls method loadPetWithVisit(...) before processNewVisitForm is
+	// Spring MVC calls method loadChildWithVisit(...) before processNewVisitForm is
 	// called
-	@PostMapping("/owners/{ownerId}/pets/{petId}/visits/new")
-	@CedarAuthorization(action = "AddClient", resourceType = "Pet", validate = true)
-	public String processNewVisitForm(@ModelAttribute Owner owner, @PathVariable int petId, @Valid Visit visit,
+	@PostMapping("/parents/{parentId}/children/{childId}/visits/new")
+	@CedarAuthorization(action = "AddClient", resourceType = "Child", validate = true)
+	public String processNewVisitForm(@ModelAttribute Parent parent, @PathVariable int childId, @Valid Visit visit,
 			BindingResult result, RedirectAttributes redirectAttributes) {
 		if (result.hasErrors()) {
-			return "pets/createOrUpdateVisitForm";
+			return "children/createOrUpdateVisitForm";
 		}
 
-		owner.addVisit(petId, visit);
-		this.owners.save(owner);
+		parent.addVisit(childId, visit);
+		this.parents.save(parent);
 		redirectAttributes.addFlashAttribute("message", "Your visit has been booked.");
-		return "redirect:/owners/{ownerId}";
+		return "redirect:/parents/{parentId}";
 	}
 
 }

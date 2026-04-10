@@ -130,16 +130,12 @@ INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 
 -- Children.
 
-INSERT INTO types VALUES (default, 'cat');     -- 1
-INSERT INTO types VALUES (default, 'dog');     -- 2
-INSERT INTO types VALUES (default, 'lizard');  -- 3
-INSERT INTO types VALUES (default, 'snake');   -- 4
-INSERT INTO types VALUES (default, 'bird');    -- 5
-INSERT INTO types VALUES (default, 'hamster'); -- 6
+INSERT INTO genders VALUES (default, 'Female');     -- 1
+INSERT INTO genders VALUES (default, 'Male');     -- 2
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_parent_id = (SELECT entity_id FROM parents WHERE telephone = '6085551023');
-INSERT INTO children (entity_id, name, birth_date, type_id, parent_id) VALUES (@new_entity_id, 'Leo', '2010-09-07', 1, @recovered_parent_id);
+INSERT INTO children (entity_id, name, birth_date, gender_id, parent_id) VALUES (@new_entity_id, 'Leo', '2010-09-07', 2, @recovered_parent_id);
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Child');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
@@ -148,7 +144,7 @@ INSERT INTO child_doctors (child_id, doctor_id) VALUES (@new_entity_id, @recover
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_parent_id = (SELECT entity_id FROM parents WHERE telephone = '6085551749');
-INSERT INTO children (entity_id, name, birth_date, type_id, parent_id) VALUES (@new_entity_id, 'Basil', '2012-08-06', 6, @recovered_parent_id);
+INSERT INTO children (entity_id, name, birth_date, gender_id, parent_id) VALUES (@new_entity_id, 'Basil', '2012-08-06', 2, @recovered_parent_id);
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Child');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 SET @recovered_doctor_id = (SELECT entity_id FROM doctors WHERE first_name = 'James' AND last_name = 'Carter');
@@ -156,7 +152,7 @@ INSERT INTO child_doctors (child_id, doctor_id) VALUES (@new_entity_id, @recover
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_parent_id = (SELECT entity_id FROM parents WHERE telephone = '6085558763');
-INSERT INTO children (entity_id, name, birth_date, type_id, parent_id) VALUES (@new_entity_id, 'Rosy', '2011-04-17', 2, @recovered_parent_id);
+INSERT INTO children (entity_id, name, birth_date, gender_id, parent_id) VALUES (@new_entity_id, 'Rosy', '2011-04-17', 1, @recovered_parent_id);
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Child');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 SET @recovered_doctor_id = (SELECT entity_id FROM doctors WHERE first_name = 'James' AND last_name = 'Carter');
@@ -166,7 +162,7 @@ INSERT INTO child_doctors (child_id, doctor_id) VALUES (@new_entity_id, @recover
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_parent_id = (SELECT entity_id FROM parents WHERE telephone = '6085558763');
-INSERT INTO children (entity_id, name, birth_date, type_id, parent_id) VALUES (@new_entity_id, 'Jewel', '2010-03-07', 2, @recovered_parent_id);
+INSERT INTO children (entity_id, name, birth_date, gender_id, parent_id) VALUES (@new_entity_id, 'Jewel', '2010-03-07', 1, @recovered_parent_id);
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Child');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 SET @recovered_doctor_id = (SELECT entity_id FROM doctors WHERE first_name = 'James' AND last_name = 'Carter');
@@ -176,7 +172,7 @@ INSERT INTO child_doctors (child_id, doctor_id) VALUES (@new_entity_id, @recover
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_parent_id = (SELECT entity_id FROM parents WHERE telephone = '6085552654');
-INSERT INTO children (entity_id, name, birth_date, type_id, parent_id) VALUES (@new_entity_id, 'Samantha', '2012-09-04', 1, @recovered_parent_id);
+INSERT INTO children (entity_id, name, birth_date, gender_id, parent_id) VALUES (@new_entity_id, 'Samantha', '2012-09-04', 1, @recovered_parent_id);
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Child');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 SET @recovered_doctor_id = (SELECT entity_id FROM doctors WHERE first_name = 'Sharon' AND last_name = 'Jenkins');
@@ -188,7 +184,7 @@ INSERT INTO child_doctors (child_id, doctor_id) VALUES (@new_entity_id, @recover
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_parent_id = (SELECT entity_id FROM parents WHERE telephone = '6085552654');
-INSERT INTO children (entity_id, name, birth_date, type_id, parent_id) VALUES (@new_entity_id, 'Max', '2012-09-04', 1, @recovered_parent_id);
+INSERT INTO children (entity_id, name, birth_date, gender_id, parent_id) VALUES (@new_entity_id, 'Max', '2012-09-04', 2, @recovered_parent_id);
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Child');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 SET @recovered_doctor_id = (SELECT entity_id FROM doctors WHERE first_name = 'Sharon' AND last_name = 'Jenkins');
@@ -200,7 +196,7 @@ INSERT INTO child_doctors (child_id, doctor_id) VALUES (@new_entity_id, @recover
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_parent_id = (SELECT entity_id FROM parents WHERE telephone = '6085555487');
-INSERT INTO children (entity_id, name, birth_date, type_id, parent_id) VALUES (@new_entity_id, 'Lucky', '2011-08-06', 5, @recovered_parent_id);
+INSERT INTO children (entity_id, name, birth_date, gender_id, parent_id) VALUES (@new_entity_id, 'Lucky', '2011-08-06', 1, @recovered_parent_id);
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Child');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 SET @recovered_doctor_id = (SELECT entity_id FROM doctors WHERE first_name = 'James' AND last_name = 'Carter');
@@ -208,7 +204,7 @@ INSERT INTO child_doctors (child_id, doctor_id) VALUES (@new_entity_id, @recover
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_parent_id = (SELECT entity_id FROM parents WHERE telephone = '6085555487');
-INSERT INTO children (entity_id, name, birth_date, type_id, parent_id) VALUES (@new_entity_id, 'Sly', '2012-06-08', 1, @recovered_parent_id);
+INSERT INTO children (entity_id, name, birth_date, gender_id, parent_id) VALUES (@new_entity_id, 'Sly', '2012-06-08', 2, @recovered_parent_id);
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Child');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 SET @recovered_doctor_id = (SELECT entity_id FROM doctors WHERE first_name = 'James' AND last_name = 'Carter');
@@ -222,7 +218,7 @@ INSERT INTO confidentialities VALUES (default, 'Protected'); -- 3
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_parent_id = (SELECT entity_id FROM parents WHERE telephone = '6085552654');
-SET @recovered_child_id = (SELECT entity_id FROM children WHERE name = 'Samantha' AND type_id = 1 AND parent_id = @recovered_parent_id);
+SET @recovered_child_id = (SELECT entity_id FROM children WHERE name = 'Samantha' AND gender_id = 1 AND parent_id = @recovered_parent_id);
 INSERT INTO visits (entity_id, child_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_child_id, '2013-01-01', 1, 'rabies shot');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
@@ -231,7 +227,7 @@ INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recover
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_parent_id = (SELECT entity_id FROM parents WHERE telephone = '6085552654');
-SET @recovered_child_id = (SELECT entity_id FROM children WHERE name = 'Max' AND type_id = 1 AND parent_id = @recovered_parent_id);
+SET @recovered_child_id = (SELECT entity_id FROM children WHERE name = 'Max' AND gender_id = 2 AND parent_id = @recovered_parent_id);
 INSERT INTO visits (entity_id, child_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_child_id, '2013-01-02', 1, 'rabies shot');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
@@ -240,7 +236,7 @@ INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recover
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_parent_id = (SELECT entity_id FROM parents WHERE telephone = '6085552654');
-SET @recovered_child_id = (SELECT entity_id FROM children WHERE name = 'Max' AND type_id = 1 AND parent_id = @recovered_parent_id);
+SET @recovered_child_id = (SELECT entity_id FROM children WHERE name = 'Max' AND gender_id = 2 AND parent_id = @recovered_parent_id);
 INSERT INTO visits (entity_id, child_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_child_id, '2013-01-03', 2, 'neutered');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
@@ -253,7 +249,7 @@ INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recover
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_parent_id = (SELECT entity_id FROM parents WHERE telephone = '6085552654');
-SET @recovered_child_id = (SELECT entity_id FROM children WHERE name = 'Samantha' AND type_id = 1 AND parent_id = @recovered_parent_id);
+SET @recovered_child_id = (SELECT entity_id FROM children WHERE name = 'Samantha' AND gender_id = 1 AND parent_id = @recovered_parent_id);
 INSERT INTO visits (entity_id, child_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_child_id, '2013-01-04', 2, 'spayed');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
@@ -266,7 +262,7 @@ INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recover
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_parent_id = (SELECT entity_id FROM parents WHERE telephone = '6085558763');
-SET @recovered_child_id = (SELECT entity_id FROM children WHERE name = 'Rosy' AND type_id = 2 AND parent_id = @recovered_parent_id);
+SET @recovered_child_id = (SELECT entity_id FROM children WHERE name = 'Rosy' AND gender_id = 1 AND parent_id = @recovered_parent_id);
 INSERT INTO visits (entity_id, child_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_child_id, '2013-01-04', 1, 'rabies shot');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
@@ -277,7 +273,7 @@ INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recover
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_parent_id = (SELECT entity_id FROM parents WHERE telephone = '6085558763');
-SET @recovered_child_id = (SELECT entity_id FROM children WHERE name = 'Jewel' AND type_id = 2 AND parent_id = @recovered_parent_id);
+SET @recovered_child_id = (SELECT entity_id FROM children WHERE name = 'Jewel' AND gender_id = 1 AND parent_id = @recovered_parent_id);
 INSERT INTO visits (entity_id, child_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_child_id, '2013-01-04', 1, 'rabies shot');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
@@ -288,7 +284,7 @@ INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recover
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_parent_id = (SELECT entity_id FROM parents WHERE telephone = '6085555487');
-SET @recovered_child_id = (SELECT entity_id FROM children WHERE name = 'Lucky' AND type_id = 5 AND parent_id = @recovered_parent_id);
+SET @recovered_child_id = (SELECT entity_id FROM children WHERE name = 'Lucky' AND gender_id = 1 AND parent_id = @recovered_parent_id);
 INSERT INTO visits (entity_id, child_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_child_id, '2013-01-05', 1, 'vaccination');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
@@ -297,7 +293,7 @@ INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recover
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_parent_id = (SELECT entity_id FROM parents WHERE telephone = '6085555487');
-SET @recovered_child_id = (SELECT entity_id FROM children WHERE name = 'Sly' AND type_id = 1 AND parent_id = @recovered_parent_id);
+SET @recovered_child_id = (SELECT entity_id FROM children WHERE name = 'Sly' AND gender_id = 2 AND parent_id = @recovered_parent_id);
 INSERT INTO visits (entity_id, child_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_child_id, '2013-01-05', 1, 'vaccination');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
@@ -306,7 +302,7 @@ INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recover
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 SET @recovered_parent_id = (SELECT entity_id FROM parents WHERE telephone = '6085551749');
-SET @recovered_child_id = (SELECT entity_id FROM children WHERE name = 'Basil' AND type_id = 6 AND parent_id = @recovered_parent_id);
+SET @recovered_child_id = (SELECT entity_id FROM children WHERE name = 'Basil' AND gender_id = 2 AND parent_id = @recovered_parent_id);
 INSERT INTO visits (entity_id, child_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_child_id, '2013-01-06', 3, '???');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);

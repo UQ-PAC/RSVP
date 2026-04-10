@@ -15,13 +15,12 @@
  */
 package org.springframework.samples.petclinic.owner;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 import java.io.Serializable;
 
@@ -31,7 +30,7 @@ import org.springframework.samples.petclinic.model.Identifiable;
  * @author Juergen Hoeller Can be Cat, Dog, Hamster...
  */
 @Entity
-@Table(name = "types")
+@Table(name = "genders")
 public class PetType implements Serializable, Identifiable {
 
 	@Id

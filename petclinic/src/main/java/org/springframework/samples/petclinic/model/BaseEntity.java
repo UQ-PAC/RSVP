@@ -15,14 +15,11 @@
  */
 package org.springframework.samples.petclinic.model;
 
-import java.io.Serializable;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
@@ -31,6 +28,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -53,9 +51,9 @@ public class BaseEntity implements Serializable, Identifiable {
 	private Integer id;
 
 	@ManyToMany
-	@JoinTable(name = "entity_databases", joinColumns = @JoinColumn(name = "entity_id"),
-			inverseJoinColumns = @JoinColumn(name = "database_id"))
-	private Set<Database> databases = new HashSet<>();
+	@JoinTable(name = "entity_clinics", joinColumns = @JoinColumn(name = "entity_id"),
+			inverseJoinColumns = @JoinColumn(name = "clinic_id"))
+	private Set<Clinic> clinics = new HashSet<>();
 
 	public Integer getId() {
 		return id;
@@ -69,16 +67,16 @@ public class BaseEntity implements Serializable, Identifiable {
 		return this.id == null;
 	}
 
-	public Set<Database> getDatabases() {
-		return databases;
+	public Set<Clinic> getClinics() {
+		return clinics;
 	}
 
-	public void setDatabases(Set<Database> databases) {
-		this.databases = databases;
+	public void setClinics(Set<Clinic> clinics) {
+		this.clinics = clinics;
 	}
 
-	public void addDatabase(Database database) {
-		this.databases.add(database);
+	public void addClinic(Clinic clinic) {
+		this.clinics.add(clinic);
 	}
 
 }

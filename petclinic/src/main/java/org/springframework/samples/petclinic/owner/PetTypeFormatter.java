@@ -15,13 +15,13 @@
  */
 package org.springframework.samples.petclinic.owner;
 
-import org.springframework.format.Formatter;
-import org.springframework.stereotype.Component;
-
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Objects;
+
+import org.springframework.format.Formatter;
+import org.springframework.stereotype.Component;
 
 /**
  * Instructs Spring MVC on how to parse and print elements of type 'PetType'. Starting
@@ -34,29 +34,29 @@ import java.util.Objects;
  * @author Michael Isvy
  */
 @Component
-public class PetTypeFormatter implements Formatter<PetType> {
+public class PetTypeFormatter implements Formatter<Gender> {
 
-	private final PetTypeRepository types;
+	private final GenderRepository genders;
 
-	public PetTypeFormatter(PetTypeRepository types) {
-		this.types = types;
+	public GenderFormatter(GenderRepository genders) {
+		this.genders = genders;
 	}
 
 	@Override
-	public String print(PetType petType, Locale locale) {
-		String name = petType.getName();
+	public String print(Gender gender, Locale locale) {
+		String name = gender.getName();
 		return (name != null) ? name : "<null>";
 	}
 
 	@Override
-	public PetType parse(String text, Locale locale) throws ParseException {
-		Collection<PetType> findPetTypes = this.types.findPetTypes();
-		for (PetType type : findPetTypes) {
-			if (Objects.equals(type.getName(), text)) {
-				return type;
+	public Gender parse(String text, Locale locale) throws ParseException {
+		Collection<Gender> findGenders = this.genders.findGenders();
+		for (Gender gender : findGenders) {
+			if (Objects.equals(gender.getName(), text)) {
+				return gender;
 			}
 		}
-		throw new ParseException("type not found: " + text, 0);
+		throw new ParseException("Gender not found: " + text, 0);
 	}
 
 }

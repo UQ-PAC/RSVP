@@ -20,7 +20,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 /**
- * <code>Validator</code> for <code>Pet</code> forms.
+ * <code>Validator</code> for <code>Child</code> forms.
  * <p>
  * We're not using Bean Validation annotations here because it is easier to define such
  * validation rule in Java.
@@ -35,30 +35,30 @@ public class PetValidator implements Validator {
 
 	@Override
 	public void validate(Object obj, Errors errors) {
-		Pet pet = (Pet) obj;
-		String name = pet.getName();
+		Child child = (Child) obj;
+		String name = child.getName();
 		// name validation
 		if (!StringUtils.hasText(name)) {
 			errors.rejectValue("name", REQUIRED, REQUIRED);
 		}
 
 		// type validation
-		if (pet.isNew() && pet.getType() == null) {
+		if (child.isNew() && child.getType() == null) {
 			errors.rejectValue("type", REQUIRED, REQUIRED);
 		}
 
 		// birth date validation
-		if (pet.getBirthDate() == null) {
+		if (child.getBirthDate() == null) {
 			errors.rejectValue("birthDate", REQUIRED, REQUIRED);
 		}
 	}
 
 	/**
-	 * This Validator validates *just* Pet instances
+	 * This Validator validates *just* Child instances
 	 */
 	@Override
 	public boolean supports(Class<?> clazz) {
-		return Pet.class.isAssignableFrom(clazz);
+		return Child.class.isAssignableFrom(clazz);
 	}
 
 }

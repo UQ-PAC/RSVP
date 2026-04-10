@@ -15,6 +15,9 @@
  */
 package org.springframework.samples.petclinic.owner;
 
+import com.cedarpolicy.value.EntityUID;
+import com.cedarpolicy.value.Value;
+
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,21 +34,18 @@ import org.springframework.ui.ModelMap;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import org.springframework.samples.petclinic.cedar.CedarAuthorization;
 import org.springframework.samples.petclinic.cedar.CedarRequest;
 import org.springframework.samples.petclinic.cedar.CedarService;
-
-import com.cedarpolicy.value.EntityUID;
-import com.cedarpolicy.value.Value;
 
 /**
  * @author Juergen Hoeller
@@ -54,63 +54,63 @@ import com.cedarpolicy.value.Value;
  * @author Wick Dynex
  */
 @Controller
-@RequestMapping("/owners/{ownerId}")
+@RequestMapping("/parents/{parentId}")
 class PetController {
 
-	private static final String VIEWS_PETS_CREATE_OR_UPDATE_FORM = "pets/createOrUpdatePetForm";
+	private static final String VIEWS_PETS_CREATE_OR_UPDATE_FORM = "children/createOrUpdateChildForm";
 
-	private final OwnerRepository owners;
+	private final ParentRepository parents;
 
-	private final PetTypeRepository types;
+	private final ChildTypeRepository types;
 
 	private final CedarService cedarService;
 
-	public PetController(OwnerRepository owners, PetTypeRepository types, CedarService cedarService) {
-		this.owners = owners;
+	public ChildController(ParentRepository parents, ChildTypeRepository types, CedarService cedarService) {
+		this.parents = parents;
 		this.types = types;
 		this.cedarService = cedarService;
 	}
 
-	@ModelAttribute("types")
-	public Collection<PetType> populatePetTypes() {
-		return this.types.findPetTypes();
+	@ModelAttribute("gender")
+	public Collection<Gender> populateGender() {
+		return this.gender.findGenders();
 	}
 
-	@ModelAttribute("owner")
-	public Owner findOwner(@PathVariable("ownerId") int ownerId) {
-		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
-		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
-				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct."));
-		return owner;
+	@ModelAttribute("parent")
+	public Parent findParent(@PathVariable("parentId") int parentId) {
+		Optional<Parent> optionalParent = this.parents.findById(parentId);
+		Parent parent = optionalParent.orElseThrow(() -> new IllegalArgumentException(
+				"Parent not found with id: " + parentId + ". Please ensure the ID is correct."));
+		return parent;
 	}
 
-	@ModelAttribute("pet")
-	public Pet findPet(@PathVariable("ownerId") int ownerId,
-			@PathVariable(name = "petId", required = false) Integer petId) {
+	@ModelAttribute("child")
+	public Child findChild(@PathVariable("parentId") int parentId,
+			@PathVariable(name = "childId", required = false) Integer childId) {
 
-		if (petId == null) {
-			return new Pet();
+		if (childId == null) {
+			return new Child();
 		}
 
-		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
-		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
-				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct."));
-		return owner.getPet(petId);
+		Optional<Parent> optionalParent = this.parents.findById(parentId);
+		Parent parent = optionalParent.orElseThrow(() -> new IllegalArgumentException(
+				"Parent not found with id: " + parentId + ". Please ensure the ID is correct."));
+		return parent.getChild(childId);
 	}
 
-	@InitBinder("owner")
-	public void initOwnerBinder(WebDataBinder dataBinder) {
+	@InitBinder("parent")
+	public void initParentBinder(WebDataBinder dataBinder) {
 		dataBinder.setDisallowedFields("id");
 	}
 
-	@InitBinder("pet")
-	public void initPetBinder(WebDataBinder dataBinder) {
-		dataBinder.setValidator(new PetValidator());
+	@InitBinder("child")
+	public void initChildBinder(WebDataBinder dataBinder) {
+		dataBinder.setValidator(new ChildValidator());
 	}
 
-	@GetMapping("/pets/new")
-	@CedarAuthorization(action = "AddClient", resourceType = "PetOwner", validate = true)
-	public String initCreationForm(Owner owner, ModelMap model, HttpSession session) {
+	@GetMapping("/children/new")
+	@CedarAuthorization(action = "AddClient", resourceType = "Parent", validate = true)
+	public String initCreationForm(Parent parent, ModelMap model, HttpSession session) {
 		String principalId = (String) session.getAttribute("currentUser");
 		if (session.getAttribute("currentUser") == null) {
 			principalId = "Guest";
@@ -120,41 +120,41 @@ class PetController {
 
 		EntityUID principal;
 		if (principalId.equals("Guest")) {
-			principal = EntityUID.parse("PetClinic::Guest::\"Unknown\"")
+			principal = EntityUID.parse("ChildClinic::Guest::\"Unknown\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 		else {
-			principal = EntityUID.parse("PetClinic::Employee::\"" + principalId + "\"")
+			principal = EntityUID.parse("ChildClinic::Employee::\"" + principalId + "\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 
-		EntityUID action = EntityUID.parse("PetClinic::Action::\"" + "EditClient" + "\"")
+		EntityUID action = EntityUID.parse("ChildClinic::Action::\"" + "EditClient" + "\"")
 			.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
 		EntityUID resource = EntityUID
-			.parse("PetClinic::PetOwner::\"" + owner.getFirstName() + " " + owner.getLastName() + "\"")
+			.parse("ChildClinic::Parent::\"" + parent.getFirstName() + " " + parent.getLastName() + "\"")
 			.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
 		Map<String, Value> contextMap = new HashMap<>();
 		CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
 		ResponseEntity<String> response = cedarService.checkAccess(cedarReq);
 		if (!response.getBody().startsWith("Access Granted.")) {
-			throw new SecurityException("Access Denied to modify Owner.");
+			throw new SecurityException("Access Denied to modify Parent.");
 		}
 
-		Pet pet = new Pet();
-		owner.addPet(pet);
+		Child child = new Child();
+		parent.addChild(child);
 		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
 	}
 
-	@PostMapping("/pets/new")
-	@CedarAuthorization(action = "AddClient", resourceType = "PetOwner", validate = true)
-	public String processCreationForm(Owner owner, @Valid Pet pet, BindingResult result,
+	@PostMapping("/children/new")
+	@CedarAuthorization(action = "AddClient", resourceType = "Parent", validate = true)
+	public String processCreationForm(Parent parent, @Valid Child child, BindingResult result,
 			RedirectAttributes redirectAttributes) {
 
-		if (StringUtils.hasText(pet.getName()) && pet.isNew() && owner.getPet(pet.getName(), true) != null)
+		if (StringUtils.hasText(child.getName()) && child.isNew() && parent.getChild(child.getName(), true) != null)
 			result.rejectValue("name", "duplicate", "already exists");
 
 		LocalDate currentDate = LocalDate.now();
-		if (pet.getBirthDate() != null && pet.getBirthDate().isAfter(currentDate)) {
+		if (child.getBirthDate() != null && child.getBirthDate().isAfter(currentDate)) {
 			result.rejectValue("birthDate", "typeMismatch.birthDate");
 		}
 
@@ -162,35 +162,35 @@ class PetController {
 			return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
 		}
 
-		owner.addPet(pet);
-		this.owners.save(owner);
-		redirectAttributes.addFlashAttribute("message", "New Pet has been Added.");
-		return "redirect:/owners/{ownerId}";
+		parent.addChild(child);
+		this.parents.save(parent);
+		redirectAttributes.addFlashAttribute("message", "New Child has been Added.");
+		return "redirect:/parents/{parentId}";
 	}
 
-	@GetMapping("/pets/{petId}/edit")
-	@CedarAuthorization(action = "EditClient", resourceType = "Pet", validate = true)
+	@GetMapping("/children/{childId}/edit")
+	@CedarAuthorization(action = "EditClient", resourceType = "Child", validate = true)
 	public String initUpdateForm() {
 		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
 	}
 
-	@PostMapping("/pets/{petId}/edit")
-	@CedarAuthorization(action = "EditClient", resourceType = "Pet", validate = true)
-	public String processUpdateForm(Owner owner, @Valid Pet pet, BindingResult result,
+	@PostMapping("/children/{childId}/edit")
+	@CedarAuthorization(action = "EditClient", resourceType = "Child", validate = true)
+	public String processUpdateForm(Parent parent, @Valid Child child, BindingResult result,
 			RedirectAttributes redirectAttributes) {
 
-		String petName = pet.getName();
+		String childName = child.getName();
 
-		// checking if the pet name already exists for the owner
-		if (StringUtils.hasText(petName)) {
-			Pet existingPet = owner.getPet(petName, false);
-			if (existingPet != null && !Objects.equals(existingPet.getId(), pet.getId())) {
+		// checking if the child name already exists for the parent
+		if (StringUtils.hasText(childName)) {
+			Child existingChild = parent.getChild(childName, false);
+			if (existingChild != null && !Objects.equals(existingChild.getId(), child.getId())) {
 				result.rejectValue("name", "duplicate", "already exists");
 			}
 		}
 
 		LocalDate currentDate = LocalDate.now();
-		if (pet.getBirthDate() != null && pet.getBirthDate().isAfter(currentDate)) {
+		if (child.getBirthDate() != null && child.getBirthDate().isAfter(currentDate)) {
 			result.rejectValue("birthDate", "typeMismatch.birthDate");
 		}
 
@@ -198,30 +198,30 @@ class PetController {
 			return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
 		}
 
-		updatePetDetails(owner, pet);
-		redirectAttributes.addFlashAttribute("message", "Pet details has been edited.");
-		return "redirect:/owners/{ownerId}";
+		updateChildDetails(parent, child);
+		redirectAttributes.addFlashAttribute("message", "Child details have been edited.");
+		return "redirect:/parents/{parentId}";
 	}
 
 	/**
-	 * Updates the pet details if it exists or adds a new pet to the owner.
-	 * @param owner The owner of the pet
-	 * @param pet The pet with updated details
+	 * Updates the child details if it exists or adds a new child to the parent.
+	 * @param parent The parent of the child
+	 * @param child The child with updated details
 	 */
-	private void updatePetDetails(Owner owner, Pet pet) {
-		Integer id = pet.getId();
-		Assert.state(id != null, "'pet.getId()' must not be null");
-		Pet existingPet = owner.getPet(id);
-		if (existingPet != null) {
-			// Update existing pet's properties
-			existingPet.setName(pet.getName());
-			existingPet.setBirthDate(pet.getBirthDate());
-			existingPet.setType(pet.getType());
+	private void updateChildDetails(Parent parent, Child child) {
+		Integer id = child.getId();
+		Assert.state(id != null, "'child.getId()' must not be null");
+		Child existingChild = parent.getChild(id);
+		if (existingChild != null) {
+			// Update existing child's properties
+			existingChild.setName(child.getName());
+			existingChild.setBirthDate(child.getBirthDate());
+			existingChild.setType(child.getType());
 		}
 		else {
-			owner.addPet(pet);
+			parent.addChild(child);
 		}
-		this.owners.save(owner);
+		this.parents.save(parent);
 	}
 
 }

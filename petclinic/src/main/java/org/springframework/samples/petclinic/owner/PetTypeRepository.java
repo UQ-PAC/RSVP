@@ -27,13 +27,13 @@ import org.springframework.data.jpa.repository.Query;
  * @author Patrick Baumgartner
  */
 
-public interface PetTypeRepository extends JpaRepository<PetType, Integer> {
+public interface PetTypeRepository extends JpaRepository<Gender, Integer> {
 
 	/**
-	 * Retrieve all {@link PetType}s from the data store.
-	 * @return a Collection of {@link PetType}s.
+	 * Retrieve all {@link Gender}s from the data store.
+	 * @return a Collection of {@link Gender}s.
 	 */
-	@Query("SELECT ptype FROM PetType ptype ORDER BY ptype.name")
-	List<PetType> findPetTypes();
+	@Query("SELECT gender FROM Gender gender ORDER BY gender.name")
+	List<Gender> findGender();
 
 }

@@ -15,14 +15,6 @@
  */
 package org.springframework.samples.petclinic.owner;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import org.springframework.core.style.ToStringCreator;
-import org.springframework.samples.petclinic.model.Person;
-import org.springframework.util.Assert;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,8 +27,17 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.core.style.ToStringCreator;
+import org.springframework.util.Assert;
+
+import org.springframework.samples.petclinic.model.Person;
+
 /**
- * Simple JavaBean domain object representing an owner.
+ * Simple JavaBean domain object representing a parent.
  *
  * @author Ken Krebs
  * @author Juergen Hoeller
@@ -46,7 +47,7 @@ import jakarta.validation.constraints.NotBlank;
  * @author Wick Dynex
  */
 @Entity
-@Table(name = "owners")
+@Table(name = "parents")
 @PrimaryKeyJoinColumn(name = "entity_id")
 public class Owner extends Person {
 
@@ -64,9 +65,9 @@ public class Owner extends Person {
 	private String telephone;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name = "owner_id")
+	@JoinColumn(name = "parent_id")
 	@OrderBy("name")
-	private final List<Pet> pets = new ArrayList<>();
+	private final List<Child> children = new ArrayList<>();
 
 	public String getAddress() {
 		return this.address;
@@ -92,36 +93,36 @@ public class Owner extends Person {
 		this.telephone = telephone;
 	}
 
-	public List<Pet> getPets() {
-		return this.pets;
+	public List<Child> getChildren() {
+		return this.children;
 	}
 
-	public void addPet(Pet pet) {
-		if (pet.isNew()) {
-			getPets().add(pet);
+	public void addChild(Child child) {
+		if (child.isNew()) {
+			getChildren().add(child);
 		}
 	}
 
 	/**
-	 * Return the Pet with the given name, or null if none found for this Owner.
+	 * Return the Child with the given name, or null if none found for this Parent.
 	 * @param name to test
-	 * @return the Pet with the given name, or null if no such Pet exists for this Owner
+	 * @return the Child with the given name, or null if no such Child exists for this Parent
 	 */
-	public Pet getPet(String name) {
-		return getPet(name, false);
+	public Child getChild(String name) {
+		return getChild(name, false);
 	}
 
 	/**
-	 * Return the Pet with the given id, or null if none found for this Owner.
+	 * Return the Child with the given id, or null if none found for this Parent.
 	 * @param id to test
-	 * @return the Pet with the given id, or null if no such Pet exists for this Owner
+	 * @return the Child with the given id, or null if no such Child exists for this Parent
 	 */
-	public Pet getPet(Integer id) {
-		for (Pet pet : getPets()) {
-			if (!pet.isNew()) {
-				Integer compId = pet.getId();
+	public Child getChild(Integer id) {
+		for (Child child : getChildren()) {
+			if (!child.isNew()) {
+				Integer compId = child.getId();
 				if (Objects.equals(compId, id)) {
-					return pet;
+					return child;
 				}
 			}
 		}
@@ -129,17 +130,17 @@ public class Owner extends Person {
 	}
 
 	/**
-	 * Return the Pet with the given name, or null if none found for this Owner.
+	 * Return the Child with the given name, or null if none found for this Parent.
 	 * @param name to test
-	 * @param ignoreNew whether to ignore new pets (pets that are not saved yet)
-	 * @return the Pet with the given name, or null if no such Pet exists for this Owner
+	 * @param ignoreNew whether to ignore new children (children that are not saved yet)
+	 * @return the Child with the given name, or null if no such Child exists for this Parent
 	 */
-	public Pet getPet(String name, boolean ignoreNew) {
-		for (Pet pet : getPets()) {
-			String compName = pet.getName();
+	public Child getChild(String name, boolean ignoreNew) {
+		for (Child child : getChildren()) {
+			String compName = child.getName();
 			if (compName != null && compName.equalsIgnoreCase(name)) {
-				if (!ignoreNew || !pet.isNew()) {
-					return pet;
+				if (!ignoreNew || !child.isNew()) {
+					return child;
 				}
 			}
 		}
@@ -159,20 +160,20 @@ public class Owner extends Person {
 	}
 
 	/**
-	 * Adds the given {@link Visit} to the {@link Pet} with the given identifier.
-	 * @param petId the identifier of the {@link Pet}, must not be {@literal null}.
+	 * Adds the given {@link Visit} to the {@link Child} with the given identifier.
+	 * @param childId the identifier of the {@link Child}, must not be {@literal null}.
 	 * @param visit the visit to add, must not be {@literal null}.
 	 */
-	public void addVisit(Integer petId, Visit visit) {
+	public void addVisit(Integer childId, Visit visit) {
 
-		Assert.notNull(petId, "Pet identifier must not be null!");
+		Assert.notNull(childId, "Child identifier must not be null!");
 		Assert.notNull(visit, "Visit must not be null!");
 
-		Pet pet = getPet(petId);
+		Child child = getChild(childId);
 
-		Assert.notNull(pet, "Invalid Pet identifier!");
+		Assert.notNull(child, "Invalid Child identifier!");
 
-		pet.addVisit(visit);
+		child.addVisit(visit);
 	}
 
 }

@@ -1,5 +1,14 @@
 package org.springframework.samples.petclinic.cedar;
 
+import com.cedarpolicy.AuthorizationEngine;
+import com.cedarpolicy.BasicAuthorizationEngine;
+import com.cedarpolicy.model.AuthorizationRequest;
+import com.cedarpolicy.model.AuthorizationResponse;
+import com.cedarpolicy.model.AuthorizationSuccessResponse;
+import com.cedarpolicy.model.entity.Entities;
+import com.cedarpolicy.model.policy.PolicySet;
+import com.cedarpolicy.model.schema.Schema;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,15 +24,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.cedarpolicy.AuthorizationEngine;
-import com.cedarpolicy.BasicAuthorizationEngine;
-import com.cedarpolicy.model.AuthorizationRequest;
-import com.cedarpolicy.model.AuthorizationResponse;
-import com.cedarpolicy.model.AuthorizationSuccessResponse;
-import com.cedarpolicy.model.entity.Entities;
-import com.cedarpolicy.model.policy.PolicySet;
-import com.cedarpolicy.model.schema.Schema;
-
 @Service
 public class CedarService {
 
@@ -37,7 +37,7 @@ public class CedarService {
 
 	private Map<String, String> policyIdMap;
 
-	public CedarService(@Value("${policy.file:petclinic-rsvp-policy.cedar}") String policyFile) {
+	public CedarService(@Value("${policy.file:childclinic-rsvp-policy.cedar}") String policyFile) {
 		try {
 			this.policySet = PolicySet.parsePolicies(Path.of("src/main/resources/cedar/" + policyFile));
 			System.out
@@ -47,13 +47,13 @@ public class CedarService {
 			throw new RuntimeException("Failed to parse Cedar Policy.", e);
 		}
 		try {
-			this.entities = Entities.parse(Path.of("src/main/resources/cedar/petclinic-rsvp-entities.json"));
+			this.entities = Entities.parse(Path.of("src/main/resources/cedar/childclinic-rsvp-entities.json"));
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Failed to parse Cedar Entities.", e);
 		}
 		try {
-			String schemaText = Files.readString(Path.of("src/main/resources/cedar/petclinic-rsvp-schema.cedarschema"));
+			String schemaText = Files.readString(Path.of("src/main/resources/cedar/childclinic-rsvp-schema.cedarschema"));
 			this.schema = Schema.parse(Schema.JsonOrCedar.Cedar, schemaText);
 		}
 		catch (Exception e) {

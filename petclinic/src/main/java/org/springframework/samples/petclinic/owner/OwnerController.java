@@ -15,6 +15,12 @@
  */
 package org.springframework.samples.petclinic.owner;
 
+import com.cedarpolicy.value.EntityUID;
+import com.cedarpolicy.value.Value;
+
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,32 +28,26 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
-
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import org.springframework.samples.petclinic.cedar.CedarAuthorization;
 import org.springframework.samples.petclinic.cedar.CedarRequest;
 import org.springframework.samples.petclinic.cedar.CedarService;
-
-import com.cedarpolicy.value.EntityUID;
-import com.cedarpolicy.value.Value;
 
 /**
  * @author Juergen Hoeller
@@ -59,14 +59,14 @@ import com.cedarpolicy.value.Value;
 @Controller
 class OwnerController {
 
-	private static final String VIEWS_OWNER_CREATE_OR_UPDATE_FORM = "owners/createOrUpdateOwnerForm";
+	private static final String VIEWS_PARENT_CREATE_OR_UPDATE_FORM = "parents/createOrUpdateParentForm";
 
-	private final OwnerRepository owners;
+	private final ParentRepository parents;
 
 	private final CedarService cedarService;
 
-	public OwnerController(OwnerRepository owners, CedarService cedarService) {
-		this.owners = owners;
+	public ParentController(ParentRepository parents, CedarService cedarService) {
+		this.parents = parents;
 		this.cedarService = cedarService;
 	}
 
@@ -75,45 +75,45 @@ class OwnerController {
 		dataBinder.setDisallowedFields("id");
 	}
 
-	@ModelAttribute("owner")
-	public Owner findOwner(@PathVariable(name = "ownerId", required = false) Integer ownerId) {
-		return ownerId == null ? new Owner()
-				: this.owners.findById(ownerId)
-					.orElseThrow(() -> new IllegalArgumentException("Owner not found with id: " + ownerId
-							+ ". Please ensure the ID is correct and the owner exists in the database."));
+	@ModelAttribute("parent")
+	public Parent findParent(@PathVariable(name = "parentId", required = false) Integer parentId) {
+		return parentId == null ? new Parent()
+				: this.parents.findById(parentId)
+					.orElseThrow(() -> new IllegalArgumentException("Parent not found with id: " + parentId
+							+ ". Please ensure the ID is correct and the parent exists in the database."));
 	}
 
-	@GetMapping("/owners/new")
+	@GetMapping("/parents/new")
 	@CedarAuthorization(action = "AddClient", resourceType = "Clinic", validate = true)
 	public String initCreationForm() {
-		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+		return VIEWS_PARENT_CREATE_OR_UPDATE_FORM;
 	}
 
-	@PostMapping("/owners/new")
+	@PostMapping("/parents/new")
 	@CedarAuthorization(action = "AddClient", resourceType = "Clinic", validate = true)
-	public String processCreationForm(@Valid Owner owner, BindingResult result, RedirectAttributes redirectAttributes) {
+	public String processCreationForm(@Valid Parent parent, BindingResult result, RedirectAttributes redirectAttributes) {
 		if (result.hasErrors()) {
-			redirectAttributes.addFlashAttribute("error", "There was an error in creating the owner.");
-			return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+			redirectAttributes.addFlashAttribute("error", "There was an error in creating the parent.");
+			return VIEWS_PARENT_CREATE_OR_UPDATE_FORM;
 		}
 
-		this.owners.save(owner);
-		redirectAttributes.addFlashAttribute("message", "New Owner Created.");
-		return "redirect:/owners/" + owner.getId();
+		this.parents.save(parent);
+		redirectAttributes.addFlashAttribute("message", "New Parent Created.");
+		return "redirect:/parents/" + parent.getId();
 	}
 
-	@GetMapping("/owners/find")
+	@GetMapping("/parents/find")
 	@CedarAuthorization(action = "ListClients", resourceType = "Clinic", resourceId = "Any", validate = true)
 	public String initFindForm() {
-		return "owners/findOwners";
+		return "parents/findParents";
 	}
 
-	@GetMapping("/owners")
+	@GetMapping("/parents")
 	@CedarAuthorization(action = "ListClients", resourceType = "Clinic", resourceId = "Any", validate = true)
-	public String processFindForm(@RequestParam(defaultValue = "1") int page, Owner owner, BindingResult result,
+	public String processFindForm(@RequestParam(defaultValue = "1") int page, Parent parent, BindingResult result,
 			Model model, HttpSession session) {
-		// allow parameterless GET request for /owners to return all records
-		String lastName = owner.getLastName();
+		// allow parameterless GET request for /parents to return all records
+		String lastName = parent.getLastName();
 		if (lastName == null) {
 			lastName = ""; // empty string signifies broadest possible search
 		}
@@ -127,22 +127,22 @@ class OwnerController {
 
 		EntityUID principal;
 		if (principalId.equals("Guest")) {
-			principal = EntityUID.parse("PetClinic::Guest::\"Unknown\"")
+			principal = EntityUID.parse("ChildClinic::Guest::\"Unknown\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 		else {
-			principal = EntityUID.parse("PetClinic::Employee::\"" + principalId + "\"")
+			principal = EntityUID.parse("ChildClinic::Employee::\"" + principalId + "\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 
-		// find owners by last name
-		Page<Owner> ownersResults = findPaginatedForOwnersLastName(page, lastName);
+		// find parents by last name
+		Page<Parent> parentsResults = findPaginatedForParentsLastName(page, lastName);
 
-		List<Owner> authorizedOwners = ownersResults.stream().filter(o -> {
-			EntityUID action = EntityUID.parse("PetClinic::Action::\"" + "ViewClient" + "\"")
+		List<Parent> authorizedParents = parentsResults.stream().filter(o -> {
+			EntityUID action = EntityUID.parse("ChildClinic::Action::\"" + "ViewClient" + "\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
 			EntityUID resource = EntityUID
-				.parse("PetClinic::PetOwner::\"" + o.getFirstName() + " " + o.getLastName() + "\"")
+				.parse("ChildClinic::Parent::\"" + o.getFirstName() + " " + o.getLastName() + "\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
 			Map<String, Value> contextMap = new HashMap<>();
 			CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
@@ -155,12 +155,12 @@ class OwnerController {
 			}
 		}).collect(Collectors.toList());
 
-		Map<Integer, String> ownerAuthorizationMap = ownersResults.stream()
-			.collect(Collectors.toMap(Owner::getId, o -> {
-				EntityUID action = EntityUID.parse("PetClinic::Action::\"" + "ViewClient" + "\"")
+		Map<Integer, String> parentAuthorizationMap = parentsResults.stream()
+			.collect(Collectors.toMap(Parent::getId, o -> {
+				EntityUID action = EntityUID.parse("ChildClinic::Action::\"" + "ViewClient" + "\"")
 					.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
 				EntityUID resource = EntityUID
-					.parse("PetClinic::PetOwner::\"" + o.getFirstName() + " " + o.getLastName() + "\"")
+					.parse("ChildClinic::Parent::\"" + o.getFirstName() + " " + o.getLastName() + "\"")
 					.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
 				Map<String, Value> contextMap = new HashMap<>();
 				CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
@@ -168,80 +168,80 @@ class OwnerController {
 				return response.getBody();
 			}));
 
-		if (authorizedOwners.isEmpty()) {
-			// no owners found
-			result.rejectValue("lastName", "notFound", "No owners found.");
-			return "owners/findOwners";
+		if (authorizedParents.isEmpty()) {
+			// no parents found
+			result.rejectValue("lastName", "notFound", "No parents found.");
+			return "parents/findParents";
 		}
 
-		if (authorizedOwners.size() == 1 && ownersResults.getTotalElements() == 1) {
-			// 1 owner found
-			owner = authorizedOwners.iterator().next();
-			if (ownerAuthorizationMap.get(owner.getId()).startsWith("Access Granted.")) {
-				return "redirect:/owners/" + owner.getId();
+		if (authorizedParents.size() == 1 && parentsResults.getTotalElements() == 1) {
+			// 1 parent found
+			parent = authorizedParents.iterator().next();
+			if (parentAuthorizationMap.get(parent.getId()).startsWith("Access Granted.")) {
+				return "redirect:/parents/" + parent.getId();
 			}
 		}
 
-		model.addAttribute("authMap", ownerAuthorizationMap);
+		model.addAttribute("authMap", parentAuthorizationMap);
 
-		return addPaginationModel(page, model, ownersResults);
+		return addPaginationModel(page, model, parentsResults);
 	}
 
-	private String addPaginationModel(int page, Model model, Page<Owner> paginated) {
-		List<Owner> listOwners = paginated.getContent();
+	private String addPaginationModel(int page, Model model, Page<Parent> paginated) {
+		List<Parent> listParents = paginated.getContent();
 		model.addAttribute("currentPage", page);
 		model.addAttribute("totalPages", paginated.getTotalPages());
 		model.addAttribute("totalItems", paginated.getTotalElements());
-		model.addAttribute("listOwners", listOwners);
-		return "owners/ownersList";
+		model.addAttribute("listParents", listParents);
+		return "parents/parentsList";
 	}
 
-	private Page<Owner> findPaginatedForOwnersLastName(int page, String lastname) {
+	private Page<Parent> findPaginatedForParentsLastName(int page, String lastname) {
 		int pageSize = 5;
 		Pageable pageable = PageRequest.of(page - 1, pageSize);
-		return owners.findByLastNameStartingWith(lastname, pageable);
+		return parents.findByLastNameStartingWith(lastname, pageable);
 	}
 
-	@GetMapping("/owners/{ownerId}/edit")
-	@CedarAuthorization(action = "EditClient", resourceType = "PetOwner", validate = true)
-	public String initUpdateOwnerForm() {
-		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+	@GetMapping("/parents/{parentId}/edit")
+	@CedarAuthorization(action = "EditClient", resourceType = "Parent", validate = true)
+	public String initUpdateParentForm() {
+		return VIEWS_PARENT_CREATE_OR_UPDATE_FORM;
 	}
 
-	@PostMapping("/owners/{ownerId}/edit")
-	@CedarAuthorization(action = "EditClient", resourceType = "PetOwner", validate = true)
-	public String processUpdateOwnerForm(@Valid Owner owner, BindingResult result, @PathVariable("ownerId") int ownerId,
+	@PostMapping("/parents/{parentId}/edit")
+	@CedarAuthorization(action = "EditClient", resourceType = "Parent", validate = true)
+	public String processUpdateParentForm(@Valid Parent parent, BindingResult result, @PathVariable("parentId") int parentId,
 			RedirectAttributes redirectAttributes) {
 		if (result.hasErrors()) {
-			redirectAttributes.addFlashAttribute("error", "There was an error in updating the owner.");
-			return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+			redirectAttributes.addFlashAttribute("error", "There was an error in updating the parent.");
+			return VIEWS_PARENT_CREATE_OR_UPDATE_FORM;
 		}
 
-		if (!Objects.equals(owner.getId(), ownerId)) {
-			result.rejectValue("id", "mismatch", "The owner ID in the form does not match the URL.");
-			redirectAttributes.addFlashAttribute("error", "Owner ID mismatch. Please try again.");
-			return "redirect:/owners/{ownerId}/edit";
+		if (!Objects.equals(parent.getId(), parentId)) {
+			result.rejectValue("id", "mismatch", "The parent ID in the form does not match the URL.");
+			redirectAttributes.addFlashAttribute("error", "Parent ID mismatch. Please try again.");
+			return "redirect:/parents/{parentId}/edit";
 		}
 
-		owner.setId(ownerId);
-		this.owners.save(owner);
-		redirectAttributes.addFlashAttribute("message", "Owner Values Updated.");
-		return "redirect:/owners/{ownerId}";
+		parent.setId(parentId);
+		this.parents.save(parent);
+		redirectAttributes.addFlashAttribute("message", "Parent Values Updated.");
+		return "redirect:/parents/{parentId}";
 	}
 
 	/**
-	 * Custom handler for displaying an owner.
-	 * @param ownerId the ID of the owner to display
+	 * Custom handler for displaying an parent.
+	 * @param parentId the ID of the parent to display
 	 * @return a ModelMap with the model attributes for the view
 	 */
-	@GetMapping("/owners/{ownerId}")
-	@CedarAuthorization(action = "ViewClient", resourceType = "PetOwner", validate = true)
-	public ModelAndView showOwner(@PathVariable("ownerId") int ownerId) {
-		ModelAndView mav = new ModelAndView("owners/ownerDetails");
-		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
-		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
-				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct."));
-		mav.addObject(owner);
+	@GetMapping("/parents/{parentId}")
+	@CedarAuthorization(action = "ViewClient", resourceType = "Parent", validate = true)
+	public ModelAndView showParent(@PathVariable("parentId") int parentId) {
+		ModelAndView mav = new ModelAndView("parents/parentDetails");
+		Optional<Parent> optionalParent = this.parents.findById(parentId);
+		Parent parent = optionalParent.orElseThrow(() -> new IllegalArgumentException(
+				"Parent not found with id: " + parentId + ". Please ensure the ID is correct."));
+		mav.addObject(parent);
 		return mav;
 	}
 

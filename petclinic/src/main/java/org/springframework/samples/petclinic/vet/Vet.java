@@ -15,14 +15,6 @@
  */
 package org.springframework.samples.petclinic.vet;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.springframework.samples.petclinic.model.Person;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -32,8 +24,16 @@ import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import jakarta.xml.bind.annotation.XmlElement;
 
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.samples.petclinic.model.Person;
+
 /**
- * Simple JavaBean domain object representing a veterinarian.
+ * Simple JavaBean domain object representing a doctor.
  *
  * @author Ken Krebs
  * @author Juergen Hoeller
@@ -41,12 +41,12 @@ import jakarta.xml.bind.annotation.XmlElement;
  * @author Arjen Poutsma
  */
 @Entity
-@Table(name = "vets")
+@Table(name = "doctors")
 @PrimaryKeyJoinColumn(name = "entity_id")
 public class Vet extends Person {
 
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "vet_specialties", joinColumns = @JoinColumn(name = "vet_id"),
+	@JoinTable(name = "doctor_specialties", joinColumns = @JoinColumn(name = "doctor_id"),
 			inverseJoinColumns = @JoinColumn(name = "specialty_id"))
 	private Set<Specialty> specialties;
 

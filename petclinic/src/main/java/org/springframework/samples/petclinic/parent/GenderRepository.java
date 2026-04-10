@@ -13,4 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.samples.petclinic.vet;
+
+package org.springframework.samples.petclinic.parent;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+/**
+ * Repository class for <code>Gender</code> domain objects.
+ *
+ * @author Patrick Baumgartner
+ */
+
+public interface GenderRepository extends JpaRepository<Gender, Integer> {
+
+	/**
+	 * Retrieve all {@link Gender}s from the data store.
+	 * @return a Collection of {@link Gender}s.
+	 */
+	@Query("SELECT gender FROM Gender gender ORDER BY gender.name")
+	List<Gender> findGenders();
+
+}

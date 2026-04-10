@@ -1,6 +1,6 @@
 {
-  "principal": "PetClinic::Employee::\"James Carter\"",
-  "resource": "PetClinic::PetVisit::\"Rosy 1\"",
-  "action": "PetClinic::Action::\"ListClients\"",
+  "principal": "ChildClinic::Employee::\"James Carter\"",
+  "resource": "ChildClinic::Child::\"Leo\"",
+  "action": "ChildClinic::Action::\"ViewClient\"",
   "context": {}
 }

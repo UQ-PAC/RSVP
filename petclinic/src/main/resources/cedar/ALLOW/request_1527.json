@@ -1,6 +1,0 @@
-{
-  "principal": "PetClinic::Employee::\"Kathaleen Tramonte\"",
-  "resource": "PetClinic::PetVisit::\"Samantha 2\"",
-  "action": "PetClinic::Action::\"ViewClient\"",
-  "context": {}
-}

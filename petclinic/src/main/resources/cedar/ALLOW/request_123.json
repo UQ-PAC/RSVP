@@ -1,6 +1,0 @@
-{
-  "principal": "PetClinic::Employee::\"???\"",
-  "resource": "PetClinic::Employee::\"Jestine Teixeira\"",
-  "action": "PetClinic::Action::\"ViewEmployee\"",
-  "context": {}
-}

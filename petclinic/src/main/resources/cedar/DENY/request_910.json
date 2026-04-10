@@ -1,0 +1,6 @@
+{
+  "principal": "ChildClinic::Guest::\"Unknown\"",
+  "resource": "ChildClinic::Visit::\"Jewel 1\"",
+  "action": "ChildClinic::Action::\"EditClient\"",
+  "context": {}
+}

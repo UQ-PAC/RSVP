@@ -1,6 +1,6 @@
 {
-  "principal": "PetClinic::Guest::\"Unknown\"",
-  "resource": "PetClinic::Pet::\"Rosy\"",
-  "action": "PetClinic::Action::\"ListClients\"",
+  "principal": "ChildClinic::Guest::\"Unknown\"",
+  "resource": "ChildClinic::Visit::\"Rosy 1\"",
+  "action": "ChildClinic::Action::\"ListClients\"",
   "context": {}
 }

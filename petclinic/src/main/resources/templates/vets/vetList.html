@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 
-<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'vets')}">
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'doctors')}">
 
 <body>
 
-  <h2 th:text="#{vets}">Veterinarians</h2>
+  <h2 th:text="#{doctors}">Doctors</h2>
 
-  <table id="vets" class="table table-striped">
+  <table id="doctors" class="table table-striped">
     <thead>
       <tr>
         <th th:text="#{name}">Name</th>
@@ -14,11 +14,11 @@
       </tr>
     </thead>
     <tbody>
-      <tr th:each="vet : ${listVets}">
-        <td th:text="${vet.firstName + ' ' + vet.lastName}"></td>
+      <tr th:each="doctor : ${listDoctors}">
+        <td th:text="${doctor.firstName + ' ' + doctor.lastName}"></td>
         <td>
-          <span th:each="specialty : ${vet.specialties}" th:text="${specialty.name + ' '}" /> <span
-            th:if="${vet.nrOfSpecialties == 0}" th:text="#{none}">none</span>
+          <span th:each="specialty : ${doctor.specialties}" th:text="${specialty.name + ' '}" /> <span
+            th:if="${doctor.nrOfSpecialties == 0}" th:text="#{none}">none</span>
         </td>
       </tr>
     </tbody>
@@ -27,27 +27,27 @@
     <span th:text="#{pages}">Pages:</span>
     <span>[</span>
     <span th:each="i: ${#numbers.sequence(1, totalPages)}">
-      <a th:if="${currentPage != i}" th:href="@{'/vets.html?page=__${i}__'}">[[${i}]]</a>
+      <a th:if="${currentPage != i}" th:href="@{'/doctors.html?page=__${i}__'}">[[${i}]]</a>
       <span th:unless="${currentPage != i}">[[${i}]]</span>
     </span>
     <span>]&nbsp;</span>
     <span>
-      <a th:if="${currentPage > 1}" th:href="@{'/vets.html?page=1'}" th:title="#{first}"
+      <a th:if="${currentPage > 1}" th:href="@{'/doctors.html?page=1'}" th:title="#{first}"
         class="fa fa-fast-backward"></a>
       <span th:unless="${currentPage > 1}" th:title="#{first}" class="fa fa-fast-backward"></span>
     </span>
     <span>
-      <a th:if="${currentPage > 1}" th:href="@{'/vets.html?page=__${currentPage - 1}__'}" th:title="#{previous}"
+      <a th:if="${currentPage > 1}" th:href="@{'/doctors.html?page=__${currentPage - 1}__'}" th:title="#{previous}"
         class="fa fa-step-backward"></a>
       <span th:unless="${currentPage > 1}" th:title="#{previous}" class="fa fa-step-backward"></span>
     </span>
     <span>
-      <a th:if="${currentPage < totalPages}" th:href="@{'/vets.html?page=__${currentPage + 1}__'}" th:title="#{next}"
+      <a th:if="${currentPage < totalPages}" th:href="@{'/doctors.html?page=__${currentPage + 1}__'}" th:title="#{next}"
         class="fa fa-step-forward"></a>
       <span th:unless="${currentPage < totalPages}" th:title="#{next}" class="fa fa-step-forward"></span>
     </span>
     <span>
-      <a th:if="${currentPage < totalPages}" th:href="@{'/vets.html?page=__${totalPages}__'}" th:title="#{last}"
+      <a th:if="${currentPage < totalPages}" th:href="@{'/doctors.html?page=__${totalPages}__'}" th:title="#{last}"
         class="fa fa-fast-forward"></a>
       <span th:unless="${currentPage < totalPages}" th:title="#{last}" class="fa fa-fast-forward"></span>
     </span>

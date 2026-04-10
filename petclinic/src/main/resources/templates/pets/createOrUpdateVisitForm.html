@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'owners')}">
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'parents')}">
 
 <body>
 
@@ -9,21 +9,21 @@
     Visit
   </h2>
 
-  <b th:text="#{pet}">Pet</b>
+  <b th:text="#{child}">Child</b>
   <table class="table table-striped">
     <thead>
       <tr>
         <th th:text="#{name}">Name</th>
         <th th:text="#{birthDate}">Birth Date</th>
         <th th:text="#{type}">Type</th>
-        <th th:text="#{owner}">Owner</th>
+        <th th:text="#{parent}">Parent</th>
       </tr>
     </thead>
     <tr>
-      <td th:text="${pet.name}"></td>
-      <td th:text="${#temporals.format(pet.birthDate, 'yyyy-MM-dd')}"></td>
-      <td th:text="${pet.type}"></td>
-      <td th:text="${owner?.firstName + ' ' + owner?.lastName}"></td>
+      <td th:text="${child.name}"></td>
+      <td th:text="${#temporals.format(child.birthDate, 'yyyy-MM-dd')}"></td>
+      <td th:text="${child.type}"></td>
+      <td th:text="${parent?.firstName + ' ' + parent?.lastName}"></td>
     </tr>
   </table>
 
@@ -35,7 +35,7 @@
 
     <div class="form-group">
       <div class="col-sm-offset-2 col-sm-10">
-        <input type="hidden" name="petId" th:value="${pet.id}" />
+        <input type="hidden" name="childId" th:value="${child.id}" />
         <button class="btn btn-primary" type="submit" th:text="#{addVisit}">Add Visit</button>
       </div>
     </div>
@@ -48,7 +48,7 @@
       <th th:text="#{date}">Date</th>
       <th th:text="#{description}">Description</th>
     </tr>
-    <tr th:if="${!visit['new']}" th:each="visit : ${pet.visits}">
+    <tr th:if="${!visit['new']}" th:each="visit : ${child.visits}">
       <td th:text="${#temporals.format(visit.date, 'yyyy-MM-dd')}"></td>
       <td th:text=" ${visit.description}"></td>
     </tr>

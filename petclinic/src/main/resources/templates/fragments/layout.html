@@ -9,9 +9,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" type="image/x-icon" th:href="@{/resources/images/{imageName}(imageName=${@imageRandomizer.getRandomImage()})}">
-  <title th:text="#{layoutTitle}">PetClinic :: a Spring Framework demonstration</title>
+  <title th:text="#{layoutTitle}">ChildClinic :: a Spring Framework and Cedar demonstration</title>
   <link th:href="@{/webjars/font-awesome/css/font-awesome.min.css}" rel="stylesheet">
-  <link rel="stylesheet" th:href="@{/resources/css/petclinic.css}" />
+  <link rel="stylesheet" th:href="@{/resources/css/childclinic.css}" />
 
 </head>
 
@@ -45,14 +45,14 @@
             <span th:text="#{home}">Home</span>
           </li>
 
-          <li th:replace="~{::menuItem ('/owners/find','owners','find owners','search',#{findOwners})}">
+          <li th:replace="~{::menuItem ('/parents/find','parents','find parents','search',#{findParents})}">
             <span class="fa fa-search" aria-hidden="true"></span>
-            <span th:text="#{findOwners}">Find owners</span>
+            <span th:text="#{findParents}">Find parents</span>
           </li>
 
-          <li th:replace="~{::menuItem ('/vets.html','vets','veterinarians','th-list',#{vets})}">
+          <li th:replace="~{::menuItem ('/doctors.html','doctors','doctors','th-list',#{doctors})}">
             <span class="fa fa-th-list" aria-hidden="true"></span>
-            <span th:text="#{vets}">Veterinarians</span>
+            <span th:text="#{doctors}">Doctors</span>
           </li>
 
           <li

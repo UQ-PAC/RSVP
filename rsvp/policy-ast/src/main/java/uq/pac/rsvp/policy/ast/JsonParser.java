@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 
 import uq.pac.rsvp.policy.ast.expr.ActionExpression;
 import uq.pac.rsvp.policy.ast.expr.EntityExpression;
-import uq.pac.rsvp.policy.ast.expr.EuidExpression;
 import uq.pac.rsvp.policy.ast.expr.EuidExpression.EuidExpressionDeserialiser;
 import uq.pac.rsvp.policy.ast.expr.Expression;
 import uq.pac.rsvp.policy.ast.expr.Expression.ExpressionDeserialiser;
@@ -18,7 +17,7 @@ public class JsonParser {
 
     private static Gson singleton;
 
-    private static Gson getGson() {
+    public static Gson getGson() {
 
         if (singleton == null) {
             singleton = new GsonBuilder()

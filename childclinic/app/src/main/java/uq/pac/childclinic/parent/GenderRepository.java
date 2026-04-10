@@ -33,7 +33,7 @@ public interface GenderRepository extends JpaRepository<Gender, Integer> {
 	 * Retrieve all {@link Gender}s from the data store.
 	 * @return a Collection of {@link Gender}s.
 	 */
-	@Query("SELECT gender FROM Gender gender ORDER BY gender.name")
+	@Query("SELECT g FROM Gender g ORDER BY g.name")
 	List<Gender> findGenders();
 
 }

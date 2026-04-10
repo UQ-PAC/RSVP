@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 
-<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'owners')}">
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'parents')}">
 
 <body>
 
-  <h2 th:text="#{findOwners}">Find Owners</h2>
+  <h2 th:text="#{findParents}">Find Parents</h2>
 
-  <form th:object="${owner}" th:action="@{/owners}" method="get" class="form-horizontal" id="search-owner-form">
+  <form th:object="${parent}" th:action="@{/parents}" method="get" class="form-horizontal" id="search-parent-form">
     <div class="form-group">
       <div class="control-group" id="lastNameGroup">
         <label class="col-sm-2 control-label" th:text="#{lastName}">Last name </label>
@@ -22,11 +22,11 @@
     </div>
     <div class="form-group">
       <div class="col-sm-offset-2 col-sm-10">
-        <button type="submit" class="btn btn-primary" th:text="#{findOwner}">Find Owner</button>
+        <button type="submit" class="btn btn-primary" th:text="#{findParent}">Find Parent</button>
       </div>
     </div>
 
-    <a class="btn btn-primary" th:href="@{/owners/new}" th:text="#{addOwner}">Add Owner</a>
+    <a class="btn btn-primary" th:href="@{/parents/new}" th:text="#{addParent}">Add Parent</a>
 
   </form>
 

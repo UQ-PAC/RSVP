@@ -3,21 +3,21 @@ DROP TABLE entities IF EXISTS;
 DROP TABLE entity_types IF EXISTS;
 DROP TABLE entity_clinics IF EXISTS;
 DROP TABLE users IF EXISTS;
-DROP TABLE vets IF EXISTS;
+DROP TABLE doctors IF EXISTS;
 DROP TABLE specialties IF EXISTS;
-DROP TABLE vet_specialties IF EXISTS;
+DROP TABLE doctor_specialties IF EXISTS;
 DROP TABLE roles IF EXISTS;
 DROP TABLE user_roles IF EXISTS;
 DROP TABLE levels IF EXISTS;
 DROP TABLE user_levels IF EXISTS;
 DROP TABLE user_manager IF EXISTS;
-DROP TABLE owners IF EXISTS;
+DROP TABLE parents IF EXISTS;
 DROP TABLE types IF EXISTS;
-DROP TABLE pets IF EXISTS;
+DROP TABLE children IF EXISTS;
 DROP TABLE confidentialities IF EXISTS;
 DROP TABLE visits IF EXISTS;
-DROP TABLE pet_vets IF EXISTS;
-DROP TABLE visit_vets IF EXISTS;
+DROP TABLE child_doctors IF EXISTS;
+DROP TABLE visit_doctors IF EXISTS;
 
 -- Lookup Clinics Table.
 CREATE TABLE clinics (
@@ -35,7 +35,7 @@ CREATE TABLE entities (
 
 CREATE TABLE entity_types (
   entity_id   INTEGER NOT NULL,
-  entity_type VARCHAR(20) NOT NULL, -- 'User', 'Administrator', 'Secretary', 'Veterinarian', 'PetOwner', 'Pet', 'PetVisit'.
+  entity_type VARCHAR(20) NOT NULL, -- 'User', 'Administrator', 'Secretary', 'Doctor', 'Parent', 'Child', 'Visit'.
   PRIMARY KEY (entity_id, entity_type),
   FOREIGN KEY (entity_id) REFERENCES entities(entity_id) ON DELETE CASCADE
 );
@@ -55,13 +55,13 @@ CREATE TABLE users (
 );
 CREATE INDEX users_username ON users (username);
 
-CREATE TABLE vets (
+CREATE TABLE doctors (
   entity_id  INTEGER PRIMARY KEY,
   first_name VARCHAR(30) NOT NULL,
   last_name  VARCHAR(30) NOT NULL,
   FOREIGN KEY (entity_id) REFERENCES entities(entity_id) ON DELETE CASCADE
 );
-CREATE INDEX vets_last_name ON vets (last_name);
+CREATE INDEX doctors_last_name ON doctors (last_name);
 
 -- Lookup Specialties Table.
 CREATE TABLE specialties (
@@ -70,11 +70,11 @@ CREATE TABLE specialties (
 );
 CREATE INDEX specialties_name ON specialties (name);
 
-CREATE TABLE vet_specialties (
-  vet_id       INTEGER NOT NULL,
+CREATE TABLE doctor_specialties (
+  doctor_id       INTEGER NOT NULL,
   specialty_id INTEGER NOT NULL,
-  PRIMARY KEY (vet_id, specialty_id),
-  FOREIGN KEY (vet_id) REFERENCES vets(entity_id) ON DELETE CASCADE,
+  PRIMARY KEY (doctor_id, specialty_id),
+  FOREIGN KEY (doctor_id) REFERENCES doctors(entity_id) ON DELETE CASCADE,
   FOREIGN KEY (specialty_id) REFERENCES specialties(id) ON DELETE CASCADE
 );
 
@@ -117,7 +117,7 @@ CREATE TABLE user_manager (
   CONSTRAINT distinct_users CHECK (user_id != manager_id)
 );
 
-CREATE TABLE owners (
+CREATE TABLE parents (
   entity_id  INTEGER PRIMARY KEY,
   first_name VARCHAR(30) NOT NULL,
   last_name  VARCHAR(30) NOT NULL,
@@ -126,7 +126,7 @@ CREATE TABLE owners (
   telephone  VARCHAR(20) UNIQUE NOT NULL,
   FOREIGN KEY (entity_id) REFERENCES entities(entity_id) ON DELETE CASCADE
 );
-CREATE INDEX owners_last_name ON owners (last_name);
+CREATE INDEX parents_last_name ON parents (last_name);
 
 -- Lookup Types Table.
 CREATE TABLE types (
@@ -135,18 +135,18 @@ CREATE TABLE types (
 );
 CREATE INDEX types_name ON types (name);
 
-CREATE TABLE pets (
+CREATE TABLE children (
   entity_id  INTEGER PRIMARY KEY,
   name       VARCHAR(30) NOT NULL,
   birth_date DATE NOT NULL,
   type_id    INTEGER NOT NULL,
-  owner_id   INTEGER NOT NULL,
+  parent_id   INTEGER NOT NULL,
   FOREIGN KEY (entity_id) REFERENCES entities(entity_id) ON DELETE CASCADE,
-  FOREIGN KEY (owner_id) REFERENCES owners(entity_id) ON DELETE CASCADE,
+  FOREIGN KEY (parent_id) REFERENCES parents(entity_id) ON DELETE CASCADE,
   FOREIGN KEY (type_id) REFERENCES types(id) ON DELETE CASCADE,
-  CONSTRAINT unique_pet UNIQUE (name, type_id, owner_id)
+  CONSTRAINT unique_child UNIQUE (name, type_id, parent_id)
 );
-CREATE INDEX pets_name ON pets (name);
+CREATE INDEX children_name ON children (name);
 
 -- Lookup Types Table.
 CREATE TABLE confidentialities (
@@ -157,28 +157,28 @@ CREATE INDEX confidentialities_name ON types (name);
 
 CREATE TABLE visits (
   entity_id          INTEGER PRIMARY KEY,
-  pet_id             INTEGER NOT NULL,
+  child_id             INTEGER NOT NULL,
   visit_date         DATE NOT NULL,
   confidentiality_id INTEGER NOT NULL,
   description VARCHAR(255),
   FOREIGN KEY (entity_id) REFERENCES entities(entity_id) ON DELETE CASCADE,
-  FOREIGN KEY (pet_id) REFERENCES pets(entity_id) ON DELETE CASCADE,
+  FOREIGN KEY (child_id) REFERENCES children(entity_id) ON DELETE CASCADE,
   FOREIGN KEY (confidentiality_id) REFERENCES confidentialities(id) ON DELETE CASCADE
 );
-CREATE INDEX visits_pet_id ON visits (pet_id);
+CREATE INDEX visits_child_id ON visits (child_id);
 
-CREATE TABLE pet_vets (
-  pet_id      INTEGER NOT NULL,
-  vet_id      INTEGER NOT NULL,
-  PRIMARY KEY (pet_id, vet_id),
-  FOREIGN KEY (pet_id) REFERENCES pets(entity_id) ON DELETE CASCADE,
-  FOREIGN KEY (vet_id) REFERENCES vets(entity_id) ON DELETE CASCADE
+CREATE TABLE child_doctors (
+  child_id      INTEGER NOT NULL,
+  doctor_id      INTEGER NOT NULL,
+  PRIMARY KEY (child_id, doctor_id),
+  FOREIGN KEY (child_id) REFERENCES children(entity_id) ON DELETE CASCADE,
+  FOREIGN KEY (doctor_id) REFERENCES doctors(entity_id) ON DELETE CASCADE
 );
 
-CREATE TABLE visit_vets (
+CREATE TABLE visit_doctors (
   visit_id    INTEGER NOT NULL,
-  vet_id      INTEGER NOT NULL,
-  PRIMARY KEY (visit_id, vet_id),
+  doctor_id      INTEGER NOT NULL,
+  PRIMARY KEY (visit_id, doctor_id),
   FOREIGN KEY (visit_id) REFERENCES visits(entity_id) ON DELETE CASCADE,
-  FOREIGN KEY (vet_id) REFERENCES vets(entity_id) ON DELETE CASCADE
+  FOREIGN KEY (doctor_id) REFERENCES doctors(entity_id) ON DELETE CASCADE
 );

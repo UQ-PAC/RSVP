@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 ERROR=
-SCHEMA="petclinic-rsvp-schema.cedarschema"
-ENTITIES="petclinic-rsvp-entities.json"
-POLICY="petclinic-rsvp-policy.cedar"
+SCHEMA="childclinic-rsvp-schema.cedarschema"
+ENTITIES="childclinic-rsvp-entities.json"
+POLICY="childclinic-rsvp-policy.cedar"
 
 ALLOW="./ALLOW"
 DENY="./DENY"

@@ -1,7 +1,7 @@
 {
-    "principal": "PetClinic::Employee::\"Bob\"",
-    "action": "PetClinic::Action::\"DeleteClient\"",
-    "resource": "PetClinic::PetOwner::\"George Franklin\"",
+    "principal": "ChildClinic::Employee::\"Bob\"",
+    "action": "ChildClinic::Action::\"DeleteClient\"",
+    "resource": "ChildClinic::Parent::\"George Franklin\"",
     "context": { },
     "validateRequest": true
 }

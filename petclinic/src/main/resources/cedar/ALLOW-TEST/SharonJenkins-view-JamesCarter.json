@@ -1,7 +1,7 @@
 {
-    "principal": "PetClinic::Employee::\"Sharon Jenkins\"",
-    "action": "PetClinic::Action::\"ViewEmployee\"",
-    "resource": "PetClinic::Employee::\"James Carter\"",
+    "principal": "ChildClinic::Employee::\"Sharon Jenkins\"",
+    "action": "ChildClinic::Action::\"ViewEmployee\"",
+    "resource": "ChildClinic::Employee::\"James Carter\"",
     "context": { },
     "validateRequest": true
 }

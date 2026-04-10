@@ -1,7 +1,7 @@
 {
-    "principal": "PetClinic::Employee::\"Sharon Jenkins\"",
-    "action": "PetClinic::Action::\"EditClient\"",
-    "resource": "PetClinic::Pet::\"Max\"",
+    "principal": "ChildClinic::Employee::\"Sharon Jenkins\"",
+    "action": "ChildClinic::Action::\"EditClient\"",
+    "resource": "ChildClinic::Child::\"Max\"",
     "context": { },
     "validateRequest": true
 }

@@ -31,7 +31,7 @@ import org.springframework.samples.petclinic.model.Identifiable;
  */
 @Entity
 @Table(name = "genders")
-public class PetType implements Serializable, Identifiable {
+public class Gender implements Serializable, Identifiable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -29,7 +29,7 @@ import org.springframework.validation.Validator;
  * @author Ken Krebs
  * @author Juergen Hoeller
  */
-public class PetValidator implements Validator {
+public class ChildValidator implements Validator {
 
 	private static final String REQUIRED = "required";
 
@@ -42,9 +42,9 @@ public class PetValidator implements Validator {
 			errors.rejectValue("name", REQUIRED, REQUIRED);
 		}
 
-		// type validation
-		if (child.isNew() && child.getType() == null) {
-			errors.rejectValue("type", REQUIRED, REQUIRED);
+		// gender validation
+		if (child.isNew() && child.getGender() == null) {
+			errors.rejectValue("gender", REQUIRED, REQUIRED);
 		}
 
 		// birth date validation

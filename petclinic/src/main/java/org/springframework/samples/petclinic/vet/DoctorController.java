@@ -47,7 +47,7 @@ import org.springframework.samples.petclinic.cedar.CedarService;
  * @author Arjen Poutsma
  */
 @Controller
-class VetController {
+class DoctorController {
 
 	private final DoctorRepository doctorRepository;
 

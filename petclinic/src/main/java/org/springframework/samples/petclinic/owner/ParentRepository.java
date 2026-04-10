@@ -33,10 +33,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author Michael Isvy
  * @author Wick Dynex
  */
-public interface OwnerRepository extends JpaRepository<Parent, Integer> {
+public interface ParentRepository extends JpaRepository<Parent, Integer> {
 
 	/**
-	 * Retrieve {@link Parent}s from the data store by last name, returning all owners
+	 * Retrieve {@link Parent}s from the data store by last name, returning all parents
 	 * whose last name <i>starts</i> with the given name.
 	 * @param lastName Value to search for
 	 * @return a Collection of matching {@link Parent}s (or an empty Collection if none

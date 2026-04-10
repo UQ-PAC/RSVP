@@ -43,7 +43,7 @@ import org.springframework.samples.petclinic.model.Person;
 @Entity
 @Table(name = "doctors")
 @PrimaryKeyJoinColumn(name = "entity_id")
-public class Vet extends Person {
+public class Doctor extends Person {
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "doctor_specialties", joinColumns = @JoinColumn(name = "doctor_id"),

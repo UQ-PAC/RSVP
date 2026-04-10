@@ -8,7 +8,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="shortcut icon" type="image/x-icon" th:href="@{/resources/images/favicon.png}">
+  <link rel="shortcut icon" type="image/x-icon" th:href="@{/resources/images/{imageName}(imageName=${@imageRandomizer.getRandomImage()})}">
   <title th:text="#{layoutTitle}">PetClinic :: a Spring Framework demonstration</title>
   <link th:href="@{/webjars/font-awesome/css/font-awesome.min.css}" rel="stylesheet">
   <link rel="stylesheet" th:href="@{/resources/css/petclinic.css}" />
@@ -19,7 +19,9 @@
 
   <nav class="navbar navbar-expand-lg navbar-dark" role="navigation">
     <div class="container-fluid">
-      <a class="navbar-brand" th:href="@{/}"><span></span></a>
+      <a class="navbar-brand" th:href="@{/}" style="display: flex; align-items: center; justify-content: center; width: 150px; height: 60px; padding: 0;">
+        <img th:src="@{/resources/images/{imageName}(imageName=${@imageRandomizer.getRandomImage()})}" alt="Logo" style="max-height: 50px; width: auto; filter: invert(100%);" />
+      </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-navbar">
         <span class="navbar-toggler-icon"></span>
       </button>

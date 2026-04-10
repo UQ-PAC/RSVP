@@ -49,7 +49,7 @@ import org.springframework.samples.petclinic.model.Person;
 @Entity
 @Table(name = "parents")
 @PrimaryKeyJoinColumn(name = "entity_id")
-public class Owner extends Person {
+public class Parent extends Person {
 
 	@Column(name = "address")
 	@NotBlank

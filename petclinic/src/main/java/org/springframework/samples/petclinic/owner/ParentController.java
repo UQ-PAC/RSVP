@@ -57,7 +57,7 @@ import org.springframework.samples.petclinic.cedar.CedarService;
  * @author Wick Dynex
  */
 @Controller
-class OwnerController {
+class ParentController {
 
 	private static final String VIEWS_PARENT_CREATE_OR_UPDATE_FORM = "parents/createOrUpdateParentForm";
 

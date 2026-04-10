@@ -55,25 +55,25 @@ import org.springframework.samples.petclinic.cedar.CedarService;
  */
 @Controller
 @RequestMapping("/parents/{parentId}")
-class PetController {
+class ChildController {
 
-	private static final String VIEWS_PETS_CREATE_OR_UPDATE_FORM = "children/createOrUpdateChildForm";
+	private static final String VIEWS_CHILDREN_CREATE_OR_UPDATE_FORM = "children/createOrUpdateChildForm";
 
 	private final ParentRepository parents;
 
-	private final ChildTypeRepository types;
+	private final GenderRepository genders;
 
 	private final CedarService cedarService;
 
-	public ChildController(ParentRepository parents, ChildTypeRepository types, CedarService cedarService) {
+	public ChildController(ParentRepository parents, GenderRepository genders, CedarService cedarService) {
 		this.parents = parents;
-		this.types = types;
+		this.genders = genders;
 		this.cedarService = cedarService;
 	}
 
 	@ModelAttribute("gender")
 	public Collection<Gender> populateGender() {
-		return this.gender.findGenders();
+		return this.genders.findGenders();
 	}
 
 	@ModelAttribute("parent")
@@ -142,7 +142,7 @@ class PetController {
 
 		Child child = new Child();
 		parent.addChild(child);
-		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
+		return VIEWS_CHILDREN_CREATE_OR_UPDATE_FORM;
 	}
 
 	@PostMapping("/children/new")
@@ -159,7 +159,7 @@ class PetController {
 		}
 
 		if (result.hasErrors()) {
-			return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
+			return VIEWS_CHILDREN_CREATE_OR_UPDATE_FORM;
 		}
 
 		parent.addChild(child);
@@ -171,7 +171,7 @@ class PetController {
 	@GetMapping("/children/{childId}/edit")
 	@CedarAuthorization(action = "EditClient", resourceType = "Child", validate = true)
 	public String initUpdateForm() {
-		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
+		return VIEWS_CHILDREN_CREATE_OR_UPDATE_FORM;
 	}
 
 	@PostMapping("/children/{childId}/edit")
@@ -195,7 +195,7 @@ class PetController {
 		}
 
 		if (result.hasErrors()) {
-			return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
+			return VIEWS_CHILDREN_CREATE_OR_UPDATE_FORM;
 		}
 
 		updateChildDetails(parent, child);
@@ -216,7 +216,7 @@ class PetController {
 			// Update existing child's properties
 			existingChild.setName(child.getName());
 			existingChild.setBirthDate(child.getBirthDate());
-			existingChild.setType(child.getType());
+			existingChild.setGender(child.getGender());
 		}
 		else {
 			parent.addChild(child);

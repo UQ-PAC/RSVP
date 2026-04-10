@@ -36,7 +36,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.petclinic.model.NamedEntity;
 
 /**
- * Simple business object representing a pet.
+ * Simple business object representing a child.
  *
  * @author Ken Krebs
  * @author Juergen Hoeller
@@ -46,7 +46,7 @@ import org.springframework.samples.petclinic.model.NamedEntity;
 @Entity
 @Table(name = "children")
 @PrimaryKeyJoinColumn(name = "entity_id")
-public class Pet extends NamedEntity {
+public class Child extends NamedEntity {
 
 	@Column(name = "birth_date")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -57,7 +57,7 @@ public class Pet extends NamedEntity {
 	private Gender gender;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name = "pet_id")
+	@JoinColumn(name = "child_id")
 	@OrderBy("date ASC")
 	private final Set<Visit> visits = new LinkedHashSet<>();
 

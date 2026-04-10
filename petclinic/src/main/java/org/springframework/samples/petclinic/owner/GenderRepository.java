@@ -22,18 +22,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 /**
- * Repository class for <code>PetType</code> domain objects.
+ * Repository class for <code>Gender</code> domain objects.
  *
  * @author Patrick Baumgartner
  */
 
-public interface PetTypeRepository extends JpaRepository<Gender, Integer> {
+public interface GenderRepository extends JpaRepository<Gender, Integer> {
 
 	/**
 	 * Retrieve all {@link Gender}s from the data store.
 	 * @return a Collection of {@link Gender}s.
 	 */
 	@Query("SELECT gender FROM Gender gender ORDER BY gender.name")
-	List<Gender> findGender();
+	List<Gender> findGenders();
 
 }

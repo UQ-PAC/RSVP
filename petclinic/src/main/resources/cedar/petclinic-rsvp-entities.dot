@@ -1,90 +1,100 @@
 strict digraph {
 	ordering="out"
 	node[shape=box]
-	subgraph "cluster_PetClinic::Clinic" {
-		label="PetClinic::Clinic"
-		"PetClinic::Clinic::\"B\"" [label="B"]
-		"PetClinic::Clinic::\"A\"" [label="A"]
+	subgraph "cluster_ChildClinic::Confidentiality" {
+		label="ChildClinic::Confidentiality"
+		"ChildClinic::Confidentiality::\"Protected\"" [label="Protected"]
+		"ChildClinic::Confidentiality::\"Sensitive\"" [label="Sensitive"]
+		"ChildClinic::Confidentiality::\"Official\"" [label="Official"]
 	}
-	subgraph "cluster_PetClinic::PetOwner" {
-		label="PetClinic::PetOwner"
-		"PetClinic::PetOwner::\"Carlos Estaban\"" [label="Carlos Estaban"]
-		"PetClinic::PetOwner::\"George Franklin\"" [label="George Franklin"]
-		"PetClinic::PetOwner::\"Eduardo Rodriquez\"" [label="Eduardo Rodriquez"]
-		"PetClinic::PetOwner::\"Jean Coleman\"" [label="Jean Coleman"]
+	subgraph "cluster_ChildClinic::Visit" {
+		label="ChildClinic::Visit"
+		"ChildClinic::Visit::\"Max 1\"" [label="Max 1"]
+		"ChildClinic::Visit::\"Rosy 1\"" [label="Rosy 1"]
+		"ChildClinic::Visit::\"Jewel 1\"" [label="Jewel 1"]
+		"ChildClinic::Visit::\"Basil 1\"" [label="Basil 1"]
+		"ChildClinic::Visit::\"Samantha 1\"" [label="Samantha 1"]
+		"ChildClinic::Visit::\"Sly 1\"" [label="Sly 1"]
+		"ChildClinic::Visit::\"Lucky 1\"" [label="Lucky 1"]
+		"ChildClinic::Visit::\"Samantha 2\"" [label="Samantha 2"]
+		"ChildClinic::Visit::\"Max 2\"" [label="Max 2"]
 	}
-	subgraph "cluster_PetClinic::Confidentiality" {
-		label="PetClinic::Confidentiality"
-		"PetClinic::Confidentiality::\"Sensitive\"" [label="Sensitive"]
-		"PetClinic::Confidentiality::\"Protected\"" [label="Protected"]
-		"PetClinic::Confidentiality::\"Official\"" [label="Official"]
+	subgraph "cluster_ChildClinic::Clinic" {
+		label="ChildClinic::Clinic"
+		"ChildClinic::Clinic::\"A\"" [label="A"]
+		"ChildClinic::Clinic::\"B\"" [label="B"]
 	}
-	subgraph "cluster_PetClinic::ProfessionalLevel" {
-		label="PetClinic::ProfessionalLevel"
-		"PetClinic::ProfessionalLevel::\"Registrar\"" [label="Registrar"]
-		"PetClinic::ProfessionalLevel::\"Staff\"" [label="Staff"]
-		"PetClinic::ProfessionalLevel::\"Specialist\"" [label="Specialist"]
-		"PetClinic::ProfessionalLevel::\"Intern\"" [label="Intern"]
-		"PetClinic::ProfessionalLevel::\"Senior\"" [label="Senior"]
-		"PetClinic::ProfessionalLevel::\"Resident\"" [label="Resident"]
+	subgraph "cluster_ChildClinic::Child" {
+		label="ChildClinic::Child"
+		"ChildClinic::Child::\"Jewel\"" [label="Jewel"]
+		"ChildClinic::Child::\"Lucky\"" [label="Lucky"]
+		"ChildClinic::Child::\"Leo\"" [label="Leo"]
+		"ChildClinic::Child::\"Rosy\"" [label="Rosy"]
+		"ChildClinic::Child::\"Basil\"" [label="Basil"]
+		"ChildClinic::Child::\"Sly\"" [label="Sly"]
+		"ChildClinic::Child::\"Samantha\"" [label="Samantha"]
+		"ChildClinic::Child::\"Max\"" [label="Max"]
 	}
-	subgraph "cluster_PetClinic::Employee" {
-		label="PetClinic::Employee"
-		"PetClinic::Employee::\"Bob\"" [label="Bob"]
-		"PetClinic::Employee::\"James Carter\"" [label="James Carter"]
-		"PetClinic::Employee::\"Sharon Jenkins\"" [label="Sharon Jenkins"]
-		"PetClinic::Employee::\"Linda Douglas\"" [label="Linda Douglas"]
-		"PetClinic::Employee::\"Alice\"" [label="Alice"]
+	subgraph "cluster_ChildClinic::Action" {
+		label="ChildClinic::Action"
+		"ChildClinic::Action::\"AddClient\"" [label="AddClient"]
+		"ChildClinic::Action::\"EditClient\"" [label="EditClient"]
+		"ChildClinic::Action::\"DeleteClient\"" [label="DeleteClient"]
+		"ChildClinic::Action::\"ListEmployees\"" [label="ListEmployees"]
+		"ChildClinic::Action::\"AddEmployee\"" [label="AddEmployee"]
+		"ChildClinic::Action::\"EditEmployee\"" [label="EditEmployee"]
+		"ChildClinic::Action::\"ListClients\"" [label="ListClients"]
+		"ChildClinic::Action::\"DeleteEmployee\"" [label="DeleteEmployee"]
+		"ChildClinic::Action::\"ViewClient\"" [label="ViewClient"]
+		"ChildClinic::Action::\"ViewEmployee\"" [label="ViewEmployee"]
 	}
-	subgraph "cluster_PetClinic::Action" {
-		label="PetClinic::Action"
-		"PetClinic::Action::\"DeleteClient\"" [label="DeleteClient"]
-		"PetClinic::Action::\"DeleteEmployee\"" [label="DeleteEmployee"]
-		"PetClinic::Action::\"ViewEmployee\"" [label="ViewEmployee"]
-		"PetClinic::Action::\"ViewClient\"" [label="ViewClient"]
-		"PetClinic::Action::\"EditEmployee\"" [label="EditEmployee"]
-		"PetClinic::Action::\"EditClient\"" [label="EditClient"]
-		"PetClinic::Action::\"AddEmployee\"" [label="AddEmployee"]
-		"PetClinic::Action::\"AddClient\"" [label="AddClient"]
+	subgraph "cluster_ChildClinic::EmployeeRole" {
+		label="ChildClinic::EmployeeRole"
+		"ChildClinic::EmployeeRole::\"Doctor\"" [label="Doctor"]
+		"ChildClinic::EmployeeRole::\"Secretary\"" [label="Secretary"]
+		"ChildClinic::EmployeeRole::\"Administrator\"" [label="Administrator"]
 	}
-	subgraph "cluster_PetClinic::Guest" {
-		label="PetClinic::Guest"
-		"PetClinic::Guest::\"Unknown\"" [label="Unknown"]
+	subgraph "cluster_ChildClinic::Employee" {
+		label="ChildClinic::Employee"
+		"ChildClinic::Employee::\"Kathaleen Tramonte\"" [label="Kathaleen Tramonte"]
+		"ChildClinic::Employee::\"Sharon Jenkins\"" [label="Sharon Jenkins"]
+		"ChildClinic::Employee::\"Jestine Teixeira\"" [label="Jestine Teixeira"]
+		"ChildClinic::Employee::\"Alice\"" [label="Alice"]
+		"ChildClinic::Employee::\"Linda Douglas\"" [label="Linda Douglas"]
+		"ChildClinic::Employee::\"Bob\"" [label="Bob"]
+		"ChildClinic::Employee::\"James Carter\"" [label="James Carter"]
+		"ChildClinic::Employee::\"Carl\"" [label="Carl"]
 	}
-	subgraph "cluster_PetClinic::EmployeeRole" {
-		label="PetClinic::EmployeeRole"
-		"PetClinic::EmployeeRole::\"Secretary\"" [label="Secretary"]
-		"PetClinic::EmployeeRole::\"Administrator\"" [label="Administrator"]
-		"PetClinic::EmployeeRole::\"Veterinarian\"" [label="Veterinarian"]
+	subgraph "cluster_ChildClinic::Guest" {
+		label="ChildClinic::Guest"
+		"ChildClinic::Guest::\"Unknown\"" [label="Unknown"]
 	}
-	subgraph "cluster_PetClinic::Pet" {
-		label="PetClinic::Pet"
-		"PetClinic::Pet::\"Leo\"" [label="Leo"]
-		"PetClinic::Pet::\"Samantha\"" [label="Samantha"]
-		"PetClinic::Pet::\"Rosy\"" [label="Rosy"]
-		"PetClinic::Pet::\"Sly\"" [label="Sly"]
-		"PetClinic::Pet::\"Max\"" [label="Max"]
-		"PetClinic::Pet::\"Lucky\"" [label="Lucky"]
-		"PetClinic::Pet::\"Jewel\"" [label="Jewel"]
+	subgraph "cluster_ChildClinic::ProfessionalLevel" {
+		label="ChildClinic::ProfessionalLevel"
+		"ChildClinic::ProfessionalLevel::\"Staff\"" [label="Staff"]
+		"ChildClinic::ProfessionalLevel::\"Specialist\"" [label="Specialist"]
+		"ChildClinic::ProfessionalLevel::\"Resident\"" [label="Resident"]
+		"ChildClinic::ProfessionalLevel::\"Senior\"" [label="Senior"]
+		"ChildClinic::ProfessionalLevel::\"Registrar\"" [label="Registrar"]
+		"ChildClinic::ProfessionalLevel::\"Intern\"" [label="Intern"]
 	}
-	subgraph "cluster_PetClinic::PetVisit" {
-		label="PetClinic::PetVisit"
-		"PetClinic::PetVisit::\"Samantha 1\"" [label="Samantha 1"]
-		"PetClinic::PetVisit::\"Sly 1\"" [label="Sly 1"]
-		"PetClinic::PetVisit::\"Rosy 1\"" [label="Rosy 1"]
-		"PetClinic::PetVisit::\"Max 2\"" [label="Max 2"]
-		"PetClinic::PetVisit::\"Jewel 1\"" [label="Jewel 1"]
-		"PetClinic::PetVisit::\"Max 1\"" [label="Max 1"]
-		"PetClinic::PetVisit::\"Samantha 2\"" [label="Samantha 2"]
-		"PetClinic::PetVisit::\"Lucky 1\"" [label="Lucky 1"]
+	subgraph "cluster_ChildClinic::Parent" {
+		label="ChildClinic::Parent"
+		"ChildClinic::Parent::\"Jean Coleman\"" [label="Jean Coleman"]
+		"ChildClinic::Parent::\"Eduardo Rodriquez\"" [label="Eduardo Rodriquez"]
+		"ChildClinic::Parent::\"George Franklin\"" [label="George Franklin"]
+		"ChildClinic::Parent::\"Betty Davis\"" [label="Betty Davis"]
+		"ChildClinic::Parent::\"Carlos Estaban\"" [label="Carlos Estaban"]
 	}
-	"PetClinic::Action::\"DeleteClient\"" -> "PetClinic::Action::\"ClientOperations\""
-	"PetClinic::Action::\"DeleteEmployee\"" -> "PetClinic::Action::\"EmployeeOperations\""
-	"PetClinic::Action::\"ViewEmployee\"" -> "PetClinic::Action::\"EmployeeOperations\""
-	"PetClinic::Action::\"ViewClient\"" -> "PetClinic::Action::\"ClientOperations\""
-	"PetClinic::Action::\"EditEmployee\"" -> "PetClinic::Action::\"EmployeeOperations\""
-	"PetClinic::Action::\"EditClient\"" -> "PetClinic::Action::\"ClientOperations\""
-	"PetClinic::Action::\"AddEmployee\"" -> "PetClinic::Action::\"EmployeeOperations\""
-	"PetClinic::Action::\"AddClient\"" -> "PetClinic::Action::\"ClientOperations\""
+	"ChildClinic::Action::\"AddClient\"" -> "ChildClinic::Action::\"ClientOperations\""
+	"ChildClinic::Action::\"EditClient\"" -> "ChildClinic::Action::\"ClientOperations\""
+	"ChildClinic::Action::\"DeleteClient\"" -> "ChildClinic::Action::\"ClientOperations\""
+	"ChildClinic::Action::\"ListEmployees\"" -> "ChildClinic::Action::\"EmployeeOperations\""
+	"ChildClinic::Action::\"AddEmployee\"" -> "ChildClinic::Action::\"EmployeeOperations\""
+	"ChildClinic::Action::\"EditEmployee\"" -> "ChildClinic::Action::\"EmployeeOperations\""
+	"ChildClinic::Action::\"ListClients\"" -> "ChildClinic::Action::\"ClientOperations\""
+	"ChildClinic::Action::\"DeleteEmployee\"" -> "ChildClinic::Action::\"EmployeeOperations\""
+	"ChildClinic::Action::\"ViewClient\"" -> "ChildClinic::Action::\"ClientOperations\""
+	"ChildClinic::Action::\"ViewEmployee\"" -> "ChildClinic::Action::\"EmployeeOperations\""
 }
 

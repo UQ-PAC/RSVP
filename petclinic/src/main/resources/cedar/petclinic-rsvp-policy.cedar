@@ -1,4 +1,4 @@
-// PetClinic RSVP Policy
+// ChildClinic RSVP Policy
 // Original version without introduced issues.
 
 // 'policy0'
@@ -6,84 +6,84 @@
 @id("Policy: Anyone can list Employees.")
 permit (
     principal,
-    action == PetClinic::Action::"ListEmployees",
-    resource is PetClinic::Clinic
+    action == ChildClinic::Action::"ListEmployees",
+    resource is ChildClinic::Clinic
 );
 
 // 'policy1'
 // Every Employee can list the Clients they are allowed to view.
 @id("Policy: Every Employee can list Clients.")
 permit (
-    principal is PetClinic::Employee,
-    action == PetClinic::Action::"ListClients",
-    resource is PetClinic::Clinic
+    principal is ChildClinic::Employee,
+    action == ChildClinic::Action::"ListClients",
+    resource is ChildClinic::Clinic
 );
 
 // 'policy2'
-// Anyone can view any Secretary or Veterinarian.
-@id("Policy: Public Secretary and Veterinarian data.")
+// Anyone can view any Secretary or Doctor.
+@id("Policy: Public Secretary and Doctor data.")
 permit (
     principal,
-    action == PetClinic::Action::"ViewEmployee",
-    resource is PetClinic::Employee
+    action == ChildClinic::Action::"ViewEmployee",
+    resource is ChildClinic::Employee
 )
 when {
-    resource.roles.containsAny([PetClinic::EmployeeRole::"Secretary",
-                                PetClinic::EmployeeRole::"Veterinarian"])
+    resource.roles.containsAny([ChildClinic::EmployeeRole::"Secretary",
+                                ChildClinic::EmployeeRole::"Doctor"])
 };
 
 // 'policy3'
 // No Guest can access any client data.
 @id("Policy: Guest cannot access client data.")
 forbid (
-    principal is PetClinic::Guest,
-    action in PetClinic::Action::"ClientOperations",
+    principal is ChildClinic::Guest,
+    action in ChildClinic::Action::"ClientOperations",
     resource
 )
 when {
-    resource is PetClinic::PetOwner ||
-    resource is PetClinic::Pet ||
-    resource is PetClinic::PetVisit
+    resource is ChildClinic::Parent ||
+    resource is ChildClinic::Child ||
+    resource is ChildClinic::Visit
 };
 
 // 'policy4'
 // Every Administrator can do anything, anywhere.
 @id("Policy: Administrator.")
 permit (
-    principal is PetClinic::Employee,
+    principal is ChildClinic::Employee,
     action,
     resource
 )
 when {
-    principal.roles.contains(PetClinic::EmployeeRole::"Administrator")
+    principal.roles.contains(ChildClinic::EmployeeRole::"Administrator")
 };
 
 // 'policy5'
 // Every Secretary can view and edit their Clinics' data.
 @id("Policy: Secretary can view and edit in their Clinics.")
 permit (
-    principal is PetClinic::Employee,
+    principal is ChildClinic::Employee,
     action,
     resource
 )
 when {
-    principal.roles.contains(PetClinic::EmployeeRole::"Secretary") &&
+    principal.roles.contains(ChildClinic::EmployeeRole::"Secretary") &&
     (
-        resource is PetClinic::Employee ||
-        resource is PetClinic::PetOwner ||
-        resource is PetClinic::Pet ||
-        resource is PetClinic::PetVisit
+        resource is ChildClinic::Employee ||
+        resource is ChildClinic::Parent ||
+        resource is ChildClinic::Child ||
+        resource is ChildClinic::Visit
     ) &&
     resource.clinics.containsAny(principal.clinics)
 }
 unless {
-    action in [PetClinic::Action::"AddClient",
-               PetClinic::Action::"AddEmployee",
-               PetClinic::Action::"DeleteClient",
-               PetClinic::Action::"DeleteEmployee"] ||
+    action in [ChildClinic::Action::"AddClient",
+               ChildClinic::Action::"AddEmployee",
+               ChildClinic::Action::"DeleteClient",
+               ChildClinic::Action::"DeleteEmployee"] ||
     (
         resource has roles &&
-        resource.roles.contains(PetClinic::EmployeeRole::"Administrator")
+        resource.roles.contains(ChildClinic::EmployeeRole::"Administrator")
     )
 };
 
@@ -91,130 +91,130 @@ unless {
 // Every Secretary can add clients to their Clinics' data.
 @id("Policy: Secretary can add clients to their Clinics.")
 permit (
-    principal is PetClinic::Employee,
-    action == PetClinic::Action::"AddClient",
-    resource is PetClinic::Clinic
+    principal is ChildClinic::Employee,
+    action == ChildClinic::Action::"AddClient",
+    resource is ChildClinic::Clinic
 )
 when {
-    principal.roles.contains(PetClinic::EmployeeRole::"Secretary") &&
+    principal.roles.contains(ChildClinic::EmployeeRole::"Secretary") &&
     principal.clinics.contains(resource)
 };
 
 // 'policy7'
-// Every Veterinarian can view and edit their clients' data.
-@id("Policy: Veterinarian can view and edit their clients.")
+// Every Doctor can view and edit their clients' data.
+@id("Policy: Doctor can view and edit their clients.")
 permit (
-    principal is PetClinic::Employee,
-    action in PetClinic::Action::"ClientOperations",
+    principal is ChildClinic::Employee,
+    action in ChildClinic::Action::"ClientOperations",
     resource
 )
 when {
-    principal.roles.contains(PetClinic::EmployeeRole::"Veterinarian") &&
+    principal.roles.contains(ChildClinic::EmployeeRole::"Doctor") &&
     (
-        resource is PetClinic::PetOwner ||
-        resource is PetClinic::Pet ||
-        resource is PetClinic::PetVisit
+        resource is ChildClinic::Parent ||
+        resource is ChildClinic::Child ||
+        resource is ChildClinic::Visit
     ) &&
-    principal in resource.veterinarians
+    principal in resource.doctors
 }
 unless {
-    action == PetClinic::Action::"DeleteClient"
+    action == ChildClinic::Action::"DeleteClient"
 };
 
 // 'policy8'
-// Every Veterinarian can add their clients' data.
-@id("Policy: Veterinarian can add their clients.")
+// Every Doctor can add their clients' data.
+@id("Policy: Doctor can add their clients.")
 permit (
-    principal is PetClinic::Employee,
-    action == PetClinic::Action::"AddClient",
-    resource is PetClinic::Clinic
+    principal is ChildClinic::Employee,
+    action == ChildClinic::Action::"AddClient",
+    resource is ChildClinic::Clinic
 )
 when {
-    principal.roles.contains(PetClinic::EmployeeRole::"Veterinarian") &&
+    principal.roles.contains(ChildClinic::EmployeeRole::"Doctor") &&
     principal.clinics.contains(resource)
 };
 
 // 'policy9'
-// No Intern Veterinarian can edit their clients' data.
-@id("Policy: Intern Veterinarian cannot edit their clients.")
+// No Intern Doctor can edit their clients' data.
+@id("Policy: Intern Doctor cannot edit their clients.")
 forbid (
-    principal is PetClinic::Employee,
-    action == PetClinic::Action::"EditClient",
+    principal is ChildClinic::Employee,
+    action == ChildClinic::Action::"EditClient",
     resource
 )
 when {
-    principal.roles.contains(PetClinic::EmployeeRole::"Veterinarian") &&
+    principal.roles.contains(ChildClinic::EmployeeRole::"Doctor") &&
     principal has level &&
-    principal.level == PetClinic::ProfessionalLevel::"Intern" &&
+    principal.level == ChildClinic::ProfessionalLevel::"Intern" &&
     (
-        resource is PetClinic::PetOwner ||
-        resource is PetClinic::Pet ||
-        resource is PetClinic::PetVisit
+        resource is ChildClinic::Parent ||
+        resource is ChildClinic::Child ||
+        resource is ChildClinic::Visit
     ) &&
-    principal in resource.veterinarians
+    principal in resource.doctors
 };
 
 // 'policy10'
 // Every Employee can view and edit their own data.
 @id("Policy: Employee can edit their own data.")
 permit (
-    principal is PetClinic::Employee,
+    principal is ChildClinic::Employee,
     action,
-    resource is PetClinic::Employee
+    resource is ChildClinic::Employee
 )
 when {
-    action in [PetClinic::Action::"ViewEmployee",
-               PetClinic::Action::"EditEmployee"] &&
+    action in [ChildClinic::Action::"ViewEmployee",
+               ChildClinic::Action::"EditEmployee"] &&
     principal == resource
 };
 
 // 'policy11'
-// Every Senior or Specialist Veterinarian can delete their clients' data.
-@id("Policy: Senior or Specialist Veterinarian can delete their clients.")
+// Every Senior or Specialist Doctor can delete their clients' data.
+@id("Policy: Senior or Specialist Doctor can delete their clients.")
 permit (
-    principal is PetClinic::Employee,
-    action in PetClinic::Action::"DeleteClient",
+    principal is ChildClinic::Employee,
+    action in ChildClinic::Action::"DeleteClient",
     resource
 )
 when {
-    principal.roles.contains(PetClinic::EmployeeRole::"Veterinarian") &&
+    principal.roles.contains(ChildClinic::EmployeeRole::"Doctor") &&
     principal has level &&
     (
-        principal.level == PetClinic::ProfessionalLevel::"Senior" ||
-        principal.level == PetClinic::ProfessionalLevel::"Specialist"
+        principal.level == ChildClinic::ProfessionalLevel::"Senior" ||
+        principal.level == ChildClinic::ProfessionalLevel::"Specialist"
     ) &&
     (
-        resource is PetClinic::PetOwner ||
-        resource is PetClinic::Pet ||
-        resource is PetClinic::PetVisit
+        resource is ChildClinic::Parent ||
+        resource is ChildClinic::Child ||
+        resource is ChildClinic::Visit
     ) &&
-    principal in resource.veterinarians
+    principal in resource.doctors
 };
 
 // 'policy12'
-// Every Senior or Specialist Veterinarian can view all clients' data.
-@id("Policy: Senior or Specialist Veterinarian can view all clients.")
+// Every Senior or Specialist Doctor can view all clients' data.
+@id("Policy: Senior or Specialist Doctor can view all clients.")
 permit (
-    principal is PetClinic::Employee,
-    action == PetClinic::Action::"ViewClient",
+    principal is ChildClinic::Employee,
+    action == ChildClinic::Action::"ViewClient",
     resource
 )
 when {
-    principal.roles.contains(PetClinic::EmployeeRole::"Veterinarian") &&
+    principal.roles.contains(ChildClinic::EmployeeRole::"Doctor") &&
     principal has level &&
     (
-        principal.level == PetClinic::ProfessionalLevel::"Senior" ||
-        principal.level == PetClinic::ProfessionalLevel::"Specialist"
+        principal.level == ChildClinic::ProfessionalLevel::"Senior" ||
+        principal.level == ChildClinic::ProfessionalLevel::"Specialist"
     ) &&
     (
-        resource is PetClinic::PetOwner ||
-        resource is PetClinic::Pet ||
-        resource is PetClinic::PetVisit
+        resource is ChildClinic::Parent ||
+        resource is ChildClinic::Child ||
+        resource is ChildClinic::Visit
     )
 }
 unless {
     resource has confidentiality &&
-    resource.confidentiality == PetClinic::Confidentiality::"Protected"
+    resource.confidentiality == ChildClinic::Confidentiality::"Protected"
 };
 
 // 'policy13'
@@ -232,12 +232,12 @@ when {
 }
 unless {
     (
-        principal is PetClinic::Employee &&
-        principal.roles.contains(PetClinic::EmployeeRole::"Administrator")
+        principal is ChildClinic::Employee &&
+        principal.roles.contains(ChildClinic::EmployeeRole::"Administrator")
     ) ||
     (
-        action == PetClinic::Action::"ViewEmployee" &&
-        resource.roles.containsAny([PetClinic::EmployeeRole::"Secretary",
-                                    PetClinic::EmployeeRole::"Veterinarian"])
+        action == ChildClinic::Action::"ViewEmployee" &&
+        resource.roles.containsAny([ChildClinic::EmployeeRole::"Secretary",
+                                    ChildClinic::EmployeeRole::"Doctor"])
     )
 };

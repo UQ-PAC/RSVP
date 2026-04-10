@@ -1,9 +1,9 @@
-namespace PetClinic {
+namespace ChildClinic {
     entity Clinic;
 
     entity Confidentiality enum ["Official", "Sensitive", "Protected"];
 
-    entity EmployeeRole enum ["Administrator", "Secretary", "Veterinarian"];
+    entity EmployeeRole enum ["Administrator", "Secretary", "Doctor"];
 
     entity ProfessionalLevel enum ["Intern", "Resident", "Staff", "Senior", "Registrar", "Specialist"];
 
@@ -17,24 +17,24 @@ namespace PetClinic {
 
     entity Guest;
 
-    entity PetOwner = {
+    entity Parent = {
         name: String,
-        pets: Set<Pet>,
+        children: Set<Child>,
         clinics: Set<Clinic>,
-        veterinarians: Set<Employee>
+        doctors: Set<Employee>
     };
 
-    entity Pet = {
+    entity Child = {
         name: String,
-        owner: PetOwner,
+        parent: Parent,
         clinics: Set<Clinic>,
-        veterinarians: Set<Employee>
+        doctors: Set<Employee>
     };
 
-    entity PetVisit = {
-        pet: Pet,
+    entity Visit = {
+        child: Child,
         clinics: Set<Clinic>,
-        veterinarians: Set<Employee>,
+        doctors: Set<Employee>,
         confidentiality: Confidentiality
     };
 
@@ -43,31 +43,31 @@ namespace PetClinic {
 
     action ListClients in ClientOperations appliesTo {
         principal: [Employee, Guest],
-        resource: [Clinic, PetOwner, Pet, PetVisit],
+        resource: [Clinic, Parent, Child, Visit],
         context: { }
     };
 
     action ViewClient in ClientOperations appliesTo {
         principal: [Employee, Guest],
-        resource: [PetOwner, Pet, PetVisit],
+        resource: [Parent, Child, Visit],
         context: { }
     };
 
     action AddClient in ClientOperations appliesTo {
         principal: [Employee, Guest],
-        resource: [Clinic, PetOwner, Pet],
+        resource: [Clinic, Parent, Child],
         context: { }
     };
 
     action EditClient in ClientOperations appliesTo {
         principal: [Employee, Guest],
-        resource: [PetOwner, Pet, PetVisit],
+        resource: [Parent, Child, Visit],
         context: { }
     };
 
     action DeleteClient in ClientOperations appliesTo {
         principal: [Employee, Guest],
-        resource: [PetOwner, Pet, PetVisit],
+        resource: [Parent, Child, Visit],
         context: { }
     };
 

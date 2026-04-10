@@ -71,8 +71,8 @@ class ChildController {
 		this.cedarService = cedarService;
 	}
 
-	@ModelAttribute("gender")
-	public Collection<Gender> populateGender() {
+	@ModelAttribute("genders")
+	public Collection<Gender> populateGenders() {
 		return this.genders.findGenders();
 	}
 

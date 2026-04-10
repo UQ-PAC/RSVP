@@ -15,14 +15,14 @@
       <tr>
         <th th:text="#{name}">Name</th>
         <th th:text="#{birthDate}">Birth Date</th>
-        <th th:text="#{type}">Type</th>
+        <th th:text="#{gender}">Gender</th>
         <th th:text="#{parent}">Parent</th>
       </tr>
     </thead>
     <tr>
       <td th:text="${child.name}"></td>
       <td th:text="${#temporals.format(child.birthDate, 'yyyy-MM-dd')}"></td>
-      <td th:text="${child.type}"></td>
+      <td th:text="${child.gender}"></td>
       <td th:text="${parent?.firstName + ' ' + parent?.lastName}"></td>
     </tr>
   </table>

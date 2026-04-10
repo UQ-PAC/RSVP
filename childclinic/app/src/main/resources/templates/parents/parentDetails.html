@@ -52,8 +52,8 @@
           <dd th:text="${child.name}"></dd>
           <dt th:text="#{birthDate}">Birth Date</dt>
           <dd th:text="${#temporals.format(child.birthDate, 'yyyy-MM-dd')}"></dd>
-          <dt th:text="#{type}">Type</dt>
-          <dd th:text="${child.type}"></dd>
+          <dt th:text="#{gender}">Gender</dt>
+          <dd th:text="${child.gender}"></dd>
         </dl>
       </td>
       <td valign="top">

@@ -32,6 +32,8 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import uq.pac.childclinic.system.Clinic;
+
 /**
  * Simple JavaBean domain object with an id property. Used as a base class for objects
  * needing this property.

@@ -366,10 +366,7 @@ public class SchemaTest {
 
             Map<String, CommonTypeDefinition> types = new HashMap<>();
 
-            Map<String, String> typeAnnotations = new HashMap<>();
-            typeAnnotations.put("ATypeAnnotation", "enough annotations already...");
-
-            types.put("SomeType", new EntityTypeReference("App::SomeType", entity, typeAnnotations));
+            types.put("SomeType", new EntityTypeReference("App::SomeType", entity));
 
             Namespace app = new Namespace("App", entities, actions, types);
             schema.add(app);
@@ -684,8 +681,6 @@ public class SchemaTest {
         CommonTypeDefinition type = schema.getCommonType("App::SomeType");
 
         assertNotNull(type);
-        assertEquals(1, type.getAnnotations().size());
-        assertEquals("enough annotations already...", type.getAnnotations().get("ATypeAnnotation"));
         assertTrue(type instanceof EntityTypeReference);
         assertEquals(entity, ((EntityTypeReference) type).getDefinition());
     }

@@ -1,8 +1,8 @@
 package uq.pac.rsvp.policy.datalog.invariant;
 
-import com.cedarpolicy.model.entity.Entities;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
+import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.ast.schema.ActionDefinition;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
@@ -38,7 +38,7 @@ public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDe
      * constructor that copies general data from this factory object, computes invariant-specific
      * information and does validation.
      */
-    public InvariantValidator(Schema schema, Entities entities) {
+    public InvariantValidator(Schema schema, EntitySet entities) {
         this.types = new HashMap<>();
         this.variables = null;
 
@@ -55,8 +55,8 @@ public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDe
 
         // FIXME: ensure entities and actions have types
         this.entities = entities.getEntities().stream().collect(Collectors.toMap(
-                e -> e.getEUID().toCedarExpr(),
-                e -> types.get(e.getEUID().getType().toString())));
+                e -> e.getEuid().getReference(),
+                e -> types.get(e.getEuid().getType())));
 
 		// Put in undefined references
         schema.entityTypes().stream()

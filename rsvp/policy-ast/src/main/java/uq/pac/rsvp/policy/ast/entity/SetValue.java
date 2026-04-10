@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.ast.entity;
 
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class SetValue extends EntityValue {
     private final Set<EntityValue> values;
@@ -12,6 +13,10 @@ public class SetValue extends EntityValue {
 
     public Set<EntityValue> getValues() {
         return values;
+    }
+
+    public void forEach(Consumer<EntityValue> consumer) {
+        values.forEach(consumer);
     }
 
     @Override

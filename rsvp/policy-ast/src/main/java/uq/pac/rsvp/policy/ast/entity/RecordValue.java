@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.ast.entity;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 
 
 public class RecordValue extends EntityValue {
@@ -30,6 +31,10 @@ public class RecordValue extends EntityValue {
             return l.values.equals(this.values);
         }
         return false;
+    }
+
+    public void forEach(BiConsumer<String, EntityValue> consumer) {
+        values.forEach(consumer);
     }
 
     @Override

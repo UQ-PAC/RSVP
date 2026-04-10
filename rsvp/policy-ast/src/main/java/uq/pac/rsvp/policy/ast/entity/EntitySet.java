@@ -33,7 +33,11 @@ public class EntitySet {
                 .collect(Collectors.toSet()));
     }
 
-    public Stream<Entity> entities() {
+    public static EntitySet parse(Path json) throws FileNotFoundException {
+        return new EntitySet(json);
+    }
+
+    public Stream<Entity> stream() {
         return entities.stream();
     }
 

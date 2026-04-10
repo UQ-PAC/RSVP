@@ -1,7 +1,6 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import com.cedarpolicy.model.entity.Entity;
-import com.cedarpolicy.value.*;
+import uq.pac.rsvp.policy.ast.entity.*;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
@@ -29,29 +28,21 @@ public class TranslationEntity {
      */
     private final TranslationEntityDefinition definition;
 
-    public static String getEUIDString(EntityUID id) {
-        return id.toCedarExpr();
-    }
-
-    public static DLTerm getEUIDLiteral(EntityUID id) {
-        return DLTerm.lit(getEUIDString(id));
-    }
-
-    private void addAttributeFacts(Value value, DLTerm euid, String attr, List<DLFact> statements) {
+    private void addAttributeFacts(EntityValue value, DLTerm euid, String attr, List<DLFact> statements) {
         Consumer<DLTerm> addFact = vt ->
                 statements.add(new DLFact(AttributeRuleDecl, euid, DLTerm.lit(attr), vt));
 
         statements.add(new DLFact(HasAttributeRuleDecl, euid, DLTerm.lit(attr)));
 
         switch (value) {
-            case PrimString s -> addFact.accept(DLTerm.lit(s.toString()));
-            case PrimLong l -> addFact.accept(DLTerm.lit(Long.toString(l.getValue())));
-            case PrimBool b -> addFact.accept(DLTerm.lit(b.toString()));
-            case EntityUID e -> addFact.accept(DLTerm.lit(getEUIDString(e)));
-            case CedarList lst -> lst.forEach(v -> addAttributeFacts(v, euid, attr, statements));
-            case CedarMap map -> {
-                EntityUID recEuid = TranslationConstants.getRandomTmpEUID();
-                DLTerm recTerm = getEUIDLiteral(recEuid);
+            case StringValue s -> addFact.accept(DLTerm.lit(s.toString()));
+            case LongValue l -> addFact.accept(DLTerm.lit(Long.toString(l.getValue())));
+            case BooleanValue b -> addFact.accept(DLTerm.lit(b.toString()));
+            case EntityReference e -> addFact.accept(DLTerm.lit(e.getReference()));
+            case SetValue lst -> lst.forEach(v -> addAttributeFacts(v, euid, attr, statements));
+            case RecordValue map -> {
+                EntityReference recEuid = TranslationConstants.getRandomTmpEUID();
+                DLTerm recTerm = DLTerm.lit(recEuid.getReference());
                 addAttributeFacts(recEuid, euid, attr, statements);
                 map.forEach((at, vl) -> addAttributeFacts(vl, recTerm, at, statements));
             }
@@ -64,31 +55,31 @@ public class TranslationEntity {
      * This is for the case when only an entity UID is known, but
      * not the entire entity
      */
-    public TranslationEntity(TranslationEntityDefinition definition, EntityUID uid) {
+    public TranslationEntity(TranslationEntityDefinition definition, EntityReference uid) {
         this.definition = definition;
         DLRuleDecl relation = definition.getEntityRuleDecl();
-        DLTerm euid = getEUIDLiteral(uid);
+        DLTerm euid = DLTerm.lit(uid.getReference());
         this.facts = List.of(new DLFact(relation, euid));
     }
 
     public TranslationEntity(Entity entity, TranslationSchema schema) {
         List<DLFact> statements = new ArrayList<>();
-        this.definition = schema.getTranslationEntityType(entity.getEUID().getType().toString());
+        this.definition = schema.getTranslationEntityType(entity.getEuid().getType());
         // We assume the inputs are validated, so by the time we get to see entities,
         // it has been made sure that there is an underlying type for each encountered EUID
-        require(definition != null, "Cannot locate type for entity " + entity.getEUID());
+        require(definition != null, "Cannot locate type for entity " + entity.getEuid());
         // Build facts
         DLRuleDecl decl = definition.getEntityRuleDecl();
-        DLTerm euid = getEUIDLiteral(entity.getEUID());
+        DLTerm euid = DLTerm.lit(entity.getEuid().getReference());
         statements.add(new DLFact(decl, euid));
 
-        entity.attrs.forEach((attr, value) -> {
-            addAttributeFacts(value, getEUIDLiteral(entity.getEUID()), attr, statements);
+        entity.getAttrs().forEach((attr, value) -> {
+            addAttributeFacts(value, DLTerm.lit(entity.getEuid().getReference()), attr, statements);
         });
 
 		// Generate facts for parent hierarchy
-        entity.parentsEUIDs.forEach(pid -> {
-            statements.add(new DLFact(TranslationConstants.ParentOfRuleDecl, getEUIDLiteral(pid), euid));
+        entity.getParents().forEach(pid -> {
+            statements.add(new DLFact(TranslationConstants.ParentOfRuleDecl, DLTerm.lit(pid.getReference()), euid));
         });
         // Entity is reflexive, an element is a member of its own hierarchy
         statements.add(new DLFact(TranslationConstants.ParentOfRuleDecl, euid, euid));

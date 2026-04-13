@@ -10,10 +10,14 @@ A Gradle project (in `./policygen`) for generating random Cedar policies for tes
 
 Gradle projects in `./rsvp`:
 
-- `app`: Java CLI
+- `app`: Java CLI (currently just placeholder, not useful)
 - `webserver`: Spring Boot web server for interacting with the React web interface
+   (runs in conjunction with the React application in `./webapp`)
 - `policy-ast`: AST library for modelling policies and schemas in Java
 - `policy-dl`: Datalog encoding of Cedar policies
+- `support`: library with common interfaces/classes between other components
+- `verification`: library to perform verification checks and generate reports (to be consumed by
+  the web application, for example)
 
 ## Web application
 

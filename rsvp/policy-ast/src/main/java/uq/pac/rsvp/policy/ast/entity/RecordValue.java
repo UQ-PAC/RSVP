@@ -1,5 +1,6 @@
 package uq.pac.rsvp.policy.ast.entity;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -12,8 +13,16 @@ public class RecordValue extends EntityValue {
         this.values = Map.copyOf(values);
     }
 
+    public RecordValue() {
+        this.values = Collections.emptyMap();
+    }
+
     public Map<String, EntityValue> getValues() {
         return values;
+    }
+
+    public EntityValue getValue(String key) {
+        return values.get(key);
     }
 
     @Override

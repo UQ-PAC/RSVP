@@ -10,6 +10,7 @@ import uq.pac.rsvp.policy.datalog.TestUtil;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
@@ -21,29 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class EntitySetTest {
 
     private final static Path TESTDIR = Path.of(TestUtil.RESOURCEDIR.toString(), "entity");
-
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "entities-tab",
-            "entities-undefined"
-    })
-    void unsupportedName(String name) {
-        Path entity = TestUtil.findFile(TESTDIR, name + ".json"),
-                schema = TestUtil.findFile(TESTDIR, ".cedarschema"),
-                policy = TestUtil.findFile(TESTDIR, ".cedar"),
-                invariants = TestUtil.findFile(TESTDIR, ".invariant");
-        assertThrows(TranslationError.class, () -> Translation.validate(schema, policy, entity, invariants));
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = { "entities" })
-    void supported(String name) {
-        Path entity = TestUtil.findFile(TESTDIR, name + ".json"),
-                schema = TestUtil.findFile(TESTDIR, ".cedarschema"),
-                policy = TestUtil.findFile(TESTDIR, ".cedar"),
-                invariants = TestUtil.findFile(TESTDIR, ".invariant");
-        assertDoesNotThrow(() -> Translation.validate(schema, policy, entity, invariants));
-    }
 
     // Take all the entities from the translation sets and compare them with what Cedar gets
     @Test

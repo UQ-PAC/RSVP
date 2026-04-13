@@ -118,6 +118,132 @@ public class SchemaTest {
             Schema schema = Schema.parseCedarSchema(Path.of(url.getPath()));
             checkAnnotations(schema);
         }
+
+        @Test
+        @DisplayName("handles aliases")
+        void testAliases() throws RsvpException {
+            Schema schema = Schema.parseCedarSchema("entity File = {\n" + //
+                    "    path: Path,\n" + //
+                    "    access: FileAttr,\n" + //
+                    "    permission: FilePermission\n" + //
+                    "};\n" + //
+                    "\n" + //
+                    "entity Directory = {\n" + //
+                    "    access: DirAttr,\n" + //
+                    "    path: Path,\n" + //
+                    "    permission: DirPermission\n" + //
+                    "};\n" + //
+                    "\n" + //
+                    "type FileAttr = String;\n" + //
+                    "type DirAttr = String;\n" + //
+                    "type FilePermission = {\n" + //
+                    "    read: Bool,\n" + //
+                    "    write: Bool,\n" + //
+                    "    exec: Bool\n" + //
+                    "};\n" + //
+                    "\n" + //
+                    "type DirPermission = {\n" + //
+                    "    read: Bool,\n" + //
+                    "    write: Bool,\n" + //
+                    "    exec: Bool\n" + //
+                    "};\n" + //
+                    "\n" + //
+                    "type Path = String;\n" + //
+                    "\n" + //
+                    "action \"introspect\" appliesTo {\n" + //
+                    "    principal: [File, Directory],\n" + //
+                    "    resource: [File, Directory]\n" + //
+                    "};");
+
+            EntityTypeDefinition file = schema.getEntityType("File");
+            EntityTypeDefinition directory = schema.getEntityType("Directory");
+            assertNotNull(file);
+            assertNotNull(directory);
+
+            CommonTypeDefinition fileAttr = schema.getCommonType("FileAttr");
+            CommonTypeDefinition dirAttr = schema.getCommonType("DirAttr");
+            CommonTypeDefinition filePermission = schema.getCommonType("FilePermission");
+            CommonTypeDefinition dirPermission = schema.getCommonType("DirPermission");
+            CommonTypeDefinition path = schema.getCommonType("Path");
+            assertNotNull(fileAttr);
+            assertNotNull(dirAttr);
+            assertNotNull(filePermission);
+            assertNotNull(dirPermission);
+            assertNotNull(path);
+            assertTrue(fileAttr instanceof StringType);
+            assertTrue(dirAttr instanceof StringType);
+            assertTrue(filePermission instanceof RecordTypeDefinition);
+            assertTrue(dirPermission instanceof RecordTypeDefinition);
+            assertTrue(path instanceof StringType);
+
+            CommonTypeDefinition filePathAttr = file.getShape().getAttributeType("path");
+            assertNotNull(filePathAttr);
+            assertTrue(filePathAttr instanceof CommonTypeReference);
+            assertEquals(path, ((CommonTypeReference) filePathAttr).getDefinition());
+
+            CommonTypeDefinition fileAccessAttr = file.getShape().getAttributeType("access");
+            assertNotNull(fileAccessAttr);
+            assertTrue(fileAccessAttr instanceof CommonTypeReference);
+            assertEquals(fileAttr, ((CommonTypeReference) fileAccessAttr).getDefinition());
+
+            CommonTypeDefinition filePermissionAttr = file.getShape().getAttributeType("permission");
+            assertNotNull(filePermissionAttr);
+            assertTrue(filePermissionAttr instanceof CommonTypeReference);
+            assertEquals(filePermission, ((CommonTypeReference) filePermissionAttr).getDefinition());
+
+            CommonTypeDefinition dirPathAttr = directory.getShape().getAttributeType("path");
+            assertNotNull(dirPathAttr);
+            assertTrue(dirPathAttr instanceof CommonTypeReference);
+            System.err.println(((CommonTypeReference) dirPathAttr).getDefinition().toString());
+            assertEquals(path, ((CommonTypeReference) dirPathAttr).getDefinition());
+
+            CommonTypeDefinition dirAccessAttr = directory.getShape().getAttributeType("access");
+            assertNotNull(dirAccessAttr);
+            assertTrue(dirAccessAttr instanceof CommonTypeReference);
+            assertEquals(dirAttr, ((CommonTypeReference) dirAccessAttr).getDefinition());
+
+            CommonTypeDefinition dirPermissionAttr = directory.getShape().getAttributeType("permission");
+            assertNotNull(dirPermissionAttr);
+            assertTrue(dirPermissionAttr instanceof CommonTypeReference);
+            assertEquals(dirPermission, ((CommonTypeReference) dirPermissionAttr).getDefinition());
+
+            CommonTypeDefinition filePermRead = ((RecordTypeDefinition) filePermission).getAttributeType("read");
+            assertNotNull(filePermRead);
+            assertTrue(filePermRead instanceof BooleanType);
+
+            CommonTypeDefinition filePermWrite = ((RecordTypeDefinition) filePermission).getAttributeType("write");
+            assertNotNull(filePermWrite);
+            assertTrue(filePermWrite instanceof BooleanType);
+
+            CommonTypeDefinition filePermExec = ((RecordTypeDefinition) filePermission).getAttributeType("exec");
+            assertNotNull(filePermExec);
+            assertTrue(filePermExec instanceof BooleanType);
+
+            CommonTypeDefinition dirPermRead = ((RecordTypeDefinition) dirPermission).getAttributeType("read");
+            assertNotNull(dirPermRead);
+            assertTrue(dirPermRead instanceof BooleanType);
+
+            CommonTypeDefinition dirPermWrite = ((RecordTypeDefinition) dirPermission).getAttributeType("write");
+            assertNotNull(dirPermWrite);
+            assertTrue(dirPermWrite instanceof BooleanType);
+
+            CommonTypeDefinition dirPermExec = ((RecordTypeDefinition) dirPermission).getAttributeType("exec");
+            assertNotNull(dirPermExec);
+            assertTrue(dirPermExec instanceof BooleanType);
+
+            ActionDefinition introspect = schema.getAction("Action", "introspect");
+            assertNotNull(introspect);
+
+            Set<EntityTypeDefinition> principals = introspect.getAppliesToPrincipalTypes();
+            Set<EntityTypeDefinition> resources = introspect.getAppliesToResourceTypes();
+
+            assertEquals(2, principals.size());
+            assertEquals(2, resources.size());
+
+            assertTrue(principals.containsAll(Arrays.asList(file, directory)));
+            assertTrue(resources.containsAll(Arrays.asList(file, directory)));
+
+        }
     }
 
     @Nested

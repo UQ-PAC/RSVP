@@ -20,6 +20,26 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
     @Override
     public void visitSchema(Schema schema) {
         this.schema = schema;
+
+        // Type aliases must be resolved first so that they can be referenced in other
+        // types
+        for (Map.Entry<String, Namespace> entry : schema.entrySet()) {
+            Namespace namespace = entry.getValue();
+
+            for (String name : namespace.commonTypeNames()) {
+                CommonTypeDefinition commonType = namespace.getCommonType(name);
+
+                if (commonType instanceof UnresolvedTypeReference) {
+                    commonType = Schema.resolveTypeReference((UnresolvedTypeReference) commonType, schema,
+                            namespace);
+                    namespace.resolveCommonType(name, commonType);
+                }
+
+                schema.addCommonType(commonType);
+            }
+        }
+
+
         for (Map.Entry<String, Namespace> entry : schema.entrySet()) {
             this.namespace = entry.getValue();
 
@@ -37,14 +57,6 @@ public class SchemaResolutionVisitor extends SchemaVisitorImpl {
 
             for (String name : this.namespace.commonTypeNames()) {
                 CommonTypeDefinition commonType = this.namespace.getCommonType(name);
-
-                if (commonType instanceof UnresolvedTypeReference) {
-                    commonType = Schema.resolveTypeReference((UnresolvedTypeReference) commonType, schema,
-                            this.namespace);
-                    this.namespace.resolveCommonType(name, commonType);
-                }
-
-                schema.addCommonType(commonType);
                 commonType.accept(this);
             }
         }

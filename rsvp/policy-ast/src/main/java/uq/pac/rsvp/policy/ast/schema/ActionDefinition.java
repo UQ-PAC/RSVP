@@ -9,6 +9,7 @@ import com.google.gson.annotations.SerializedName;
 
 import uq.pac.rsvp.policy.ast.schema.common.RecordTypeDefinition;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
+import uq.pac.rsvp.policy.ast.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class ActionDefinition implements SchemaItem {
@@ -194,5 +195,10 @@ public class ActionDefinition implements SchemaItem {
     @Override
     public <T> T compute(SchemaComputationVisitor<T> visitor) {
         return visitor.visitActionDefinition(this);
+    }
+
+    @Override
+    public <T> void process(SchemaPayloadVisitor<T> visitor, T payload) {
+        visitor.visitActionDefinition(this, payload);
     }
 }

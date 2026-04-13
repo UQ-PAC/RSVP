@@ -4,6 +4,7 @@ import java.util.Map;
 
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
+import uq.pac.rsvp.policy.ast.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class CommonTypeReference extends CommonTypeDefinition {
@@ -44,4 +45,13 @@ public class CommonTypeReference extends CommonTypeDefinition {
         return visitor.visitCommonTypeReference(this);
     }
 
+    @Override
+    public <T> void process(SchemaPayloadVisitor<T> visitor, T payload) {
+        visitor.visitCommonTypeReference(this, payload);
+    }
+
+    @Override
+    public String toString() {
+        return getName() + "( " + definition + " )";
+    }
 }

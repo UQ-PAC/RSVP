@@ -27,6 +27,7 @@ import uq.pac.rsvp.policy.ast.schema.common.LongType;
 import uq.pac.rsvp.policy.ast.schema.common.StringType;
 import uq.pac.rsvp.policy.ast.schema.common.UnresolvedTypeReference;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
+import uq.pac.rsvp.policy.ast.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaResolutionVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
@@ -365,6 +366,11 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
     @Override
     public <T> T compute(SchemaComputationVisitor<T> visitor) {
         return visitor.visitSchema(this);
+    }
+
+    @Override
+    public <T> void process(SchemaPayloadVisitor<T> visitor, T payload) {
+        visitor.visitSchema(this, payload);
     }
 
     public static class SchemaDeserialiser implements JsonDeserializer<Schema> {

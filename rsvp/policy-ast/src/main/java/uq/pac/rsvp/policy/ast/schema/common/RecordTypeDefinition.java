@@ -1,12 +1,11 @@
 package uq.pac.rsvp.policy.ast.schema.common;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
+import uq.pac.rsvp.policy.ast.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class RecordTypeDefinition extends CommonTypeDefinition {
@@ -45,6 +44,10 @@ public class RecordTypeDefinition extends CommonTypeDefinition {
         return Map.copyOf(attributes);
     }
 
+    public boolean hasAttribute(String key) {
+        return attributes.containsKey(key);
+    }
+
     public CommonTypeDefinition getAttributeType(String name) {
         return attributes.get(name);
     }
@@ -63,4 +66,23 @@ public class RecordTypeDefinition extends CommonTypeDefinition {
         return visitor.visitRecordTypeDefinition(this);
     }
 
+    @Override
+    public <T> void process(SchemaPayloadVisitor<T> visitor, T payload) {
+        visitor.visitRecordTypeDefinition(this, payload);
+    }
+
+    @Override
+    public String toString() {
+        List<String> components = new ArrayList<>();
+        attributes.forEach((attr, val) -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append(attr);
+            if (!val.isRequired()) {
+                sb.append("?");
+            }
+            sb.append(":").append(val);
+            components.add(sb.toString());
+        });
+        return "{ " + String.join(", ", components) + "}";
+    }
 }

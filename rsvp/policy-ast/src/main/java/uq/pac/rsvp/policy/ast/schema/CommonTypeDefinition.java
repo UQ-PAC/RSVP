@@ -21,6 +21,7 @@ import uq.pac.rsvp.policy.ast.schema.common.SetTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.common.StringType;
 import uq.pac.rsvp.policy.ast.schema.common.UnresolvedTypeReference;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
+import uq.pac.rsvp.policy.ast.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public abstract class CommonTypeDefinition implements SchemaItem {
@@ -75,6 +76,9 @@ public abstract class CommonTypeDefinition implements SchemaItem {
 
     @Override
     public abstract <T> T compute(SchemaComputationVisitor<T> visitor);
+
+    @Override
+    public abstract <T> void process(SchemaPayloadVisitor<T> visitor, T payload);
 
     public static class CommonTypeDefinitionDeserialiser implements JsonDeserializer<CommonTypeDefinition> {
 

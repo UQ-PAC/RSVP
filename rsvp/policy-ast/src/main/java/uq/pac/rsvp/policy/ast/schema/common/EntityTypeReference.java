@@ -5,6 +5,7 @@ import java.util.Map;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
+import uq.pac.rsvp.policy.ast.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class EntityTypeReference extends CommonTypeDefinition {
@@ -43,5 +44,15 @@ public class EntityTypeReference extends CommonTypeDefinition {
     @Override
     public <T> T compute(SchemaComputationVisitor<T> visitor) {
         return visitor.visitEntityTypeReference(this);
+    }
+
+    @Override
+    public <T> void process(SchemaPayloadVisitor<T> visitor, T payload) {
+        visitor.visitEntityTypeReference(this, payload);
+    }
+
+    @Override
+    public String toString() {
+        return definition.getName();
     }
 }

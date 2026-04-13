@@ -9,12 +9,12 @@ import java.util.stream.Collectors;
 
 public abstract class EntityValue {
 
-    // FIXME: We need source locations here
-
+    // FIXME: Need source locations
     private final static JsonElement REFERENCE_SCHEMA = JsonParser.getGson().fromJson("""
             { "id" : "id", "type" : "type" }
             """, JsonElement.class);
 
+    // FIXME: Move this out of here
     public static EntityValue deserialise(JsonElement json) {
         return switch (json) {
             case JsonObject object -> {

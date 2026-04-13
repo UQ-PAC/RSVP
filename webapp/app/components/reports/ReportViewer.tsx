@@ -8,7 +8,6 @@ import { useVerification } from "../providers/VerificationContext";
 type GroupedReports = [string, Report[]][];
 
 export function ReportViewer() {
-  // const [reports, setReports] = useState<Report[]>([]);
   const [info, setInfo] = useState<GroupedReports>([]);
   const [warn, setWarn] = useState<GroupedReports>([]);
   const [err, setErr] = useState<GroupedReports>([]);

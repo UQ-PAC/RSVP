@@ -120,8 +120,6 @@ public class VerificationService {
                     throw new ErrorResponseException(HttpStatus.BAD_REQUEST);
                 }
 
-                // logger.info("Verifying: {}", file);
-
                 Set<Report> all = Verification.verifyPolicies(fileId, file, schemaFile, entitiesFile);
 
                 logger.info(all.toString());

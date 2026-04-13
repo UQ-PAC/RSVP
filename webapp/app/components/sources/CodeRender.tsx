@@ -27,10 +27,6 @@ const robotoMono = Roboto_Mono({
   subsets: ["latin"],
 });
 
-// TODO:
-//     line-based highlight (starts or ends mid-line)
-//     scroll to primary or top unless explicitely clicked on line
-// FIXME: multiple reports per line....?
 export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
   const { selected, hovered, scroll } = useSelection();
   const selectionDispatch = useSelectionDispatch();

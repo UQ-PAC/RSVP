@@ -5,10 +5,6 @@ on:
     paths:
       - "webapp/**"
       - ".github/workflows/webapp.yaml"
-  pull_request:
-    paths:
-      - "webapp/**"
-      - ".github/workflows/webapp.yaml"
   workflow_dispatch:
 
 jobs:

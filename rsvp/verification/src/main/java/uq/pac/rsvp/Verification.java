@@ -54,12 +54,6 @@ public class Verification {
         return results;
     }
 
-    // public static List<Report> verify(String policies, String schema) throws
-    // RsvpException {
-    // return verify(PolicySet.parseCedarPolicySet(policies),
-    // Schema.parseCedarSchema(schema));
-    // }
-
     public static Set<Report> verify(PolicySet policies, Schema schema) {
         RandomReportGenerator generator = new RandomReportGenerator();
 

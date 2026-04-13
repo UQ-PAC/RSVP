@@ -35,7 +35,6 @@ public class JsonParser {
         return parseSchema(null, json);
     }
 
-    // FIXME: no schema line numbers anyway
     public static Schema parseSchema(String filename, String json) {
         return getGson(filename, json).fromJson(json, Schema.class);
     }

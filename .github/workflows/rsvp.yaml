@@ -7,10 +7,6 @@ on:
     paths:
       - "rsvp/**"
       - ".github/workflows/rsvp.yaml"
-  pull_request:
-    paths:
-      - "rsvp/**"
-      - ".github/workflows/rsvp.yaml"
   workflow_dispatch:
 
 jobs:

@@ -132,6 +132,7 @@ public class PolicySetTest {
             policy = "permit (principal, action, resource);";
             policies = PolicySet.parseCedarPolicySet("test.cedar", policy);
 
+            // FIXME: source locations missing
         }
     }
 

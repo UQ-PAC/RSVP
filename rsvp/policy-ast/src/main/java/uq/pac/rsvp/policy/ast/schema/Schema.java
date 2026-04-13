@@ -244,7 +244,7 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
             if (common instanceof UnresolvedTypeReference) {
                 throw new SchemaResolutionException("Unexpected unresolved schema definition");
             }
-            
+
             return new CommonTypeReference(definitionName, common, unresolved.isRequired(),
                     unresolved.getAnnotations());
         }

@@ -19,11 +19,8 @@
 /rsvp/rsvp-tmp
 /rsvp/support/bin
 /rsvp/support/build
-/webapp/coverage
-/webapp/build
-/webapp/client/public
-/webapp/client/coverage
-/webapp/client/build
+/rsvp/verification/bin
+/rsvp/verification/build
 
 # misc
 .DS_Store

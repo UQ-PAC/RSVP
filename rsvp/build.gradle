@@ -70,9 +70,6 @@ subprojects {
     }
 
     dependencies {
-        // Avoid log4j warnings
-        // implementation("org.slf4j:slf4j-api:2.0.17")
-        // implementation("org.slf4j:slf4j-simple:2.0.17")
         // Custom cedar-java fork (https://github.com/rebecca-odonoghue/cedar-java)
         implementation 'com.cedarpolicy:cedar-java:4.8.0-rsvp-4:uber'
 

@@ -105,14 +105,14 @@ public class Translation {
             this.program = translate(schema, policies, entities, invariants);
             program.execute(datalogDir);
 
-        } catch (RsvpException | AuthException | IOException | RuntimeException | InterruptedException e) {
+        } catch (RsvpException | AuthException | IOException | RuntimeException | InterruptedException | IllegalAccessException e) {
             throw new TranslationError(e);
         }
     }
 
     record InputSet(Schema schema, PolicySet policies, EntitySet entities, InvariantSet invariants) {}
 
-    static InputSet validate(Path schemaFile, Path policyFile, Path entityFile, Path invariantsFile) throws IOException, AuthException, RsvpException {
+    static InputSet validate(Path schemaFile, Path policyFile, Path entityFile, Path invariantsFile) throws IOException, AuthException, RsvpException, IllegalAccessException {
         EntitySet entities = EntitySet.parse(entityFile);
         com.cedarpolicy.model.schema.Schema cedarSchema =
                 new com.cedarpolicy.model.schema.Schema(Files.readString(schemaFile));

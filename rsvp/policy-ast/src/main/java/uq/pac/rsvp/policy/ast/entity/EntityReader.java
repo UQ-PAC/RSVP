@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-class Reader {
+class EntityReader {
     // FIXME: Need source locations
 
     static Field POSITION;

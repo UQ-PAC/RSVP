@@ -5,6 +5,7 @@ import com.cedarpolicy.value.*;
 import org.junit.jupiter.api.Test;
 import uq.pac.rsvp.policy.ast.entity.*;
 import uq.pac.rsvp.policy.datalog.TestUtil;
+import uq.pac.rsvp.support.SourceLoc;
 
 import javax.swing.*;
 import java.io.IOException;

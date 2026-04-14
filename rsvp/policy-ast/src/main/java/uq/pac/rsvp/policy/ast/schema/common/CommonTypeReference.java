@@ -4,30 +4,15 @@ import java.util.Map;
 
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
+import uq.pac.rsvp.policy.ast.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class CommonTypeReference extends CommonTypeDefinition {
 
     private final CommonTypeDefinition definition;
 
-    public CommonTypeReference(String name, CommonTypeDefinition definition, boolean required,
-            Map<String, String> annotations) {
-        super(name, required, annotations);
-        this.definition = definition;
-    }
-
-    public CommonTypeReference(CommonTypeDefinition definition, boolean required, Map<String, String> annotations) {
-        super(required, annotations);
-        this.definition = definition;
-    }
-
-    public CommonTypeReference(String name, CommonTypeDefinition definition, Map<String, String> annotations) {
-        super(name, annotations);
-        this.definition = definition;
-    }
-
-    public CommonTypeReference(CommonTypeDefinition definition, Map<String, String> annotations) {
-        super(annotations);
+    public CommonTypeReference(String name, CommonTypeDefinition definition, boolean required) {
+        super(name, required);
         this.definition = definition;
     }
 
@@ -60,4 +45,13 @@ public class CommonTypeReference extends CommonTypeDefinition {
         return visitor.visitCommonTypeReference(this);
     }
 
+    @Override
+    public <T> void process(SchemaPayloadVisitor<T> visitor, T payload) {
+        visitor.visitCommonTypeReference(this, payload);
+    }
+
+    @Override
+    public String toString() {
+        return getName() + "( " + definition + " )";
+    }
 }

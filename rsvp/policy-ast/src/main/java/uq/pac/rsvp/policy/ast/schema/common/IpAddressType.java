@@ -4,24 +4,13 @@ import java.util.Map;
 
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
+import uq.pac.rsvp.policy.ast.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class IpAddressType extends CommonTypeDefinition {
 
-    public IpAddressType(String name, boolean required, Map<String, String> annotations) {
-        super(name, required, annotations);
-    }
-
-    public IpAddressType(boolean required, Map<String, String> annotations) {
-        super(required, annotations);
-    }
-
-    public IpAddressType(String name, Map<String, String> annotations) {
-        super(name, annotations);
-    }
-
-    public IpAddressType(Map<String, String> annotations) {
-        super(annotations);
+    public IpAddressType(String name, boolean required) {
+        super(name, required);
     }
 
     public IpAddressType(boolean required) {
@@ -44,5 +33,15 @@ public class IpAddressType extends CommonTypeDefinition {
     @Override
     public <T> T compute(SchemaComputationVisitor<T> visitor) {
         return visitor.visitIpAddress(this);
+    }
+
+    @Override
+    public <T> void process(SchemaPayloadVisitor<T> visitor, T payload) {
+        visitor.visitIpAddress(this, payload);
+    }
+
+    @Override
+    public String toString() {
+        return "__cedar::idaddr";
     }
 }

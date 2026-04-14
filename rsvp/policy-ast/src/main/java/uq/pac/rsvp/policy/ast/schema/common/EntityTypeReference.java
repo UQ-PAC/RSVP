@@ -5,30 +5,15 @@ import java.util.Map;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
+import uq.pac.rsvp.policy.ast.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class EntityTypeReference extends CommonTypeDefinition {
 
     private final EntityTypeDefinition definition;
 
-    public EntityTypeReference(String name, EntityTypeDefinition definition, boolean required,
-            Map<String, String> annotations) {
-        super(name, required, annotations);
-        this.definition = definition;
-    }
-
-    public EntityTypeReference(EntityTypeDefinition definition, boolean required, Map<String, String> annotations) {
-        super(required, annotations);
-        this.definition = definition;
-    }
-
-    public EntityTypeReference(String name, EntityTypeDefinition definition, Map<String, String> annotations) {
-        super(name, annotations);
-        this.definition = definition;
-    }
-
-    public EntityTypeReference(EntityTypeDefinition definition, Map<String, String> annotations) {
-        super(annotations);
+    public EntityTypeReference(String name, EntityTypeDefinition definition, boolean required) {
+        super(name, required);
         this.definition = definition;
     }
 
@@ -59,5 +44,15 @@ public class EntityTypeReference extends CommonTypeDefinition {
     @Override
     public <T> T compute(SchemaComputationVisitor<T> visitor) {
         return visitor.visitEntityTypeReference(this);
+    }
+
+    @Override
+    public <T> void process(SchemaPayloadVisitor<T> visitor, T payload) {
+        visitor.visitEntityTypeReference(this, payload);
+    }
+
+    @Override
+    public String toString() {
+        return definition.getName();
     }
 }

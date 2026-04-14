@@ -28,7 +28,6 @@ public class JsonParser {
                 .registerTypeAdapter(SourceLoc.class, new SourceLocDeserializer(filename, content))
                 .disableJdkUnsafe()
                 .create();
-
     }
 
     public static Schema parseSchema(String json) {

@@ -4,24 +4,13 @@ import java.util.Map;
 
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
+import uq.pac.rsvp.policy.ast.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class DateTimeType extends CommonTypeDefinition {
 
-    public DateTimeType(String name, boolean required, Map<String, String> annotations) {
-        super(name, required, annotations);
-    }
-
-    public DateTimeType(boolean required, Map<String, String> annotations) {
-        super(required, annotations);
-    }
-
-    public DateTimeType(String name, Map<String, String> annotations) {
-        super(name, annotations);
-    }
-
-    public DateTimeType(Map<String, String> annotations) {
-        super(annotations);
+    public DateTimeType(String name, boolean required) {
+        super(name, required);
     }
 
     public DateTimeType(boolean required) {
@@ -44,5 +33,15 @@ public class DateTimeType extends CommonTypeDefinition {
     @Override
     public <T> T compute(SchemaComputationVisitor<T> visitor) {
         return visitor.visitDateTime(this);
+    }
+
+    @Override
+    public <T> void process(SchemaPayloadVisitor<T> visitor, T payload) {
+        visitor.visitDateTime(this, payload);
+    }
+
+    @Override
+    public String toString() {
+        return "__cedar::datetime";
     }
 }

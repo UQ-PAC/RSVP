@@ -21,6 +21,7 @@ import uq.pac.rsvp.policy.ast.schema.common.SetTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.common.StringType;
 import uq.pac.rsvp.policy.ast.schema.common.UnresolvedTypeReference;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
+import uq.pac.rsvp.policy.ast.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public abstract class CommonTypeDefinition implements SchemaItem {
@@ -31,44 +32,25 @@ public abstract class CommonTypeDefinition implements SchemaItem {
     // it will be false
     private final boolean required;
 
-    private final Map<String, String> annotations;
-
-    protected CommonTypeDefinition(String name, boolean required, Map<String, String> annotations) {
+    protected CommonTypeDefinition(String name, boolean required) {
         this.definitionName = name;
         this.required = required;
-        this.annotations = annotations != null ? Map.copyOf(annotations) : Collections.emptyMap();
-    }
-
-    protected CommonTypeDefinition(boolean required, Map<String, String> annotations) {
-        this(null, required, annotations);
-    }
-
-    protected CommonTypeDefinition(boolean required) {
-        this(null, required, null);
-    }
-
-    protected CommonTypeDefinition(String name, Map<String, String> annotations) {
-        this(name, false, annotations);
-    }
-
-    protected CommonTypeDefinition(Map<String, String> annotations) {
-        this(null, false, annotations);
     }
 
     protected CommonTypeDefinition(String name) {
-        this(name, false, null);
+        this(name, false);
+    }
+
+    protected CommonTypeDefinition(boolean required) {
+        this(null, required);
     }
 
     protected CommonTypeDefinition() {
-        this(null, false, null);
+        this(null, false);
     }
 
     public boolean isRequired() {
         return required;
-    }
-
-    public Map<String, String> getAnnotations() {
-        return annotations;
     }
 
     /**
@@ -94,6 +76,9 @@ public abstract class CommonTypeDefinition implements SchemaItem {
 
     @Override
     public abstract <T> T compute(SchemaComputationVisitor<T> visitor);
+
+    @Override
+    public abstract <T> void process(SchemaPayloadVisitor<T> visitor, T payload);
 
     public static class CommonTypeDefinitionDeserialiser implements JsonDeserializer<CommonTypeDefinition> {
 

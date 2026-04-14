@@ -4,23 +4,12 @@ import java.util.Map;
 
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
+import uq.pac.rsvp.policy.ast.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class StringType extends CommonTypeDefinition {
-    public StringType(String name, boolean required, Map<String, String> annotations) {
-        super(name, required, annotations);
-    }
-
-    public StringType(boolean required, Map<String, String> annotations) {
-        super(required, annotations);
-    }
-
-    public StringType(String name, Map<String, String> annotations) {
-        super(name, annotations);
-    }
-
-    public StringType(Map<String, String> annotations) {
-        super(annotations);
+    public StringType(String name, boolean required) {
+        super(name, required);
     }
 
     public StringType(boolean required) {
@@ -43,5 +32,15 @@ public class StringType extends CommonTypeDefinition {
     @Override
     public <T> T compute(SchemaComputationVisitor<T> visitor) {
         return visitor.visitString(this);
+    }
+
+    @Override
+    public <T> void process(SchemaPayloadVisitor<T> visitor, T payload) {
+        visitor.visitString(this, payload);
+    }
+
+    @Override
+    public String toString() {
+        return "__cedar::String";
     }
 }

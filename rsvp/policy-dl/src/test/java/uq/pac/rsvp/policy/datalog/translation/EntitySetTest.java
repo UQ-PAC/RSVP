@@ -3,14 +3,11 @@ package uq.pac.rsvp.policy.datalog.translation;
 import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.value.*;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import uq.pac.rsvp.policy.ast.entity.*;
 import uq.pac.rsvp.policy.datalog.TestUtil;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +22,7 @@ public class EntitySetTest {
 
     // Take all the entities from the translation sets and compare them with what Cedar gets
     @Test
-    void buildTest() throws IOException {
+    void buildTest() throws IOException, IllegalAccessException {
         Path path = TestUtil.getResourceDir("translation");
         for (Path ep : TestUtil.findFiles(path, ".json")) {
             Entities cedarEntities = Entities.parse(ep);

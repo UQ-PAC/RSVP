@@ -22,7 +22,7 @@ public class TypingTest {
 
     private final InvariantValidator validator;
 
-    public TypingTest() throws RsvpException, IOException {
+    public TypingTest() throws RsvpException, IOException, IllegalAccessException {
         Path schemaPath = TestUtil.getResourceDir( "invariant", "schema.cedarschema");
         Schema schema = Schema.parseCedarSchema(schemaPath);
         Path entitiesPath = TestUtil.getResourceDir("invariant", "entities.json");

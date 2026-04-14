@@ -3,6 +3,7 @@ package uq.pac.rsvp.policy.ast.entity;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 
@@ -49,5 +50,13 @@ public class RecordValue extends EntityValue {
     @Override
     public String toString() {
         return values.toString();
+    }
+
+    public int size() {
+        return values.size();
+    }
+
+    public Set<String> keySet() {
+        return values.keySet();
     }
 }

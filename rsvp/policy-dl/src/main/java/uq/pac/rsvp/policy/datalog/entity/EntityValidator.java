@@ -201,10 +201,6 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
 
     @Override
     public void visitCommonTypeReference(CommonTypeReference type, EntityValue payload) {
-        CommonTypeDefinition definition = schema.getCommonType(type.getName());
-        if (definition == null) {
-            throw new Error("Unexpected type: " + type);
-        }
-        definition.process(this, payload);
+        type.getDefinition().process(this, payload);
     }
 }

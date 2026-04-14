@@ -41,4 +41,8 @@ public class JsonParser {
     public static PolicySet parsePolicySet(String filename, String json, String cedar) {
         return getGson(filename, cedar).fromJson(json, PolicySet.class);
     }
+
+    public static PolicySet parsePolicySet(String filename, String json) {
+        return parsePolicySet(filename, json, null);
+    }
 }

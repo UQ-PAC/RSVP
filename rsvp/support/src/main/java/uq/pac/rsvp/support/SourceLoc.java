@@ -1,6 +1,7 @@
 package uq.pac.rsvp.support;
 
 import java.lang.reflect.Type;
+import java.nio.file.Path;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -12,42 +13,57 @@ public class SourceLoc {
 
     public static final SourceLoc MISSING = new SourceLoc();
 
+    public record LineLoc(int line, int column) {
+        @Override
+        public String toString() {
+            return line + ":" + column;
+        }
+    }
+
     public final String file;
     public final int offset;
     public final int len;
 
-    public final int line;
-    public final int col;
+    private final LineLoc start;
+    private final LineLoc end;
 
-    public SourceLoc(String file, int offset, int len, int line, int col) {
-        this.file = file;
+    public SourceLoc(FileSource source, int offset, int len) {
         this.offset = offset;
         this.len = len;
-        this.line = line;
-        this.col = col;
+
+        if (source != null) {
+            this.file = source.getFile();
+            this.start = source.getLineLoc(offset);
+            this.end = source.getLineLoc(offset);
+        } else {
+            this.file = null;
+            this.start = null;
+            this.end = null;
+        }
     }
 
-    public SourceLoc() {
-        file = "unknown";
-        offset = -1;
-        len = 0;
-        line = -1;
-        col = -1;
+    private SourceLoc() {
+        this(null, -1, 0);
+    }
+
+    public LineLoc getStartLoc() {
+        return start;
+    }
+
+    public LineLoc getEndLoc() {
+        return end;
     }
 
     @Override
     public String toString() {
-        return file + ":" + line + ":" + col + ":" + len;
+        return file + ":" + start + ":" + len;
     }
 
     public static class SourceLocDeserializer implements JsonDeserializer<SourceLoc> {
+        private final FileSource fs;
 
-        private final String filename;
-        private final String content;
-
-        public SourceLocDeserializer(String filename, String content) {
-            this.filename = filename;
-            this.content = content;
+        public SourceLocDeserializer(String filename, String contents) {
+            this.fs = FileSource.get(filename, contents);
         }
 
         @Override
@@ -55,40 +71,18 @@ public class SourceLoc {
                 throws JsonParseException {
 
             JsonObject sourceObject = json.getAsJsonObject();
-            JsonElement configuiredFilename = sourceObject.get("file");
+            JsonElement sourceFilename = sourceObject.get("file");
 
             int offset = sourceObject.get("offset").getAsInt();
             int len = sourceObject.get("len").getAsInt();
 
-            int line = 1;
-            int col = 1;
-
-            boolean found = false;
-
-            for (int i = 0; i < content.length(); i++) {
-                if (i == offset) {
-                    found = true;
-                    break;
-                } else if (content.charAt(i) == '\n') {
-                    line++;
-                    col = 1;
-                } else {
-                    col++;
-                }
+            if (fs != null) {
+                return new SourceLoc(fs, offset, len);
+            } else if (sourceFilename != null) {
+                FileSource fs = FileSource.get(Path.of(sourceFilename.getAsString()));
+                return new SourceLoc(fs, offset, len);
             }
-
-            if (!found) {
-                line = -1;
-                col = -1;
-            }
-
-            if (configuiredFilename != null) {
-                return new SourceLoc(configuiredFilename.getAsString(), offset, len, line, col);
-            } else if (filename != null) {
-                return new SourceLoc(filename, offset, len, line, col);
-            } else {
-                return new SourceLoc("unknown", offset, len, line, col);
-            }
+            return SourceLoc.MISSING;
         }
     }
 }

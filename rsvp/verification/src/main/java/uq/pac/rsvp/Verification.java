@@ -35,11 +35,8 @@ public class Verification {
 
         Path dlPath = Files.createTempDirectory("rsvp-");
 
-        Schema schema = Schema.parseCedarSchema(schemaPath);
-        PolicySet policies = PolicySet.parseCedarPolicySet(policyFilename, Files.readString(policiesPath));
-
         Translation translation =
-                new Translation(schema, policies, entities, null, dlPath);
+                new Translation(schemaPath, policiesPath, entities, null, dlPath);
 
         Map<Policy, RequestSet> policyResults = translation.getPolicyResult();
 

@@ -56,7 +56,8 @@ public class ExpressionTest {
         void testDeserialisation() throws IOException, URISyntaxException {
             URL url = ClassLoader.getSystemResource("expr.ast.json");
             String json = Files.readString(Path.of(url.toURI()));
-            PolicySet policies = JsonParser.parsePolicySet("file.json", json, "");
+            PolicySet policies = JsonParser.parsePolicySet("file.json", json,
+                    Files.readString(Path.of(url.getPath())));
 
             String[] expected = {
                     "((principal.role == \"normie\") && ([\"secret\", \"top secret\"].contains(resource.access) || (resource has \"leaked\")))",
@@ -72,7 +73,7 @@ public class ExpressionTest {
                 // Check source loc
                 SourceLoc source = condition.getSourceLoc();
                 if (i == 0) {
-                    assertEquals("expr.cedar", source.file);
+                    assertEquals("file.json", source.file);
                     assertEquals(5, source.offset);
                     assertEquals(25, source.len);
                 } else {

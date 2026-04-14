@@ -42,9 +42,7 @@ import com.cedarpolicy.model.EntityValidationRequest;
 import com.cedarpolicy.model.ValidationRequest;
 import com.cedarpolicy.model.ValidationResponse;
 import com.cedarpolicy.model.entity.Entities;
-import com.cedarpolicy.model.entity.Entity;
 import com.cedarpolicy.model.exception.AuthException;
-import com.cedarpolicy.value.EntityUID;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Multimap;
@@ -52,6 +50,9 @@ import com.google.common.collect.Multimap;
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
+import uq.pac.rsvp.policy.ast.entity.Entity;
+import uq.pac.rsvp.policy.ast.entity.EntityReference;
+import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.ast.DLAtom;
 import uq.pac.rsvp.policy.datalog.ast.DLDeclTerm;
@@ -72,7 +73,7 @@ public class Translation {
 
     private final Schema schema;
     private final PolicySet policies;
-    private final Entities entities;
+    private final EntitySet entities;
     private final InvariantSet invariants;
     private final Path datalogDir;
     private final DLProgram program;
@@ -109,42 +110,10 @@ public class Translation {
         }
     }
 
-    /**
-     * Create a translation from a previously-parsed schema and policy set (plus an entities file /
-     * invariant file). This overload will not perform schema validation.
-     */
-    public Translation(Schema schema, PolicySet policies, Path entitiesFile, Path invariantFile, Path datalogDir) {
-        this.datalogDir = datalogDir;
-        try {
-            this.schema = schema;
-            this.entities = updateEntities(Entities.parse(entitiesFile), schema);
-            this.policies = policies;
-            this.invariants = invariantFile == null ? InvariantSet.parse("") : InvariantSet.parse(invariantFile);
-
-            this.policyDeclarations = HashBiMap.create();
-            int index = 1;
-            for (Policy p : policies) {
-                policyDeclarations.put(p, TranslationConstants.makePolicyRuleDecl(index++));
-            }
-
-            this.invariantDeclarations = HashBiMap.create();
-            index = 1;
-            for (Invariant i : invariants.getInvariants()) {
-                invariantDeclarations.put(i, TranslationConstants.makeInvariantRuleDecl(i, index++));
-            }
-
-            this.program = translate(schema, policies, entities, invariants);
-            program.execute(datalogDir);
-
-        } catch (IOException | RuntimeException | InterruptedException e) {
-            throw new TranslationError(e);
-        }
-    }
-
-    record InputSet(Schema schema, PolicySet policies, Entities entities, InvariantSet invariants) {}
+    record InputSet(Schema schema, PolicySet policies, EntitySet entities, InvariantSet invariants) {}
 
     static InputSet validate(Path schemaFile, Path policyFile, Path entityFile, Path invariantsFile) throws IOException, AuthException, RsvpException {
-        Entities entities = Entities.parse(entityFile);
+        EntitySet entities = EntitySet.parse(entityFile);
         com.cedarpolicy.model.schema.Schema cedarSchema =
                 new com.cedarpolicy.model.schema.Schema(Files.readString(schemaFile));
         com.cedarpolicy.model.policy.PolicySet policies =
@@ -164,7 +133,8 @@ public class Translation {
         }
 
         EntityValidationRequest eReq =
-                new EntityValidationRequest(cedarSchema, entities.getEntities().stream().toList());
+                new EntityValidationRequest(cedarSchema,
+                        Entities.parse(entityFile).getEntities().stream().toList());
         engine.validateEntities(eReq);
 
         // For the moment we do not support arbitrary action names as Cedar does,
@@ -181,7 +151,7 @@ public class Translation {
         // For the moment we also do not support entity names that have the same
         // delimiter that is used for Datalog output (\t)
         List<String> entityNames = entities.getEntities().stream()
-                .map(e -> e.getEUID().getId().toString())
+                .map(e -> e.getEuid().getId())
                 .collect(Collectors.toCollection(ArrayList::new));
         rsvpSchema.entityTypes()
                 .forEach(et -> entityNames.addAll(et.getEntityNamesEnum()));
@@ -194,9 +164,10 @@ public class Translation {
             }
         }
 
-        // Make sure that the name of the internal record type used for processing records is not used in the schema
+        // Make sure that the name of the internal record type used for processing
+        // records is not used in the schema
         rsvpSchema.entityTypes().forEach(et -> {
-            if (et.getName().equals(TmpRecordType.getName())) {
+            if (et.getName().equals(TmpRecordType)) {
                 throw new TranslationError("Internal record type: " + et.getName() + "in schema");
             }
         });
@@ -215,32 +186,36 @@ public class Translation {
      * - remove actions (as entities)
      * - add implicit entities from enums
      */
-    public static Entities updateEntities(Entities entities, Schema schema) {
+    public static EntitySet updateEntities(EntitySet entities, Schema schema) {
         // When we are given an entity set it can also include actions,
         // remove those from the set of entities, as we treat them differently
         // and pull action-related information from the schema
-        Set<Entity> entitySet = entities.getEntities().stream()
+        Set<Entity> entitySet = entities.stream()
                 .filter(e -> {
-                    String type = e.getEUID().getType().toString();
+                    String type = e.getEuid().getType();
                     return !type.equals("Action") && !type.endsWith("::Action");
                 }).collect(Collectors.toCollection(HashSet::new));
 
-        // Strictly speaking we expect a complete closed world in that we operate on the set of provided entities.
-        // One exception is the enum-style definition of entities. The translation assumes they exist as well,
+        // Strictly speaking we expect a complete closed world in that we operate on the
+        // set of provided entities. One exception is the enum-style definition of entities.
+        // The translation assumes they exist as well,
         // but here we allow them to be generated if they are not provided.
-        Set<EntityUID> entitiesEuids = entitySet.stream().map(Entity::getEUID).collect(Collectors.toSet());
+        Set<EntityReference> entitiesEuids = entitySet.stream()
+                .map(Entity::getEuid)
+                .collect(Collectors.toSet());
+
         schema.entityTypeNames().stream().map(schema::getEntityType).forEach(ed -> {
             ed.getEntityNamesEnum().forEach(en -> {
-                EntityUID uid = EntityUID.parse("%s::\"%s\"".formatted(ed.getName(), en)).orElseThrow();
+                EntityReference uid = new EntityReference(ed.getName(), en);
                 if (!entitiesEuids.contains(uid)) {
                     entitySet.add(new Entity(uid));
                 }
             });
         });
-        return new Entities(entitySet);
+        return new EntitySet(entitySet);
     }
 
-    private DLProgram translate(Schema schema, PolicySet policies, Entities entities, InvariantSet invariants) {
+    private DLProgram translate(Schema schema, PolicySet policies, EntitySet entities, InvariantSet invariants) {
         TranslationSchema translationSchema = new TranslationSchema(schema);
         TranslationEntitySet translationEntities = new TranslationEntitySet(entities, translationSchema);
         Collection<TranslationPolicy> translationPermitPolicies = policies.stream()
@@ -446,7 +421,7 @@ public class Translation {
         return policies;
     }
 
-    public Entities getEntities() {
+    public EntitySet getEntities() {
         return entities;
     }
 

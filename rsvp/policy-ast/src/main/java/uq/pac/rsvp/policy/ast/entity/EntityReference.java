@@ -36,8 +36,13 @@ public class EntityReference extends EntityValue {
         return false;
     }
 
+    // FIXME: There will be a problem with escaped characters
+    public String getReference() {
+        return type + "::\"" + id + "\"";
+    }
+
     @Override
     public String toString() {
-        return type + "::\"" + id + "\"";
+        return getReference();
     }
 }

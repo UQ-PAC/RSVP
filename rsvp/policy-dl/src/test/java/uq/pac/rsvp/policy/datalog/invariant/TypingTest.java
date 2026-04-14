@@ -1,10 +1,10 @@
 package uq.pac.rsvp.policy.datalog.invariant;
 
-import com.cedarpolicy.model.entity.Entities;
 import org.fusesource.jansi.Ansi;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import uq.pac.rsvp.RsvpException;
+import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.TestUtil;
 import uq.pac.rsvp.policy.datalog.translation.Translation;
@@ -26,7 +26,7 @@ public class TypingTest {
         Path schemaPath = TestUtil.getResourceDir( "invariant", "schema.cedarschema");
         Schema schema = Schema.parseCedarSchema(schemaPath);
         Path entitiesPath = TestUtil.getResourceDir("invariant", "entities.json");
-        Entities entities = Translation.updateEntities(Entities.parse(entitiesPath), schema);
+        EntitySet entities = Translation.updateEntities(EntitySet.parse(entitiesPath), schema);
         this.validator = new InvariantValidator(schema, entities);
     }
 

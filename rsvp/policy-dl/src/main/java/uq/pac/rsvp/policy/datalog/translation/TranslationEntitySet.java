@@ -1,8 +1,8 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import com.cedarpolicy.model.entity.Entities;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.datalog.ast.DLFact;
 
 import java.util.*;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class TranslationEntitySet {
     private final List<TranslationEntity> entities;
 
-    public TranslationEntitySet(Entities entities, TranslationSchema schema) {
+    public TranslationEntitySet(EntitySet entities, TranslationSchema schema) {
         List<TranslationEntity> entityList = entities.getEntities()
                 .stream()
                 .map(e -> new TranslationEntity(e, schema))
@@ -29,10 +29,6 @@ public class TranslationEntitySet {
         }
 
         this.entities = List.copyOf(entityList);
-    }
-
-    public List<TranslationEntity> getTranslationEntities() {
-        return entities;
     }
 
     public Multimap<String, DLFact> getFacts() {

@@ -1,6 +1,7 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
 import com.cedarpolicy.value.EntityUID;
+import uq.pac.rsvp.policy.ast.entity.EntityReference;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.datalog.ast.*;
 import uq.pac.rsvp.policy.datalog.invariant.Invariant;
@@ -229,14 +230,14 @@ public class TranslationConstants {
      * Temporary entity type. This type is used to generate internal EUID's
      * to aid with record/atribute processing
      */
-    public static EntityTypeDefinition TmpRecordType =
-            new EntityTypeDefinition("RSVP::DL::Tmp::Record::Attr::Type");
+    public static String TmpRecordType =
+            "RSVP::DL::Tmp::Record::Attr::Type";
 
     /**
      * Generate a random EUID based on the {@link TranslationConstants#TmpRecordType}
      */
-    public static EntityUID getRandomTmpEUID() {
-        return getEUID(TmpRecordType, UUID.randomUUID().toString());
+    public static EntityReference getRandomTmpEUID() {
+        return new EntityReference(TmpRecordType, UUID.randomUUID().toString());
     }
 
     /**
@@ -255,8 +256,8 @@ public class TranslationConstants {
      * Get an unknown entity (UID) only. Abstraction over entities that can be given for
      * authorisation but are not in the provided list of entities
      */
-    public static EntityUID getUndefinedEUID(TranslationEntityDefinition def) {
-        return getEUID(def.getEntityDefinition(), UndefinedEntityUIDName);
+    public static EntityReference getUndefinedEUID(TranslationEntityDefinition def) {
+        return new EntityReference(def.getEntityDefinition().getName(), UndefinedEntityUIDName);
     }
 
     /**

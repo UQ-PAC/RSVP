@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 public abstract class EntityValue {
 
+    // FIXME: We need source locations here
+
     private final static JsonElement REFERENCE_SCHEMA = JsonParser.getGson().fromJson("""
             { "id" : "id", "type" : "type" }
             """, JsonElement.class);

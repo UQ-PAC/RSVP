@@ -1,3 +1,5 @@
+"use client";
+
 import { faCaretLeft, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import cx from "classnames";
@@ -6,6 +8,8 @@ import {
   useFocus,
   useFocusDispatch,
 } from "./providers/FocusContext";
+
+import "./drawer.css";
 
 interface DrawerProps {
   title: string;
@@ -17,7 +21,7 @@ export function Drawer({ title, side, children }: DrawerProps) {
   const { drawer } = useFocus();
   const dispatch = useFocusDispatch();
 
-  const expanded = !drawer[side];
+  const expanded = !drawer.expansions[side];
 
   const className = cx("drawer", `drawer-${side}`, expanded && "expanded");
 
@@ -32,11 +36,14 @@ export function Drawer({ title, side, children }: DrawerProps) {
         className="drawer-tab"
         onClick={() =>
           dispatch({
-            type: "drawer",
-            key: side,
-            value: expanded
-              ? ExpansionState.Collapsed
-              : ExpansionState.Expanded,
+            type: "focus",
+            target: "drawer",
+            focus: {
+              key: side,
+              value: expanded
+                ? ExpansionState.Collapsed
+                : ExpansionState.Expanded,
+            },
           })
         }
       >

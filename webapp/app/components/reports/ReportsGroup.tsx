@@ -1,18 +1,18 @@
 "use client";
 
-import { ReportItem } from "./ReportItem";
-import { Report } from "../../types";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMinusSquare,
   faPlusSquare,
 } from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Report } from "../../types";
 import {
   ExpansionState,
   useFocus,
   useFocusDispatch,
 } from "../providers/FocusContext";
 import { useSelectionDispatch } from "../providers/SelectionContext";
+import { ReportItem } from "./ReportItem";
 
 interface ReportsGroupProps {
   section: string;
@@ -20,13 +20,14 @@ interface ReportsGroupProps {
   reports: Report[];
 }
 
+// TODO: organise by filename (collapsible)
 export function ReportsGroup({ section, name, reports }: ReportsGroupProps) {
   const { "report-group": groupFocus } = useFocus();
   const focusDispatch = useFocusDispatch();
   const selectionDispatch = useSelectionDispatch();
 
   const groupKey = `${section}-${name}`;
-  const expanded = !groupFocus[groupKey];
+  const expanded = !groupFocus.expansions[groupKey];
 
   return (
     <div className="reports-group">
@@ -35,11 +36,14 @@ export function ReportsGroup({ section, name, reports }: ReportsGroupProps) {
         onClick={() => {
           selectionDispatch({ type: "other", scroll: "none" });
           focusDispatch({
-            type: "report-group",
-            key: groupKey,
-            value: expanded
-              ? ExpansionState.Collapsed
-              : ExpansionState.Expanded,
+            type: "focus",
+            target: "report-group",
+            focus: {
+              key: groupKey,
+              value: expanded
+                ? ExpansionState.Collapsed
+                : ExpansionState.Expanded,
+            },
           });
         }}
       >

@@ -94,9 +94,7 @@ export function FileInput({ addFiles }: FileInputProps) {
           {isDragging ? (
             <p>Drop files here</p>
           ) : (
-            <div>
-              <p>Drag and drop files or click to browse</p>
-            </div>
+            <p>Drag and drop files or click to browse</p>
           )}
         </div>
       </div>

@@ -1,95 +1,138 @@
 "use client";
 
-import { SourceFile } from "./SourceFile";
-import { Report, VerificationFile } from "../../types";
-import { useEffect } from "react";
-import hljs from "highlight.js";
-import { CedarHighlight } from "./CedarHighlight";
-import {
-  ExpansionState,
-  useFocus,
-  useFocusDispatch,
-} from "../providers/FocusContext";
-import { InvariantHighlight } from "./InvariantHighlight";
-import { EntitiesHighlight } from "./EntitiesHighlight";
+import { Report, VerificationFile, VersionedFile } from "../../types";
 import { useVerification } from "../providers/VerificationContext";
+import { Fallback } from "./Fallback";
+import { SourceFile } from "./SourceFile";
+
+import { useRef } from "react";
+import { diff } from "../../requests";
+import { ExpansionState, useFocusDispatch } from "../providers/FocusContext";
+import { ToggleAll } from "../shared/ToggleAll";
+import "./sources.css";
+
+type SourceFocusState = { [group: string]: { [index: string]: string } };
 
 export function SourceFileViewer() {
-  useEffect(() => {
-    hljs.debugMode();
-    hljs.registerLanguage("cedar", () => CedarHighlight);
-    hljs.registerLanguage("invariant", () => InvariantHighlight);
-    hljs.registerLanguage("entities", () => EntitiesHighlight);
-  }, []);
-
-  const { drawer: drawerFocus } = useFocus();
-  const focusDispatch = useFocusDispatch();
-
   const verificationContext = useVerification();
+  const groups = Object.entries(verificationContext);
+
+  const focusDispatch = useFocusDispatch();
+  const focusState = useRef<SourceFocusState>({});
+
+  const toggleAll = (group: string, expand: ExpansionState) => {
+    if (focusState.current[group]) {
+      Object.values(focusState.current[group]).forEach((id) => {
+        focusDispatch({
+          type: "focus",
+          target: "source-file",
+          focus: { key: id, value: expand },
+        });
+      });
+    }
+  };
 
   const filterReports = (
-    source: VerificationFile,
+    source: VersionedFile,
     reports?: Promise<Report[]>,
-  ): { source: VerificationFile; reports: Promise<Report[]> } => ({
-    source,
-    reports:
-      reports?.then((reports) =>
-        reports.filter(
-          // TODO: multiple locations
-          (report) => report.primarySourceLocation.source === source,
-        ),
-      ) ?? Promise.resolve([]),
-  });
+  ): Promise<Report[]> =>
+    reports?.then((reports) =>
+      reports.filter(
+        // TODO: multiple locations
+        (report) =>
+          report.primarySourceLocation.source === source.original ||
+          source.versions.some(
+            (version) => report.primarySourceLocation.source === version,
+          ),
+      ),
+    ) ?? Promise.resolve([]);
 
-  const sources = Object.entries(verificationContext).reduce<
-    { source: VerificationFile; reports: Promise<Report[]> }[]
-  >((all, [, group]) => {
-    const filterGroup = (source) => filterReports(source, group.reports);
+  const getDiffs = async (
+    group: string,
+    original: VerificationFile,
+    updated: VerificationFile,
+  ): Promise<string> => {
+    const diffs = verificationContext[group]?.diffs;
 
-    return [
-      ...all,
-      ...group.cedar.map(filterGroup),
-      ...group.cedarschema.map(filterGroup),
-      ...group.entities.map(filterGroup),
-      ...group.invariant.map(filterGroup),
-    ];
-  }, []);
+    if (!diffs) {
+      console.error("Error retrieving diff for group: " + group);
+      return "";
+    }
+
+    return original.resolved
+      .then((original) => original.serverId)
+      .then((originalId) =>
+        updated.resolved
+          .then((updated) => updated.serverId)
+          .then((updatedId) => {
+            let unifiedDiff = diffs[originalId]?.[updatedId];
+
+            if (!unifiedDiff) {
+              unifiedDiff = diff(
+                { id: originalId, name: original.file.name },
+                { id: updatedId, name: updated.file.name },
+              );
+
+              if (!diffs[originalId]) {
+                diffs[originalId] = {};
+              }
+              diffs[originalId][updatedId] = unifiedDiff;
+            }
+
+            return unifiedDiff;
+          }),
+      );
+  };
 
   return (
     <div className="source-files-container">
-      {!sources.length && (
-        <p className="source-files-instruction">
-          <a
-            className="source-files-upload-link"
-            onClick={() => {
-              if (drawerFocus["left"] == ExpansionState.Collapsed) {
-                focusDispatch({
-                  type: "drawer",
-                  key: "left",
-                  value: ExpansionState.Expanded,
-                });
-                focusDispatch({
-                  type: "drawer",
-                  key: "right",
-                  value: ExpansionState.Collapsed,
-                });
-              }
-            }}
-          >
-            Upload Cedar policy and schema files
-          </a>{" "}
-          to run verification.
-        </p>
-      )}
-      {sources.map(({ source, reports }, i) => (
-        <SourceFile
-          key={i}
-          filename={source.file.name}
-          filetype="cedar"
-          content={source.resolved.then((uploaded) => uploaded.content)}
-          reports={reports}
-        />
-      ))}
+      {groups.map(([name, group], i) => {
+        return (
+          <div key={i} className="source-files-analysis-group">
+            {group.files.length > 0 && (
+              <span className="source-files-analysis-group-header">
+                <h2 className="source-files-analysis-group-title">{name}</h2>
+                <ToggleAll
+                  name="source-file-analysis-group"
+                  toggle={(expand) => toggleAll(name, expand)}
+                />
+              </span>
+            )}
+            {group.files.map((source) => {
+              const key =
+                source.original.file.name +
+                source.original.file.lastModified +
+                source.original.file.size;
+              return (
+                <SourceFile
+                  key={key}
+                  source={source}
+                  reports={filterReports(source, group.reports)}
+                  getDiff={(original, updated) =>
+                    getDiffs(name, original, updated)
+                  }
+                  setFocus={(original, updated) => {
+                    if (!focusState.current[name]) {
+                      focusState.current[name] = {};
+                    }
+
+                    focusState.current[name][key] = updated
+                      ? original + updated
+                      : original;
+                  }}
+                />
+              );
+            })}
+            {!group.files.length && (
+              <Fallback
+                instruction="Upload Cedar policy and schema files"
+                target={name}
+              />
+            )}
+          </div>
+        );
+      })}
+      {!groups.length && <Fallback instruction="Create a policy set" />}
     </div>
   );
 }

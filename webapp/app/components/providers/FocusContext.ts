@@ -7,35 +7,118 @@ export enum ExpansionState {
   Collapsed = 1,
 }
 
-type ExpansionMap = { [key: string]: ExpansionState };
+type ExpansionId = string;
+type ExpansionMap = { [key: ExpansionId]: ExpansionState };
+type ExpansionGroup = ExpansionId[];
 interface FocusState {
-  [target: string]: ExpansionMap;
+  [target: string]: {
+    expansions: ExpansionMap;
+    groups?: { [key: ExpansionId]: ExpansionGroup };
+  };
 }
 
 export const emptyFocus: FocusState = {
   drawer: {
-    left: ExpansionState.Expanded,
-    right: ExpansionState.Collapsed,
+    expansions: {
+      left: ExpansionState.Expanded,
+      right: ExpansionState.Collapsed,
+    },
   },
-  "report-group": {},
-  "source-file": {},
+  "report-group": { expansions: {} },
+  "source-file": { expansions: {}, groups: {} },
 };
 
 interface FocusAction {
-  type: FocusTarget;
-  key: string;
-  value: ExpansionState;
+  type: "focus" | "register" | "deregister";
+  target: FocusTarget;
+  focus?: {
+    key: string;
+    value: ExpansionState;
+  };
+  register?: [ExpansionId, ExpansionId[]];
+  deregister?: ExpansionId;
 }
 
 export function focusReducer(
   context: FocusState,
   action: FocusAction,
 ): FocusState {
-  const updatedContext = { ...context };
-  const updatedTarget = { ...context[action.type] };
+  switch (action.type) {
+    case "focus":
+      return doFocus(context, action);
+    case "register":
+      return doRegister(context, action);
+    case "deregister":
+      return doDeregister(context, action);
+  }
+}
 
-  updatedTarget[action.key] = action.value;
-  updatedContext[action.type] = updatedTarget;
+function doFocus(context: FocusState, action: FocusAction): FocusState {
+  if (!action.focus) {
+    return context;
+  }
+
+  const updatedContext: FocusState = { ...context };
+
+  const expansions = context[action.target].expansions;
+  const groups = context[action.target].groups;
+  const updatedTarget = {
+    expansions: { ...expansions },
+    groups: groups ? { ...groups } : undefined,
+  };
+
+  if (action.focus.value === ExpansionState.Expanded) {
+    // Collapse all conflicting focus entries
+    Object.values(updatedTarget.groups ?? {})
+      .find((group) => group.some((item) => item === action.focus?.key))
+      ?.forEach((item) => {
+        updatedTarget.expansions[item] = ExpansionState.Collapsed;
+      });
+  }
+
+  // Expand target
+  updatedTarget.expansions[action.focus.key] = action.focus.value;
+
+  updatedContext[action.target] = updatedTarget;
+
+  return updatedContext;
+}
+
+function doRegister(context: FocusState, action: FocusAction): FocusState {
+  if (!action.register) {
+    return context;
+  }
+
+  const updatedContext: FocusState = { ...context };
+
+  const groups = context[action.target].groups;
+  const updatedTarget = {
+    expansions: { ...context[action.target].expansions },
+    groups: groups ? { ...groups } : {},
+  };
+
+  updatedTarget.groups[action.register[0]] = action.register[1];
+  updatedContext[action.target] = updatedTarget;
+
+  return updatedContext;
+}
+
+function doDeregister(context: FocusState, action: FocusAction): FocusState {
+  if (!action.deregister) {
+    return context;
+  }
+
+  const updatedContext: FocusState = { ...context };
+
+  const groups = context[action.target].groups;
+  const updatedTarget = {
+    expansions: { ...context[action.target].expansions },
+    groups: groups ? { ...groups } : {},
+  };
+
+  delete updatedTarget.groups[action.deregister];
+
+  updatedContext[action.target] = updatedTarget;
 
   return updatedContext;
 }

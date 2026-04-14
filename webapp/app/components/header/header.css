@@ -1,0 +1,49 @@
+@layer components {
+  /********  Header  ********/
+  .app-header {
+    padding: 1.5rem 2.5rem 0.5rem;
+    border-bottom: 1px solid var(--color-gray-300);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .app-header .header-left-align {
+    flex-grow: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+  }
+
+  .app-header .title {
+    color: var(--color-gray-700);
+  }
+
+  .app-header .subtitle {
+    color: var(--color-gray-500);
+  }
+
+  /********  VerifyButton  ********/
+  .verify-button {
+    margin: 0.1rem;
+    padding: 0.7rem 1.5rem;
+    font-size: 1.2rem;
+    border-radius: 1.5rem;
+    background-color: var(--color-gray-200);
+    color: var(--color-gray-700);
+    cursor: pointer;
+  }
+
+  .verify-button:hover {
+    background-color: var(--color-gray-700);
+    color: var(--color-gray-200);
+  }
+
+  .verify-button .verify-button-text {
+    font-weight: 800;
+  }
+
+  .verify-button .verify-button-icon {
+    margin-right: 0.3rem;
+  }
+}

@@ -1,18 +1,20 @@
-package uq.pac.rsvp;
+package uq.pac.rsvp.verification;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.Iterator;
+import java.util.Collection;
 
 import uq.pac.rsvp.policy.ast.AstNode;
 import uq.pac.rsvp.policy.ast.Policy;
+import uq.pac.rsvp.policy.ast.PolicyProgram;
 import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
 import uq.pac.rsvp.policy.ast.expr.CallExpression;
 import uq.pac.rsvp.policy.ast.expr.ConditionalExpression;
@@ -21,7 +23,6 @@ import uq.pac.rsvp.policy.ast.expr.RecordExpression;
 import uq.pac.rsvp.policy.ast.expr.SetExpression;
 import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
-import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitorImpl;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantAssignment;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
@@ -31,24 +32,51 @@ import uq.pac.rsvp.policy.datalog.translation.Translation;
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.support.reporting.Report;
 import uq.pac.rsvp.support.reporting.Report.Severity;
+import uq.pac.rsvp.RsvpException;
+import uq.pac.rsvp.support.util.Pair;
 
 public class Verification {
 
+
+    // FIXME: source loc should be correct from outset
     private static SourceLoc mapSourceLoc(String filename, SourceLoc original) {
         return new SourceLoc(filename, original.offset, original.len, original.getStartLoc(),
                 original.getEndLoc());
     }
 
-    public static Set<Report> verifyPolicies(String policyFilename, Path policiesPath, Path schemaPath, Path entities,
-            String invariantsFilename, Path invariantsPath)
-            throws RsvpException, IOException {
+    public static Set<Report> verifyPolicies(Set<List<Pair<String, Path>>> policies, Set<Path> schemas, Set<Path> entities, Set<Pair<String, Path>> invariants)
+            throws RsvpException, IOException, ConfigurationException, InterruptedException {
 
         Set<Report> results = new HashSet<>();
 
+        if (policies.isEmpty() || policies.iterator().next().isEmpty()) {
+            throw new ConfigurationException("No policies provided");
+        }
+
+        if (schemas.isEmpty()) {
+            throw new ConfigurationException("No schema provided");
+        }
+
+        if (entities.isEmpty()) {
+            throw new ConfigurationException("No entities provided");
+        }
+
+        Pair<String, Path> policyFile = policies.iterator().next().get(0);
+        String policyFilename = policyFile.getKey();
+        Path policiesPath = policyFile.getValue();
+        Path schemaPath = schemas.iterator().next();
+        Path entitiesPath = entities.iterator().next();
+        Pair<String, Path> invariantsFile = invariants.iterator().next();
+        String invariantsFilename = invariantsFile.getKey();
+        Path invariantsPath = invariantsFile.getValue();
+
         Path dlPath = Files.createTempDirectory("rsvp-");
 
-        Translation translation =
-                new Translation(schemaPath, policiesPath, entities, invariantsPath, dlPath);
+        // Schema schema = Schema.parseCedarSchema(schemaPath);
+        // PolicySet policySet = PolicySet.parseCedarPolicySet(policyFilename,
+        //         Files.readString(policiesPath));
+
+        Translation translation = new Translation(schemaPath, policiesPath, entitiesPath, invariantsPath, dlPath);
 
         Map<Policy, RequestSet> policyResults = translation.getPolicyResult();
 
@@ -212,13 +240,34 @@ public class Verification {
             }
         });
 
+        // TODO: remove
+        // results.addAll(generateRandomReports(policies));
+
         return results;
     }
 
-    public static Set<Report> verify(Collection<Policy> policies, Schema schema) {
-        RandomReportGenerator generator = new RandomReportGenerator();
-        policies.forEach(p -> p.accept(generator));
-        return generator.reports;
+
+    public static Set<Report> generateRandomReports(Set<List<Pair<String, Path>>> policies)
+            throws RsvpException, IOException, ConfigurationException, InterruptedException {
+        Set<Report> results = new HashSet<>();
+
+        for (List<Pair<String, Path>> policyFile : policies) {
+            Pair<String, Path> recent = policyFile.get(policyFile.size() - 1);
+            String policyFilename = recent.getKey();
+            Path policiesPath = recent.getValue();
+
+            RandomReportGenerator generator = new RandomReportGenerator(policyFilename);
+
+            PolicyProgram policyProgram = PolicyProgram.parse(policiesPath);
+            Collection<Policy> parsed = policyProgram.getPolicies();
+
+            parsed.forEach(policy -> policy.accept(generator));
+
+            results.addAll(generator.reports);
+        }
+
+        Thread.sleep(1000);
+        return results;
     }
 
     private static class RandomReportGenerator extends PolicyVisitorImpl {
@@ -226,10 +275,12 @@ public class Verification {
         public final Set<Report> reports;
 
         private final Random random;
+        private final String filename;
 
-        RandomReportGenerator() {
+        RandomReportGenerator(String filename) {
             reports = new HashSet<>();
             random = new Random();
+            this.filename = filename;
         }
 
         @Override
@@ -282,7 +333,7 @@ public class Verification {
 
         private void maybeAddRandomReport(AstNode entry, int probability) {
             int p = random.nextInt(100);
-            SourceLoc loc = entry.getSourceLoc();
+            SourceLoc loc = mapSourceLoc(this.filename, entry.getSourceLoc());
             if (p <= probability && loc != SourceLoc.MISSING) {
                 reports.add(generateRandomReport(loc));
             }
@@ -296,7 +347,8 @@ public class Verification {
             Severity severity = s < 34 ? Severity.Info : s < 67 ? Severity.Warning : Severity.Error;
             String message = m < 34 ? "Fantastic. Great move. Well done Angus."
                     : m < 67 ? "Ugly implementation" : "Who thought this was a good idea?";
-            String detail = d < 50 ? "" : "This is a very detailed report. "
+            String detail = d < 50 ? ""
+                    : "This is a very detailed report. "
                             + "Look at all of the details that are included here. "
                             + "So many details that need to be included in the report so that you can fully understand it.";
 

@@ -7,8 +7,8 @@ import {
   ExpansionState,
   useFocus,
   useFocusDispatch,
-} from "./providers/FocusContext";
-import { useVerificationDispatch } from "./providers/VerificationContext";
+} from "../providers/FocusContext";
+import { useVerificationDispatch } from "../providers/VerificationContext";
 
 const lexendDeca = Lexend_Deca({
   subsets: ["latin"],
@@ -22,16 +22,16 @@ export function VerifyButton() {
   const onclick = () => {
     verificationDispatch({ type: "verify" });
 
-    if (drawerFocus["right"] === ExpansionState.Collapsed) {
+    if (drawerFocus.expansions["right"] === ExpansionState.Collapsed) {
       focusDispatch({
-        type: "drawer",
-        key: "left",
-        value: ExpansionState.Collapsed,
+        type: "focus",
+        target: "drawer",
+        focus: { key: "left", value: ExpansionState.Collapsed },
       });
       focusDispatch({
-        type: "drawer",
-        key: "right",
-        value: ExpansionState.Expanded,
+        type: "focus",
+        target: "drawer",
+        focus: { key: "right", value: ExpansionState.Expanded },
       });
     }
   };

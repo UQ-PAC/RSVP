@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,33 +30,46 @@ public class RsvpController {
     Logger logger = LoggerFactory.getLogger(RsvpController.class);
 
     @Autowired
+    FileService fileService;
+
+    @Autowired
     VerificationService verificationService;
+
+    @Autowired
+    DiffService diffService;
 
     @PostMapping(path = "/upload", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public String upload(@RequestPart MultipartFile file) throws IOException {
         logger.info("POST /upload ({})", file.getOriginalFilename());
-        return verificationService.createTempFile(file);
+        return fileService.createTempFile(file);
 
     }
 
     @GetMapping("/file/{id}")
     public String getFile(@PathVariable String id) throws IOException {
         logger.info("GET /file/{}", id);
-        return verificationService.readFile(id);
+        return fileService.readFile(id);
     }
 
     @DeleteMapping("/file/{id}")
     public String deleteFile(@PathVariable String id) throws IOException {
         logger.info("DELETE /file/{}", id);
-        return verificationService.deleteFile(id);
+        return fileService.deleteFile(id);
     }
 
     @PostMapping("/verify")
     public Set<Report> verify(
             @Validated @RequestBody VerificationFileset verification)
-            throws RsvpException, IOException {
+            throws RsvpException, IOException, InterruptedException {
         logger.info("POST /verify");
         return verificationService.runVerification(verification);
+    }
+
+    @GetMapping("/diff")
+    public String diff(@RequestParam String original, @RequestParam String originalName, @RequestParam String updated,
+            @RequestParam String updatedName) throws IOException {
+        logger.info("GET /diff ? {} & {}", original, updated);
+        return diffService.getDiff(original, originalName, updated, updatedName);
     }
 
     public static void main(String[] args) {

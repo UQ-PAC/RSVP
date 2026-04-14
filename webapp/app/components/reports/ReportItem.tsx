@@ -1,5 +1,3 @@
-import cx from "classnames";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCaretDown,
   faCaretUp,
@@ -7,13 +5,15 @@ import {
   faCircleInfo,
   faCircleXmark,
 } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import cx from "classnames";
+import { useEffect, useRef } from "react";
+import { Report } from "../../types";
+import { ExpansionState, useFocusDispatch } from "../providers/FocusContext";
 import {
   useSelection,
   useSelectionDispatch,
 } from "../providers/SelectionContext";
-import { Report } from "../../types";
-import { useEffect, useRef } from "react";
-import { ExpansionState, useFocusDispatch } from "../providers/FocusContext";
 
 interface ReportItemParams {
   report: Report;
@@ -77,14 +77,15 @@ export function ReportItem({ report }: ReportItemParams) {
         className="report-item-header"
         onClick={() => {
           if (!isSelected) {
-            const filename = report.primarySourceLocation.source?.file.name;
-            if (filename) {
-              focusDispatch({
-                type: "source-file",
-                key: filename,
-                value: ExpansionState.Expanded,
-              });
-            }
+            report.primarySourceLocation.source?.resolved
+              .then((uploaded) => uploaded.serverId)
+              .then((id) =>
+                focusDispatch({
+                  type: "focus",
+                  target: "source-file",
+                  focus: { key: id, value: ExpansionState.Expanded },
+                }),
+              );
           }
           selectionDispatch({ type: "click", id: report.id, scroll: "source" });
         }}

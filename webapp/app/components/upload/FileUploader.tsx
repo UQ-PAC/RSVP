@@ -1,58 +1,54 @@
 "use client";
 
 import { useState } from "react";
-import { VerificationGroup } from "./VerificationGroup";
+import { AnalysisGroup } from "./AnalysisGroup";
 import { CreateContextButton } from "./CreateContextButton";
-import { useVerificationDispatch } from "../providers/VerificationContext";
-import { upload } from "../../requests";
-import { FileType } from "../../types";
+
+import {
+  useVerification,
+  useVerificationDispatch,
+} from "../providers/VerificationContext";
+import { NewGroupForm } from "./NewGroupForm";
+import "./upload.css";
 
 export function FileUploader() {
-  const [policySets, setPolicySets] = useState<string[]>([]);
-
+  const context = useVerification();
   const dispatch = useVerificationDispatch();
+  const policySets = Object.keys(context);
 
-  const createPolicySet = () => {
-    setPolicySets([...policySets, "Policy set " + (policySets.length + 1)]);
+  const [creating, setCreating] = useState(false);
+
+  const openCreatePolicySetForm = () => {
+    setCreating(true);
+  };
+
+  const cancelCreatePolicySet = () => {
+    setCreating(false);
+  };
+
+  const createPolicySet = (name: string) => {
+    dispatch({ type: "add", group: name });
+    setCreating(false);
   };
 
   return (
     <div className="upload-container">
       {policySets.map((policySet, i) => (
-        <VerificationGroup
+        <AnalysisGroup
           key={i}
           name={policySet}
-          addFiles={(toAdd: File[]) => {
-            toAdd.forEach((file) => {
-              let filetype: FileType = "cedar";
-
-              if (file.name.endsWith(".cedarschema")) {
-                filetype = "cedarschema";
-              } else if (file.name.endsWith(".json")) {
-                filetype = "entities";
-              } else if (file.name.endsWith(".invariant")) {
-                filetype = "invariant";
-              } else if (!file.name.endsWith("cedar")) {
-                return;
-              }
-
-              dispatch({
-                type: "add",
-                group: policySet,
-                file: {
-                  file,
-                  filetype,
-                  resolved: upload(file),
-                },
-              });
-            });
-          }}
-          remove={() =>
-            setPolicySets(policySets.filter((name) => name !== policySet))
-          }
+          removeGroup={() => dispatch({ type: "remove", group: policySet })}
         />
       ))}
-      <CreateContextButton onclick={createPolicySet} />
+      {creating && (
+        <NewGroupForm
+          index={policySets.length + 1}
+          create={createPolicySet}
+          cancel={cancelCreatePolicySet}
+          existing={[...policySets]}
+        />
+      )}
+      {!creating && <CreateContextButton onclick={openCreatePolicySetForm} />}
     </div>
   );
 }

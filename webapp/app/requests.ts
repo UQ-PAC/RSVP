@@ -1,18 +1,14 @@
-import {
-  sortReports,
-  UploadedFile,
-  VerificationRequest,
-  Report,
-} from "./types";
+import { Report, UploadedFile, VerificationRequest } from "./types";
+import { sortReports } from "./util";
 
 export async function upload(file: File): Promise<UploadedFile> {
   // Create FormData object - required for sending binary file data
   const formData = new FormData();
-  formData.append("file", file); // Add file with 'file' key
+  formData.append("file", file);
 
   return fetch("/api/upload", {
     method: "POST",
-    body: formData, // Send FormData directly, not JSON
+    body: formData,
   })
     .then((res) => res.text())
     .then((text) => ({ serverId: text, content: download(text) }));
@@ -30,14 +26,32 @@ export async function download(id: string): Promise<string> {
 
 // TODO: check if response is OK
 export async function verify(request: VerificationRequest): Promise<Report[]> {
-  return fetch("/api/verify", {
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    method: "POST",
-    body: JSON.stringify(request),
-  })
-    .then((res) => res.json())
-    .then(sortReports);
+  return (
+    fetch("/api/verify", {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify(request),
+    })
+      .then((res) => res.json())
+      .then(sortReports)
+      // Return no reports on error, error response will be logged already
+      .catch(() => [])
+  );
+}
+
+export async function diff(
+  original: { id: string; name: string },
+  updated: { id: string; name: string },
+): Promise<string> {
+  const params = [
+    `original=${original.id}`,
+    `originalName=${original.name}`,
+    `updated=${updated.id}`,
+    `updatedName=${updated.name}`,
+  ];
+
+  return fetch(`/api/diff?${params.join("&")}`).then((res) => res.text());
 }

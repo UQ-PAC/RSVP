@@ -2,24 +2,24 @@
 
 import cx from "classnames";
 import hljs from "highlight.js";
-
-import { JSX, useEffect, useRef } from "react";
 import { Roboto_Mono } from "next/font/google";
+import { JSX, useEffect, useRef } from "react";
 
-import { FileSyntax, Report } from "../../types";
-import {
-  useSelection,
-  useSelectionDispatch,
-} from "../providers/SelectionContext";
+import { FileType, Report } from "../../types";
 import {
   ExpansionState,
   useFocus,
   useFocusDispatch,
 } from "../providers/FocusContext";
+import {
+  useSelection,
+  useSelectionDispatch,
+} from "../providers/SelectionContext";
 
+import "./CodeHighlight";
 interface CodeRenderParams {
   content: string;
-  syntax: FileSyntax;
+  syntax: FileType;
   reports: Report[];
 }
 
@@ -52,9 +52,11 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
   } = {};
 
   const highlight = (text: string) =>
-    hljs.highlight(text, {
-      language: syntax,
-    }).value;
+    syntax !== "text"
+      ? hljs.highlight(text, {
+          language: syntax,
+        }).value
+      : text;
 
   reports.forEach((report) => {
     const loc = report.primarySourceLocation;
@@ -98,6 +100,17 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
   });
 
   const code: JSX.Element[] = [];
+
+  code.push(
+    <span key="line-0" className="source-file-empty-line-number">
+      {" "}
+    </span>,
+    <span
+      key="0"
+      className="source-file-line-content source-file-empty-line"
+    ></span>,
+  );
+
   content.split("\n").forEach((line, i) => {
     const n = i + 1;
     const report = reportsByLine[n];
@@ -119,24 +132,17 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
     const isSelected = relevant && hovered !== id && selected === id;
     const isHovered = relevant && hovered === id;
 
-    const className = cx(
-      "source-file-line-content",
-      report?.length && "source-report",
-      relevant?.report.severity && `source-report-${relevant.report.severity}`,
-      isHovered && "hovered",
-      isSelected && "selected",
-    );
-
     let highlighted: string | undefined = undefined;
 
+    // FIXME:
     if (relevant?.start || relevant?.end) {
       const begin = relevant?.start
-        ? highlight(line.slice(0, relevant.start))
+        ? highlight(line.slice(0, relevant.start - 1))
         : "";
       const mid =
         `<span class="source-report-text-highlight source-report-text-highlight-${relevant?.report.severity}"` +
         `data-report="${relevant?.report.id}">${highlight(
-          line.slice(relevant?.start ?? 0, relevant?.end),
+          line.slice(relevant?.start ? relevant.start - 1 : 0, relevant?.end),
         )}</span>`;
       const end = relevant?.end ? highlight(line.slice(relevant.end)) : "";
 
@@ -145,11 +151,80 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
       highlighted = highlight(line);
     }
 
+    const click = relevant
+      ? () => {
+          if (selected !== id) {
+            if (drawerFocus.expansions["right"] !== ExpansionState.Expanded) {
+              focusDispatch({
+                type: "focus",
+                target: "drawer",
+                focus: { key: "left", value: ExpansionState.Collapsed },
+              });
+              focusDispatch({
+                type: "focus",
+                target: "drawer",
+                focus: {
+                  key: "right",
+                  value: ExpansionState.Expanded,
+                },
+              });
+            }
+
+            focusDispatch({
+              type: "focus",
+              target: "report-group",
+              focus: {
+                key: `${relevant?.report.severity}-${relevant?.report.primarySourceLocation.source?.file.name}`,
+                value: ExpansionState.Expanded,
+              },
+            });
+          }
+
+          selectionDispatch({
+            type: "click",
+            id: id,
+            scroll: selected !== id ? "report" : "none",
+          });
+        }
+      : undefined;
+
+    const mouseEnter = relevant
+      ? () =>
+          selectionDispatch({
+            type: "mouseEnter",
+            id: id,
+            scroll: "none",
+          })
+      : undefined;
+
+    const mouseLeave = relevant
+      ? () =>
+          selectionDispatch({
+            type: "mouseLeave",
+            id: id,
+            scroll: "none",
+          })
+      : undefined;
+
+    const numberClass = cx(
+      "source-file-line-number",
+      report?.length && "source-report",
+      relevant?.report.severity && `source-report-${relevant.report.severity}`,
+      (isHovered || isSelected) && "selected",
+    );
+    const contentClass = cx(
+      "source-file-line-content",
+      report?.length && "source-report",
+      relevant?.report.severity && `source-report-${relevant.report.severity}`,
+      isHovered && "hovered",
+      isSelected && "selected",
+    );
+
     code.push(
-      <span key={`line-${n}`} className="source-file-line-number"></span>,
+      <span key={`line-${n}`} className={numberClass}></span>,
       <span
         key={n}
-        className={className}
+        className={contentClass}
         data-report={id}
         ref={
           relevant &&
@@ -159,65 +234,16 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
             : undefined
         }
         dangerouslySetInnerHTML={{ __html: highlighted }}
-        onClick={
-          relevant
-            ? () => {
-                if (selected !== id) {
-                  if (drawerFocus["right"] !== ExpansionState.Expanded) {
-                    focusDispatch({
-                      type: "drawer",
-                      key: "left",
-                      value: ExpansionState.Collapsed,
-                    });
-                    focusDispatch({
-                      type: "drawer",
-                      key: "right",
-                      value: ExpansionState.Expanded,
-                    });
-                  }
-
-                  focusDispatch({
-                    type: "report-group",
-                    key: `${relevant?.report.severity}-${relevant?.report.primarySourceLocation.source?.file.name}`,
-                    value: ExpansionState.Expanded,
-                  });
-                }
-
-                selectionDispatch({
-                  type: "click",
-                  id: id,
-                  scroll: selected !== id ? "report" : "none",
-                });
-              }
-            : undefined
-        }
-        onMouseEnter={
-          relevant
-            ? () =>
-                selectionDispatch({
-                  type: "mouseEnter",
-                  id: id,
-                  scroll: "none",
-                })
-            : undefined
-        }
-        onMouseLeave={
-          relevant
-            ? () =>
-                selectionDispatch({
-                  type: "mouseLeave",
-                  id: id,
-                  scroll: "none",
-                })
-            : undefined
-        }
+        onClick={click}
+        onMouseEnter={mouseEnter}
+        onMouseLeave={mouseLeave}
       ></span>,
     );
   });
 
   return (
-    <div className="source-file-render">
-      <pre className={`code ${robotoMono.className}`}>{code}</pre>
+    <div className={cx("source-file-render", robotoMono.className)}>
+      <pre className="code">{code}</pre>
     </div>
   );
 }

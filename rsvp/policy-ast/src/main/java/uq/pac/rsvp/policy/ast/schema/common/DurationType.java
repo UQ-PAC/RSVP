@@ -8,20 +8,8 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class DurationType extends CommonTypeDefinition {
 
-    public DurationType(String name, boolean required, Map<String, String> annotations) {
-        super(name, required, annotations);
-    }
-
-    public DurationType(boolean required, Map<String, String> annotations) {
-        super(required, annotations);
-    }
-
-    public DurationType(String name, Map<String, String> annotations) {
-        super(name, annotations);
-    }
-
-    public DurationType(Map<String, String> annotations) {
-        super(annotations);
+    public DurationType(String name, boolean required) {
+        super(name, required);
     }
 
     public DurationType(boolean required) {

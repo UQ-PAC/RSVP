@@ -16,13 +16,13 @@ public class UnresolvedTypeReference extends CommonTypeDefinition {
     @SerializedName("name")
     private final String rawTypeName;
 
-    public UnresolvedTypeReference(String definitionName, String typeName, Map<String, String> annotations) {
-        super(definitionName, annotations);
+    public UnresolvedTypeReference(String definitionName, String typeName) {
+        super(definitionName);
         this.rawTypeName = typeName;
     }
 
-    public UnresolvedTypeReference(String typeName, boolean required, Map<String, String> annotations) {
-        super(required, annotations);
+    public UnresolvedTypeReference(String typeName, boolean required) {
+        super(required);
         this.rawTypeName = typeName;
     }
 

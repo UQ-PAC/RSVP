@@ -8,20 +8,8 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class LongType extends CommonTypeDefinition {
 
-    public LongType(String name, boolean required, Map<String, String> annotations) {
-        super(name, required, annotations);
-    }
-
-    public LongType(boolean required, Map<String, String> annotations) {
-        super(required, annotations);
-    }
-
-    public LongType(String name, Map<String, String> annotations) {
-        super(name, annotations);
-    }
-
-    public LongType(Map<String, String> annotations) {
-        super(annotations);
+    public LongType(String name, boolean required) {
+        super(name, required);
     }
 
     public LongType(boolean required) {

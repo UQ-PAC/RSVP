@@ -12,26 +12,8 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 public class RecordTypeDefinition extends CommonTypeDefinition {
     private final Map<String, CommonTypeDefinition> attributes;
 
-    public RecordTypeDefinition(String name, Map<String, CommonTypeDefinition> attributes, boolean required,
-            Map<String, String> annotations) {
-        super(name, required, annotations);
-        this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
-    }
-
-    public RecordTypeDefinition(Map<String, CommonTypeDefinition> attributes, boolean required,
-            Map<String, String> annotations) {
-        super(required, annotations);
-        this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
-    }
-
-    public RecordTypeDefinition(String name, Map<String, CommonTypeDefinition> attributes,
-            Map<String, String> annotations) {
-        super(name, annotations);
-        this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
-    }
-
-    public RecordTypeDefinition(Map<String, CommonTypeDefinition> attributes, Map<String, String> annotations) {
-        super(annotations);
+    public RecordTypeDefinition(String name, Map<String, CommonTypeDefinition> attributes, boolean required) {
+        super(name, required);
         this.attributes = attributes != null ? new HashMap<>(attributes) : new HashMap<>();
     }
 

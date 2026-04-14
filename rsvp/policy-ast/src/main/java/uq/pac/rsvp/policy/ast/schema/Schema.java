@@ -245,25 +245,23 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
                 throw new SchemaResolutionException("Unexpected unresolved schema definition");
             }
 
-            return new CommonTypeReference(definitionName, common, unresolved.isRequired(),
-                    unresolved.getAnnotations());
+            return new CommonTypeReference(definitionName, common, unresolved.isRequired());
         }
 
         EntityTypeDefinition entity = resolveEntityType(referenceTypeName, schema, local);
 
         if (entity != null) {
-            return new EntityTypeReference(definitionName, entity, unresolved.isRequired(),
-                    unresolved.getAnnotations());
+            return new EntityTypeReference(definitionName, entity, unresolved.isRequired());
         }
 
         return switch (referenceTypeName) {
-            case "Bool" -> new BooleanType(definitionName, unresolved.isRequired(), unresolved.getAnnotations());
-            case "Long" -> new LongType(definitionName, unresolved.isRequired(), unresolved.getAnnotations());
-            case "String" -> new StringType(definitionName, unresolved.isRequired(), unresolved.getAnnotations());
-            case "datetime" -> new DateTimeType(definitionName, unresolved.isRequired(), unresolved.getAnnotations());
-            case "decimal" -> new DecimalType(definitionName, unresolved.isRequired(), unresolved.getAnnotations());
-            case "duration" -> new DurationType(definitionName, unresolved.isRequired(), unresolved.getAnnotations());
-            case "ipaddr" -> new IpAddressType(definitionName, unresolved.isRequired(), unresolved.getAnnotations());
+            case "Bool" -> new BooleanType(definitionName, unresolved.isRequired());
+            case "Long" -> new LongType(definitionName, unresolved.isRequired());
+            case "String" -> new StringType(definitionName, unresolved.isRequired());
+            case "datetime" -> new DateTimeType(definitionName, unresolved.isRequired());
+            case "decimal" -> new DecimalType(definitionName, unresolved.isRequired());
+            case "duration" -> new DurationType(definitionName, unresolved.isRequired());
+            case "ipaddr" -> new IpAddressType(definitionName, unresolved.isRequired());
             default -> throw new SchemaResolutionException("Could not resolve type: " + referenceTypeName);
         };
 

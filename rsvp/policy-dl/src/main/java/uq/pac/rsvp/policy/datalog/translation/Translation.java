@@ -187,6 +187,7 @@ public class Translation {
      * - add implicit entities from enums
      */
     public static EntitySet updateEntities(EntitySet entities, Schema schema) {
+        // FIXME: Move to entity validation
         // When we are given an entity set it can also include actions,
         // remove those from the set of entities, as we treat them differently
         // and pull action-related information from the schema

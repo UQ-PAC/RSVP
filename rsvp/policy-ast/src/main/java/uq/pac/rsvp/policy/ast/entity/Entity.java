@@ -1,32 +1,36 @@
 package uq.pac.rsvp.policy.ast.entity;
 
 
+import uq.pac.rsvp.support.SourceLoc;
+
 import java.util.Collections;
 import java.util.Set;
 
 public class Entity {
+    private final SourceLoc location;
     private final EntityReference euid;
     private final RecordValue attrs;
     private final Set<EntityReference> parents;
     private final EntityValue context;
 
-    public Entity(EntityReference uid, RecordValue attrs, Set<EntityReference> parents, EntityValue context) {
+    public Entity(EntityReference uid, RecordValue attrs, Set<EntityReference> parents, EntityValue context, SourceLoc location) {
         this.euid = uid;
         this.attrs = attrs;
         this.parents = parents;
         this.context = context;
+        this.location = location;
     }
 
-    public Entity(EntityReference uid, RecordValue attrs, Set<EntityReference> parents) {
-        this(uid, attrs, parents, new RecordValue());
+    public Entity(EntityReference uid, RecordValue attrs, Set<EntityReference> parents, EntityValue context) {
+        this(uid, attrs, parents, context, SourceLoc.MISSING);
     }
 
-    public Entity(EntityReference uid, RecordValue attrs) {
-        this(uid, attrs, Set.of());
+    public Entity(EntityReference euid, SourceLoc location) {
+        this(euid, new RecordValue(), Collections.emptySet(), null, location);
     }
 
-    public Entity(EntityReference uid) {
-        this(uid, new RecordValue(Collections.emptyMap()), Set.of());
+    public Entity(EntityReference euid) {
+        this(euid, SourceLoc.MISSING);
     }
 
     public EntityReference getEuid() {
@@ -43,6 +47,10 @@ public class Entity {
 
     public EntityValue getContext() {
         return context;
+    }
+
+    public SourceLoc getLocation() {
+        return location;
     }
 
     @Override

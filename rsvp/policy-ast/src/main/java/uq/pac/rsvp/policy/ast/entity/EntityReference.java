@@ -1,14 +1,21 @@
 package uq.pac.rsvp.policy.ast.entity;
 
+import uq.pac.rsvp.support.SourceLoc;
+
 import java.util.Objects;
 
 public class EntityReference extends EntityValue {
     private final String type;
     private final String id;
 
-    public EntityReference(String type, String id) {
+    public EntityReference(String type, String id, SourceLoc location) {
+        super(location);
         this.type = type;
         this.id = id;
+    }
+
+    public EntityReference(String type, String id) {
+        this(type, id, SourceLoc.MISSING);
     }
 
     public String getId() {

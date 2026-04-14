@@ -1,5 +1,7 @@
 package uq.pac.rsvp.policy.ast.entity;
 
+import uq.pac.rsvp.support.SourceLoc;
+
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -7,8 +9,13 @@ import java.util.function.Consumer;
 public class SetValue extends EntityValue {
     private final Set<EntityValue> values;
 
-    public SetValue(Set<EntityValue> values) {
+    public SetValue(Set<EntityValue> values, SourceLoc location) {
+        super(location);
         this.values = Set.copyOf(values);
+    }
+
+    public SetValue(Set<EntityValue> values) {
+        this(values, SourceLoc.MISSING);
     }
 
     public Set<EntityValue> getValues() {

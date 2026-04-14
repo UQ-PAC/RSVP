@@ -1,5 +1,7 @@
 package uq.pac.rsvp.policy.ast.entity;
 
+import uq.pac.rsvp.support.SourceLoc;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -10,12 +12,17 @@ import java.util.function.BiConsumer;
 public class RecordValue extends EntityValue {
     private final Map<String, EntityValue> values;
 
-    public RecordValue(Map<String, EntityValue> values) {
+    public RecordValue(Map<String, EntityValue> values, SourceLoc location) {
+        super(location);
         this.values = Map.copyOf(values);
     }
 
+    public RecordValue(Map<String, EntityValue> values) {
+        this(values, SourceLoc.MISSING);
+    }
+
     public RecordValue() {
-        this.values = Collections.emptyMap();
+        this(Collections.emptyMap(), SourceLoc.MISSING);
     }
 
     public Map<String, EntityValue> getValues() {

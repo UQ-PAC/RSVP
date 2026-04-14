@@ -1,10 +1,17 @@
 package uq.pac.rsvp.policy.ast.entity;
 
+import uq.pac.rsvp.support.SourceLoc;
+
 public class BooleanValue extends EntityValue {
     private final boolean value;
 
-    public BooleanValue(boolean value) {
+    public BooleanValue(boolean value, SourceLoc location) {
+        super(location);
         this.value = value;
+    }
+
+    public BooleanValue(boolean value) {
+        this(value, SourceLoc.MISSING);
     }
 
     public boolean getValue() {

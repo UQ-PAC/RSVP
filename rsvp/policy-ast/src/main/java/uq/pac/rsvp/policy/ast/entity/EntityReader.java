@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-class Reader {
+class EntityReader {
     // FIXME: Need source locations
 
     static Field POSITION;
@@ -26,8 +26,12 @@ class Reader {
         }
     }
 
-    private static int position(JsonReader reader) throws IllegalAccessException {
-        return (int) POSITION.get(reader);
+    private static int position(JsonReader reader) {
+        try {
+            return (int) POSITION.get(reader);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static EntityValue getReferenceOrRecord(RecordValue value) {
@@ -40,7 +44,7 @@ class Reader {
         return value;
     }
 
-    private static EntityValue readEntityValue(JsonReader reader) throws IOException, IllegalAccessException {
+    private static EntityValue readEntityValue(JsonReader reader) throws IOException {
         return switch (reader.peek()) {
             case BEGIN_ARRAY -> {
                 Set<EntityValue> values = new HashSet<>();

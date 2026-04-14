@@ -1,12 +1,19 @@
 package uq.pac.rsvp.policy.ast.entity;
 
+import uq.pac.rsvp.support.SourceLoc;
+
 import java.util.Objects;
 
 public class LongValue extends EntityValue {
     private final long value;
 
-    public LongValue(long value) {
+    public LongValue(long value, SourceLoc location) {
+        super(location);
         this.value = value;
+    }
+
+    public LongValue(long value) {
+        this(value, SourceLoc.MISSING);
     }
 
     public long getValue() {

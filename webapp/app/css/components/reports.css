@@ -1,0 +1,207 @@
+@layer components {
+  /******** ReportViewer ********/
+
+  .reports-container {
+    overflow-y: scroll;
+  }
+
+  .reports-container .reports-instruction {
+    color: #505050;
+    padding: 0.75rem 0.5rem 0;
+  }
+
+  .reports-section .reports-section-header {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 0.5rem 0;
+    border-bottom: 1px solid var(--color-gray-300);
+  }
+
+  .reports-section .reports-section-header .reports-section-toggle {
+    font-size: 0.6rem;
+    color: var(--color-gray-400);
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .reports-section .reports-section-header .reports-section-toggle > a {
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .reports-section
+    .reports-section-header
+    .reports-section-toggle
+    > a.disabled {
+    color: var(--color-gray-300);
+  }
+
+  .reports-section .reports-section-title {
+    font-weight: 600;
+    flex-grow: 1;
+  }
+
+  .reports-group-header {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 0.2rem 0.5rem 0.1rem 0.5rem;
+    line-height: 1.5rem;
+  }
+
+  .reports-group-content {
+    margin-left: 0.5rem;
+  }
+
+  .reports-group-header:hover {
+    background-color: var(--color-gray-200);
+  }
+
+  .reports-group-header .reports-group-toggle {
+    font-size: 0.8rem;
+    margin-right: 0.4rem;
+    color: var(--color-gray-500);
+  }
+
+  .reports-group-header .reports-group-title {
+    margin-bottom: 0.1rem;
+  }
+
+  .report-item {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 1rem 0.5rem 0.5rem;
+    margin-left: 0.4rem;
+  }
+
+  .report-item .report-item-header {
+    display: flex;
+    gap: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .report-item .report-item-message {
+    color: var(--color-gray-600);
+  }
+
+  .report-item .report-item-message .report-item-line-info {
+    color: var(--color-gray-700);
+    font-size: 0.7rem;
+    line-height: 1rem;
+    font-weight: 400;
+  }
+  .report-item.report-item-info.selected .report-item-message,
+  .report-item.report-item-info.hovered .report-item-message {
+    color: var(--color-info-darkest);
+  }
+
+  .report-item.report-item-warn.selected .report-item-message,
+  .report-item.report-item-warn.hovered .report-item-message {
+    color: var(--color-warn-darkest);
+  }
+
+  .report-item.report-item-err.selected .report-item-message,
+  .report-item.report-item-err.hovered .report-item-message {
+    color: var(--color-err-darkest);
+  }
+
+  .report-item .report-item-icon {
+    margin-right: 0.3rem;
+    margin-top: 0.3rem;
+  }
+
+  .report-item .report-item-message {
+    flex-grow: 1;
+  }
+
+  .report-item .report-item-message-detail {
+    /* margin: 0.2rem; */
+    margin-top: 0.5rem;
+    color: var(--color-gray-700);
+    font-size: 0.9rem;
+  }
+  .report-item.report-item-info {
+    border-left: 0.2rem solid var(--color-info-darker);
+  }
+
+  .report-item.report-item-warn {
+    border-left: 0.2rem solid var(--color-warn-darker);
+  }
+
+  .report-item.report-item-err {
+    border-left: 0.2rem solid var(--color-red-500);
+  }
+
+  .report-item.report-item-info .report-item-icon-severity {
+    color: var(--color-info-darkest);
+  }
+
+  .report-item.report-item-warn .report-item-icon-severity {
+    color: var(--color-warn-darkest);
+  }
+
+  .report-item.report-item-err .report-item-icon-severity {
+    color: var(--color-err-darkest);
+  }
+
+  .report-item .report-item-icon.report-item-icon-expand {
+    color: var(--color-gray-600);
+  }
+
+  /********  report highlighting  ********/
+
+  .source-report.source-report-info.hovered,
+  .report-item.report-item-info.hovered {
+    background-color: var(--color-info-mid);
+  }
+
+  .source-report.source-report-warn.hovered,
+  .report-item.report-item-warn.hovered {
+    background-color: var(--color-warn-mid);
+  }
+
+  .source-report.source-report-err.hovered,
+  .report-item.report-item-err.hovered {
+    background-color: var(--color-err-mid);
+  }
+
+  .source-report.source-report-info.selected,
+  .report-item.report-item-info.selected {
+    background-color: var(--color-info-light);
+  }
+
+  .source-report.source-report-warn.selected,
+  .report-item.report-item-warn.selected {
+    background-color: var(--color-warn-light);
+  }
+
+  .source-report.source-report-err.selected,
+  .report-item.report-item-err.selected {
+    background-color: var(--color-err-light);
+  }
+
+  .source-report.selected .source-report-text-highlight-info {
+    background-color: var(--color-info-mid);
+  }
+
+  .source-report.selected .source-report-text-highlight-warn {
+    background-color: var(--color-warn-mid);
+  }
+
+  .source-report.selected .source-report-text-highlight-err {
+    background-color: var(--color-err-mid);
+  }
+
+  .source-report.hovered .source-report-text-highlight-info {
+    background-color: var(--color-info-darker);
+  }
+
+  .source-report.hovered .source-report-text-highlight-warn {
+    background-color: var(--color-warn-darker);
+  }
+
+  .source-report.hovered .source-report-text-highlight-err {
+    background-color: var(--color-err-darker);
+  }
+}

@@ -1,0 +1,31 @@
+@layer theme {
+  :root {
+    --background: #ffffff;
+    --foreground: #171717;
+  }
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-roboto-mono);
+  --font-large: 2.5rem;
+  --font-med: 1.5rem;
+  --font-sm: 1rem;
+
+  --color-slate-dark: var(--color-slate-600);
+
+  --color-info-light: var(--color-blue-100);
+  --color-info-mid: var(--color-blue-200);
+  --color-info-darker: var(--color-blue-300);
+  --color-info-darkest: var(--color-sky-800);
+  --color-warn-light: var(--color-amber-100);
+  --color-warn-mid: var(--color-amber-200);
+  --color-warn-darker: var(--color-amber-300);
+  --color-warn-darkest: var(--color-amber-600);
+  --color-err-light: var(--color-red-100);
+  --color-err-mid: var(--color-red-200);
+  --color-err-darker: var(--color-red-300);
+  --color-err-darkest: var(--color-red-800);
+}

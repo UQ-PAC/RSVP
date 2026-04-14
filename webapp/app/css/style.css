@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@layer theme, base, components;
+
+@import "./globals.css";
+@import "./theme.css";
+@import "./syntax.css";
+@import "./components/app.css";
+@import "./components/reports.css";
+@import "./components/sources.css";
+@import "./components/upload.css";

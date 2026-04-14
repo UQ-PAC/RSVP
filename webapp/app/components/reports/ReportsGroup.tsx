@@ -20,6 +20,7 @@ interface ReportsGroupProps {
   reports: Report[];
 }
 
+// TODO: organise by filename (collapsible)
 export function ReportsGroup({ section, name, reports }: ReportsGroupProps) {
   const { "report-group": groupFocus } = useFocus();
   const focusDispatch = useFocusDispatch();

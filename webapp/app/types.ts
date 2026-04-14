@@ -1,5 +1,4 @@
 export type FileType = "cedar" | "cedarschema" | "entities" | "invariant";
-export type FileSyntax = "cedar" | "entities" | "invariant";
 export type ReportSeverity = "info" | "warn" | "err";
 
 export interface SourceLoc {
@@ -43,8 +42,7 @@ export interface VerificationFile {
   resolved: Promise<UploadedFile>;
 }
 
-export const sortReports = (reports: Report[]) =>
-  reports.sort(
-    (a: Report, b: Report) =>
-      a.primarySourceLocation.offset - b.primarySourceLocation.offset,
-  );
+export interface VersionedFile {
+  original: VerificationFile;
+  versions: VerificationFile[];
+}

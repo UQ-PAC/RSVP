@@ -6,7 +6,7 @@ import hljs from "highlight.js";
 import { JSX, useEffect, useRef } from "react";
 import { Roboto_Mono } from "next/font/google";
 
-import { FileSyntax, Report } from "../../types";
+import { FileType, Report } from "../../types";
 import {
   useSelection,
   useSelectionDispatch,
@@ -17,9 +17,10 @@ import {
   useFocusDispatch,
 } from "../providers/FocusContext";
 
+import "./CodeHighlight";
 interface CodeRenderParams {
   content: string;
-  syntax: FileSyntax;
+  syntax: FileType;
   reports: Report[];
 }
 
@@ -27,6 +28,10 @@ const robotoMono = Roboto_Mono({
   subsets: ["latin"],
 });
 
+// TODO:
+//     line-based highlight (starts or ends mid-line)
+//     scroll to primary or top unless explicitely clicked on line
+// FIXME: multiple reports per line....?
 export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
   const { selected, hovered, scroll } = useSelection();
   const selectionDispatch = useSelectionDispatch();

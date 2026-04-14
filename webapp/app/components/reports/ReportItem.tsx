@@ -53,6 +53,9 @@ export function ReportItem({ report }: ReportItemParams) {
         ? faCircleExclamation
         : faCircleInfo;
 
+  // line info || entire file
+  // need version info for policy file reports (only if more than one version exists)
+
   return (
     <div
       id={`report-${report.id}`}

@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { VerificationGroup } from "./VerificationGroup";
+import { AnalysisGroup } from "./AnalysisGroup";
 import { CreateContextButton } from "./CreateContextButton";
 import { useVerificationDispatch } from "../providers/VerificationContext";
 import { upload } from "../../requests";
-import { FileType } from "../../types";
+import { getFileType } from "@/app/util";
 
 export function FileUploader() {
   const [policySets, setPolicySets] = useState<string[]>([]);
@@ -19,35 +19,23 @@ export function FileUploader() {
   return (
     <div className="upload-container">
       {policySets.map((policySet, i) => (
-        <VerificationGroup
+        <AnalysisGroup
           key={i}
           name={policySet}
           addFiles={(toAdd: File[]) => {
             toAdd.forEach((file) => {
-              let filetype: FileType = "cedar";
-
-              if (file.name.endsWith(".cedarschema")) {
-                filetype = "cedarschema";
-              } else if (file.name.endsWith(".json")) {
-                filetype = "entities";
-              } else if (file.name.endsWith(".invariant")) {
-                filetype = "invariant";
-              } else if (!file.name.endsWith("cedar")) {
-                return;
-              }
-
               dispatch({
                 type: "add",
                 group: policySet,
                 file: {
                   file,
-                  filetype,
+                  filetype: getFileType(file) ?? "cedar",
                   resolved: upload(file),
                 },
               });
             });
           }}
-          remove={() =>
+          removeGroup={() =>
             setPolicySets(policySets.filter((name) => name !== policySet))
           }
         />

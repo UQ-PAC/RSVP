@@ -2,7 +2,7 @@
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { FileSyntax, FileType, Report } from "../../types";
+import { FileType, Report } from "../../types";
 import { faFileLines } from "@fortawesome/free-regular-svg-icons/faFileLines";
 import { CodeRender } from "./CodeRender";
 import {
@@ -39,20 +39,6 @@ export function SourceFile({
 
   const expanded = !focus[filename];
 
-  let syntax: FileSyntax | undefined = undefined;
-
-  switch (filetype) {
-    case "cedar":
-    case "cedarschema":
-      syntax = "cedar";
-      break;
-    case "entities":
-      syntax = "entities";
-      break;
-    case "invariant":
-      syntax = "invariant";
-  }
-
   useEffect(() => {
     content.then((code) => setCode(code));
   }, [content]);
@@ -84,7 +70,11 @@ export function SourceFile({
         />
       </div>
       {expanded && (
-        <CodeRender content={code} syntax={syntax} reports={resolvedReports} />
+        <CodeRender
+          content={code}
+          syntax={filetype}
+          reports={resolvedReports}
+        />
       )}
     </div>
   );

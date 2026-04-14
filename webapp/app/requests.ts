@@ -1,9 +1,5 @@
-import {
-  sortReports,
-  UploadedFile,
-  VerificationRequest,
-  Report,
-} from "./types";
+import { UploadedFile, VerificationRequest, Report } from "./types";
+import { sortReports } from "./util";
 
 export async function upload(file: File): Promise<UploadedFile> {
   // Create FormData object - required for sending binary file data

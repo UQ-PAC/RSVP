@@ -1,12 +1,23 @@
 import { verify } from "../../requests";
-import { VerificationFile, VerificationRequest, Report } from "../../types";
+import {
+  VerificationFile,
+  VerificationRequest,
+  Report,
+  VersionedFile,
+} from "../../types";
 import { createContext, Dispatch, useContext } from "react";
 
+type VerificationFileList = VerificationFile[];
+type VerificationFileDict = { [id: string]: VerificationFile };
+type VersionedFileDict = { [id: string]: VersionedFile };
+
 interface VerificationGroup {
-  cedar: VerificationFile[]; // TODO: multiple versions
-  cedarschema: VerificationFile[];
-  entities: VerificationFile[];
-  invariant: VerificationFile[];
+  cedar: VerificationFileList; // TODO: multiple versions
+  cedarschema: VerificationFileList;
+  entities: VerificationFileList;
+  invariant: VerificationFileList;
+  versioned: VersionedFileDict;
+  byId?: Promise<VerificationFileDict>;
   reports?: Promise<Report[]>;
 }
 
@@ -19,87 +30,117 @@ export const emptyVerificationGroup: VerificationGroup = {
   cedarschema: [],
   entities: [],
   invariant: [],
+  versioned: {},
 };
 export const emptyVerification: VerificationState = {};
 
 interface VerificationAction {
-  type: "add" | "remove" | "verify";
+  type: "add" | "remove" | "version" | "verify";
   group?: string;
   file?: VerificationFile;
+  original?: { file: VerificationFile; serverId: string }; // TODO: index
+}
+
+async function getServerId(file): Promise<string> {
+  return file.resolved.then((resolved) => resolved.serverId);
+}
+
+async function sortFilesById(group: VerificationGroup): Promise<{
+  policies: VerificationFileDict;
+  schemas: VerificationFileDict;
+  entities: VerificationFileDict;
+  invariants: VerificationFileDict;
+  all: VerificationFileDict;
+}> {
+  return new Promise(async (resolve) => {
+    const policies: VerificationFileDict = {};
+    const schemas: VerificationFileDict = {};
+    const entities: VerificationFileDict = {};
+    const invariants: VerificationFileDict = {};
+
+    await Promise.all([
+      ...group.cedar.map((file) =>
+        getServerId(file).then((id) => (policies[id] = file)),
+      ),
+      ...group.cedarschema.map((file) =>
+        getServerId(file).then((id) => (schemas[id] = file)),
+      ),
+      ...group.entities.map((file) =>
+        getServerId(file).then((id) => (entities[id] = file)),
+      ),
+      ...group.invariant.map((file) =>
+        getServerId(file).then((id) => (invariants[id] = file)),
+      ),
+      ...Object.values(group.versioned)
+        .flatMap((versioned) => versioned.versions)
+        .map((file) => getServerId(file).then((id) => (policies[id] = file))),
+    ]);
+
+    resolve({
+      policies,
+      schemas,
+      entities,
+      invariants,
+      all: {
+        ...policies,
+        ...schemas,
+        ...entities,
+        ...invariants,
+      },
+    });
+  });
 }
 
 export function verificationReducer(
   context: VerificationState,
   action: VerificationAction,
 ): VerificationState {
+  console.log(JSON.stringify(action));
+
   if (action.type === "verify") {
     const newContext = {};
-
-    const getServerId = async (file): Promise<string> =>
-      (await file.resolved).serverId;
 
     // TODO: multiple versions
     Object.entries(context).forEach(([id, group]) => {
       const fileResolution = new Promise<{
         request: VerificationRequest;
+        byId: VerificationFileDict;
         resolveFilenames: (report: Report) => Report;
       }>(async (resolve) => {
-        const policiesById: { [id: string]: VerificationFile } = {};
-        const schemasById: { [id: string]: VerificationFile } = {};
-        const entitiesById: { [id: string]: VerificationFile } = {};
-        const invariantsById: { [id: string]: VerificationFile } = {};
-
-        await Promise.all([
-          ...group.cedar.map((file) =>
-            getServerId(file).then((id) => (policiesById[id] = file)),
-          ),
-          ...group.cedarschema.map((file) =>
-            getServerId(file).then((id) => (schemasById[id] = file)),
-          ),
-          ...group.entities.map((file) =>
-            getServerId(file).then((id) => (entitiesById[id] = file)),
-          ),
-          ...group.invariant.map((file) =>
-            getServerId(file).then((id) => (invariantsById[id] = file)),
-          ),
-        ]);
+        const { policies, schemas, entities, invariants, all } =
+          await sortFilesById(group);
 
         const request: VerificationRequest = {
-          policyFiles: Object.keys(policiesById).map((id) => [
+          policyFiles: Object.keys(policies).map((id) => [
             { version: "0", id },
           ]),
-          schemas: Object.keys(schemasById),
-          entities: Object.keys(entitiesById),
-          invariants: Object.keys(invariantsById),
-        };
-
-        const allById = {
-          ...policiesById,
-          ...schemasById,
-          ...entitiesById,
-          ...invariantsById,
+          schemas: Object.keys(schemas),
+          entities: Object.keys(entities),
+          invariants: Object.keys(invariants),
         };
 
         const resolveFilenames = (report: Report): Report => ({
           ...report,
           primarySourceLocation: {
             ...report.primarySourceLocation,
-            source: allById[report.primarySourceLocation.file],
+            source: all[report.primarySourceLocation.file],
           },
           sourceLocations: report.sourceLocations.map((sourceLoc) => ({
             ...sourceLoc,
-            source: allById[sourceLoc.file],
+            source: all[sourceLoc.file],
           })),
         });
 
         resolve({
           request,
+          byId: all,
           resolveFilenames,
         });
       });
 
       const newGroup = {
         ...group,
+        byId: fileResolution.then(({ byId }) => byId),
         reports: fileResolution.then(({ request, resolveFilenames }) =>
           verify(request).then((reports) => reports.map(resolveFilenames)),
         ),
@@ -118,11 +159,33 @@ export function verificationReducer(
 
     if (action.type === "add") {
       newGroup[action.file.filetype] = [...list, action.file];
+
+      newGroup.byId = sortFilesById(newGroup).then(({ all }) => all);
     } else if (action.type === "remove") {
       newGroup[action.file.filetype] = [
         ...list.filter((file) => file !== action.file),
       ];
+
+      newGroup.byId = sortFilesById(newGroup).then(({ all }) => all);
+
+      // TODO: delete version
+    } else if (action.type === "version" && action.original) {
+      const original = newGroup.versioned[action.original.serverId];
+
+      if (!original) {
+        newGroup.versioned[action.original.serverId] = {
+          original: action.original.file,
+          versions: [],
+        };
+      }
+
+      newGroup.versioned[action.original.serverId].versions.push(action.file);
+
+      newGroup.cedar = [
+        ...group.cedar.filter((policy) => policy !== action.file),
+      ];
     }
+
     newContext[action.group] = newGroup;
     return newContext;
   }

@@ -2,25 +2,21 @@
 
 import { SourceFile } from "./SourceFile";
 import { Report, VerificationFile } from "../../types";
-import { useEffect } from "react";
-import hljs from "highlight.js";
-import { CedarHighlight } from "./CedarHighlight";
 import {
   ExpansionState,
   useFocus,
   useFocusDispatch,
 } from "../providers/FocusContext";
-import { InvariantHighlight } from "./InvariantHighlight";
-import { EntitiesHighlight } from "./EntitiesHighlight";
 import { useVerification } from "../providers/VerificationContext";
+import { getFileType } from "@/app/util";
 
 export function SourceFileViewer() {
-  useEffect(() => {
-    hljs.debugMode();
-    hljs.registerLanguage("cedar", () => CedarHighlight);
-    hljs.registerLanguage("invariant", () => InvariantHighlight);
-    hljs.registerLanguage("entities", () => EntitiesHighlight);
-  }, []);
+  // useEffect(() => {
+  //   hljs.debugMode();
+  //   hljs.registerLanguage("cedar", () => CedarHighlight);
+  //   hljs.registerLanguage("invariant", () => InvariantHighlight);
+  //   // hljs.registerLanguage("entities", () => EntitiesHighlight);
+  // }, []);
 
   const { drawer: drawerFocus } = useFocus();
   const focusDispatch = useFocusDispatch();
@@ -46,6 +42,7 @@ export function SourceFileViewer() {
   >((all, [, group]) => {
     const filterGroup = (source) => filterReports(source, group.reports);
 
+    // FIXME:??? get from map of all? want ordered
     return [
       ...all,
       ...group.cedar.map(filterGroup),
@@ -85,7 +82,7 @@ export function SourceFileViewer() {
         <SourceFile
           key={i}
           filename={source.file.name}
-          filetype="cedar"
+          filetype={getFileType(source.file) ?? "cedar"}
           content={source.resolved.then((uploaded) => uploaded.content)}
           reports={reports}
         />

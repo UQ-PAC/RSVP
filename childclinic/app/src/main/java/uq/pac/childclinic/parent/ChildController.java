@@ -46,6 +46,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uq.pac.childclinic.cedar.CedarAuthorization;
 import uq.pac.childclinic.cedar.CedarRequest;
 import uq.pac.childclinic.cedar.CedarService;
+import uq.pac.childclinic.system.Clinic;
+import uq.pac.childclinic.system.ClinicRepository;
 
 /**
  * @author Juergen Hoeller
@@ -65,10 +67,13 @@ class ChildController {
 
 	private final CedarService cedarService;
 
-	public ChildController(ParentRepository parents, GenderRepository genders, CedarService cedarService) {
+	private final ClinicRepository clinics;
+
+	public ChildController(ParentRepository parents, GenderRepository genders, CedarService cedarService, ClinicRepository clinics) {
 		this.parents = parents;
 		this.genders = genders;
 		this.cedarService = cedarService;
+		this.clinics = clinics;
 	}
 
 	@ModelAttribute("genders")
@@ -82,6 +87,11 @@ class ChildController {
 		Parent parent = optionalParent.orElseThrow(() -> new IllegalArgumentException(
 				"Parent not found with id: " + parentId + ". Please ensure the ID is correct."));
 		return parent;
+	}
+
+	@ModelAttribute("clinics")
+	public Collection<Clinic> populateClinics() {
+		return this.clinics.findClinics();
 	}
 
 	@ModelAttribute("child")

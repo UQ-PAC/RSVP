@@ -21,6 +21,7 @@ import com.cedarpolicy.value.Value;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uq.pac.childclinic.cedar.CedarAuthorization;
 import uq.pac.childclinic.cedar.CedarRequest;
 import uq.pac.childclinic.cedar.CedarService;
+import uq.pac.childclinic.system.Clinic;
+import uq.pac.childclinic.system.ClinicRepository;
 
 /**
  * @author Juergen Hoeller
@@ -65,14 +68,22 @@ class ParentController {
 
 	private final CedarService cedarService;
 
-	public ParentController(ParentRepository parents, CedarService cedarService) {
+	private final ClinicRepository clinics;
+
+	public ParentController(ParentRepository parents, CedarService cedarService, ClinicRepository clinics) {
 		this.parents = parents;
 		this.cedarService = cedarService;
+		this.clinics = clinics;
 	}
 
 	@InitBinder
 	public void setAllowedFields(WebDataBinder dataBinder) {
 		dataBinder.setDisallowedFields("id");
+	}
+
+	@ModelAttribute("clinics")
+	public Collection<Clinic> populateClinics() {
+		return this.clinics.findClinics();
 	}
 
 	@ModelAttribute("parent")

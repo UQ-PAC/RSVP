@@ -14,6 +14,7 @@
         <th th:text="#{city}">City</th>
         <th th:text="#{telephone}">Telephone</th>
         <th th:text="#{children}">Children</th>
+        <th th:text="#{clinics}">Clinics</th> </tr>
       </tr>
     </thead>
     <tbody>
@@ -33,6 +34,7 @@
           <td th:text="${parent.city}" />
           <td th:text="${parent.telephone}" />
           <td><span th:text="${#strings.listJoin(parent.children, ', ')}" /></td>
+          <td th:text="${parent.clinicDescriptions}"></td> </span>
         </span>
         <span th:unless="${authMap[parent.id].startsWith('Access Granted.')}"></span>
       </tr>

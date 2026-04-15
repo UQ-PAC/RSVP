@@ -17,9 +17,12 @@ package uq.pac.childclinic.parent;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
@@ -45,6 +48,11 @@ public class Visit extends BaseEntity {
 	@NotBlank
 	private String description;
 
+	@ManyToOne
+	@JoinColumn(name = "confidentiality_id", nullable = false)
+	@NotNull
+	private Confidentiality confidentiality;
+
 	/**
 	 * Creates a new instance of Visit for the current date
 	 */
@@ -66,6 +74,14 @@ public class Visit extends BaseEntity {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public Confidentiality getConfidentiality() {
+		return this.confidentiality;
+	}
+
+	public void setConfidentiality(Confidentiality confidentiality) {
+		this.confidentiality = confidentiality;
 	}
 
 }

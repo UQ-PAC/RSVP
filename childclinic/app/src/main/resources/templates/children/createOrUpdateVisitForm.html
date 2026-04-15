@@ -17,6 +17,7 @@
         <th th:text="#{birthDate}">Birth Date</th>
         <th th:text="#{gender}">Gender</th>
         <th th:text="#{parent}">Parent</th>
+        <th th:text="#{clinics}">Clinics</th>
       </tr>
     </thead>
     <tr>
@@ -24,13 +25,38 @@
       <td th:text="${#temporals.format(child.birthDate, 'yyyy-MM-dd')}"></td>
       <td th:text="${child.gender}"></td>
       <td th:text="${parent?.firstName + ' ' + parent?.lastName}"></td>
+      <td th:text="${child.clinicDescriptions}"></td>
     </tr>
   </table>
 
   <form th:object="${visit}" class="form-horizontal" method="post">
     <div class="form-group has-feedback">
-      <input th:replace="~{fragments/inputField :: input ('Date', 'date', 'date')}" />
-      <input th:replace="~{fragments/inputField :: input ('Description', 'description', 'text')}" />
+      <input th:replace="~{fragments/inputField :: input (#{date}, 'date', 'date')}" />
+
+      <input th:replace="~{fragments/inputField :: input (#{description}, 'description', 'text')}" />
+
+      <div class="control-group">
+        <label class="col-sm-2 control-label" th:text="#{confidentiality}">Confidentiality</label>
+        <div class="col-sm-10">
+          <select th:field="*{confidentiality}" class="form-control">
+            <option th:each="conf : ${confidentialities}" 
+                    th:value="${conf.name}" 
+                    th:text="${conf.name}">Confidentiality</option>
+          </select>
+          <span class="help-inline" th:errors="*{confidentiality}">[error]</span>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="col-sm-2 control-label" th:text="#{clinics}">Clinics</label>
+        <div class="col-sm-10">
+          <select th:field="*{clinics}" class="form-control" multiple="multiple">
+            <option th:each="clinic : ${clinics}" 
+                    th:value="${clinic.clinicName}" 
+                    th:text="${clinic.clinicName}">Clinic</option>
+          </select>
+          <span class="help-inline" th:errors="*{clinics}">[error]</span>
+        </div>
+      </div>
     </div>
 
     <div class="form-group">
@@ -47,10 +73,14 @@
     <tr>
       <th th:text="#{date}">Date</th>
       <th th:text="#{description}">Description</th>
+      <th th:text="#{confidentiality}">Confidentiality</th>
+      <th th:text="#{clinics}">Clinics</th>
     </tr>
     <tr th:if="${!visit['new']}" th:each="visit : ${child.visits}">
       <td th:text="${#temporals.format(visit.date, 'yyyy-MM-dd')}"></td>
       <td th:text=" ${visit.description}"></td>
+      <td th:text="${visit?.confidentiality?.name}"></td>
+      <td th:text="${visit?.clinicDescriptions}"></td>
     </tr>
   </table>
 

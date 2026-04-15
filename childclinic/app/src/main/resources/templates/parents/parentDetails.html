@@ -31,6 +31,10 @@
       <th th:text="#{telephone}">Telephone</th>
       <td th:text="*{telephone}"></td>
     </tr>
+    <tr>
+      <th th:text="#{clinics}">Clinics</th>
+      <td th:text="*{clinicDescriptions}"></td>
+    </tr>
   </table>
 
   <a th:href="@{__${parent.id}__/edit}" class="btn btn-primary" th:text="#{editParent}">Edit
@@ -54,6 +58,8 @@
           <dd th:text="${#temporals.format(child.birthDate, 'yyyy-MM-dd')}"></dd>
           <dt th:text="#{gender}">Gender</dt>
           <dd th:text="${child.gender}"></dd>
+          <dt th:text="#{clinics}">Clinics</dt>
+          <dd th:text="${child.clinicDescriptions}"></dd>
         </dl>
       </td>
       <td valign="top">
@@ -62,11 +68,15 @@
             <tr>
               <th th:text="#{visitDate}">Visit Date</th>
               <th th:text="#{description}">Description</th>
+              <th th:text="#{confidentiality}">Confidentiality</th>
+              <th th:text="#{clinics}">Clinics</th>
             </tr>
           </thead>
           <tr th:each="visit : ${child.visits}">
             <td th:text="${#temporals.format(visit.date, 'yyyy-MM-dd')}"></td>
             <td th:text="${visit?.description}"></td>
+            <td th:text="${visit?.confidentiality?.name}"></td>
+            <td th:text="${visit?.clinicDescriptions}"></td>
           </tr>
           <tr>
             <td><a th:href="@{__${parent.id}__/children/__${child.id}__/edit}" th:text="#{editChild}">Edit Child</a></td>

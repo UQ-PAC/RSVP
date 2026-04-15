@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -42,6 +43,7 @@ public interface ParentRepository extends JpaRepository<Parent, Integer> {
 	 * @return a Collection of matching {@link Parent}s (or an empty Collection if none
 	 * found)
 	 */
+	@EntityGraph(attributePaths = {"clinics", "children", "children.clinics", "children.visits"})
 	Page<Parent> findByLastNameStartingWith(String lastName, Pageable pageable);
 
 	/**
@@ -57,6 +59,7 @@ public interface ParentRepository extends JpaRepository<Parent, Integer> {
 	 * @throws IllegalArgumentException if the id is null (assuming null is not a valid
 	 * input for id)
 	 */
+	@EntityGraph(attributePaths = {"clinics", "children", "children.clinics", "children.visits"})
 	Optional<Parent> findById(Integer id);
 
 }

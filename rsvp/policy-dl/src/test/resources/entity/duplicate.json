@@ -1,0 +1,26 @@
+[
+    {
+        "uid": { "type": "Account", "id": "Alice" },
+        "attrs": {
+            "name" : "Bob",
+            "age" : 25,
+            "role" : { "__entity": { "type": "Role", "id": "User" } },
+            "friends" : []
+        },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Account", "id": "Alice" },
+        "attrs": {
+            "name" : "Carl",
+            "age" : 27,
+            "role" : { "__entity": { "type": "Role", "id": "User" } },
+            "friends" : []
+        },
+        "parents": []
+    }
+]
+
+// @MESSAGE: Duplicate entity: Account::"Alice"
+// @LOCATION: MISSING
+// @NAME: Duplicate entity

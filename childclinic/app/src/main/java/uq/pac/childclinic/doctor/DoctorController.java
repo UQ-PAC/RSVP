@@ -20,6 +20,7 @@ import com.cedarpolicy.value.Value;
 
 import jakarta.servlet.http.HttpSession;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +65,6 @@ class DoctorController {
 		// Here we are returning an object of type 'Doctors' rather than a collection of Doctor
 		// objects so it is simpler for Object-Xml mapping
 		Doctors doctors = new Doctors();
-		Page<Doctor> paginated = findPaginated(page);
 
 		String principalId = (String) session.getAttribute("currentUser");
 		if (session.getAttribute("currentUser") == null) {
@@ -83,7 +83,9 @@ class DoctorController {
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 
-		List<Doctor> authorizedDoctors = paginated.stream().filter(doctor -> {
+		Collection<Doctor> allDoctors = doctorRepository.findAll();
+
+		List<Doctor> authorizedDoctors = allDoctors.stream().filter(doctor -> {
 			EntityUID action = EntityUID.parse("ChildClinic::Action::\"" + "ViewEmployee" + "\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
 			EntityUID resource = EntityUID
@@ -92,18 +94,23 @@ class DoctorController {
 			Map<String, Value> contextMap = new HashMap<>();
 			CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
 			ResponseEntity<String> response = cedarService.checkAccess(cedarReq);
-			if (response.getBody().startsWith("Access Granted.")) {
-				return true;
-			}
-			else {
-				return false;
-			}
+			return response.getBody().startsWith("Access Granted.");
 		}).collect(Collectors.toList());
 
 		doctors.getDoctorsList().addAll(authorizedDoctors);
 
-		Page<Doctor> filteredPaginated = new PageImpl<>(authorizedDoctors, PageRequest.of(page - 1, 5),
-				authorizedDoctors.size());
+		Pageable pageable = PageRequest.of(page - 1, 5);
+		int start = (int) pageable.getOffset();
+		int end = Math.min((start + pageable.getPageSize()), authorizedDoctors.size());
+		
+		List<Doctor> pageContent;
+		if (start > authorizedDoctors.size()) {
+		    pageContent = List.of();
+		} else {
+		    pageContent = authorizedDoctors.subList(start, end);
+		}
+
+		Page<Doctor> filteredPaginated = new PageImpl<>(pageContent, pageable, authorizedDoctors.size());
 
 		return addPaginationModel(page, filteredPaginated, model);
 	}
@@ -117,12 +124,6 @@ class DoctorController {
 		return "doctors/doctorsList";
 	}
 
-	private Page<Doctor> findPaginated(int page) {
-		int pageSize = 5;
-		Pageable pageable = PageRequest.of(page - 1, pageSize);
-		return doctorRepository.findAll(pageable);
-	}
-
 	@GetMapping({ "/doctors" })
 	@CedarAuthorization(action = "ListEmployees", resourceType = "Clinic", resourceId = "Any", validate = true)
 	public @ResponseBody Doctors showResourcesDoctorsList(HttpSession session) {
@@ -131,6 +132,10 @@ class DoctorController {
 		Doctors doctors = new Doctors();
 
 		String principalId = (String) session.getAttribute("currentUser");
+		if (principalId == null) {
+			principalId = "Guest";
+		}
+
 		EntityUID principal;
 		if (principalId.equals("Guest")) {
 			principal = EntityUID.parse("ChildClinic::Guest::\"Unknown\"")
@@ -150,12 +155,7 @@ class DoctorController {
 			Map<String, Value> contextMap = new HashMap<>();
 			CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
 			ResponseEntity<String> response = cedarService.checkAccess(cedarReq);
-			if (response.getBody().startsWith("Access Granted.")) {
-				return true;
-			}
-			else {
-				return false;
-			}
+			return response.getBody().startsWith("Access Granted.");
 		}).collect(Collectors.toList());
 
 		doctors.getDoctorsList().addAll(authorizedDoctors);

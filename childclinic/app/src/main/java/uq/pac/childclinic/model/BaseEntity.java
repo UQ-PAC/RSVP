@@ -17,6 +17,7 @@ package uq.pac.childclinic.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -31,6 +32,7 @@ import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import uq.pac.childclinic.system.Clinic;
 
@@ -52,7 +54,7 @@ public class BaseEntity implements Serializable, Identifiable {
 	@SequenceGenerator(name = "entity_sequence_generator", sequenceName = "entities_sequence", allocationSize = 1)
 	private Integer id;
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "entity_clinics", joinColumns = @JoinColumn(name = "entity_id"),
 			inverseJoinColumns = @JoinColumn(name = "clinic_id"))
 	private Set<Clinic> clinics = new HashSet<>();
@@ -80,5 +82,15 @@ public class BaseEntity implements Serializable, Identifiable {
 	public void addClinic(Clinic clinic) {
 		this.clinics.add(clinic);
 	}
+
+	public String getClinicDescriptions() {
+        if (this.clinics == null || this.clinics.isEmpty()) {
+            return "No Assigned Clinics";
+        }
+        return this.clinics.stream()
+            .map(Clinic::getClinicName)
+            .sorted()
+            .collect(Collectors.joining(", "));
+    }
 
 }

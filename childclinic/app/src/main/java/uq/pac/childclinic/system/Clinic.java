@@ -13,17 +13,17 @@ public class Clinic implements Serializable {
 
 	@Id
 	@Column(name = "clinic_id")
-	private Integer database_id;
+	private Integer clinic_id;
 
 	@Column(name = "name")
 	private String name;
 
 	public Integer getClinicId() {
-		return database_id;
+		return clinic_id;
 	}
 
-	public void setClinicId(Integer database_id) {
-		this.database_id = database_id;
+	public void setClinicId(Integer clinic_id) {
+		this.clinic_id = clinic_id;
 	}
 
 	public String getClinicName() {

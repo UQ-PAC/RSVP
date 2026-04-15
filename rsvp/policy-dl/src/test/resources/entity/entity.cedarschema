@@ -1,8 +1,25 @@
-entity User enum [ "Alice", "Bob" ];
-entity File;
+entity Role enum [ "User", "Admin" ];
 
-action introspect appliesTo {
-    principal: [ File ],
-    resource: [ User ]
+entity Account = {
+    name: String,
+    age: Long,
+    role: Role,
+    friends: Set<Account>,
+};
+
+entity Album = {
+    owner: Account,
+    private: Bool
+};
+
+entity Photo = {
+    album: Album,
+    size : Long,
+    type: String
+};
+
+action view appliesTo {
+    principal: [ Account ],
+    resource: [ Photo ]
 };
 

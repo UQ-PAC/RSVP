@@ -95,6 +95,9 @@ class VisitController {
 	// Spring MVC calls method loadChildWithVisit(...) before initNewVisitForm is
 	// called
 	@GetMapping("/parents/{parentId}/children/{childId}/visits/new")
+	@CedarAuthorization(action = "ViewClient", resourceType = "Parent", validate = true)
+	@CedarAuthorization(action = "ViewClient", resourceType = "Child", validate = true)
+	@CedarAuthorization(action = "EditClient", resourceType = "Child", validate = true)
 	@CedarAuthorization(action = "AddClient", resourceType = "Child", validate = true)
 	public String initNewVisitForm(Child child, HttpSession session) {
 		String principalId = (String) session.getAttribute("currentUser");
@@ -131,8 +134,8 @@ class VisitController {
 	// Spring MVC calls method loadChildWithVisit(...) before processNewVisitForm is
 	// called
 	@PostMapping("/parents/{parentId}/children/{childId}/visits/new")
-	@CedarAuthorization(action = "AddClient", resourceType = "Child", validate = true)
-	public String processNewVisitForm(@ModelAttribute Parent parent, @PathVariable int childId, @Valid Visit visit,
+	@CedarAuthorization(action = "EditClient", resourceType = "Child", validate = true)
+	public String processNewVisitForm(@ModelAttribute Parent parent, @PathVariable("childId") int childId, @Valid Visit visit,
 			BindingResult result, RedirectAttributes redirectAttributes) {
 		if (result.hasErrors()) {
 			return "children/createOrUpdateVisitForm";

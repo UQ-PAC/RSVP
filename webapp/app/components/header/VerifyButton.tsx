@@ -7,8 +7,8 @@ import {
   ExpansionState,
   useFocus,
   useFocusDispatch,
-} from "./providers/FocusContext";
-import { useVerificationDispatch } from "./providers/VerificationContext";
+} from "../providers/FocusContext";
+import { useVerificationDispatch } from "../providers/VerificationContext";
 
 const lexendDeca = Lexend_Deca({
   subsets: ["latin"],

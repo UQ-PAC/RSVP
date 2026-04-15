@@ -145,4 +145,54 @@
     > .source-file-line-content.source-report.source-report-err {
     border-right: 0.15rem dotted var(--color-red-500);
   }
+
+  /********  report highlighting  ********/
+
+  .source-report.source-report-info.hovered {
+    background-color: var(--color-info-mid);
+  }
+
+  .source-report.source-report-warn.hovered {
+    background-color: var(--color-warn-mid);
+  }
+
+  .source-report.source-report-err.hovered {
+    background-color: var(--color-err-mid);
+  }
+
+  .source-report.source-report-info.selected {
+    background-color: var(--color-info-light);
+  }
+
+  .source-report.source-report-warn.selected {
+    background-color: var(--color-warn-light);
+  }
+
+  .source-report.source-report-err.selected {
+    background-color: var(--color-err-light);
+  }
+
+  .source-report.selected .source-report-text-highlight-info {
+    background-color: var(--color-info-mid);
+  }
+
+  .source-report.selected .source-report-text-highlight-warn {
+    background-color: var(--color-warn-mid);
+  }
+
+  .source-report.selected .source-report-text-highlight-err {
+    background-color: var(--color-err-mid);
+  }
+
+  .source-report.hovered .source-report-text-highlight-info {
+    background-color: var(--color-info-darker);
+  }
+
+  .source-report.hovered .source-report-text-highlight-warn {
+    background-color: var(--color-warn-darker);
+  }
+
+  .source-report.hovered .source-report-text-highlight-err {
+    background-color: var(--color-err-darker);
+  }
 }

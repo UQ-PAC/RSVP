@@ -1,3 +1,5 @@
+"use client";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FileInput } from "./FileInput";
 import { faTrashCan } from "@fortawesome/free-regular-svg-icons";
@@ -7,33 +9,62 @@ import {
   useVerificationDispatch,
 } from "../providers/VerificationContext";
 import { VerificationFile } from "@/app/types";
-import { remove } from "../../requests";
-import { FileList } from "./FileList";
+import { remove, upload } from "../../requests";
+import { UploadedFile } from "./UploadedFile";
+import { HiddenFileInput } from "./HiddenFileInput";
+import { useRef } from "react";
+import { getFileType } from "../../util";
 
 interface AnalysisGroupProps {
   name: string;
-  addFiles: (files: File[]) => void;
   removeGroup: () => void;
 }
 
-export function AnalysisGroup({
-  name,
-  addFiles,
-  removeGroup,
-}: AnalysisGroupProps) {
+export function AnalysisGroup({ name, removeGroup }: AnalysisGroupProps) {
+  const versionOriginFile = useRef<VerificationFile>(null);
+  const versionInputRef = useRef<HTMLInputElement>(null);
+
   const context = useVerification();
   const dispatch = useVerificationDispatch();
 
-  const {
-    cedar: policies,
-    cedarschema: schemas,
-    entities,
-    invariant: invariants,
-  } = context[name] ?? emptyVerificationGroup;
+  const { files } = context[name] ?? emptyVerificationGroup;
 
-  const removeFile = (file: VerificationFile) => {
+  const addFiles = (toAdd: File[], original?: VerificationFile) =>
+    toAdd.forEach((file) => {
+      dispatch({
+        type: "add",
+        group: name,
+        file: {
+          file,
+          filetype: getFileType(file),
+          resolved: upload(file),
+        },
+        original,
+      });
+    });
+
+  // Handle regular file input selection
+  const handleVersionFileInput = (e) => {
+    if (
+      e.target.files &&
+      e.target.files.length > 0 &&
+      versionOriginFile.current
+    ) {
+      const selectedFiles = Array.from<File>(e.target.files);
+      addFiles(selectedFiles, versionOriginFile.current);
+    }
+    versionOriginFile.current = null;
+  };
+
+  // Programmatically open file selection dialog
+  const openCedarFileDialog = (file: VerificationFile) => {
+    versionOriginFile.current = file;
+    versionInputRef.current?.click();
+  };
+
+  const removeFile = (file: VerificationFile, original?: VerificationFile) => {
     file.resolved.then((uploaded) => remove(uploaded.serverId));
-    dispatch({ type: "remove", group: name, file: file });
+    dispatch({ type: "remove", group: name, file, original });
   };
 
   return (
@@ -47,45 +78,35 @@ export function AnalysisGroup({
         />
       </span>
       <div className="analysis-group-filelist">
-        {policies.length > 0 && (
-          <FileList
-            title="Policies"
-            filetype="cedar"
+        {files.map((file, i) => (
+          <UploadedFile
+            key={i}
             group={name}
-            files={policies}
+            file={file.original}
             remove={removeFile}
-            nested
-          />
-        )}
-        {schemas.length > 0 && (
-          <FileList
-            title="Schemas"
-            filetype="cedarschema"
-            group={name}
-            files={schemas}
-            remove={removeFile}
-          />
-        )}
-        {entities.length > 0 && (
-          <FileList
-            title="Entities"
-            filetype="entities"
-            group={name}
-            files={entities}
-            remove={removeFile}
-          />
-        )}
-        {invariants.length > 0 && (
-          <FileList
-            title="Invariants"
-            filetype="invariant"
-            group={name}
-            files={invariants}
-            remove={removeFile}
-          />
-        )}
+            addChild={
+              file.original.filetype === "cedar"
+                ? openCedarFileDialog
+                : undefined
+            }
+          >
+            {file.versions.map((version, j) => (
+              <UploadedFile
+                key={j}
+                group={name}
+                file={version}
+                remove={removeFile}
+              />
+            ))}
+          </UploadedFile>
+        ))}
       </div>
       <FileInput addFiles={addFiles} />
+      <HiddenFileInput
+        ref={versionInputRef}
+        accept="cedar"
+        handleFileInput={handleVersionFileInput}
+      />
     </div>
   );
 }

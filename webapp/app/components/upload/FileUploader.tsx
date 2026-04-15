@@ -3,14 +3,11 @@
 import { useState } from "react";
 import { AnalysisGroup } from "./AnalysisGroup";
 import { CreateContextButton } from "./CreateContextButton";
-import { useVerificationDispatch } from "../providers/VerificationContext";
-import { upload } from "../../requests";
-import { getFileType } from "@/app/util";
+
+import "./upload.css";
 
 export function FileUploader() {
   const [policySets, setPolicySets] = useState<string[]>([]);
-
-  const dispatch = useVerificationDispatch();
 
   const createPolicySet = () => {
     setPolicySets([...policySets, "Policy set " + (policySets.length + 1)]);
@@ -22,19 +19,6 @@ export function FileUploader() {
         <AnalysisGroup
           key={i}
           name={policySet}
-          addFiles={(toAdd: File[]) => {
-            toAdd.forEach((file) => {
-              dispatch({
-                type: "add",
-                group: policySet,
-                file: {
-                  file,
-                  filetype: getFileType(file) ?? "cedar",
-                  resolved: upload(file),
-                },
-              });
-            });
-          }}
           removeGroup={() =>
             setPolicySets(policySets.filter((name) => name !== policySet))
           }

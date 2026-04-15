@@ -2,91 +2,50 @@
 
 import { SourceFile } from "./SourceFile";
 import { Report, VerificationFile } from "../../types";
-import {
-  ExpansionState,
-  useFocus,
-  useFocusDispatch,
-} from "../providers/FocusContext";
 import { useVerification } from "../providers/VerificationContext";
 import { getFileType } from "@/app/util";
+import { Fallback } from "./Fallback";
+
+import "./sources.css";
 
 export function SourceFileViewer() {
-  // useEffect(() => {
-  //   hljs.debugMode();
-  //   hljs.registerLanguage("cedar", () => CedarHighlight);
-  //   hljs.registerLanguage("invariant", () => InvariantHighlight);
-  //   // hljs.registerLanguage("entities", () => EntitiesHighlight);
-  // }, []);
-
-  const { drawer: drawerFocus } = useFocus();
-  const focusDispatch = useFocusDispatch();
-
   const verificationContext = useVerification();
 
   const filterReports = (
     source: VerificationFile,
     reports?: Promise<Report[]>,
-  ): { source: VerificationFile; reports: Promise<Report[]> } => ({
-    source,
-    reports:
-      reports?.then((reports) =>
-        reports.filter(
-          // TODO: multiple locations
-          (report) => report.primarySourceLocation.source === source,
-        ),
-      ) ?? Promise.resolve([]),
-  });
+  ): Promise<Report[]> =>
+    reports?.then((reports) =>
+      reports.filter(
+        // TODO: multiple locations
+        (report) => report.primarySourceLocation.source === source,
+      ),
+    ) ?? Promise.resolve([]);
 
-  const sources = Object.entries(verificationContext).reduce<
-    { source: VerificationFile; reports: Promise<Report[]> }[]
-  >((all, [, group]) => {
-    const filterGroup = (source) => filterReports(source, group.reports);
-
-    // FIXME:??? get from map of all? want ordered
-    return [
-      ...all,
-      ...group.cedar.map(filterGroup),
-      ...group.cedarschema.map(filterGroup),
-      ...group.entities.map(filterGroup),
-      ...group.invariant.map(filterGroup),
-    ];
-  }, []);
+  const groups = Object.entries(verificationContext);
 
   return (
     <div className="source-files-container">
-      {!sources.length && (
-        <p className="source-files-instruction">
-          <a
-            className="source-files-upload-link"
-            onClick={() => {
-              if (drawerFocus["left"] == ExpansionState.Collapsed) {
-                focusDispatch({
-                  type: "drawer",
-                  key: "left",
-                  value: ExpansionState.Expanded,
-                });
-                focusDispatch({
-                  type: "drawer",
-                  key: "right",
-                  value: ExpansionState.Collapsed,
-                });
-              }
-            }}
-          >
-            Upload Cedar policy and schema files
-          </a>{" "}
-          to run verification.
-        </p>
-      )}
-      {sources.map(({ source, reports }, i) => (
-        <SourceFile
-          key={i}
-          filename={source.file.name}
-          filetype={getFileType(source.file) ?? "cedar"}
-          content={source.resolved.then((uploaded) => uploaded.content)}
-          reports={reports}
-        />
+      {groups.map(([name, group], i) => (
+        <div key={i} className="source-files-analysis-group">
+          <span className="source-files-analysis-group-header">
+            <h2 className="source-files-analysis-group-title">{name}</h2>
+          </span>
+          {group.files.map(({ original: source }, i) => (
+            <SourceFile
+              key={i}
+              filename={source.file.name}
+              filetype={getFileType(source.file)}
+              content={source.resolved.then((uploaded) => uploaded.content)}
+              reports={filterReports(source, group.reports)}
+            />
+          ))}
+          {!group.files.length && (
+            <Fallback instruction="Upload Cedar policy and schema files" />
+          )}
+        </div>
       ))}
+      {!groups.length && <Fallback instruction="Create a policy set" />}
     </div>
   );
 }

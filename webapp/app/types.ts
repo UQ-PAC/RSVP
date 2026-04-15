@@ -1,4 +1,9 @@
-export type FileType = "cedar" | "cedarschema" | "entities" | "invariant";
+export type FileType =
+  | "cedar"
+  | "cedarschema"
+  | "entities"
+  | "invariant"
+  | "text";
 export type ReportSeverity = "info" | "warn" | "err";
 
 export interface SourceLoc {

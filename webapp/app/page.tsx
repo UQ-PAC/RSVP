@@ -1,15 +1,10 @@
-"use client";
-
-import { useState } from "react";
-import type { FilePondErrorDescription, FilePondFile } from "filepond";
 import { SourceFileViewer } from "./components/sources/SourceFileViewer";
 
-import { Header } from "./components/Header";
+import { Header } from "./components/header/Header";
 
 import "filepond/dist/filepond.min.css";
 import { ReportViewer } from "./components/reports/ReportViewer";
 import { Drawer } from "./components/Drawer";
-import { Content } from "./components/Content";
 
 import { ContextProvider } from "./components/providers/ContextProvider";
 import { FileUploader } from "./components/upload/FileUploader";
@@ -19,7 +14,7 @@ export default function Home() {
     <div className="app">
       <ContextProvider>
         <Header heading="RSVP" subheading="Policy Verification" />
-        <Content>
+        <div className="app-content">
           <Drawer title="Policies" side="left">
             <FileUploader />
           </Drawer>
@@ -27,7 +22,7 @@ export default function Home() {
           <Drawer title="Reports" side="right">
             <ReportViewer />
           </Drawer>
-        </Content>
+        </div>
       </ContextProvider>
     </div>
   );

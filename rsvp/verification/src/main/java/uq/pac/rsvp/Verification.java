@@ -33,28 +33,31 @@ public class Verification {
 
         Set<Report> results = new HashSet<>();
 
-        Path dlPath = Files.createTempDirectory("rsvp-");
+        // Path dlPath = Files.createTempDirectory("rsvp-");
 
-        Schema schema = Schema.parseCedarSchema(schemaPath);
+        // Schema schema = Schema.parseCedarSchema(schemaPath);
         PolicySet policies = PolicySet.parseCedarPolicySet(policyFilename, Files.readString(policiesPath));
 
-        Translation translation =
-                new Translation(schema, policies, entities, null, dlPath);
+        // Translation translation =
+        //         new Translation(schema, policies, entities, null, dlPath);
 
-        Map<Policy, RequestSet> policyResults = translation.getPolicyResult();
+        // Map<Policy, RequestSet> policyResults = translation.getPolicyResult();
 
-        policyResults.forEach((k, v) -> {
-            if (v.isEmpty()) {
-                Report r = new Report(Severity.Warning, "Policy '" + k.getName() + "' does not match any requests",
-                        k.getSourceLoc());
-                results.add(r);
-            }
-        });
+        // policyResults.forEach((k, v) -> {
+        //     if (v.isEmpty()) {
+        //         Report r = new Report(Severity.Warning, "Policy '" + k.getName() + "' does not match any requests",
+        //                 k.getSourceLoc());
+        //         results.add(r);
+        //     }
+        // });
+
+
+        results.addAll(verify(policies)); 
 
         return results;
     }
 
-    public static Set<Report> verify(PolicySet policies, Schema schema) {
+    public static Set<Report> verify(PolicySet policies) {
         RandomReportGenerator generator = new RandomReportGenerator();
 
         policies.accept(generator);

@@ -1,3 +1,42 @@
+@import "tailwindcss";
+
+@layer theme, base, components;
+
+@layer base {
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+  }
+
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: clip;
+  }
+
+  .large-text {
+    font-size: var(--font-large);
+  }
+
+  .med-text {
+    font-size: var(--font-med);
+  }
+
+  .sm-text {
+    font-size: var(--font-sm);
+  }
+
+  .bold-text {
+    font-weight: 600;
+  }
+
+  .centered-text {
+    text-align: center;
+  }
+}
+
 @layer theme {
   :root {
     --background: #ffffff;
@@ -28,4 +67,15 @@
   --color-err-mid: var(--color-red-200);
   --color-err-darker: var(--color-red-300);
   --color-err-darkest: var(--color-red-800);
+}
+
+@layer components {
+  .app-content {
+    position: relative;
+    display: inline-flex;
+    align-items: stretch;
+    flex-grow: 1;
+    background-color: var(--color-gray-100);
+    overflow-y: scroll;
+  }
 }

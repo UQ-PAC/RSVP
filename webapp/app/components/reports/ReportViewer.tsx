@@ -5,6 +5,8 @@ import { Report, ReportSeverity } from "../../types";
 import { ReportsSection } from "./ReportsSection";
 import { useVerification } from "../providers/VerificationContext";
 
+import "./reports.css";
+
 type GroupedReports = [string, Report[]][];
 
 export function ReportViewer() {

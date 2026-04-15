@@ -1,6 +1,8 @@
-import { useVerificationDispatch } from "./providers/VerificationContext";
 import { VerifyButton } from "./VerifyButton";
 import { Lexend_Giga } from "next/font/google";
+
+import "./header.css";
+
 interface HeaderParams {
   heading: string;
   subheading?: string;

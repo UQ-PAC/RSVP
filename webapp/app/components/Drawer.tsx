@@ -1,3 +1,5 @@
+"use client";
+
 import { faCaretLeft, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import cx from "classnames";
@@ -6,6 +8,8 @@ import {
   useFocus,
   useFocusDispatch,
 } from "./providers/FocusContext";
+
+import "./drawer.css";
 
 interface DrawerProps {
   title: string;

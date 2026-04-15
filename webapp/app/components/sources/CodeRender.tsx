@@ -57,9 +57,11 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
   } = {};
 
   const highlight = (text: string) =>
-    hljs.highlight(text, {
-      language: syntax,
-    }).value;
+    syntax !== "text"
+      ? hljs.highlight(text, {
+          language: syntax,
+        }).value
+      : text;
 
   reports.forEach((report) => {
     const loc = report.primarySourceLocation;

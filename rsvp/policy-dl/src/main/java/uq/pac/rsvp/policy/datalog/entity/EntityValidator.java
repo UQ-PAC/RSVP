@@ -5,6 +5,7 @@ import uq.pac.rsvp.policy.ast.schema.*;
 import uq.pac.rsvp.policy.ast.schema.common.*;
 import uq.pac.rsvp.policy.ast.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
+import uq.pac.rsvp.support.SourceLoc;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -30,8 +31,8 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
     }
 
     static class Error extends RuntimeException {
-        Error(String msg) {
-            super(msg);
+        Error(SourceLoc loc, String msg) {
+            super(msg + (loc == null || loc == SourceLoc.MISSING ? "" : " at " + loc));
         }
     }
 
@@ -44,18 +45,18 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
     private void validate(Entity entity) {
         EntityReference euid = entity.getEuid();
         if (uids.contains(euid)) {
-            throw new Error("Duplicate entity: " + entity.getEuid());
+            throw new Error(euid.getLocation(), "Duplicate entity: " + entity.getEuid());
         }
         uids.add(euid);
 
         // Prevent entity names from having '\t' used as an internal delimiter
         if (euid.getId().contains(OUTPUT_DELIMITER)) {
-            throw new Error("Unsupported entity name including tab characters: " + euid);
+            throw new Error(entity.getLocation(), "Unsupported entity name including tab characters: " + euid);
         }
 
         // Prevent entity names from having '???' internal names
         if (euid.getId().equals(UndefinedEntityUIDName)) {
-            throw new TranslationError("Internal entity name in schema: " + euid);
+            throw new Error(euid.getLocation(), "Internal entity name in schema: " + euid);
         }
 
         EntityTypeDefinition def = schema.getEntityType(euid.getType());
@@ -63,9 +64,9 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
             Set<String> actionTypes =
                     schema.actions().stream().map(ActionDefinition::getType).collect(Collectors.toSet());
             if (actionTypes.contains(euid.getType())) {
-                throw new Error("Action entity: " + entity.getEuid() + " in entity set");
+                throw new Error(entity.getLocation(), "Action entity: " + entity.getEuid() + " in entity set");
             } else {
-                throw new Error("Definition of " + euid.getType() + " not found in the schema");
+                throw new Error(entity.getLocation(), "Definition of " + euid.getType() + " not found in the schema");
             }
         }
         def.getShape().process(this, entity.getAttrs());
@@ -78,10 +79,10 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
                         .collect(Collectors.toSet());
                 memberOf.add(def.getName());
                 if (!memberOf.contains(parent.getType())) {
-                    throw new Error("Unexpected parent type: " + parent.getType() + " expected one of " + memberOf);
+                    throw new Error(value.getLocation(), "Unexpected parent type: " + parent.getType() + " expected one of " + memberOf);
                 }
             } else {
-                throw new Error("Unexpected value: " + value + " expected entity reference");
+                throw new Error(value.getLocation(), "Unexpected value: " + value + " expected entity reference");
             }
         }
     }
@@ -89,16 +90,12 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
     // FIXME: incorporate source locations
     private static <T extends EntityValue> T expectedType(EntityValue payload, Class<T> cls, String kind) {
         if (payload == null) {
-            throw new Error("Missing " + kind + " value");
+            throw new Error(payload.getLocation(), "Missing " + kind + " value");
         }
         if (!cls.isInstance(payload)) {
-            throw new Error("Expected " + kind +  ", got value: " + payload);
+            throw new Error(payload.getLocation(), "Expected " + kind +  ", got value: " + payload);
         }
         return cls.cast(payload);
-    }
-
-    private void unsupported(SchemaItem item) {
-        throw new Error("Unsupported schema component: " + item);
     }
 
     @Override
@@ -113,7 +110,7 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
 
         value.forEach((attr, val) -> {
             if (!rec.hasAttribute(attr)) {
-                throw new Error("Unexpected attribute: " + attr);
+                throw new Error(null, "Unexpected attribute: " + attr);
             }
         });
     }
@@ -132,13 +129,13 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
         EntityTypeDefinition definition = type.getDefinition();
 
         if (!definition.getName().equals(ref.getType())) {
-            throw new Error("Unexpected type: expected" + definition.getName() + ", got " + ref.getType());
+            throw new Error(payload.getLocation(), "Unexpected type: expected" + definition.getName() + ", got " + ref.getType());
         }
 
         // FIXME: Need to check if enum supports no values
         if (!definition.getEntityNamesEnum().isEmpty()) {
             if (!definition.getEntityNamesEnum().contains(ref.getId())) {
-                throw new Error("Unexpected ID " + ref.getId() +
+                throw new Error(payload.getLocation(), "Unexpected ID " + ref.getId() +
                         " for type " + definition.getName() + ", expected one of " + definition.getEntityNamesEnum());
             }
         }
@@ -147,6 +144,11 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
     @Override
     public void visitBoolean(BooleanType type, EntityValue payload) {
         expectedType(payload, BooleanValue.class, "boolean");
+    }
+
+    @Override
+    public void visitCommonTypeReference(CommonTypeReference type, EntityValue payload) {
+        type.getDefinition().process(this, payload);
     }
 
     @Override
@@ -161,46 +163,41 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
 
     @Override
     public void visitDateTime(DateTimeType type, EntityValue payload) {
-        unsupported(schema);
+        throw new Error(payload.getLocation(), "Unsupported element: " + payload);
     }
 
     @Override
     public void visitDecimal(DecimalType type, EntityValue payload) {
-        unsupported(schema);
+        throw new Error(payload.getLocation(), "Unsupported element: " + payload);
     }
 
     @Override
     public void visitDuration(DurationType type, EntityValue payload) {
-        unsupported(schema);
+        throw new Error(payload.getLocation(), "Unsupported element: " + payload);
     }
 
     @Override
     public void visitIpAddress(IpAddressType type, EntityValue payload) {
-        unsupported(schema);
+        throw new Error(payload.getLocation(), "Unsupported element: " + payload);
     }
 
     @Override
     public void visitUnresolvedTypeReference(UnresolvedTypeReference type, EntityValue payload) {
-        unsupported(schema);
+        throw new TranslationError("Unresolved reference in schema: " + type);
     }
 
     @Override
     public void visitSchema(Schema schema, EntityValue payload) {
-        unsupported(schema);
+        throw new TranslationError("Schema in type visitor");
     }
 
     @Override
     public void visitEntityTypeDefinition(EntityTypeDefinition type, EntityValue payload) {
-        unsupported(schema);
+        throw new TranslationError("Entity definition in type in visitor");
     }
 
     @Override
     public void visitActionDefinition(ActionDefinition action, EntityValue payload) {
-        unsupported(schema);
-    }
-
-    @Override
-    public void visitCommonTypeReference(CommonTypeReference type, EntityValue payload) {
-        type.getDefinition().process(this, payload);
+        throw new TranslationError("Action definition in type in visitor");
     }
 }

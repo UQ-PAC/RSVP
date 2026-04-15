@@ -50,6 +50,10 @@ public class SourceLoc {
         this(null, -1, 0);
     }
 
+    public String getFile() {
+        return file;
+    }
+
     public LineLoc getStartLoc() {
         return start;
     }

@@ -84,13 +84,15 @@ class ParentController {
 	}
 
 	@GetMapping("/parents/new")
-	@CedarAuthorization(action = "AddClient", resourceType = "Clinic", validate = true)
+	// Requires change from resourceId = "Any" to specific Clinic!
+	@CedarAuthorization(action = "AddClient", resourceType = "Clinic", resourceId = "Any", validate = true)
 	public String initCreationForm() {
 		return VIEWS_PARENT_CREATE_OR_UPDATE_FORM;
 	}
 
 	@PostMapping("/parents/new")
-	@CedarAuthorization(action = "AddClient", resourceType = "Clinic", validate = true)
+	// Requires change from resourceId = "Any" to specific Clinic!
+	@CedarAuthorization(action = "AddClient", resourceType = "Clinic", resourceId = "Any", validate = true)
 	public String processCreationForm(@Valid Parent parent, BindingResult result, RedirectAttributes redirectAttributes) {
 		if (result.hasErrors()) {
 			redirectAttributes.addFlashAttribute("error", "There was an error in creating the parent.");
@@ -203,6 +205,7 @@ class ParentController {
 	}
 
 	@GetMapping("/parents/{parentId}/edit")
+	@CedarAuthorization(action = "ViewClient", resourceType = "Parent", validate = true)
 	@CedarAuthorization(action = "EditClient", resourceType = "Parent", validate = true)
 	public String initUpdateParentForm() {
 		return VIEWS_PARENT_CREATE_OR_UPDATE_FORM;

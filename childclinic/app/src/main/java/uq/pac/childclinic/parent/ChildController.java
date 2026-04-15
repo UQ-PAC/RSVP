@@ -109,6 +109,8 @@ class ChildController {
 	}
 
 	@GetMapping("/children/new")
+	@CedarAuthorization(action = "ViewClient", resourceType = "Parent", validate = true)
+	@CedarAuthorization(action = "EditClient", resourceType = "Parent", validate = true)
 	@CedarAuthorization(action = "AddClient", resourceType = "Parent", validate = true)
 	public String initCreationForm(Parent parent, ModelMap model, HttpSession session) {
 		String principalId = (String) session.getAttribute("currentUser");
@@ -146,6 +148,7 @@ class ChildController {
 	}
 
 	@PostMapping("/children/new")
+	@CedarAuthorization(action = "EditClient", resourceType = "Parent", validate = true)
 	@CedarAuthorization(action = "AddClient", resourceType = "Parent", validate = true)
 	public String processCreationForm(Parent parent, @Valid Child child, BindingResult result,
 			RedirectAttributes redirectAttributes) {
@@ -169,13 +172,15 @@ class ChildController {
 	}
 
 	@GetMapping("/children/{childId}/edit")
+	@CedarAuthorization(action = "ViewClient", resourceType = "Parent", validate = true)
+	@CedarAuthorization(action = "ViewClient", resourceType = "Child", validate = true)
 	@CedarAuthorization(action = "EditClient", resourceType = "Child", validate = true)
 	public String initUpdateForm() {
 		return VIEWS_CHILDREN_CREATE_OR_UPDATE_FORM;
 	}
 
 	@PostMapping("/children/{childId}/edit")
-	@CedarAuthorization(action = "EditClient", resourceType = "Child", validate = true)
+	@CedarAuthorization(action = "EditClient", resourceType = "Child", validate = true) // Fix Cedar logic to capture "childId"!
 	public String processUpdateForm(Parent parent, @Valid Child child, BindingResult result,
 			RedirectAttributes redirectAttributes) {
 

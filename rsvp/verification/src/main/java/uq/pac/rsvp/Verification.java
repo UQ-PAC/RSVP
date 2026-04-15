@@ -3,6 +3,7 @@ package uq.pac.rsvp;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
@@ -20,6 +21,7 @@ import uq.pac.rsvp.policy.ast.expr.SetExpression;
 import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitorImpl;
+import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestSet;
 import uq.pac.rsvp.policy.datalog.translation.Translation;
 import uq.pac.rsvp.support.SourceLoc;
@@ -50,6 +52,68 @@ public class Verification {
                 results.add(r);
             }
         });
+
+        // Generate the inverse map, request -> policy set:
+        Map<Request, Set<Policy>> requestPolicyMap = new HashMap<>();
+        policyResults.forEach((k, v) -> {
+            v.forEach(r -> {
+                requestPolicyMap.computeIfAbsent(r, y -> { return new HashSet<>(); }).add(k);
+            });
+        });
+
+        // Policy grid - which policies may be subsumed (or equal to) others. Start by assuming
+        // that all policies have an equal request set:
+        Map<Policy, Set<Policy>> policyGrid = new HashMap<>();
+        policyResults.keySet().forEach(p -> {
+            Set<Policy> subsumers = new HashSet<>();
+            subsumers.addAll(policyResults.keySet());
+            subsumers.remove(p);
+            policyGrid.put(p, subsumers);
+        });
+
+        // Now trim the subsumption sets by processing each request:
+        requestPolicyMap.forEach((k, v) -> {
+            // The set (v) has policies which may subsume each other. Any policy not in the set
+            // does not subsume any policy in the set.
+            v.forEach(p -> {
+               Set<Policy> subsumersOfP = policyGrid.get(p);
+               subsumersOfP.removeIf(p2 -> !v.contains(p2));
+            });
+        });
+
+        policyGrid.forEach((p, ss) -> {
+            ss.forEach(p2 -> {
+                // (It is ok for a "forbid" policy to be "subsumed" by a "permit" policy - in that
+                // case the forbid acts as a filter over the permit).
+                if (!p.isForbid() || p2.isForbid()) {
+                    if (!policyResults.get(p).isEmpty()) {
+                        Report r;
+                        if (policyGrid.get(p2).contains(p)) {
+                            // If two policies subsume each other, they match an identical set of
+                            // requests (this will be reported twice: once for each of the policies).
+                            r = new Report(Severity.Warning, "Policy '" + p.getName() + "' and '"
+                                    + p2.getName() + "' match the same set of requests",
+                                    p.getSourceLoc());
+                        }
+                        else {
+                            r = new Report(Severity.Warning, "Policy '" + p.getName() + "' does "
+                                    + "not match any requests that are not also matched by policy '"
+                                    + p2.getName() + "'",
+                                    p.getSourceLoc());
+                        }
+                        results.add(r);
+                        // TODO can we give both source locations in a single report?
+                    }
+                }
+                // TODO if a permit policy is subsumed by a forbid policy , make that clear in the
+                // report
+            });
+        });
+
+        // TODO check for useless "permit" policies, i.e. which match some requests but those
+        // requests are always ultimately forbidden.
+        // TODO check for policies which could be removed without affecting authorisation matrix
+        // (unless already reported)
 
         return results;
     }

@@ -1,0 +1,6 @@
+{
+  "principal": "ChildrenClinic::Guest::\"Unknown\"",
+  "resource": "ChildrenClinic::Patient::\"Rosy Rodriquez\"",
+  "action": "ChildrenClinic::Action::\"EditPatient\"",
+  "context": {}
+}

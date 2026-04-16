@@ -1,6 +1,0 @@
-{
-  "principal": "ChildClinic::Guest::\"???\"",
-  "resource": "ChildClinic::Child::\"Basil\"",
-  "action": "ChildClinic::Action::\"AddClient\"",
-  "context": {}
-}

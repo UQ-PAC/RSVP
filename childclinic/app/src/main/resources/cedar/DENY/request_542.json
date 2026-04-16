@@ -1,6 +1,0 @@
-{
-  "principal": "ChildClinic::Employee::\"Linda Douglas\"",
-  "resource": "ChildClinic::Employee::\"Jestine Teixeira\"",
-  "action": "ChildClinic::Action::\"DeleteEmployee\"",
-  "context": {}
-}

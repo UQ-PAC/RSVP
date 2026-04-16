@@ -1,6 +1,0 @@
-{
-  "principal": "ChildClinic::Employee::\"James Carter\"",
-  "resource": "ChildClinic::Visit::\"Basil 1\"",
-  "action": "ChildClinic::Action::\"DeleteClient\"",
-  "context": {}
-}

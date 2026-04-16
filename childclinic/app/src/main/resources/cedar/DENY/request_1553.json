@@ -1,6 +1,0 @@
-{
-  "principal": "ChildClinic::Employee::\"???\"",
-  "resource": "ChildClinic::Visit::\"Jewel 1\"",
-  "action": "ChildClinic::Action::\"ViewClient\"",
-  "context": {}
-}

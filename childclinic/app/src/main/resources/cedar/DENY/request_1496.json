@@ -1,6 +1,0 @@
-{
-  "principal": "ChildClinic::Employee::\"???\"",
-  "resource": "ChildClinic::Child::\"Max\"",
-  "action": "ChildClinic::Action::\"AddClient\"",
-  "context": {}
-}

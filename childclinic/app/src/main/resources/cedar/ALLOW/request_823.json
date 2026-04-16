@@ -1,6 +1,0 @@
-{
-  "principal": "ChildClinic::Employee::\"Jestine Teixeira\"",
-  "resource": "ChildClinic::Child::\"Jewel\"",
-  "action": "ChildClinic::Action::\"AddClient\"",
-  "context": {}
-}

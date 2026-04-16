@@ -1,0 +1,15 @@
+[
+    {
+        "uid": {
+            "type": "File", "id": "ls"
+        },
+        "attrs": {
+            "role" : { "__entity": { "type": "Role", "id": "User" } },
+            "friends" : []
+        },
+        "parents": []
+    }
+]
+
+// @MESSAGE: Undefined entity type: File
+// @LOCATION: 7:224 [2:5-11:6]

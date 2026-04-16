@@ -13,7 +13,7 @@ public class EntitySet {
     }
 
     public static EntitySet parse(Path json) throws IOException, IllegalAccessException {
-        return EntityReader.parse(json);
+        return new EntityReader(json).parse();
     }
 
     public Stream<Entity> stream() {

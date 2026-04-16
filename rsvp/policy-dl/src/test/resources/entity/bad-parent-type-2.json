@@ -1,0 +1,17 @@
+[
+    {
+        "uid": {
+            "type": "Account", "id": "Alice"
+        },
+        "attrs": {
+            "role" : { "__entity": { "type": "Role", "id": "User" } },
+            "friends" : []
+        },
+        "parents": [
+            { "type" : "Role", "id": "User" }
+        ]
+    }
+]
+
+// @MESSAGE: Unexpected parent type: Role expected one of [Account]
+// @LOCATION: 243:33 [11:13-11:46]

@@ -1,6 +1,5 @@
 package uq.pac.rsvp.policy.ast.entity;
 
-
 import uq.pac.rsvp.support.SourceLoc;
 
 import java.util.Collections;

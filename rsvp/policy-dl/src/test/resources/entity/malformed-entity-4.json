@@ -1,0 +1,9 @@
+[
+    {
+        "uid": { "type": "Account", "id": "Alice" },
+        "parents": [ ]
+    }
+]
+
+// @MESSAGE: Missing attrs entity attribute
+// @LOCATION: 7:83 [2:5-5:6]

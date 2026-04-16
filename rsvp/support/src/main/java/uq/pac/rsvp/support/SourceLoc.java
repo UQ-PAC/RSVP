@@ -1,6 +1,8 @@
 package uq.pac.rsvp.support;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import com.google.gson.JsonDeserializationContext;
@@ -34,7 +36,7 @@ public class SourceLoc {
         if (source != null) {
             this.file = source.getFile();
             this.start = source.getLineLoc(offset);
-            this.end = source.getLineLoc(offset);
+            this.end = source.getLineLoc(offset + len);
         } else {
             this.file = null;
             this.start = null;
@@ -60,7 +62,11 @@ public class SourceLoc {
 
     @Override
     public String toString() {
-        return file + ":" + start + ":" + len;
+        String loc = "%s:%d:%d".formatted(file, offset, len);
+        if (start != null && end != null) {
+            loc += " [%s-%s]".formatted(start.toString(), end.toString());
+        }
+        return loc;
     }
 
     public static class SourceLocDeserializer implements JsonDeserializer<SourceLoc> {
@@ -83,8 +89,18 @@ public class SourceLoc {
             if (fs != null) {
                 return new SourceLoc(fs, offset, len);
             } else if (sourceFilename != null) {
-                FileSource fs = FileSource.get(Path.of(sourceFilename.getAsString()));
-                return new SourceLoc(fs, offset, len);
+                // The file has not been provided to the deserialiser, but it has been found
+                // in the JSON specification. If so, try to read that file to extract its contents.
+                // The file may not necessarily exist
+                Path fn = Path.of(sourceFilename.getAsString());
+                if (Files.exists(fn) && Files.isReadable(fn) && Files.isRegularFile(fn)) {
+                    try {
+                        FileSource fs = FileSource.get(Path.of(sourceFilename.getAsString()));
+                        return new SourceLoc(fs, offset, len);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
             return SourceLoc.MISSING;
         }

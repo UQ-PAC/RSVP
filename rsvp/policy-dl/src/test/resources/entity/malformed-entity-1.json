@@ -1,0 +1,6 @@
+[
+    "foobar"
+]
+
+// @MESSAGE: Expected object start
+// @LOCATION: 7:1 [2:5-2:6]

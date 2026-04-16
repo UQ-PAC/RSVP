@@ -1,0 +1,12 @@
+[
+    {
+        "attrs": {
+            "role" : { "__entity": { "type": "Role", "id": "User" } },
+            "friends" : []
+        },
+        "parents": [ ]
+    }
+]
+
+// @MESSAGE: Missing uid entity attribute
+// @LOCATION: 7:158 [2:5-8:6]

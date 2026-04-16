@@ -1,0 +1,13 @@
+[
+    {
+        "euid": { "type": "Account", "id": "Alice" },
+        "attrs": {
+            "role" : { "__entity": { "type": "Role", "id": "User" } },
+            "friends" : []
+        },
+        "parents": [ ]
+    }
+]
+
+// @MESSAGE: Unexpected entity key: euid
+// @LOCATION: 7:4 [2:5-3:3]

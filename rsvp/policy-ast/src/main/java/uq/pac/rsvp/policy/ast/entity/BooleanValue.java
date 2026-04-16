@@ -2,6 +2,8 @@ package uq.pac.rsvp.policy.ast.entity;
 
 import uq.pac.rsvp.support.SourceLoc;
 
+import java.util.Objects;
+
 public class BooleanValue extends EntityValue {
     private final boolean value;
 
@@ -20,7 +22,7 @@ public class BooleanValue extends EntityValue {
 
     @Override
     public int hashCode() {
-        return value ? 0 : 1;
+        return Objects.hash(value);
     }
 
     @Override

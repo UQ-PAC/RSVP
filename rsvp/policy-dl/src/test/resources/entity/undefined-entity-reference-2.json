@@ -1,0 +1,15 @@
+[
+    {
+        "uid": { "type": "Account", "id": "Alice" },
+        "attrs": {
+            "role" : { "__entity": { "type": "Role", "id": "User" } },
+            "friends" : [
+                { "__entity": { "type": "Account", "id": "Bob" } }
+            ]
+        },
+        "parents": [ ]
+    }
+]
+
+// @MESSAGE: Undefined entity reference: Account::"Bob"
+// @LOCATION: 208:34 [7:31-7:65]

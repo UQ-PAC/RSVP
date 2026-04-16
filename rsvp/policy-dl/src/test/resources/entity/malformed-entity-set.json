@@ -1,0 +1,6 @@
+{
+    "foobar": true
+}
+
+// @MESSAGE: Expected array start
+// @LOCATION: 1:1 [1:1-1:2]

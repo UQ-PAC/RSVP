@@ -32,13 +32,8 @@ public class FileSource {
         return new FileSource(filename, lines);
     }
 
-    public static FileSource get(Path filename) {
-        try {
-            return filename != null && Files.isRegularFile(filename) && Files.isReadable(filename) ?
-                    new FileSource(filename.toString(), Files.readAllLines(filename)) : null;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public static FileSource get(Path filename) throws IOException {
+        return filename != null ? new FileSource(filename.toString(), Files.readAllLines(filename)) : null;
     }
 
     @Override

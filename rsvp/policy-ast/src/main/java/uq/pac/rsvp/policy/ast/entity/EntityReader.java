@@ -2,6 +2,8 @@ package uq.pac.rsvp.policy.ast.entity;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
+import uq.pac.rsvp.support.FileSource;
+import uq.pac.rsvp.support.SourceLoc;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -13,10 +15,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Parse a JSON specification describing a set of Cedar entities and output then as an {@link EntitySet}
+ */
 class EntityReader {
-    // FIXME: Need source locations
 
-    static Field POSITION;
+    private static final Field POSITION;
     static {
         try {
             POSITION = JsonReader.class.getDeclaredField("pos");
@@ -34,18 +38,26 @@ class EntityReader {
         }
     }
 
+    private final FileSource source;
+
+    public EntityReader(Path file) throws IOException {
+        this.source = FileSource.get(file);
+    }
+
     private static EntityValue getReferenceOrRecord(RecordValue value) {
         if (value.size() == 2 &&
                 value.keySet().equals(Set.of("type", "id")) &&
                 value.getValue("type") instanceof StringValue type &&
                 value.getValue("id") instanceof StringValue id) {
-            return new EntityReference(type.getValue(), id.getValue());
+            return new EntityReference(type.getValue(), id.getValue(), value.getLocation());
         }
         return value;
     }
 
-    private static EntityValue readEntityValue(JsonReader reader) throws IOException {
-        return switch (reader.peek()) {
+    private EntityValue readEntityValue(JsonReader reader) throws IOException {
+        JsonToken token = reader.peek();
+        int offset = position(reader);
+        return switch (token) {
             case BEGIN_ARRAY -> {
                 Set<EntityValue> values = new HashSet<>();
                 reader.beginArray();
@@ -65,22 +77,38 @@ class EntityReader {
                     values.put(name, value);
                 }
                 reader.endObject();
-                RecordValue value = new RecordValue(values);
+                RecordValue value = new RecordValue(values, new SourceLoc(source, offset, position(reader) - offset + 1));
                 yield values.keySet().equals(Set.of("__entity")) ?
                         values.get("__entity") : getReferenceOrRecord(value);
             }
-            case STRING -> new StringValue(reader.nextString());
-            case NUMBER -> new LongValue(reader.nextLong());
-            case BOOLEAN -> new BooleanValue(reader.nextBoolean());
-            case NULL -> throw new Error("Null value");
+            case STRING -> {
+                // For strings the offset is at the start, but we also need to take the account quotes
+                // FIXME: if there are escaped characters, the location will likely be off
+                String value = reader.nextString();
+                yield new StringValue(value, new SourceLoc(source, offset, value.length() + 2));
+            }
+            case NUMBER -> {
+                // For numbers teh location is shifted to the last digit, push it back
+                long number = reader.nextLong();
+                int length = Long.toString(number).length();
+                yield new LongValue(number, new SourceLoc(source, offset - length + 1, length));
+            }
+            case BOOLEAN -> {
+                // The offset for booleans will be shifted to the last char, so push it back
+                boolean bool = reader.nextBoolean();
+                int length = bool ? 4 : 5;
+                yield new BooleanValue(bool, new SourceLoc(source, position(reader) - length + 1, length));
+            }
+            case NULL -> throw new EntityException(new SourceLoc(source, offset, 4), "Null value");
             default -> throw new RuntimeException();
         };
     }
 
-    static Entity readEntity(JsonReader reader) throws IOException, IllegalAccessException {
+    private Entity readEntity(JsonReader reader) throws IOException {
         JsonToken token = reader.peek();
+        int offset = position(reader);
         if (token != JsonToken.BEGIN_OBJECT) {
-            throw new Error("Expected object start");
+            throw new EntityException(new SourceLoc(source, offset, 1), "Expected object start");
         }
         reader.beginObject();
 
@@ -96,22 +124,50 @@ class EntityReader {
                 case "parents" -> {
                     SetValue set = (SetValue) readEntityValue(reader);
                     parents = set.getValues().stream()
-                            .map(e -> (EntityReference) e)
+                            .map(e -> {
+                                if (e instanceof EntityReference ref) {
+                                    return ref;
+                                }
+                                throw new EntityException(e.getLocation(), "Expected entity reference");
+                            })
                             .collect(Collectors.toSet());
                 }
                 case "context" -> context = readEntityValue(reader);
-                case "uid" -> uid = (EntityReference) readEntityValue(reader);
-                default -> throw new Error("Unexpected key: " + name);
+                case "uid" -> {
+                    EntityValue value = readEntityValue(reader);
+                    if (value instanceof EntityReference ref) {
+                        uid = ref;
+                    } else {
+                        throw new EntityException(value.getLocation(), "Expected entity reference");
+                    }
+                }
+                // FIXME: location of an attribute
+                default -> throw new EntityException(new SourceLoc(source, offset, name.length()), "Unexpected entity key: " + name);
             }
         }
+
+        SourceLoc loc = new SourceLoc(source, offset, position(reader) - offset + 1);
+
+        if (uid == null) {
+            throw new EntityException(loc, "Missing uid entity attribute");
+        }
+
+        if (attrs == null) {
+            throw new EntityException(loc, "Missing attrs entity attribute");
+        }
+
+        if (parents == null) {
+            throw new EntityException(loc, "Missing parents entity attribute");
+        }
+
         reader.endObject();
-        return new Entity(uid, attrs, parents, context);
+        return new Entity(uid, attrs, parents, context, loc);
     }
 
-    static EntitySet readEntitySet (JsonReader reader) throws IOException, IllegalAccessException {
+    private EntitySet readEntitySet (JsonReader reader) throws IOException {
         JsonToken token = reader.peek();
         if (token != JsonToken.BEGIN_ARRAY) {
-            throw new Error("Expected object start");
+            throw new EntityException(new SourceLoc(source, position(reader), 1), "Expected array start");
         }
         reader.beginArray();
 
@@ -125,7 +181,7 @@ class EntityReader {
         return new EntitySet(entities);
     }
 
-    static EntitySet parse(Path json) throws IOException, IllegalAccessException {
-        return readEntitySet(new JsonReader(new FileReader(json.toFile())));
+    public EntitySet parse() throws IOException, IllegalAccessException {
+        return readEntitySet(new JsonReader(new FileReader(source.getFile())));
     }
 }

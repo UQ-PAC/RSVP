@@ -50,8 +50,6 @@ import com.google.common.collect.Multimap;
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
-import uq.pac.rsvp.policy.ast.entity.Entity;
-import uq.pac.rsvp.policy.ast.entity.EntityReference;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.ast.DLAtom;
@@ -61,6 +59,7 @@ import uq.pac.rsvp.policy.datalog.ast.DLProgram;
 import uq.pac.rsvp.policy.datalog.ast.DLRule;
 import uq.pac.rsvp.policy.datalog.ast.DLRuleDecl;
 import uq.pac.rsvp.policy.datalog.ast.DLTerm;
+import uq.pac.rsvp.policy.datalog.entity.EntityValidator;
 import uq.pac.rsvp.policy.datalog.invariant.Invariant;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantSet;
@@ -172,48 +171,13 @@ public class Translation {
             }
         });
 
-        entities = updateEntities(entities, rsvpSchema);
+        entities = EntityValidator.validate(rsvpSchema, entities);
         InvariantSet invariants =
                 invariantsFile == null ? InvariantSet.parse("") : InvariantSet.parse(invariantsFile);
         InvariantValidator invariantValidator = new InvariantValidator(rsvpSchema, entities);
         invariants.stream().forEach(invariantValidator::validate);
 
         return new InputSet(rsvpSchema, PolicySet.parseCedarPolicySet(policyFile), entities, invariants);
-    }
-
-    /**
-     * Update the initial set of entities to
-     * - remove actions (as entities)
-     * - add implicit entities from enums
-     */
-    public static EntitySet updateEntities(EntitySet entities, Schema schema) {
-        // FIXME: Move to entity validation
-        // When we are given an entity set it can also include actions,
-        // remove those from the set of entities, as we treat them differently
-        // and pull action-related information from the schema
-        Set<Entity> entitySet = entities.stream()
-                .filter(e -> {
-                    String type = e.getEuid().getType();
-                    return !type.equals("Action") && !type.endsWith("::Action");
-                }).collect(Collectors.toCollection(HashSet::new));
-
-        // Strictly speaking we expect a complete closed world in that we operate on the
-        // set of provided entities. One exception is the enum-style definition of entities.
-        // The translation assumes they exist as well,
-        // but here we allow them to be generated if they are not provided.
-        Set<EntityReference> entitiesEuids = entitySet.stream()
-                .map(Entity::getEuid)
-                .collect(Collectors.toSet());
-
-        schema.entityTypeNames().stream().map(schema::getEntityType).forEach(ed -> {
-            ed.getEntityNamesEnum().forEach(en -> {
-                EntityReference uid = new EntityReference(ed.getName(), en);
-                if (!entitiesEuids.contains(uid)) {
-                    entitySet.add(new Entity(uid));
-                }
-            });
-        });
-        return new EntitySet(entitySet);
     }
 
     private DLProgram translate(Schema schema, PolicySet policies, EntitySet entities, InvariantSet invariants) {

@@ -1,0 +1,28 @@
+[
+    {
+        "uid": { "type": "Account", "id": "Alice" },
+        "attrs": {
+            "role" : { "__entity": { "type": "Role", "id": "User" } },
+            "friends" : []
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "Album", "id": "Public" },
+        "attrs": {
+            "owner" : { "__entity": { "type": "Account", "id": "Alice" } }
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "Photo", "id": "Meadow" },
+        "attrs": {
+            "album" : { "__entity": { "type": "Album", "id": "White" } },
+            "data": false
+        },
+        "parents": [ ]
+    }
+]
+
+// @MESSAGE: Expected record
+// @LOCATION: 584:5 [21:21-21:26]

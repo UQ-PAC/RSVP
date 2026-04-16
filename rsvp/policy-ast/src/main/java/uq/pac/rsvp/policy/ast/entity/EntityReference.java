@@ -4,6 +4,9 @@ import uq.pac.rsvp.support.SourceLoc;
 
 import java.util.Objects;
 
+/**
+ * A reference to en entity, such as Account::"Alice"
+ */
 public class EntityReference extends EntityValue {
     private final String type;
     private final String id;

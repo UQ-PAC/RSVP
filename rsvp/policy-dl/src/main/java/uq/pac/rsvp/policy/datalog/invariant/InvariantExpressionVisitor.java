@@ -75,12 +75,6 @@ class InvariantExpressionVisitor extends InvariantBaseVisitor<Expression> {
     }
 
     @Override
-    public Expression visitImplicationExpr(InvariantParser.ImplicationExprContext ctx) {
-        Expression left = new UnaryExpression(UnaryExpression.UnaryOp.Not, ctx.expression(0).accept(this));
-        return new BinaryExpression(left, BinaryExpression.BinaryOp.Or, ctx.expression(1).accept(this));
-    }
-
-    @Override
     public Expression visitLiteralExpr(InvariantParser.LiteralExprContext ctx) {
         return new BooleanExpression(Boolean.parseBoolean(ctx.getText()));
     }
@@ -166,7 +160,6 @@ class InvariantExpressionVisitor extends InvariantBaseVisitor<Expression> {
     @Override
     public Expression visitEntityExpr(InvariantParser.EntityExprContext ctx) {
         // FIXME: Entity expression via Type expression, not string
-        String type = ctx.entity().type().getText();
         return getActionOrEntityExpression(ctx.entity());
     }
 

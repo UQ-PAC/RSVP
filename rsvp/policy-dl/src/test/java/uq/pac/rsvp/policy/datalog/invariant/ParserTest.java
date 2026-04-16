@@ -50,8 +50,6 @@ public class ParserTest {
         // Disjunction
         @invariant("i18") principal.album.photo || resource;
         @invariant("i19") (principal.album.photo || resource);
-        // Implication
-        @invariant("i20") principal.album.photo --> resource;
         // Negation
         @invariant("i21") !principal.album.photo;
         @invariant("i22") !(principal.album.photo || resource);
@@ -110,8 +108,6 @@ public class ParserTest {
         (principal.album.photo || resource);
         @invariant("i19")
         (principal.album.photo || resource);
-        @invariant("i20")
-        (!principal.album.photo || resource);
         @invariant("i21")
         !principal.album.photo;
         @invariant("i22")
@@ -132,7 +128,7 @@ public class ParserTest {
         ((-1 + (2 * 3)) == ((6 * 7) + 8));
         @invariant("i29")
         (if true; then false; else true);
-        @invariant("i30") 
+        @invariant("i30")
         "a\\nb\\t\\"";
         """;
 

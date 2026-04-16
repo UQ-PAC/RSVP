@@ -25,7 +25,7 @@ principal.role != Role::"Admin" || allow(principal, resource, Action::"viewPhoto
 
 // 6. Reformulation of the above with for all instead of for none and using implies
 @invariant("AdminRightsForAllImplication")
-principal.role == Role::"Admin" --> allow(principal, resource, Action::"viewPhoto")
+principal.role != Role::"Admin" || allow(principal, resource, Action::"viewPhoto")
     for all principal: Account, resource: Photo;
 
 // 7. If a user can create an album for another user, then this is the same user
@@ -35,5 +35,5 @@ principal.role == Role::"Admin" --> allow(principal, resource, Action::"viewPhot
 
 // 8. Admins cannot create albums for themselves
 @invariant("AdminCreateAlbums")
-tim.role == Role::"Admin" && anyone.role == Role::"Admin" --> deny(tim, anyone, Action::"createAlbum")
+!(tim.role == Role::"Admin" && anyone.role == Role::"Admin") || deny(tim, anyone, Action::"createAlbum")
     for all tim: Account, anyone: Account;

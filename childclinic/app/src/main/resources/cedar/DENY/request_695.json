@@ -1,6 +1,0 @@
-{
-  "principal": "ChildClinic::Employee::\"James Carter\"",
-  "resource": "ChildClinic::Visit::\"Max 2\"",
-  "action": "ChildClinic::Action::\"EditClient\"",
-  "context": {}
-}

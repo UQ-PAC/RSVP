@@ -1,6 +1,6 @@
 {
-  "principal": "ChildClinic::Employee::\"Bob\"",
-  "resource": "ChildClinic::Parent::\"George Franklin\"",
-  "action": "ChildClinic::Action::\"DeleteClient\"",
+  "principal": "ChildrenClinic::Employee::\"Kathaleen Tramonte\"",
+  "resource": "ChildrenClinic::Visit::\"Jewel Rodriquez 1\"",
+  "action": "ChildrenClinic::Action::\"ListPatients\"",
   "context": {}
 }

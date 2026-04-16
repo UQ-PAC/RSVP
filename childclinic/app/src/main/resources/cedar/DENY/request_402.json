@@ -1,6 +1,6 @@
 {
-  "principal": "ChildClinic::Employee::\"Linda Douglas\"",
-  "resource": "ChildClinic::Visit::\"Jewel 1\"",
-  "action": "ChildClinic::Action::\"ViewClient\"",
+  "principal": "ChildrenClinic::Guest::\"???\"",
+  "resource": "ChildrenClinic::Visit::\"Sly Estaban 1\"",
+  "action": "ChildrenClinic::Action::\"ViewPatient\"",
   "context": {}
 }

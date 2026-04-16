@@ -1,6 +1,6 @@
 {
-  "principal": "ChildClinic::Employee::\"Kathaleen Tramonte\"",
-  "resource": "ChildClinic::Child::\"Leo\"",
-  "action": "ChildClinic::Action::\"AddClient\"",
+  "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
+  "resource": "ChildrenClinic::Patient::\"Lucky Estaban\"",
+  "action": "ChildrenClinic::Action::\"AddPatient\"",
   "context": {}
 }

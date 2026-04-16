@@ -1,6 +1,6 @@
 {
-  "principal": "ChildClinic::Employee::\"Carl\"",
-  "resource": "ChildClinic::Visit::\"Max 1\"",
-  "action": "ChildClinic::Action::\"ListClients\"",
+  "principal": "ChildrenClinic::Employee::\"???\"",
+  "resource": "ChildrenClinic::Patient::\"Lucky Estaban\"",
+  "action": "ChildrenClinic::Action::\"ViewPatient\"",
   "context": {}
 }

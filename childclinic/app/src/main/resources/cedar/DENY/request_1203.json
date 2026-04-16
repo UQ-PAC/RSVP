@@ -1,6 +1,6 @@
 {
-  "principal": "ChildClinic::Employee::\"James Carter\"",
-  "resource": "ChildClinic::Parent::\"???\"",
-  "action": "ChildClinic::Action::\"AddClient\"",
+  "principal": "ChildrenClinic::Guest::\"Unknown\"",
+  "resource": "ChildrenClinic::Visit::\"Jewel Rodriquez 1\"",
+  "action": "ChildrenClinic::Action::\"DeletePatient\"",
   "context": {}
 }

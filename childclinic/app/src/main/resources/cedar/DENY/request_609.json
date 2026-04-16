@@ -1,6 +1,6 @@
 {
-  "principal": "ChildClinic::Guest::\"Unknown\"",
-  "resource": "ChildClinic::Visit::\"Samantha 2\"",
-  "action": "ChildClinic::Action::\"ViewClient\"",
+  "principal": "ChildrenClinic::Guest::\"Unknown\"",
+  "resource": "ChildrenClinic::Employee::\"Kathaleen Tramonte\"",
+  "action": "ChildrenClinic::Action::\"EditEmployee\"",
   "context": {}
 }

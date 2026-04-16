@@ -1,6 +1,0 @@
-{
-  "principal": "ChildClinic::Guest::\"Unknown\"",
-  "resource": "ChildClinic::Visit::\"Sly 1\"",
-  "action": "ChildClinic::Action::\"ViewClient\"",
-  "context": {}
-}

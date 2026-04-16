@@ -1,6 +1,6 @@
 {
-  "principal": "ChildClinic::Employee::\"Kathaleen Tramonte\"",
-  "resource": "ChildClinic::Clinic::\"B\"",
-  "action": "ChildClinic::Action::\"AddEmployee\"",
+  "principal": "ChildrenClinic::Guest::\"Unknown\"",
+  "resource": "ChildrenClinic::Patient::\"Rosy Rodriquez\"",
+  "action": "ChildrenClinic::Action::\"DeletePatient\"",
   "context": {}
 }

@@ -1,6 +1,6 @@
 {
-  "principal": "ChildClinic::Guest::\"???\"",
-  "resource": "ChildClinic::Visit::\"Sly 1\"",
-  "action": "ChildClinic::Action::\"EditClient\"",
+  "principal": "ChildrenClinic::Employee::\"Linda Douglas\"",
+  "resource": "ChildrenClinic::Patient::\"Rosy Rodriquez\"",
+  "action": "ChildrenClinic::Action::\"ViewPatient\"",
   "context": {}
 }

@@ -1,6 +1,6 @@
 {
-  "principal": "ChildClinic::Employee::\"Jestine Teixeira\"",
-  "resource": "ChildClinic::Parent::\"Jean Coleman\"",
-  "action": "ChildClinic::Action::\"EditClient\"",
+  "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
+  "resource": "ChildrenClinic::Visit::\"Max Coleman 1\"",
+  "action": "ChildrenClinic::Action::\"DeletePatient\"",
   "context": {}
 }

@@ -1,6 +1,6 @@
 {
-  "principal": "ChildClinic::Employee::\"Alice\"",
-  "resource": "ChildClinic::Parent::\"Jean Coleman\"",
-  "action": "ChildClinic::Action::\"AddClient\"",
+  "principal": "ChildrenClinic::Employee::\"Carl\"",
+  "resource": "ChildrenClinic::Patient::\"Leo Franklin\"",
+  "action": "ChildrenClinic::Action::\"ListPatients\"",
   "context": {}
 }

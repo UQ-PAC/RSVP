@@ -1,6 +1,6 @@
 {
-  "principal": "ChildClinic::Employee::\"Kathaleen Tramonte\"",
-  "resource": "ChildClinic::Visit::\"Max 1\"",
-  "action": "ChildClinic::Action::\"EditClient\"",
+  "principal": "ChildrenClinic::Employee::\"Linda Douglas\"",
+  "resource": "ChildrenClinic::Employee::\"Sharon Jenkins\"",
+  "action": "ChildrenClinic::Action::\"DeleteEmployee\"",
   "context": {}
 }

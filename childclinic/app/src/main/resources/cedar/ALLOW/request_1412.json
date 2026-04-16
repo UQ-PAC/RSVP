@@ -1,6 +1,0 @@
-{
-  "principal": "ChildClinic::Guest::\"Unknown\"",
-  "resource": "ChildClinic::Clinic::\"A\"",
-  "action": "ChildClinic::Action::\"ListEmployees\"",
-  "context": {}
-}

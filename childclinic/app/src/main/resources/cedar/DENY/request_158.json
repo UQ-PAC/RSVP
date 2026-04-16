@@ -1,6 +1,6 @@
 {
-  "principal": "ChildClinic::Guest::\"Unknown\"",
-  "resource": "ChildClinic::Parent::\"Betty Davis\"",
-  "action": "ChildClinic::Action::\"EditClient\"",
+  "principal": "ChildrenClinic::Employee::\"Bob\"",
+  "resource": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
+  "action": "ChildrenClinic::Action::\"DeleteEmployee\"",
   "context": {}
 }

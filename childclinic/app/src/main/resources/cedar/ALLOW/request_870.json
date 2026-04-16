@@ -1,6 +1,6 @@
 {
-  "principal": "ChildClinic::Employee::\"Alice\"",
-  "resource": "ChildClinic::Child::\"Leo\"",
-  "action": "ChildClinic::Action::\"DeleteClient\"",
+  "principal": "ChildrenClinic::Employee::\"Linda Douglas\"",
+  "resource": "ChildrenClinic::Clinic::\"A\"",
+  "action": "ChildrenClinic::Action::\"ListEmployees\"",
   "context": {}
 }

@@ -1,6 +1,0 @@
-{
-  "principal": "ChildClinic::Employee::\"Carl\"",
-  "resource": "ChildClinic::Child::\"Basil\"",
-  "action": "ChildClinic::Action::\"ViewClient\"",
-  "context": {}
-}

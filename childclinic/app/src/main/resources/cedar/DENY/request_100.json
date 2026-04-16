@@ -1,6 +1,6 @@
 {
-  "principal": "ChildClinic::Employee::\"???\"",
-  "resource": "ChildClinic::Parent::\"George Franklin\"",
-  "action": "ChildClinic::Action::\"ViewClient\"",
+  "principal": "ChildrenClinic::Employee::\"Sharon Jenkins\"",
+  "resource": "ChildrenClinic::Patient::\"Sly Estaban\"",
+  "action": "ChildrenClinic::Action::\"ListPatients\"",
   "context": {}
 }

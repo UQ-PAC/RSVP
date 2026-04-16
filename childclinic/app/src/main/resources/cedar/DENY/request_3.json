@@ -1,6 +1,6 @@
 {
-  "principal": "ChildClinic::Guest::\"Unknown\"",
-  "resource": "ChildClinic::Child::\"Basil\"",
-  "action": "ChildClinic::Action::\"ListClients\"",
+  "principal": "ChildrenClinic::Employee::\"Linda Douglas\"",
+  "resource": "ChildrenClinic::Visit::\"Basil Davis 1\"",
+  "action": "ChildrenClinic::Action::\"EditPatient\"",
   "context": {}
 }

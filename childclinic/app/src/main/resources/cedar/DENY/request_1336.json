@@ -1,6 +1,0 @@
-{
-  "principal": "ChildClinic::Guest::\"Unknown\"",
-  "resource": "ChildClinic::Parent::\"George Franklin\"",
-  "action": "ChildClinic::Action::\"ListClients\"",
-  "context": {}
-}

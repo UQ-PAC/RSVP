@@ -1,6 +1,0 @@
-{
-  "principal": "ChildClinic::Employee::\"James Carter\"",
-  "resource": "ChildClinic::Parent::\"Carlos Estaban\"",
-  "action": "ChildClinic::Action::\"ListClients\"",
-  "context": {}
-}

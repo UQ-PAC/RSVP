@@ -1,6 +1,0 @@
-{
-  "principal": "ChildClinic::Employee::\"???\"",
-  "resource": "ChildClinic::Parent::\"Carlos Estaban\"",
-  "action": "ChildClinic::Action::\"ViewClient\"",
-  "context": {}
-}

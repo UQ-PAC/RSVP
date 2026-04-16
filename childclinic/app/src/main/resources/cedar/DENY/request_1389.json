@@ -1,6 +1,0 @@
-{
-  "principal": "ChildClinic::Guest::\"???\"",
-  "resource": "ChildClinic::Parent::\"George Franklin\"",
-  "action": "ChildClinic::Action::\"EditClient\"",
-  "context": {}
-}

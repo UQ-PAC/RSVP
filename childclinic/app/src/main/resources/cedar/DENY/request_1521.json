@@ -1,6 +1,0 @@
-{
-  "principal": "ChildClinic::Employee::\"Kathaleen Tramonte\"",
-  "resource": "ChildClinic::Parent::\"George Franklin\"",
-  "action": "ChildClinic::Action::\"ListClients\"",
-  "context": {}
-}

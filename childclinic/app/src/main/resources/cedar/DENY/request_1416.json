@@ -1,6 +1,0 @@
-{
-  "principal": "ChildClinic::Guest::\"Unknown\"",
-  "resource": "ChildClinic::Child::\"???\"",
-  "action": "ChildClinic::Action::\"DeleteClient\"",
-  "context": {}
-}

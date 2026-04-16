@@ -1,0 +1,6 @@
+{
+  "principal": "ChildrenClinic::Guest::\"Unknown\"",
+  "resource": "ChildrenClinic::Patient::\"Max Coleman\"",
+  "action": "ChildrenClinic::Action::\"AddPatient\"",
+  "context": {}
+}

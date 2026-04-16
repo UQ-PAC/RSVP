@@ -1,6 +1,0 @@
-{
-  "principal": "ChildClinic::Employee::\"Jestine Teixeira\"",
-  "resource": "ChildClinic::Visit::\"Lucky 1\"",
-  "action": "ChildClinic::Action::\"ViewClient\"",
-  "context": {}
-}

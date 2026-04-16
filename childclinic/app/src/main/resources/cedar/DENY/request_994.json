@@ -1,6 +1,0 @@
-{
-  "principal": "ChildClinic::Guest::\"Unknown\"",
-  "resource": "ChildClinic::Employee::\"Linda Douglas\"",
-  "action": "ChildClinic::Action::\"EditEmployee\"",
-  "context": {}
-}

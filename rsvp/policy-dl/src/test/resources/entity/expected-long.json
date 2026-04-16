@@ -1,0 +1,32 @@
+[
+    {
+        "uid": { "type": "Account", "id": "Alice" },
+        "attrs": {
+            "role" : { "__entity": { "type": "Role", "id": "User" } },
+            "friends" : []
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "Album", "id": "Public" },
+        "attrs": {
+            "owner" : { "__entity": { "type": "Account", "id": "Alice" } }
+        },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "Photo", "id": "Meadow" },
+        "attrs": {
+            "album" : { "__entity": { "type": "Album", "id": "White" } },
+            "data": {
+                "size": false,
+                "private": true,
+                "format": "jpeg"
+            }
+        },
+        "parents": [ ]
+    }
+]
+
+// @MESSAGE: Expected long
+// @LOCATION:  610:5 [22:25-22:30]

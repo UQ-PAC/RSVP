@@ -22,8 +22,7 @@
             "directories": [ ],
             "files" : {
                 "files" : [
-                    { "__entity": { "type": "File", "id": "ls" } },
-                    { "__entity": { "type": "File", "id": "gvim" } }
+                    { "__entity": { "type": "File", "id": "ls" } }
                 ]
             }
         },

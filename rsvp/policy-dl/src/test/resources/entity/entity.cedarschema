@@ -1,21 +1,21 @@
 entity Role enum [ "User", "Admin" ];
 
 entity Account = {
-    name: String,
-    age: Long,
     role: Role,
     friends: Set<Account>,
 };
 
 entity Album = {
-    owner: Account,
-    private: Bool
+    owner: Account
 };
 
 entity Photo = {
     album: Album,
-    size : Long,
-    type: String
+    data: {
+        size : Long,
+        private: Bool,
+        format: String
+    }
 };
 
 action view appliesTo {

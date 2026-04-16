@@ -1,0 +1,13 @@
+[
+    {
+        "uid": { "type": "Account", "id": "Alice" },
+        "attrs": {
+            "role" : { "__entity": { "type": "Role", "id": "Moderator" } },
+            "friends" : []
+        },
+        "parents": [ ]
+    }
+]
+
+// @MESSAGE: Unexpected ID Moderator for type Role, expected one of [User, Admin]
+// @LOCATION: 116:37 [5:36-5:73]

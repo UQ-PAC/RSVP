@@ -1,0 +1,15 @@
+[
+    {
+        "uid": {
+            "type": "Account", "id": "???"
+        },
+        "attrs": {
+            "role" : { "__entity": { "type": "Role", "id": "User" } },
+            "friends" : []
+        },
+        "parents": []
+    }
+]
+
+// @MESSAGE: Internal entity id: ???
+// @LOCATION: 24:54 [3:16-5:10]

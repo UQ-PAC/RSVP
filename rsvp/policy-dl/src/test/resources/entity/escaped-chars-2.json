@@ -1,0 +1,13 @@
+[
+    {
+        "uid": { "type": "Account", "id": "Alice\tBob" },
+        "attrs": {
+            "role" : { "__entity": { "type": "Role", "id": "User" } },
+            "friends" : []
+        },
+        "parents": []
+    }
+]
+
+// @MESSAGE: Unsupported entity id (escaped characters): Alice	Bob
+// @LOCATION: 24:41 [3:16-3:57]

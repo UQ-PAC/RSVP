@@ -1,0 +1,15 @@
+[
+    {
+        "uid": {
+            "type": "Account", "id": "Alice"
+        },
+        "attrs": {
+            "role" : { "__entity": { "type": "Role", "id": "User" } },
+            "friends" : []
+        },
+        "parents": [ true ]
+    }
+]
+
+// @MESSAGE: Expected entity reference
+// @LOCATION: 231:4 [10:22-10:26]

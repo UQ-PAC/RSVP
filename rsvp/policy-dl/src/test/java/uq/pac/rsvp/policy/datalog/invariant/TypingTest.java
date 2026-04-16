@@ -7,7 +7,7 @@ import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.TestUtil;
-import uq.pac.rsvp.policy.datalog.translation.Translation;
+import uq.pac.rsvp.policy.datalog.entity.EntityValidator;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 import uq.pac.rsvp.policy.datalog.util.Logger;
 
@@ -26,7 +26,7 @@ public class TypingTest {
         Path schemaPath = TestUtil.getResourceDir( "invariant", "schema.cedarschema");
         Schema schema = Schema.parseCedarSchema(schemaPath);
         Path entitiesPath = TestUtil.getResourceDir("invariant", "entities.json");
-        EntitySet entities = Translation.updateEntities(EntitySet.parse(entitiesPath), schema);
+        EntitySet entities = EntityValidator.validate(schema, EntitySet.parse(entitiesPath));
         this.validator = new InvariantValidator(schema, entities);
     }
 

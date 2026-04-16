@@ -27,9 +27,9 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.NotBlank;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import org.springframework.core.style.ToStringCreator;
 import org.springframework.util.Assert;
@@ -67,7 +67,7 @@ public class Parent extends Person {
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "parent_id")
 	@OrderBy("name")
-	private final List<Child> children = new ArrayList<>();
+	private final Set<Child> children = new LinkedHashSet<>();
 
 	public String getAddress() {
 		return this.address;
@@ -93,7 +93,7 @@ public class Parent extends Person {
 		this.telephone = telephone;
 	}
 
-	public List<Child> getChildren() {
+	public Set<Child> getChildren() {
 		return this.children;
 	}
 

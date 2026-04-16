@@ -43,7 +43,15 @@ public interface ParentRepository extends JpaRepository<Parent, Integer> {
 	 * @return a Collection of matching {@link Parent}s (or an empty Collection if none
 	 * found)
 	 */
-	@EntityGraph(attributePaths = {"clinics", "children", "children.clinics", "children.visits"})
+	@EntityGraph(attributePaths = {
+		"clinics", 
+		"children", 
+		"children.clinics", 
+		"children.visits", 
+		"children.gender", 
+		"children.visits.confidentiality",
+		"children.visits.clinics"
+	})
 	Page<Parent> findByLastNameStartingWith(String lastName, Pageable pageable);
 
 	/**
@@ -59,7 +67,15 @@ public interface ParentRepository extends JpaRepository<Parent, Integer> {
 	 * @throws IllegalArgumentException if the id is null (assuming null is not a valid
 	 * input for id)
 	 */
-	@EntityGraph(attributePaths = {"clinics", "children", "children.clinics", "children.visits"})
+	@EntityGraph(attributePaths = {
+		"clinics", 
+		"children", 
+		"children.clinics", 
+		"children.visits", 
+		"children.gender", 
+		"children.visits.confidentiality",
+		"children.visits.clinics"
+	})
 	Optional<Parent> findById(Integer id);
 
 }

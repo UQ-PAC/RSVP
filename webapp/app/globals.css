@@ -35,6 +35,10 @@
   .centered-text {
     text-align: center;
   }
+
+  .spacer {
+    flex-grow: 10;
+  }
 }
 
 @layer theme {

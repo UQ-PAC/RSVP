@@ -10,11 +10,14 @@ import { createContext, Dispatch, useContext } from "react";
 
 type VerificationFileDict = { [id: string]: VerificationFile };
 type VersionedFileList = VersionedFile[];
+type VersionDict = { [id: string]: string[] };
+type DiffDict = { [id: string]: { [id: string]: Promise<string> } };
 
 interface VerificationGroup {
   files: VersionedFileList;
   byId?: Promise<VerificationFileDict>;
   reports?: Promise<Report[]>;
+  diffs: DiffDict;
 }
 
 interface VerificationState {
@@ -23,11 +26,12 @@ interface VerificationState {
 
 export const emptyVerificationGroup: VerificationGroup = {
   files: [],
+  diffs: {},
 };
 export const emptyVerification: VerificationState = {};
 
 interface VerificationAction {
-  type: "add" | "move" | "remove" | "verify";
+  type: "add" | "move" | "remove" | "verify" | "diff";
   group?: string;
   file?: VerificationFile;
   index?: number;
@@ -54,6 +58,8 @@ export function verificationReducer(
   action: VerificationAction,
 ): VerificationState {
   switch (action.type) {
+    case "diff":
+      return doDiff(context, action);
     case "verify":
       return doVerify(context);
     case "add":
@@ -64,6 +70,11 @@ export function verificationReducer(
       return doRemove(context, action);
   }
 }
+
+function doDiff(
+  context: VerificationState,
+  action: VerificationAction,
+): VerificationState {}
 
 function doVerify(context: VerificationState): VerificationState {
   const newContext = {};
@@ -76,11 +87,19 @@ function doVerify(context: VerificationState): VerificationState {
       byId: VerificationFileDict;
       resolveFilenames: (report: Report) => Report;
     }>(async (resolve) => {
-      const { policies, schemas, entities, invariants, all } =
+      const { policies, schemas, entities, invariants, versions, all } =
         await sortFilesById(group);
 
       const request: VerificationRequest = {
-        policyFiles: Object.keys(policies).map((id) => [{ version: "0", id }]),
+        policyFiles: Object.keys(policies).map((id) => {
+          return [
+            { version: "0", id },
+            ...versions[id].map((version, i) => ({
+              version: `${i + 1}`,
+              id: version,
+            })),
+          ];
+        }),
         schemas: Object.keys(schemas),
         entities: Object.keys(entities),
         invariants: Object.keys(invariants),
@@ -329,6 +348,7 @@ async function sortFilesById(group: VerificationGroup): Promise<{
   schemas: VerificationFileDict;
   entities: VerificationFileDict;
   invariants: VerificationFileDict;
+  versions: VersionDict;
   all: VerificationFileDict;
 }> {
   return new Promise(async (resolve) => {
@@ -339,19 +359,34 @@ async function sortFilesById(group: VerificationGroup): Promise<{
       invariant: {},
     };
 
-    const versions: VerificationFileDict = {};
+    const versions: VersionDict = {};
+
+    const all: VerificationFileDict = {};
 
     const mapId = async (file: VerificationFile) => {
-      getServerId(file).then((id) => (sorted[file.filetype][id] = file));
+      getServerId(file).then((id) => {
+        sorted[file.filetype][id] = file;
+        if (file.filetype === "cedar") {
+          versions[id] = [];
+        }
+      });
     };
 
     await Promise.all(group.files.map((file) => mapId(file.original)));
 
     await Promise.all(
       group.files.flatMap((file) =>
-        file.versions.map((version) =>
-          getServerId(version).then((id) => (versions[id] = version)),
-        ),
+        getServerId(file.original).then((originalId) => {
+          if (file.versions.length) {
+            versions[originalId] = [];
+          }
+          return file.versions.map((version) =>
+            getServerId(version).then((id) => {
+              all[id] = version;
+              versions[originalId].push(id);
+            }),
+          );
+        }),
       ),
     );
 
@@ -360,12 +395,13 @@ async function sortFilesById(group: VerificationGroup): Promise<{
       schemas: sorted.cedarschema,
       entities: sorted.entities,
       invariants: sorted.invariant,
+      versions,
       all: {
         ...sorted.cedar,
         ...sorted.cedarschema,
         ...sorted.entities,
         ...sorted.invariant,
-        ...versions,
+        ...all,
       },
     });
   });

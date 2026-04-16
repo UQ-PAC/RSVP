@@ -1,11 +1,7 @@
 import { SourceFileViewer } from "./components/sources/SourceFileViewer";
-
 import { Header } from "./components/header/Header";
-
-import "filepond/dist/filepond.min.css";
 import { ReportViewer } from "./components/reports/ReportViewer";
 import { Drawer } from "./components/Drawer";
-
 import { ContextProvider } from "./components/providers/ContextProvider";
 import { FileUploader } from "./components/upload/FileUploader";
 

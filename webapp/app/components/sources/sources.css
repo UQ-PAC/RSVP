@@ -45,14 +45,52 @@
     border-radius: 0.5rem;
   }
 
-  .source-file-header:hover {
+  .source-file-header:hover:not(:has(.source-file-version:hover)) {
     background-color: var(--color-gray-300);
   }
 
   .source-file-header .source-file-name {
-    flex-grow: 1;
+    width: 20%;
+    min-width: 20%;
     font-family: var(--font-sans);
     color: var(--color-gray-600);
+  }
+
+  .source-file-header .source-file-versions {
+    flex-grow: 1;
+    display: flex;
+    overflow-x: scroll;
+    max-width: 50%;
+  }
+
+  .source-file-header .source-file-versions .source-file-version {
+    line-height: 2rem;
+    padding: 0 0.7rem;
+    background-color: var(--color-gray-100);
+    border: 1px solid var(--color-gray-300);
+    border-right: none;
+    width: 3.2rem;
+    min-width: 3.2rem;
+    display: inline;
+    font-size: 0.8rem;
+    text-align: center;
+  }
+
+  .source-file-header .source-file-versions .source-file-version:first-child {
+    border-radius: 0.5rem 0 0 0.5rem;
+  }
+
+  .source-file-header .source-file-versions .source-file-version:last-child {
+    border-radius: 0 0.5rem 0.5rem 0;
+    border-right: 1px solid var(--color-gray-300);
+  }
+
+  .source-file-header .source-file-versions .source-file-version.selected {
+    background-color: var(--color-gray-400);
+  }
+
+  .source-file-header .source-file-versions .source-file-version:hover {
+    background-color: var(--color-gray-500);
   }
 
   .source-file-header .source-file-icon {

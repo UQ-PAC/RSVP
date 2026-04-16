@@ -29,51 +29,7 @@ public class VerificationService {
     private static final Logger logger = LoggerFactory.getLogger(VerificationService.class);
 
     @Autowired
-    VerificationSession session;
-
-    public String createTempFile(MultipartFile file) throws IOException {
-        String filename = file.getOriginalFilename();
-        int ext = filename.lastIndexOf('.');
-
-        Path tmp = Files.createTempFile(filename.substring(0, ext), ext > -1 ? filename.substring(ext) : null);
-        file.transferTo(tmp);
-
-        String hash = Hashing.sha256()
-                .hashString(tmp.toString(), StandardCharsets.UTF_8)
-                .toString();
-
-        session.addFile(hash, tmp);
-        logger.info("Created: {} ({})", tmp.toString(), hash);
-
-        return hash;
-    }
-
-    public String readFile(String id) throws IOException {
-        Path file = session.getFile(id);
-
-        logger.info("Reading file with id {}", id);
-
-        if (file == null) {
-            logger.error(session.getHashes().toString());
-            logger.error(this.toString());
-            throw new ErrorResponseException(HttpStatus.NOT_FOUND);
-        }
-
-        return Files.readString(file);
-    }
-
-    public String deleteFile(String id) throws IOException {
-        Path file = session.removeFile(id);
-        logger.info("Deleting file with id {}", id);
-
-        if (file == null) {
-            throw new ErrorResponseException(HttpStatus.NOT_FOUND);
-        }
-
-        Files.delete(file);
-
-        return "";
-    }
+    FileService fileService;
 
     public Set<Report> runVerification(VerificationFileset verification)
             throws RsvpException, IOException {
@@ -93,7 +49,7 @@ public class VerificationService {
             throw new ErrorResponseException(HttpStatus.BAD_REQUEST);
         }
 
-        Path schemaFile = session.getFile(schemas.iterator().next());
+        Path schemaFile = fileService.getPath(schemas.iterator().next());
         logger.info("Schema: {}", schemaFile);
 
         Set<String> entities = verification.getEntities();
@@ -106,14 +62,14 @@ public class VerificationService {
             throw new ErrorResponseException(HttpStatus.BAD_REQUEST);
         }
 
-        Path entitiesFile = session.getFile(entities.iterator().next());
+        Path entitiesFile = fileService.getPath(entities.iterator().next());
 
         for (List<VersionedPolicy> policy : versionedPolicies) {
             if (policy.size() > 0) {
                 // TODO: enable multiple files parsed to single policy set
                 // TODO: handle multiple versions
                 String fileId = policy.get(0).getId();
-                Path file = session.getFile(policy.get(0).getId());
+                Path file = fileService.getPath(policy.get(0).getId());
 
                 if (!file.toString().endsWith(".cedar")) {
                     logger.error("Bad request: {} is not a Cedar policy file.", file.toString());

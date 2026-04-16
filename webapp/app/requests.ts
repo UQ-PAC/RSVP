@@ -4,11 +4,11 @@ import { sortReports } from "./util";
 export async function upload(file: File): Promise<UploadedFile> {
   // Create FormData object - required for sending binary file data
   const formData = new FormData();
-  formData.append("file", file); // Add file with 'file' key
+  formData.append("file", file);
 
   return fetch("/api/upload", {
     method: "POST",
-    body: formData, // Send FormData directly, not JSON
+    body: formData,
   })
     .then((res) => res.text())
     .then((text) => ({ serverId: text, content: download(text) }));
@@ -36,4 +36,8 @@ export async function verify(request: VerificationRequest): Promise<Report[]> {
   })
     .then((res) => res.json())
     .then(sortReports);
+}
+
+export async function diff(a: string, b: string): Promise<string> {
+  return fetch(`/api/diff?a=${a}&b=${b}`).then((res) => res.text());
 }

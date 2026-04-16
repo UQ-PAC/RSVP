@@ -1,16 +1,16 @@
 # Cedar Authorization Files
 
-This folder contains the Cedar files for the RSVP version of ChildClinic, ChildClinic, including request files for testing.
+This folder contains the Cedar files for the RSVP version of PetClinic, ChildrenClinic, including request files for testing.
 
-To run all tests: `./childclinic-rsvp-requests.sh`.
+To run all tests: `./childrenclinic-rsvp-requests.sh`.
 
 The commands above will load the default Cedar files:
-- Schema: `childclinic-rsvp-schema.cedarschema`
-- Entities: `childclinic-rsvp-entities.json`
-- Policy: `childclinic-rsvp-policy.cedar`
+- Schema: `childrenclinic-rsvp-schema.cedarschema`
+- Entities: `childrenclinic-rsvp-entities.json`
+- Policy: `childrenclinic-rsvp-policy.cedar`
 
 You can change the default Cedar Policy by running, instead:
-- `./childclinic-rsvp-requests.sh -p <another-policy.cedar>`
+- `./childrenclinic-rsvp-requests.sh -p <another-policy.cedar>`
 
 Available flags:
 - `-t`: to read requests from the `./ALLOW-TEST` and `./DENY-TEST` folders instead of from the `./ALLOW` and `./DENY` folders.
@@ -25,13 +25,13 @@ Request JSON files in the `./ALLOW-TEST` and `./DENY-TEST` folders are named fol
 On Debian, run: `sudo apt install xdot`.
 
 2. Update the Graphviz dot file.
-Run: `cedar visualize --entities childclinic-rsvp-entities.json > childclinic-rsvp-entities.dot`.
+Run: `cedar visualize --entities childrenclinic-rsvp-entities.json > childrenclinic-rsvp-entities.dot`.
 
-3. Run `xdot`, e.g.: `xdot childclinic-rsvp-entities.dot`.
+3. Run `xdot`, e.g.: `xdot childrenclinic-rsvp-entities.dot`.
 
-## Authorisation Model for the RSVP ChildClinic App
+## Authorisation Model for the RSVP ChildrenClinic App
 
-Cedar [Schema](childclinic-rsvp-schema.cedarschema).
+Cedar [Schema](childrenclinic-rsvp-schema.cedarschema).
 
 ### Entities
 
@@ -45,19 +45,22 @@ For `Level`, the values `Resident`, `Registrar`, and `Specialist` are only used 
 
 `Guest` has no attributes.
 
-Non-_actors_ are entities `Parent`, `Child`, and `Visit`.
+Non-_actors_ are entities `AccompanyingAdult`, `Patient`, and `Visit`.
 
-Evey `Parent` must have a `name`, at least one entity `Child` in their set `children`, at least one entity `Clinic` in their set `clinics`, and at least one entity `Doctor` in their set `doctors`.
+Evey `AccompanyingAdult` must have a `name`.
 
-Evey `Child` must have a `name`, one entity `Parent` as their `parent`, at least one entity `Clinic` in their set `clinics`, and at least one entity `Doctor` in their set `doctors`.
+Evey `Patient` must have a `name`, at least one entity `AccompanyingAdult` in their set `adults`, at least one entity `Clinic` in their set `clinics`, and at least one entity `Doctor` in their set `doctors`.
 
-Every `Visit` must have one entity `Child` as their `child`, at least one entity `Clinic` in their set `clinics`, at least one entity `Doctor` in their set `doctors`, and one entity `Confidentiality` as their `confidentiality`.
+Every `Visit` must have one entity `Patient` as their `patient`, at least one entity `AccompanyingAdult` in their set `adults`, at least one entity `Clinic` in their set `clinics`, at least one entity `Doctor` in their set `doctors`, and one entity `Confidentiality` as their `confidentiality`.
 `Confidentiality` is either `Official`, `Sensitive`, or `Protected`.
 
 ### Actions
 
-Actions are separated into two groups, `ClientOperations` and `EmployeeOperations`, and every action applies to a principal whose entity is either `Employee` or `Guest`.
+Actions are separated into two groups, `EmployeeOperations` and `PatientOperations`, and every action applies to a principal whose entity is either `Employee` or `Guest`.
 
-Actions `ViewClient`, `EditClient`, and `DeleteClient` apply to a resource whose entity is either `Parent`, `Child`, or `Visit`.
 Actions `ViewEmployee`, `EditEmployee`, and `DeleteEmployee` apply to a resource whose entity is `Employee`.
-Actions `AddClient` and `AddEmployee` apply to a resource whose entity is `Clinic`.
+Actions `ListEmployees` and `AddEmployee` apply to a resource whose entity is `Clinic`.
+
+Actions `ViewPatient`, `EditPatient`, and `DeletePatient` apply to a resource whose entity is either `Patient` or `Visit`.
+Action `ListPatients` applies to a resource whose entity is either `Clinic`, `Patient`, or `Visit`.
+Action `AddPatient`, applies to a resource whose entity is either `Clinic` or `Patient`.

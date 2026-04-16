@@ -210,6 +210,7 @@ body {
   text-align: var(--bs-body-text-align);
   background-color: var(--bs-body-bg);
   -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
 
 hr {
@@ -431,7 +432,8 @@ button,
 [type="button"],
 [type="reset"],
 [type="submit"] {
-  -webkit-appearance: button; }
+  -webkit-appearance: button;
+  appearance: button; }
   button:not(:disabled),
   [type="button"]:not(:disabled),
   [type="reset"]:not(:disabled),
@@ -478,6 +480,7 @@ legend {
 
 [type="search"] {
   -webkit-appearance: textfield;
+  appearance: textfield;
   outline-offset: -2px; }
   [type="search"]::-webkit-search-cancel-button {
     cursor: pointer;
@@ -492,14 +495,16 @@ legend {
 }
 */
 ::-webkit-search-decoration {
-  -webkit-appearance: none; }
+  -webkit-appearance: none;
+  appearance: none; }
 
 ::-webkit-color-swatch-wrapper {
   padding: 0; }
 
 ::file-selector-button {
   font: inherit;
-  -webkit-appearance: button; }
+  -webkit-appearance: button;
+  appearance: button; }
 
 output {
   display: inline-block; }
@@ -9287,14 +9292,14 @@ textarea.form-control-lg {
 .btn-primary {
   margin-top: 12px;
   border-width: 2px;
-  transition: border 0.15s;
   color: #f1f1f1;
   background: #34302D;
   border-color: #6db33f;
   -webkit-transition: border 0.15s;
   -moz-transition: border 0.15s;
   -o-transition: border 0.15s;
-  -ms-transition: border 0.15s; }
+  -ms-transition: border 0.15s;
+  transition: border 0.15s; }
   .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active,
   .btn-primary .open .dropdown-toggle {
     background-color: #34302D;
@@ -9386,15 +9391,16 @@ table td.action-column {
   width: 200px; }
 
 .myspinner {
-  animation-name: spinner;
-  animation-duration: 2s;
-  animation-iteration-count: infinite;
-  animation-timing-function: linear;
   -webkit-transform-origin: 49% 50%;
+  transform-origin: 49% 50%;
   -webkit-animation-name: spinner;
   -webkit-animation-duration: 2s;
   -webkit-animation-iteration-count: infinite;
-  -webkit-animation-timing-function: linear; }
+  -webkit-animation-timing-function: linear;
+  animation-name: spinner;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear; }
 
 hr {
   border-top: 1px dotted #34302D; }
@@ -9466,7 +9472,8 @@ strong {
   opacity: 0;
   -moz-transition: opacity 0.12s ease-in-out;
   -webkit-transition: opacity 0.12s ease-in-out;
-  -o-transition: opacity 0.12s ease-in-out; }
+  -o-transition: opacity 0.12s ease-in-out;
+  transition: opacity 0.12s ease-in-out; }
 
 .navbar a:hover.navbar-brand span {
   opacity: 1; }
@@ -9477,11 +9484,11 @@ strong {
   font-size: 14px;
   /* line-height: 14px; */
   padding: 28px 20px;
-  transition: all 0.15s;
   -webkit-transition: all 0.15s;
   -moz-transition: all 0.15s;
   -o-transition: all 0.15s;
-  -ms-transition: all 0.15s; }
+  -ms-transition: all 0.15s;
+  transition: all 0.15s; }
 
 .navbar li > a {
   text-transform: uppercase; }

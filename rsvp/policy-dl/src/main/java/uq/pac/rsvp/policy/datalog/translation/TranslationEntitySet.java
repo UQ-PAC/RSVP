@@ -13,11 +13,13 @@ import java.util.stream.Collectors;
  */
 public class TranslationEntitySet {
     private final List<TranslationEntity> entities;
+    private final RecordMap records;
 
     public TranslationEntitySet(EntitySet entities, TranslationSchema schema) {
+        this.records = new RecordMap();
         List<TranslationEntity> entityList = entities.getEntities()
                 .stream()
-                .map(e -> new TranslationEntity(e, schema))
+                .map(e -> new TranslationEntity(e, schema, records))
                 .collect(Collectors.toCollection(ArrayList::new));
 
         // Generate undefined (UID-only) entities omitting Enum entities

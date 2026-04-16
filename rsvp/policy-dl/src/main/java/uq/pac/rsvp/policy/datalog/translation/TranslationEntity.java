@@ -44,7 +44,7 @@ public class TranslationEntity {
                 EntityReference recEuid = TranslationConstants.getRandomTmpEUID();
                 DLTerm recTerm = DLTerm.lit(recEuid.getReference());
                 addAttributeFacts(recEuid, euid, attr, statements);
-                map.forEach((at, vl) -> addAttributeFacts(vl, recTerm, at, statements));
+                map.forEach((at, vl) -> addAttributeFacts(vl, recTerm, at.getValue(), statements));
             }
             default -> throw new TranslationError("Unsupported value: " + value.getClass());
         }
@@ -74,7 +74,7 @@ public class TranslationEntity {
         statements.add(new DLFact(decl, euid));
 
         entity.getAttrs().forEach((attr, value) -> {
-            addAttributeFacts(value, DLTerm.lit(entity.getEuid().getReference()), attr, statements);
+            addAttributeFacts(value, DLTerm.lit(entity.getEuid().getReference()), attr.getValue(), statements);
         });
 
 		// Generate facts for parent hierarchy

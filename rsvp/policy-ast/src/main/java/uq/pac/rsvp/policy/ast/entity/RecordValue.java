@@ -10,14 +10,14 @@ import java.util.function.BiConsumer;
 
 
 public class RecordValue extends EntityValue {
-    private final Map<String, EntityValue> values;
+    private final Map<AttributeName, EntityValue> values;
 
-    public RecordValue(Map<String, EntityValue> values, SourceLoc location) {
+    public RecordValue(Map<AttributeName, EntityValue> values, SourceLoc location) {
         super(location);
         this.values = Map.copyOf(values);
     }
 
-    public RecordValue(Map<String, EntityValue> values) {
+    public RecordValue(Map<AttributeName, EntityValue> values) {
         this(values, SourceLoc.MISSING);
     }
 
@@ -25,11 +25,11 @@ public class RecordValue extends EntityValue {
         this(Collections.emptyMap(), SourceLoc.MISSING);
     }
 
-    public Map<String, EntityValue> getValues() {
+    public Map<AttributeName, EntityValue> getValues() {
         return values;
     }
 
-    public EntityValue getValue(String key) {
+    public EntityValue getValue(AttributeName key) {
         return values.get(key);
     }
 
@@ -50,7 +50,7 @@ public class RecordValue extends EntityValue {
         return false;
     }
 
-    public void forEach(BiConsumer<String, EntityValue> consumer) {
+    public void forEach(BiConsumer<AttributeName, EntityValue> consumer) {
         values.forEach(consumer);
     }
 
@@ -63,7 +63,7 @@ public class RecordValue extends EntityValue {
         return values.size();
     }
 
-    public Set<String> keySet() {
+    public Set<AttributeName> attributes() {
         return values.keySet();
     }
 }

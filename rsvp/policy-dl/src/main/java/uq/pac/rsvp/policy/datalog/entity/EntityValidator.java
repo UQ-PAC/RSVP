@@ -131,7 +131,7 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
     public void visitRecordTypeDefinition(RecordTypeDefinition rec, EntityValue payload) {
         RecordValue value = expectedType(payload, RecordValue.class, "record");
         rec.getAttributes().forEach((attr, type) -> {
-            EntityValue attrValue = value.getValue(attr);
+            EntityValue attrValue = value.getValue(new AttributeName(attr));
             if (attrValue != null) {
                 type.process(this, attrValue);
             }
@@ -141,10 +141,8 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
         });
 
         value.forEach((attr, val) -> {
-            if (!rec.hasAttribute(attr)) {
-                // TODO: Reporting the location of the entire record here because attributes
-                //       are currently encoded as string and do not have associated locations
-                throw new EntityException(value.getLocation(), "Unexpected attribute: " + attr);
+            if (!rec.hasAttribute(attr.getValue())) {
+                throw new EntityException(attr.getLocation(), "Unexpected attribute: " + attr);
             }
         });
     }

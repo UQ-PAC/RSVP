@@ -5,7 +5,6 @@ import com.cedarpolicy.value.*;
 import org.junit.jupiter.api.Test;
 import uq.pac.rsvp.policy.ast.entity.*;
 import uq.pac.rsvp.policy.datalog.TestUtil;
-import uq.pac.rsvp.support.SourceLoc;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -64,7 +63,7 @@ public class EntitySetTest {
             case CedarList lst -> new SetValue(lst.stream().map(this::cedarToRsvp).collect(Collectors.toSet()));
             case CedarMap map ->
                 new RecordValue(map.entrySet().stream()
-                        .collect(Collectors.toMap(Map.Entry::getKey, e -> cedarToRsvp(e.getValue()))));
+                        .collect(Collectors.toMap(e -> new AttributeName(e.getKey()), e -> cedarToRsvp(e.getValue()))));
             default -> throw new RuntimeException("Unsupported value: " + value);
         };
     }

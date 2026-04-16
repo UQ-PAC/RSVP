@@ -45,11 +45,14 @@ class EntityReader {
     }
 
     private static EntityValue getReferenceOrRecord(RecordValue value) {
+        AttributeName id = new AttributeName("id"),
+                type = new AttributeName("type");
+
         if (value.size() == 2 &&
-                value.keySet().equals(Set.of("type", "id")) &&
-                value.getValue("type") instanceof StringValue type &&
-                value.getValue("id") instanceof StringValue id) {
-            return new EntityReference(type.getValue(), id.getValue(), value.getLocation());
+                value.attributes().equals(Set.of(type, id)) &&
+                value.getValue(type) instanceof StringValue t &&
+                value.getValue(id) instanceof StringValue i) {
+            return new EntityReference(t.getValue(), i.getValue(), value.getLocation());
         }
         return value;
     }
@@ -69,17 +72,21 @@ class EntityReader {
                 yield new SetValue(values);
             }
             case BEGIN_OBJECT -> {
-                Map<String, EntityValue> values = new HashMap<>();
+                Map<AttributeName, EntityValue> values = new HashMap<>();
                 reader.beginObject();
                 while (reader.peek() != JsonToken.END_OBJECT) {
+                    int attrOffset = position(reader);
                     String name = reader.nextName();
+                    SourceLoc loc = new SourceLoc(source, attrOffset, name.length() + 2);
+                    AttributeName an = new AttributeName(name, loc);
                     EntityValue value = readEntityValue(reader);
-                    values.put(name, value);
+                    values.put(an, value);
                 }
                 reader.endObject();
                 RecordValue value = new RecordValue(values, new SourceLoc(source, offset, position(reader) - offset + 1));
-                yield values.keySet().equals(Set.of("__entity")) ?
-                        values.get("__entity") : getReferenceOrRecord(value);
+                AttributeName cedarEntity = new AttributeName("__entity");
+                yield values.keySet().equals(Set.of(cedarEntity)) ?
+                        values.get(cedarEntity) : getReferenceOrRecord(value);
             }
             case STRING -> {
                 // For strings the offset is at the start, but we also need to take the account quotes

@@ -1,0 +1,20 @@
+#exception-message-box {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    width: 30%;
+    min-width: 30%;
+    background-color: var(--bs-danger-bg-subtle);
+    white-space: pre-wrap;
+}
+
+#exception-message-box h4 {
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: var(--bs-danger);
+    margin-top: 0.5rem;
+}
+
+#exception-message-box p {
+    color: var(--bs-danger);
+}

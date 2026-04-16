@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.datalog.ast.*;
+import uq.pac.rsvp.policy.datalog.visitors.ValueVisitorAdapter;
 
 import java.util.Set;
 import java.util.function.Function;

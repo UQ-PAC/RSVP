@@ -3,6 +3,7 @@ package uq.pac.rsvp.policy.datalog.translation;
 import org.logicng.formulas.*;
 import org.logicng.transformations.dnf.DNFFactorization;
 import uq.pac.rsvp.policy.ast.expr.*;
+import uq.pac.rsvp.policy.datalog.visitors.ValueVisitorAdapter;
 
 import java.util.*;
 import java.util.stream.Collectors;

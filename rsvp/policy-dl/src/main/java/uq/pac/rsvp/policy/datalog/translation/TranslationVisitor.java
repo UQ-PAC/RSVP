@@ -3,6 +3,7 @@ package uq.pac.rsvp.policy.datalog.translation;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.datalog.ast.*;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantQuantifier;
+import uq.pac.rsvp.policy.datalog.visitors.VoidVisitorAdapter;
 
 import java.util.ArrayList;
 import java.util.Collection;

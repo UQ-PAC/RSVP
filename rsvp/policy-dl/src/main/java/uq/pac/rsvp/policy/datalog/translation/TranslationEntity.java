@@ -28,6 +28,8 @@ public class TranslationEntity {
      */
     private final TranslationEntityDefinition definition;
 
+    private final RecordMap records;
+
     private void addAttributeFacts(EntityValue value, DLTerm euid, String attr, List<DLFact> statements) {
         Consumer<DLTerm> addFact = vt ->
                 statements.add(new DLFact(AttributeRuleDecl, euid, DLTerm.lit(attr), vt));
@@ -41,7 +43,7 @@ public class TranslationEntity {
             case EntityReference e -> addFact.accept(DLTerm.lit(e.getReference()));
             case SetValue lst -> lst.forEach(v -> addAttributeFacts(v, euid, attr, statements));
             case RecordValue map -> {
-                EntityReference recEuid = TranslationConstants.getRandomTmpEUID();
+                EntityReference recEuid = records.getReference(map);
                 DLTerm recTerm = DLTerm.lit(recEuid.getReference());
                 addAttributeFacts(recEuid, euid, attr, statements);
                 map.forEach((at, vl) -> addAttributeFacts(vl, recTerm, at.getValue(), statements));
@@ -60,9 +62,11 @@ public class TranslationEntity {
         DLRuleDecl relation = definition.getEntityRuleDecl();
         DLTerm euid = DLTerm.lit(uid.getReference());
         this.facts = List.of(new DLFact(relation, euid));
+        this.records = null;
     }
 
-    public TranslationEntity(Entity entity, TranslationSchema schema) {
+    public TranslationEntity(Entity entity, TranslationSchema schema, RecordMap records) {
+        this.records = records;
         List<DLFact> statements = new ArrayList<>();
         this.definition = schema.getTranslationEntityType(entity.getEuid().getType());
         // We assume the inputs are validated, so by the time we get to see entities,

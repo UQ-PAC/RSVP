@@ -12,7 +12,7 @@ public class InvariantResult {
 
     private final boolean holds;
     private final Invariant invariant;
-    private final Set<Assignment> assignments;
+    private final Set<InvariantAssignment> assignments;
 
     public InvariantResult(Invariant invariant, Relation relation) {
         this.invariant = invariant;
@@ -43,7 +43,7 @@ public class InvariantResult {
      * condition is then weaker, so whether the original invariant holds needs to be tested
      * separately).
      */
-    public Set<Assignment> getAssignments() {
+    public Set<InvariantAssignment> getAssignments() {
         return assignments;
     }
 

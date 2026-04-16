@@ -76,22 +76,29 @@ export function SourceFileViewer() {
       return "";
     }
 
-    return original.resolved.then((original) =>
-      updated.resolved.then((updated) => {
-        let unifiedDiff = diffs[original.serverId]?.[updated.serverId];
+    return original.resolved
+      .then((original) => original.serverId)
+      .then((originalId) =>
+        updated.resolved
+          .then((updated) => updated.serverId)
+          .then((updatedId) => {
+            let unifiedDiff = diffs[originalId]?.[updatedId];
 
-        if (!unifiedDiff) {
-          unifiedDiff = diff(original.serverId, updated.serverId);
+            if (!unifiedDiff) {
+              unifiedDiff = diff(
+                { id: originalId, name: original.file.name },
+                { id: updatedId, name: updated.file.name },
+              );
 
-          if (!diffs[original.serverId]) {
-            diffs[original.serverId] = {};
-          }
-          diffs[original.serverId][updated.serverId] = unifiedDiff;
-        }
+              if (!diffs[originalId]) {
+                diffs[originalId] = {};
+              }
+              diffs[originalId][updatedId] = unifiedDiff;
+            }
 
-        return unifiedDiff;
-      }),
-    );
+            return unifiedDiff;
+          }),
+      );
   };
 
   return (

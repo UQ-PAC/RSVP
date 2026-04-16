@@ -38,6 +38,16 @@ export async function verify(request: VerificationRequest): Promise<Report[]> {
     .then(sortReports);
 }
 
-export async function diff(a: string, b: string): Promise<string> {
-  return fetch(`/api/diff?a=${a}&b=${b}`).then((res) => res.text());
+export async function diff(
+  original: { id: string; name: string },
+  updated: { id: string; name: string },
+): Promise<string> {
+  const params = [
+    `original=${original.id}`,
+    `originalName=${original.name}`,
+    `updated=${updated.id}`,
+    `updatedName=${updated.name}`,
+  ];
+
+  return fetch(`/api/diff?&${params.join("&")}`).then((res) => res.text());
 }

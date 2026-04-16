@@ -19,13 +19,13 @@ public class DiffService {
     @Autowired
     FileService fileService;
 
-    public String getDiff(String a, String b) throws IOException {
+    public String getDiff(String original, String originalName, String updated, String updatedName) throws IOException {
 
-        List<String> one = fileService.getLines(a);
-        List<String> two = fileService.getLines(b);
+        List<String> one = fileService.getLines(original);
+        List<String> two = fileService.getLines(updated);
 
         Patch<String> patch = DiffUtils.diff(one, two);
-        List<String> diff = UnifiedDiffUtils.generateUnifiedDiff(a, b, one, patch, 2);
+        List<String> diff = UnifiedDiffUtils.generateUnifiedDiff(originalName, updatedName, one, patch, 4);
 
         return String.join("\n", diff);
     }

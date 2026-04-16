@@ -1,23 +1,29 @@
 "use client";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-import { Report, VerificationFile, VersionedFile } from "../../types";
-import { faFileLines } from "@fortawesome/free-regular-svg-icons/faFileLines";
-import { CodeRender } from "./CodeRender";
 import {
   faSquareMinus,
   faSquarePlus,
 } from "@fortawesome/free-regular-svg-icons";
+import { faFileLines } from "@fortawesome/free-regular-svg-icons/faFileLines";
+import { faCodeCompare } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import cx from "classnames";
+import { Roboto_Mono } from "next/font/google";
+import { useEffect, useState } from "react";
+import { Report, VerificationFile, VersionedFile } from "../../types";
 import {
   ExpansionState,
   useFocus,
   useFocusDispatch,
 } from "../providers/FocusContext";
 import { useSelectionDispatch } from "../providers/SelectionContext";
-import { useEffect, useState } from "react";
-import { SourceVersionSelect } from "./SourceVersionSelect";
+import { CodeRender } from "./CodeRender";
 import { DiffRender } from "./DiffRender";
+import { SourceVersionSelect } from "./SourceVersionSelect";
+
+const robotoMono = Roboto_Mono({
+  subsets: ["latin"],
+});
 
 interface SourceFileParams {
   source: VersionedFile;
@@ -91,7 +97,7 @@ export function SourceFile({ source, reports, getDiff }: SourceFileParams) {
   }
 
   return (
-    <div className={`source-file ${expanded ? "expanded" : "collapsed"}`}>
+    <div className={cx("source-file", expanded ? "expanded" : "collapsed")}>
       <div
         className="source-file-header"
         onClick={() => {
@@ -105,8 +111,13 @@ export function SourceFile({ source, reports, getDiff }: SourceFileParams) {
           });
         }}
       >
-        <FontAwesomeIcon className="source-file-icon" icon={faFileLines} />
-        <h2 className="source-file-name">{filename}</h2>
+        <FontAwesomeIcon
+          className="source-file-icon"
+          icon={compare ? faCodeCompare : faFileLines}
+        />
+        <h2 className="source-file-name">
+          {compare ? "Comparison" : filename}
+        </h2>
         {source.versions.length > 0 && (
           <SourceVersionSelect
             versions={Array.from(
@@ -127,7 +138,9 @@ export function SourceFile({ source, reports, getDiff }: SourceFileParams) {
           icon={expanded ? faSquareMinus : faSquarePlus}
         />
       </div>
-      {expanded && render}
+      <div className={cx("source-file-content", robotoMono.className)}>
+        {expanded && render}
+      </div>
     </div>
   );
 }

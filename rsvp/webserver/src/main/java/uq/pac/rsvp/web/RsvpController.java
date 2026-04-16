@@ -66,9 +66,10 @@ public class RsvpController {
     }
 
     @GetMapping("/diff")
-    public String diff(@RequestParam String a, @RequestParam String b) throws IOException {
-        logger.info("GET /diff ? {} & {}", a, b);
-        return diffService.getDiff(a, b);
+    public String diff(@RequestParam String original, @RequestParam String originalName, @RequestParam String updated,
+            @RequestParam String updatedName) throws IOException {
+        logger.info("GET /diff ? {} & {}", original, updated);
+        return diffService.getDiff(original, originalName, updated, updatedName);
     }
 
     public static void main(String[] args) {

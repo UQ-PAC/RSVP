@@ -4,18 +4,17 @@ import cx from "classnames";
 import hljs from "highlight.js";
 
 import { JSX, useEffect, useRef } from "react";
-import { Roboto_Mono } from "next/font/google";
 
 import { FileType, Report } from "../../types";
-import {
-  useSelection,
-  useSelectionDispatch,
-} from "../providers/SelectionContext";
 import {
   ExpansionState,
   useFocus,
   useFocusDispatch,
 } from "../providers/FocusContext";
+import {
+  useSelection,
+  useSelectionDispatch,
+} from "../providers/SelectionContext";
 
 import "./CodeHighlight";
 interface CodeRenderParams {
@@ -24,12 +23,7 @@ interface CodeRenderParams {
   reports: Report[];
 }
 
-const robotoMono = Roboto_Mono({
-  subsets: ["latin"],
-});
-
 // TODO:
-//     line-based highlight (starts or ends mid-line)
 //     scroll to primary or top unless explicitely clicked on line
 // FIXME: multiple reports per line....?
 export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
@@ -105,6 +99,14 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
   });
 
   const code: JSX.Element[] = [];
+
+  code.push(
+    <span key="line-0" className="source-file-empty-line">
+      {" "}
+    </span>,
+    <span key="0" className="source-file-line-content"></span>,
+  );
+
   content.split("\n").forEach((line, i) => {
     const n = i + 1;
     const report = reportsByLine[n];
@@ -224,7 +226,7 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
 
   return (
     <div className="source-file-render">
-      <pre className={`code ${robotoMono.className}`}>{code}</pre>
+      <pre className="code">{code}</pre>
     </div>
   );
 }

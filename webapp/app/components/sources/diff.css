@@ -1,0 +1,45 @@
+/** Diff2Html overrides **/
+
+.d2h-file-wrapper {
+  margin-bottom: 0;
+  border: none;
+}
+
+.d2h-file-name-wrapper {
+  margin-left: 0.5rem;
+}
+
+.d2h-file-header {
+  background-color: var(--color-gray-50);
+}
+
+.d2h-icon {
+  color: var(--color-gray-400);
+}
+
+.d2h-file-name {
+  font-family: var(--font-sans);
+  color: var(--color-gray-700);
+}
+
+.d2h-diff-table {
+  font-size: 0.8rem;
+  line-height: 1.2rem;
+  color: var(--color-gray-700);
+  font-family: var(--font-mono);
+}
+
+.d2h-code-side-linenumber {
+  width: 3rem;
+}
+
+.d2h-file-side-diff:first-child
+  .d2h-diff-tbody
+  > tr:last-child
+  .d2h-code-side-linenumber {
+  border-radius: 0 0 0 0.4rem;
+}
+
+.d2h-info {
+  background-color: var(--color-gray-100);
+}

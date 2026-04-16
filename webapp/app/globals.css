@@ -59,6 +59,9 @@
 
   --color-slate-dark: var(--color-slate-600);
 
+  /* From Diff2Html */
+  --d2h-dim-color: #0000004d;
+
   --color-info-light: var(--color-blue-100);
   --color-info-mid: var(--color-blue-200);
   --color-info-darker: var(--color-blue-300);

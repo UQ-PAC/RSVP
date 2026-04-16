@@ -15,7 +15,7 @@
 
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
 
   <nav class="navbar navbar-expand-lg navbar-dark" role="navigation">
     <div class="container-fluid">
@@ -99,20 +99,18 @@
       </div>
     </div>
   </nav>
-  <div class="container-fluid">
+
+  <div class="container-fluid flex-grow-1">
     <div class="container xd-container">
-
       <th:block th:insert="${template}" />
+    </div>
+  </div>
 
-      <br />
-      <br />
-      <div class="container">
-        <div class="row">
-          <div class="col-12 text-center">
-            <img src="../static/images/spring-logo.svg" th:src="@{/resources/images/spring-logo.svg}"
-              alt="VMware Tanzu Logo" class="logo">
-          </div>
-        </div>
+  <div class="container mt-auto pb-5">
+    <div class="row">
+      <div class="col-12 text-center">
+        <img src="../static/images/spring-logo.svg" th:src="@{/resources/images/spring-logo.svg}"
+          alt="VMware Tanzu Logo" class="logo pt-4">
       </div>
     </div>
   </div>

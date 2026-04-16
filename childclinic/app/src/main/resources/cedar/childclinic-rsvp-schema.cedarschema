@@ -1,4 +1,4 @@
-namespace ChildClinic {
+namespace ChildrenClinic {
     entity Clinic;
 
     entity Confidentiality enum ["Official", "Sensitive", "Protected"];
@@ -17,59 +17,27 @@ namespace ChildClinic {
 
     entity Guest;
 
-    entity Parent = {
-        name: String,
-        children: Set<Child>,
-        clinics: Set<Clinic>,
-        doctors: Set<Employee>
+    entity AccompanyingAdult = {
+        name: String
     };
 
-    entity Child = {
+    entity Patient = {
         name: String,
-        parent: Parent,
+        adults: Set<AccompanyingAdult>,
         clinics: Set<Clinic>,
         doctors: Set<Employee>
     };
 
     entity Visit = {
-        child: Child,
+        patient: Patient,
+        adults: Set<AccompanyingAdult>,
         clinics: Set<Clinic>,
         doctors: Set<Employee>,
         confidentiality: Confidentiality
     };
 
-    action ClientOperations;
     action EmployeeOperations;
-
-    action ListClients in ClientOperations appliesTo {
-        principal: [Employee, Guest],
-        resource: [Clinic, Parent, Child, Visit],
-        context: { }
-    };
-
-    action ViewClient in ClientOperations appliesTo {
-        principal: [Employee, Guest],
-        resource: [Parent, Child, Visit],
-        context: { }
-    };
-
-    action AddClient in ClientOperations appliesTo {
-        principal: [Employee, Guest],
-        resource: [Clinic, Parent, Child],
-        context: { }
-    };
-
-    action EditClient in ClientOperations appliesTo {
-        principal: [Employee, Guest],
-        resource: [Parent, Child, Visit],
-        context: { }
-    };
-
-    action DeleteClient in ClientOperations appliesTo {
-        principal: [Employee, Guest],
-        resource: [Parent, Child, Visit],
-        context: { }
-    };
+    action PatientOperations;
 
     action ListEmployees in EmployeeOperations appliesTo {
         principal: [Employee, Guest],
@@ -98,6 +66,36 @@ namespace ChildClinic {
     action DeleteEmployee in EmployeeOperations appliesTo {
         principal: [Employee, Guest],
         resource: Employee,
+        context: { }
+    };
+
+    action ListPatients in PatientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: [Clinic, Patient, Visit],
+        context: { }
+    };
+
+    action ViewPatient in PatientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: [Patient, Visit],
+        context: { }
+    };
+
+    action AddPatient in PatientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: [Clinic, Patient],
+        context: { }
+    };
+
+    action EditPatient in PatientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: [Patient, Visit],
+        context: { }
+    };
+
+    action DeletePatient in PatientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: [Patient, Visit],
         context: { }
     };
 }

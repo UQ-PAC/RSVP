@@ -1,7 +1,0 @@
-{
-    "principal": "ChildClinic::Employee::\"Sharon Jenkins\"",
-    "action": "ChildClinic::Action::\"EditClient\"",
-    "resource": "ChildClinic::Child::\"Max\"",
-    "context": { },
-    "validateRequest": true
-}

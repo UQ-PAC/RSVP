@@ -1,7 +1,0 @@
-{
-    "principal": "ChildClinic::Guest::\"Unknown\"",
-    "action": "ChildClinic::Action::\"ViewClient\"",
-    "resource": "ChildClinic::Parent::\"Jean Coleman\"",
-    "context": { },
-    "validateRequest": true
-}

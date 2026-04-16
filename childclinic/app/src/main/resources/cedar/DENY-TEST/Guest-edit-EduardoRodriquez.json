@@ -1,7 +1,0 @@
-{
-    "principal": "ChildClinic::Guest::\"Unknown\"",
-    "action": "ChildClinic::Action::\"EditClient\"",
-    "resource": "ChildClinic::Parent::\"Eduardo Rodriquez\"",
-    "context": { },
-    "validateRequest": true
-}

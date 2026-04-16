@@ -1,7 +1,0 @@
-{
-    "principal": "ChildClinic::Employee::\"Sharon Jenkins\"",
-    "action": "ChildClinic::Action::\"ViewClient\"",
-    "resource": "ChildClinic::Child::\"Leo\"",
-    "context": { },
-    "validateRequest": true
-}

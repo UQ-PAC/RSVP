@@ -1,0 +1,7 @@
+{
+    "principal": "ChildrenClinic::Employee::\"Sharon Jenkins\"",
+    "action": "ChildrenClinic::Action::\"EditPatient\"",
+    "resource": "ChildrenClinic::Patient::\"Max Coleman\"",
+    "context": { },
+    "validateRequest": true
+}

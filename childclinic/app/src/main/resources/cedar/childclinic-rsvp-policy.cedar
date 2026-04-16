@@ -1,4 +1,4 @@
-// ChildClinic RSVP Policy
+// ChildrenClinic RSVP Policy
 // Original version without introduced issues.
 
 // 'policy0'
@@ -6,17 +6,17 @@
 @id("Policy: Anyone can list Employees.")
 permit (
     principal,
-    action == ChildClinic::Action::"ListEmployees",
-    resource is ChildClinic::Clinic
+    action == ChildrenClinic::Action::"ListEmployees",
+    resource is ChildrenClinic::Clinic
 );
 
 // 'policy1'
-// Every Employee can list the Clients they are allowed to view.
-@id("Policy: Every Employee can list Clients.")
+// Every Employee can list the Patients they are allowed to view.
+@id("Policy: Every Employee can list Patients.")
 permit (
-    principal is ChildClinic::Employee,
-    action == ChildClinic::Action::"ListClients",
-    resource is ChildClinic::Clinic
+    principal is ChildrenClinic::Employee,
+    action == ChildrenClinic::Action::"ListPatients",
+    resource is ChildrenClinic::Clinic
 );
 
 // 'policy2'
@@ -24,132 +24,128 @@ permit (
 @id("Policy: Public Secretary and Doctor data.")
 permit (
     principal,
-    action == ChildClinic::Action::"ViewEmployee",
-    resource is ChildClinic::Employee
+    action == ChildrenClinic::Action::"ViewEmployee",
+    resource is ChildrenClinic::Employee
 )
 when {
-    resource.roles.containsAny([ChildClinic::EmployeeRole::"Secretary",
-                                ChildClinic::EmployeeRole::"Doctor"])
+    resource.roles.containsAny([ChildrenClinic::EmployeeRole::"Secretary",
+                                ChildrenClinic::EmployeeRole::"Doctor"])
 };
 
 // 'policy3'
-// No Guest can access any client data.
-@id("Policy: Guest cannot access client data.")
+// No Guest can access any patient data.
+@id("Policy: Guest cannot access patient data.")
 forbid (
-    principal is ChildClinic::Guest,
-    action in ChildClinic::Action::"ClientOperations",
+    principal is ChildrenClinic::Guest,
+    action in ChildrenClinic::Action::"PatientOperations",
     resource
 )
 when {
-    resource is ChildClinic::Parent ||
-    resource is ChildClinic::Child ||
-    resource is ChildClinic::Visit
+    resource is ChildrenClinic::Patient ||
+    resource is ChildrenClinic::Visit
 };
 
 // 'policy4'
 // Every Administrator can do anything, anywhere.
 @id("Policy: Administrator.")
 permit (
-    principal is ChildClinic::Employee,
+    principal is ChildrenClinic::Employee,
     action,
     resource
 )
 when {
-    principal.roles.contains(ChildClinic::EmployeeRole::"Administrator")
+    principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator")
 };
 
 // 'policy5'
 // Every Secretary can view and edit their Clinics' data.
 @id("Policy: Secretary can view and edit in their Clinics.")
 permit (
-    principal is ChildClinic::Employee,
+    principal is ChildrenClinic::Employee,
     action,
     resource
 )
 when {
-    principal.roles.contains(ChildClinic::EmployeeRole::"Secretary") &&
+    principal.roles.contains(ChildrenClinic::EmployeeRole::"Secretary") &&
     (
-        resource is ChildClinic::Employee ||
-        resource is ChildClinic::Parent ||
-        resource is ChildClinic::Child ||
-        resource is ChildClinic::Visit
+        resource is ChildrenClinic::Employee ||
+        resource is ChildrenClinic::Patient ||
+        resource is ChildrenClinic::Visit
     ) &&
     resource.clinics.containsAny(principal.clinics)
 }
 unless {
-    action in [ChildClinic::Action::"AddClient",
-               ChildClinic::Action::"AddEmployee",
-               ChildClinic::Action::"DeleteClient",
-               ChildClinic::Action::"DeleteEmployee"] ||
+    action in [ChildrenClinic::Action::"AddPatient",
+               ChildrenClinic::Action::"AddEmployee",
+               ChildrenClinic::Action::"DeletePatient",
+               ChildrenClinic::Action::"DeleteEmployee"] ||
     (
         resource has roles &&
-        resource.roles.contains(ChildClinic::EmployeeRole::"Administrator")
+        resource.roles.contains(ChildrenClinic::EmployeeRole::"Administrator")
     )
 };
 
 // 'policy6'
-// Every Secretary can add clients to their Clinics' data.
-@id("Policy: Secretary can add clients to their Clinics.")
+// Every Secretary can add patients to their Clinics' data.
+@id("Policy: Secretary can add patients to their Clinics.")
 permit (
-    principal is ChildClinic::Employee,
-    action == ChildClinic::Action::"AddClient",
-    resource is ChildClinic::Clinic
+    principal is ChildrenClinic::Employee,
+    action == ChildrenClinic::Action::"AddPatient",
+    resource is ChildrenClinic::Clinic
 )
 when {
-    principal.roles.contains(ChildClinic::EmployeeRole::"Secretary") &&
+    principal.roles.contains(ChildrenClinic::EmployeeRole::"Secretary") &&
     principal.clinics.contains(resource)
 };
 
 // 'policy7'
-// Every Doctor can view and edit their clients' data.
-@id("Policy: Doctor can view and edit their clients.")
+// Every Doctor can view and edit their patients' data.
+@id("Policy: Doctor can view and edit their patients.")
 permit (
-    principal is ChildClinic::Employee,
-    action in ChildClinic::Action::"ClientOperations",
+    principal is ChildrenClinic::Employee,
+    action in ChildrenClinic::Action::"PatientOperations",
     resource
 )
 when {
-    principal.roles.contains(ChildClinic::EmployeeRole::"Doctor") &&
+    principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
     (
-        resource is ChildClinic::Parent ||
-        resource is ChildClinic::Child ||
-        resource is ChildClinic::Visit
+        resource is ChildrenClinic::Patient ||
+        resource is ChildrenClinic::Visit
     ) &&
     principal in resource.doctors
 }
 unless {
-    action == ChildClinic::Action::"DeleteClient"
+    action == ChildrenClinic::Action::"DeletePatient"
 };
 
 // 'policy8'
-// Every Doctor can add their clients' data.
-@id("Policy: Doctor can add their clients.")
+// Every Doctor can add their patients' data.
+@id("Policy: Doctor can add their patients.")
 permit (
-    principal is ChildClinic::Employee,
-    action == ChildClinic::Action::"AddClient",
-    resource is ChildClinic::Clinic
+    principal is ChildrenClinic::Employee,
+    action == ChildrenClinic::Action::"AddPatient",
+    resource is ChildrenClinic::Clinic
 )
 when {
-    principal.roles.contains(ChildClinic::EmployeeRole::"Doctor") &&
+    principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
     principal.clinics.contains(resource)
 };
 
 // 'policy9'
-// No Intern Doctor can edit their clients' data.
-@id("Policy: Intern Doctor cannot edit their clients.")
+// No Intern Doctor can edit their patients' data.
+@id("Policy: Intern Doctor cannot edit their patients.")
 forbid (
-    principal is ChildClinic::Employee,
-    action == ChildClinic::Action::"EditClient",
+    principal is ChildrenClinic::Employee,
+    action == ChildrenClinic::Action::"EditPatient",
     resource
 )
 when {
-    principal.roles.contains(ChildClinic::EmployeeRole::"Doctor") &&
+    principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
     principal has level &&
-    principal.level == ChildClinic::ProfessionalLevel::"Intern" &&
+    principal.level == ChildrenClinic::ProfessionalLevel::"Intern" &&
     (
-        resource is ChildClinic::Parent ||
-        resource is ChildClinic::Child ||
-        resource is ChildClinic::Visit
+        resource is ChildrenClinic::Patient ||
+        resource is ChildrenClinic::Visit
     ) &&
     principal in resource.doctors
 };
@@ -158,63 +154,61 @@ when {
 // Every Employee can view and edit their own data.
 @id("Policy: Employee can edit their own data.")
 permit (
-    principal is ChildClinic::Employee,
+    principal is ChildrenClinic::Employee,
     action,
-    resource is ChildClinic::Employee
+    resource is ChildrenClinic::Employee
 )
 when {
-    action in [ChildClinic::Action::"ViewEmployee",
-               ChildClinic::Action::"EditEmployee"] &&
+    action in [ChildrenClinic::Action::"ViewEmployee",
+               ChildrenClinic::Action::"EditEmployee"] &&
     principal == resource
 };
 
 // 'policy11'
-// Every Senior or Specialist Doctor can delete their clients' data.
-@id("Policy: Senior or Specialist Doctor can delete their clients.")
+// Every Senior or Specialist Doctor can delete their patients' data.
+@id("Policy: Senior or Specialist Doctor can delete their patients.")
 permit (
-    principal is ChildClinic::Employee,
-    action in ChildClinic::Action::"DeleteClient",
+    principal is ChildrenClinic::Employee,
+    action in ChildrenClinic::Action::"DeletePatient",
     resource
 )
 when {
-    principal.roles.contains(ChildClinic::EmployeeRole::"Doctor") &&
+    principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
     principal has level &&
     (
-        principal.level == ChildClinic::ProfessionalLevel::"Senior" ||
-        principal.level == ChildClinic::ProfessionalLevel::"Specialist"
+        principal.level == ChildrenClinic::ProfessionalLevel::"Senior" ||
+        principal.level == ChildrenClinic::ProfessionalLevel::"Specialist"
     ) &&
     (
-        resource is ChildClinic::Parent ||
-        resource is ChildClinic::Child ||
-        resource is ChildClinic::Visit
+        resource is ChildrenClinic::Patient ||
+        resource is ChildrenClinic::Visit
     ) &&
     principal in resource.doctors
 };
 
 // 'policy12'
-// Every Senior or Specialist Doctor can view all clients' data.
-@id("Policy: Senior or Specialist Doctor can view all clients.")
+// Every Senior or Specialist Doctor can view all patients' data.
+@id("Policy: Senior or Specialist Doctor can view all patients.")
 permit (
-    principal is ChildClinic::Employee,
-    action == ChildClinic::Action::"ViewClient",
+    principal is ChildrenClinic::Employee,
+    action == ChildrenClinic::Action::"ViewPatient",
     resource
 )
 when {
-    principal.roles.contains(ChildClinic::EmployeeRole::"Doctor") &&
+    principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
     principal has level &&
     (
-        principal.level == ChildClinic::ProfessionalLevel::"Senior" ||
-        principal.level == ChildClinic::ProfessionalLevel::"Specialist"
+        principal.level == ChildrenClinic::ProfessionalLevel::"Senior" ||
+        principal.level == ChildrenClinic::ProfessionalLevel::"Specialist"
     ) &&
     (
-        resource is ChildClinic::Parent ||
-        resource is ChildClinic::Child ||
-        resource is ChildClinic::Visit
+        resource is ChildrenClinic::Patient ||
+        resource is ChildrenClinic::Visit
     )
 }
 unless {
     resource has confidentiality &&
-    resource.confidentiality == ChildClinic::Confidentiality::"Protected"
+    resource.confidentiality == ChildrenClinic::Confidentiality::"Protected"
 };
 
 // 'policy13'
@@ -232,12 +226,12 @@ when {
 }
 unless {
     (
-        principal is ChildClinic::Employee &&
-        principal.roles.contains(ChildClinic::EmployeeRole::"Administrator")
+        principal is ChildrenClinic::Employee &&
+        principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator")
     ) ||
     (
-        action == ChildClinic::Action::"ViewEmployee" &&
-        resource.roles.containsAny([ChildClinic::EmployeeRole::"Secretary",
-                                    ChildClinic::EmployeeRole::"Doctor"])
+        action == ChildrenClinic::Action::"ViewEmployee" &&
+        resource.roles.containsAny([ChildrenClinic::EmployeeRole::"Secretary",
+                                    ChildrenClinic::EmployeeRole::"Doctor"])
     )
 };

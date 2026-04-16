@@ -1,100 +1,100 @@
 strict digraph {
 	ordering="out"
 	node[shape=box]
-	subgraph "cluster_ChildClinic::Confidentiality" {
-		label="ChildClinic::Confidentiality"
-		"ChildClinic::Confidentiality::\"Protected\"" [label="Protected"]
-		"ChildClinic::Confidentiality::\"Sensitive\"" [label="Sensitive"]
-		"ChildClinic::Confidentiality::\"Official\"" [label="Official"]
+	subgraph "cluster_ChildrenClinic::Patient" {
+		label="ChildrenClinic::Patient"
+		"ChildrenClinic::Patient::\"Basil Davis\"" [label="Basil Davis"]
+		"ChildrenClinic::Patient::\"Leo Franklin\"" [label="Leo Franklin"]
+		"ChildrenClinic::Patient::\"Sly Estaban\"" [label="Sly Estaban"]
+		"ChildrenClinic::Patient::\"Jewel Rodriquez\"" [label="Jewel Rodriquez"]
+		"ChildrenClinic::Patient::\"Max Coleman\"" [label="Max Coleman"]
+		"ChildrenClinic::Patient::\"Lucky Estaban\"" [label="Lucky Estaban"]
+		"ChildrenClinic::Patient::\"Samantha Coleman\"" [label="Samantha Coleman"]
+		"ChildrenClinic::Patient::\"Rosy Rodriquez\"" [label="Rosy Rodriquez"]
 	}
-	subgraph "cluster_ChildClinic::Visit" {
-		label="ChildClinic::Visit"
-		"ChildClinic::Visit::\"Max 1\"" [label="Max 1"]
-		"ChildClinic::Visit::\"Rosy 1\"" [label="Rosy 1"]
-		"ChildClinic::Visit::\"Jewel 1\"" [label="Jewel 1"]
-		"ChildClinic::Visit::\"Basil 1\"" [label="Basil 1"]
-		"ChildClinic::Visit::\"Samantha 1\"" [label="Samantha 1"]
-		"ChildClinic::Visit::\"Sly 1\"" [label="Sly 1"]
-		"ChildClinic::Visit::\"Lucky 1\"" [label="Lucky 1"]
-		"ChildClinic::Visit::\"Samantha 2\"" [label="Samantha 2"]
-		"ChildClinic::Visit::\"Max 2\"" [label="Max 2"]
+	subgraph "cluster_ChildrenClinic::EmployeeRole" {
+		label="ChildrenClinic::EmployeeRole"
+		"ChildrenClinic::EmployeeRole::\"Doctor\"" [label="Doctor"]
+		"ChildrenClinic::EmployeeRole::\"Secretary\"" [label="Secretary"]
+		"ChildrenClinic::EmployeeRole::\"Administrator\"" [label="Administrator"]
 	}
-	subgraph "cluster_ChildClinic::Clinic" {
-		label="ChildClinic::Clinic"
-		"ChildClinic::Clinic::\"A\"" [label="A"]
-		"ChildClinic::Clinic::\"B\"" [label="B"]
+	subgraph "cluster_ChildrenClinic::Visit" {
+		label="ChildrenClinic::Visit"
+		"ChildrenClinic::Visit::\"Lucky Estaban 1\"" [label="Lucky Estaban 1"]
+		"ChildrenClinic::Visit::\"Samantha Coleman 2\"" [label="Samantha Coleman 2"]
+		"ChildrenClinic::Visit::\"Samantha Coleman 1\"" [label="Samantha Coleman 1"]
+		"ChildrenClinic::Visit::\"Sly Estaban 1\"" [label="Sly Estaban 1"]
+		"ChildrenClinic::Visit::\"Jewel Rodriquez 1\"" [label="Jewel Rodriquez 1"]
+		"ChildrenClinic::Visit::\"Max Coleman 1\"" [label="Max Coleman 1"]
+		"ChildrenClinic::Visit::\"Max Coleman 2\"" [label="Max Coleman 2"]
+		"ChildrenClinic::Visit::\"Rosy Rodriquez 1\"" [label="Rosy Rodriquez 1"]
+		"ChildrenClinic::Visit::\"Basil Davis 1\"" [label="Basil Davis 1"]
 	}
-	subgraph "cluster_ChildClinic::Child" {
-		label="ChildClinic::Child"
-		"ChildClinic::Child::\"Jewel\"" [label="Jewel"]
-		"ChildClinic::Child::\"Lucky\"" [label="Lucky"]
-		"ChildClinic::Child::\"Leo\"" [label="Leo"]
-		"ChildClinic::Child::\"Rosy\"" [label="Rosy"]
-		"ChildClinic::Child::\"Basil\"" [label="Basil"]
-		"ChildClinic::Child::\"Sly\"" [label="Sly"]
-		"ChildClinic::Child::\"Samantha\"" [label="Samantha"]
-		"ChildClinic::Child::\"Max\"" [label="Max"]
+	subgraph "cluster_ChildrenClinic::Confidentiality" {
+		label="ChildrenClinic::Confidentiality"
+		"ChildrenClinic::Confidentiality::\"Protected\"" [label="Protected"]
+		"ChildrenClinic::Confidentiality::\"Sensitive\"" [label="Sensitive"]
+		"ChildrenClinic::Confidentiality::\"Official\"" [label="Official"]
 	}
-	subgraph "cluster_ChildClinic::Action" {
-		label="ChildClinic::Action"
-		"ChildClinic::Action::\"AddClient\"" [label="AddClient"]
-		"ChildClinic::Action::\"EditClient\"" [label="EditClient"]
-		"ChildClinic::Action::\"DeleteClient\"" [label="DeleteClient"]
-		"ChildClinic::Action::\"ListEmployees\"" [label="ListEmployees"]
-		"ChildClinic::Action::\"AddEmployee\"" [label="AddEmployee"]
-		"ChildClinic::Action::\"EditEmployee\"" [label="EditEmployee"]
-		"ChildClinic::Action::\"ListClients\"" [label="ListClients"]
-		"ChildClinic::Action::\"DeleteEmployee\"" [label="DeleteEmployee"]
-		"ChildClinic::Action::\"ViewClient\"" [label="ViewClient"]
-		"ChildClinic::Action::\"ViewEmployee\"" [label="ViewEmployee"]
+	subgraph "cluster_ChildrenClinic::Action" {
+		label="ChildrenClinic::Action"
+		"ChildrenClinic::Action::\"AddPatient\"" [label="AddPatient"]
+		"ChildrenClinic::Action::\"ListEmployees\"" [label="ListEmployees"]
+		"ChildrenClinic::Action::\"ListPatients\"" [label="ListPatients"]
+		"ChildrenClinic::Action::\"EditEmployee\"" [label="EditEmployee"]
+		"ChildrenClinic::Action::\"EditPatient\"" [label="EditPatient"]
+		"ChildrenClinic::Action::\"DeleteEmployee\"" [label="DeleteEmployee"]
+		"ChildrenClinic::Action::\"AddEmployee\"" [label="AddEmployee"]
+		"ChildrenClinic::Action::\"DeletePatient\"" [label="DeletePatient"]
+		"ChildrenClinic::Action::\"ViewEmployee\"" [label="ViewEmployee"]
+		"ChildrenClinic::Action::\"ViewPatient\"" [label="ViewPatient"]
 	}
-	subgraph "cluster_ChildClinic::EmployeeRole" {
-		label="ChildClinic::EmployeeRole"
-		"ChildClinic::EmployeeRole::\"Doctor\"" [label="Doctor"]
-		"ChildClinic::EmployeeRole::\"Secretary\"" [label="Secretary"]
-		"ChildClinic::EmployeeRole::\"Administrator\"" [label="Administrator"]
+	subgraph "cluster_ChildrenClinic::Clinic" {
+		label="ChildrenClinic::Clinic"
+		"ChildrenClinic::Clinic::\"B\"" [label="B"]
+		"ChildrenClinic::Clinic::\"A\"" [label="A"]
 	}
-	subgraph "cluster_ChildClinic::Employee" {
-		label="ChildClinic::Employee"
-		"ChildClinic::Employee::\"Kathaleen Tramonte\"" [label="Kathaleen Tramonte"]
-		"ChildClinic::Employee::\"Sharon Jenkins\"" [label="Sharon Jenkins"]
-		"ChildClinic::Employee::\"Jestine Teixeira\"" [label="Jestine Teixeira"]
-		"ChildClinic::Employee::\"Alice\"" [label="Alice"]
-		"ChildClinic::Employee::\"Linda Douglas\"" [label="Linda Douglas"]
-		"ChildClinic::Employee::\"Bob\"" [label="Bob"]
-		"ChildClinic::Employee::\"James Carter\"" [label="James Carter"]
-		"ChildClinic::Employee::\"Carl\"" [label="Carl"]
+	subgraph "cluster_ChildrenClinic::AccompanyingAdult" {
+		label="ChildrenClinic::AccompanyingAdult"
+		"ChildrenClinic::AccompanyingAdult::\"Eduardo Rodriquez\"" [label="Eduardo Rodriquez"]
+		"ChildrenClinic::AccompanyingAdult::\"Carlos Estaban\"" [label="Carlos Estaban"]
+		"ChildrenClinic::AccompanyingAdult::\"Jean Coleman\"" [label="Jean Coleman"]
+		"ChildrenClinic::AccompanyingAdult::\"George Franklin\"" [label="George Franklin"]
+		"ChildrenClinic::AccompanyingAdult::\"Betty Davis\"" [label="Betty Davis"]
 	}
-	subgraph "cluster_ChildClinic::Guest" {
-		label="ChildClinic::Guest"
-		"ChildClinic::Guest::\"Unknown\"" [label="Unknown"]
+	subgraph "cluster_ChildrenClinic::ProfessionalLevel" {
+		label="ChildrenClinic::ProfessionalLevel"
+		"ChildrenClinic::ProfessionalLevel::\"Senior\"" [label="Senior"]
+		"ChildrenClinic::ProfessionalLevel::\"Intern\"" [label="Intern"]
+		"ChildrenClinic::ProfessionalLevel::\"Registrar\"" [label="Registrar"]
+		"ChildrenClinic::ProfessionalLevel::\"Specialist\"" [label="Specialist"]
+		"ChildrenClinic::ProfessionalLevel::\"Resident\"" [label="Resident"]
+		"ChildrenClinic::ProfessionalLevel::\"Staff\"" [label="Staff"]
 	}
-	subgraph "cluster_ChildClinic::ProfessionalLevel" {
-		label="ChildClinic::ProfessionalLevel"
-		"ChildClinic::ProfessionalLevel::\"Staff\"" [label="Staff"]
-		"ChildClinic::ProfessionalLevel::\"Specialist\"" [label="Specialist"]
-		"ChildClinic::ProfessionalLevel::\"Resident\"" [label="Resident"]
-		"ChildClinic::ProfessionalLevel::\"Senior\"" [label="Senior"]
-		"ChildClinic::ProfessionalLevel::\"Registrar\"" [label="Registrar"]
-		"ChildClinic::ProfessionalLevel::\"Intern\"" [label="Intern"]
+	subgraph "cluster_ChildrenClinic::Guest" {
+		label="ChildrenClinic::Guest"
+		"ChildrenClinic::Guest::\"Unknown\"" [label="Unknown"]
 	}
-	subgraph "cluster_ChildClinic::Parent" {
-		label="ChildClinic::Parent"
-		"ChildClinic::Parent::\"Jean Coleman\"" [label="Jean Coleman"]
-		"ChildClinic::Parent::\"Eduardo Rodriquez\"" [label="Eduardo Rodriquez"]
-		"ChildClinic::Parent::\"George Franklin\"" [label="George Franklin"]
-		"ChildClinic::Parent::\"Betty Davis\"" [label="Betty Davis"]
-		"ChildClinic::Parent::\"Carlos Estaban\"" [label="Carlos Estaban"]
+	subgraph "cluster_ChildrenClinic::Employee" {
+		label="ChildrenClinic::Employee"
+		"ChildrenClinic::Employee::\"Jestine Teixeira\"" [label="Jestine Teixeira"]
+		"ChildrenClinic::Employee::\"Sharon Jenkins\"" [label="Sharon Jenkins"]
+		"ChildrenClinic::Employee::\"Kathaleen Tramonte\"" [label="Kathaleen Tramonte"]
+		"ChildrenClinic::Employee::\"Alice\"" [label="Alice"]
+		"ChildrenClinic::Employee::\"Carl\"" [label="Carl"]
+		"ChildrenClinic::Employee::\"James Carter\"" [label="James Carter"]
+		"ChildrenClinic::Employee::\"Linda Douglas\"" [label="Linda Douglas"]
+		"ChildrenClinic::Employee::\"Bob\"" [label="Bob"]
 	}
-	"ChildClinic::Action::\"AddClient\"" -> "ChildClinic::Action::\"ClientOperations\""
-	"ChildClinic::Action::\"EditClient\"" -> "ChildClinic::Action::\"ClientOperations\""
-	"ChildClinic::Action::\"DeleteClient\"" -> "ChildClinic::Action::\"ClientOperations\""
-	"ChildClinic::Action::\"ListEmployees\"" -> "ChildClinic::Action::\"EmployeeOperations\""
-	"ChildClinic::Action::\"AddEmployee\"" -> "ChildClinic::Action::\"EmployeeOperations\""
-	"ChildClinic::Action::\"EditEmployee\"" -> "ChildClinic::Action::\"EmployeeOperations\""
-	"ChildClinic::Action::\"ListClients\"" -> "ChildClinic::Action::\"ClientOperations\""
-	"ChildClinic::Action::\"DeleteEmployee\"" -> "ChildClinic::Action::\"EmployeeOperations\""
-	"ChildClinic::Action::\"ViewClient\"" -> "ChildClinic::Action::\"ClientOperations\""
-	"ChildClinic::Action::\"ViewEmployee\"" -> "ChildClinic::Action::\"EmployeeOperations\""
+	"ChildrenClinic::Action::\"AddPatient\"" -> "ChildrenClinic::Action::\"PatientOperations\""
+	"ChildrenClinic::Action::\"ListEmployees\"" -> "ChildrenClinic::Action::\"EmployeeOperations\""
+	"ChildrenClinic::Action::\"ListPatients\"" -> "ChildrenClinic::Action::\"PatientOperations\""
+	"ChildrenClinic::Action::\"EditEmployee\"" -> "ChildrenClinic::Action::\"EmployeeOperations\""
+	"ChildrenClinic::Action::\"EditPatient\"" -> "ChildrenClinic::Action::\"PatientOperations\""
+	"ChildrenClinic::Action::\"DeleteEmployee\"" -> "ChildrenClinic::Action::\"EmployeeOperations\""
+	"ChildrenClinic::Action::\"AddEmployee\"" -> "ChildrenClinic::Action::\"EmployeeOperations\""
+	"ChildrenClinic::Action::\"DeletePatient\"" -> "ChildrenClinic::Action::\"PatientOperations\""
+	"ChildrenClinic::Action::\"ViewEmployee\"" -> "ChildrenClinic::Action::\"EmployeeOperations\""
+	"ChildrenClinic::Action::\"ViewPatient\"" -> "ChildrenClinic::Action::\"PatientOperations\""
 }
 

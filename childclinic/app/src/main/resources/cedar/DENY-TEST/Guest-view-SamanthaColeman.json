@@ -1,0 +1,7 @@
+{
+    "principal": "ChildrenClinic::Guest::\"Unknown\"",
+    "action": "ChildrenClinic::Action::\"ViewPatient\"",
+    "resource": "ChildrenClinic::Patient::\"Samantha Coleman\"",
+    "context": { },
+    "validateRequest": true
+}

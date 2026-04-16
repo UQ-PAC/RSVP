@@ -17,7 +17,7 @@
     {
         "uid": { "type": "Photo", "id": "Meadow" },
         "attrs": {
-            "album" : { "__entity": { "type": "Album", "id": "White" } },
+            "album" : { "__entity": { "type": "Album", "id": "Public" } },
             "data": {
                 "size": 128,
                 "private": true,
@@ -30,4 +30,4 @@
 ]
 
 // @MESSAGE: Unexpected attribute: permission
-// @LOCATION: 584:148 [21:21-26:14]
+// @LOCATION: 699:12 [25:17-25:29]

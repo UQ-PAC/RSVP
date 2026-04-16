@@ -16,8 +16,8 @@ import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
 public class InvariantTransformer {
 
     public static Invariant transform(Invariant invariant) {
-        if (invariant.getQuantifier().getScope() == Quantifier.Scope.ALL) {
-            Quantifier q = new Quantifier(Quantifier.Scope.NONE, invariant.getQuantifier().getVariables());
+        if (invariant.getQuantifier().getScope() == InvariantQuantifier.Scope.ALL) {
+            InvariantQuantifier q = new InvariantQuantifier(InvariantQuantifier.Scope.NONE, invariant.getQuantifier().getVariables());
             Expression e = new UnaryExpression(UnaryExpression.UnaryOp.Not, invariant.getExpression());
             invariant = new Invariant(invariant.getName(), q, e);
         }

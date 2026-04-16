@@ -2,7 +2,7 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.datalog.ast.*;
-import uq.pac.rsvp.policy.datalog.invariant.Quantifier;
+import uq.pac.rsvp.policy.datalog.invariant.InvariantQuantifier;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -72,7 +72,7 @@ public class TranslationVisitor extends VoidVisitorAdapter {
         return new DLRule(makeAtom(decl), visitor.expressions);
     }
 
-    public static DLRule translateInvariant(TranslationSchema schema, Collection<Expression> exprs, DLRuleDecl decl, Quantifier quantifier) {
+    public static DLRule translateInvariant(TranslationSchema schema, Collection<Expression> exprs, DLRuleDecl decl, InvariantQuantifier quantifier) {
         TranslationVisitor visitor = new TranslationVisitor(schema, TranslationContext.Invariant);
 
         // Grounding terms for typed variables of is straightforward in that

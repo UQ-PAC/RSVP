@@ -48,7 +48,7 @@ public class InvariantSet {
         parser.removeErrorListeners();
         parser.addErrorListener(errorListener);
 
-        ExpressionVisitor sv = new ExpressionVisitor();
+        InvariantExpressionVisitor sv = new InvariantExpressionVisitor();
         List<Invariant> invariants = new InvariantBaseVisitor<List<Invariant>> () {
             @Override
             public List<Invariant> visitProgram(InvariantParser.ProgramContext ctx) {
@@ -57,17 +57,17 @@ public class InvariantSet {
                     Expression expr = sv.visit(inv.expression());
                     // Quantifier is optional (defaults to ALL) unless variables are specified,
                     // since then this is basically a constant expression
-                    Quantifier quantifier = null;
+                    InvariantQuantifier quantifier = null;
                     String str = inv.STRING().getText();
                     String name = str.substring(1, str.length() - 1);
                     if (inv.quantifier() != null) {
-                        Quantifier.Scope scope = Quantifier.Scope.valueOf(inv.quantifier().quant.getText().toUpperCase());
-                        List<Quantifier.Variable> variables =
+                        InvariantQuantifier.Scope scope = InvariantQuantifier.Scope.valueOf(inv.quantifier().quant.getText().toUpperCase());
+                        List<InvariantQuantifier.Variable> variables =
                                 inv.quantifier().typedVariable().stream().map(tv ->
-                                        new Quantifier.Variable(tv.variable().getText(),
-                                                ExpressionVisitor.getTypeExpression(tv.type()).getValue()))
+                                        new InvariantQuantifier.Variable(tv.variable().getText(),
+                                                InvariantExpressionVisitor.getTypeExpression(tv.type()).getValue()))
                                 .toList();
-                        quantifier = new Quantifier(scope, variables);
+                        quantifier = new InvariantQuantifier(scope, variables);
                     }
                     return new Invariant(name, quantifier, expr);
                 }).toList();

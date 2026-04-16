@@ -1,19 +1,17 @@
 package uq.pac.rsvp.policy.datalog.invariant;
 
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
-import uq.pac.rsvp.policy.datalog.util.Util;
 
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-class ExpressionVisitor extends InvariantBaseVisitor<Expression> {
+class InvariantExpressionVisitor extends InvariantBaseVisitor<Expression> {
 
-    public ExpressionVisitor() {}
+    public InvariantExpressionVisitor() {}
 
     static TypeExpression getTypeExpression(InvariantParser.TypeContext ctx) {
         String type = ctx.ID().stream()

@@ -2,21 +2,19 @@ package uq.pac.rsvp.policy.datalog.invariant;
 
 import uq.pac.rsvp.policy.ast.expr.Expression;
 
-import java.util.Collections;
-
 
 public class Invariant {
     private final String name;
-    private final Quantifier quantifier;
+    private final InvariantQuantifier quantifier;
     private final Expression expression;
 
-    public Invariant(String name, Quantifier quantifier, Expression expression) {
+    public Invariant(String name, InvariantQuantifier quantifier, Expression expression) {
         this.name = name;
-        this.quantifier = quantifier == null ? new Quantifier() : quantifier;
+        this.quantifier = quantifier == null ? new InvariantQuantifier() : quantifier;
         this.expression = expression;
     }
 
-    public Quantifier getQuantifier() {
+    public InvariantQuantifier getQuantifier() {
         return quantifier;
     }
 

@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 /**
  * Representation of a quantifier for invariant that captures
  */
-public class Quantifier {
+public class InvariantQuantifier {
     public enum Scope {
         ALL("all"),
         SOME("some"),
@@ -30,11 +30,11 @@ public class Quantifier {
     private final List<Variable> variables;
     private final Scope scope;
 
-    public Quantifier() {
+    public InvariantQuantifier() {
         this(Scope.ALL, Collections.emptyList());
     }
 
-    public Quantifier(Scope scope, List<Variable> variables) {
+    public InvariantQuantifier(Scope scope, List<Variable> variables) {
         this.variables = List.copyOf(variables);
         this.scope = scope;
     }

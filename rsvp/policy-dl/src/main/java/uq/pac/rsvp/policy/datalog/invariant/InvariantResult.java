@@ -12,12 +12,12 @@ public class InvariantResult {
 
     private final boolean holds;
     private final Invariant invariant;
-    private final Set<Assignment> assignments;
+    private final Set<InvariantAssignment> assignments;
 
     public InvariantResult(Invariant invariant, Relation relation) {
         this.invariant = invariant;
-        this.assignments = Assignment.getAssignments(relation);
-        Quantifier.Scope scope = invariant.getQuantifier().getScope();
+        this.assignments = InvariantAssignment.getAssignments(relation);
+        InvariantQuantifier.Scope scope = invariant.getQuantifier().getScope();
         switch (invariant.getQuantifier().getScope()) {
             case SOME -> this.holds = !relation.isEmpty();
             case NONE, ALL -> this.holds = relation.isEmpty();
@@ -34,7 +34,7 @@ public class InvariantResult {
      * the `for all` variant is rewritten to `for none`. If the assignments for the `for all`
      * invariant are needed they can be generated with the `for some` quantifier scope instead
      */
-    public Set<Assignment> getAssignments() {
+    public Set<InvariantAssignment> getAssignments() {
         return assignments;
     }
 

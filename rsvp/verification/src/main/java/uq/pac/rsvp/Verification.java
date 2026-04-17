@@ -71,16 +71,36 @@ public class Verification {
             policyGrid.put(p, subsumers);
         });
 
+        class PolicyAnalysisResult {
+            // Whether the policy uniquely matches at least one request (i.e. there is no other
+            // policy that matches the request). For "forbid" policies this considers only other
+            // "forbid" policies.
+            boolean uniquelyMatchesRequest;
+
+            // Whether it has been reported that this policy is subsumed by another
+            boolean subsumptionReported;
+        }
+
+        Map<Policy, PolicyAnalysisResult> analysisResults = new HashMap<>();
+        policyResults.keySet().forEach(p -> {
+            analysisResults.put(p, new PolicyAnalysisResult());
+        });
+
         // Now trim the subsumption sets by processing each request:
         requestPolicyMap.forEach((k, v) -> {
-            // The set (v) has policies which may subsume each other. Any policy not in the set
-            // does not subsume any policy in the set.
+            // The set (v) of policies matching the request has policies which may subsume each
+            // other. But, any policy not in the set does not subsume any policy in the set:
             v.forEach(p -> {
                Set<Policy> subsumersOfP = policyGrid.get(p);
                subsumersOfP.removeIf(p2 -> !v.contains(p2));
             });
+
+            if (v.size() == 1) {
+                analysisResults.get(v.iterator().next()).uniquelyMatchesRequest = true;
+            }
         });
 
+        // Create reports for subsumed policies
         policyGrid.forEach((p, ss) -> {
             ss.forEach(p2 -> {
                 // (It is ok for a "forbid" policy to be "subsumed" by a "permit" policy - in that
@@ -93,27 +113,33 @@ public class Verification {
                             // requests (this will be reported twice: once for each of the policies).
                             r = new Report(Severity.Warning, "Policy '" + p.getName() + "' and '"
                                     + p2.getName() + "' match the same set of requests",
-                                    p.getSourceLoc());
+                                    p.getSourceLoc(), p2.getSourceLoc());
                         }
                         else {
                             r = new Report(Severity.Warning, "Policy '" + p.getName() + "' does "
                                     + "not match any requests that are not also matched by policy '"
                                     + p2.getName() + "'",
-                                    p.getSourceLoc());
+                                    p.getSourceLoc(), p2.getSourceLoc());
                         }
+                        analysisResults.get(p).subsumptionReported = true;
                         results.add(r);
-                        // TODO can we give both source locations in a single report?
                     }
                 }
-                // TODO if a permit policy is subsumed by a forbid policy , make that clear in the
+                // TODO if a permit policy is subsumed by a forbid policy, make that clear in the
                 // report
             });
         });
 
-        // TODO check for useless "permit" policies, i.e. which match some requests but those
-        // requests are always ultimately forbidden.
-        // TODO check for policies which could be removed without affecting authorisation matrix
-        // (unless already reported)
+        // Create reports for policies that don't uniquely match any request
+        analysisResults.forEach((p, analysisResult) -> {
+            if (!analysisResult.uniquelyMatchesRequest && !analysisResult.subsumptionReported) {
+                Report r = new Report(Severity.Warning, "Policy '" + p.getName() + "' does not "
+                        + "uniquely match any request",
+                        "Removing this policy would (by itself) have no effect",
+                        p.getSourceLoc());
+                results.add(r);
+            }
+        });
 
         return results;
     }

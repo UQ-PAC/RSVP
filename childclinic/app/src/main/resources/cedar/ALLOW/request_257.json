@@ -1,0 +1,6 @@
+{
+  "principal": "ChildrenClinic::Employee::\"Carl\"",
+  "resource": "ChildrenClinic::Visit::\"Rosy Rodriquez 1\"",
+  "action": "ChildrenClinic::Action::\"ListPatients\"",
+  "context": {}
+}

@@ -1,0 +1,6 @@
+{
+  "principal": "ChildrenClinic::Guest::\"???\"",
+  "resource": "ChildrenClinic::Visit::\"Sly Estaban 1\"",
+  "action": "ChildrenClinic::Action::\"ListPatients\"",
+  "context": {}
+}

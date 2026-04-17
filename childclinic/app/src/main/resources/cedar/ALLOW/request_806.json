@@ -1,0 +1,6 @@
+{
+  "principal": "ChildrenClinic::Employee::\"Bob\"",
+  "resource": "ChildrenClinic::Employee::\"Sharon Jenkins\"",
+  "action": "ChildrenClinic::Action::\"ViewEmployee\"",
+  "context": {}
+}

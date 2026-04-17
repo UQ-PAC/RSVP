@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'error')}">
+
+<body>
+
+  <div class="row">
+    <div class="col-md-12">
+      <img class="img-responsive" th:src="@{/resources/images/{imageName}(imageName=${@imageRandomizer.getRandomImage()})}" style="width: 245px; height: 245px;" />
+    </div>
+  </div>
+  <h2 th:text="#{somethingHappened}">Something happened...</h2>
+
+  <!-- Status-specific error message -->
+  <p th:switch="${status}">
+    <span th:case="403" th:text="#{error.403}">Access denied.</span>
+    <span th:case="404" th:text="#{error.404}">The requested page was not found.</span>
+    <span th:case="500" th:text="#{error.500}">An internal server error occurred.</span>
+    <span th:case="*" th:text="#{error.general}">An unexpected error occurred.</span>
+  </p>
+
+  <br>
+
+  <!-- Exception message (for developers) -->
+  <div class="row" id="exception-message-box">
+    <h4>Authorisation Query Results</h4>
+    <p th:text="${message}">Exception message.</p>
+  </div>
+
+</body>
+
+</html>

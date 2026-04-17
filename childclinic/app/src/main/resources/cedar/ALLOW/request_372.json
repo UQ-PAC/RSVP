@@ -1,0 +1,6 @@
+{
+  "principal": "ChildrenClinic::Employee::\"Bob\"",
+  "resource": "ChildrenClinic::Visit::\"Max Coleman 1\"",
+  "action": "ChildrenClinic::Action::\"EditPatient\"",
+  "context": {}
+}

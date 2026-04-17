@@ -1,0 +1,6 @@
+{
+  "principal": "ChildrenClinic::Employee::\"Linda Douglas\"",
+  "resource": "ChildrenClinic::Visit::\"Max Coleman 2\"",
+  "action": "ChildrenClinic::Action::\"DeletePatient\"",
+  "context": {}
+}

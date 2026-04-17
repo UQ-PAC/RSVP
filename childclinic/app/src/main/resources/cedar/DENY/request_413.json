@@ -1,0 +1,6 @@
+{
+  "principal": "ChildrenClinic::Guest::\"Unknown\"",
+  "resource": "ChildrenClinic::Patient::\"Lucky Estaban\"",
+  "action": "ChildrenClinic::Action::\"DeletePatient\"",
+  "context": {}
+}

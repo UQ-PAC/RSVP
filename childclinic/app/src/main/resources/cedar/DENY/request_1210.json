@@ -1,0 +1,6 @@
+{
+  "principal": "ChildrenClinic::Employee::\"James Carter\"",
+  "resource": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
+  "action": "ChildrenClinic::Action::\"DeleteEmployee\"",
+  "context": {}
+}

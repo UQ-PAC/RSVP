@@ -1,0 +1,6 @@
+{
+  "principal": "ChildrenClinic::Guest::\"???\"",
+  "resource": "ChildrenClinic::Visit::\"Basil Davis 1\"",
+  "action": "ChildrenClinic::Action::\"EditPatient\"",
+  "context": {}
+}

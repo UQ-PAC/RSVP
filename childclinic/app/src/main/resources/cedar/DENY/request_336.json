@@ -1,0 +1,6 @@
+{
+  "principal": "ChildrenClinic::Guest::\"???\"",
+  "resource": "ChildrenClinic::Patient::\"Lucky Estaban\"",
+  "action": "ChildrenClinic::Action::\"ViewPatient\"",
+  "context": {}
+}

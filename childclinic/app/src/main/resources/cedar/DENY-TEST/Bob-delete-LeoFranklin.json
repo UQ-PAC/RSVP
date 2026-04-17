@@ -1,0 +1,7 @@
+{
+    "principal": "ChildrenClinic::Employee::\"Bob\"",
+    "action": "ChildrenClinic::Action::\"DeletePatient\"",
+    "resource": "ChildrenClinic::Patient::\"Leo Franklin\"",
+    "context": { },
+    "validateRequest": true
+}

@@ -24,10 +24,7 @@ export interface Report {
   messageDetail?: string;
 }
 
-export type VersionedPolicy = {
-  version: string;
-  id: string;
-}[];
+export type VersionedPolicy = string[];
 
 export interface VerificationRequest {
   policyFiles: VersionedPolicy[];

@@ -49,9 +49,12 @@
 }
 
 @theme {
+  --font-roboto-flex: "Roboto Flex", "Roboto Flex Fallback", sans-serif;
+  --font-roboto-mono: "Roboto Mono", "Roboto Mono Fallback", monospace;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-plex-sans);
+  --font-sans: var(--font-roboto-flex);
   --font-mono: var(--font-roboto-mono);
   --font-large: 2.5rem;
   --font-med: 1.5rem;
@@ -61,6 +64,7 @@
 
   /* From Diff2Html */
   --d2h-dim-color: #0000004d;
+  --d2h-line-border-color: #eee;
 
   --color-info-light: var(--color-blue-100);
   --color-info-mid: var(--color-blue-200);

@@ -10,7 +10,7 @@
 }
 
 .d2h-file-header {
-  background-color: var(--color-gray-50);
+  display: none;
 }
 
 .d2h-icon {
@@ -24,22 +24,35 @@
 
 .d2h-diff-table {
   font-size: 0.8rem;
-  line-height: 1.2rem;
   color: var(--color-gray-700);
   font-family: var(--font-mono);
 }
 
 .d2h-code-side-linenumber {
   width: 3rem;
+  line-height: 1.3rem;
+  position: relative;
+  display: block;
+  padding-left: 0.2rem;
+  padding-right: 0.5rem;
+}
+
+.d2h-code-side-line {
+  margin-left: -3rem;
+  border: 0;
 }
 
 .d2h-file-side-diff:first-child
   .d2h-diff-tbody
   > tr:last-child
   .d2h-code-side-linenumber {
-  border-radius: 0 0 0 0.4rem;
+  border-radius: 0 0 0 0.45rem;
 }
 
 .d2h-info {
   background-color: var(--color-gray-100);
+}
+
+.d2h-code-line-ctn {
+  vertical-align: baseline;
 }

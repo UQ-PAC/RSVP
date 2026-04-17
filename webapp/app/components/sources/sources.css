@@ -126,11 +126,17 @@
     counter-reset: lineno;
   }
 
-  .source-file .source-file-render .code > .source-file-empty-line {
+  .source-file-empty-line,
+  .source-file .source-file-render .code > .source-file-line-number {
     position: relative;
     align-self: stretch;
-    border-right: 1px solid var(--d2h-dim-color);
+    border-right: 1px solid var(--d2h-line-border-color);
     background-color: white;
+    width: 3rem;
+  }
+
+  .source-file .source-file-render .code > .source-file-empty-line {
+    line-height: 1.25rem;
   }
   .source-file .source-file-render .code > .source-file-line-number {
     counter-increment: lineno;
@@ -139,13 +145,9 @@
     padding-left: 0.2rem;
     padding-right: 0.5rem;
     overflow: clip;
-    position: relative;
     text-align: right;
     color: var(--d2h-dim-color);
-    border-right: 1px solid var(--d2h-dim-color);
-    align-self: stretch;
-    width: 3rem;
-    background-color: white;
+    line-height: 1.22rem;
   }
 
   .source-file
@@ -169,10 +171,8 @@
   }
 
   .source-file .source-file-render .code > .source-file-line-content {
-    padding: 0 1rem;
-    text-indent: -0.2rem;
-    line-height: 1.2rem;
-    /* border-left: 0.2rem solid var(--color-gray-100); */
+    padding: 0.07rem 0 0 1.55rem;
+    line-height: 1.245rem;
     height: 100%;
     font-size: 0.8rem;
   }
@@ -200,6 +200,13 @@
     .code
     > .source-file-line-content.source-report.source-report-err {
     border-right: 0.15rem dotted var(--color-red-500);
+  }
+
+  .source-file-empty-diff {
+    font-family: var(--font-sans);
+    padding: 1rem 2rem;
+    text-align: center;
+    color: var(--color-gray-600);
   }
 
   /********  report highlighting  ********/

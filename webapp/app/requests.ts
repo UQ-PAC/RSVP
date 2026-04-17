@@ -1,4 +1,4 @@
-import { UploadedFile, VerificationRequest, Report } from "./types";
+import { Report, UploadedFile, VerificationRequest } from "./types";
 import { sortReports } from "./util";
 
 export async function upload(file: File): Promise<UploadedFile> {
@@ -49,5 +49,5 @@ export async function diff(
     `updatedName=${updated.name}`,
   ];
 
-  return fetch(`/api/diff?&${params.join("&")}`).then((res) => res.text());
+  return fetch(`/api/diff?${params.join("&")}`).then((res) => res.text());
 }

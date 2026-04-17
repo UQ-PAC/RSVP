@@ -1,12 +1,12 @@
 import { sortSources } from "@/app/util";
+import { createContext, Dispatch, useContext } from "react";
 import { verify } from "../../requests";
 import {
+  Report,
   VerificationFile,
   VerificationRequest,
-  Report,
   VersionedFile,
 } from "../../types";
-import { createContext, Dispatch, useContext } from "react";
 
 type VerificationFileDict = { [id: string]: VerificationFile };
 type VersionedFileList = VersionedFile[];
@@ -92,13 +92,7 @@ function doVerify(context: VerificationState): VerificationState {
 
       const request: VerificationRequest = {
         policyFiles: Object.keys(policies).map((id) => {
-          return [
-            { version: "0", id },
-            ...versions[id].map((version, i) => ({
-              version: `${i + 1}`,
-              id: version,
-            })),
-          ];
+          return [id, ...versions[id]];
         }),
         schemas: Object.keys(schemas),
         entities: Object.keys(entities),

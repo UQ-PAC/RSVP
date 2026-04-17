@@ -115,9 +115,7 @@ export function SourceFile({ source, reports, getDiff }: SourceFileParams) {
           className="source-file-icon"
           icon={compare ? faCodeCompare : faFileLines}
         />
-        <h2 className="source-file-name">
-          {compare ? "Comparison" : filename}
-        </h2>
+        <h2 className="source-file-name">{compare ? "Comparison" : "x"}</h2>
         {source.versions.length > 0 && (
           <SourceVersionSelect
             versions={Array.from(

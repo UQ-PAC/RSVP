@@ -6,38 +6,15 @@ import java.util.List;
 import java.util.Set;
 
 public class VerificationFileset {
-    private final Set<List<VersionedPolicy>> policyFiles;
+    private final Set<List<String>> policyFiles;
     private final Set<String> schemas;
     private final Set<String> entities;
     private final Set<String> invariants;
 
-    public static class VersionedPolicy {
-        private final String version;
-        private final String id;
-
-        public VersionedPolicy(String version, String id) {
-            this.version = version;
-            this.id = id;
-        }
-
-        public VersionedPolicy() {
-            this.version = null;
-            this.id = null;
-        }
-
-        public String getVersion() {
-            return version;
-        }
-
-        public String getId() {
-            return id;
-        }
-    }
-
-    public VerificationFileset(Collection<List<VersionedPolicy>> policyFiles, Collection<String> schemas,
+    public VerificationFileset(Collection<List<String>> policyFiles, Collection<String> schemas,
             Collection<String> entities, Collection<String> invariants) {
         this.policyFiles = new HashSet<>();
-        for (List<VersionedPolicy> versionedfile : policyFiles) {
+        for (List<String> versionedfile : policyFiles) {
             this.policyFiles.add(List.copyOf(versionedfile));
         }
         this.schemas = new HashSet<>(schemas);
@@ -53,7 +30,7 @@ public class VerificationFileset {
 
     }
 
-    public Set<List<VersionedPolicy>> getPolicyFiles() {
+    public Set<List<String>> getPolicyFiles() {
         return Set.copyOf(policyFiles);
     }
 

@@ -33,19 +33,14 @@ export function DiffRender({ left, right, diff }: DiffRenderProps) {
 
   useEffect(() => {
     diff.then((diff) => {
-      console.log(diff);
-
-      //   const diffjson = diff2html.parse(diff);
-      //   const html = diff2html.html(diffjson, {
-      //     drawFileList: false,
-      //     outputFormat: "side-by-side",
-      //     // matching: "lines",
-      //     highlightLanguages: "cedar",
-      //   });
-
       if (ref.current) {
-        const diffUi = new Diff2HtmlUI(ref.current, diff, diffConfig);
-        diffUi.draw();
+        if (diff.length === 0) {
+          ref.current.innerText = "No changes";
+          ref.current.className = `${ref.current.className} source-file-empty-diff`;
+        } else {
+          const diffUi = new Diff2HtmlUI(ref.current, diff, diffConfig);
+          diffUi.draw();
+        }
       }
     });
   }, [diff]);

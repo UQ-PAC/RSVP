@@ -109,6 +109,24 @@ public class Verification {
 
             if (v.size() == 1) {
                 analysisResults.get(v.iterator().next()).uniquelyMatchesRequest = true;
+            } else {
+                // If there is only a single forbid policy that matches, consider it a unique
+                // match. (We don't want to report that a forbid policy does not uniquely match
+                // requests just because those requests are otherwise permitted).
+                Policy singleForbid = null;
+                for (Policy p : v) {
+                    if (p.isForbid()) {
+                        if (singleForbid != null) {
+                            singleForbid = null;
+                            break;
+                        }
+                        singleForbid = p;
+                    }
+                }
+
+                if (singleForbid != null) {
+                    analysisResults.get(singleForbid).uniquelyMatchesRequest = true;
+                }
             }
         });
 

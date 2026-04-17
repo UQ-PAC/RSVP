@@ -45,14 +45,6 @@ public class Verification {
 
         Map<Policy, RequestSet> policyResults = translation.getPolicyResult();
 
-        policyResults.forEach((k, v) -> {
-            if (v.isEmpty()) {
-                Report r = new Report(Severity.Warning, "Policy '" + k.getName() + "' does not match any requests",
-                        k.getSourceLoc());
-                results.add(r);
-            }
-        });
-
         // Generate the inverse map, request -> policy set:
         Map<Request, Set<Policy>> requestPolicyMap = new HashMap<>();
         policyResults.forEach((k, v) -> {
@@ -61,29 +53,49 @@ public class Verification {
             });
         });
 
-        // Policy grid - which policies may be subsumed (or equal to) others. Start by assuming
-        // that all policies have an equal request set:
-        Map<Policy, Set<Policy>> policyGrid = new HashMap<>();
-        policyResults.keySet().forEach(p -> {
-            Set<Policy> subsumers = new HashSet<>();
-            subsumers.addAll(policyResults.keySet());
-            subsumers.remove(p);
-            policyGrid.put(p, subsumers);
-        });
-
         class PolicyAnalysisResult {
             // Whether the policy uniquely matches at least one request (i.e. there is no other
             // policy that matches the request). For "forbid" policies this considers only other
             // "forbid" policies.
             boolean uniquelyMatchesRequest;
 
-            // Whether it has been reported that this policy is subsumed by another
+            // Whether it has been reported that this policy is subsumed by another (or if it
+            // does not match any requests)
             boolean subsumptionReported;
+
+            // Policies which subsume or match an identical set of requests to this one
+            Set<Policy> subsumers;
         }
 
+        // Create a map of policy to policy-related analysis results:
         Map<Policy, PolicyAnalysisResult> analysisResults = new HashMap<>();
         policyResults.keySet().forEach(p -> {
             analysisResults.put(p, new PolicyAnalysisResult());
+        });
+
+        // Check for and report policies not matching any requests:
+        policyResults.forEach((k, v) -> {
+            if (v.isEmpty()) {
+                Report r = new Report(Severity.Warning, "Policy '" + k.getName() + "' does not "
+                        + "match any requests",
+                        k.getSourceLoc());
+                results.add(r);
+
+                // A policy not matching any requests will be trivially subsumed by every other
+                // policy; mark subsumption as reported to avoid further subsumption reports.
+                analysisResults.get(k).subsumptionReported = true;
+            }
+        });
+
+        // Subsumption - which policies may be subsumed (or equal to) others. Start by assuming
+        // that all policies have an equal request set, i.e. that each policy may be subsumed by
+        // every other individual policy:
+        analysisResults.forEach((p, analysisResult) -> {
+            if (!analysisResult.subsumptionReported) {
+                analysisResult.subsumers = new HashSet<>();
+                analysisResult.subsumers.addAll(analysisResults.keySet());
+                analysisResult.subsumers.remove(p);
+            }
         });
 
         // Now trim the subsumption sets by processing each request:
@@ -91,7 +103,7 @@ public class Verification {
             // The set (v) of policies matching the request has policies which may subsume each
             // other. But, any policy not in the set does not subsume any policy in the set:
             v.forEach(p -> {
-               Set<Policy> subsumersOfP = policyGrid.get(p);
+               Set<Policy> subsumersOfP = analysisResults.get(p).subsumers;
                subsumersOfP.removeIf(p2 -> !v.contains(p2));
             });
 
@@ -101,29 +113,31 @@ public class Verification {
         });
 
         // Create reports for subsumed policies
-        policyGrid.forEach((p, ss) -> {
+        analysisResults.forEach((p, analysisResult) -> {
+            Set<Policy> ss = analysisResult.subsumers;
+            if (ss == null) {
+                return;
+            }
             ss.forEach(p2 -> {
                 // (It is ok for a "forbid" policy to be "subsumed" by a "permit" policy - in that
                 // case the forbid acts as a filter over the permit).
                 if (!p.isForbid() || p2.isForbid()) {
-                    if (!policyResults.get(p).isEmpty()) {
-                        Report r;
-                        if (policyGrid.get(p2).contains(p)) {
-                            // If two policies subsume each other, they match an identical set of
-                            // requests (this will be reported twice: once for each of the policies).
-                            r = new Report(Severity.Warning, "Policy '" + p.getName() + "' and '"
-                                    + p2.getName() + "' match the same set of requests",
-                                    p.getSourceLoc(), p2.getSourceLoc());
-                        }
-                        else {
-                            r = new Report(Severity.Warning, "Policy '" + p.getName() + "' does "
-                                    + "not match any requests that are not also matched by policy '"
-                                    + p2.getName() + "'",
-                                    p.getSourceLoc(), p2.getSourceLoc());
-                        }
-                        analysisResults.get(p).subsumptionReported = true;
-                        results.add(r);
+                    Report r;
+                    if (analysisResults.get(p2).subsumers.contains(p)) {
+                        // If two policies subsume each other, they match an identical set of
+                        // requests (this will be reported twice: once for each of the policies).
+                        r = new Report(Severity.Warning, "Policy '" + p.getName() + "' and '"
+                                + p2.getName() + "' match the same set of requests",
+                                p.getSourceLoc(), p2.getSourceLoc());
                     }
+                    else {
+                        r = new Report(Severity.Warning, "Policy '" + p.getName() + "' does "
+                                + "not match any requests that are not also matched by policy '"
+                                + p2.getName() + "'",
+                                p.getSourceLoc(), p2.getSourceLoc());
+                    }
+                    analysisResults.get(p).subsumptionReported = true;
+                    results.add(r);
                 }
                 // TODO if a permit policy is subsumed by a forbid policy, make that clear in the
                 // report

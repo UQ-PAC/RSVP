@@ -65,6 +65,7 @@
   /* From Diff2Html */
   --d2h-dim-color: #0000004d;
   --d2h-line-border-color: #eee;
+  --d2h-info-border-color: #d5e4f2;
 
   --color-info-light: var(--color-blue-100);
   --color-info-mid: var(--color-blue-200);

@@ -1,19 +1,19 @@
 "use client";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { FileInput } from "./FileInput";
+import { VerificationFile } from "@/app/types";
 import { faTrashCan } from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useRef } from "react";
+import { remove, upload } from "../../requests";
+import { getFileType } from "../../util";
 import {
   emptyVerificationGroup,
   useVerification,
   useVerificationDispatch,
 } from "../providers/VerificationContext";
-import { VerificationFile } from "@/app/types";
-import { remove, upload } from "../../requests";
-import { UploadedFile } from "./UploadedFile";
+import { FileInput } from "./FileInput";
 import { HiddenFileInput } from "./HiddenFileInput";
-import { useRef } from "react";
-import { getFileType } from "../../util";
+import { UploadedFile } from "./UploadedFile";
 
 interface AnalysisGroupProps {
   name: string;
@@ -104,7 +104,7 @@ export function AnalysisGroup({ name, removeGroup }: AnalysisGroupProps) {
       <FileInput addFiles={addFiles} />
       <HiddenFileInput
         ref={versionInputRef}
-        accept="cedar"
+        accept=".cedar"
         handleFileInput={handleVersionFileInput}
       />
     </div>

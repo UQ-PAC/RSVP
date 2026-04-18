@@ -101,10 +101,13 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
   const code: JSX.Element[] = [];
 
   code.push(
-    <span key="line-0" className="source-file-empty-line">
+    <span key="line-0" className="source-file-empty-line-number">
       {" "}
     </span>,
-    <span key="0" className="source-file-line-content"></span>,
+    <span
+      key="0"
+      className="source-file-line-content source-file-empty-line"
+    ></span>,
   );
 
   content.split("\n").forEach((line, i) => {
@@ -128,24 +131,17 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
     const isSelected = relevant && hovered !== id && selected === id;
     const isHovered = relevant && hovered === id;
 
-    const className = cx(
-      "source-file-line-content",
-      report?.length && "source-report",
-      relevant?.report.severity && `source-report-${relevant.report.severity}`,
-      isHovered && "hovered",
-      isSelected && "selected",
-    );
-
     let highlighted: string | undefined = undefined;
 
+    // FIXME:
     if (relevant?.start || relevant?.end) {
       const begin = relevant?.start
-        ? highlight(line.slice(0, relevant.start))
+        ? highlight(line.slice(0, relevant.start - 1))
         : "";
       const mid =
         `<span class="source-report-text-highlight source-report-text-highlight-${relevant?.report.severity}"` +
         `data-report="${relevant?.report.id}">${highlight(
-          line.slice(relevant?.start ?? 0, relevant?.end),
+          line.slice(relevant?.start ? relevant.start - 1 : 0, relevant?.end),
         )}</span>`;
       const end = relevant?.end ? highlight(line.slice(relevant.end)) : "";
 
@@ -154,11 +150,74 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
       highlighted = highlight(line);
     }
 
+    const click = relevant
+      ? () => {
+          if (selected !== id) {
+            if (drawerFocus["right"] !== ExpansionState.Expanded) {
+              focusDispatch({
+                type: "drawer",
+                key: "left",
+                value: ExpansionState.Collapsed,
+              });
+              focusDispatch({
+                type: "drawer",
+                key: "right",
+                value: ExpansionState.Expanded,
+              });
+            }
+
+            focusDispatch({
+              type: "report-group",
+              key: `${relevant?.report.severity}-${relevant?.report.primarySourceLocation.source?.file.name}`,
+              value: ExpansionState.Expanded,
+            });
+          }
+
+          selectionDispatch({
+            type: "click",
+            id: id,
+            scroll: selected !== id ? "report" : "none",
+          });
+        }
+      : undefined;
+
+    const mouseEnter = relevant
+      ? () =>
+          selectionDispatch({
+            type: "mouseEnter",
+            id: id,
+            scroll: "none",
+          })
+      : undefined;
+
+    const mouseLeave = relevant
+      ? () =>
+          selectionDispatch({
+            type: "mouseLeave",
+            id: id,
+            scroll: "none",
+          })
+      : undefined;
+
+    const numberClass = cx(
+      "source-file-line-number",
+      report?.length && "source-report",
+      relevant?.report.severity && `source-report-${relevant.report.severity}`,
+      (isHovered || isSelected) && "selected",
+    );
+    const contentClass = cx(
+      "source-file-line-content",
+      report?.length && "source-report",
+      relevant?.report.severity && `source-report-${relevant.report.severity}`,
+      isHovered && "hovered",
+      isSelected && "selected",
+    );
+
     code.push(
-      <span key={`line-${n}`} className="source-file-line-number"></span>,
+      <span key={`line-${n}`} className={numberClass}></span>,
       <span
         key={n}
-        className={className}
+        className={contentClass}
         data-report={id}
         ref={
           relevant &&
@@ -168,58 +227,9 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
             : undefined
         }
         dangerouslySetInnerHTML={{ __html: highlighted }}
-        onClick={
-          relevant
-            ? () => {
-                if (selected !== id) {
-                  if (drawerFocus["right"] !== ExpansionState.Expanded) {
-                    focusDispatch({
-                      type: "drawer",
-                      key: "left",
-                      value: ExpansionState.Collapsed,
-                    });
-                    focusDispatch({
-                      type: "drawer",
-                      key: "right",
-                      value: ExpansionState.Expanded,
-                    });
-                  }
-
-                  focusDispatch({
-                    type: "report-group",
-                    key: `${relevant?.report.severity}-${relevant?.report.primarySourceLocation.source?.file.name}`,
-                    value: ExpansionState.Expanded,
-                  });
-                }
-
-                selectionDispatch({
-                  type: "click",
-                  id: id,
-                  scroll: selected !== id ? "report" : "none",
-                });
-              }
-            : undefined
-        }
-        onMouseEnter={
-          relevant
-            ? () =>
-                selectionDispatch({
-                  type: "mouseEnter",
-                  id: id,
-                  scroll: "none",
-                })
-            : undefined
-        }
-        onMouseLeave={
-          relevant
-            ? () =>
-                selectionDispatch({
-                  type: "mouseLeave",
-                  id: id,
-                  scroll: "none",
-                })
-            : undefined
-        }
+        onClick={click}
+        onMouseEnter={mouseEnter}
+        onMouseLeave={mouseLeave}
       ></span>,
     );
   });

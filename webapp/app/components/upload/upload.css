@@ -14,6 +14,106 @@
     display: flex;
     align-items: center;
   }
+
+  .create-policy-context-button {
+    margin: 0.5rem;
+    padding: 0.7rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 1.5rem;
+    background-color: var(--color-gray-200);
+    color: var(--color-gray-700);
+    cursor: pointer;
+  }
+
+  .create-policy-context-button:hover {
+    background-color: var(--color-gray-700);
+    color: var(--color-gray-200);
+  }
+
+  .create-policy-context-button .create-policy-context-button-text {
+    font-weight: 800;
+  }
+
+  .create-policy-context-button .create-policy-context-button-icon {
+    margin-right: 0.4rem;
+  }
+
+  /** Create analysis group form **/
+
+  .create-analysis-group-form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    margin: 0 0.5rem;
+  }
+  .create-analysis-group-form .create-analysis-group-text-input {
+    border: 1px solid var(--color-gray-300);
+    border-radius: 0.2rem;
+    padding: 0 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .create-analysis-group-form .create-analysis-group-text-input:focus-visible,
+  .create-analysis-group-form .create-analysis-group-text-input:focus {
+    outline: none;
+  }
+
+  .create-analysis-group-form .create-analysis-group-text-input.invalid {
+    outline: 1px solid var(--color-err-darker);
+    /* position: fixed; */
+  }
+
+  .create-analysis-group-form .input-error-message-container {
+    position: relative;
+  }
+
+  .create-analysis-group-form .input-error-message {
+    color: var(--color-err-darkest);
+    font-size: 0.7rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .create-analysis-group-form .create-analysis-group-buttons {
+    display: flex;
+    justify-content: space-evenly;
+  }
+
+  .create-analysis-group-form button {
+    margin: 1.5rem 0.2rem 0.5rem;
+    padding: 0.4rem 1rem;
+    border-radius: 1.5rem;
+    background-color: var(--color-gray-200);
+    color: var(--color-gray-700);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .create-analysis-group-form button:not([disabled]) {
+    cursor: pointer;
+  }
+
+  .create-analysis-group-form button:is([disabled]) {
+    color: var(--color-gray-300);
+  }
+
+  .create-analysis-group-form button .button-icon {
+    font-size: 1rem;
+  }
+
+  .create-analysis-group-form button .button-text {
+    font-weight: 700;
+    font-size: 1rem;
+  }
+  .create-analysis-group-form button:hover:not([disabled]) {
+    background-color: var(--color-gray-700);
+    color: var(--color-gray-200);
+  }
+
+  /** Analysis group **/
+
   .upload-container .analysis-group-header .analysis-group-title {
     flex-grow: 1;
   }
@@ -69,29 +169,6 @@
     font-size: 0.8rem;
     cursor: pointer;
     color: var(--color-gray-700);
-  }
-
-  .create-policy-context-button {
-    margin: 0.5rem;
-    padding: 0.7rem 1.5rem;
-    font-size: 1rem;
-    border-radius: 1.5rem;
-    background-color: var(--color-gray-200);
-    color: var(--color-gray-700);
-    cursor: pointer;
-  }
-
-  .create-policy-context-button:hover {
-    background-color: var(--color-gray-700);
-    color: var(--color-gray-200);
-  }
-
-  .create-policy-context-button .create-policy-context-button-text {
-    font-weight: 800;
-  }
-
-  .create-policy-context-button .create-policy-context-button-icon {
-    margin-right: 0.4rem;
   }
 
   .analysis-group {

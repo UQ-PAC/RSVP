@@ -1,8 +1,9 @@
 "use client";
 
-import { ReportsGroup } from "./ReportsGroup";
 import { Report, ReportSeverity } from "../../types";
 import { ExpansionState, useFocusDispatch } from "../providers/FocusContext";
+import { ToggleAll } from "../shared/ToggleAll";
+import { ReportsGroup } from "./ReportsGroup";
 
 interface ReportsSectionProps {
   title: string;
@@ -31,22 +32,7 @@ export function ReportsSection({
     <div className={`reports-section reports-section-${severity}`}>
       <span className="reports-section-header">
         <h4 className="reports-section-title">{title}</h4>
-
-        <span className="reports-section-toggle">
-          <a
-            className="reports-section-expand"
-            onClick={() => toggleAll(ExpansionState.Expanded)}
-          >
-            EXPAND ALL
-          </a>
-          <span>|</span>
-          <a
-            className="reports-section-collapse"
-            onClick={() => toggleAll(ExpansionState.Collapsed)}
-          >
-            COLLAPSE ALL
-          </a>
-        </span>
+        <ToggleAll name="reports-section" toggle={toggleAll} />
       </span>
 
       {reports.map(([group, items]) => (

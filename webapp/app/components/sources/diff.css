@@ -26,6 +26,12 @@
   font-size: 0.8rem;
   color: var(--color-gray-700);
   font-family: var(--font-mono);
+  table-layout: fixed;
+}
+
+.d2h-diff-table td:not(.d2h-code-side-linenumber) {
+  width: 100%;
+  padding-left: 3rem;
 }
 
 .d2h-code-side-linenumber {

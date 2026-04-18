@@ -17,25 +17,6 @@
     border-bottom: 1px solid var(--color-gray-300);
   }
 
-  .reports-section .reports-section-header .reports-section-toggle {
-    font-size: 0.6rem;
-    color: var(--color-gray-400);
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .reports-section .reports-section-header .reports-section-toggle > a {
-    cursor: pointer;
-    text-align: center;
-  }
-
-  .reports-section
-    .reports-section-header
-    .reports-section-toggle
-    > a.disabled {
-    color: var(--color-gray-300);
-  }
-
   .reports-section .reports-section-title {
     font-weight: 600;
     flex-grow: 1;

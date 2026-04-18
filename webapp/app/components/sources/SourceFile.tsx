@@ -111,17 +111,25 @@ export function SourceFile({ source, reports, getDiff }: SourceFileParams) {
           });
         }}
       >
-        <FontAwesomeIcon
-          className="source-file-icon"
-          icon={compare ? faCodeCompare : faFileLines}
-        />
-        <h2 className="source-file-name">{compare ? "Comparison" : "x"}</h2>
+        {source.versions.length === 0 && (
+          <FontAwesomeIcon
+            className="source-file-icon"
+            icon={compare ? faCodeCompare : faFileLines}
+          />
+        )}
+        {source.versions.length === 0 && (
+          <h2 className="source-file-name">{filename}</h2>
+        )}
         {source.versions.length > 0 && (
           <SourceVersionSelect
             versions={Array.from(
               { length: source.versions.length + 1 },
               (_, i) => i + 1,
             )}
+            versionNames={[
+              source.original.file.name,
+              ...source.versions.map((file) => file.file.name),
+            ]}
             selectedVersion={version}
             selectedCompare={compare}
             set={(version: number, compare?: number) => {
@@ -130,7 +138,7 @@ export function SourceFile({ source, reports, getDiff }: SourceFileParams) {
             }}
           />
         )}
-        <span className="spacer" />
+
         <FontAwesomeIcon
           className="source-file-toggle"
           icon={expanded ? faSquareMinus : faSquarePlus}

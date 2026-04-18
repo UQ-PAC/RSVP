@@ -1,0 +1,11 @@
+.toggle-all {
+  font-size: 0.6em;
+  color: var(--color-gray-400);
+  display: flex;
+  gap: 0.7em;
+}
+
+.toggle-all > a {
+  cursor: pointer;
+  text-align: center;
+}

@@ -4,13 +4,24 @@ import { useState } from "react";
 import { AnalysisGroup } from "./AnalysisGroup";
 import { CreateContextButton } from "./CreateContextButton";
 
+import { NewGroupForm } from "./NewGroupForm";
 import "./upload.css";
 
 export function FileUploader() {
   const [policySets, setPolicySets] = useState<string[]>([]);
+  const [creating, setCreating] = useState(false);
 
-  const createPolicySet = () => {
-    setPolicySets([...policySets, "Policy set " + (policySets.length + 1)]);
+  const openCreatePolicySetForm = () => {
+    setCreating(true);
+  };
+
+  const cancelCreatePolicySet = () => {
+    setCreating(false);
+  };
+
+  const createPolicySet = (name: string) => {
+    setPolicySets([...policySets, name]);
+    setCreating(false);
   };
 
   return (
@@ -24,7 +35,15 @@ export function FileUploader() {
           }
         />
       ))}
-      <CreateContextButton onclick={createPolicySet} />
+      {creating && (
+        <NewGroupForm
+          index={policySets.length + 1}
+          create={createPolicySet}
+          cancel={cancelCreatePolicySet}
+          existing={[...policySets]}
+        />
+      )}
+      {!creating && <CreateContextButton onclick={openCreatePolicySetForm} />}
     </div>
   );
 }

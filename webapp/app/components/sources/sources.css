@@ -8,6 +8,20 @@
     padding: 0 1rem;
   }
 
+  .source-files-container .source-files-analysis-group-header {
+    font-size: 1.3rem;
+    display: flex;
+    align-items: baseline;
+    margin-top: 1rem;
+    padding: 0 1rem;
+  }
+
+  .source-files-container
+    .source-files-analysis-group-header
+    .source-files-analysis-group-title {
+    flex-grow: 1;
+    color: var(--color-gray-600);
+  }
   .source-files-container .source-files-instruction {
     text-align: center;
     margin-top: 4rem;
@@ -29,68 +43,101 @@
   .source-file .source-file-header {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     cursor: pointer;
     background-color: var(--color-gray-200);
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.9rem;
     line-height: 3rem;
+    gap: 2rem;
   }
 
   .source-file.expanded .source-file-header {
     border-radius: 0.5rem 0.5rem 0 0;
     border-bottom: 1px solid var(--color-gray-300);
+    overflow: visible;
   }
 
   .source-file.collapsed .source-file-header {
     border-radius: 0.5rem;
   }
 
-  .source-file-header:hover:not(:has(.source-file-version:hover)) {
+  /* .source-file-header:hover:not(:has(.source-file-version:hover)) {
     background-color: var(--color-gray-300);
-  }
+  } */
 
   .source-file-header .source-file-name {
-    width: 20%;
-    min-width: 20%;
+    flex-grow: 2;
     font-family: var(--font-sans);
     color: var(--color-gray-600);
+    margin-left: -1.7rem;
   }
 
   .source-file-header .source-file-versions {
+    display: inline-flex;
+    align-self: stretch;
+    /* overflow-x: clip;
+    overflow-y: scroll; */
+    /* overflow-x: scroll;
+    overflow-y: auto; */
     flex-grow: 1;
-    display: flex;
-    overflow-x: scroll;
-    max-width: 50%;
+    gap: 0;
+    max-width: 90%;
   }
 
   .source-file-header .source-file-versions .source-file-version {
     line-height: 2rem;
-    padding: 0 0.7rem;
-    background-color: var(--color-gray-100);
-    border: 1px solid var(--color-gray-300);
-    border-right: none;
-    width: 3.2rem;
-    min-width: 3.2rem;
-    display: inline;
+    padding: 0.2rem 1.2rem 0 0;
+    background-color: var(--color-gray-200);
+    border-bottom: 1px solid var(--color-gray-300);
+    border-right: 1px solid var(--color-gray-300);
+    margin-bottom: -1px;
+    /* border-right: none; */
+    /* width: 3.2rem; */
+    /* min-width: 3.2rem; */
+    display: flex;
     font-size: 0.8rem;
-    text-align: center;
+    /* text-align: center; */
+    /* margin-top: 0.75rem; */
+    /* border-radius: 0.4rem 0.4rem 0 0; */
+    font-weight: 500;
+    color: var(--color-gray-600);
+    text-wrap: nowrap;
+    align-items: center;
+    /* justify-content: space-between; */
+    /* flex-grow: 1; */
+    width: fit-content;
   }
 
+  /* .source-file-header:hover .source-file-versions .source-file-version {
+    border: 1px solid var(--color-gray-300);
+  } */
+
   .source-file-header .source-file-versions .source-file-version:first-child {
-    border-radius: 0.5rem 0 0 0.5rem;
+    border-radius: 0.4rem 0 0 0;
   }
 
   .source-file-header .source-file-versions .source-file-version:last-child {
-    border-radius: 0 0.5rem 0.5rem 0;
-    border-right: 1px solid var(--color-gray-300);
+    /* border-radius: 0 0.4rem 0 0; */
+    /* border-right: 1px solid var(--color-gray-300); */
   }
 
   .source-file-header .source-file-versions .source-file-version.selected {
-    background-color: var(--color-gray-400);
+    background-color: var(--color-gray-100);
+    /* z-index: 100; */
+    cursor: default;
+    color: var(--color-gray-700);
+  }
+
+  .source-file.expanded
+    .source-file-header
+    .source-file-versions
+    .source-file-version.selected {
+    border-bottom: 1px solid var(--color-gray-100);
   }
 
   .source-file-header .source-file-versions .source-file-version:hover {
-    background-color: var(--color-gray-500);
+    background-color: var(--color-gray-100);
   }
 
   .source-file-header .source-file-icon {
@@ -126,19 +173,26 @@
     counter-reset: lineno;
   }
 
-  .source-file-empty-line,
-  .source-file .source-file-render .code > .source-file-line-number {
+  .source-file-empty-line-number,
+  .source-file-line-number {
     position: relative;
     align-self: stretch;
     border-right: 1px solid var(--d2h-line-border-color);
+    border-left: 1px solid var(--d2h-line-border-color);
     background-color: white;
     width: 3rem;
   }
 
-  .source-file .source-file-render .code > .source-file-empty-line {
-    line-height: 1.25rem;
+  .source-file-empty-line-number {
+    border-color: var(--d2h-info-border-color);
   }
-  .source-file .source-file-render .code > .source-file-line-number {
+
+  .source-file-empty-line,
+  .source-file-empty-line-number {
+    line-height: 1.25rem;
+    background-color: var(--color-gray-100);
+  }
+  .source-file-line-number {
     counter-increment: lineno;
     word-break: keep-all;
     margin: 0;
@@ -185,21 +239,21 @@
     .source-file-render
     .code
     > .source-file-line-content.source-report.source-report-info {
-    border-right: 0.15rem dotted var(--color-info-darker);
+    border-right: 1px solid var(--color-info-darker);
   }
 
   .source-file
     .source-file-render
     .code
     > .source-file-line-content.source-report.source-report-warn {
-    border-right: 0.15rem dotted var(--color-warn-darker);
+    border-right: 1px solid var(--color-warn-darker);
   }
 
   .source-file
     .source-file-render
     .code
     > .source-file-line-content.source-report.source-report-err {
-    border-right: 0.15rem dotted var(--color-red-500);
+    border-right: 1px solid var(--color-err-darker);
   }
 
   .source-file-empty-diff {
@@ -257,5 +311,18 @@
 
   .source-report.hovered .source-report-text-highlight-err {
     background-color: var(--color-err-darker);
+  }
+
+  .source-file-line-number.source-report-info {
+    border-right: 1px solid var(--color-info-darker);
+    border-left: 1px solid var(--color-info-darker);
+  }
+  .source-file-line-number.source-report-warn {
+    border-right: 1px solid var(--color-warn-darker);
+    border-left: 1px solid var(--color-warn-darker);
+  }
+  .source-file-line-number.source-report-err {
+    border-right: 1px solid var(--color-err-darker);
+    border-left: 1px solid var(--color-err-darker);
   }
 }

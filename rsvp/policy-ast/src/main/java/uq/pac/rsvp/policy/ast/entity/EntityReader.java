@@ -51,6 +51,10 @@ class EntityReader {
     private final FileSource source;
     private final JsonReader reader;
 
+    private SourceLoc loc(int offset, int length) {
+        return new SourceLoc(source, offset, length);
+    }
+
     EntityReader(Path file) throws IOException {
         this.source = new FileSource(file);
         this.reader = new JsonReader(new FileReader(file.toFile()));
@@ -85,7 +89,7 @@ class EntityReader {
                     values.add(readEntityValue());
                 }
                 reader.endArray();
-                yield new SetValue(values, new SourceLoc(source, offset, position() - offset));
+                yield new SetValue(values, loc(offset, position() - offset));
             }
             case BEGIN_OBJECT -> {
                 Map<AttributeName, EntityValue> values = new HashMap<>();
@@ -94,14 +98,14 @@ class EntityReader {
                 while (reader.peek() != JsonToken.END_OBJECT) {
                     int attrPosition = position() - 1;
                     String name = reader.nextName();
-                    SourceLoc loc = new SourceLoc(source, attrPosition,name.length() + 2);
+                    SourceLoc loc = loc(attrPosition,name.length() + 2);
                     AttributeName attrName = new AttributeName(name, loc);
                     EntityValue value = readEntityValue();
                     values.put(attrName, value);
                 }
 
                 reader.endObject();
-                SourceLoc location = new SourceLoc(source, offset, position() - offset);
+                SourceLoc location = loc(offset, position() - offset);
                 RecordValue value = new RecordValue(values, location);
                 AttributeName cedarEntity = new AttributeName("__entity");
                 yield values.keySet().equals(Set.of(cedarEntity)) ?
@@ -111,21 +115,21 @@ class EntityReader {
                 // For strings the offset is at the start, but we also need to take the account quotes
                 // FIXME: if there are escaped characters, the location will likely be off
                 String value = reader.nextString();
-                yield new StringValue(value, new SourceLoc(source, offset, value.length() + 2));
+                yield new StringValue(value, loc(offset, value.length() + 2));
             }
             case NUMBER -> {
                 // For numbers the location is shifted to the last digit, push it back
                 long number = reader.nextLong();
                 int length = Long.toString(number).length();
-                yield new LongValue(number, new SourceLoc(source, offset - length + 1, length));
+                yield new LongValue(number, loc(offset - length + 1, length));
             }
             case BOOLEAN -> {
                 // The offset for booleans will be shifted to the last char, so push it back
                 boolean bool = reader.nextBoolean();
                 int length = bool ? 4 : 5;
-                yield new BooleanValue(bool, new SourceLoc(source, position() - length, length));
+                yield new BooleanValue(bool, loc(position() - length, length));
             }
-            case NULL -> throw new EntityException(new SourceLoc(source, offset, 4), "Null value");
+            case NULL -> throw new EntityException(loc(offset, 4), "Null value");
             default -> throw new RuntimeException();
         };
     }
@@ -134,7 +138,7 @@ class EntityReader {
         JsonToken token = reader.peek();
         int offset = position() - 1;
         if (token != JsonToken.BEGIN_OBJECT) {
-            throw new EntityException(new SourceLoc(source, offset, 1), "Expected object start");
+            throw new EntityException(loc(offset, 1), "Expected object start");
         }
         reader.beginObject();
 
@@ -170,13 +174,13 @@ class EntityReader {
                 }
                 // FIXME: location of an attribute
                 default -> {
-                    SourceLoc loc = new SourceLoc(source, localOffset, name.length() + 2);
+                    SourceLoc loc = loc(localOffset, name.length() + 2);
                     throw new EntityException(loc, "Unexpected entity key: " + name);
                 }
             }
         }
 
-        SourceLoc loc = new SourceLoc(source, offset, position() - offset);
+        SourceLoc loc = loc(offset, position() - offset);
 
         if (uid == null) {
             throw new EntityException(loc, "Missing uid entity attribute");
@@ -197,7 +201,7 @@ class EntityReader {
     private EntitySet readEntitySet() throws IOException {
         JsonToken token = reader.peek();
         if (token != JsonToken.BEGIN_ARRAY) {
-            throw new EntityException(new SourceLoc(source, position() - 1, 1), "Expected array start");
+            throw new EntityException(loc(position() - 1, 1), "Expected array start");
         }
         reader.beginArray();
 

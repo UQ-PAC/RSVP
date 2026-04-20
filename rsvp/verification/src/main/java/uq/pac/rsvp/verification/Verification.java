@@ -35,7 +35,7 @@ public class Verification {
     // policiesPath, Path schemaPath, Path entities)
     public static Set<Report> verifyPolicies(Set<List<Pair<String, Path>>> policies, Set<Path> schemas,
             Set<Path> entities, Set<Path> invariants)
-            throws RsvpException, IOException, ConfigurationException {
+            throws RsvpException, IOException, ConfigurationException, InterruptedException {
 
         // if (policies.isEmpty() || policies.iterator().next().isEmpty()) {
         // throw new ConfigurationException("No policies provided");
@@ -78,6 +78,7 @@ public class Verification {
         // }
         // });
 
+        // TODO: remove
         for (List<Pair<String, Path>> policyFile : policies) {
             String policyFilename = policyFile.get(0).getKey();
             Path policiesPath = policyFile.get(0).getValue();
@@ -85,6 +86,8 @@ public class Verification {
 
             results.addAll(verify(policySet));
         }
+
+        Thread.sleep(1000);
 
         return results;
     }

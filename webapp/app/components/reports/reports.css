@@ -3,6 +3,9 @@
 
   .reports-container {
     overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .reports-container .reports-instruction {
@@ -32,6 +35,34 @@
 
   .reports-group-content {
     margin-left: 0.5rem;
+  }
+
+  .reports-instruction.verifying {
+    color: var(--color-gray-500);
+    font-weight: 500;
+  }
+
+  .verification-progress-icon {
+    font-size: 2rem;
+    color: var(--color-gray-400);
+    margin: 6rem auto 1rem;
+  }
+
+  .verification-progress-icon path {
+    animation-name: spinner;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    transform-origin: 50% 50%;
+    animation-timing-function: linear;
+  }
+
+  @keyframes spinner {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(359deg);
+    }
   }
 
   .reports-group-header:hover {

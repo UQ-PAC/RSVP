@@ -73,7 +73,7 @@ function doVerify(context: VerificationState): VerificationState {
   const newContext = {};
 
   // TODO: multiple versions
-  // FIXME:
+  // FIXME: clear reports first...
   Object.entries(context).forEach(([id, group]) => {
     const fileResolution = new Promise<{
       request: VerificationRequest;

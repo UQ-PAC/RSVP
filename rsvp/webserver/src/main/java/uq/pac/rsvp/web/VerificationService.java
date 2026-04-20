@@ -36,12 +36,7 @@ public class VerificationService {
     FileService fileService;
 
     public Set<Report> runVerification(VerificationFileset verification)
-            throws RsvpException, IOException {
-
-        // Set<Report> result = new HashSet<>();
-
-        // for (VerificationFileset verification : verifications) {
-        // Set<List<String>> versionedPolicies = verification.getPolicyFiles();
+            throws RsvpException, IOException, InterruptedException {
 
         Set<List<Pair<String, Path>>> policies = new HashSet<>();
         Set<Path> schemas = new HashSet<>();
@@ -71,50 +66,9 @@ public class VerificationService {
             invariants.add(fileService.getPath(invariantsFile));
         }
 
-        // Set<String> schemas = verification.getSchemas();
-        // if (schemas.isEmpty()) {
-        // logger.error("Bad request: no schema included");
-        // throw new ErrorResponseException(HttpStatus.BAD_REQUEST);
-        // }
-        // if (schemas.size() > 1) {
-        // logger.error("Bad request: too many schema files (more than 1)");
-        // throw new ErrorResponseException(HttpStatus.BAD_REQUEST);
-        // }
-
-        // Path schemaFile = fileService.getPath(schemas.iterator().next());
-        // logger.info("Schema: {}", schemaFile);
-
-        // Set<String> entities = verification.getEntities();
-        // if (entities.isEmpty()) {
-        // logger.error("Bad request: no entities included");
-        // throw new ErrorResponseException(HttpStatus.BAD_REQUEST);
-        // }
-        // if (entities.size() > 1) {
-        // logger.error("Bad request: too many entity files (more than 1)");
-        // throw new ErrorResponseException(HttpStatus.BAD_REQUEST);
-        // }
-
-        // Path entitiesFile = fileService.getPath(entities.iterator().next());
-
-        // for (List<VersionedPolicy> policy : versionedPolicies) {
-        // if (policy.size() > 0) {
-        // String fileId = policy.get(0).getId();
-        // Path file = fileService.getPath(policy.get(0).getId());
-
-        // if (!file.toString().endsWith(".cedar")) {
-        // logger.error("Bad request: {} is not a Cedar policy file.", file.toString());
-        // throw new ErrorResponseException(HttpStatus.BAD_REQUEST);
-        // }
-
-        // logger.info(all.toString());
-
-        // result.addAll(all);
-        // }
-        // }
         try {
 
             Set<Report> result = Verification.verifyPolicies(policies, schemas, entities, invariants);
-
             logger.info("Generated " + result.size() + " reports");
 
             return result;

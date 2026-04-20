@@ -60,7 +60,7 @@ public class RsvpController {
     @PostMapping("/verify")
     public Set<Report> verify(
             @Validated @RequestBody VerificationFileset verification)
-            throws RsvpException, IOException {
+            throws RsvpException, IOException, InterruptedException {
         logger.info("POST /verify");
         return verificationService.runVerification(verification);
     }

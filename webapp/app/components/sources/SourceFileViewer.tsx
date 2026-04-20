@@ -5,7 +5,7 @@ import { useVerification } from "../providers/VerificationContext";
 import { Fallback } from "./Fallback";
 import { SourceFile } from "./SourceFile";
 
-import { diff } from "@/app/requests";
+import { diff } from "../../requests";
 import {
   ExpansionState,
   useFocus,

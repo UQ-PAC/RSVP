@@ -1,4 +1,3 @@
-import { VerificationFile } from "@/app/types";
 import { useCallback } from "react";
 
 // Hack for drag and drop with React 19 typings

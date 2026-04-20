@@ -1,4 +1,3 @@
-import { sortSources } from "@/app/util";
 import { createContext, Dispatch, useContext } from "react";
 import { verify } from "../../requests";
 import {
@@ -7,6 +6,7 @@ import {
   VerificationRequest,
   VersionedFile,
 } from "../../types";
+import { sortSources } from "../../util";
 
 type VerificationFileDict = { [id: string]: VerificationFile };
 type VersionedFileList = VersionedFile[];

@@ -1,10 +1,10 @@
 "use client";
 
-import { VerificationFile } from "@/app/types";
 import { faTrashCan } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRef } from "react";
 import { remove, upload } from "../../requests";
+import { VerificationFile } from "../../types";
 import { getFileType } from "../../util";
 import {
   emptyVerificationGroup,

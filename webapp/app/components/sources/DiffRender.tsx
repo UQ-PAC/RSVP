@@ -1,5 +1,5 @@
-import { VerificationFile } from "@/app/types";
 import { useEffect, useRef } from "react";
+import { VerificationFile } from "../../types";
 
 import {
   Diff2HtmlUI,

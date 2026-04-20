@@ -1,0 +1,44 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`App renders 1`] = `
+<DocumentFragment>
+  <div
+    class="app"
+  >
+    <div
+      data-testid="context-provider"
+    >
+      <div
+        data-heading="RSVP"
+        data-subheading="Policy Verification"
+        data-testid="header"
+      />
+      <div
+        class="app-content"
+      >
+        <div
+          data-side="left"
+          data-testid="drawer-left"
+          data-title="Policies"
+        >
+          <div
+            data-testid="file-uploader"
+          />
+        </div>
+        <div
+          data-testid="source-file-viewer"
+        />
+        <div
+          data-side="right"
+          data-testid="drawer-right"
+          data-title="Reports"
+        >
+          <div
+            data-testid="report-viewer"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;

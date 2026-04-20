@@ -1,8 +1,8 @@
-import { SourceFileViewer } from "./components/sources/SourceFileViewer";
-import { Header } from "./components/header/Header";
-import { ReportViewer } from "./components/reports/ReportViewer";
 import { Drawer } from "./components/Drawer";
+import { Header } from "./components/header/Header";
 import { ContextProvider } from "./components/providers/ContextProvider";
+import { ReportViewer } from "./components/reports/ReportViewer";
+import { SourceFileViewer } from "./components/sources/SourceFileViewer";
 import { FileUploader } from "./components/upload/FileUploader";
 
 export default function Home() {

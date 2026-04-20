@@ -6,4 +6,4 @@
 ]
 
 // @MESSAGE: Missing attrs entity attribute
-// @LOCATION: 7:83 [2:5-5:6]
+// @LOCATION: 6:83 [2:5-5:5]

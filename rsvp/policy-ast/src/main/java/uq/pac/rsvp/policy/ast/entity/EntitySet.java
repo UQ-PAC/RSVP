@@ -16,6 +16,10 @@ public class EntitySet {
         return new EntityReader(json).parse();
     }
 
+    public static EntitySet parse(String filename, String json) throws IOException, IllegalAccessException {
+        return new EntityReader(filename, json).parse();
+    }
+
     public Stream<Entity> stream() {
         return entities.stream();
     }

@@ -3,6 +3,7 @@ package uq.pac.rsvp.policy.datalog.invariant;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import uq.pac.rsvp.policy.ast.expr.Expression;
+import uq.pac.rsvp.support.FileSource;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,10 +34,15 @@ public class InvariantSet {
     }
 
     public static InvariantSet parse(Path file) throws IOException {
-        return parse(Files.readString(file));
+        return parse(file.toString(), Files.readString(file));
     }
 
+
     public static InvariantSet parse(String text) {
+        return parse("unknown", text);
+    }
+
+    public static InvariantSet parse(String file, String text) {
         ThrowingErrorListener errorListener = new ThrowingErrorListener();
 
         InvariantLexer lexer = new InvariantLexer(CharStreams.fromString(text));
@@ -48,7 +54,7 @@ public class InvariantSet {
         parser.removeErrorListeners();
         parser.addErrorListener(errorListener);
 
-        InvariantExpressionVisitor sv = new InvariantExpressionVisitor();
+        InvariantExpressionVisitor sv = new InvariantExpressionVisitor(new FileSource(file, text));
         List<Invariant> invariants = new InvariantBaseVisitor<List<Invariant>> () {
             @Override
             public List<Invariant> visitProgram(InvariantParser.ProgramContext ctx) {
@@ -65,7 +71,7 @@ public class InvariantSet {
                         List<InvariantQuantifier.Variable> variables =
                                 inv.quantifier().typedVariable().stream().map(tv ->
                                         new InvariantQuantifier.Variable(tv.variable().getText(),
-                                                InvariantExpressionVisitor.getTypeExpression(tv.type()).getValue()))
+                                                sv.getTypeExpression(tv.type()).getValue()))
                                 .toList();
                         quantifier = new InvariantQuantifier(scope, variables);
                     }

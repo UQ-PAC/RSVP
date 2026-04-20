@@ -3,4 +3,4 @@
 }
 
 // @MESSAGE: Expected array start
-// @LOCATION: 1:1 [1:1-1:2]
+// @LOCATION: 0:1 [1:1-1:1]

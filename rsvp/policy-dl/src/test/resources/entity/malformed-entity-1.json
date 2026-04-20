@@ -3,4 +3,4 @@
 ]
 
 // @MESSAGE: Expected object start
-// @LOCATION: 7:1 [2:5-2:6]
+// @LOCATION: 6:1 [2:5-2:5]

@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
+import uq.pac.rsvp.support.FileSource;
 
 import java.util.List;
 import java.util.function.BiFunction;
@@ -11,16 +12,20 @@ import java.util.stream.Collectors;
 
 class InvariantExpressionVisitor extends InvariantBaseVisitor<Expression> {
 
-    public InvariantExpressionVisitor() {}
+    private final FileSource fs;
 
-    static TypeExpression getTypeExpression(InvariantParser.TypeContext ctx) {
+    public InvariantExpressionVisitor(FileSource fs) {
+        this.fs = fs;
+    }
+
+    TypeExpression getTypeExpression(InvariantParser.TypeContext ctx) {
         String type = ctx.ID().stream()
                 .map(ParseTree::getText)
                 .collect(Collectors.joining("::"));
         return new TypeExpression(type);
     }
 
-    static Expression getActionOrEntityExpression(InvariantParser.EntityContext ctx) {
+    Expression getActionOrEntityExpression(InvariantParser.EntityContext ctx) {
         String type = getTypeExpression(ctx.type()).getValue();
         String eid = ctx.STRING().getText();
         BiFunction<String, String, Expression> supplier = type.equals("Action") || type.endsWith("::Action") ?

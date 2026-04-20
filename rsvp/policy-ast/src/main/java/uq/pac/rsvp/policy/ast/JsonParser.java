@@ -12,6 +12,7 @@ import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition.CommonTypeDefinitionDeserialiser;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.Schema.SchemaDeserialiser;
+import uq.pac.rsvp.support.FileSource;
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.support.SourceLoc.SourceLocDeserializer;
 
@@ -19,13 +20,15 @@ public class JsonParser {
 
     private static Gson getGson(String filename, String content) {
 
+        FileSource fs = content == null ? null : new FileSource(filename, content);
+
         return new GsonBuilder()
                 .registerTypeAdapter(Expression.class, new ExpressionDeserialiser())
                 .registerTypeAdapter(ActionExpression.class, new EuidExpressionDeserialiser())
                 .registerTypeAdapter(EntityExpression.class, new EuidExpressionDeserialiser())
                 .registerTypeAdapter(CommonTypeDefinition.class, new CommonTypeDefinitionDeserialiser())
                 .registerTypeAdapter(Schema.class, new SchemaDeserialiser())
-                .registerTypeAdapter(SourceLoc.class, new SourceLocDeserializer(filename, content))
+                .registerTypeAdapter(SourceLoc.class, new SourceLocDeserializer(fs))
                 .disableJdkUnsafe()
                 .create();
     }

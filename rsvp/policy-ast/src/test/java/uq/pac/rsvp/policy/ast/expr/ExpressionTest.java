@@ -91,7 +91,7 @@ public class ExpressionTest {
         void testInvalidAstFile() throws IOException, URISyntaxException {
             URL url = ClassLoader.getSystemResource("invalid.ast.json");
             String json = Files.readString(Path.of(url.toURI()));
-            assertThrows(JsonParseException.class, () -> JsonParser.parsePolicySet("file.json", json, ""));
+            assertThrows(JsonParseException.class, () -> JsonParser.parsePolicySet("file.json", json));
         }
 
         @Test
@@ -100,7 +100,7 @@ public class ExpressionTest {
             URL url = ClassLoader.getSystemResource("is.ast.json");
             String json = Files.readString(Path.of(url.toURI()));
 
-            PolicySet policies = JsonParser.parsePolicySet("file.json", json, "");
+            PolicySet policies = JsonParser.parsePolicySet("file.json", json);
 
             Expression condition = policies.getFirst().getCondition();
             assertTrue(condition instanceof BinaryExpression);

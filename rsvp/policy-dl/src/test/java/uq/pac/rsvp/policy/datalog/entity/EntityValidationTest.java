@@ -1,12 +1,13 @@
 package uq.pac.rsvp.policy.datalog.entity;
 
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.RsvpException;
-import uq.pac.rsvp.policy.ast.entity.EntityException;
-import uq.pac.rsvp.policy.ast.entity.EntitySet;
+import uq.pac.rsvp.policy.ast.entity.*;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.TestUtil;
+import uq.pac.rsvp.support.SourceLoc;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -83,6 +84,77 @@ public class EntityValidationTest {
             String basename = fn.substring(0, fn.length() - 5);
             return DynamicTest.dynamicTest(basename, () -> testFile(p));
         }).toList();
+    }
+
+    void assertLoc(String expected, EntityValue value) {
+        assertLoc(expected, value.getLocation());
+    }
+
+    void assertLoc(String expected, SourceLoc actual) {
+        assertEquals(actual.file + ":" + expected, actual.toString());
+    }
+
+    @Test
+    void locationTest() throws IOException, IllegalAccessException {
+        String json = """
+        [{
+            "uid": { "type": "Directory", "id": "/etc" },
+            "attrs": {
+                "partition": { "type": "Partition", "id": "sda" },
+                "size" : 128,
+                "path": "/etc",
+                "access": "readonly",
+                "permission": {
+                    "read" : false,
+                    "write": true,
+                    "exec" : true
+                },
+                "dev": [ "sda", "sdb" ]
+            },
+            "parents": [
+                { "type": "Partition", "id": "sda" }
+            ]
+        }]
+        """;
+        EntitySet entities = EntitySet.parse("entities.json", json);
+        Entity entity = entities.getEntities().stream().findAny().orElseThrow();
+        assertEquals(1, entities.getEntities().size());
+
+        RecordValue attrs = entity.getAttrs();
+        EntityReference reference = entity.getEuid();
+
+        // Entity reference
+        assertLoc("14:37 [2:12-2:48]", reference);
+
+        // Attribute
+        AttributeName partition = attrs.getAttributeName("partition");
+        assertLoc("76:11 [4:9-4:19]", partition.getLocation());
+
+        // Integer
+        LongValue size = (LongValue) attrs.getValue("size");
+        assertLoc("144:3 [5:18-5:20]", size);
+
+        // Boolean
+        RecordValue permission = (RecordValue) attrs.getValue("permission");
+        BooleanValue read = (BooleanValue) permission.getValue("read");
+        BooleanValue write = (BooleanValue) permission.getValue("write");
+
+        assertLoc("248:5 [9:22-9:26]", read);
+        assertLoc("276:4 [10:22-10:25]", write);
+
+        // String
+        StringValue path = (StringValue) attrs.getValue("path");
+        assertLoc("165:6 [6:17-6:22]", path);
+
+        // Record
+        assertLoc("225:92 [8:23-12:9]", permission);
+
+        // Set
+        SetValue dev = (SetValue) attrs.getValue("dev");
+        assertLoc("334:16 [13:16-13:31]", dev);
+
+        // Entity
+        assertLoc("1:426 [1:2-18:1]", entity.getLocation());
     }
 
 }

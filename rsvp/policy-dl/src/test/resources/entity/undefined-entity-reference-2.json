@@ -12,4 +12,4 @@
 ]
 
 // @MESSAGE: Undefined entity reference: Account::"Bob"
-// @LOCATION: 208:34 [7:31-7:65]
+// @LOCATION: 207:34 [7:31-7:64]

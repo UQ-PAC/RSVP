@@ -30,4 +30,4 @@
 ]
 
 // @MESSAGE: Unexpected attribute: permission
-// @LOCATION: 699:12 [25:17-25:29]
+// @LOCATION: 698:12 [25:17-25:28]

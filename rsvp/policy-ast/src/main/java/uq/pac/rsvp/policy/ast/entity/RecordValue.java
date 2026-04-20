@@ -33,6 +33,17 @@ public class RecordValue extends EntityValue {
         return values.get(key);
     }
 
+    public EntityValue getValue(String key) {
+        return getValue(new AttributeName(key));
+    }
+
+    public AttributeName getAttributeName(String attribute) {
+        return values.keySet().stream()
+                .filter(a -> a.getValue().equals(attribute))
+                .findFirst()
+                .orElse(null);
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(values);

@@ -1,18 +1,18 @@
 "use client";
 
-import { ReportItem } from "./ReportItem";
-import { Report } from "../../types";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMinusSquare,
   faPlusSquare,
 } from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Report } from "../../types";
 import {
   ExpansionState,
   useFocus,
   useFocusDispatch,
 } from "../providers/FocusContext";
 import { useSelectionDispatch } from "../providers/SelectionContext";
+import { ReportItem } from "./ReportItem";
 
 interface ReportsGroupProps {
   section: string;
@@ -52,8 +52,8 @@ export function ReportsGroup({ section, name, reports }: ReportsGroupProps) {
       </div>
       {expanded && (
         <div className="reports-group-content">
-          {reports.map((report) => (
-            <ReportItem key={report.id} report={report} />
+          {reports.map((report, i) => (
+            <ReportItem key={i} report={report} />
           ))}
         </div>
       )}

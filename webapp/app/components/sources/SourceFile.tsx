@@ -34,6 +34,7 @@ interface SourceFileParams {
   ) => Promise<string>;
 }
 
+// TODO: nested tabs split down the middle
 export function SourceFile({ source, reports, getDiff }: SourceFileParams) {
   const [code, setCode] = useState("");
   const [resolvedReports, setResolvedReports] = useState<Report[]>([]);
@@ -136,13 +137,21 @@ export function SourceFile({ source, reports, getDiff }: SourceFileParams) {
               setVersion(version);
               setCompare(compare);
             }}
-          />
+            expanded={expanded}
+          >
+            <FontAwesomeIcon
+              className="source-file-toggle"
+              icon={expanded ? faSquareMinus : faSquarePlus}
+            />
+          </SourceVersionSelect>
         )}
 
-        <FontAwesomeIcon
-          className="source-file-toggle"
-          icon={expanded ? faSquareMinus : faSquarePlus}
-        />
+        {source.versions.length === 0 && (
+          <FontAwesomeIcon
+            className="source-file-toggle"
+            icon={expanded ? faSquareMinus : faSquarePlus}
+          />
+        )}
       </div>
       <div className={cx("source-file-content", robotoMono.className)}>
         {expanded && render}

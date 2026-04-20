@@ -41,15 +41,11 @@
   }
 
   .source-file .source-file-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     cursor: pointer;
     background-color: var(--color-gray-200);
     font-weight: 600;
     font-size: 0.9rem;
     line-height: 3rem;
-    gap: 2rem;
   }
 
   .source-file.expanded .source-file-header {
@@ -73,19 +69,74 @@
     margin-left: -1.7rem;
   }
 
-  .source-file-header .source-file-versions {
-    display: inline-flex;
-    align-self: stretch;
-    /* overflow-x: clip;
-    overflow-y: scroll; */
-    /* overflow-x: scroll;
-    overflow-y: auto; */
+  .source-file-header .source-file-tabs {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
     flex-grow: 1;
-    gap: 0;
+  }
+
+  .source-file-header .top-row {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .source-file-header .source-file-versions {
+    align-self: stretch;
+    flex-grow: 1;
     max-width: 90%;
   }
 
-  .source-file-header .source-file-versions .source-file-version {
+  .source-file-header .source-file-versions,
+  .source-file-header .source-comparison-original,
+  .source-file-header .source-comparison-updated {
+    display: inline-flex;
+    gap: 0;
+    overflow-x: scroll;
+    overflow-y: clip;
+    /* Hide scrollbar for IE, Edge and Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+    margin-bottom: -1px;
+  }
+
+  .source-file-header .source-file-version.source-file-compare.selected {
+    background-color: var(--color-gray-300);
+  }
+
+  .source-file-header .source-file-version.source-file-compare:hover {
+    background-color: var(--color-gray-300);
+  }
+
+  .source-file-header .source-comparison-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background-color: var(--color-gray-300);
+  }
+
+  .source-file-header .source-comparison-tabs .source-comparison-original,
+  .source-file-header .source-comparison-tabs .source-comparison-updated {
+    padding-left: calc(3rem);
+    position: relative;
+  }
+
+  .source-file-header .source-compare-icon {
+    position: absolute;
+    top: 0.7rem;
+    left: 0.9rem;
+    color: var(--color-gray-500);
+  }
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .source-file-header .source-file-versions::-webkit-scrollbar,
+  .source-file-header .source-comparison-original::-webkit-scrollbar,
+  .source-file-header .source-comparison-updated::-webkit-scrollbar {
+    display: none;
+  }
+
+  .source-file-header .source-file-version {
     line-height: 2rem;
     padding: 0.2rem 1.2rem 0 0;
     background-color: var(--color-gray-200);
@@ -109,6 +160,15 @@
     width: fit-content;
   }
 
+  .source-comparison-original .source-file-version,
+  .source-comparison-updated .source-file-version {
+    border-top: 1px solid var(--color-gray-300);
+  }
+
+  .source-comparison-updated .source-file-version:first-child {
+    border-left: 1px solid var(--color-gray-300);
+  }
+
   /* .source-file-header:hover .source-file-versions .source-file-version {
     border: 1px solid var(--color-gray-300);
   } */
@@ -117,12 +177,7 @@
     border-radius: 0.4rem 0 0 0;
   }
 
-  .source-file-header .source-file-versions .source-file-version:last-child {
-    /* border-radius: 0 0.4rem 0 0; */
-    /* border-right: 1px solid var(--color-gray-300); */
-  }
-
-  .source-file-header .source-file-versions .source-file-version.selected {
+  .source-file-header .source-file-version.selected {
     background-color: var(--color-gray-100);
     /* z-index: 100; */
     cursor: default;
@@ -136,7 +191,7 @@
     border-bottom: 1px solid var(--color-gray-100);
   }
 
-  .source-file-header .source-file-versions .source-file-version:hover {
+  .source-file-header .source-file-version:hover {
     background-color: var(--color-gray-100);
   }
 

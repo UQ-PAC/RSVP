@@ -31,7 +31,7 @@ export const emptyVerificationGroup: VerificationGroup = {
 export const emptyVerification: VerificationState = {};
 
 interface VerificationAction {
-  type: "add" | "move" | "remove" | "verify" | "diff";
+  type: "add" | "move" | "remove" | "verify";
   group?: string;
   file?: VerificationFile;
   index?: number;
@@ -58,8 +58,6 @@ export function verificationReducer(
   action: VerificationAction,
 ): VerificationState {
   switch (action.type) {
-    case "diff":
-      return doDiff(context, action);
     case "verify":
       return doVerify(context);
     case "add":
@@ -70,11 +68,6 @@ export function verificationReducer(
       return doRemove(context, action);
   }
 }
-
-function doDiff(
-  context: VerificationState,
-  action: VerificationAction,
-): VerificationState {}
 
 function doVerify(context: VerificationState): VerificationState {
   const newContext = {};
@@ -135,7 +128,7 @@ function doAdd(
   context: VerificationState,
   action: VerificationAction,
 ): VerificationState {
-  if (!action.file || !action.group) {
+  if (!action.group) {
     console.error(
       `Invalid action: { file: ${action.file}, group: ${action.group} }`,
     );
@@ -149,7 +142,8 @@ function doAdd(
   const newContext = { ...context };
   const newGroup = { ...group };
 
-  if (action.original) {
+  // Add file as a version of another file
+  if (action.original && action.file) {
     if (action.file.filetype !== action.original.filetype) {
       console.error(
         `Incompatible file types. Original: ${action.original.filetype}, Version: ${action.file.filetype}}`,
@@ -176,7 +170,7 @@ function doAdd(
         },
       ]);
     }
-  } else {
+  } else if (action.file) {
     // Add new standalone file
     newGroup.files = sortSources([
       ...group.files,
@@ -285,7 +279,7 @@ function doRemove(
   context: VerificationState,
   action: VerificationAction,
 ): VerificationState {
-  if (!action.file || !action.group) {
+  if (!action.group) {
     console.error(
       `Invalid action: { file: ${action.file}, group: ${action.group} }`,
     );
@@ -295,14 +289,15 @@ function doRemove(
   const group: VerificationGroup = context[action.group];
 
   if (!group) {
-    console.error("Removing file from non-existent group: " + action.group);
+    console.error(`Group "${action.group} doesn't exist.`);
     return context;
   }
 
   const newContext = { ...context };
   const newGroup = { ...group };
 
-  if (action.original) {
+  if (action.original && action.file) {
+    // TODO: version reports
     // Remove version
     const existing = newGroup.files.find(
       (file) => file.original === action.original,
@@ -324,16 +319,27 @@ function doRemove(
         },
       ];
     }
-  } else {
+    newContext[action.group] = newGroup;
+  } else if (action.file) {
+    // Remove standalone file (and all versions)
     newGroup.files = [
       ...group.files.filter((file) => file.original !== action.file),
     ];
+    // Delete any associated reports (TODO: multiple source locations)
+    newGroup.reports = group.reports?.then((reports) =>
+      reports.filter(
+        (report) => report.primarySourceLocation.source !== action.file,
+      ),
+    );
+    newContext[action.group] = newGroup;
+  } else {
+    // Remove group
+    delete newContext[action.group];
   }
 
   // Re-index by serverId
   newGroup.byId = sortFilesById(newGroup).then(({ all }) => all);
 
-  newContext[action.group] = newGroup;
   return newContext;
 }
 

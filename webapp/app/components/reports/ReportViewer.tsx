@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Report, ReportSeverity } from "../../types";
-import { ReportsSection } from "./ReportsSection";
 import { useVerification } from "../providers/VerificationContext";
+import { ReportsSection } from "./ReportsSection";
 
 import "./reports.css";
 
@@ -16,19 +16,26 @@ export function ReportViewer() {
   const [err, setErr] = useState<GroupedReports>([]);
 
   const verificationContext = useVerification();
+  console.log("re-render");
 
   useEffect(() => {
     const unresolved: Promise<Report[]>[] = Object.values(verificationContext)
       .filter(({ reports }) => !!reports)
       .map(({ reports }) => reports as Promise<Report[]>);
+    console.log("1");
+    // console.log(Object.keys(verificationContext));
 
     Promise.all(unresolved).then((resolved) => {
       const reports = resolved?.flat();
+      console.log("2");
+      console.log(reports.length);
 
       if (reports) {
         setInfo(sortByFile("info", reports));
         setWarn(sortByFile("warn", reports));
         setErr(sortByFile("err", reports));
+      } else {
+        console.log("TEHEHE");
       }
     });
   }, [verificationContext]);

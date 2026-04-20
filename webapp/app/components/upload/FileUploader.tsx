@@ -4,11 +4,18 @@ import { useState } from "react";
 import { AnalysisGroup } from "./AnalysisGroup";
 import { CreateContextButton } from "./CreateContextButton";
 
+import {
+  useVerification,
+  useVerificationDispatch,
+} from "../providers/VerificationContext";
 import { NewGroupForm } from "./NewGroupForm";
 import "./upload.css";
 
 export function FileUploader() {
-  const [policySets, setPolicySets] = useState<string[]>([]);
+  const context = useVerification();
+  const dispatch = useVerificationDispatch();
+  const policySets = Object.keys(context);
+
   const [creating, setCreating] = useState(false);
 
   const openCreatePolicySetForm = () => {
@@ -20,7 +27,7 @@ export function FileUploader() {
   };
 
   const createPolicySet = (name: string) => {
-    setPolicySets([...policySets, name]);
+    dispatch({ type: "add", group: name });
     setCreating(false);
   };
 
@@ -30,9 +37,7 @@ export function FileUploader() {
         <AnalysisGroup
           key={i}
           name={policySet}
-          removeGroup={() =>
-            setPolicySets(policySets.filter((name) => name !== policySet))
-          }
+          removeGroup={() => dispatch({ type: "remove", group: policySet })}
         />
       ))}
       {creating && (

@@ -1,18 +1,18 @@
 "use client";
 
-import { SourceFile } from "./SourceFile";
 import { Report, VerificationFile } from "../../types";
 import { useVerification } from "../providers/VerificationContext";
 import { Fallback } from "./Fallback";
+import { SourceFile } from "./SourceFile";
 
-import "./sources.css";
+import { diff } from "@/app/requests";
 import {
   ExpansionState,
   useFocus,
   useFocusDispatch,
 } from "../providers/FocusContext";
 import { ToggleAll } from "../shared/ToggleAll";
-import { diff } from "@/app/requests";
+import "./sources.css";
 
 export function SourceFileViewer() {
   const verificationContext = useVerification();
@@ -105,13 +105,15 @@ export function SourceFileViewer() {
     <div className="source-files-container">
       {groups.map(([name, group], i) => (
         <div key={i} className="source-files-analysis-group">
-          <span className="source-files-analysis-group-header">
-            <h2 className="source-files-analysis-group-title">{name}</h2>
-            <ToggleAll
-              name="source-file-analysis-group"
-              toggle={(expand) => toggleAll(name, expand)}
-            />
-          </span>
+          {group.files.length > 0 && (
+            <span className="source-files-analysis-group-header">
+              <h2 className="source-files-analysis-group-title">{name}</h2>
+              <ToggleAll
+                name="source-file-analysis-group"
+                toggle={(expand) => toggleAll(name, expand)}
+              />
+            </span>
+          )}
           {group.files.map((source, i) => (
             <SourceFile
               key={i}

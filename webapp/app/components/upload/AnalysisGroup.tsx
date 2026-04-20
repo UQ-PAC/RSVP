@@ -95,7 +95,7 @@ export function AnalysisGroup({ name, removeGroup }: AnalysisGroupProps) {
                 key={j}
                 group={name}
                 file={version}
-                remove={removeFile}
+                remove={(version) => removeFile(version, file.original)}
               />
             ))}
           </UploadedFile>

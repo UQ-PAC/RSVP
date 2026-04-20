@@ -117,7 +117,7 @@ locally or pull them from GitHub Packages.
        // Note: check for latest released version, version numbers here are examples
        implementation 'uq.pac.rsvp:policy-ast:1.1.2-SNAPSHOT'
        implementation 'uq.pac.rsvp:support:1.0.0-SNAPSHOT'
-       implementation 'uq.pac.rsvp:rsvp-verification:1.0.0-SNAPSHOT'
+       implementation 'uq.pac.rsvp:verification:1.0.0-SNAPSHOT'
        // any other dependencies
    }
    ```
@@ -150,7 +150,7 @@ locally or pull them from GitHub Packages.
        // Note: check for latest released version, version numbers here are examples
        implementation 'uq.pac.rsvp:policy-ast:1.1.2-SNAPSHOT'
        implementation 'uq.pac.rsvp:support:1.0.0-SNAPSHOT'
-       implementation 'uq.pac.rsvp:rsvp-verification:1.0.0-SNAPSHOT'
+       implementation 'uq.pac.rsvp:verification:1.0.0-SNAPSHOT'
        // any other dependencies
    }
    ```

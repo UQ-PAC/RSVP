@@ -10,10 +10,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -45,6 +42,54 @@ class EntityReader {
             return source.getPosition(line + 1, pos - lineStart);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private enum EntityAttribute {
+        ATTRS("attrs", true),
+        UID("uid", true),
+        PARENTS("parents", true),
+        CONTEXT("context", false);
+
+        private final String name;
+        private final boolean required;
+
+        EntityAttribute(String name, boolean required) {
+            this.name = name;
+            this.required = required;
+        }
+
+        private static final Map<Class<?>, String> LABELS = Map.of(
+                EntityReference.class, "entity reference",
+                RecordValue.class, "record",
+                SetValue.class, "set");
+
+        private static final Set<String> ATTRIBUTES = new HashSet<>();
+        static {
+            for (EntityAttribute attr : EntityAttribute.values()) {
+                ATTRIBUTES.add(attr.name);
+            }
+        }
+
+        public static boolean contains(String attr) {
+            return ATTRIBUTES.contains(attr);
+        }
+
+        @SuppressWarnings("unchecked")
+        <E extends EntityValue> E get(RecordValue entityRecord, Class<E> target) {
+            E val = (E) entityRecord.getValue(name);
+
+            if (!required && val == null) {
+                return null;
+            }
+            if (val == null) {
+                throw new EntityException(entityRecord.getLocation(), "Missing " + name + " entity attribute");
+            }
+            if (target.isInstance(val)) {
+                return target.cast(val);
+            } else {
+                throw new EntityException(val.getLocation(), "Expected " + LABELS.get(target));
+            }
         }
     }
 
@@ -140,62 +185,28 @@ class EntityReader {
         if (token != JsonToken.BEGIN_OBJECT) {
             throw new EntityException(loc(offset, 1), "Expected object start");
         }
-        reader.beginObject();
+        RecordValue entityRecord = (RecordValue) readEntityValue();
 
-        RecordValue attrs = null;
-        EntityReference uid = null;
-        EntityValue context = null;
-        Set<EntityReference> parents = null;
-
-        while (reader.peek() != JsonToken.END_OBJECT) {
-            int localOffset = position() - 1;
-            String name = reader.nextName();
-            switch (name) {
-                case "attrs" -> attrs = (RecordValue) readEntityValue();
-                case "parents" -> {
-                    SetValue set = (SetValue) readEntityValue();
-                    parents = set.getValues().stream()
-                            .map(e -> {
-                                if (e instanceof EntityReference ref) {
-                                    return ref;
-                                }
-                                throw new EntityException(e.getLocation(), "Expected entity reference");
-                            })
-                            .collect(Collectors.toSet());
-                }
-                case "context" -> context = readEntityValue();
-                case "uid" -> {
-                    EntityValue value = readEntityValue();
-                    if (value instanceof EntityReference ref) {
-                        uid = ref;
-                    } else {
-                        throw new EntityException(value.getLocation(), "Expected entity reference");
+        EntityReference uid = EntityAttribute.UID.get(entityRecord, EntityReference.class);
+        RecordValue attrs = EntityAttribute.ATTRS.get(entityRecord, RecordValue.class);
+        EntityValue context = EntityAttribute.CONTEXT.get(entityRecord, EntityValue.class);
+        SetValue parentsSet = EntityAttribute.PARENTS.get(entityRecord, SetValue.class);
+        Set<EntityReference>  parents = parentsSet.getValues().stream()
+                .map(e -> {
+                    if (e instanceof EntityReference ref) {
+                        return ref;
                     }
-                }
-                // FIXME: location of an attribute
-                default -> {
-                    SourceLoc loc = loc(localOffset, name.length() + 2);
-                    throw new EntityException(loc, "Unexpected entity key: " + name);
-                }
+                    throw new EntityException(e.getLocation(), "Expected entity reference");
+                })
+                .collect(Collectors.toSet());
+
+        entityRecord.forEach(((attr, value) -> {
+            if (!EntityAttribute.contains(attr.getValue())) {
+                throw new EntityException(attr.getLocation(), "Unexpected entity key: " + attr);
             }
-        }
+        }));
 
-        SourceLoc loc = loc(offset, position() - offset);
-
-        if (uid == null) {
-            throw new EntityException(loc, "Missing uid entity attribute");
-        }
-
-        if (attrs == null) {
-            throw new EntityException(loc, "Missing attrs entity attribute");
-        }
-
-        if (parents == null) {
-            throw new EntityException(loc, "Missing parents entity attribute");
-        }
-
-        reader.endObject();
-        return new Entity(uid, attrs, parents, context, loc);
+        return new Entity(uid, attrs, parents, context, entityRecord.getLocation());
     }
 
     private EntitySet readEntitySet() throws IOException {

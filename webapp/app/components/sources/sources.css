@@ -46,6 +46,9 @@
     font-weight: 600;
     font-size: 0.9rem;
     line-height: 3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
   }
 
   .source-file.expanded .source-file-header {
@@ -63,22 +66,22 @@
   } */
 
   .source-file-header .source-file-name {
-    flex-grow: 2;
+    flex-grow: 1;
     font-family: var(--font-sans);
     color: var(--color-gray-600);
-    margin-left: -1.7rem;
   }
 
   .source-file-header .source-file-tabs {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    flex-grow: 1;
+    width: 100%;
+    max-width: 100%;
   }
 
   .source-file-header .top-row {
     display: flex;
-    gap: 2rem;
+    gap: 1rem;
     align-items: center;
     justify-content: space-between;
   }
@@ -86,7 +89,7 @@
   .source-file-header .source-file-versions {
     align-self: stretch;
     flex-grow: 1;
-    max-width: 90%;
+    /* max-width: 95%; */
   }
 
   .source-file-header .source-file-versions,
@@ -112,21 +115,23 @@
 
   .source-file-header .source-comparison-tabs {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 3rem calc(50% - 3rem) 3rem calc(50% - 3rem);
     background-color: var(--color-gray-300);
+    /* position: relative; */
   }
 
   .source-file-header .source-comparison-tabs .source-comparison-original,
   .source-file-header .source-comparison-tabs .source-comparison-updated {
-    padding-left: calc(3rem);
-    position: relative;
+    padding-top: 0.1rem;
   }
 
   .source-file-header .source-compare-icon {
-    position: absolute;
-    top: 0.7rem;
-    left: 0.9rem;
+    /* position: absolute; */
+    /* top: 0.7rem; */
+    /* left: 0.9rem; */
     color: var(--color-gray-500);
+    align-self: center;
+    justify-self: center;
   }
 
   /* Hide scrollbar for Chrome, Safari and Opera */
@@ -143,20 +148,12 @@
     border-bottom: 1px solid var(--color-gray-300);
     border-right: 1px solid var(--color-gray-300);
     margin-bottom: -1px;
-    /* border-right: none; */
-    /* width: 3.2rem; */
-    /* min-width: 3.2rem; */
     display: flex;
     font-size: 0.8rem;
-    /* text-align: center; */
-    /* margin-top: 0.75rem; */
-    /* border-radius: 0.4rem 0.4rem 0 0; */
     font-weight: 500;
     color: var(--color-gray-600);
     text-wrap: nowrap;
     align-items: center;
-    /* justify-content: space-between; */
-    /* flex-grow: 1; */
     width: fit-content;
   }
 

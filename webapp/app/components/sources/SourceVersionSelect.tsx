@@ -76,11 +76,11 @@ export function SourceVersionSelect({
         <div className="bottom-row">
           {selectedCompare !== undefined && (
             <div className="source-comparison-tabs">
+              <FontAwesomeIcon
+                className="source-compare-icon"
+                icon={faCodeCompare}
+              />
               <div className="source-comparison-original">
-                <FontAwesomeIcon
-                  className="source-compare-icon"
-                  icon={faCodeCompare}
-                />
                 {versions.slice(0, -1).map((version, i) => {
                   return (
                     <div
@@ -106,11 +106,11 @@ export function SourceVersionSelect({
                   );
                 })}
               </div>
+              <FontAwesomeIcon
+                className="source-compare-icon"
+                icon={faCodeCompare}
+              />
               <div className="source-comparison-updated">
-                <FontAwesomeIcon
-                  className="source-compare-icon"
-                  icon={faCodeCompare}
-                />
                 {versions.slice(selectedVersion).map((version, i) => {
                   return (
                     <div

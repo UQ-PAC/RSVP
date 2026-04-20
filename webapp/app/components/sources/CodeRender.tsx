@@ -100,15 +100,15 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
 
   const code: JSX.Element[] = [];
 
-  code.push(
-    <span key="line-0" className="source-file-empty-line-number">
-      {" "}
-    </span>,
-    <span
-      key="0"
-      className="source-file-line-content source-file-empty-line"
-    ></span>,
-  );
+  // code.push(
+  //   <span key="line-0" className="source-file-empty-line-number">
+  //     {" "}
+  //   </span>,
+  //   <span
+  //     key="0"
+  //     className="source-file-line-content source-file-empty-line"
+  //   ></span>,
+  // );
 
   content.split("\n").forEach((line, i) => {
     const n = i + 1;

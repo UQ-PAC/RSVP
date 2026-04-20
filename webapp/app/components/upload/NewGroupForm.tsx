@@ -22,7 +22,9 @@ export function NewGroupForm({
 
   const [name, setName] = useState(placeholder);
 
-  const invalid = existing.some((existing) => existing === name);
+  const invalid = existing.some(
+    (existing) => existing.toLowerCase() === name.toLowerCase(),
+  );
 
   return (
     <form className="create-analysis-group-form">

@@ -8,6 +8,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
+/**
+ * Describes a location (range) within a textual source, given by offset (0-based) and length,
+ * as well as line and column (1-based).
+ */
 public class SourceLoc {
 
     public static final SourceLoc MISSING = new SourceLoc();

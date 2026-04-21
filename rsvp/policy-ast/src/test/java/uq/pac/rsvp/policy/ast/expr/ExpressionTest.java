@@ -43,7 +43,7 @@ public class ExpressionTest {
             assertTrue(is.getLeft() instanceof VariableExpression);
             assertTrue(is.getRight() instanceof TypeExpression);
 
-            assertEquals("App::Role::Admin", ((TypeExpression) (is.getRight())).getValue());
+            assertEquals("App::Role::Admin", ((TypeExpression) (is.getRight())).getType());
         }
     }
 
@@ -111,7 +111,7 @@ public class ExpressionTest {
             assertTrue(is.getLeft() instanceof VariableExpression);
             assertTrue(is.getRight() instanceof TypeExpression);
 
-            assertEquals("App::Role::Admin", ((TypeExpression) (is.getRight())).getValue());
+            assertEquals("App::Role::Admin", ((TypeExpression) (is.getRight())).getType());
         }
     }
 }

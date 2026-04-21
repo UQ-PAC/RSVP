@@ -138,7 +138,7 @@ public class TranslationVisitor extends VoidVisitorAdapter {
             case Is -> {
                 TypeExpression typeExpr = required(expr.getRight(), TypeExpression.class);
                 DLTerm var = getOperand(expr.getLeft());
-                DLRuleDecl decl = schema.getTranslationEntityType(typeExpr.getValue()).getEntityRuleDecl();
+                DLRuleDecl decl = schema.getTranslationEntityType(typeExpr.getType()).getEntityRuleDecl();
                 expressions.add(new DLAtom(decl, negated, var));
             }
             case In -> {

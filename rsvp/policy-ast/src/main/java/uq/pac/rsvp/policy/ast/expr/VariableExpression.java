@@ -4,8 +4,6 @@ import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
-import java.util.Objects;
-
 public class VariableExpression extends Expression {
 
     private final String ref;

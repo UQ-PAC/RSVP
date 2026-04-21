@@ -70,7 +70,7 @@ public class InvariantSet {
                         List<InvariantQuantifier.Variable> variables =
                                 inv.quantifier().typedVariable().stream().map(tv ->
                                         new InvariantQuantifier.Variable(tv.variable().getText(),
-                                                sv.getTypeExpression(tv.type()).getValue()))
+                                                sv.getTypeExpression(tv.type()).getType()))
                                 .toList();
                         quantifier = new InvariantQuantifier(scope, variables);
                     }

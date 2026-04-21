@@ -1,17 +1,17 @@
 package uq.pac.rsvp.policy.ast.expr;
 
-import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Variable;
-
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
+
+import java.util.Objects;
 
 public class VariableExpression extends Expression {
 
     private final String ref;
 
     public VariableExpression(String ref, SourceLoc source) {
-        super(Variable, source);
+        super(source);
         this.ref = ref;
     }
 
@@ -42,5 +42,17 @@ public class VariableExpression extends Expression {
     @Override
     public String toString() {
         return ref;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        } else if (other == null) {
+            return false;
+        } else if (other instanceof VariableExpression var) {
+            return this.ref.equals(var.ref);
+        }
+        return false;
     }
 }

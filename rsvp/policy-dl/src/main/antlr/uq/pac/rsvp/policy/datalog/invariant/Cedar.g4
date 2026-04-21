@@ -1,4 +1,4 @@
-grammar Invariant;
+grammar Cedar;
 
 // Reserved Keywords
 FOR:   'for';
@@ -69,7 +69,17 @@ quantifier:
 ;
 
 invariant:
-    '@' 'invariant' '(' STRING ')' expression quantifier? ';'
+    'invariant' expression quantifier? ';'
 ;
 
-program : invariant*;
+policy:
+    perm=('permit' | 'forbid') '{'
+        expression ','
+        expression ','
+        expression
+        'when' '{'  expression '}'
+        'unless' '{' expression '}'
+    '}' ';'?
+;
+
+program : (invariant | policy)*;

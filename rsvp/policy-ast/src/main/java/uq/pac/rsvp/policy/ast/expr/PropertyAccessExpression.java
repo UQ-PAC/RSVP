@@ -1,7 +1,5 @@
 package uq.pac.rsvp.policy.ast.expr;
 
-import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.PropertyAccess;
-
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
@@ -12,7 +10,7 @@ public class PropertyAccessExpression extends Expression {
     private final String prop;
 
     public PropertyAccessExpression(Expression obj, String prop, SourceLoc source) {
-        super(PropertyAccess, source);
+        super(source);
         this.obj = obj;
         this.prop = prop;
     }

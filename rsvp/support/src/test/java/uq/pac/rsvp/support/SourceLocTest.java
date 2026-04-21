@@ -16,14 +16,14 @@ public class SourceLocTest {
     private final static FileSource FS = new FileSource(FILENAME, SOURCE);
 
     void locOk(int of, int ln, int ls, int cs, int le, int ce) {
-        SourceLoc loc = new SourceLoc(FS, of, ln);
+        SourceLoc loc = FS.getSourceLoc(of, ln);
         String expected = "%s:%d:%d [%d:%d-%d:%d]".formatted(FILENAME, of, ln, ls, cs, le, ce);
         assertEquals(expected, loc.toString());
     }
 
     void locFail(int offset, int length) {
         try {
-            new SourceLoc(FS, offset, length);
+            FS.getSourceLoc(offset, length);
             fail("Unexpected pass");
         } catch (RuntimeException e) {
             String msg = e.getMessage();

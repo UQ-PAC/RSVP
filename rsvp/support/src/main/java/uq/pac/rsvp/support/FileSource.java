@@ -52,15 +52,23 @@ public class FileSource {
      * Then position for 1:1 ("a") is 1, 1:3 (c) is 3 and 2:1 (d) is 5
      */
     public int getPosition(int line, int column) {
-        if (line < 1 || line >= data.length) {
-            throw new RuntimeException("Invalid line: " + line);
+        int position = getSourcePosition(line, column);
+        if (position == -1) {
+            throw new RuntimeException("Invalid location: %d:%d".formatted(line, column));
         }
-        int offset = data[line - 1] + column;
+        return position;
+    }
+
+    private int getSourcePosition(int line, int column) {
+        if (line < 1 || line >= data.length || column < 1) {
+            return -1;
+        }
+        int position = data[line - 1] + column;
         // The column exceeds line length
-        if (offset > data[line] || !isValid(offset)) {
-            throw new RuntimeException("Invalid column: " + column);
+        if (position > data[line] || !isValid(position)) {
+            return -1;
         }
-        return offset;
+        return position;
     }
 
     // Split a string into a list of lines, accounts for leading
@@ -104,12 +112,45 @@ public class FileSource {
         return new LineLoc(line, column);
     }
 
-    public boolean isValid(int offset) {
-        return offset > 0 && offset <= data[data.length - 1];
+    public boolean isValid(int position) {
+        return position > 0 && position <= data[data.length - 1];
     }
 
     @Override
     public String toString() {
         return file + ":" +  data[data.length - 1] + " " + Arrays.toString(data);
     }
+
+    /**
+     * Construct a source location describing a source code interval. The interval is constructed
+     * from a zero-based offset (position before the first character in the interval)
+     * and the length of the interval. Consider the following file
+     * <pre>
+     *     1 abc
+     *     2 def
+     * </pre>
+     * String {@code "def"} starts at location "2:1" and ends at "2:3". The {@code offset} is then
+     * 4 (considering the first line ends with a '\n') and the {@code length} is 3.
+     *
+     * @param offset zero-based char offset pointing to the first character of the range
+     * @param len the length of the fragment
+     * @throws RuntimeException if the offset or the length are out of bounds WRT the provided index
+     */
+    public SourceLoc getSourceLoc(int offset, int len) {
+        // If line locations are computed, then offset and length
+        // must be valid WRT file source. The offset itself is checked
+        // by the file source, but we need to make sure length is valid
+        if (len < 1 || !isValid(offset + 1) || !isValid(offset + len)) {
+            throw new RuntimeException("Invalid source location: %s:%d:%d".formatted(getFile(), offset, len));
+        }
+        return new SourceLoc(file, offset, len,
+                getLineLoc(offset + 1), getLineLoc(offset + len));
+    }
+
+    public SourceLoc getSourceLoc(LineLoc start, LineLoc end) {
+        int offset = getPosition(start.line(), start.column()) - 1;
+        int length = getPosition(end.line(), end.column()) - offset;
+        return new SourceLoc(file, offset, length, start, end);
+    }
+
 }

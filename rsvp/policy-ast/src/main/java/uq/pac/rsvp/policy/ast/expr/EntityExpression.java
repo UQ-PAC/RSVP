@@ -1,7 +1,5 @@
 package uq.pac.rsvp.policy.ast.expr;
 
-import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.EntityLiteral;
-
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;;
@@ -9,7 +7,7 @@ import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;;
 public class EntityExpression extends EuidExpression {
 
     public EntityExpression(String eid, String entityType, SourceLoc source) {
-        super(EntityLiteral, eid, entityType, source);
+        super(eid, entityType, source);
     }
 
     public EntityExpression(String eid, String entityType) {

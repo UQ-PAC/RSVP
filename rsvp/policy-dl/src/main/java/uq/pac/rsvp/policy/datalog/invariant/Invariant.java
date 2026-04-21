@@ -4,12 +4,10 @@ import uq.pac.rsvp.policy.ast.expr.Expression;
 
 
 public class Invariant {
-    private final String name;
     private final InvariantQuantifier quantifier;
     private final Expression expression;
 
-    public Invariant(String name, InvariantQuantifier quantifier, Expression expression) {
-        this.name = name;
+    public Invariant(InvariantQuantifier quantifier, Expression expression) {
         this.quantifier = quantifier == null ? new InvariantQuantifier() : quantifier;
         this.expression = expression;
     }
@@ -22,12 +20,8 @@ public class Invariant {
         return expression;
     }
 
-    public String getName() {
-        return name;
-    }
-
     @Override
     public String toString() {
-        return "@invariant(\"" + name + "\")\n" + expression + (quantifier.isEmpty() ? "" : "\n    " + quantifier);
+        return "invariant " + expression + (quantifier.isEmpty() ? "" : "\n    " + quantifier) + ";";
     }
 }

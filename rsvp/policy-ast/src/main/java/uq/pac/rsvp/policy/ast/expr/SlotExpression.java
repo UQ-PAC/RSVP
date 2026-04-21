@@ -1,7 +1,5 @@
 package uq.pac.rsvp.policy.ast.expr;
 
-import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Slot;
-
 import com.google.gson.annotations.SerializedName;
 
 import uq.pac.rsvp.support.SourceLoc;
@@ -31,7 +29,7 @@ public class SlotExpression extends Expression {
     private final SlotId id;
 
     public SlotExpression(SlotId id, SourceLoc source) {
-        super(Slot, source);
+        super(source);
         this.id = id;
     }
 

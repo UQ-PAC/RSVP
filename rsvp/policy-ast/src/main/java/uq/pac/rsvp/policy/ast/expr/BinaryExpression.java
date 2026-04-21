@@ -1,6 +1,5 @@
 package uq.pac.rsvp.policy.ast.expr;
 
-import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Binary;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -62,7 +61,7 @@ public class BinaryExpression extends Expression {
     private final Expression right;
 
     public BinaryExpression(Expression left, BinaryOp op, Expression right, SourceLoc source) {
-        super(Binary, source);
+        super(source);
         this.left = left;
         this.op = op;
         this.right = right;

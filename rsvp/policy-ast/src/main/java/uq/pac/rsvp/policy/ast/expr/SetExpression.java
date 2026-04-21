@@ -1,7 +1,5 @@
 package uq.pac.rsvp.policy.ast.expr;
 
-import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Set;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,7 +12,7 @@ public class SetExpression extends Expression {
     private final Set<Expression> elements;
 
     public SetExpression(Set<Expression> elements, SourceLoc source) {
-        super(Set, source);
+        super(source);
         this.elements = elements == null ? new HashSet<>() : new HashSet<>(elements);
     }
 

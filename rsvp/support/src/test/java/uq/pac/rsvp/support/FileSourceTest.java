@@ -37,12 +37,12 @@ public class FileSourceTest {
         }
     }
 
-    void lineLocFail(FileSource fs, int ln, int col, String msg) {
+    void lineLocFail(FileSource fs, int ln, int col) {
         try {
             fs.getPosition(ln, col);
             fail("Unexpected pass");
         } catch (RuntimeException e) {
-            assertEquals(msg, e.getMessage());
+            assertEquals("Invalid location: %d:%d".formatted(ln, col), e.getMessage());
         }
     }
 
@@ -76,14 +76,14 @@ public class FileSourceTest {
         offsetFail(two, 3);
 
         // Invalid line/column
-        lineLocFail(FS, -1, 1, "Invalid line: -1");
-        lineLocFail(FS, 0, 1, "Invalid line: 0");
-        lineLocFail(FS, 6, 1, "Invalid line: 6");
-        lineLocFail(FS, 7, 1, "Invalid line: 7");
-        lineLocFail(FS, 1, -1, "Invalid column: -1");
-        lineLocFail(FS, 1, 0, "Invalid column: 0");
-        lineLocFail(FS, 1, 2, "Invalid column: 2");
-        lineLocFail(FS, 1, 3, "Invalid column: 3");
-        lineLocFail(FS, 3, 5, "Invalid column: 5");
+        lineLocFail(FS, -1, 1);
+        lineLocFail(FS, 0, 1);
+        lineLocFail(FS, 6, 1);
+        lineLocFail(FS, 7, 1);
+        lineLocFail(FS, 1, -1);
+        lineLocFail(FS, 1, 0);
+        lineLocFail(FS, 1, 2);
+        lineLocFail(FS, 1, 3);
+        lineLocFail(FS, 3, 5);
     }
 }

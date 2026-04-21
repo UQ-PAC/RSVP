@@ -1,7 +1,5 @@
 package uq.pac.rsvp.policy.ast.expr;
 
-import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Conditional;
-
 import com.google.gson.annotations.SerializedName;
 
 import uq.pac.rsvp.support.SourceLoc;
@@ -18,7 +16,7 @@ public class ConditionalExpression extends Expression {
     private final Expression els;
 
     public ConditionalExpression(Expression condition, Expression then, Expression els, SourceLoc source) {
-        super(Conditional, source);
+        super(source);
         this.condition = condition;
         this.then = then;
         this.els = els;

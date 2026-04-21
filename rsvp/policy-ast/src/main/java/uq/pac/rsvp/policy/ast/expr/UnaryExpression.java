@@ -1,7 +1,5 @@
 package uq.pac.rsvp.policy.ast.expr;
 
-import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Unary;
-
 import com.google.gson.annotations.SerializedName;
 
 import uq.pac.rsvp.support.SourceLoc;
@@ -21,7 +19,7 @@ public class UnaryExpression extends Expression {
     private final Expression expr;
 
     public UnaryExpression(UnaryOp op, Expression expr, SourceLoc source) {
-        super(Unary, source);
+        super(source);
         this.op = op;
         this.expr = expr;
     }

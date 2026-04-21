@@ -45,27 +45,26 @@ public class InvariantSet {
     public static InvariantSet parse(String file, String text) {
         ThrowingErrorListener errorListener = new ThrowingErrorListener();
 
-        InvariantLexer lexer = new InvariantLexer(CharStreams.fromString(text));
+        CedarLexer lexer = new CedarLexer(CharStreams.fromString(text));
         lexer.removeErrorListeners();
         lexer.addErrorListener(errorListener);
 
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-        InvariantParser parser = new InvariantParser(tokens);
+        CedarParser parser = new CedarParser(tokens);
         parser.removeErrorListeners();
         parser.addErrorListener(errorListener);
 
-        InvariantExpressionVisitor sv = new InvariantExpressionVisitor(new FileSource(file, text));
-        List<Invariant> invariants = new InvariantBaseVisitor<List<Invariant>> () {
+        FileSource fs = new FileSource(file, text);
+        ExpressionVisitor sv = new ExpressionVisitor(fs);
+        List<Invariant> invariants = new SourceVisitor<List<Invariant>>(fs) {
             @Override
-            public List<Invariant> visitProgram(InvariantParser.ProgramContext ctx) {
+            public List<Invariant> visitProgram(CedarParser.ProgramContext ctx) {
                 return ctx.invariant().stream().map(inv -> {
                     // Invariant expression
                     Expression expr = sv.visit(inv.expression());
                     // Quantifier is optional (defaults to ALL) unless variables are specified,
                     // since then this is basically a constant expression
                     InvariantQuantifier quantifier = null;
-                    String str = inv.STRING().getText();
-                    String name = str.substring(1, str.length() - 1);
                     if (inv.quantifier() != null) {
                         InvariantQuantifier.Scope scope = InvariantQuantifier.Scope.valueOf(inv.quantifier().quant.getText().toUpperCase());
                         List<InvariantQuantifier.Variable> variables =
@@ -75,7 +74,7 @@ public class InvariantSet {
                                 .toList();
                         quantifier = new InvariantQuantifier(scope, variables);
                     }
-                    return new Invariant(name, quantifier, expr);
+                    return new Invariant(quantifier, expr);
                 }).toList();
             }
         }.visit(parser.program());

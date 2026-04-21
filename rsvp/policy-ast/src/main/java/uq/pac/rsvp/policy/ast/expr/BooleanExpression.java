@@ -1,7 +1,5 @@
 package uq.pac.rsvp.policy.ast.expr;
 
-import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.BooleanLiteral;
-
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;;
@@ -11,7 +9,7 @@ public class BooleanExpression extends Expression {
     private final boolean value;
 
     public BooleanExpression(boolean value, SourceLoc source) {
-        super(BooleanLiteral, source);
+        super(source);
         this.value = value;
     }
 

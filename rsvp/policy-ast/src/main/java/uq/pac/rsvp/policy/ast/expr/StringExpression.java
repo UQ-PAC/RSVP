@@ -1,7 +1,5 @@
 package uq.pac.rsvp.policy.ast.expr;
 
-import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.StringLiteral;
-
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;;
@@ -12,7 +10,7 @@ public class StringExpression extends Expression {
     private final boolean quoted;
 
     public StringExpression(String value, boolean quoted, SourceLoc source) {
-        super(StringLiteral, source);
+        super(source);
         this.value = value;
         this.quoted = quoted || !NICE_PROP_NAME.matcher(value).matches();
     }

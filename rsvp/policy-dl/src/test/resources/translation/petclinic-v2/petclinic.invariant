@@ -1,23 +1,23 @@
 // PetClinic RSVP Invariants
 
 // 1. There is at least one Administrator.
-@invariant("Administrator existence.")
+invariant
 entity.roles.contains(PetClinic::EmployeeRole::"Administrator")
     for some entity: PetClinic::Employee;
 
 // 2. Employee should have name, clinics, and roles.
-@invariant("Employee data.")
+invariant
 entity == PetClinic::Employee::"???" ||
 entity has name && entity has clinics && entity has roles
     for all entity: PetClinic::Employee;
 
 // 3. Veterinarian should have level.
-@invariant("Veterinarian data.")
+invariant
 !entity.roles.contains(PetClinic::EmployeeRole::"Veterinarian") || entity has level
     for all entity: PetClinic::Employee;
 
 // 4. Only Veterinarian can be "Resident", "Registrar", or "Specialist".
-@invariant("Resident, Registrar, or Specialist.")
+invariant
 !(
     entity.level == PetClinic::ProfessionalLevel::"Resident" ||
     entity.level == PetClinic::ProfessionalLevel::"Registrar" ||
@@ -26,7 +26,7 @@ entity has name && entity has clinics && entity has roles
     for all entity: PetClinic::Employee;
 
 // 5. Every "Intern" and "Registrar" must have a manager.
-@invariant("Intern and Registrar manager.")
+invariant
 !(
     entity.level == PetClinic::ProfessionalLevel::"Intern" ||
     entity.level == PetClinic::ProfessionalLevel::"Registrar"
@@ -34,24 +34,24 @@ entity has name && entity has clinics && entity has roles
     for all entity: PetClinic::Employee;
 
 // 6. No Employee can be their own manager.
-@invariant("No Employee can be their own manager.")
+invariant
 !(entity has manager) || entity.manager != entity
     for all entity: PetClinic::Employee;
 
 // 7. PetOwner should have name, pets, clinics, and veterinarians.
-@invariant("PetOwner data.")
+invariant
 entity == PetClinic::PetOwner::"???" ||
 entity has name && entity has pets && entity has clinics && entity has veterinarians
     for all entity: PetClinic::PetOwner;
 
 // 8. Pet should have name, owner, clinics, and veterinarians
-@invariant("Pet data.")
+invariant
 entity == PetClinic::Pet::"???" ||
 entity has name && entity has owner && entity has clinics && entity has veterinarians
     for all entity: PetClinic::Pet;
 
 // 9. PetVisit should have pet, clinics, veterinarians, and confidentiality.
-@invariant("PetVisit data.")
+invariant
 entity == PetClinic::PetVisit::"???" ||
 entity has pet && entity has clinics && entity has veterinarians && entity has confidentiality
     for all entity: PetClinic::PetVisit;

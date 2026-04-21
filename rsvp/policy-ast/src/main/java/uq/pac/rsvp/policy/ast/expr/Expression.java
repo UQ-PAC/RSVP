@@ -16,38 +16,8 @@ public abstract class Expression extends PolicyFileEntry {
 
     protected static final Pattern NICE_PROP_NAME = Pattern.compile("[a-zA-Z0-9_]+");
 
-    public static enum ExprType {
-        Binary,
-        Unary,
-        Conditional,
-        Call,
-        Slot,
-        Variable,
-        PropertyAccess,
-        ActionLiteral,
-        BooleanLiteral,
-        EntityLiteral,
-        LongLiteral,
-        StringLiteral,
-        Type,
-        Record,
-        Set
-    }
-
-    private final ExprType type;
-
-    protected Expression(ExprType type, SourceLoc source) {
+    protected Expression(SourceLoc source) {
         super(source);
-        this.type = type;
-    }
-
-    public final boolean isLiteral() {
-        return type == ExprType.BooleanLiteral || type == ExprType.EntityLiteral || type == ExprType.LongLiteral
-                || type == ExprType.StringLiteral || type == ExprType.ActionLiteral;
-    }
-
-    public final boolean isCollection() {
-        return type == ExprType.Set || type == ExprType.Record;
     }
 
     public static class ExpressionDeserialiser implements JsonDeserializer<Expression> {

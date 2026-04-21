@@ -97,7 +97,7 @@ class EntityReader {
     private final JsonReader reader;
 
     private SourceLoc loc(int offset, int length) {
-        return new SourceLoc(source, offset, length);
+        return source.getSourceLoc(offset, length);
     }
 
     EntityReader(Path file) throws IOException {

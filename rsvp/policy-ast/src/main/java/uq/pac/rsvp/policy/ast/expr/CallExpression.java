@@ -1,6 +1,5 @@
 package uq.pac.rsvp.policy.ast.expr;
 
-import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Call;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +15,7 @@ public class CallExpression extends Expression {
     private final List<Expression> args;
 
     public CallExpression(Expression self, String func, List<Expression> args, SourceLoc source) {
-        super(Call, source);
+        super(source);
         this.self = self;
         this.func = func;
         this.args = args;

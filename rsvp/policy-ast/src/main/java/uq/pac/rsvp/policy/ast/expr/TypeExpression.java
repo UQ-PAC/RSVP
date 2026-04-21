@@ -4,13 +4,11 @@ import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
-import static uq.pac.rsvp.policy.ast.expr.Expression.ExprType.Type;
-
 public class TypeExpression extends Expression {
     private final String value;
 
     public TypeExpression(String value, SourceLoc source) {
-        super(Type, source);
+        super(source);
         this.value = value;
     }
 

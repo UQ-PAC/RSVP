@@ -19,7 +19,7 @@ public class InvariantTransformer {
         if (invariant.getQuantifier().getScope() == InvariantQuantifier.Scope.ALL) {
             InvariantQuantifier q = new InvariantQuantifier(InvariantQuantifier.Scope.NONE, invariant.getQuantifier().getVariables());
             Expression e = new UnaryExpression(UnaryExpression.UnaryOp.Not, invariant.getExpression());
-            invariant = new Invariant(invariant.getName(), q, e);
+            invariant = new Invariant(q, e);
         }
         return invariant;
     }

@@ -12,8 +12,8 @@ public abstract class EuidExpression extends Expression {
     private final String entityType;
     private final String eid;
 
-    protected EuidExpression(ExprType exprType, String eid, String entityType, SourceLoc source) {
-        super(exprType, source);
+    protected EuidExpression(String eid, String entityType, SourceLoc source) {
+        super(source);
         this.entityType = entityType;
         this.eid = eid;
     }

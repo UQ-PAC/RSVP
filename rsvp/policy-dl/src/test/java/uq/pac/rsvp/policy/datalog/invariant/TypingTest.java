@@ -233,7 +233,7 @@ public class TypingTest {
 
         try {
             String text = """
-                @invariant("test") %s;
+                invariant %s;
                 """.formatted(invariantText);
             Ansi.Color colour = pass ? GREEN : YELLOW;
             logger.info(colour, "[*] %s", invariantText);

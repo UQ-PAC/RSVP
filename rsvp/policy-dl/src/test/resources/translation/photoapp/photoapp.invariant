@@ -1,39 +1,31 @@
 // 1. There exists at least one admin in the system
-@invariant("ThereBeAdmins")
-principal.role == Role::"Admin"
+invariant principal.role == Role::"Admin"
     for some principal: Account;
 
 // 2. Admin accounts should not have albums
-@invariant("NoAlbums")
-album.owner.role == Role::"Admin"
+invariant album.owner.role == Role::"Admin"
     for none album : Album;
 
 // 3. Photos should exceed 10 MB
-@invariant("PhotoSizeLimit")
-photo.size > 10
+invariant photo.size > 10
     for none photo: Photo;
 
 // 4. All admins can see all photos of users
- @invariant("AdminRightsForNone")
-principal.role == Role::"Admin" && deny(principal, resource, Action::"viewPhoto")
+invariant principal.role == Role::"Admin" && deny(principal, resource, Action::"viewPhoto")
     for none  principal: Account, resource: Photo;
 
 // 5. Reformulation of the above with for all instead of for none
-@invariant("AdminRightsForAll")
-principal.role != Role::"Admin" || allow(principal, resource, Action::"viewPhoto")
+invariant principal.role != Role::"Admin" || allow(principal, resource, Action::"viewPhoto")
     for all principal: Account, resource: Photo;
 
 // 6. Reformulation of the above with for all instead of for none and using implies
-@invariant("AdminRightsForAllImplication")
-principal.role != Role::"Admin" || allow(principal, resource, Action::"viewPhoto")
+invariant principal.role != Role::"Admin" || allow(principal, resource, Action::"viewPhoto")
     for all principal: Account, resource: Photo;
 
 // 7. If a user can create an album for another user, then this is the same user
-@invariant("UserRights")
-!(bob.role == Role::"User" && alice.role == Role::"User" && allow(bob, alice, Action::"createAlbum")) || bob == alice
+invariant !(bob.role == Role::"User" && alice.role == Role::"User" && allow(bob, alice, Action::"createAlbum")) || bob == alice
     for all bob: Account, alice: Account;
 
 // 8. Admins cannot create albums for themselves
-@invariant("AdminCreateAlbums")
-!(tim.role == Role::"Admin" && anyone.role == Role::"Admin") || deny(tim, anyone, Action::"createAlbum")
+invariant !(tim.role == Role::"Admin" && anyone.role == Role::"Admin") || deny(tim, anyone, Action::"createAlbum")
     for all tim: Account, anyone: Account;

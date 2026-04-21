@@ -67,7 +67,7 @@ public class Policy extends PolicyFileEntry {
      * from a Cedar formatted policy file, this name will be the identifier assigned
      * by Cedar and should correspond to any Cedar log messages. If this policy was
      * created manually, the name may be {@code null}.
-     * 
+     *
      * Names are not currently checked for uniqueness. If constructed manually, it
      * is possible for more than one policy to have the same name.
      * 
@@ -93,13 +93,7 @@ public class Policy extends PolicyFileEntry {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(effect == Effect.Permit ? "permit" : "forbid");
-        sb.append(" on: ");
-        sb.append(condition.toString());
-
-        return sb.toString();
+        return (effect == Effect.Permit ? "permit" : "forbid") + " on: " + condition.toString();
     }
 
 }

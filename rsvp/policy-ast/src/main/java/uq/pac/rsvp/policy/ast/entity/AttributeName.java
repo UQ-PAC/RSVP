@@ -1,5 +1,6 @@
 package uq.pac.rsvp.policy.ast.entity;
 
+import uq.pac.rsvp.policy.ast.AstNode;
 import uq.pac.rsvp.support.SourceLoc;
 
 import java.util.Objects;
@@ -7,12 +8,11 @@ import java.util.Objects;
 /**
  * Record attribute. A name accompanied by a source location
  */
-public class AttributeName {
+public class AttributeName extends AstNode {
     private final String value;
-    private final SourceLoc location;
 
     public AttributeName(String value, SourceLoc location) {
-        this.location = location;
+        super(location);
         this.value = value;
     }
 
@@ -44,9 +44,5 @@ public class AttributeName {
     @Override
     public String toString() {
         return value;
-    }
-
-    public SourceLoc getLocation() {
-        return location;
     }
 }

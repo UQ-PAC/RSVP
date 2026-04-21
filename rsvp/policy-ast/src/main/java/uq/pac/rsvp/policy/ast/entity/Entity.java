@@ -1,23 +1,23 @@
 package uq.pac.rsvp.policy.ast.entity;
 
+import uq.pac.rsvp.policy.ast.AstNode;
 import uq.pac.rsvp.support.SourceLoc;
 
 import java.util.Collections;
 import java.util.Set;
 
-public class Entity {
-    private final SourceLoc location;
+public class Entity extends AstNode {
     private final EntityReference euid;
     private final RecordValue attrs;
     private final Set<EntityReference> parents;
     private final EntityValue context;
 
     public Entity(EntityReference uid, RecordValue attrs, Set<EntityReference> parents, EntityValue context, SourceLoc location) {
+        super(location);
         this.euid = uid;
         this.attrs = attrs;
         this.parents = parents;
         this.context = context;
-        this.location = location;
     }
 
     public Entity(EntityReference uid, RecordValue attrs, Set<EntityReference> parents, EntityValue context) {
@@ -46,10 +46,6 @@ public class Entity {
 
     public EntityValue getContext() {
         return context;
-    }
-
-    public SourceLoc getLocation() {
-        return location;
     }
 
     @Override

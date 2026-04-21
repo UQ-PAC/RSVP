@@ -87,7 +87,7 @@ public class EntityValidationTest {
     }
 
     void assertLoc(String expected, EntityValue value) {
-        assertLoc(expected, value.getLocation());
+        assertLoc(expected, value.getSourceLoc());
     }
 
     void assertLoc(String expected, SourceLoc actual) {
@@ -128,7 +128,7 @@ public class EntityValidationTest {
 
         // Attribute
         AttributeName partition = attrs.getAttributeName("partition");
-        assertLoc("76:11 [4:9-4:19]", partition.getLocation());
+        assertLoc("76:11 [4:9-4:19]", partition.getSourceLoc());
 
         // Integer
         LongValue size = (LongValue) attrs.getValue("size");
@@ -154,7 +154,6 @@ public class EntityValidationTest {
         assertLoc("334:16 [13:16-13:31]", dev);
 
         // Entity
-        assertLoc("1:426 [1:2-18:1]", entity.getLocation());
+        assertLoc("1:426 [1:2-18:1]", entity.getSourceLoc());
     }
-
 }

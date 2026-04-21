@@ -1,15 +1,13 @@
 package uq.pac.rsvp.policy.ast.entity;
 
+import uq.pac.rsvp.policy.ast.AstNode;
 import uq.pac.rsvp.support.SourceLoc;
 
-public abstract class EntityValue {
-    protected final SourceLoc location;
+public abstract class EntityValue extends AstNode {
 
     public EntityValue(SourceLoc location) {
-        this.location = location;
+        super(location);
     }
 
-    public SourceLoc getLocation() {
-        return location;
-    }
+
 }

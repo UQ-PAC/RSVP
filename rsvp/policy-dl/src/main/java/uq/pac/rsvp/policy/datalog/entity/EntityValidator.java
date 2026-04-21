@@ -65,7 +65,7 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
         // Check all references for existence
         for (EntityReference ref : references) {
             if (!uids.contains(ref)) {
-                throw new EntityException(ref.getLocation(), "Undefined entity reference: " + ref);
+                throw new EntityException(ref.getSourceLoc(), "Undefined entity reference: " + ref);
             }
         }
 
@@ -75,7 +75,7 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
     private void validate(Entity entity) {
         EntityReference euid = entity.getEuid();
         if (uids.contains(euid)) {
-            throw new EntityException(euid.getLocation(), "Duplicate entity: " + entity.getEuid());
+            throw new EntityException(euid.getSourceLoc(), "Duplicate entity: " + entity.getEuid());
         }
         uids.add(euid);
 
@@ -84,12 +84,12 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
         // this can skew source locations and partly because there is no good reason
         // to have these characters in entity names in general
         if (ESCAPED.matcher(euid.getId()).find()) {
-            throw new EntityException(euid.getLocation(), "Unsupported entity id (escaped characters): " + euid.getId());
+            throw new EntityException(euid.getSourceLoc(), "Unsupported entity id (escaped characters): " + euid.getId());
         }
 
         // Prevent entity names from having '???' internal names
         if (euid.getId().equals(UndefinedEntityUIDName)) {
-            throw new EntityException(euid.getLocation(), "Internal entity id: " + euid.getId());
+            throw new EntityException(euid.getSourceLoc(), "Internal entity id: " + euid.getId());
         }
 
         EntityTypeDefinition def = schema.getEntityType(euid.getType());
@@ -97,9 +97,9 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
             Set<String> actionTypes =
                     schema.actions().stream().map(ActionDefinition::getType).collect(Collectors.toSet());
             if (actionTypes.contains(euid.getType())) {
-                throw new EntityException(entity.getLocation(), "Action entity: " + entity.getEuid());
+                throw new EntityException(entity.getSourceLoc(), "Action entity: " + entity.getEuid());
             } else {
-                throw new EntityException(entity.getLocation(), "Undefined entity type: " + euid.getType());
+                throw new EntityException(entity.getSourceLoc(), "Undefined entity type: " + euid.getType());
             }
         }
         def.getShape().process(this, entity.getAttrs());
@@ -112,7 +112,7 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
                         .collect(Collectors.toSet());
                 memberOf.add(def.getName());
                 if (!memberOf.contains(parent.getType())) {
-                    throw new EntityException(value.getLocation(), "Unexpected parent type: " + parent.getType() + " expected one of " + memberOf);
+                    throw new EntityException(value.getSourceLoc(), "Unexpected parent type: " + parent.getType() + " expected one of " + memberOf);
                 }
             }
         }
@@ -122,7 +122,7 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
     private static <T extends EntityValue> T expectedType(EntityValue payload, Class<T> cls, String kind) {
         require(payload != null);
         if (!cls.isInstance(payload)) {
-            throw new EntityException(payload.getLocation(), "Expected " + kind);
+            throw new EntityException(payload.getSourceLoc(), "Expected " + kind);
         }
         return cls.cast(payload);
     }
@@ -136,13 +136,13 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
                 type.process(this, attrValue);
             }
             if (attrValue == null && type.isRequired()) {
-                throw new EntityException(payload.getLocation(), "Missing attribute: " + attr);
+                throw new EntityException(payload.getSourceLoc(), "Missing attribute: " + attr);
             }
         });
 
         value.forEach((attr, val) -> {
             if (!rec.hasAttribute(attr.getValue())) {
-                throw new EntityException(attr.getLocation(), "Unexpected attribute: " + attr);
+                throw new EntityException(attr.getSourceLoc(), "Unexpected attribute: " + attr);
             }
         });
     }
@@ -159,13 +159,13 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
         EntityTypeDefinition definition = type.getDefinition();
 
         if (!definition.getName().equals(ref.getType())) {
-            throw new EntityException(payload.getLocation(), "Unexpected type: expected" + definition.getName() + ", got " + ref.getType());
+            throw new EntityException(payload.getSourceLoc(), "Unexpected type: expected" + definition.getName() + ", got " + ref.getType());
         }
 
         // FIXME: Need to check if enum supports no values
         if (!definition.getEntityNamesEnum().isEmpty()) {
             if (!definition.getEntityNamesEnum().contains(ref.getId())) {
-                throw new EntityException(payload.getLocation(), "Unexpected ID " + ref.getId() +
+                throw new EntityException(payload.getSourceLoc(), "Unexpected ID " + ref.getId() +
                         " for type " + definition.getName() + ", expected one of " + definition.getEntityNamesEnum());
             }
         }
@@ -196,22 +196,22 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
 
     @Override
     public void visitDateTime(DateTimeType type, EntityValue payload) {
-        throw new EntityException(payload.getLocation(), "Unsupported element: " + payload);
+        throw new EntityException(payload.getSourceLoc(), "Unsupported element: " + payload);
     }
 
     @Override
     public void visitDecimal(DecimalType type, EntityValue payload) {
-        throw new EntityException(payload.getLocation(), "Unsupported element: " + payload);
+        throw new EntityException(payload.getSourceLoc(), "Unsupported element: " + payload);
     }
 
     @Override
     public void visitDuration(DurationType type, EntityValue payload) {
-        throw new EntityException(payload.getLocation(), "Unsupported element: " + payload);
+        throw new EntityException(payload.getSourceLoc(), "Unsupported element: " + payload);
     }
 
     @Override
     public void visitIpAddress(IpAddressType type, EntityValue payload) {
-        throw new EntityException(payload.getLocation(), "Unsupported element: " + payload);
+        throw new EntityException(payload.getSourceLoc(), "Unsupported element: " + payload);
     }
 
     @Override

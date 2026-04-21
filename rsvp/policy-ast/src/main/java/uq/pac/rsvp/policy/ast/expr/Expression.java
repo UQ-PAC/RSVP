@@ -9,10 +9,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
-import uq.pac.rsvp.policy.ast.PolicyFileEntry;
+import uq.pac.rsvp.policy.ast.AstNode;
+import uq.pac.rsvp.policy.ast.PolicyItem;
 import uq.pac.rsvp.support.SourceLoc;
 
-public abstract class Expression extends PolicyFileEntry {
+public abstract class Expression extends AstNode implements PolicyItem {
 
     protected static final Pattern NICE_PROP_NAME = Pattern.compile("[a-zA-Z0-9_]+");
 

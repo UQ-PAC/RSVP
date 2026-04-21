@@ -10,7 +10,7 @@ import java.util.Random;
 import java.util.Set;
 
 import uq.pac.rsvp.policy.ast.Policy;
-import uq.pac.rsvp.policy.ast.PolicyFileEntry;
+import uq.pac.rsvp.policy.ast.AstNode;
 import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
 import uq.pac.rsvp.policy.ast.expr.CallExpression;
@@ -254,7 +254,7 @@ public class Verification {
             super.visitUnaryExpr(expr);
         }
 
-        private void maybeAddRandomReport(PolicyFileEntry entry, int probability) {
+        private void maybeAddRandomReport(AstNode entry, int probability) {
             int p = random.nextInt(100);
             SourceLoc loc = entry.getSourceLoc();
             if (p <= probability && loc != SourceLoc.MISSING) {

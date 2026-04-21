@@ -83,12 +83,12 @@ class EntityReader {
                 return null;
             }
             if (val == null) {
-                throw new EntityException(entityRecord.getLocation(), "Missing " + name + " entity attribute");
+                throw new EntityException(entityRecord.getSourceLoc(), "Missing " + name + " entity attribute");
             }
             if (target.isInstance(val)) {
                 return target.cast(val);
             } else {
-                throw new EntityException(val.getLocation(), "Expected " + LABELS.get(target));
+                throw new EntityException(val.getSourceLoc(), "Expected " + LABELS.get(target));
             }
         }
     }
@@ -118,7 +118,7 @@ class EntityReader {
                 value.attributes().equals(Set.of(type, id)) &&
                 value.getValue(type) instanceof StringValue t &&
                 value.getValue(id) instanceof StringValue i) {
-            return new EntityReference(t.getValue(), i.getValue(), value.getLocation());
+            return new EntityReference(t.getValue(), i.getValue(), value.getSourceLoc());
         }
         return value;
     }
@@ -196,17 +196,17 @@ class EntityReader {
                     if (e instanceof EntityReference ref) {
                         return ref;
                     }
-                    throw new EntityException(e.getLocation(), "Expected entity reference");
+                    throw new EntityException(e.getSourceLoc(), "Expected entity reference");
                 })
                 .collect(Collectors.toSet());
 
         entityRecord.forEach(((attr, value) -> {
             if (!EntityAttribute.contains(attr.getValue())) {
-                throw new EntityException(attr.getLocation(), "Unexpected entity key: " + attr);
+                throw new EntityException(attr.getSourceLoc(), "Unexpected entity key: " + attr);
             }
         }));
 
-        return new Entity(uid, attrs, parents, context, entityRecord.getLocation());
+        return new Entity(uid, attrs, parents, context, entityRecord.getSourceLoc());
     }
 
     private EntitySet readEntitySet() throws IOException {

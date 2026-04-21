@@ -1,18 +1,18 @@
-package uq.pac.rsvp.policy.datalog.invariant;
+package uq.pac.rsvp.policy.ast.invariant;
 
 import uq.pac.rsvp.policy.ast.expr.Expression;
 
 
 public class Invariant {
-    private final InvariantQuantifier quantifier;
+    private final Quantifier quantifier;
     private final Expression expression;
 
-    public Invariant(InvariantQuantifier quantifier, Expression expression) {
-        this.quantifier = quantifier == null ? new InvariantQuantifier() : quantifier;
+    public Invariant(Quantifier quantifier, Expression expression) {
+        this.quantifier = quantifier == null ? new Quantifier() : quantifier;
         this.expression = expression;
     }
 
-    public InvariantQuantifier getQuantifier() {
+    public Quantifier getQuantifier() {
         return quantifier;
     }
 

@@ -1,4 +1,7 @@
-package uq.pac.rsvp.policy.datalog.invariant;
+package uq.pac.rsvp.policy.ast.invariant;
+
+import uq.pac.rsvp.policy.ast.expr.TypeExpression;
+import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 
 import java.util.Collections;
 import java.util.List;
@@ -7,7 +10,7 @@ import java.util.stream.Collectors;
 /**
  * Representation of a quantifier for invariant that captures
  */
-public class InvariantQuantifier {
+public class Quantifier {
     public enum Scope {
         ALL("all"),
         SOME("some"),
@@ -25,16 +28,16 @@ public class InvariantQuantifier {
         }
     }
 
-    public record Variable(String name, String type) { }
+    public record Variable(VariableExpression name, TypeExpression type) { }
 
     private final List<Variable> variables;
     private final Scope scope;
 
-    public InvariantQuantifier() {
+    public Quantifier() {
         this(Scope.ALL, Collections.emptyList());
     }
 
-    public InvariantQuantifier(Scope scope, List<Variable> variables) {
+    public Quantifier(Scope scope, List<Variable> variables) {
         this.variables = List.copyOf(variables);
         this.scope = scope;
     }
@@ -55,7 +58,7 @@ public class InvariantQuantifier {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         String vars = variables.stream()
-                .map(e -> e.name + ": " + e.type)
+                .map(e -> e.name.getReference() + ": " + e.type.getValue())
                 .collect(Collectors.joining(", "));
         if (!vars.isEmpty()) {
             sb.append("for ")

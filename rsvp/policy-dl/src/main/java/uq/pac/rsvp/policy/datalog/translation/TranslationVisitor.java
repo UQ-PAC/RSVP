@@ -2,7 +2,7 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.datalog.ast.*;
-import uq.pac.rsvp.policy.datalog.invariant.InvariantQuantifier;
+import uq.pac.rsvp.policy.ast.invariant.Quantifier;
 import uq.pac.rsvp.policy.datalog.visitors.VoidVisitorAdapter;
 
 import java.util.ArrayList;
@@ -73,15 +73,15 @@ public class TranslationVisitor extends VoidVisitorAdapter {
         return new DLRule(makeAtom(decl), visitor.expressions);
     }
 
-    public static DLRule translateInvariant(TranslationSchema schema, Collection<Expression> exprs, DLRuleDecl decl, InvariantQuantifier quantifier) {
+    public static DLRule translateInvariant(TranslationSchema schema, Collection<Expression> exprs, DLRuleDecl decl, Quantifier quantifier) {
         TranslationVisitor visitor = new TranslationVisitor(schema, TranslationContext.Invariant);
 
         // Grounding terms for typed variables of is straightforward in that
         // each variable belongs to the entity relation defined by its type
         visitor.expressions.add(new DLInlineComment("Ground terms"));
         quantifier.getVariables().forEach(var -> {
-            DLRuleDecl entityDecl = schema.getTranslationEntityType(var.type()).getEntityRuleDecl();
-            visitor.expressions.add(new DLAtom(entityDecl, DLTerm.var(var.name())));
+            DLRuleDecl entityDecl = schema.getTranslationEntityType(var.type().getValue()).getEntityRuleDecl();
+            visitor.expressions.add(new DLAtom(entityDecl, DLTerm.var(var.name().getReference())));
         });
 
         exprs.forEach(e -> {

@@ -1,8 +1,12 @@
-package uq.pac.rsvp.policy.datalog.invariant;
+package uq.pac.rsvp.policy.ast.invariant;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import uq.pac.rsvp.policy.ast.expr.Expression;
+import uq.pac.rsvp.policy.ast.expr.TypeExpression;
+import uq.pac.rsvp.policy.ast.expr.VariableExpression;
+import uq.pac.rsvp.policy.ast.CedarLexer;
+import uq.pac.rsvp.policy.ast.CedarParser;
 import uq.pac.rsvp.support.FileSource;
 
 import java.io.IOException;
@@ -37,7 +41,6 @@ public class InvariantSet {
         return parse(file.toString(), Files.readString(file));
     }
 
-
     public static InvariantSet parse(String text) {
         return parse("unknown", text);
     }
@@ -64,15 +67,16 @@ public class InvariantSet {
                     Expression expr = sv.visit(inv.expression());
                     // Quantifier is optional (defaults to ALL) unless variables are specified,
                     // since then this is basically a constant expression
-                    InvariantQuantifier quantifier = null;
+                    Quantifier quantifier = null;
                     if (inv.quantifier() != null) {
-                        InvariantQuantifier.Scope scope = InvariantQuantifier.Scope.valueOf(inv.quantifier().quant.getText().toUpperCase());
-                        List<InvariantQuantifier.Variable> variables =
-                                inv.quantifier().typedVariable().stream().map(tv ->
-                                        new InvariantQuantifier.Variable(tv.variable().getText(),
-                                                sv.getTypeExpression(tv.type()).getValue()))
-                                .toList();
-                        quantifier = new InvariantQuantifier(scope, variables);
+                        Quantifier.Scope scope = Quantifier.Scope.valueOf(inv.quantifier().quant.getText().toUpperCase());
+                        List<Quantifier.Variable> variables =
+                                inv.quantifier().typedVariable().stream().map(tv -> {
+                                    VariableExpression var = (VariableExpression) sv.visitVariable(tv.variable());
+                                    TypeExpression type = (TypeExpression) sv.visitType(tv.type());
+                                    return new Quantifier.Variable(var, type);
+                                }).toList();
+                        quantifier = new Quantifier(scope, variables);
                     }
                     return new Invariant(quantifier, expr);
                 }).toList();

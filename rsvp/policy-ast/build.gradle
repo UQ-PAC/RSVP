@@ -1,5 +1,30 @@
+plugins {
+    id "antlr"
+}
+
 dependencies {
     implementation project(':support')
+    // Antlr
+    antlr 'org.antlr:antlr4:4.13.2'
+    implementation 'org.antlr:antlr4-runtime:4.13.2'
+}
+
+generateGrammarSource {
+    maxHeapSize = "64m"
+    arguments += [ "-visitor",
+                   "-long-messages",
+                   "-package", "uq.pac.rsvp.policy.ast" ]
+    outputDirectory = file("${projectDir}/build/generated/java")
+}
+
+sourceSets {
+    main {
+        java.srcDirs += "${projectDir}/build/generated/java/"
+    }
+}
+
+compileJava {
+    dependsOn 'generateGrammarSource'
 }
 
 publishing {

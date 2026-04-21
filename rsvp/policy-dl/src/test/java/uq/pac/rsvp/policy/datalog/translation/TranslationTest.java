@@ -17,7 +17,7 @@ import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.datalog.TestUtil;
 import uq.pac.rsvp.policy.datalog.entity.EntityValidator;
-import uq.pac.rsvp.policy.datalog.invariant.Invariant;
+import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 import uq.pac.rsvp.policy.datalog.util.Logger;
 

@@ -24,7 +24,7 @@ public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDe
     private final Map<String, RecordTypeDefinition> entities;
     private final Map<String, RecordTypeDefinition> actions;
 
-    private InvariantValidator(InvariantValidator factory, Invariant invariant) {
+    private InvariantValidator(InvariantValidator factory, uq.pac.rsvp.policy.ast.invariant.Invariant invariant) {
         this.types = Map.copyOf(factory.types);
         this.entities = Map.copyOf(factory.entities);
         this.actions = Map.copyOf(factory.actions);
@@ -69,18 +69,18 @@ public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDe
         ));
     }
 
-    private static Map<String, RecordTypeDefinition> getVariables(Invariant invariant, Map<String, RecordTypeDefinition> types) {
+    private static Map<String, RecordTypeDefinition> getVariables(uq.pac.rsvp.policy.ast.invariant.Invariant invariant, Map<String, RecordTypeDefinition> types) {
         Map<String, RecordTypeDefinition> variables = new HashMap<>();
         invariant.getQuantifier().getVariables().forEach(var -> {
-            if (!types.containsKey(var.type())) {
+            if (!types.containsKey(var.type().getValue())) {
                 throw new Error("invalid type: %s in quantifier: %s. Available types: %s",
                         var.type(), invariant.getQuantifier(), types.keySet());
             }
-            if (variables.containsKey(var.name())) {
+            if (variables.containsKey(var.name().getReference())) {
                 throw new Error("duplicate variable name: %s in quantifier: %s",
                         var.name(), invariant.getQuantifier());
             }
-            variables.put(var.name(), types.get(var.type()));
+            variables.put(var.name().getReference(), types.get(var.type().getValue()));
         });
         return variables;
     }
@@ -99,7 +99,7 @@ public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDe
         return exprs.stream().map(this::collect).toList();
     }
 
-    public void validate(Invariant invariant) {
+    public void validate(uq.pac.rsvp.policy.ast.invariant.Invariant invariant) {
         require(this.variables == null);
         InvariantValidator validator = new InvariantValidator(this, invariant);
         expect(validator.collect(invariant.getExpression()), TBoolean);

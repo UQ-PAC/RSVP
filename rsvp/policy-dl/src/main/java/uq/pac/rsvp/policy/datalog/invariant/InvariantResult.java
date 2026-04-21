@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.datalog.invariant;
 
 import java.util.Set;
 
+import uq.pac.rsvp.policy.ast.invariant.Quantifier;
 import uq.pac.rsvp.policy.datalog.translation.Relation;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 
@@ -11,21 +12,21 @@ import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 public class InvariantResult {
 
     private final boolean holds;
-    private final Invariant invariant;
+    private final uq.pac.rsvp.policy.ast.invariant.Invariant invariant;
     private final Set<InvariantAssignment> assignments;
 
-    public InvariantResult(Invariant invariant, Relation relation) {
+    public InvariantResult(uq.pac.rsvp.policy.ast.invariant.Invariant invariant, Relation relation) {
         this.invariant = invariant;
-        this.assignments = Assignment.getAssignments(relation);
+        this.assignments = InvariantAssignment.getAssignments(relation);
         Quantifier.Scope scope = invariant.getQuantifier().getScope();
-        switch (scope) {
+        switch (invariant.getQuantifier().getScope()) {
             case SOME -> this.holds = !relation.isEmpty();
             case NONE, ALL -> this.holds = relation.isEmpty();
             default -> throw new TranslationError("Unreachable");
         }
     }
 
-    public Invariant getInvariant() {
+    public uq.pac.rsvp.policy.ast.invariant.Invariant getInvariant() {
         return invariant;
     }
 

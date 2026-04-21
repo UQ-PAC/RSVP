@@ -105,10 +105,10 @@ public class ParserTest {
     @Test
     @DisplayName("Invariant Parsing")
     void parseTest() {
-        InvariantSet invariants = InvariantSet.parse(INPUT);
+        uq.pac.rsvp.policy.ast.invariant.InvariantSet invariants = uq.pac.rsvp.policy.ast.invariant.InvariantSet.parse(INPUT);
         invariants.stream().forEach(i -> logger.info(YELLOW, i + ""));
         String text = invariants.stream()
-                        .map(Invariant::toString)
+                        .map(uq.pac.rsvp.policy.ast.invariant.Invariant::toString)
                         .collect(Collectors.joining("\n"));
         assertEquals(EXPECTED.trim(), text);
     }

@@ -1,19 +1,22 @@
-package uq.pac.rsvp.policy.datalog.invariant;
+package uq.pac.rsvp.policy.ast.invariant;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import uq.pac.rsvp.policy.ast.CedarBaseVisitor;
+import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.support.FileSource;
 import uq.pac.rsvp.support.LineLoc;
 import uq.pac.rsvp.support.SourceLoc;
 
-class SourceVisitor<T> extends CedarBaseVisitor<T> {
+
+class InvariantStatementVisitor extends CedarBaseVisitor<Expression> {
 
     private final FileSource fs;
 
-    public SourceVisitor(FileSource fs) {
+    public InvariantStatementVisitor(FileSource fs) {
         this.fs = fs;
     }
 
-    protected SourceLoc location(ParserRuleContext context) {
+    private SourceLoc location(ParserRuleContext context) {
         int startLine = context.start.getLine(),
                 startColumn = context.start.getCharPositionInLine() + 1,
                 endLine = context.stop.getLine(),

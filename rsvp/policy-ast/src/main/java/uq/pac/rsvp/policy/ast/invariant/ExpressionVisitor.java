@@ -1,13 +1,15 @@
-package uq.pac.rsvp.policy.datalog.invariant;
+package uq.pac.rsvp.policy.ast.invariant;
 
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import uq.pac.rsvp.policy.ast.CedarParser;
 import uq.pac.rsvp.policy.ast.expr.*;
-import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 import uq.pac.rsvp.support.FileSource;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static uq.pac.rsvp.policy.ast.expr.BinaryExpression.BinaryOp.*;
 
 class ExpressionVisitor extends SourceVisitor<Expression> {
 
@@ -15,15 +17,17 @@ class ExpressionVisitor extends SourceVisitor<Expression> {
         super(fs);
     }
 
-    TypeExpression getTypeExpression(CedarParser.TypeContext ctx) {
+    @Override
+    public Expression visitType(CedarParser.TypeContext ctx) {
         String type = ctx.ID().stream()
                 .map(ParseTree::getText)
                 .collect(Collectors.joining("::"));
         return new TypeExpression(type, location(ctx));
     }
 
-    Expression getActionOrEntityExpression(CedarParser.EntityContext ctx) {
-        String type = getTypeExpression(ctx.type()).getValue();
+    @Override
+    public Expression visitEntity(CedarParser.EntityContext ctx) {
+        String type = ((TypeExpression) visitType(ctx.type())).getValue();
         String eid = ctx.STRING().getText();
         eid = eid.substring(1, eid.length() - 1);
         if (type.equals("Action") || type.endsWith("::Action")) {
@@ -34,8 +38,13 @@ class ExpressionVisitor extends SourceVisitor<Expression> {
     }
 
     @Override
-    public Expression visitVariableExpr(CedarParser.VariableExprContext ctx) {
+    public Expression visitVariable(CedarParser.VariableContext ctx) {
         return new VariableExpression(ctx.getText(), location(ctx));
+    }
+
+    @Override
+    public Expression visitVariableExpr(CedarParser.VariableExprContext ctx) {
+        return visitVariable(ctx.variable());
     }
 
     @Override
@@ -91,14 +100,13 @@ class ExpressionVisitor extends SourceVisitor<Expression> {
 
     @Override
     public Expression visitIsExpr(CedarParser.IsExprContext ctx) {
-        return new BinaryExpression(ctx.expression().accept(this),
-                BinaryExpression.BinaryOp.Is, getTypeExpression(ctx.type()), location(ctx));
+        return new BinaryExpression(ctx.expression().accept(this), Is, visitType(ctx.type()), location(ctx));
     }
 
     @Override
     public Expression visitInExpr(CedarParser.InExprContext ctx) {
         return new BinaryExpression(ctx.expression().accept(this),
-                BinaryExpression.BinaryOp.In, getActionOrEntityExpression(ctx.entity()), location(ctx));
+                BinaryExpression.BinaryOp.In, visitEntity(ctx.entity()), location(ctx));
     }
 
     @Override
@@ -108,18 +116,18 @@ class ExpressionVisitor extends SourceVisitor<Expression> {
             attr = attr.substring(1, attr.length() - 1);
         }
         return new BinaryExpression(ctx.expression().accept(this),
-                BinaryExpression.BinaryOp.HasAttr, new StringExpression(attr), location(ctx));
+                HasAttr, new StringExpression(attr), location(ctx));
     }
 
     @Override
     public Expression visitComparisonExpr(CedarParser.ComparisonExprContext ctx) {
         BinaryExpression.BinaryOp op = switch (ctx.op.getText()) {
-            case "==" -> BinaryExpression.BinaryOp.Eq;
-            case "!=" -> BinaryExpression.BinaryOp.Neq;
-            case ">" -> BinaryExpression.BinaryOp.Greater;
-            case "<" -> BinaryExpression.BinaryOp.Less;
-            case ">=" -> BinaryExpression.BinaryOp.GreaterEq;
-            case "<=" -> BinaryExpression.BinaryOp.LessEq;
+            case "==" -> Eq;
+            case "!=" -> Neq;
+            case ">" -> Greater;
+            case "<" -> Less;
+            case ">=" -> GreaterEq;
+            case "<=" -> LessEq;
             default -> throw new AssertionError("unreachable");
         };
         return new BinaryExpression(ctx.expression(0).accept(this), op,
@@ -159,13 +167,12 @@ class ExpressionVisitor extends SourceVisitor<Expression> {
 
     @Override
     public Expression visitTypeExpr(CedarParser.TypeExprContext ctx) {
-        return getTypeExpression(ctx.type());
+        return visitType(ctx.type());
     }
 
     @Override
     public Expression visitEntityExpr(CedarParser.EntityExprContext ctx) {
-        // FIXME: Entity expression via Type expression, not string
-        return getActionOrEntityExpression(ctx.entity());
+        return visitEntity(ctx.entity());
     }
 
     @Override
@@ -181,11 +188,11 @@ class ExpressionVisitor extends SourceVisitor<Expression> {
 
     @Override
     public Expression visitInvariant(CedarParser.InvariantContext ctx) {
-        throw new TranslationError("Invariant in expression visitor");
+        throw new AssertionError("Invariant in expression visitor");
     }
 
     @Override
     public Expression visitProgram(CedarParser.ProgramContext ctx) {
-        throw new TranslationError("Program in expression visitor");
+        throw new AssertionError("Program in expression visitor");
     }
 }

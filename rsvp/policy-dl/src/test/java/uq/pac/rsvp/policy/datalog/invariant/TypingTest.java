@@ -237,7 +237,7 @@ public class TypingTest {
                 """.formatted(invariantText);
             Ansi.Color colour = pass ? GREEN : YELLOW;
             logger.info(colour, "[*] %s", invariantText);
-            validator.validate(InvariantSet.parse(text).stream().findAny().orElseThrow());
+            validator.validate(uq.pac.rsvp.policy.ast.invariant.InvariantSet.parse(text).stream().findAny().orElseThrow());
             if (!pass) {
                 throw new TranslationError("Unexpected test pass for invariant: " + invariantText);
             }

@@ -14,8 +14,8 @@ public class LocationTest {
     void test() throws RsvpException, IOException {
         Path photoapp = TestUtil.getResourceDir("translation", "photoapp");
         Schema schema = Schema.parseCedarSchema(Path.of(photoapp.toString(), "photoapp.cedarschema"));
-        InvariantSet invariants = InvariantSet.parse(Path.of(photoapp.toString(), "photoapp.invariant"));
-        Invariant invariant = invariants.stream()
+        uq.pac.rsvp.policy.ast.invariant.InvariantSet invariants = uq.pac.rsvp.policy.ast.invariant.InvariantSet.parse(Path.of(photoapp.toString(), "photoapp.invariant"));
+        uq.pac.rsvp.policy.ast.invariant.Invariant invariant = invariants.stream()
                 .findFirst()
                 .orElseThrow();
         System.out.println(invariant);

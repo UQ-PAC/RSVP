@@ -4,7 +4,7 @@ import com.cedarpolicy.value.EntityUID;
 import uq.pac.rsvp.policy.ast.entity.EntityReference;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.datalog.ast.*;
-import uq.pac.rsvp.policy.datalog.invariant.Invariant;
+import uq.pac.rsvp.policy.ast.invariant.Invariant;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -199,7 +199,7 @@ public class TranslationConstants {
     public static DLRuleDecl makeInvariantRuleDecl(Invariant invariant, int index) {
         String name = InvariantPrefix + index;
         List<DLDeclTerm> terms = invariant.getQuantifier().getVariables().stream()
-                .map(v -> new DLDeclTerm(v.name(), DLType.SYMBOL))
+                .map(v -> new DLDeclTerm(v.name().getReference(), DLType.SYMBOL))
                 .toList();
         return new DLRuleDecl(name, terms);
     }

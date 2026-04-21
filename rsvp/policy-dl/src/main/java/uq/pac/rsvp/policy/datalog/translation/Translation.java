@@ -60,9 +60,9 @@ import uq.pac.rsvp.policy.datalog.ast.DLRule;
 import uq.pac.rsvp.policy.datalog.ast.DLRuleDecl;
 import uq.pac.rsvp.policy.datalog.ast.DLTerm;
 import uq.pac.rsvp.policy.datalog.entity.EntityValidator;
-import uq.pac.rsvp.policy.datalog.invariant.Invariant;
+import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
-import uq.pac.rsvp.policy.datalog.invariant.InvariantSet;
+import uq.pac.rsvp.policy.ast.invariant.InvariantSet;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantValidator;
 
 /**

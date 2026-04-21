@@ -5,11 +5,11 @@ import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
 public class TypeExpression extends Expression {
-    private final String type;
+    private final String value;
 
     public TypeExpression(String value, SourceLoc source) {
         super(source);
-        this.type = value;
+        this.value = value;
     }
 
     public TypeExpression(String value) {
@@ -22,8 +22,8 @@ public class TypeExpression extends Expression {
         this(null, SourceLoc.MISSING);
     }
 
-    public String getType() {
-        return type;
+    public String getValue() {
+        return value;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class TypeExpression extends Expression {
 
     @Override
     public String toString() {
-        return type;
+        return value;
     }
 
     @Override
@@ -47,8 +47,8 @@ public class TypeExpression extends Expression {
             return true;
         } else if (other == null) {
             return false;
-        } else if (other instanceof TypeExpression var) {
-            return this.type.equals(var.type);
+        } else if (other instanceof TypeExpression te) {
+            return this.value.equals(te.value);
         }
         return false;
     }

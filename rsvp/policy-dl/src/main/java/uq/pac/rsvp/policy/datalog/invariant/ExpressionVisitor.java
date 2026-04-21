@@ -23,7 +23,7 @@ class ExpressionVisitor extends SourceVisitor<Expression> {
     }
 
     Expression getActionOrEntityExpression(CedarParser.EntityContext ctx) {
-        String type = getTypeExpression(ctx.type()).getType();
+        String type = getTypeExpression(ctx.type()).getValue();
         String eid = ctx.STRING().getText();
         eid = eid.substring(1, eid.length() - 1);
         if (type.equals("Action") || type.endsWith("::Action")) {

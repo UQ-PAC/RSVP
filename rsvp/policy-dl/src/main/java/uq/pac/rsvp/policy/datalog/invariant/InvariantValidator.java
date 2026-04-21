@@ -220,11 +220,11 @@ public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDe
 
     @Override
     public CommonTypeDefinition visitTypeExpr(TypeExpression expr) {
-        if (types.containsKey(expr.getType())) {
+        if (types.containsKey(expr.getValue())) {
             return TypeOfEntityType;
         }
         throw new Error("invalid type: %s in type expression: %s. Available types: %s",
-                expr.getType(), expr, types.keySet());
+                expr.getValue(), expr, types.keySet());
     }
 
     @Override

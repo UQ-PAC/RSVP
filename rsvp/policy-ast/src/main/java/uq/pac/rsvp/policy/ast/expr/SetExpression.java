@@ -1,6 +1,7 @@
 package uq.pac.rsvp.policy.ast.expr;
 
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import uq.pac.rsvp.support.SourceLoc;
@@ -13,14 +14,16 @@ public class SetExpression extends Expression {
 
     public SetExpression(Set<Expression> elements, SourceLoc source) {
         super(source);
-        this.elements = elements == null ? new HashSet<>() : new HashSet<>(elements);
+        this.elements = elements == null ? Set.of() :
+                // Preserve the order of the original set (if the order is imposed)
+                Collections.unmodifiableSet(new LinkedHashSet<>(elements));
     }
 
     public SetExpression(Set<Expression> elements) {
         this(elements, SourceLoc.MISSING);
     }
 
-    public SetExpression() {
+    private SetExpression() {
         this(null, SourceLoc.MISSING);
     }
 
@@ -53,5 +56,4 @@ public class SetExpression extends Expression {
         sb.append(']');
         return sb.toString();
     }
-
 }

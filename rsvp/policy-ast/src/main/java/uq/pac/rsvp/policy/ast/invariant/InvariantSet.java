@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
 
+// FIXME: Remove in favour of Program
 public class InvariantSet {
     private final Set<Invariant> invariants;
 

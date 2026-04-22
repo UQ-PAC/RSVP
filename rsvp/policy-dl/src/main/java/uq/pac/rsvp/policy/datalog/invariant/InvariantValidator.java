@@ -71,7 +71,7 @@ public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDe
         ));
     }
 
-    private static Map<String, RecordTypeDefinition> getVariables(uq.pac.rsvp.policy.ast.invariant.Invariant invariant, Map<String, RecordTypeDefinition> types) {
+    private static Map<String, RecordTypeDefinition> getVariables(Invariant invariant, Map<String, RecordTypeDefinition> types) {
         Map<String, RecordTypeDefinition> variables = new HashMap<>();
         invariant.getQuantifier().getVariables().forEach(var -> {
             if (!types.containsKey(var.type().getValue())) {
@@ -101,7 +101,7 @@ public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDe
         return exprs.stream().map(this::collect).toList();
     }
 
-    public void validate(uq.pac.rsvp.policy.ast.invariant.Invariant invariant) {
+    public void validate(Invariant invariant) {
         require(this.variables == null);
         InvariantValidator validator = new InvariantValidator(this, invariant);
         expect(validator.collect(invariant.getExpression()), TBoolean);

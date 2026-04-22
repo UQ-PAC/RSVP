@@ -16,6 +16,7 @@ import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
+//FIXME: Remove in favour of program
 public class PolicySet extends PolicyAstNode {
 
     private final List<Policy> policies;

@@ -15,6 +15,7 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;
+import uq.pac.rsvp.policy.ast.invariant.Program;
 import uq.pac.rsvp.policy.datalog.TestUtil;
 import uq.pac.rsvp.policy.datalog.entity.EntityValidator;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
@@ -135,6 +136,10 @@ public class TranslationTest {
         logger.info(YELLOW, "Policy: " + test.policy)
                 .info(MAGENTA, "Datalog specification: " + test.datalogDir + "/" + TranslationConstants.ProgramName)
                 .fine(CYAN, Files.readString(test.policy));
+
+        // FIXME: Check whether program can parse. Rework
+        Program.parse(test.policy);
+        Program.parse(test.invariants);
 
         long lines = Files.readAllLines(test.policy).stream()
                 .map(String::trim)

@@ -1,17 +1,22 @@
 package uq.pac.rsvp.policy.ast;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
 import com.google.gson.annotations.SerializedName;
 
+import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
+import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
 import uq.pac.rsvp.support.SourceLoc;
 
 import uq.pac.rsvp.policy.ast.expr.Expression;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
-public class Policy extends PolicyAstNode {
+import static uq.pac.rsvp.policy.ast.Policy.Effect.Permit;
+import static uq.pac.rsvp.policy.ast.expr.BinaryExpression.BinaryOp.And;
+import static uq.pac.rsvp.policy.ast.expr.UnaryExpression.UnaryOp.Not;
+
+public class Policy extends Statement {
 
     public enum Effect {
         @SerializedName("permit")
@@ -51,7 +56,7 @@ public class Policy extends PolicyAstNode {
     }
 
     public boolean isPermit() {
-        return effect == Effect.Permit;
+        return effect == Permit;
     }
 
     public boolean isForbid() {
@@ -67,7 +72,7 @@ public class Policy extends PolicyAstNode {
      * from a Cedar formatted policy file, this name will be the identifier assigned
      * by Cedar and should correspond to any Cedar log messages. If this policy was
      * created manually, the name may be {@code null}.
-     *
+     * <p>
      * Names are not currently checked for uniqueness. If constructed manually, it
      * is possible for more than one policy to have the same name.
      * 
@@ -93,6 +98,64 @@ public class Policy extends PolicyAstNode {
 
     @Override
     public String toString() {
-        return (effect == Effect.Permit ? "permit" : "forbid") + " on: " + condition.toString();
+        return (effect == Permit ? "permit" : "forbid") + " on: " + condition.toString();
+    }
+
+    public static class Builder {
+        private Effect effect;
+        private Expression condition;
+        private String name;
+        private final Map<String, String> annotations;
+        private SourceLoc location;
+
+        public Builder() {
+            this.effect = Permit;
+            this.condition = null;
+            this.name = null;
+            this.annotations = new HashMap<>();
+            this.location = SourceLoc.MISSING;
+        }
+
+        public Builder and(Expression e) {
+            if (e != null) {
+                this.condition = condition == null ? e : new BinaryExpression(e, And, condition);
+            }
+            return this;
+        }
+
+        public Builder andNot(Expression e) {
+            if (e != null) {
+                return and(new UnaryExpression(Not, e));
+            }
+            return this;
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder effect(Effect effect) {
+            this.effect = effect;
+            return this;
+        }
+
+        public Builder location(SourceLoc location) {
+            this.location = location;
+            return this;
+        }
+
+        public Builder annotation(String name, String value) {
+            annotations.put(name, value);
+            return this;
+        }
+
+        public Builder annotation(String name) {
+            return annotation(name, null);
+        }
+
+        public Policy build() {
+            return new Policy(name, effect, condition, annotations, location);
+        }
     }
 }

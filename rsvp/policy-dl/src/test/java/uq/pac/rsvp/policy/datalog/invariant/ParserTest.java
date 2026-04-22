@@ -2,14 +2,16 @@ package uq.pac.rsvp.policy.datalog.invariant;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import uq.pac.rsvp.policy.ast.invariant.Invariant;
+import uq.pac.rsvp.policy.ast.invariant.Program;
 import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.policy.datalog.util.Logger;
 
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.fusesource.jansi.Ansi.Color.YELLOW;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ParserTest {
 
@@ -17,54 +19,58 @@ public class ParserTest {
 
     private static final String INPUT = """
         // Literal
-        invariant true;
-        invariant false;
-        invariant false && false || !true;
+        true
+        false
+        false && false || !true
         // Variable
-        invariant principal;
+        principal
         // Property access
-        invariant principal.album.photo;
+        principal.album.photo
         // Property access with function call
-        invariant principal.album.photo.isEmpty();
+        principal.album.photo.isEmpty()
         // Function call without property access
-        invariant allow(principal, resource, action);
+        allow(principal, resource, action)
         // Type
-        invariant Principal::Album::Photo;
+        Principal::Album::Photo
         // Entity
-        invariant Resource::Picture::Kind::"Forest";
-        invariant Photoapp::Action::"view";
+        Resource::Picture::Kind::"Forest"
+        Photoapp::Action::"view"
         // Literal string
-        invariant "view";
+        "view"
         // Literal long
-        invariant 42;
-        invariant -42;
+        42
+        -42
+        // Literal Array
+        []
+        [1]
+        [1, 2]
         // In
-        invariant resource is Resource::Picture::Kind;
+        resource is Resource::Picture::Kind
         // Is
-        invariant resource in Resource::Picture::Kind::"Forest";
+        resource in Resource::Picture::Kind::"Forest"
         // Has
-        invariant principal has "attr";
-        invariant principal has attr;
+        principal has "attr"
+        principal has attr;
         // Conjunction
-        invariant principal.album.photo && resource;
+        principal.album.photo && resource
         // Disjunction
-        invariant principal.album.photo || resource;
-        invariant (principal.album.photo || resource);
+        principal.album.photo || resource
+        (principal.album.photo || resource)
         // Negation
-        invariant !principal.album.photo;
-        invariant !(principal.album.photo || resource);
+        !principal.album.photo
+        !(principal.album.photo || resource)
         // Equality
-        invariant a == b && c != d;
-        invariant a == "a" && c != "c";
-        invariant a == 1 && c != 2;
+        a == b && c != d
+        a == "a" && c != "c"
+        a == 1 && c != 2
         // Quantifiers
-        invariant resource == Resource::Picture::Kind::"Forest" for some resource: Resource::Picture::Kind;
-        invariant resource.foo == "foo" && principal.bar == "bar" for all resource:  Resource::Picture, principal: Album::Photo;
+        resource == Resource::Picture::Kind::"Forest" for some resource: Resource::Picture::Kind;
+        resource.foo == "foo" && principal.bar == "bar" for all resource:  Resource::Picture, principal: Album::Photo;
         // Arithmetic precedence
-        invariant -1 + 2 * 3 == 6 * 7 + 8;
+        -1 + 2 * 3 == 6 * 7 + 8
         // Conditional expressions
-        invariant if true then false else true;
-        invariant "a\\nb\\t\\"";
+        if true then false else true
+        "a\\nb\\t\\""
         """;
 
     private static final String EXPECTED = """
@@ -81,6 +87,9 @@ public class ParserTest {
         invariant "view";
         invariant 42;
         invariant -42;
+        invariant [];
+        invariant [1];
+        invariant [1, 2];
         invariant (resource is Resource::Picture::Kind);
         invariant (resource in Resource::Picture::Kind::"Forest");
         invariant (principal has "attr");
@@ -105,12 +114,19 @@ public class ParserTest {
     @Test
     @DisplayName("Invariant Parsing")
     void parseTest() {
-        uq.pac.rsvp.policy.ast.invariant.InvariantSet invariants = uq.pac.rsvp.policy.ast.invariant.InvariantSet.parse(INPUT);
-        invariants.stream().forEach(i -> logger.info(YELLOW, i + ""));
-        String text = invariants.stream()
-                        .map(uq.pac.rsvp.policy.ast.invariant.Invariant::toString)
-                        .collect(Collectors.joining("\n"));
-        assertEquals(EXPECTED.trim(), text);
+        List<String> strings = Arrays.stream(INPUT.split("\\n"))
+                .filter(l -> !l.trim().startsWith("//"))
+                .toList();
+
+        StringBuilder sb = new StringBuilder();
+        strings.forEach(s -> {
+            String text = "invariant %s;".formatted(s);
+            logger.info(YELLOW, text);
+            Invariant invariant = Program.parse(text).invariants().findFirst().orElseThrow();
+            sb.append(invariant).append('\n');
+        });
+
+        assertEquals(EXPECTED.trim(), sb.toString().trim());
     }
 
     // Some components of the invariant checking rely on the fact that boolean type

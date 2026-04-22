@@ -3,6 +3,7 @@ package uq.pac.rsvp.policy.datalog.invariant;
 import java.util.Set;
 
 import uq.pac.rsvp.policy.ast.invariant.Quantifier;
+import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.datalog.translation.Relation;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 
@@ -12,10 +13,10 @@ import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 public class InvariantResult {
 
     private final boolean holds;
-    private final uq.pac.rsvp.policy.ast.invariant.Invariant invariant;
+    private final Invariant invariant;
     private final Set<InvariantAssignment> assignments;
 
-    public InvariantResult(uq.pac.rsvp.policy.ast.invariant.Invariant invariant, Relation relation) {
+    public InvariantResult(Invariant invariant, Relation relation) {
         this.invariant = invariant;
         this.assignments = InvariantAssignment.getAssignments(relation);
         Quantifier.Scope scope = invariant.getQuantifier().getScope();
@@ -26,7 +27,7 @@ public class InvariantResult {
         }
     }
 
-    public uq.pac.rsvp.policy.ast.invariant.Invariant getInvariant() {
+    public Invariant getInvariant() {
         return invariant;
     }
 

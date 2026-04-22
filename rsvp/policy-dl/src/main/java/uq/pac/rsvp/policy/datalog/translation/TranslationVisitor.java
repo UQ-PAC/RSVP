@@ -142,6 +142,7 @@ public class TranslationVisitor extends VoidVisitorAdapter {
                 expressions.add(new DLAtom(decl, negated, var));
             }
             case In -> {
+                // FIXME: Need to check the case of `IN` where rhs is a set rather than en entity
                 DLTerm lhs = getOperand(expr.getLeft()),
                         rhs = getOperand(expr.getRight());
                 expressions.add(new DLAtom(ParentOfRuleDecl, negated, rhs, lhs));

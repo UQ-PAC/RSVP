@@ -6,7 +6,10 @@ import uq.pac.rsvp.policy.ast.CedarParser;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.support.FileSource;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static uq.pac.rsvp.policy.ast.expr.BinaryExpression.BinaryOp.*;
@@ -105,8 +108,8 @@ class ExpressionVisitor extends SourceVisitor<Expression> {
 
     @Override
     public Expression visitInExpr(CedarParser.InExprContext ctx) {
-        return new BinaryExpression(ctx.expression().accept(this),
-                BinaryExpression.BinaryOp.In, visitEntity(ctx.entity()), location(ctx));
+        return new BinaryExpression(ctx.expression(0).accept(this),
+                BinaryExpression.BinaryOp.In, ctx.expression(1).accept(this), location(ctx));
     }
 
     @Override
@@ -158,10 +161,12 @@ class ExpressionVisitor extends SourceVisitor<Expression> {
             }
         }
         String fun = ctx.ID().getText();
-        List<Expression> args = ctx.callArguments().expression().stream()
-                .map(c -> c.accept(this))
-                .toList();
-
+        List<Expression> args = Collections.emptyList();
+        if (ctx.expressionList() != null) {
+            args = ctx.expressionList().expression().stream()
+                    .map(c -> c.accept(this))
+                    .toList();
+        }
         return new CallExpression(object, fun, args, location(ctx));
     }
 
@@ -173,6 +178,17 @@ class ExpressionVisitor extends SourceVisitor<Expression> {
     @Override
     public Expression visitEntityExpr(CedarParser.EntityExprContext ctx) {
         return visitEntity(ctx.entity());
+    }
+
+    @Override
+    public Expression visitSetExpr(CedarParser.SetExprContext ctx) {
+        Set<Expression> expressions = Collections.emptySet();
+        if (ctx.expressionList() != null) {
+            expressions = ctx.expressionList().expression().stream()
+                    .map(e -> e.accept(this))
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+        }
+        return new SetExpression(expressions, location(ctx));
     }
 
     @Override

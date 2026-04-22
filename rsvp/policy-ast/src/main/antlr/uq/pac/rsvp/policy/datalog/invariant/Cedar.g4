@@ -1,16 +1,24 @@
 grammar Cedar;
 
 // Reserved Keywords
-FOR:   'for';
-ALL:   'all';
-SOME:  'some';
-NONE:  'none';
-IS:    'is';
-IN:    'in';
-HAS:   'has';
+FOR: 'for';
+ALL: 'all';
+SOME: 'some';
+NONE: 'none';
+IS: 'is';
+IN: 'in';
+HAS: 'has';
 WHERE: 'where';
-TRUE:  'true';
+TRUE: 'true';
 FALSE: 'false';
+WHEN: 'when';
+UNLESS: 'unless';
+PERMIT: 'permit';
+FORBID: 'forbid';
+INVARIANT: 'invariant';
+IF: 'if';
+THEN: 'then';
+ELSE: 'else';
 
 // Identifier
 ID: [A-Za-z][A-Za-z0-9_]*;
@@ -32,22 +40,27 @@ WS: [ \r\n\t]+ -> skip;
 literal: TRUE | FALSE;
 variable: ID;
 property: ID ('.' ID)*;
+
+// Entity or action type, such as App::Account
 type: ID ('::' ID)*;
+
+// Literal entity, such as App::Account::"Alice"
 entity: type '::' STRING;
 
 expression :
       literal                                                          # literalExpr
     | variable                                                         # variableExpr
     | property                                                         # propertyExpr
-    | (property '.')? ID callArguments                                 # callExpr
+    | (property '.')? ID '(' expressionList? ')'                       # callExpr
     | type                                                             # typeExpr
     | entity                                                           # entityExpr
     | STRING                                                           # stringExpr
     | LONG                                                             # longExpr
-    | expression IN entity                                             # inExpr
+    | expression IN expression                                         # inExpr
     | expression IS type                                               # isExpr
     | expression HAS attr=(ID | STRING)                                # hasExpr
     | '(' expression ')'                                               # groupingExpr
+    | '[' expressionList? ']'                                          # setExpr
     | '!' expression                                                   # negationExpr
     | '-' expression                                                   # arithNegationExpr
     | expression op='*' expression                                     # arithExpr
@@ -55,13 +68,11 @@ expression :
     | expression op=('==' | '!=' | '>' | '<' | '>=' | '<=') expression # comparisonExpr
     | expression '&&' expression                                       # conjunctionExpr
     | expression '||' expression                                       # disjunctionExpr
-    | 'if' expression 'then' expression 'else' expression              # conditionalExpr
+    | IF expression THEN expression ELSE expression                    # conditionalExpr
 ;
 
-callArguments:
-    | '(' ')'
-    | '(' expression (',' expression)* ')'
-;
+expressionList:
+    expression (',' expression)*;
 
 typedVariable: variable ':' type;
 quantifier:
@@ -69,17 +80,22 @@ quantifier:
 ;
 
 invariant:
-    'invariant' expression quantifier? ';'
+    INVARIANT expression quantifier? ';'
 ;
 
+annotation: '@' ID | '@' ID '(' STRING ')';
+when: WHEN '{'  expression '}';
+unless: UNLESS '{'  expression '}';
+
 policy:
-    perm=('permit' | 'forbid') '{'
+    annotation*
+    perm=(PERMIT | FORBID) '('
         expression ','
         expression ','
-        expression
-        'when' '{'  expression '}'
-        'unless' '{' expression '}'
-    '}' ';'?
+        expression ')'
+        when?
+        unless?
+    ';'?
 ;
 
 program : (invariant | policy)*;

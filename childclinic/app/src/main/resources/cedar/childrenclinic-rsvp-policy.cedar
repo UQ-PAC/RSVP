@@ -42,6 +42,7 @@ forbid (
 )
 when {
     resource is ChildrenClinic::Patient ||
+    resource is ChildrenClinic::ResponsibleAdult ||
     resource is ChildrenClinic::Visit
 };
 
@@ -70,15 +71,20 @@ when {
     (
         resource is ChildrenClinic::Employee ||
         resource is ChildrenClinic::Patient ||
+        resource is ChildrenClinic::ResponsibleAdult ||
         resource is ChildrenClinic::Visit
     ) &&
     resource.clinics.containsAny(principal.clinics)
 }
 unless {
-    action in [ChildrenClinic::Action::"AddPatient",
+    action in [ChildrenClinic::Action::"AddAdult",
                ChildrenClinic::Action::"AddEmployee",
+               ChildrenClinic::Action::"AddPatient",
+               ChildrenClinic::Action::"AddVisit",
+               ChildrenClinic::Action::"DeleteAdult",
+               ChildrenClinic::Action::"DeleteEmployee",
                ChildrenClinic::Action::"DeletePatient",
-               ChildrenClinic::Action::"DeleteEmployee"] ||
+               ChildrenClinic::Action::"DeleteVisit"] ||
     (
         resource has roles &&
         resource.roles.contains(ChildrenClinic::EmployeeRole::"Administrator")
@@ -86,14 +92,16 @@ unless {
 };
 
 // 'policy6'
-// Every Secretary can add patients to their Clinics' data.
-@id("Policy: Secretary can add patients to their Clinics.")
+// Every Secretary can add patients and adults to their Clinics' data.
+@id("Policy: Secretary can add patients and adults to their Clinics.")
 permit (
     principal is ChildrenClinic::Employee,
-    action == ChildrenClinic::Action::"AddPatient",
+    action,
     resource is ChildrenClinic::Clinic
 )
 when {
+    action in [ChildrenClinic::Action::"AddAdult",
+               ChildrenClinic::Action::"AddPatient"] &&
     principal.roles.contains(ChildrenClinic::EmployeeRole::"Secretary") &&
     principal.clinics.contains(resource)
 };
@@ -119,16 +127,22 @@ unless {
 };
 
 // 'policy8'
-// Every Doctor can add their patients' data.
-@id("Policy: Doctor can add their patients.")
+// Every Doctor can add patients and adults to their Clinics' data.
+@id("Policy: Doctor can add patients and adults to their Clinics.")
 permit (
     principal is ChildrenClinic::Employee,
-    action == ChildrenClinic::Action::"AddPatient",
+    action,
     resource is ChildrenClinic::Clinic
 )
 when {
+    action in [ChildrenClinic::Action::"AddAdult",
+               ChildrenClinic::Action::"AddPatient"] &&
     principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
     principal.clinics.contains(resource)
+}
+unless {
+    principal has level &&
+    principal.level == ChildrenClinic::ProfessionalLevel::"Intern"
 };
 
 // 'policy9'
@@ -235,3 +249,18 @@ unless {
                                     ChildrenClinic::EmployeeRole::"Doctor"])
     )
 };
+
+// // 'policyXX'
+// // Test for 'adults' set of records.
+// @id("Policy: ")
+// permit (
+//     principal,
+//     action == ChildrenClinic::Action::"ViewVisit",
+//     resource is ChildrenClinic::Visit
+// )
+// when {
+//     resource.patient.adults.contains({
+//         adult: principal,
+//         authority: ChildrenClinic::AdultAuthority::"Parent"
+//     })
+// };

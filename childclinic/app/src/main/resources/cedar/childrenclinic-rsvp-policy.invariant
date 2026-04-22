@@ -41,12 +41,12 @@ entity.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") --> entity has lev
 entity has manager --> entity.manager != entity
     for all entity: ChildrenClinic::Employee;
 
-// 7. AccompanyingAdult should have name.
-@invariant("AccompanyingAdult data.")
-entity has name
-    for all entity: ChildrenClinic::AccompanyingAdult;
+// 7. ResponsibleAdult should have name and clinics.
+@invariant("ResponsibleAdult data.")
+entity has name && entity has clinics
+    for all entity: ChildrenClinic::ResponsibleAdult;
 
-// 8. Patient should have name, adults, clinics, and doctors
+// 8. Patient should have name, adults, clinics, and doctors.
 @invariant("Patient data.")
 entity has name && entity has adults && entity has clinics && entity has doctors
     for all entity: ChildrenClinic::Patient;

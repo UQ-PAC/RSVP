@@ -17,12 +17,15 @@ import uq.pac.rsvp.policy.ast.expr.StringExpression;
 import uq.pac.rsvp.policy.ast.expr.TypeExpression;
 import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
+import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.ast.invariant.Quantifier;
 
 public interface PolicyVisitor {
     void visitPolicySet(PolicySet policySet);
 
     void visitPolicy(Policy policy);
+
+    void visitInvariant(Invariant invariant);
 
     void visitQuantifier(Quantifier quantifier);
 

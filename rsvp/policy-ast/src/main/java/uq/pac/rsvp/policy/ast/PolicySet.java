@@ -12,12 +12,11 @@ import com.cedarpolicy.model.exception.InternalException;
 
 import com.google.gson.*;
 import uq.pac.rsvp.RsvpException;
-import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
-public class PolicySet extends PolicyItem {
+public class PolicySet extends PolicyAstNode {
 
     private final List<Policy> policies;
 

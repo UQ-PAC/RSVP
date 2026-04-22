@@ -1,6 +1,6 @@
 package uq.pac.rsvp.policy.ast.invariant;
 
-import uq.pac.rsvp.policy.ast.PolicyItem;
+import uq.pac.rsvp.policy.ast.PolicyAstNode;
 import uq.pac.rsvp.policy.ast.expr.TypeExpression;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 /**
  * Representation of a quantifier for invariant that captures
  */
-public class Quantifier extends PolicyItem {
+public class Quantifier extends PolicyAstNode {
 
     public enum Scope {
         ALL("all"),

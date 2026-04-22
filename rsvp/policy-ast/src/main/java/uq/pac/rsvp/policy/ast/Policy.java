@@ -11,7 +11,7 @@ import uq.pac.rsvp.policy.ast.expr.Expression;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
-public class Policy extends PolicyItem {
+public class Policy extends PolicyAstNode {
 
     public enum Effect {
         @SerializedName("permit")

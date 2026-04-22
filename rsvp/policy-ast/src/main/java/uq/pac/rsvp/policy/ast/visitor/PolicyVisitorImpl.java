@@ -18,6 +18,7 @@ import uq.pac.rsvp.policy.ast.expr.StringExpression;
 import uq.pac.rsvp.policy.ast.expr.TypeExpression;
 import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
+import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.ast.invariant.Quantifier;
 
 // Basic visitor implementation. Visits each expression tree in a policy set.
@@ -32,6 +33,12 @@ public abstract class PolicyVisitorImpl implements PolicyVisitor {
     @Override
     public void visitPolicy(Policy policy) {
         policy.getCondition().accept(this);
+    }
+
+    @Override
+    public void visitInvariant(Invariant invariant) {
+        invariant.getExpression().accept(this);
+        invariant.getQuantifier().accept(this);
     }
 
     @Override
@@ -94,35 +101,27 @@ public abstract class PolicyVisitorImpl implements PolicyVisitor {
 
     // Literal expressions
     @Override
-    public void visitVariableExpr(VariableExpression expr) {
-    }
+    public void visitVariableExpr(VariableExpression expr) {}
 
     @Override
-    public void visitActionExpr(ActionExpression expr) {
-    }
+    public void visitActionExpr(ActionExpression expr) {}
 
     @Override
-    public void visitBooleanExpr(BooleanExpression expr) {
-    }
+    public void visitBooleanExpr(BooleanExpression expr) {}
 
     @Override
-    public void visitEntityExpr(EntityExpression expr) {
-    }
+    public void visitEntityExpr(EntityExpression expr) {}
 
     @Override
-    public void visitLongExpr(LongExpression expr) {
-    }
+    public void visitLongExpr(LongExpression expr) {}
 
     @Override
-    public void visitSlotExpr(SlotExpression expr) {
-    }
+    public void visitSlotExpr(SlotExpression expr) {}
 
     @Override
-    public void visitStringExpr(StringExpression expr) {
-    }
+    public void visitStringExpr(StringExpression expr) {}
 
     @Override
-    public void visitTypeExpr(TypeExpression expr) {
-    }
+    public void visitTypeExpr(TypeExpression expr) {}
 
 }

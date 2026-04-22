@@ -3,6 +3,7 @@ package uq.pac.rsvp.policy.datalog.translation;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.expr.*;
+import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.ast.invariant.Quantifier;
 import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
@@ -195,6 +196,11 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
     @Override
     public Expression visitPolicy(Policy policy) {
         throw new TranslationError("Unsupported transformation for: " + policy);
+    }
+
+    @Override
+    public Expression visitInvariant(Invariant invariant) {
+        throw new TranslationError("Unsupported transformation for: " + invariant);
     }
 
     @Override

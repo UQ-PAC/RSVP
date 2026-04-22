@@ -4,9 +4,9 @@ import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
-public abstract class PolicyItem extends AstNode {
+public abstract class PolicyAstNode extends AstNode {
 
-    public PolicyItem(SourceLoc location) {
+    public PolicyAstNode(SourceLoc location) {
         super(location);
     }
 

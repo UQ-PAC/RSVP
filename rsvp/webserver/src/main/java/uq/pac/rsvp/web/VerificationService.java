@@ -108,6 +108,20 @@ public class VerificationService {
 
         Path entitiesFile = session.getFile(entities.iterator().next());
 
+        Set<String> invariants = verification.getInvariants();
+        if (invariants.size() > 1) {
+            logger.error("Bad request: too many invariant files (more than 1)");
+            throw new ErrorResponseException(HttpStatus.BAD_REQUEST);
+        }
+
+        Path invariantsFile = null;
+        String invariantsFileId = null;
+
+        if (!invariants.isEmpty()) {
+            invariantsFileId = invariants.iterator().next();
+            invariantsFile = session.getFile(invariantsFileId);
+        }
+
         for (List<VersionedPolicy> policy : versionedPolicies) {
             if (policy.size() > 0) {
                 // TODO: enable multiple files parsed to single policy set
@@ -120,9 +134,10 @@ public class VerificationService {
                     throw new ErrorResponseException(HttpStatus.BAD_REQUEST);
                 }
 
-                Set<Report> all = Verification.verifyPolicies(fileId, file, schemaFile, entitiesFile);
+                Set<Report> all = Verification.verifyPolicies(fileId, file, schemaFile,
+                        entitiesFile, invariantsFileId, invariantsFile);
 
-                logger.info(all.toString());
+                // logger.info(all.toString());
 
                 result.addAll(all);
             }

@@ -21,6 +21,8 @@ import uq.pac.rsvp.policy.ast.expr.SetExpression;
 import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitorImpl;
+import uq.pac.rsvp.policy.datalog.invariant.Invariant;
+import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestSet;
 import uq.pac.rsvp.policy.datalog.translation.Translation;
@@ -30,7 +32,8 @@ import uq.pac.rsvp.support.reporting.Report.Severity;
 
 public class Verification {
 
-    public static Set<Report> verifyPolicies(String policyFilename, Path policiesPath, Path schemaPath, Path entities)
+    public static Set<Report> verifyPolicies(String policyFilename, Path policiesPath, Path schemaPath, Path entities,
+            String invariantsFilename, Path invariantsPath)
             throws RsvpException, IOException {
 
         Set<Report> results = new HashSet<>();
@@ -41,7 +44,7 @@ public class Verification {
         PolicySet policies = PolicySet.parseCedarPolicySet(policyFilename, Files.readString(policiesPath));
 
         Translation translation =
-                new Translation(schema, policies, entities, null, dlPath);
+                new Translation(schema, policies, entities, invariantsPath, dlPath);
 
         Map<Policy, RequestSet> policyResults = translation.getPolicyResult();
 
@@ -169,6 +172,17 @@ public class Verification {
                         + "uniquely match any request",
                         "Removing this policy would (by itself) have no effect",
                         p.getSourceLoc());
+                results.add(r);
+            }
+        });
+
+        // Check invariants and report any that don't hold
+        Map<Invariant,InvariantResult> invariantResults = translation.getInvariantResult();
+        invariantResults.forEach((k, v) -> {
+            if (!v.holds()) {
+                // FIXME fix source location
+                Report r = new Report(Severity.Error, "Invariant '" + k.getName() + "' does not "
+                        + "hold", new SourceLoc(invariantsFilename, 0, 1, 1, 1));
                 results.add(r);
             }
         });

@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.UndefinedEntityUIDName;
-import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
+import static uq.pac.rsvp.Assertion.require;
 
 /**
  * Validation of a set of entities with respect to a schema.

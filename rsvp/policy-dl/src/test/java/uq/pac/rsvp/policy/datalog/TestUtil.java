@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
+import static uq.pac.rsvp.Assertion.require;
 
 public class TestUtil {
     /**

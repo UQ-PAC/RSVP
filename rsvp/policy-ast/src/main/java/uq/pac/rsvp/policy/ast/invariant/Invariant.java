@@ -1,10 +1,10 @@
 package uq.pac.rsvp.policy.ast.invariant;
 
+import uq.pac.rsvp.policy.ast.Statement;
 import uq.pac.rsvp.policy.ast.expr.Expression;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 import uq.pac.rsvp.support.SourceLoc;
-
 
 public class Invariant extends Statement {
     private final Quantifier quantifier;

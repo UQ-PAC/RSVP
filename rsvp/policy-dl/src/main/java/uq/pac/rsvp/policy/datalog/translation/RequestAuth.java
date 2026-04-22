@@ -3,7 +3,7 @@ package uq.pac.rsvp.policy.datalog.translation;
 import java.util.*;
 
 import static uq.pac.rsvp.policy.datalog.translation.RequestAuth.Decision.*;
-import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
+import static uq.pac.rsvp.Assertion.require;
 
 /**
  * A class representing a request authentication engine that checks whether a

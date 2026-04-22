@@ -20,7 +20,7 @@ import uq.pac.rsvp.policy.datalog.TestUtil;
 import uq.pac.rsvp.policy.datalog.entity.EntityValidator;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
-import uq.pac.rsvp.policy.datalog.util.Logger;
+import uq.pac.rsvp.StdLogger;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -45,13 +45,13 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TranslationTest {
 
-    private final static Logger logger = new Logger();
+    private final static StdLogger logger = new StdLogger();
 
     private final static Path TESTDIR = Path.of(TestUtil.RESOURCEDIR.toString(), "translation");
 
     @BeforeAll
     static void configure() {
-        logger.setLevel(Logger.Level.Info);
+        logger.setLevel(StdLogger.Level.Info);
     }
 
     private static class TestInput {

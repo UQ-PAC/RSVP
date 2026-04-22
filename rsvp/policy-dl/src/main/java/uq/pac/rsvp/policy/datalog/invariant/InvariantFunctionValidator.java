@@ -6,7 +6,7 @@ import uq.pac.rsvp.policy.ast.schema.common.SetTypeDefinition;
 import java.util.*;
 
 import static uq.pac.rsvp.policy.datalog.invariant.InvariantTyping.*;
-import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
+import static uq.pac.rsvp.Assertion.require;
 
 /**
  * Validation of function calls within invariant expressions

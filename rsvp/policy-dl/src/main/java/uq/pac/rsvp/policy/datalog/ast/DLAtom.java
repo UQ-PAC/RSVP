@@ -3,7 +3,7 @@ package uq.pac.rsvp.policy.datalog.ast;
 import java.util.Arrays;
 import java.util.List;
 
-import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
+import static uq.pac.rsvp.Assertion.require;
 
 /**
  * Datalog atom

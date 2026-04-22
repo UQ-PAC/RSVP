@@ -1,4 +1,4 @@
-package uq.pac.rsvp.policy.datalog.util;
+package uq.pac.rsvp;
 
 import java.util.function.Supplier;
 
@@ -22,15 +22,10 @@ public class Assertion {
         require(condition.get());
     }
 
-    public static void requireNonNull(Object ...objects) {
-        for (Object o : objects) {
-            require(o != null, "Unexpected nullified object");
+    public static <E> E require(Object o, Class<E> cls) {
+        if (cls.isInstance(o)) {
+            return cls.cast(o);
         }
-    }
-
-    public static void requireNull(Object ...objects) {
-        for (Object o : objects) {
-            require(o != null, "Unexpected non-nullified object");
-        }
+        throw new AssertionError("Unexpected type: " + o.getClass().getSimpleName());
     }
 }

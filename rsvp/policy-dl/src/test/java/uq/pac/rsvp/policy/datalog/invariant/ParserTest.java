@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.ast.invariant.Program;
 import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
-import uq.pac.rsvp.policy.datalog.util.Logger;
+import uq.pac.rsvp.StdLogger;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ParserTest {
 
-    Logger logger = new Logger();
+    StdLogger logger = new StdLogger();
 
     private static final String INPUT = """
         // Literal

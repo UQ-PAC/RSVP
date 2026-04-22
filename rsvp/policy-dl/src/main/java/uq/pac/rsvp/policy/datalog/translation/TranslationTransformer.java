@@ -7,7 +7,6 @@ import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.ast.invariant.Quantifier;
 import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
-import uq.pac.rsvp.policy.datalog.ast.*;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantFunctionValidator;
 
 import java.util.*;
@@ -17,7 +16,7 @@ import java.util.stream.Collectors;
 
 import static uq.pac.rsvp.policy.ast.expr.BinaryExpression.BinaryOp.*;
 import static uq.pac.rsvp.policy.ast.expr.UnaryExpression.UnaryOp.*;
-import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
+import static uq.pac.rsvp.Assertion.require;
 
 /**
  * Pre-analysis policy transformations

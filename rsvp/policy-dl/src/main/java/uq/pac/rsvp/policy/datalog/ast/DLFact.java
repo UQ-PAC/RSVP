@@ -1,6 +1,6 @@
 package uq.pac.rsvp.policy.datalog.ast;
 
-import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
+import static uq.pac.rsvp.Assertion.require;
 
 /**
  * Datalog fact

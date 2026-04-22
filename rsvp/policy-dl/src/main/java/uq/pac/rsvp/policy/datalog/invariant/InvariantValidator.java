@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static uq.pac.rsvp.policy.datalog.invariant.InvariantTyping.*;
-import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
+import static uq.pac.rsvp.Assertion.require;
 
 public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDefinition> {
     private final Map<String, RecordTypeDefinition> types;

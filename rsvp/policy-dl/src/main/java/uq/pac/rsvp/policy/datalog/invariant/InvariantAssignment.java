@@ -4,7 +4,7 @@ import uq.pac.rsvp.policy.datalog.translation.Relation;
 
 import java.util.*;
 
-import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
+import static uq.pac.rsvp.Assertion.require;
 
 /**
  * Representation of variable assignment for an invariant quantifier

@@ -1,4 +1,4 @@
-package uq.pac.rsvp.policy.datalog.util;
+package uq.pac.rsvp;
 
 import org.fusesource.jansi.Ansi;
 
@@ -11,7 +11,7 @@ import static org.fusesource.jansi.Ansi.ansi;
 /**
  * Very simple logger for standard streams
  */
-public class Logger {
+public class StdLogger {
 
     public enum Level {
         Severe("ERROR"),
@@ -43,7 +43,7 @@ public class Logger {
     private Ansi console;
     private boolean bright;
 
-    public Logger () {
+    public StdLogger() {
         this.console = ansi();
         this.bright = false;
     }
@@ -52,7 +52,7 @@ public class Logger {
         this.level = level;
     }
 
-    synchronized private Logger log(PrintStream stream, Ansi.Color color, Level level, String format, Object ...args) {
+    synchronized private StdLogger log(PrintStream stream, Ansi.Color color, Level level, String format, Object ...args) {
         if (level.ordinal() <= this.level.ordinal()) {
             String outs = String.format(format, args);
             if (!level.desc.isEmpty()) {
@@ -71,60 +71,60 @@ public class Logger {
         return this;
     }
 
-    synchronized public Logger bright() {
+    synchronized public StdLogger bright() {
         this.bright = true;
         return this;
     }
 
-    synchronized public Logger attr(Ansi.Attribute attribute) {
+    synchronized public StdLogger attr(Ansi.Attribute attribute) {
         console.a(attribute);
         return this;
     }
 
-    synchronized public Logger bold() {
+    synchronized public StdLogger bold() {
         console.a(Ansi.Attribute.INTENSITY_BOLD);
         return this;
     }
 
-    synchronized public Logger italic() {
+    synchronized public StdLogger italic() {
         console.a(Ansi.Attribute.ITALIC);
         return this;
     }
 
-    public Logger finest(Ansi.Color color, String format, Object ...args) {
+    public StdLogger finest(Ansi.Color color, String format, Object ...args) {
         return log(System.out, color, Level.Finest, format, args);
     }
 
-    public Logger finer(Ansi.Color color, String format, Object ...args) {
+    public StdLogger finer(Ansi.Color color, String format, Object ...args) {
         return log(System.out, color, Level.Finer, format, args);
     }
 
-    public Logger fine(Ansi.Color color, String format, Object ...args) {
+    public StdLogger fine(Ansi.Color color, String format, Object ...args) {
         return log(System.out, color, Level.Fine, format, args);
     }
 
-    public Logger info(Ansi.Color color, String format, Object ...args) {
+    public StdLogger info(Ansi.Color color, String format, Object ...args) {
         return log(System.out, color, Level.Info, format, args);
     }
 
-    public Logger info(String format, Object ...args) {
+    public StdLogger info(String format, Object ...args) {
         return log(System.out, DEFAULT, Level.Info, format, args);
     }
 
-    public Logger warning(String format, Object ...args) {
+    public StdLogger warning(String format, Object ...args) {
         return bold().bright().log(System.err, YELLOW, Level.Warning, format, args);
     }
 
-    public Logger error(String format, Object ...args) {
+    public StdLogger error(String format, Object ...args) {
         return bold().bright().log(System.err, RED, Level.Severe, format, args);
     }
 
     public static void println(Ansi.Color color, String format, Object ...args) {
-        new Logger().log(System.out, color, Level.Info, format, args);
+        new StdLogger().log(System.out, color, Level.Info, format, args);
     }
 
     public static void println(Ansi.Color color, Object o) {
-        new Logger().log(System.out, color, Level.Info, o.toString());
+        new StdLogger().log(System.out, color, Level.Info, o.toString());
     }
 
     public static void println(String format, Object ...args) {

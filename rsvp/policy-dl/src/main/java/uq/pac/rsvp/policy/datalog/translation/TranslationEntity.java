@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.AttributeRuleDecl;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.HasAttributeRuleDecl;
-import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
+import static uq.pac.rsvp.Assertion.require;
 
 /**
  * Translation of a concrete entities to Datalog. As per entity definition

@@ -1,22 +1,7 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.AttributeRuleDecl;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.ForbidRuleDecl;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.HasAttributeRuleDecl;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.NullifiedRequestsRuleDecl;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.OUTPUT_DELIMITER;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.OUTPUT_EXT;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.ParentOfRuleDecl;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.PermitRuleDecl;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.PermittedRequestsRuleDecl;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.ProgramName;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.TmpRecordType;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.UndefinedEntityUIDName;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.makeAtom;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.makeForbiddenRequestsRule;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.makeIODirectives;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.makePermittedRequestsRule;
-import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
+import static uq.pac.rsvp.Assertion.require;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

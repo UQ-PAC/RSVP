@@ -10,8 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
-import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
-import static uq.pac.rsvp.policy.datalog.util.Util.required;
+import static uq.pac.rsvp.Assertion.require;
 
 /**
  * Main translation visitor converting a Cedar expression to a set of rules
@@ -136,7 +135,7 @@ public class TranslationVisitor extends VoidVisitorAdapter {
                 expressions.add(new DLConstraint(lhs, rhs, getOperator(expr.getOp(), negated)));
             }
             case Is -> {
-                TypeExpression typeExpr = required(expr.getRight(), TypeExpression.class);
+                TypeExpression typeExpr = require(expr.getRight(), TypeExpression.class);
                 DLTerm var = getOperand(expr.getLeft());
                 DLRuleDecl decl = schema.getTranslationEntityType(typeExpr.getValue()).getEntityRuleDecl();
                 expressions.add(new DLAtom(decl, negated, var));

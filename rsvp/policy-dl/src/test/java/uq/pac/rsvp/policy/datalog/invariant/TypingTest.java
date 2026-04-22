@@ -9,7 +9,7 @@ import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.TestUtil;
 import uq.pac.rsvp.policy.datalog.entity.EntityValidator;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
-import uq.pac.rsvp.policy.datalog.util.Logger;
+import uq.pac.rsvp.StdLogger;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -18,7 +18,7 @@ import static org.fusesource.jansi.Ansi.Color.*;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class TypingTest {
-    Logger logger = new Logger();
+    StdLogger logger = new StdLogger();
 
     private final InvariantValidator validator;
 

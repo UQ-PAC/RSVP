@@ -16,7 +16,7 @@ import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestAuth;
 import uq.pac.rsvp.policy.datalog.translation.Translation;
-import uq.pac.rsvp.policy.datalog.util.Logger;
+import uq.pac.rsvp.StdLogger;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -25,11 +25,11 @@ import java.nio.file.Path;
 import java.util.*;
 
 import static org.fusesource.jansi.Ansi.Color.*;
-import static uq.pac.rsvp.policy.datalog.util.Assertion.require;
+import static uq.pac.rsvp.Assertion.require;
 
 public class Driver {
 
-    private static final Logger logger = new Logger();
+    private static final StdLogger logger = new StdLogger();
 
     private static void error(String message) {
         logger.error(message);

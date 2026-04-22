@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
-  "resource": "ChildrenClinic::Patient::\"Samantha Coleman\"",
-  "action": "ChildrenClinic::Action::\"DeletePatient\"",
-  "context": {}
-}

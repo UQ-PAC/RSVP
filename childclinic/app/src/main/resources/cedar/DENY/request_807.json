@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Linda Douglas\"",
-  "resource": "ChildrenClinic::Employee::\"Carl\"",
-  "action": "ChildrenClinic::Action::\"EditEmployee\"",
+  "principal": "ChildrenClinic::Employee::\"Sharon Jenkins\"",
+  "resource": "ChildrenClinic::ResponsibleAdult::\"Eduardo Rodriquez\"",
+  "action": "ChildrenClinic::Action::\"DeleteAdult\"",
   "context": {}
 }

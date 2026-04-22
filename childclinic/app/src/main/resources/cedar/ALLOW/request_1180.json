@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Sharon Jenkins\"",
-  "resource": "ChildrenClinic::Visit::\"Samantha Coleman 2\"",
+  "principal": "ChildrenClinic::Employee::\"Bob Buchanan\"",
+  "resource": "ChildrenClinic::Patient::\"Max Coleman\"",
   "action": "ChildrenClinic::Action::\"EditPatient\"",
   "context": {}
 }

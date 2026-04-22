@@ -1,5 +1,5 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
+  "principal": "ChildrenClinic::Employee::\"???\"",
   "resource": "ChildrenClinic::Patient::\"Sly Estaban\"",
   "action": "ChildrenClinic::Action::\"ViewPatient\"",
   "context": {}

@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Guest::\"???\"",
+  "principal": "ChildrenClinic::Guest::\"Unknown\"",
   "resource": "ChildrenClinic::Patient::\"Leo Franklin\"",
-  "action": "ChildrenClinic::Action::\"AddPatient\"",
+  "action": "ChildrenClinic::Action::\"ViewPatient\"",
   "context": {}
 }

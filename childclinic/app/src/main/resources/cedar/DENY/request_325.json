@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Employee::\"Carl\"",
-  "resource": "ChildrenClinic::Employee::\"???\"",
-  "action": "ChildrenClinic::Action::\"DeleteEmployee\"",
-  "context": {}
-}

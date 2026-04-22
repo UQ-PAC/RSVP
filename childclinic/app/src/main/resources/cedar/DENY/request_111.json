@@ -1,0 +1,6 @@
+{
+  "principal": "ChildrenClinic::Employee::\"Bob Buchanan\"",
+  "resource": "ChildrenClinic::Clinic::\"???\"",
+  "action": "ChildrenClinic::Action::\"ListVisits\"",
+  "context": {}
+}

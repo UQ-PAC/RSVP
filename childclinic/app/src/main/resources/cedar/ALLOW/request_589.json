@@ -1,0 +1,6 @@
+{
+  "principal": "ChildrenClinic::Employee::\"Alice\"",
+  "resource": "ChildrenClinic::ResponsibleAdult::\"Jean Coleman\"",
+  "action": "ChildrenClinic::Action::\"ViewAdult\"",
+  "context": {}
+}

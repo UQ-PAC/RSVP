@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Employee::\"Alice\"",
-  "resource": "ChildrenClinic::Patient::\"Rosy Rodriquez\"",
-  "action": "ChildrenClinic::Action::\"AddPatient\"",
-  "context": {}
-}

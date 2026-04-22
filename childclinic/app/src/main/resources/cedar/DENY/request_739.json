@@ -1,0 +1,6 @@
+{
+  "principal": "ChildrenClinic::Employee::\"???\"",
+  "resource": "ChildrenClinic::ResponsibleAdult::\"George Franklin\"",
+  "action": "ChildrenClinic::Action::\"DeleteAdult\"",
+  "context": {}
+}

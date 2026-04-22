@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Linda Douglas\"",
-  "resource": "ChildrenClinic::Employee::\"Kathaleen Tramonte\"",
+  "principal": "ChildrenClinic::Guest::\"Unknown\"",
+  "resource": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
   "action": "ChildrenClinic::Action::\"EditEmployee\"",
   "context": {}
 }

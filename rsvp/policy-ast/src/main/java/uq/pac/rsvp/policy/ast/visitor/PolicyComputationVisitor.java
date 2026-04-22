@@ -17,39 +17,42 @@ import uq.pac.rsvp.policy.ast.expr.StringExpression;
 import uq.pac.rsvp.policy.ast.expr.TypeExpression;
 import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
+import uq.pac.rsvp.policy.ast.invariant.Quantifier;
 
 public interface PolicyComputationVisitor<T> {
-    public T visitPolicySet(PolicySet policySet);
+    T visitPolicySet(PolicySet policySet);
 
-    public T visitPolicy(Policy policy);
+    T visitPolicy(Policy policy);
 
-    public T visitBinaryExpr(BinaryExpression expr);
+    T visitQuantifier(Quantifier quantifier);
 
-    public T visitCallExpr(CallExpression expr);
+    T visitBinaryExpr(BinaryExpression expr);
 
-    public T visitConditionalExpr(ConditionalExpression expr);
+    T visitCallExpr(CallExpression expr);
 
-    public T visitPropertyAccessExpr(PropertyAccessExpression expr);
+    T visitConditionalExpr(ConditionalExpression expr);
 
-    public T visitRecordExpr(RecordExpression expr);
+    T visitPropertyAccessExpr(PropertyAccessExpression expr);
 
-    public T visitSetExpr(SetExpression expr);
+    T visitRecordExpr(RecordExpression expr);
 
-    public T visitUnaryExpr(UnaryExpression expr);
+    T visitSetExpr(SetExpression expr);
 
-    public T visitVariableExpr(VariableExpression expr);
+    T visitUnaryExpr(UnaryExpression expr);
 
-    public T visitActionExpr(ActionExpression expr);
+    T visitVariableExpr(VariableExpression expr);
 
-    public T visitBooleanExpr(BooleanExpression expr);
+    T visitActionExpr(ActionExpression expr);
 
-    public T visitEntityExpr(EntityExpression expr);
+    T visitBooleanExpr(BooleanExpression expr);
 
-    public T visitLongExpr(LongExpression expr);
+    T visitEntityExpr(EntityExpression expr);
 
-    public T visitSlotExpr(SlotExpression expr);
+    T visitLongExpr(LongExpression expr);
 
-    public T visitStringExpr(StringExpression expr);
+    T visitSlotExpr(SlotExpression expr);
 
-    public T visitTypeExpr(TypeExpression expr);
+    T visitStringExpr(StringExpression expr);
+
+    T visitTypeExpr(TypeExpression expr);
 }

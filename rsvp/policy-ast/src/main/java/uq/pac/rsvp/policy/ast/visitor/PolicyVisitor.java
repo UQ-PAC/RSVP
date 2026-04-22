@@ -17,40 +17,43 @@ import uq.pac.rsvp.policy.ast.expr.StringExpression;
 import uq.pac.rsvp.policy.ast.expr.TypeExpression;
 import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
+import uq.pac.rsvp.policy.ast.invariant.Quantifier;
 
 public interface PolicyVisitor {
-    public void visitPolicySet(PolicySet policySet);
+    void visitPolicySet(PolicySet policySet);
 
-    public void visitPolicy(Policy policy);
+    void visitPolicy(Policy policy);
 
-    public void visitBinaryExpr(BinaryExpression expr);
+    void visitQuantifier(Quantifier quantifier);
 
-    public void visitCallExpr(CallExpression expr);
+    void visitBinaryExpr(BinaryExpression expr);
 
-    public void visitConditionalExpr(ConditionalExpression expr);
+    void visitCallExpr(CallExpression expr);
 
-    public void visitPropertyAccessExpr(PropertyAccessExpression expr);
+    void visitConditionalExpr(ConditionalExpression expr);
 
-    public void visitRecordExpr(RecordExpression expr);
+    void visitPropertyAccessExpr(PropertyAccessExpression expr);
 
-    public void visitSetExpr(SetExpression expr);
+    void visitRecordExpr(RecordExpression expr);
 
-    public void visitUnaryExpr(UnaryExpression expr);
+    void visitSetExpr(SetExpression expr);
 
-    public void visitVariableExpr(VariableExpression expr);
+    void visitUnaryExpr(UnaryExpression expr);
 
-    public void visitActionExpr(ActionExpression expr);
+    void visitVariableExpr(VariableExpression expr);
 
-    public void visitBooleanExpr(BooleanExpression expr);
+    void visitActionExpr(ActionExpression expr);
 
-    public void visitEntityExpr(EntityExpression expr);
+    void visitBooleanExpr(BooleanExpression expr);
 
-    public void visitLongExpr(LongExpression expr);
+    void visitEntityExpr(EntityExpression expr);
 
-    public void visitSlotExpr(SlotExpression expr);
+    void visitLongExpr(LongExpression expr);
 
-    public void visitStringExpr(StringExpression expr);
+    void visitSlotExpr(SlotExpression expr);
 
-    public void visitTypeExpr(TypeExpression expr);
+    void visitStringExpr(StringExpression expr);
+
+    void visitTypeExpr(TypeExpression expr);
 
 }

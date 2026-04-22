@@ -1,7 +1,11 @@
 package uq.pac.rsvp.policy.ast.invariant;
 
+import uq.pac.rsvp.policy.ast.PolicyItem;
 import uq.pac.rsvp.policy.ast.expr.TypeExpression;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
+import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
+import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
+import uq.pac.rsvp.support.SourceLoc;
 
 import java.util.Collections;
 import java.util.List;
@@ -10,7 +14,8 @@ import java.util.stream.Collectors;
 /**
  * Representation of a quantifier for invariant that captures
  */
-public class Quantifier {
+public class Quantifier extends PolicyItem {
+
     public enum Scope {
         ALL("all"),
         SOME("some"),
@@ -33,13 +38,18 @@ public class Quantifier {
     private final List<Variable> variables;
     private final Scope scope;
 
-    public Quantifier() {
-        this(Scope.ALL, Collections.emptyList());
+    public Quantifier(Scope scope, List<Variable> variables, SourceLoc location) {
+        super(location);
+        this.variables = List.copyOf(variables);
+        this.scope = scope;
     }
 
     public Quantifier(Scope scope, List<Variable> variables) {
-        this.variables = List.copyOf(variables);
-        this.scope = scope;
+        this(scope, variables, SourceLoc.MISSING);
+    }
+
+    public Quantifier() {
+        this(Scope.ALL, Collections.emptyList());
     }
 
     public Scope getScope() {
@@ -52,6 +62,16 @@ public class Quantifier {
 
     public boolean isEmpty() {
         return variables.isEmpty();
+    }
+
+    @Override
+    public void accept(PolicyVisitor visitor) {
+        visitor.visitQuantifier(this);
+    }
+
+    @Override
+    public <T> T compute(PolicyComputationVisitor<T> visitor) {
+        return visitor.visitQuantifier(this);
     }
 
     @Override

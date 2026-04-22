@@ -4,6 +4,7 @@ import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.ast.expr.*;
+import uq.pac.rsvp.policy.ast.invariant.Quantifier;
 import uq.pac.rsvp.policy.ast.schema.ActionDefinition;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.Schema;
@@ -262,6 +263,11 @@ public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDe
     @Override
     public CommonTypeDefinition visitPolicy(Policy policy) {
         throw new TranslationError("unsupported element: " + policy);
+    }
+
+    @Override
+    public CommonTypeDefinition visitQuantifier(Quantifier quantifier) {
+        throw new TranslationError("unsupported element: " + quantifier);
     }
 
     @Override

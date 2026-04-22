@@ -18,6 +18,7 @@ import uq.pac.rsvp.policy.ast.expr.StringExpression;
 import uq.pac.rsvp.policy.ast.expr.TypeExpression;
 import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
+import uq.pac.rsvp.policy.ast.invariant.Quantifier;
 
 // Basic visitor implementation. Visits each expression tree in a policy set.
 // Subclasses can override some or all methods.
@@ -31,6 +32,14 @@ public abstract class PolicyVisitorImpl implements PolicyVisitor {
     @Override
     public void visitPolicy(Policy policy) {
         policy.getCondition().accept(this);
+    }
+
+    @Override
+    public void visitQuantifier(Quantifier quantifier) {
+        quantifier.getVariables().forEach(v -> {
+            v.name().accept(this);
+            v.type().accept(this);
+        });
     }
 
     @Override

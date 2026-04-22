@@ -3,6 +3,7 @@ package uq.pac.rsvp.policy.datalog.visitors;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.expr.*;
+import uq.pac.rsvp.policy.ast.invariant.Quantifier;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 
@@ -20,6 +21,11 @@ public class VoidVisitorAdapter implements PolicyVisitor {
     @Override
     public void visitPolicy(Policy policy) {
         unsupported(policy);
+    }
+
+    @Override
+    public void visitQuantifier(Quantifier quantifier) {
+        unsupported(quantifier);
     }
 
     @Override

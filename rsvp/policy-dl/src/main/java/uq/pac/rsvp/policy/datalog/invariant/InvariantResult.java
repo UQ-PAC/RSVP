@@ -1,9 +1,9 @@
 package uq.pac.rsvp.policy.datalog.invariant;
 
+import java.util.Set;
+
 import uq.pac.rsvp.policy.datalog.translation.Relation;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
-
-import java.util.Set;
 
 /**
  * Result of evaluating an invariant
@@ -18,7 +18,7 @@ public class InvariantResult {
         this.invariant = invariant;
         this.assignments = Assignment.getAssignments(relation);
         Quantifier.Scope scope = invariant.getQuantifier().getScope();
-        switch (invariant.getQuantifier().getScope()) {
+        switch (scope) {
             case SOME -> this.holds = !relation.isEmpty();
             case NONE, ALL -> this.holds = relation.isEmpty();
             default -> throw new TranslationError("Unreachable");
@@ -30,9 +30,18 @@ public class InvariantResult {
     }
 
     /**
-     * Get assignments. Note that for the `for all` invariant we generate no assignments because
-     * the `for all` variant is rewritten to `for none`. If the assignments for the `for all`
-     * invariant are needed they can be generated with the `for some` quantifier scope instead
+     * Get variable assignments which satisfy the invariant (if it holds) or provide a
+     * counterexample (if it does not hold).
+     * <p>
+     * Note that for a `for all`-quantified variable we generate no assignments if the
+     * invariant holds (all possible values are satisfactory). Similarly, for a `for some`-
+     * quantified variable in an invariant that does <i>not</i> hold, there is no specific
+     * counterexample.
+     * <p>
+     * (If assignments are actually needed for a `for all`-quantified variable, it is possible
+     * to transform the `for all` into a `for some` which will generate assignments; the 'holds'
+     * condition is then weaker, so whether the original invariant holds needs to be tested
+     * separately).
      */
     public Set<Assignment> getAssignments() {
         return assignments;

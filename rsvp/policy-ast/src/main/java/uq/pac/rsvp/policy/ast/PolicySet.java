@@ -1,17 +1,35 @@
 package uq.pac.rsvp.policy.ast;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashSet;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import com.cedarpolicy.model.exception.InternalException;
 
+import com.google.gson.*;
 import uq.pac.rsvp.RsvpException;
+import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
+import uq.pac.rsvp.support.SourceLoc;
 
-public class PolicySet extends LinkedHashSet<Policy> implements PolicyItem {
+public class PolicySet extends PolicyItem {
+
+    private final List<Policy> policies;
+
+    public PolicySet(List<Policy> policies, SourceLoc location) {
+        // FIXME: Locations based on policies
+        super(location);
+        this.policies = List.copyOf(policies);
+    }
+
+    public PolicySet(List<Policy> policies) {
+        this(policies, SourceLoc.MISSING);
+    }
 
     /**
      * Parse a Cedar policy file and return the corresponding AST.
@@ -63,4 +81,39 @@ public class PolicySet extends LinkedHashSet<Policy> implements PolicyItem {
     public <T> T compute(PolicyComputationVisitor<T> visitor) {
         return visitor.visitPolicySet(this);
     }
+
+    public void forEach(Consumer<Policy> consumer) {
+        policies.forEach(consumer);
+    }
+
+    public Collection<Policy> getPolicies() {
+        return policies;
+    }
+
+    public Policy getFirst() {
+        return policies.getFirst();
+    }
+
+    public Stream<Policy> stream() {
+        return policies.stream();
+    }
+
+    @Override
+    public String toString() {
+        return policies.toString();
+    }
+
+    public static class PolicySetDeserialiser implements JsonDeserializer<PolicySet> {
+        @Override
+        public PolicySet deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+                throws JsonParseException {
+            JsonArray array = json.getAsJsonArray();
+            List<Policy> policies = new ArrayList<>();
+            for (JsonObject o : array.asList().stream().map(JsonElement::getAsJsonObject).toList()) {
+                policies.add(context.deserialize(o, Policy.class));
+            }
+            return new PolicySet(policies);
+        }
+    }
+
 }

@@ -67,7 +67,7 @@ public class ExpressionTest {
             };
 
             int i = 0;
-            for (Policy policy : policies) {
+            for (Policy policy : policies.getPolicies()) {
                 Expression condition = policy.getCondition();
 
                 // Check source loc

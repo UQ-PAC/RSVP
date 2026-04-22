@@ -13,7 +13,7 @@ import uq.pac.rsvp.policy.ast.AstNode;
 import uq.pac.rsvp.policy.ast.PolicyItem;
 import uq.pac.rsvp.support.SourceLoc;
 
-public abstract class Expression extends AstNode implements PolicyItem {
+public abstract class Expression extends PolicyItem {
 
     protected static final Pattern NICE_PROP_NAME = Pattern.compile("[a-zA-Z0-9_]+");
 

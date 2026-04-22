@@ -24,7 +24,7 @@ public class Main {
             System.out.println("file: " + input);
 
             int i = 1;
-            for (Policy policy : policies) {
+            for (Policy policy : policies.getPolicies()) {
                 System.out.println("[" + i + "]    " + policy.toString());
                 i++;
             }

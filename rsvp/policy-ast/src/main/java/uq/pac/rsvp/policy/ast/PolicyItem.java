@@ -2,9 +2,15 @@ package uq.pac.rsvp.policy.ast;
 
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
+import uq.pac.rsvp.support.SourceLoc;
 
-public interface PolicyItem {
-    void accept(PolicyVisitor visitor);
+public abstract class PolicyItem extends AstNode {
 
-    <T> T compute(PolicyComputationVisitor<T> visitor);
+    public PolicyItem(SourceLoc location) {
+        super(location);
+    }
+
+    public abstract void accept(PolicyVisitor visitor);
+
+    public abstract <T> T compute(PolicyComputationVisitor<T> visitor);
 }

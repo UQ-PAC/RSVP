@@ -12,6 +12,7 @@ import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition.CommonTypeDefinitionDeserialiser;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.Schema.SchemaDeserialiser;
+import uq.pac.rsvp.policy.ast.PolicySet.PolicySetDeserialiser;
 import uq.pac.rsvp.support.FileSource;
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.support.SourceLoc.SourceLocDeserializer;
@@ -28,6 +29,7 @@ public class JsonParser {
                 .registerTypeAdapter(EntityExpression.class, new EuidExpressionDeserialiser())
                 .registerTypeAdapter(CommonTypeDefinition.class, new CommonTypeDefinitionDeserialiser())
                 .registerTypeAdapter(Schema.class, new SchemaDeserialiser())
+                .registerTypeAdapter(PolicySet.class, new PolicySetDeserialiser())
                 .registerTypeAdapter(SourceLoc.class, new SourceLocDeserializer(fs))
                 .disableJdkUnsafe()
                 .create();

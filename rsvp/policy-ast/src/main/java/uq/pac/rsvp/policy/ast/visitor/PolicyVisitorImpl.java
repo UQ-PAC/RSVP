@@ -25,9 +25,7 @@ public abstract class PolicyVisitorImpl implements PolicyVisitor {
     
     @Override
     public void visitPolicySet(PolicySet policySet) {
-        for (Policy policy : policySet) {
-            policy.accept(this);
-        }
+        policySet.forEach(p -> p.accept(this));
     }
 
     @Override

@@ -11,9 +11,9 @@ import uq.pac.rsvp.policy.ast.expr.Expression;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
-public class Policy extends AstNode implements PolicyItem {
+public class Policy extends PolicyItem {
 
-    static enum Effect {
+    public enum Effect {
         @SerializedName("permit")
         Permit,
 
@@ -95,5 +95,4 @@ public class Policy extends AstNode implements PolicyItem {
     public String toString() {
         return (effect == Effect.Permit ? "permit" : "forbid") + " on: " + condition.toString();
     }
-
 }

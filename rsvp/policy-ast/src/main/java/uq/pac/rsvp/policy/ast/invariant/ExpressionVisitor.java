@@ -1,7 +1,7 @@
 package uq.pac.rsvp.policy.ast.invariant;
 
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.TerminalNode;
 import uq.pac.rsvp.policy.ast.CedarParser;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.support.FileSource;
@@ -153,10 +153,12 @@ class ExpressionVisitor extends SourceVisitor<Expression> {
     public Expression visitCallExpr(CedarParser.CallExprContext ctx) {
         Expression object = null;
         if (ctx.property() != null) {
-            List<TerminalNode> nodes = ctx.property().ID();
-            object = new VariableExpression(nodes.removeFirst().getText());
-            while (!nodes.isEmpty()) {
-                String prop = nodes.removeFirst().getText();
+            List<String> properties = ctx.property().variable().stream()
+                    .map(RuleContext::getText)
+                    .collect(Collectors.toList());
+            object = new VariableExpression(properties.removeFirst());
+            while (!properties.isEmpty()) {
+                String prop = properties.removeFirst();
                 object = new PropertyAccessExpression(object, prop);
             }
         }
@@ -193,10 +195,12 @@ class ExpressionVisitor extends SourceVisitor<Expression> {
 
     @Override
     public Expression visitPropertyExpr(CedarParser.PropertyExprContext ctx) {
-        List<TerminalNode> nodes = ctx.property().ID();
-        Expression object = new VariableExpression(nodes.removeFirst().getText());
-        while (!nodes.isEmpty()) {
-            String prop = nodes.removeFirst().getText();
+        List<String> properties = ctx.property().variable().stream()
+                .map(RuleContext::getText)
+                .collect(Collectors.toList());
+        Expression object = new VariableExpression(properties.removeFirst());
+        while (!properties.isEmpty()) {
+            String prop = properties.removeFirst();
             object = new PropertyAccessExpression(object, prop);
         }
         return object;

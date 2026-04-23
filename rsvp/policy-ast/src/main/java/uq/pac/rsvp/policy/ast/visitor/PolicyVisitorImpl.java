@@ -1,7 +1,6 @@
 package uq.pac.rsvp.policy.ast.visitor;
 
 import uq.pac.rsvp.policy.ast.Policy;
-import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.expr.ActionExpression;
 import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
 import uq.pac.rsvp.policy.ast.expr.BooleanExpression;
@@ -24,11 +23,6 @@ import uq.pac.rsvp.policy.ast.invariant.Quantifier;
 // Basic visitor implementation. Visits each expression tree in a policy set.
 // Subclasses can override some or all methods.
 public abstract class PolicyVisitorImpl implements PolicyVisitor {
-    
-    @Override
-    public void visitPolicySet(PolicySet policySet) {
-        policySet.forEach(p -> p.accept(this));
-    }
 
     @Override
     public void visitPolicy(Policy policy) {

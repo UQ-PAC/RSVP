@@ -96,16 +96,15 @@ public class PolicySetTest {
         void testContains() throws RsvpException {
             URL url = ClassLoader.getSystemResource("contains.cedar");
             PolicySet policies = PolicySet.parseCedarPolicySet(Path.of(url.getPath()));
-            policies.accept(new PolicyVisitorImpl() {
+            policies.forEach(p -> p.accept(new PolicyVisitorImpl() {
                 @Override
                 public void visitCallExpr(CallExpression expr) {
-
                     super.visitCallExpr(expr);
                     assertTrue(expr.getSelf() instanceof PropertyAccessExpression);
                     assertEquals("contains", expr.getFunc());
                     assertTrue(expr.getArgs().getFirst() instanceof VariableExpression);
                 }
-            });
+            }));
         }
 
         @Test
@@ -119,15 +118,13 @@ public class PolicySetTest {
 
             PolicySet policies = PolicySet.parseCedarPolicySet("test.cedar", policy);
 
-            policies.accept(new PolicyVisitorImpl() {
+            policies.forEach(p -> p.accept(new PolicyVisitorImpl() {
                 @Override
                 public void visitBinaryExpr(BinaryExpression expr) {
-                    System.err.println(expr.toString());
-                    System.err.println(expr.getSourceLoc().toString());
                     expr.getLeft().accept(this);
                     expr.getRight().accept(this);
                 }
-            });
+            }));
 
             policy = "permit (principal, action, resource);";
             policies = PolicySet.parseCedarPolicySet("test.cedar", policy);

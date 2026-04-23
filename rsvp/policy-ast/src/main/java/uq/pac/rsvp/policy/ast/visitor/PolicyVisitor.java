@@ -21,8 +21,6 @@ import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.ast.invariant.Quantifier;
 
 public interface PolicyVisitor {
-    void visitPolicySet(PolicySet policySet);
-
     void visitPolicy(Policy policy);
 
     void visitInvariant(Invariant invariant);

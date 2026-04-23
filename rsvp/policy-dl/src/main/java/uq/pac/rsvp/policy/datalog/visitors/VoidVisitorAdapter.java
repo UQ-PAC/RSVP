@@ -1,7 +1,6 @@
 package uq.pac.rsvp.policy.datalog.visitors;
 
 import uq.pac.rsvp.policy.ast.Policy;
-import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.ast.invariant.Quantifier;
@@ -11,12 +10,8 @@ import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 public class VoidVisitorAdapter implements PolicyVisitor {
 
     private void unsupported(Object o) {
-        throw new TranslationError("unsupported element: " + o);
-    }
-
-    @Override
-    public void visitPolicySet(PolicySet policies) {
-        unsupported(policies);
+        throw new TranslationError(this.getClass().getName() +
+                ": unsupported element " + o + " of " + o.getClass().getName());
     }
 
     @Override

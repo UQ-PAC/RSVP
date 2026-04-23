@@ -28,14 +28,15 @@ import com.cedarpolicy.model.ValidationRequest;
 import com.cedarpolicy.model.ValidationResponse;
 import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.exception.AuthException;
+import com.cedarpolicy.model.policy.PolicySet;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Multimap;
 
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.Policy;
-import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;
+import uq.pac.rsvp.policy.ast.invariant.Program;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.ast.DLAtom;
 import uq.pac.rsvp.policy.datalog.ast.DLDeclTerm;
@@ -47,7 +48,6 @@ import uq.pac.rsvp.policy.datalog.ast.DLTerm;
 import uq.pac.rsvp.policy.datalog.entity.EntityValidator;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
-import uq.pac.rsvp.policy.ast.invariant.InvariantSet;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantValidator;
 
 /**
@@ -56,9 +56,9 @@ import uq.pac.rsvp.policy.datalog.invariant.InvariantValidator;
 public class Translation {
 
     private final Schema schema;
-    private final PolicySet policies;
+    private final Collection<Policy> policies;
     private final EntitySet entities;
-    private final InvariantSet invariants;
+    private final Collection<Invariant> invariants;
     private final Path datalogDir;
     private final DLProgram program;
 
@@ -76,13 +76,13 @@ public class Translation {
 
             this.policyDeclarations = HashBiMap.create();
             int index = 1;
-            for (Policy p : policies.getPolicies()) {
+            for (Policy p : policies) {
                 policyDeclarations.put(p, TranslationConstants.makePolicyRuleDecl(index++));
             }
 
             this.invariantDeclarations = HashBiMap.create();
             index = 1;
-            for (Invariant i : invariants.getInvariants()) {
+            for (Invariant i : invariants) {
                 invariantDeclarations.put(i, TranslationConstants.makeInvariantRuleDecl(i, index++));
             }
 
@@ -94,16 +94,15 @@ public class Translation {
         }
     }
 
-    record InputSet(Schema schema, PolicySet policies, EntitySet entities, InvariantSet invariants) {}
+    record InputSet(Schema schema, Collection<Policy> policies, EntitySet entities, Collection<Invariant> invariants) {}
 
     static InputSet validate(Path schemaFile, Path policyFile, Path entityFile, Path invariantsFile) throws IOException, AuthException, RsvpException, IllegalAccessException {
         EntitySet entities = EntitySet.parse(entityFile);
         com.cedarpolicy.model.schema.Schema cedarSchema =
                 new com.cedarpolicy.model.schema.Schema(Files.readString(schemaFile));
-        com.cedarpolicy.model.policy.PolicySet policies =
-                com.cedarpolicy.model.policy.PolicySet.parsePolicies(policyFile);
+        PolicySet cedarPolicies = PolicySet.parsePolicies(policyFile);
 
-        ValidationRequest vReq = new ValidationRequest(cedarSchema, policies);
+        ValidationRequest vReq = new ValidationRequest(cedarSchema, cedarPolicies);
         AuthorizationEngine engine = new BasicAuthorizationEngine();
         ValidationResponse vResp = engine.validate(vReq);
 
@@ -132,6 +131,7 @@ public class Translation {
             });
         });
 
+        // FIXME: This needs to be moved to entity validation
         // For the moment we also do not support entity names that have the same
         // delimiter that is used for Datalog output (\t)
         List<String> entityNames = entities.getEntities().stream()
@@ -157,15 +157,34 @@ public class Translation {
         });
 
         entities = EntityValidator.validate(rsvpSchema, entities);
-        InvariantSet invariants =
-                invariantsFile == null ? InvariantSet.parse("") : InvariantSet.parse(invariantsFile);
-        InvariantValidator invariantValidator = new InvariantValidator(rsvpSchema, entities);
-        invariants.stream().forEach(invariantValidator::validate);
 
-        return new InputSet(rsvpSchema, PolicySet.parseCedarPolicySet(policyFile), entities, invariants);
+        // FIXME: For the moment (while RSVP-native policy validation is not yet ready)
+        //        we expect inputs and policies in separate files. This is so we can validate
+        //        policies against schema via Cedar utilities. Eventually, however, invariants
+        //        and policies files should be merged into one, i.e., a file contains a policy set
+        //        that should uphold the invariants from the same file
+        Collection<Invariant> invariants = List.of();
+        if (invariantsFile != null) {
+            Program invariantProgram = Program.parse(invariantsFile);
+            if (!invariantProgram.getPolicies().isEmpty()) {
+                throw new TranslationError("Invariants found in the policy source: " + policyFile);
+            }
+            invariants = invariantProgram.getInvariants();
+        }
+
+        Program policyProgram = Program.parse(policyFile);
+        Collection<Policy> policies = policyProgram.getPolicies();
+        if (!policyProgram.getInvariants().isEmpty()) {
+            throw new TranslationError("Policies found in the invariant source: " + invariantsFile);
+        }
+
+        InvariantValidator invariantValidator = new InvariantValidator(rsvpSchema, entities);
+        invariants.forEach(invariantValidator::validate);
+
+        return new InputSet(rsvpSchema, policies, entities, invariants);
     }
 
-    private DLProgram translate(Schema schema, PolicySet policies, EntitySet entities, InvariantSet invariants) {
+    private DLProgram translate(Schema schema, Collection<Policy> policies, EntitySet entities, Collection<Invariant> invariants) {
         TranslationSchema translationSchema = new TranslationSchema(schema);
         TranslationEntitySet translationEntities = new TranslationEntitySet(entities, translationSchema);
         Collection<TranslationPolicy> translationPermitPolicies = policies.stream()
@@ -265,7 +284,7 @@ public class Translation {
             .add(makeForbiddenRequestsRule().getStatements());
 
         builder.comment("Invariants");
-        for (Invariant invariant : invariants.getInvariants()) {
+        for (Invariant invariant : invariants) {
             TranslationInvariant ti = new TranslationInvariant(invariant,
                     invariantDeclarations.get(invariant), translationSchema);
             builder.add(ti.getDeclaration());
@@ -357,7 +376,7 @@ public class Translation {
 
     public Map<Invariant, InvariantResult> getInvariantResult() {
         Map<Invariant, InvariantResult> result = new HashMap<>();
-        invariants.getInvariants().forEach(invariant -> {
+        invariants.forEach(invariant -> {
             result.put(invariant, new InvariantResult(invariant, loadRelation(invariant)));
         });
         return result;
@@ -367,7 +386,7 @@ public class Translation {
         return schema;
     }
 
-    public PolicySet getPolicies() {
+    public Collection<Policy> getPolicies() {
         return policies;
     }
 
@@ -375,11 +394,11 @@ public class Translation {
         return entities;
     }
 
-    public InvariantSet getInvariants() {
+    public Collection<Invariant> getInvariants() {
         return invariants;
     }
 
-    public DLProgram getProgram() {
+    public DLProgram getDatalogProgram() {
         return program;
     }
 

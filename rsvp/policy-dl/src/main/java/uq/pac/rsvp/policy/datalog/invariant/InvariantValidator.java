@@ -1,7 +1,6 @@
 package uq.pac.rsvp.policy.datalog.invariant;
 
 import uq.pac.rsvp.policy.ast.Policy;
-import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
@@ -254,11 +253,6 @@ public class InvariantValidator implements PolicyComputationVisitor<CommonTypeDe
     @Override
     public CommonTypeDefinition visitSlotExpr(SlotExpression expr) {
         throw new TranslationError("unsupported element: " + expr);
-    }
-
-    @Override
-    public CommonTypeDefinition visitPolicySet(PolicySet policies) {
-        throw new TranslationError("unsupported element: " + policies);
     }
 
     @Override

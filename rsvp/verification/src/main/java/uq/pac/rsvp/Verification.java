@@ -3,15 +3,10 @@ package uq.pac.rsvp;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.AstNode;
-import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
 import uq.pac.rsvp.policy.ast.expr.CallExpression;
 import uq.pac.rsvp.policy.ast.expr.ConditionalExpression;
@@ -187,11 +182,9 @@ public class Verification {
         return results;
     }
 
-    public static Set<Report> verify(PolicySet policies, Schema schema) {
+    public static Set<Report> verify(Collection<Policy> policies, Schema schema) {
         RandomReportGenerator generator = new RandomReportGenerator();
-
-        policies.accept(generator);
-
+        policies.forEach(p -> p.accept(generator));
         return generator.reports;
     }
 

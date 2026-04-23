@@ -3,11 +3,12 @@ package uq.pac.rsvp.policy.ast.invariant;
 import uq.pac.rsvp.policy.ast.CedarParser;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.Statement;
-import uq.pac.rsvp.policy.ast.expr.Expression;
-import uq.pac.rsvp.policy.ast.expr.TypeExpression;
-import uq.pac.rsvp.policy.ast.expr.VariableExpression;
+import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.support.FileSource;
 
+import static uq.pac.rsvp.policy.ast.expr.BinaryExpression.BinaryOp.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 class StatementVisitor extends SourceVisitor<Statement> {
@@ -61,6 +62,59 @@ class StatementVisitor extends SourceVisitor<Statement> {
         return null;
     }
 
+    private Expression getPrincipalExpression(CedarParser.PrincipalContext ctx) {
+        List<Expression> exprs = new ArrayList<>(2);
+        VariableExpression var = new VariableExpression(ctx.PRINCIPAL().getText());
+        if (ctx.EQ() != null) {
+            exprs.add(new BinaryExpression(var, Eq, expressions.visitEntity(ctx.entity())));
+        }
+        if (ctx.IN() != null) {
+            exprs.add(new BinaryExpression(var, In, expressions.visitEntity(ctx.entity())));
+        }
+        if (ctx.IS() != null) {
+            exprs.add(new BinaryExpression(var, Is, expressions.visitType(ctx.type())));
+        }
+
+        return switch (exprs.size()) {
+            case 0 -> null;
+            case 1 -> exprs.getFirst();
+            case 2 -> new BinaryExpression(exprs.getFirst(), And, exprs.getLast());
+            default -> throw new AssertionError("unreachable");
+        };
+    }
+
+    private Expression getResourceExpression(CedarParser.ResourceContext ctx) {
+        List<Expression> exprs = new ArrayList<>(2);
+        VariableExpression var = new VariableExpression(ctx.RESOURCE().getText());
+        if (ctx.EQ() != null) {
+            exprs.add(new BinaryExpression(var, Eq, expressions.visitEntity(ctx.entity())));
+        }
+        if (ctx.IN() != null) {
+            exprs.add(new BinaryExpression(var, In, expressions.visitEntity(ctx.entity())));
+        }
+        if (ctx.IS() != null) {
+            exprs.add(new BinaryExpression(var, Is, expressions.visitType(ctx.type())));
+        }
+
+        return switch (exprs.size()) {
+            case 0 -> null;
+            case 1 -> exprs.getFirst();
+            case 2 -> new BinaryExpression(exprs.getFirst(), And, exprs.getLast());
+            default -> throw new AssertionError("unreachable");
+        };
+    }
+
+    private Expression getActionExpression(CedarParser.ActionContext ctx) {
+        VariableExpression var = new VariableExpression(ctx.ACTION().getText());
+        if (ctx.EQ() != null) {
+            return new BinaryExpression(var, Eq, expressions.visitEntity(ctx.entity(0)));
+        }
+        return ctx.entity().stream()
+                .map(e -> new BinaryExpression(var, In, expressions.visitEntity(e)))
+                .reduce((a, b) -> new BinaryExpression(a, Or, b))
+                .orElse(null);
+    }
+
     @Override
     public Statement visitPolicy(CedarParser.PolicyContext ctx) {
         Policy.Builder builder = new Policy.Builder();
@@ -82,11 +136,11 @@ class StatementVisitor extends SourceVisitor<Statement> {
         };
 
         builder.name(naming.getName())
+                .and(getPrincipalExpression(ctx.principal()))
+                .and(getResourceExpression(ctx.resource()))
+                .and(getActionExpression(ctx.action()))
                 .effect(effect)
-                .location(location(ctx))
-                .and(ctx.expression(0).accept(expressions))
-                .and(ctx.expression(1).accept(expressions))
-                .and(ctx.expression(2).accept(expressions));
+                .location(location(ctx));
 
         if (ctx.when() != null) {
             builder.and(ctx.when().expression().accept(expressions));

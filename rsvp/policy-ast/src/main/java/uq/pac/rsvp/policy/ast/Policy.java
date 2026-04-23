@@ -5,6 +5,7 @@ import java.util.*;
 import com.google.gson.annotations.SerializedName;
 
 import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
+import uq.pac.rsvp.policy.ast.expr.BooleanExpression;
 import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
 import uq.pac.rsvp.support.SourceLoc;
 
@@ -155,7 +156,8 @@ public class Policy extends Statement {
         }
 
         public Policy build() {
-            return new Policy(name, effect, condition, annotations, location);
+            Expression cond = condition == null ? new BooleanExpression(true) : condition;
+            return new Policy(name, effect, cond, annotations, location);
         }
     }
 }

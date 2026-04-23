@@ -65,7 +65,7 @@ public class PolicyVisitorImplTest {
 
         TestVisitor visitor = new TestVisitor();
 
-        visitor.visitPolicySet(policies);
+        policies.forEach(p -> p.accept(visitor));
         assertEquals(6, visitor.vars);
         assertEquals(0, visitor.bools);
         assertEquals(1, visitor.entities);

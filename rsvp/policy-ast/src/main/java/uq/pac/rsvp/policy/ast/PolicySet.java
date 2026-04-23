@@ -12,23 +12,14 @@ import com.cedarpolicy.model.exception.InternalException;
 
 import com.google.gson.*;
 import uq.pac.rsvp.RsvpException;
-import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
-import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
-import uq.pac.rsvp.support.SourceLoc;
 
 //FIXME: Remove in favour of program
-public class PolicySet extends PolicyAstNode {
+public class PolicySet {
 
     private final List<Policy> policies;
 
-    public PolicySet(List<Policy> policies, SourceLoc location) {
-        // FIXME: Locations based on policies
-        super(location);
-        this.policies = List.copyOf(policies);
-    }
-
     public PolicySet(List<Policy> policies) {
-        this(policies, SourceLoc.MISSING);
+        this.policies = List.copyOf(policies);
     }
 
     /**
@@ -70,16 +61,6 @@ public class PolicySet extends PolicyAstNode {
         } catch (InternalException | IOException e) {
             throw new RsvpException("Error parsing policy set", e);
         }
-    }
-
-    @Override
-    public void accept(PolicyVisitor visitor) {
-        visitor.visitPolicySet(this);
-    }
-
-    @Override
-    public <T> T compute(PolicyComputationVisitor<T> visitor) {
-        return visitor.visitPolicySet(this);
     }
 
     public void forEach(Consumer<Policy> consumer) {

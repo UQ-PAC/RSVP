@@ -1,7 +1,6 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
 import uq.pac.rsvp.policy.ast.Policy;
-import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.ast.invariant.Quantifier;
@@ -43,10 +42,6 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
         return expr.stream().map(this::compute).collect(Collectors.toCollection(ArrayList::new));
     }
 
-    private static Expression negate(Expression expr) {
-        return new UnaryExpression(Not, expr);
-    }
-
     @Override
     public Expression visitBinaryExpr(BinaryExpression expr) {
         Expression lhs = expr.getLeft().compute(this),
@@ -54,12 +49,13 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
 
         // Rewrite != to ==
         if (expr.getOp() == Neq) {
-            return new UnaryExpression(Not, new BinaryExpression(expr.getLeft(), Eq, expr.getRight()));
+            return new UnaryExpression(Not, new BinaryExpression(expr.getLeft(), Eq, expr.getRight()))
+                    .compute(this);
         // Booleans at the Datalog level are represented by strings, i.e., if we want to compare
         // two boolean variables with == or != this is fine because the comparison will basically be
         // over 'true' and 'false' strings. Comparison using literals is harder, because it mixes
         // string and boolean representation in Souffle. To aid this situation expressions of the form
-        // x == y are rewritten to x && y || !x || !y.  This is done for the limited number of expressions,
+        // x == y are rewritten to x && y || !x || !y. This is done for the limited number of expressions,
         // for the moment only literal boolean values and boolean-valued functions.
         } else if (expr.getOp() == Eq) {
             Predicate<Expression> isBoolean = e -> {
@@ -187,11 +183,6 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
     }
 
     // Unsupported expressions
-    @Override
-    public Expression visitPolicySet(PolicySet set) {
-        throw new TranslationError("Unsupported transformation for: " + set);
-    }
-
     @Override
     public Expression visitPolicy(Policy policy) {
         throw new TranslationError("Unsupported transformation for: " + policy);

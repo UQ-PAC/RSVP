@@ -5,6 +5,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;
+import uq.pac.rsvp.policy.ast.invariant.Program;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.TestUtil;
 import uq.pac.rsvp.policy.datalog.entity.EntityValidator;
@@ -237,7 +238,7 @@ public class TypingTest {
                 """.formatted(invariantText);
             Ansi.Color colour = pass ? GREEN : YELLOW;
             logger.info(colour, "[*] %s", invariantText);
-            validator.validate(uq.pac.rsvp.policy.ast.invariant.InvariantSet.parse(text).stream().findAny().orElseThrow());
+            validator.validate(Program.parse(text).invariants().findAny().orElseThrow());
             if (!pass) {
                 throw new TranslationError("Unexpected test pass for invariant: " + invariantText);
             }

@@ -20,7 +20,7 @@ public class InvariantResult {
         this.invariant = invariant;
         this.assignments = InvariantAssignment.getAssignments(relation);
         Quantifier.Scope scope = invariant.getQuantifier().getScope();
-        switch (invariant.getQuantifier().getScope()) {
+        switch (scope) {
             case SOME -> this.holds = !relation.isEmpty();
             case NONE, ALL -> this.holds = relation.isEmpty();
             default -> throw new TranslationError("Unreachable");

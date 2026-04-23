@@ -14,9 +14,9 @@ import uq.pac.rsvp.policy.ast.expr.PropertyAccessExpression;
 import uq.pac.rsvp.policy.ast.expr.RecordExpression;
 import uq.pac.rsvp.policy.ast.expr.SetExpression;
 import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
+import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitorImpl;
-import uq.pac.rsvp.policy.datalog.invariant.Invariant;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestSet;
@@ -36,7 +36,7 @@ public class Verification {
         Path dlPath = Files.createTempDirectory("rsvp-");
 
         Translation translation =
-                new Translation(schema, policies, entities, invariantsPath, dlPath);
+                new Translation(schemaPath, policiesPath, entities, invariantsPath, dlPath);
 
         Map<Policy, RequestSet> policyResults = translation.getPolicyResult();
 
@@ -173,8 +173,7 @@ public class Verification {
         invariantResults.forEach((k, v) -> {
             if (!v.holds()) {
                 // FIXME fix source location
-                Report r = new Report(Severity.Error, "Invariant '" + k.getName() + "' does not "
-                        + "hold", new SourceLoc(invariantsFilename, 0, 1, 1, 1));
+                Report r = new Report(Severity.Error, "Invariant does not hold", k.getSourceLoc());
                 results.add(r);
             }
         });

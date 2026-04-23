@@ -1,9 +1,11 @@
-package uq.pac.rsvp.policy.ast.invariant;
+package uq.pac.rsvp.policy.ast.parser;
 
 import uq.pac.rsvp.policy.ast.CedarParser;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.Statement;
 import uq.pac.rsvp.policy.ast.expr.*;
+import uq.pac.rsvp.policy.ast.invariant.Invariant;
+import uq.pac.rsvp.policy.ast.invariant.Quantifier;
 import uq.pac.rsvp.support.FileSource;
 
 import static uq.pac.rsvp.policy.ast.expr.BinaryExpression.BinaryOp.*;

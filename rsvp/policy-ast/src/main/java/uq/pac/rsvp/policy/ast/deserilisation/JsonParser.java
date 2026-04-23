@@ -1,21 +1,16 @@
-package uq.pac.rsvp.policy.ast;
+package uq.pac.rsvp.policy.ast.deserilisation;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.expr.ActionExpression;
 import uq.pac.rsvp.policy.ast.expr.EntityExpression;
-import uq.pac.rsvp.policy.ast.expr.EuidExpression.EuidExpressionDeserialiser;
 import uq.pac.rsvp.policy.ast.expr.Expression;
-import uq.pac.rsvp.policy.ast.expr.Expression.ExpressionDeserialiser;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
-import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition.CommonTypeDefinitionDeserialiser;
 import uq.pac.rsvp.policy.ast.schema.Schema;
-import uq.pac.rsvp.policy.ast.schema.Schema.SchemaDeserialiser;
-import uq.pac.rsvp.policy.ast.PolicySet.PolicySetDeserialiser;
 import uq.pac.rsvp.support.FileSource;
 import uq.pac.rsvp.support.SourceLoc;
-import uq.pac.rsvp.support.SourceLoc.SourceLocDeserializer;
 
 public class JsonParser {
 

@@ -19,7 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import uq.pac.rsvp.policy.ast.JsonParser;
+import uq.pac.rsvp.policy.ast.deserilisation.JsonParser;
 import uq.pac.rsvp.policy.ast.visitor.SchemaResolutionVisitor;
 
 @DisplayName("Schema entity type AST")

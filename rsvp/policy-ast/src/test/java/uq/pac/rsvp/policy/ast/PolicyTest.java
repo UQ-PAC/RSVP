@@ -21,7 +21,7 @@ import uq.pac.rsvp.policy.ast.Policy.Effect;
 import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
 import uq.pac.rsvp.policy.ast.expr.BooleanExpression;
 import uq.pac.rsvp.policy.ast.expr.Expression;
-import uq.pac.rsvp.policy.ast.expr.Expression.ExpressionDeserialiser;
+import uq.pac.rsvp.policy.ast.deserilisation.ExpressionDeserialiser;
 import uq.pac.rsvp.policy.ast.expr.StringExpression;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 import uq.pac.rsvp.policy.ast.expr.BinaryExpression.BinaryOp;

@@ -1,7 +1,6 @@
 package uq.pac.rsvp.policy.ast.schema;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -10,14 +9,9 @@ import com.cedarpolicy.model.exception.InternalException;
 import com.cedarpolicy.model.schema.Schema.JsonOrCedar;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 
 import uq.pac.rsvp.RsvpException;
-import uq.pac.rsvp.policy.ast.JsonParser;
+import uq.pac.rsvp.policy.ast.deserilisation.JsonParser;
 import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.policy.ast.schema.common.CommonTypeReference;
 import uq.pac.rsvp.policy.ast.schema.common.DateTimeType;
@@ -398,78 +392,6 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
     @Override
     public <T> void process(SchemaPayloadVisitor<T> visitor, T payload) {
         visitor.visitSchema(this, payload);
-    }
-
-    public static class SchemaDeserialiser implements JsonDeserializer<Schema> {
-
-        @Override
-        public Schema deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-                throws JsonParseException {
-
-            Schema result = new Schema();
-
-            // TODO: error reporting
-            if (json.isJsonObject()) {
-
-                for (Map.Entry<String, JsonElement> definition : json.getAsJsonObject().entrySet()) {
-
-                    String name = definition.getKey();
-                    JsonElement value = definition.getValue();
-
-                    if (value.isJsonObject()) {
-
-                        JsonObject namespace = value.getAsJsonObject();
-
-                        namespace.addProperty("name", name);
-
-                        JsonElement entityTypes = namespace.get("entityTypes");
-
-                        if (entityTypes != null && entityTypes.isJsonObject()) {
-                            for (Map.Entry<String, JsonElement> entityType : entityTypes.getAsJsonObject().entrySet()) {
-                                if (entityType.getValue().isJsonObject()) {
-                                    JsonObject type = entityType.getValue().getAsJsonObject();
-                                    String typeName = entityType.getKey();
-
-                                    type.addProperty("name", name.isEmpty() ? typeName : name + "::" + typeName);
-                                }
-                            }
-                        }
-
-                        JsonElement actions = namespace.get("actions");
-
-                        if (actions != null && actions.isJsonObject()) {
-                            for (Map.Entry<String, JsonElement> action : actions.getAsJsonObject().entrySet()) {
-                                if (action.getValue().isJsonObject()) {
-                                    JsonObject type = action.getValue().getAsJsonObject();
-                                    String id = action.getKey();
-
-                                    type.addProperty("type", name.isEmpty() ? "Action" : name + "::Action");
-                                    type.addProperty("eid", id);
-                                }
-                            }
-                        }
-
-                        JsonElement commonTypes = namespace.get("commonTypes");
-
-                        if (commonTypes != null && commonTypes.isJsonObject()) {
-                            for (Map.Entry<String, JsonElement> commonType : commonTypes.getAsJsonObject().entrySet()) {
-                                if (commonType.getValue().isJsonObject()) {
-                                    JsonObject type = commonType.getValue().getAsJsonObject();
-                                    String typeName = commonType.getKey();
-
-                                    type.addProperty("definitionName",
-                                            name.isEmpty() ? typeName : name + "::" + typeName);
-                                }
-                            }
-                        }
-
-                        result.add(context.deserialize(value, Namespace.class));
-                    }
-                }
-            }
-
-            return result;
-        }
     }
 
 }

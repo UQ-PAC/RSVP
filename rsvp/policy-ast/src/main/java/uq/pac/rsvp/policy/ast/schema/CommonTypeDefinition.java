@@ -1,25 +1,5 @@
 package uq.pac.rsvp.policy.ast.schema;
 
-import java.lang.reflect.Type;
-import java.util.Collections;
-import java.util.Map;
-
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-
-import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
-import uq.pac.rsvp.policy.ast.schema.common.DateTimeType;
-import uq.pac.rsvp.policy.ast.schema.common.DecimalType;
-import uq.pac.rsvp.policy.ast.schema.common.DurationType;
-import uq.pac.rsvp.policy.ast.schema.common.IpAddressType;
-import uq.pac.rsvp.policy.ast.schema.common.LongType;
-import uq.pac.rsvp.policy.ast.schema.common.RecordTypeDefinition;
-import uq.pac.rsvp.policy.ast.schema.common.SetTypeDefinition;
-import uq.pac.rsvp.policy.ast.schema.common.StringType;
-import uq.pac.rsvp.policy.ast.schema.common.UnresolvedTypeReference;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
@@ -80,56 +60,4 @@ public abstract class CommonTypeDefinition implements SchemaItem {
     @Override
     public abstract <T> void process(SchemaPayloadVisitor<T> visitor, T payload);
 
-    public static class CommonTypeDefinitionDeserialiser implements JsonDeserializer<CommonTypeDefinition> {
-
-        @Override
-        public CommonTypeDefinition deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-                throws JsonParseException {
-
-            if (!json.isJsonObject()) {
-                return new UnresolvedTypeReference();
-            }
-
-            JsonObject definition = json.getAsJsonObject();
-
-            String type = definition.get("type").getAsString();
-            JsonElement nameElem = definition.get("name");
-            String name = nameElem != null ? nameElem.getAsString() : "unknown";
-
-            Type attributeType = switch (type) {
-                case "Record" -> {
-                    // Record attributes are required by Cedar by default. If there is no
-                    // explicit configuration, set required to true.
-                    JsonElement attributes = definition.get("attributes");
-
-                    if (attributes.isJsonObject()) {
-                        for (Map.Entry<String, JsonElement> attr : attributes.getAsJsonObject().entrySet()) {
-                            if (attr.getValue().isJsonObject()) {
-                                JsonObject value = attr.getValue().getAsJsonObject();
-                                if (!value.has("required")) {
-                                    value.addProperty("required", true);
-                                }
-                            }
-                        }
-                    }
-
-                    yield RecordTypeDefinition.class;
-                }
-                case "Set" -> SetTypeDefinition.class;
-                default -> switch (name) {
-                    case "__cedar::String" -> StringType.class;
-                    case "__cedar::Long" -> LongType.class;
-                    case "__cedar::Bool" -> BooleanType.class;
-                    case "__cedar::datetime" -> DateTimeType.class;
-                    case "__cedar::decimal" -> DecimalType.class;
-                    case "__cedar::duration" -> DurationType.class;
-                    case "__cedar::ipaddr" -> IpAddressType.class;
-                    default -> UnresolvedTypeReference.class;
-                };
-            };
-
-            return context.deserialize(json, attributeType);
-        }
-
-    }
 }

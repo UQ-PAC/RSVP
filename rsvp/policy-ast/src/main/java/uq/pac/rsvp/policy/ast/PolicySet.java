@@ -1,7 +1,6 @@
 package uq.pac.rsvp.policy.ast;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -12,6 +11,7 @@ import com.cedarpolicy.model.exception.InternalException;
 
 import com.google.gson.*;
 import uq.pac.rsvp.RsvpException;
+import uq.pac.rsvp.policy.ast.deserilisation.JsonParser;
 
 //FIXME: Remove in favour of program
 public class PolicySet {
@@ -35,7 +35,7 @@ public class PolicySet {
     public static PolicySet parseCedarPolicySet(Path policyFile) throws RsvpException {
         try {
             String json = com.cedarpolicy.model.policy.PolicySet.parseToJsonAst(policyFile);
-            return JsonParser.parsePolicySet(policyFile.toString(), json, Files.readString(policyFile));
+            return uq.pac.rsvp.policy.ast.deserilisation.JsonParser.parsePolicySet(policyFile.toString(), json, Files.readString(policyFile));
         } catch (InternalException | IOException e) {
             throw new RsvpException("Error parsing policy set in " + policyFile.getFileName(), e);
         }
@@ -83,18 +83,4 @@ public class PolicySet {
     public String toString() {
         return policies.toString();
     }
-
-    public static class PolicySetDeserialiser implements JsonDeserializer<PolicySet> {
-        @Override
-        public PolicySet deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-                throws JsonParseException {
-            JsonArray array = json.getAsJsonArray();
-            List<Policy> policies = new ArrayList<>();
-            for (JsonObject o : array.asList().stream().map(JsonElement::getAsJsonObject).toList()) {
-                policies.add(context.deserialize(o, Policy.class));
-            }
-            return new PolicySet(policies);
-        }
-    }
-
 }

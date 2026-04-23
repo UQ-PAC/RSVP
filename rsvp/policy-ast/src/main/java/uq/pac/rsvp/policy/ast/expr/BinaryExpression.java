@@ -9,7 +9,7 @@ import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
 public class BinaryExpression extends Expression {
 
-    public static enum BinaryOp {
+    public enum BinaryOp {
         @SerializedName("eq")
         Eq,
 
@@ -101,11 +101,6 @@ public class BinaryExpression extends Expression {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append('(');
-        sb.append(left.toString());
-        sb.append(' ');
-
         String opStr = switch (op) {
             case Add -> "+";
             case And -> "&&";
@@ -122,14 +117,7 @@ public class BinaryExpression extends Expression {
             case Neq -> "!=";
             case Or -> "||";
             case Sub -> "-";
-            default -> "error";
         };
-
-        sb.append(opStr);
-        sb.append(' ');
-        sb.append(right.toString());
-        sb.append(')');
-
-        return sb.toString();
+        return '(' + left.toString() + ' ' + opStr + ' ' + right.toString() + ')';
     }
 }

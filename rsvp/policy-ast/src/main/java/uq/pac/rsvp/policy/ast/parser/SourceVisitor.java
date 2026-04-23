@@ -1,4 +1,4 @@
-package uq.pac.rsvp.policy.ast.invariant;
+package uq.pac.rsvp.policy.ast.parser;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import uq.pac.rsvp.policy.ast.CedarBaseVisitor;

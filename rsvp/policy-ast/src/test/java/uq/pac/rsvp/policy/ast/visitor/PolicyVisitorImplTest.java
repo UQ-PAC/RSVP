@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import uq.pac.rsvp.policy.ast.JsonParser;
+import uq.pac.rsvp.policy.ast.deserilisation.JsonParser;
 import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.expr.BooleanExpression;
 import uq.pac.rsvp.policy.ast.expr.EntityExpression;

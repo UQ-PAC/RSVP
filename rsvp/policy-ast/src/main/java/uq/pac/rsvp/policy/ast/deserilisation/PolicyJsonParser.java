@@ -7,39 +7,25 @@ import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.expr.ActionExpression;
 import uq.pac.rsvp.policy.ast.expr.EntityExpression;
 import uq.pac.rsvp.policy.ast.expr.Expression;
-import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
-import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.support.FileSource;
 import uq.pac.rsvp.support.SourceLoc;
 
-public class JsonParser {
+public class PolicyJsonParser {
 
-    private static Gson getGson(String filename, String content) {
-
+    private static Gson getPolicyGson(String filename, String content) {
         FileSource fs = content == null ? null : new FileSource(filename, content);
-
         return new GsonBuilder()
                 .registerTypeAdapter(Expression.class, new ExpressionDeserialiser())
                 .registerTypeAdapter(ActionExpression.class, new EuidExpressionDeserialiser())
                 .registerTypeAdapter(EntityExpression.class, new EuidExpressionDeserialiser())
-                .registerTypeAdapter(CommonTypeDefinition.class, new CommonTypeDefinitionDeserialiser())
-                .registerTypeAdapter(Schema.class, new SchemaDeserialiser())
                 .registerTypeAdapter(PolicySet.class, new PolicySetDeserialiser())
                 .registerTypeAdapter(SourceLoc.class, new SourceLocDeserializer(fs))
                 .disableJdkUnsafe()
                 .create();
     }
 
-    public static Schema parseSchema(String json) {
-        return parseSchema(null, json);
-    }
-
-    public static Schema parseSchema(String filename, String json) {
-        return getGson(filename, json).fromJson(json, Schema.class);
-    }
-
     public static PolicySet parsePolicySet(String filename, String json, String cedar) {
-        return getGson(filename, cedar).fromJson(json, PolicySet.class);
+        return getPolicyGson(filename, cedar).fromJson(json, PolicySet.class);
     }
 
     public static PolicySet parsePolicySet(String filename, String json) {

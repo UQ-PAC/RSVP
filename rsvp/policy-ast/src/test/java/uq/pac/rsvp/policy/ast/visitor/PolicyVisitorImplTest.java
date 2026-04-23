@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import uq.pac.rsvp.policy.ast.deserilisation.JsonParser;
+import uq.pac.rsvp.policy.ast.deserilisation.PolicyJsonParser;
 import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.policy.ast.expr.BooleanExpression;
 import uq.pac.rsvp.policy.ast.expr.EntityExpression;
@@ -61,7 +61,7 @@ public class PolicyVisitorImplTest {
     void visitsParsedAst() throws IOException, URISyntaxException {
         URL url = ClassLoader.getSystemResource("expr.ast.json");
         String json = Files.readString(Path.of(url.toURI()));
-        PolicySet policies = JsonParser.parsePolicySet("file", json);
+        PolicySet policies = PolicyJsonParser.parsePolicySet("file", json);
 
         TestVisitor visitor = new TestVisitor();
 

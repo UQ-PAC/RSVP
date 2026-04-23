@@ -17,7 +17,8 @@ import org.junit.jupiter.api.Test;
 import com.google.gson.JsonParseException;
 
 import uq.pac.rsvp.RsvpException;
-import uq.pac.rsvp.policy.ast.deserilisation.JsonParser;
+import uq.pac.rsvp.policy.ast.deserilisation.PolicyJsonParser;
+import uq.pac.rsvp.policy.ast.deserilisation.SchemaJsonParser;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.support.SourceLoc;
@@ -56,7 +57,7 @@ public class ExpressionTest {
         void testDeserialisation() throws IOException, URISyntaxException {
             URL url = ClassLoader.getSystemResource("expr.ast.json");
             String json = Files.readString(Path.of(url.toURI()));
-            PolicySet policies = JsonParser.parsePolicySet("file.json", json,
+            PolicySet policies = PolicyJsonParser.parsePolicySet("file.json", json,
                     Files.readString(Path.of(url.getPath())));
 
             String[] expected = {
@@ -91,7 +92,7 @@ public class ExpressionTest {
         void testInvalidAstFile() throws IOException, URISyntaxException {
             URL url = ClassLoader.getSystemResource("invalid.ast.json");
             String json = Files.readString(Path.of(url.toURI()));
-            assertThrows(JsonParseException.class, () -> JsonParser.parsePolicySet("file.json", json));
+            assertThrows(JsonParseException.class, () -> PolicyJsonParser.parsePolicySet("file.json", json));
         }
 
         @Test
@@ -100,7 +101,7 @@ public class ExpressionTest {
             URL url = ClassLoader.getSystemResource("is.ast.json");
             String json = Files.readString(Path.of(url.toURI()));
 
-            PolicySet policies = JsonParser.parsePolicySet("file.json", json);
+            PolicySet policies = PolicyJsonParser.parsePolicySet("file.json", json);
 
             Expression condition = policies.getFirst().getCondition();
             assertTrue(condition instanceof BinaryExpression);

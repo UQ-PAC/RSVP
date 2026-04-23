@@ -19,7 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import uq.pac.rsvp.policy.ast.deserilisation.JsonParser;
+import uq.pac.rsvp.policy.ast.deserilisation.SchemaJsonParser;
 import uq.pac.rsvp.policy.ast.visitor.SchemaResolutionVisitor;
 
 @DisplayName("Schema entity type AST")
@@ -33,7 +33,7 @@ public class EntityTypeDefinitionTest {
         void empty() throws IOException {
             URL url = ClassLoader.getSystemResource("empty-entity.cedarschema.json");
             String json = Files.readString(Path.of(url.getPath()));
-            Schema schema = JsonParser.parseSchema(json);
+            Schema schema = SchemaJsonParser.parseSchema(json);
 
             schema.accept(new SchemaResolutionVisitor());
 
@@ -56,7 +56,7 @@ public class EntityTypeDefinitionTest {
         void memberOf() throws IOException {
             URL url = ClassLoader.getSystemResource("entity-refs.cedarschema.json");
             String json = Files.readString(Path.of(url.getPath()));
-            Schema schema = JsonParser.parseSchema(json);
+            Schema schema = SchemaJsonParser.parseSchema(json);
 
             schema.accept(new SchemaResolutionVisitor());
 
@@ -75,7 +75,7 @@ public class EntityTypeDefinitionTest {
         void unresolved() throws IOException {
             URL url = ClassLoader.getSystemResource("missing-refs.cedarschema.json");
             String json = Files.readString(Path.of(url.getPath()));
-            Schema schema = JsonParser.parseSchema(json);
+            Schema schema = SchemaJsonParser.parseSchema(json);
 
             assertThrows(SchemaResolutionException.class, () -> schema.accept(new SchemaResolutionVisitor()));
         }

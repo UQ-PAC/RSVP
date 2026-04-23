@@ -11,7 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import uq.pac.rsvp.RsvpException;
-import uq.pac.rsvp.policy.ast.deserilisation.JsonParser;
+import uq.pac.rsvp.policy.ast.deserilisation.SchemaJsonParser;
 import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.policy.ast.schema.common.CommonTypeReference;
 import uq.pac.rsvp.policy.ast.schema.common.DateTimeType;
@@ -184,7 +184,7 @@ public class Schema extends HashMap<String, Namespace> implements SchemaItem {
      */
     public static Schema parseJsonSchema(String json) throws RsvpException {
         try {
-            Schema result = JsonParser.parseSchema(json);
+            Schema result = SchemaJsonParser.parseSchema(json);
             SchemaVisitor visitor = new SchemaResolutionVisitor();
             visitor.visitSchema(result);
             return result;

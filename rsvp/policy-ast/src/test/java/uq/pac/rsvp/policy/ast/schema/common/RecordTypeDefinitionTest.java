@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import uq.pac.rsvp.policy.ast.deserilisation.JsonParser;
+import uq.pac.rsvp.policy.ast.deserilisation.SchemaJsonParser;
 import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.deserilisation.CommonTypeDefinitionDeserialiser;
@@ -64,7 +64,7 @@ public class RecordTypeDefinitionTest {
         void required() throws IOException {
             URL url = ClassLoader.getSystemResource("required-attr.cedarschema.json");
             String json = Files.readString(Path.of(url.getPath()));
-            Schema schema = JsonParser.parseSchema(json);
+            Schema schema = SchemaJsonParser.parseSchema(json);
 
             schema.accept(new SchemaResolutionVisitor());
 

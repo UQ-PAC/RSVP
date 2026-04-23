@@ -9,9 +9,8 @@ import java.util.stream.Stream;
 
 import com.cedarpolicy.model.exception.InternalException;
 
-import com.google.gson.*;
 import uq.pac.rsvp.RsvpException;
-import uq.pac.rsvp.policy.ast.deserilisation.JsonParser;
+import uq.pac.rsvp.policy.ast.deserilisation.PolicyJsonParser;
 
 //FIXME: Remove in favour of program
 public class PolicySet {
@@ -35,7 +34,7 @@ public class PolicySet {
     public static PolicySet parseCedarPolicySet(Path policyFile) throws RsvpException {
         try {
             String json = com.cedarpolicy.model.policy.PolicySet.parseToJsonAst(policyFile);
-            return uq.pac.rsvp.policy.ast.deserilisation.JsonParser.parsePolicySet(policyFile.toString(), json, Files.readString(policyFile));
+            return PolicyJsonParser.parsePolicySet(policyFile.toString(), json, Files.readString(policyFile));
         } catch (InternalException | IOException e) {
             throw new RsvpException("Error parsing policy set in " + policyFile.getFileName(), e);
         }
@@ -57,7 +56,7 @@ public class PolicySet {
     public static PolicySet parseCedarPolicySet(String filename, String policies) throws RsvpException {
         try {
             String json = com.cedarpolicy.model.policy.PolicySet.parseStringToJsonAst(policies);
-            return JsonParser.parsePolicySet(filename, json, policies);
+            return PolicyJsonParser.parsePolicySet(filename, json, policies);
         } catch (InternalException | IOException e) {
             throw new RsvpException("Error parsing policy set", e);
         }

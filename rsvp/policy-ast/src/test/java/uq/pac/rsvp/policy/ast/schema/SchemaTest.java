@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import uq.pac.rsvp.RsvpException;
-import uq.pac.rsvp.policy.ast.deserilisation.JsonParser;
+import uq.pac.rsvp.policy.ast.deserilisation.SchemaJsonParser;
 import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.policy.ast.schema.common.CommonTypeReference;
 import uq.pac.rsvp.policy.ast.schema.common.DateTimeType;
@@ -255,7 +255,7 @@ public class SchemaTest {
         public void healthcareApp() throws IOException {
             URL url = ClassLoader.getSystemResource("healthcare.cedarschema.json");
             String json = Files.readString(Path.of(url.getPath()));
-            Schema schema = JsonParser.parseSchema(json);
+            Schema schema = SchemaJsonParser.parseSchema(json);
 
             schema.accept(new SchemaResolutionVisitor());
 
@@ -267,7 +267,7 @@ public class SchemaTest {
         public void collections() throws IOException {
             URL url = ClassLoader.getSystemResource("collection-types.cedarschema.json");
             String json = Files.readString(Path.of(url.getPath()));
-            Schema schema = JsonParser.parseSchema(json);
+            Schema schema = SchemaJsonParser.parseSchema(json);
 
             schema.accept(new SchemaResolutionVisitor());
 
@@ -280,7 +280,7 @@ public class SchemaTest {
                 throws IOException {
             URL url = ClassLoader.getSystemResource("reserved-types.cedarschema.json");
             String json = Files.readString(Path.of(url.getPath()));
-            Schema schema = JsonParser.parseSchema(json);
+            Schema schema = SchemaJsonParser.parseSchema(json);
 
             checkReservedTypes(schema);
         }
@@ -290,7 +290,7 @@ public class SchemaTest {
         public void emptyNamespace() throws IOException {
             URL url = ClassLoader.getSystemResource("unnamed-namespace.cedarschema.json");
             String json = Files.readString(Path.of(url.getPath()));
-            Schema schema = JsonParser.parseSchema(json);
+            Schema schema = SchemaJsonParser.parseSchema(json);
 
             schema.accept(new SchemaResolutionVisitor());
 
@@ -302,7 +302,7 @@ public class SchemaTest {
         public void legalShadow() throws IOException {
             URL url = ClassLoader.getSystemResource("legal-shadow.cedarschema.json");
             String json = Files.readString(Path.of(url.getPath()));
-            Schema schema = JsonParser.parseSchema(json);
+            Schema schema = SchemaJsonParser.parseSchema(json);
 
             schema.accept(new SchemaResolutionVisitor());
 
@@ -314,7 +314,7 @@ public class SchemaTest {
         public void invalidTypes() throws IOException {
             URL url = ClassLoader.getSystemResource("invalid-types.cedarschema.json");
             String json = Files.readString(Path.of(url.getPath()));
-            Schema schema = JsonParser.parseSchema(json);
+            Schema schema = SchemaJsonParser.parseSchema(json);
 
             assertThrows(SchemaResolutionException.class, () -> schema.accept(new SchemaResolutionVisitor()));
         }
@@ -324,7 +324,7 @@ public class SchemaTest {
         public void annotations() throws IOException {
             URL url = ClassLoader.getSystemResource("type-annotations.cedarschema.json");
             String json = Files.readString(Path.of(url.getPath()));
-            Schema schema = JsonParser.parseSchema(json);
+            Schema schema = SchemaJsonParser.parseSchema(json);
 
             schema.accept(new SchemaResolutionVisitor());
 

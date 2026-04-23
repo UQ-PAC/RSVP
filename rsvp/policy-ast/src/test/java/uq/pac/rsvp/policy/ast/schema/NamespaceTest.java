@@ -12,7 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import uq.pac.rsvp.policy.ast.deserilisation.JsonParser;
+import uq.pac.rsvp.policy.ast.deserilisation.SchemaJsonParser;
 import uq.pac.rsvp.policy.ast.schema.common.StringType;
 
 @DisplayName("Schema namespace AST")
@@ -27,7 +27,7 @@ public class NamespaceTest {
         public void emptyNamespace() throws IOException {
             URL url = ClassLoader.getSystemResource("empty-namespace.cedarschema.json");
             String json = Files.readString(Path.of(url.getPath()));
-            Schema schema = JsonParser.parseSchema(json);
+            Schema schema = SchemaJsonParser.parseSchema(json);
 
             Namespace app = schema.get("App");
 

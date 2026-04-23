@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import uq.pac.rsvp.RsvpException;
-import uq.pac.rsvp.policy.ast.deserilisation.JsonParser;
+import uq.pac.rsvp.policy.ast.deserilisation.SchemaJsonParser;
 import uq.pac.rsvp.policy.ast.visitor.SchemaResolutionVisitor;
 
 @DisplayName("Schema action AST")
@@ -92,7 +92,7 @@ public class ActionDefinitionTest {
         void noReferences() throws IOException {
             URL url = ClassLoader.getSystemResource("empty-action.cedarschema.json");
             String json = Files.readString(Path.of(url.getPath()));
-            Schema schema = JsonParser.parseSchema(json);
+            Schema schema = SchemaJsonParser.parseSchema(json);
 
             ActionDefinition action = schema.get("App").getAction("someAction");
             ActionDefinition another = schema.get("App").getAction("anotherAction");
@@ -128,7 +128,7 @@ public class ActionDefinitionTest {
         void resolvesMemberOf() throws IOException {
             URL url = ClassLoader.getSystemResource("action.cedarschema.json");
             String json = Files.readString(Path.of(url.getPath()));
-            Schema schema = JsonParser.parseSchema(json);
+            Schema schema = SchemaJsonParser.parseSchema(json);
 
             new SchemaResolutionVisitor().visitSchema(schema);
 
@@ -150,7 +150,7 @@ public class ActionDefinitionTest {
         void resolvesMemberOfNNS() throws IOException {
             URL url = ClassLoader.getSystemResource("action.nns.cedarschema.json");
             String json = Files.readString(Path.of(url.getPath()));
-            Schema schema = JsonParser.parseSchema(json);
+            Schema schema = SchemaJsonParser.parseSchema(json);
 
             new SchemaResolutionVisitor().visitSchema(schema);
 

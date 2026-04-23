@@ -1,11 +1,10 @@
-package uq.pac.rsvp.policy.ast.invariant;
+package uq.pac.rsvp.policy.ast;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-import uq.pac.rsvp.policy.ast.CedarLexer;
-import uq.pac.rsvp.policy.ast.CedarParser;
-import uq.pac.rsvp.policy.ast.Policy;
-import uq.pac.rsvp.policy.ast.Statement;
+import uq.pac.rsvp.policy.ast.invariant.Invariant;
+import uq.pac.rsvp.policy.ast.invariant.SourceVisitor;
+import uq.pac.rsvp.policy.ast.invariant.StatementVisitor;
 import uq.pac.rsvp.support.FileSource;
 
 import java.io.IOException;
@@ -14,10 +13,13 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class Program {
+/**
+ * This class represents a collection of policy statements, such as cedar policies and invariants
+ */
+public class PolicyProgram {
     private final List<Statement> statements;
 
-    private Program(Collection<Statement> statements) {
+    private PolicyProgram(Collection<Statement> statements) {
         this.statements = List.copyOf(statements);
     }
 
@@ -57,15 +59,15 @@ public class Program {
         }
     }
 
-    public static Program parse(Path file) throws IOException {
+    public static PolicyProgram parse(Path file) throws IOException {
         return parse(file.toString(), Files.readString(file));
     }
 
-    public static Program parse(String text) {
+    public static PolicyProgram parse(String text) {
         return parse("unknown", text);
     }
 
-    public static Program parse(String file, String text) {
+    public static PolicyProgram parse(String file, String text) {
         ThrowingErrorListener errorListener = new ThrowingErrorListener();
 
         CedarLexer lexer = new CedarLexer(CharStreams.fromString(text));
@@ -88,6 +90,6 @@ public class Program {
                 return List.of();
             }
         }.visit(parser.program());
-        return new Program(statements);
+        return new PolicyProgram(statements);
     }
 }

@@ -36,7 +36,7 @@ import com.google.common.collect.Multimap;
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;
-import uq.pac.rsvp.policy.ast.invariant.Program;
+import uq.pac.rsvp.policy.ast.PolicyProgram;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.ast.DLAtom;
 import uq.pac.rsvp.policy.datalog.ast.DLDeclTerm;
@@ -165,14 +165,14 @@ public class Translation {
         //        that should uphold the invariants from the same file
         Collection<Invariant> invariants = List.of();
         if (invariantsFile != null) {
-            Program invariantProgram = Program.parse(invariantsFile);
+            PolicyProgram invariantProgram = PolicyProgram.parse(invariantsFile);
             if (!invariantProgram.getPolicies().isEmpty()) {
                 throw new TranslationError("Invariants found in the policy source: " + policyFile);
             }
             invariants = invariantProgram.getInvariants();
         }
 
-        Program policyProgram = Program.parse(policyFile);
+        PolicyProgram policyProgram = PolicyProgram.parse(policyFile);
         Collection<Policy> policies = policyProgram.getPolicies();
         if (!policyProgram.getInvariants().isEmpty()) {
             throw new TranslationError("Policies found in the invariant source: " + invariantsFile);

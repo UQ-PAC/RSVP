@@ -3,7 +3,7 @@ package uq.pac.rsvp.policy.datalog.invariant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
-import uq.pac.rsvp.policy.ast.invariant.Program;
+import uq.pac.rsvp.policy.ast.PolicyProgram;
 import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.StdLogger;
 
@@ -122,7 +122,7 @@ public class ParserTest {
         strings.forEach(s -> {
             String text = "invariant %s;".formatted(s);
             logger.info(YELLOW, text);
-            Invariant invariant = Program.parse(text).invariants().findFirst().orElseThrow();
+            Invariant invariant = PolicyProgram.parse(text).invariants().findFirst().orElseThrow();
             sb.append(invariant).append('\n');
         });
 

@@ -1,4 +1,4 @@
-package uq.pac.rsvp.policy.ast.deserilisation;
+package uq.pac.rsvp.policy.ast.deserialisation;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

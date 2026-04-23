@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test;
 
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.deserilisation.SchemaJsonParser;
-import uq.pac.rsvp.policy.ast.visitor.SchemaResolutionVisitor;
 
 @DisplayName("Schema action AST")
 public class ActionDefinitionTest {

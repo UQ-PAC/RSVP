@@ -1,15 +1,11 @@
-package uq.pac.rsvp.policy.ast.visitor;
+package uq.pac.rsvp.policy.ast.schema;
 
 import java.util.Map;
 
-import uq.pac.rsvp.policy.ast.schema.ActionDefinition;
-import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
-import uq.pac.rsvp.policy.ast.schema.Namespace;
-import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.common.RecordTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.common.SetTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.common.UnresolvedTypeReference;
-import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
+import uq.pac.rsvp.policy.ast.visitor.SchemaVisitorImpl;
 
 // Set definition names and resolve all references to entity types
 public class SchemaResolutionVisitor extends SchemaVisitorImpl {

@@ -3,22 +3,23 @@
  */
 package uq.pac.rsvp;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 import uq.pac.rsvp.policy.ast.Policy;
-import uq.pac.rsvp.policy.ast.PolicySet;
+import uq.pac.rsvp.policy.ast.PolicyProgram;
 
 public class Main {
 
     // Currently the app just accepts zero or more cedar policy file paths as
     // arguments which are parsed and the resulting policies and conditions printed
     // to stdout.
-    public static void main(String[] args) throws RsvpException {
+    public static void main(String[] args) throws IOException {
 
         // Parse each command line arg as a policy ast file
         for (String arg : args) {
             Path input = Path.of(arg).toAbsolutePath();
-            PolicySet policies = PolicySet.parseCedarPolicySet(input);
+            PolicyProgram policies = PolicyProgram.parse(input);
 
             // Print it out
             System.out.println("file: " + input);

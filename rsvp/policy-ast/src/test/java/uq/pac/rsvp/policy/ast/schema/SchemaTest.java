@@ -35,7 +35,6 @@ import uq.pac.rsvp.policy.ast.schema.common.RecordTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.common.SetTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.common.StringType;
 import uq.pac.rsvp.policy.ast.schema.common.UnresolvedTypeReference;
-import uq.pac.rsvp.policy.ast.visitor.SchemaResolutionVisitor;
 
 @DisplayName("Schema AST")
 public class SchemaTest {

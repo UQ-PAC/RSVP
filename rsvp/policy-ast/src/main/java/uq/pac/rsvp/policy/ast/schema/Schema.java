@@ -24,7 +24,6 @@ import uq.pac.rsvp.policy.ast.schema.common.StringType;
 import uq.pac.rsvp.policy.ast.schema.common.UnresolvedTypeReference;
 import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaPayloadVisitor;
-import uq.pac.rsvp.policy.ast.visitor.SchemaResolutionVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
 public class Schema extends HashMap<String, Namespace> implements SchemaItem {

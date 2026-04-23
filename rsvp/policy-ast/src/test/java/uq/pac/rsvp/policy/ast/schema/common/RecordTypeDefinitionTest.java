@@ -24,7 +24,7 @@ import uq.pac.rsvp.policy.ast.schema.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.deserilisation.CommonTypeDefinitionDeserialiser;
 import uq.pac.rsvp.policy.ast.schema.Schema;
-import uq.pac.rsvp.policy.ast.visitor.SchemaResolutionVisitor;
+import uq.pac.rsvp.policy.ast.schema.SchemaResolutionVisitor;
 
 @DisplayName("Schema record type AST")
 public class RecordTypeDefinitionTest {

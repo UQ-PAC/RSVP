@@ -101,7 +101,6 @@ public class InvariantFunctionValidator {
         }
     }
 
-
     static class SetContainsSetFunctionValidator extends FunctionValidator {
         SetContainsSetFunctionValidator(String name) {
             super(name, List.of(TSet), List.of(List.of(TSet)), BooleanType);

@@ -10,9 +10,8 @@ import java.util.stream.Stream;
 import com.cedarpolicy.model.exception.InternalException;
 
 import uq.pac.rsvp.RsvpException;
-import uq.pac.rsvp.policy.ast.deserilisation.PolicyJsonParser;
+import uq.pac.rsvp.policy.ast.deserialisation.PolicyJsonParser;
 
-//FIXME: Remove in favour of program
 public class PolicySet {
 
     private final List<Policy> policies;

@@ -3,10 +3,15 @@ package uq.pac.rsvp;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
-import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.AstNode;
+import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
 import uq.pac.rsvp.policy.ast.expr.CallExpression;
 import uq.pac.rsvp.policy.ast.expr.ConditionalExpression;
@@ -172,7 +177,6 @@ public class Verification {
         Map<Invariant,InvariantResult> invariantResults = translation.getInvariantResult();
         invariantResults.forEach((k, v) -> {
             if (!v.holds()) {
-                // FIXME fix source location
                 Report r = new Report(Severity.Error, "Invariant does not hold", k.getSourceLoc());
                 results.add(r);
             }

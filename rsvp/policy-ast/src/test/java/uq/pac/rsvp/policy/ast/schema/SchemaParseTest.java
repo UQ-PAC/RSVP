@@ -2,10 +2,14 @@ package uq.pac.rsvp.policy.ast.schema;
 
 import com.cedarpolicy.model.exception.InternalException;
 import com.cedarpolicy.model.schema.Schema;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import uq.pac.rsvp.policy.ast.parser.SchemaParser;
+import uq.pac.rsvp.policy.ast.CedarschemaBaseVisitor;
+import uq.pac.rsvp.policy.ast.CedarschemaLexer;
+import uq.pac.rsvp.policy.ast.CedarschemaParser;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -15,11 +19,11 @@ public class SchemaParseTest {
      * Basic testing for Cedarschema grammar of cedar schemas
      * <p>
      * The following is a differential test checking whether:
-     * (1) a string accepted by Cedar is also accepted by Rsvp (text not prefixed)
-     * (2) a string rejected by Cedar is also rejected by Rsvp (input prefixed by '-')
-     * (3) a string accepted by Cedar is rejected by Rsvp (input prefixed by '~').
-     * The latter is for the cases of something Rsvp does not yet support. For the moment this
-     * applies to tags only
+     * (1) a string accepted by Cedar is also accepted by RSVP (text not prefixed)
+     * (2) a string rejected by Cedar is also rejected by RSVP (input prefixed by '-')
+     * (3) a string accepted by Cedar is rejected by RSVP (input prefixed by '~').
+     * The latter is for the cases of something RSVP does not yet support.
+     * For the moment this applies to tags only
      */
     @ParameterizedTest
     @ValueSource(strings = {
@@ -62,7 +66,7 @@ public class SchemaParseTest {
             "-namespace A { entity B; } namespace C { entity D in A::\"B\"; }",
 
             // Actions
-            // ++ Action names
+            // Action names
             "action A;",   // Action names: be identifiers or strings
             "action A, B;",
             "action \"A\";",
@@ -71,7 +75,7 @@ public class SchemaParseTest {
             "namespace A { action B; } namespace C { action D; }",
             "-namespace A { action A::B; };", // Action names cannot have '::'
 
-            // ++ in
+            // in
             "action A; action B in A;",
             "namespace C { action A; action B in A; }", // can be ID
             "namespace C { action A; action B in \"A\"; }", // can be STRING
@@ -138,7 +142,24 @@ public class SchemaParseTest {
 
             // Tags feature of entities is unsupported by RSVP
             "~entity A { name: String } tags String;",
-            "~entity A { name: String } tags { age: Long, surname: String };"
+            "~entity A { name: String } tags { age: Long, surname: String };",
+
+            // Trailing comma in record
+            "entity A { name: String, };",
+            "entity A { name: String, age: Long, };",
+            "-entity A { , };",
+
+            // Using keywords as attribute names
+            "entity A { String: String };",
+            "entity A { type: String };",
+            "entity A { entity: String };",
+            "entity A { action: String };",
+            "entity A { principal: String };",
+            "entity A { resource: String };",
+            "entity A { appliesTo: String };",
+            "entity A { enum: String };",
+            "-entity A { in: String };",
+
     })
     void test(String text) throws InternalException {
         boolean cedarPositive = true;
@@ -166,7 +187,7 @@ public class SchemaParseTest {
 
         // rsvp
         try {
-            SchemaParser.parse("test.cedarschema", text);
+            parse(text);
             if (!rsvpPositive) {
                 fail("Unexpected success [rsvp]: " + text);
             }
@@ -176,4 +197,25 @@ public class SchemaParseTest {
             }
         }
     }
+
+    static String parse(String text) {
+        SchemaParser.ThrowingErrorListener errorListener = new SchemaParser.ThrowingErrorListener();
+
+        CedarschemaLexer lexer = new CedarschemaLexer(CharStreams.fromString(text));
+        lexer.removeErrorListeners();
+        lexer.addErrorListener(errorListener);
+
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        CedarschemaParser parser = new CedarschemaParser(tokens);
+        parser.removeErrorListeners();
+        parser.addErrorListener(errorListener);
+
+        return new CedarschemaBaseVisitor<String>() {
+            @Override
+            public String visitSchema(CedarschemaParser.SchemaContext ctx) {
+                return ctx.getText();
+            }
+        }.visit(parser.schema());
+    }
+
 }

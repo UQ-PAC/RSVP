@@ -18,7 +18,7 @@ import com.google.gson.JsonParseException;
 
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.deserialisation.PolicyJsonParser;
-import uq.pac.rsvp.policy.ast.Policy;
+import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.PolicySet;
 import uq.pac.rsvp.support.SourceLoc;
 

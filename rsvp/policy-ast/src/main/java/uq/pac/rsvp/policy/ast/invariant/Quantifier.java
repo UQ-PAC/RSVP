@@ -1,6 +1,6 @@
 package uq.pac.rsvp.policy.ast.invariant;
 
-import uq.pac.rsvp.policy.ast.PolicyAstNode;
+import uq.pac.rsvp.policy.ast.policy.PolicyAstNode;
 import uq.pac.rsvp.policy.ast.expr.TypeExpression;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;

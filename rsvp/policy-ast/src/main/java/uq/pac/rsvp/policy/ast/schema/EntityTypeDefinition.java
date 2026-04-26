@@ -12,7 +12,7 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
-public class EntityTypeDefinition implements SchemaItem {
+public class EntityTypeDefinition extends SchemaStatement {
 
     private final String name;
 

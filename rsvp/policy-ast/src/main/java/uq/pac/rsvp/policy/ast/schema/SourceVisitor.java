@@ -1,12 +1,12 @@
-package uq.pac.rsvp.policy.ast.parser;
+package uq.pac.rsvp.policy.ast.schema;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import uq.pac.rsvp.policy.ast.CedarBaseVisitor;
+import uq.pac.rsvp.policy.ast.CedarschemaBaseVisitor;
 import uq.pac.rsvp.support.FileSource;
 import uq.pac.rsvp.support.LineLoc;
 import uq.pac.rsvp.support.SourceLoc;
 
-class SourceVisitor<T> extends CedarBaseVisitor<T> {
+class SourceVisitor<T> extends CedarschemaBaseVisitor<T> {
 
     private final FileSource fs;
 

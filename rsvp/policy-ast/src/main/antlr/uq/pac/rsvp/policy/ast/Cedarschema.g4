@@ -17,6 +17,32 @@ RESERVED:
     | 'decimal'
 ;
 
+TYPE: 'type';
+ENTITY: 'entity';
+ACTION: 'action';
+APPLIES: 'appliesTo';
+NAMESPACE: 'namespace';
+PRINCIPAL: 'principal';
+RESOURCE: 'resource';
+CONTEXT: 'context';
+ENUM: 'enum';
+IN: 'in';
+
+// Special list of keywords that are allowed to be used
+// as record attribute names. For whatever reason the IN
+// keyword cannot be an attribute name (as per the original cedar parser)
+keywords:
+    TYPE
+    | ENTITY
+    | ACTION
+    | APPLIES
+    | NAMESPACE
+    | PRINCIPAL
+    | RESOURCE
+    | CONTEXT
+    | ENUM
+;
+
 // Identifier (excluding keywords)
 ID: [_A-Za-z][A-Za-z0-9_]*;
 
@@ -37,15 +63,31 @@ NUMBER: [-]? [0-9]+;
 // White space
 WS: [ \r\n\t]+ -> skip;
 
+OPTIONAL: '?';
+
 // Path: an entity type, a sequence of '::'-separated identifiers i.e., A or A::B
 path: ident ('::' ident)*;
 // A single path or a non-empty literal list of thereof
 paths: path | '[' (path (',' path)*)? ']';
 
 // Names are identifiers or strings
-name: ID | STRING;
+name: keywords | RESERVED | ID | STRING ;
+
 // Comma-separated list of literal strings
 strings: STRING (',' STRING)*;
+
+attribute: name OPTIONAL? ':' type;
+record:
+    '{' '}'
+    | '{' attribute (',' attribute)* ','? '}';
+
+set: 'Set' '<' type '>';
+
+type:
+    path        # namedType
+    | record    # recordType
+    | set       # setType
+;
 
 // Action references: identifiers, strings or entity references with 'Action' sub-type
 actionRef: name | (path '::')? 'Action' '::' STRING ;
@@ -53,38 +95,31 @@ actionRefs: actionRef | '[' actionRef (',' actionRef)* ']';
 
 entityNames: ID (',' ID)*;
 entity:
-    'entity' entityNames ('in' paths)? ('='? recordType)? ';'
-    | 'entity' entityNames 'enum' '[' strings ']' ';'
+    ENTITY entityNames ('in' paths)? ('='? record)? ';'
+    | ENTITY entityNames ENUM '[' strings ']' ';'
 ;
 
 action:
-    'action' name (',' name)? ('in' actionRefs)? appliesTo? ';'
+    ACTION name (',' name)? (IN actionRefs)? appliesTo? ';'
 ;
 
-appliesTo: 'appliesTo' '{'
-    'principal' ':' paths ','
-    'resource' ':' paths
-    (',' 'context' ':' recordType)?
+appliesTo: APPLIES '{'
+    PRINCIPAL ':' paths ','
+    RESOURCE ':' paths
+    (',' CONTEXT ':' record)?
 '}';
 
 typename: ID;
 common:
-    'type' typename '=' type ';'
+    TYPE typename '=' type ';'
 ;
-
-attribute: name '?'? ':' type;
-recordType:
-    '{' '}'
-    | '{' attribute (',' attribute)* '}';
-setType: 'Set' '<' type '>';
-type: path | recordType | setType;
 
 annotation: '@' ident ('(' STRING ')')?;
 
 statement: annotation* (entity | action | common);
 
 namespace:
-    annotation* 'namespace' path '{' statement* '}';
+    annotation* NAMESPACE path '{' statement* '}';
 
 schema:
     (statement | namespace)*;

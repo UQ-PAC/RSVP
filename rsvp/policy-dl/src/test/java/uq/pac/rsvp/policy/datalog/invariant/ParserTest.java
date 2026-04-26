@@ -3,7 +3,7 @@ package uq.pac.rsvp.policy.datalog.invariant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
-import uq.pac.rsvp.policy.ast.PolicyProgram;
+import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
 import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.StdLogger;
 

@@ -1,4 +1,4 @@
-package uq.pac.rsvp.policy.ast.parser;
+package uq.pac.rsvp.policy.ast.policy;
 
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;

@@ -1,5 +1,6 @@
-package uq.pac.rsvp.policy.ast;
+package uq.pac.rsvp.policy.ast.policy;
 
+import uq.pac.rsvp.policy.ast.AstNode;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 import uq.pac.rsvp.support.SourceLoc;

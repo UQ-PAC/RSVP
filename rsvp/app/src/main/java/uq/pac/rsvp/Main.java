@@ -6,8 +6,8 @@ package uq.pac.rsvp;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import uq.pac.rsvp.policy.ast.Policy;
-import uq.pac.rsvp.policy.ast.PolicyProgram;
+import uq.pac.rsvp.policy.ast.policy.Policy;
+import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
 
 public class Main {
 

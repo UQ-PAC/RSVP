@@ -1,8 +1,6 @@
-package uq.pac.rsvp.policy.ast;
+package uq.pac.rsvp.policy.ast.policy;
 
-import org.antlr.v4.runtime.*;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
-import uq.pac.rsvp.policy.ast.parser.PolicyParser;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,13 +12,13 @@ import java.util.stream.Stream;
  * This class represents a collection of policy statements, such as cedar policies and invariants
  */
 public class PolicyProgram {
-    private final List<Statement> statements;
+    private final List<PolicyStatement> statements;
 
-    private PolicyProgram(Collection<Statement> statements) {
+    private PolicyProgram(Collection<PolicyStatement> statements) {
         this.statements = List.copyOf(statements);
     }
 
-    public Collection<Statement> getStatements() {
+    public Collection<PolicyStatement> getStatements() {
         return statements;
     }
 
@@ -32,7 +30,7 @@ public class PolicyProgram {
         return policies().toList();
     }
 
-    public Stream<Statement> stream() {
+    public Stream<PolicyStatement> stream() {
         return statements.stream();
     }
 

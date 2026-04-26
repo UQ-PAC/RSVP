@@ -12,7 +12,7 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
-public class ActionDefinition implements SchemaItem {
+public class ActionDefinition extends SchemaStatement {
 
     public static class ActionReference {
         private final String id;

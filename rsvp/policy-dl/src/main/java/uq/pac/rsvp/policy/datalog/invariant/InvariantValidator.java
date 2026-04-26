@@ -1,6 +1,6 @@
 package uq.pac.rsvp.policy.datalog.invariant;
 
-import uq.pac.rsvp.policy.ast.Policy;
+import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;

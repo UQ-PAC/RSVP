@@ -34,9 +34,9 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Multimap;
 
 import uq.pac.rsvp.RsvpException;
-import uq.pac.rsvp.policy.ast.Policy;
+import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;
-import uq.pac.rsvp.policy.ast.PolicyProgram;
+import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.ast.DLAtom;
 import uq.pac.rsvp.policy.datalog.ast.DLDeclTerm;

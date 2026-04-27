@@ -423,7 +423,7 @@ public class SchemaTest {
             Set<String> colourEnum = Set.copyOf(Arrays.asList("red", "green", "blue", "purple", "pink", "yellow"));
             entityTypes.put("Colour",
                     new EntityTypeDefinition("DataCollectionApp::Colour", new HashSet<>(), new HashMap<>(),
-                            colourEnum, new HashMap<>()));
+                            colourEnum));
 
             Namespace dataCollection = new Namespace("DataCollectionApp", entityTypes, actions, commonTypes);
             schema.add(dataCollection);
@@ -537,8 +537,7 @@ public class SchemaTest {
             entityAnnotations.put("AnEntityAnnotation", "with a value!");
 
             EntityTypeDefinition entity = new EntityTypeDefinition("App::SomeEntity", new HashSet<>(), new HashMap<>(),
-                    null,
-                    entityAnnotations);
+                    null);
             entities.put("SomeEntity", entity);
 
             Map<String, ActionDefinition> actions = new HashMap<>();
@@ -548,8 +547,7 @@ public class SchemaTest {
 
             Set<String> appliesTo = Set.copyOf(Arrays.asList("App::SomeEntity"));
             actions.put("someAction",
-                    new ActionDefinition("App::Action", "someAction", null, appliesTo, appliesTo, null,
-                            actionAnnotations));
+                    new ActionDefinition("App::Action", "someAction", null, appliesTo, appliesTo, null));
 
             Map<String, CommonTypeDefinition> types = new HashMap<>();
 
@@ -856,14 +854,14 @@ public class SchemaTest {
         EntityTypeDefinition entity = schema.getEntityType("App::SomeEntity");
 
         assertNotNull(entity);
-        assertEquals(1, entity.getAnnotations().size());
-        assertEquals("with a value!", entity.getAnnotations().get("AnEntityAnnotation"));
+//        assertEquals(1, entity.getAnnotations().size());
+//        assertEquals("with a value!", entity.getAnnotations().get("AnEntityAnnotation"));
 
         ActionDefinition action = schema.getAction("App::Action", "someAction");
 
         assertNotNull(action);
-        assertEquals(1, action.getAnnotations().size());
-        assertEquals("with a totally different value?", action.getAnnotations().get("AnActionAnnotation"));
+        //assertEquals(1, action.getAnnotations().size());
+        //assertEquals("with a totally different value?", action.getAnnotations().get("AnActionAnnotation"));
 
         CommonTypeDefinition type = schema.getCommonType("App::SomeType");
 

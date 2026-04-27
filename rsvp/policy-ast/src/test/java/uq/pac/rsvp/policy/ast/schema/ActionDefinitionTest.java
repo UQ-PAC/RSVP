@@ -102,24 +102,24 @@ public class ActionDefinitionTest {
             assertEquals(0, action.getMemberOf().size());
             assertEquals(0, action.getAppliesToPrincipalTypes().size());
             assertEquals(0, action.getAppliesToResourceTypes().size());
-            assertEquals(0, action.getAnnotations().size());
+            //assertEquals(0, action.getAnnotations().size());
 
             assertEquals(0, another.getMemberOf().size());
             assertEquals(0, another.getAppliesToPrincipalTypes().size());
             assertEquals(0, another.getAppliesToResourceTypes().size());
-            assertEquals(0, another.getAnnotations().size());
+            //assertEquals(0, another.getAnnotations().size());
 
             new SchemaResolutionVisitor().visitSchema(schema);
 
             assertEquals(0, action.getMemberOf().size());
             assertEquals(0, action.getAppliesToPrincipalTypes().size());
             assertEquals(0, action.getAppliesToResourceTypes().size());
-            assertEquals(0, action.getAnnotations().size());
+            //assertEquals(0, action.getAnnotations().size());
 
             assertEquals(0, another.getMemberOf().size());
             assertEquals(0, another.getAppliesToPrincipalTypes().size());
             assertEquals(0, another.getAppliesToResourceTypes().size());
-            assertEquals(0, another.getAnnotations().size());
+            //assertEquals(0, another.getAnnotations().size());
         }
 
         @Test
@@ -208,7 +208,7 @@ public class ActionDefinitionTest {
             assertEquals(0, action.getMemberOf().size());
             assertEquals(0, action.getAppliesToPrincipalTypes().size());
             assertEquals(0, action.getAppliesToResourceTypes().size());
-            assertEquals(0, action.getAnnotations().size());
+            //assertEquals(0, action.getAnnotations().size());
         }
 
         @Test
@@ -221,7 +221,7 @@ public class ActionDefinitionTest {
             Set<String> principalTypes = Set.copyOf(Arrays.asList("App::User", "Loser"));
             Set<String> resourceTypes = Set.copyOf(Arrays.asList("Loser"));
 
-            ActionDefinition action = new ActionDefinition("", "", memberOf, principalTypes, resourceTypes, null, null);
+            ActionDefinition action = new ActionDefinition("", "", memberOf, principalTypes, resourceTypes, null);
 
             action.resolveReferences(schema, local);
 
@@ -244,7 +244,7 @@ public class ActionDefinitionTest {
             Set<String> principalTypes = Set.copyOf(Arrays.asList("App::Loser", "Missing"));
             Set<String> resourceTypes = Set.copyOf(Arrays.asList("Missing"));
 
-            ActionDefinition action = new ActionDefinition("", "", memberOf, principalTypes, resourceTypes, null, null);
+            ActionDefinition action = new ActionDefinition("", "", memberOf, principalTypes, resourceTypes, null);
 
             assertThrows(SchemaResolutionException.class, () -> action.resolveReferences(schema, local));
 
@@ -259,11 +259,11 @@ public class ActionDefinitionTest {
             annotations.put("some_annotation", "for testing");
             annotations.put("another_annotation", "for luck");
 
-            ActionDefinition action = new ActionDefinition("", "", null, null, null, null, annotations);
+            ActionDefinition action = new ActionDefinition("", "", null, null, null, null);
 
-            assertEquals(2, action.getAnnotations().size());
-            assertEquals("for testing", action.getAnnotations().get("some_annotation"));
-            assertEquals("for luck", action.getAnnotations().get("another_annotation"));
+//            assertEquals(2, action.getAnnotations().size());
+//            assertEquals("for testing", action.getAnnotations().get("some_annotation"));
+//            assertEquals("for luck", action.getAnnotations().get("another_annotation"));
 
         }
     }

@@ -24,18 +24,14 @@ public class EntityTypeDefinition extends SchemaStatement {
     @SerializedName("enum")
     private final Set<String> entityNamesEnum;
 
-    private final Map<String, String> annotations;
-
     // Set during type resolution
     private Set<EntityTypeDefinition> resolvedMemberOfDefinitions;
 
     public EntityTypeDefinition(String name, Set<String> memberOfTypes, Map<String, CommonTypeDefinition> shape,
-            Set<String> entityNamesEnum,
-            Map<String, String> annotations) {
+            Set<String> entityNamesEnum) {
         this.name = name;
         this.unresolvedMemberOfTypes = memberOfTypes != null ? Set.copyOf(memberOfTypes) : Collections.emptySet();
         this.shape = new RecordTypeDefinition(shape);
-        this.annotations = annotations != null ? Map.copyOf(annotations) : Collections.emptyMap();
         this.entityNamesEnum = entityNamesEnum != null ? Set.copyOf(entityNamesEnum) : Collections.emptySet();
     }
 
@@ -43,21 +39,16 @@ public class EntityTypeDefinition extends SchemaStatement {
         return shape;
     }
 
-    public EntityTypeDefinition(String name, Set<String> memberOfTypes, Map<String, CommonTypeDefinition> shape,
-            Set<String> entityNamesEnum) {
-        this(name, memberOfTypes, shape, entityNamesEnum, null);
-    }
-
     public EntityTypeDefinition(String name, Set<String> memberOfTypes, Map<String, CommonTypeDefinition> shape) {
-        this(name, memberOfTypes, shape, null, null);
+        this(name, memberOfTypes, shape, null);
     }
 
     public EntityTypeDefinition(String name) {
-        this(name, null, null, null, null);
+        this(name, null, null, null);
     }
 
     public EntityTypeDefinition() {
-        this(null, null, null, null, null);
+        this(null);
     }
 
     public void resolveMemberOfTypes(Schema schema, Namespace local) {
@@ -103,10 +94,6 @@ public class EntityTypeDefinition extends SchemaStatement {
 
     public Set<String> getEntityNamesEnum() {
         return entityNamesEnum;
-    }
-
-    public Map<String, String> getAnnotations() {
-        return annotations;
     }
 
     @Override

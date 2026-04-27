@@ -47,8 +47,7 @@ class SchemaStatementVisitor extends SourceVisitor<SchemaStatement> {
                     .collect(Collectors.toSet());
         }
 
-        Map<String, String> annotations = new HashMap<>();
-        return new EntityTypeDefinition(name, unresolvedMemberOf, rec.getAttributes(), enumMembers, annotations);
+        return new EntityTypeDefinition(name, unresolvedMemberOf, rec.getAttributes(), enumMembers);
     }
 
     @Override
@@ -84,6 +83,6 @@ class SchemaStatementVisitor extends SourceVisitor<SchemaStatement> {
                 unresolvedMemberOf.add(ref);
             });
         }
-        return new ActionDefinition(type, eid, unresolvedMemberOf, principalTypes, resourceTypes, context, annotations);
+        return new ActionDefinition(type, eid, unresolvedMemberOf, principalTypes, resourceTypes, context);
     }
 }

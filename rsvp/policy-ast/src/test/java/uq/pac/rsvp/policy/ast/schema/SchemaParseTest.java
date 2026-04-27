@@ -28,14 +28,30 @@ public class SchemaParseTest {
     @ParameterizedTest
     @ValueSource(strings = {
             "namespace A {}", // Empty namespace is ok
-            "-namespace {}",  // Namespaces require names
+            "namespace A::B {}", // Schema names can be compound
+            "-namespace {}",  // but cannot be empty
+            "-namespace B { namespace B {} }", // Namespaces cannot be nested
+            "namespace B { } namespace A {}", // Multiple namespaces are ok
+            "entity A; namespace B { } entity B;", // Global namespace is special
+            "entity A; namespace B { entity C; } namespace E { entity D; }",
+            // Definition of the same schema twice is not ok, but this is a semantic issue:
+            // Cedar fails, RSVP does not (at this stage)
+            "`entity A; namespace B { entity C; } namespace B { entity D; }",
+
+            // Names of entities, types and actions cannot be compound
+            "-entity A::B;",
+            "-action A::B;",
+            "-type A::B = String;",
+            // Actions names can include arbitrary characters as long as the names are quoted
+            "action \"A::B\";",
+            // Entities and common types cannot be quoted
+            "-entity \"A::B\";",
+            "-type \"A::B\" = String",
 
             "entity A;",     // One entity
             "entity A, B;",  // Multiple entities
             "namespace N { entity A; }", // One entity in namespace
             "namespace N { entity A, B; }", // Multiple entities in namespace
-            "-entity \"A\";", // Entity names cannot be quoted
-            "-entity A::B",   // Or be composite
 
             "entity Foo {};",  // '=' is optional
             "entity Foo = { };",
@@ -95,6 +111,14 @@ public class SchemaParseTest {
             "-action A, B; action C in [];",
             "action A, B; action C in [\"A\", B];",
             "action A, B; action C in [\"A\"];",
+
+            // References can be
+            "namespace A { action B; action C in B; }", // unquoted identifiers (as action names)
+            "namespace A { action B; action C in \"B\"; }",  // quoted identifiers (as action names)
+            "namespace A { action B; action C in Action::\"B\"; }", // Relative action names, e.g. Action::"foo" in some namespace
+            "namespace A { action B; action C in A::Action::\"B\"; }", // Absolute action names, e.g. NS:Action::"foo" in some namespace
+            // References cannot be in the form of A::B (both unquoted)
+            "-namespace A { action B; action C in A::B; }",
 
             // applies to
             "-entity A, B, C; action D appliesTo { };", // unexpected token
@@ -164,13 +188,19 @@ public class SchemaParseTest {
     void test(String text) throws InternalException {
         boolean cedarPositive = true;
         boolean rsvpPositive = true;
+        // '-' both fail
         if (text.startsWith("-")) {
             text = text.substring(1);
             cedarPositive = false;
             rsvpPositive = false;
+        // RSVP fails, Cedar does not
         } else if (text.startsWith("~")) {
             text = text.substring(1);
             rsvpPositive = false;
+        // Cedar fails, RSVP does not
+        } else if (text.startsWith("`")) {
+            text = text.substring(1);
+            cedarPositive = false;
         }
 
         // cedar

@@ -42,12 +42,12 @@ public class EntityTypeDefinitionTest {
             assertEquals(0, some.getEntityNamesEnum().size());
             assertEquals(0, some.getMemberOfTypes().size());
             assertEquals(0, some.getShapeAttributeNames().size());
-            assertEquals(0, some.getAnnotations().size());
+            //assertEquals(0, some.getAnnotations().size());
 
             assertEquals(0, another.getEntityNamesEnum().size());
             assertEquals(0, another.getMemberOfTypes().size());
             assertEquals(0, another.getShapeAttributeNames().size());
-            assertEquals(0, another.getAnnotations().size());
+            //assertEquals(0, another.getAnnotations().size());
         }
 
         @Test
@@ -95,7 +95,7 @@ public class EntityTypeDefinitionTest {
             entities.put("SomeEntity", new EntityTypeDefinition("App::SomeEntity"));
             entities.put("AnotherEntity",
                     new EntityTypeDefinition("App::AnotherEntity", Collections.emptySet(), Collections.emptyMap(),
-                            Collections.emptySet(), Collections.emptyMap()));
+                            Collections.emptySet()));
 
             Namespace app = new Namespace("App", entities, null);
             schema.add(app);
@@ -111,12 +111,12 @@ public class EntityTypeDefinitionTest {
             assertEquals(0, some.getEntityNamesEnum().size());
             assertEquals(0, some.getMemberOfTypes().size());
             assertEquals(0, some.getShapeAttributeNames().size());
-            assertEquals(0, some.getAnnotations().size());
+            //assertEquals(0, some.getAnnotations().size());
 
             assertEquals(0, another.getEntityNamesEnum().size());
             assertEquals(0, another.getMemberOfTypes().size());
             assertEquals(0, another.getShapeAttributeNames().size());
-            assertEquals(0, another.getAnnotations().size());
+            //assertEquals(0, another.getAnnotations().size());
         }
 
         @Test

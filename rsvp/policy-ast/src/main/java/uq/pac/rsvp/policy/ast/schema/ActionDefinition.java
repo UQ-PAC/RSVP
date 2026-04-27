@@ -2,7 +2,6 @@ package uq.pac.rsvp.policy.ast.schema;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import com.google.gson.annotations.SerializedName;
@@ -24,8 +23,7 @@ public class ActionDefinition extends SchemaStatement {
         }
 
         protected ActionReference() {
-            this.id = null;
-            this.type = null;
+            this(null, null);
         }
 
         public String getName() {
@@ -71,27 +69,23 @@ public class ActionDefinition extends SchemaStatement {
 
     private final ActionApplication appliesTo;
 
-    private final Map<String, String> annotations;
-
     // Set during type resolution
     private Set<ActionDefinition> resolvedMemberOf;
 
     public ActionDefinition(String type, String eid, Set<ActionReference> memberOf, Set<String> principalTypes,
-            Set<String> resourceTypes,
-            RecordTypeDefinition context, Map<String, String> annotations) {
+            Set<String> resourceTypes, RecordTypeDefinition context) {
         this.type = type;
         this.eid = eid;
         this.unresolvedMemberOf = memberOf != null ? Set.copyOf(memberOf) : Collections.emptySet();
         this.appliesTo = new ActionApplication(principalTypes, resourceTypes, context);
-        this.annotations = annotations != null ? Map.copyOf(annotations) : Collections.emptyMap();
     }
 
     public ActionDefinition(String type, String eid) {
-        this(type, eid, null, null, null, null, null);
+        this(type, eid, null, null, null, null);
     }
 
     public ActionDefinition() {
-        this(null, null, null, null, null, null, null);
+        this(null, null, null, null, null, null);
     }
 
     public void resolveReferences(Schema schema, Namespace local) {
@@ -188,10 +182,6 @@ public class ActionDefinition extends SchemaStatement {
      */
     public RecordTypeDefinition getAppliesToContext() {
         return appliesTo.context;
-    }
-
-    public Map<String, String> getAnnotations() {
-        return annotations;
     }
 
     @Override

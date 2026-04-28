@@ -6,13 +6,17 @@ export type FileType =
   | "text";
 export type ReportSeverity = "info" | "warn" | "err";
 
+interface LineLoc {
+  line: number;
+  column: number;
+}
 export interface SourceLoc {
   file: string;
   source?: VerificationFile;
   offset: number;
   len: number;
-  line: number;
-  col: number;
+  startLoc?: LineLoc;
+  endLoc?: LineLoc;
 }
 
 export interface Report {

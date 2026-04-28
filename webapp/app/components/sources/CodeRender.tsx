@@ -60,34 +60,43 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
 
   reports.forEach((report) => {
     const loc = report.primarySourceLocation;
+
+    if (!loc.startLoc || !loc.endLoc) return;
+
     const lines = content.slice(loc.offset, loc.offset + loc.len).split("\n");
     const nLines = lines.length;
+
+    // const nLines = loc.endLoc.line - loc.startLoc.line;
 
     let offset = loc.offset;
 
     const partial =
-      report.primarySourceLocation.col !== 1 ||
+      loc.startLoc.column !== 1 ||
       content.charAt(loc.offset + loc.len) !== "\n";
 
-    for (let line = loc.line; line < loc.line + nLines; line++) {
+    for (
+      let line = loc.startLoc.line;
+      line < loc.startLoc.line + nLines;
+      line++
+    ) {
       if (!reportsByLine[line]) {
         reportsByLine[line] = [];
       }
 
-      const lineContent = lines[line - loc.line];
+      const lineContent = lines[line - loc.startLoc.line];
 
       let start: number | undefined = undefined;
       let end: number | undefined = undefined;
 
       if (partial) {
-        if (line === loc.line && loc.col !== 1) {
-          start = loc.col - 1;
+        if (line === loc.startLoc.line && loc.startLoc.column !== 1) {
+          start = loc.startLoc.column - 1;
         } else {
           const trimmed = lineContent.trimStart();
           start = lineContent.length - trimmed.length || 1;
         }
 
-        if (line === loc.line + nLines - 1) {
+        if (line === loc.startLoc.line + nLines - 1) {
           end = loc.offset + loc.len - offset + start;
         } else {
           end = start + lineContent.length;
@@ -229,7 +238,7 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
         ref={
           relevant &&
           selected === id &&
-          relevant?.report.primarySourceLocation.line === n
+          relevant?.report.primarySourceLocation.startLoc?.line === n
             ? focus
             : undefined
         }

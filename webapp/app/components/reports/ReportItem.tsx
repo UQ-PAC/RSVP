@@ -99,7 +99,7 @@ export function ReportItem({ report }: ReportItemParams) {
         >
           {report.message}
           <span className="report-item-line-info">
-            {`  (${report.primarySourceLocation.source?.file.name}:${report.primarySourceLocation.line}:${report.primarySourceLocation.col})`}
+            {`  (${report.primarySourceLocation.source?.file.name}:${report.primarySourceLocation.startLoc?.line}:${report.primarySourceLocation.startLoc?.column})`}
           </span>
         </span>
 

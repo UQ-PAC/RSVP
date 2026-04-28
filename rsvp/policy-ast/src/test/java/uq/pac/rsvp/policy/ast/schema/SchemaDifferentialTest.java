@@ -13,37 +13,39 @@ public class SchemaDifferentialTest {
     }
 
     private final static String SCHEMA_TEXT = """
-            type FileAttr = String;
-            type DirAttr = String;
-            type FilePermission = {
-                read: Bool,
-                write: Bool,
-                exec: Bool,
-                attr: FileAttr
-            };
-
-            type DirPermission = {
-                read: Bool,
-                write: Bool,
-                exec: Bool,
-                attr: DirAttr
-            };
-            
-            namespace Bar {
-                entity Super;
-            }
-            
-            namespace Foo {
-                type Path = String;
-
-                entity Role enum [ "A", "B" ];
-
-                entity Account in Bar::Super = {
-                    name: String,
-                    attr: {
-                        read: Bool
+            namespace HealthCareApp {
+                entity Role enum ["Admin", "Doctor", "InsuranceRep"];
+                entity User in [Role];
+                entity InfoType;
+                entity Info in [InfoType] {
+                    provider: User,
+                    patient: User
+                };
+                action createAppointment in [updateAppointment] appliesTo {
+                    principal: [User],
+                    resource: [Info],
+                    context: {
+                        referrer: User,
+                        detail: AppointmentDetails
                     }
                 };
+                action updateAppointment appliesTo {
+                    principal: [User],
+                    resource: [Info],
+                };
+                action deleteAppointment appliesTo {
+                    principal: [User],
+                    resource: [Info],
+                };
+                action listAppointments appliesTo {
+                    principal: [User],
+                    resource: [Info],
+                };
+                type AppointmentDetails = {
+                    reason: String,
+                    cost: Long,
+                };
+                type Diagnosis = String;
             }
             """;
 }

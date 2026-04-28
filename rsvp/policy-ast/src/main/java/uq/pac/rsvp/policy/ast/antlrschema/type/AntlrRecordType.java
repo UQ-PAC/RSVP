@@ -71,17 +71,21 @@ public class AntlrRecordType extends AntlrBuiltinType {
     private String toString(AntlrBuiltinType type, String indent) {
         if (type instanceof AntlrRecordType rec) {
             StringBuilder sb = new StringBuilder();
-            sb.append("{").append("\n");
-            rec.getAttributes().forEach((a, t) -> {
-                sb.append(indent).append("    ")
-                        .append('"')
-                        .append(a.toString())
-                        .append('"')
-                        .append(": ")
-                        .append(toString(t, indent + "    "))
-                        .append(",\n");
-            });
-            sb.append(indent).append("}");
+            if (rec.isEmpty()) {
+                sb.append("{ }");
+            } else {
+                sb.append("{").append("\n");
+                rec.getAttributes().forEach((a, t) -> {
+                    sb.append(indent).append("    ")
+                            .append('"')
+                            .append(a.toString())
+                            .append('"')
+                            .append(": ")
+                            .append(toString(t, indent + "    "))
+                            .append(",\n");
+                });
+                sb.append(indent).append("}");
+            }
             return sb.toString();
         } else {
             return type.toString();
@@ -91,6 +95,10 @@ public class AntlrRecordType extends AntlrBuiltinType {
     @Override
     public String toString() {
         return toString(this, "");
+    }
+
+    public boolean isEmpty() {
+        return attributes.isEmpty();
     }
 
     @Override

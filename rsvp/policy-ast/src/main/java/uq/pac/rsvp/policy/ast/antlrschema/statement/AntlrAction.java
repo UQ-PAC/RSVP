@@ -1,19 +1,36 @@
 package uq.pac.rsvp.policy.ast.antlrschema.statement;
 
+import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrTypeReference;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaValueVisitor;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVoidVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
+import java.util.Set;
+
 public class AntlrAction extends AntlrSchemaStatement {
 
-    public AntlrAction(String namespace, String name, SourceLoc location) {
+    private final Set<AntlrTypeReference> memberOf;
+    private final AntlrActionApplication appliesTo;
+
+    public AntlrAction(String namespace, String name, Set<AntlrTypeReference> memberOf, AntlrActionApplication appliesTo, SourceLoc location) {
         super(namespace, name, location);
+        this.memberOf = memberOf;
+        this.appliesTo = appliesTo;
     }
 
     @Override
     public String toString() {
-        return "action " + getName() + ";";
+        String in = memberOf.isEmpty() ? " " : " in " + memberOf;
+        return "action " + getName() + in + appliesTo + ";";
+    }
+
+    public Set<AntlrTypeReference> getMemberOf() {
+        return memberOf;
+    }
+
+    public AntlrActionApplication getApplication() {
+        return appliesTo;
     }
 
     @Override

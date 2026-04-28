@@ -1,10 +1,7 @@
 package uq.pac.rsvp.policy.ast.antlrschema.parser;
 
 import uq.pac.rsvp.policy.ast.CedarschemaParser;
-import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrCommonType;
-import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrEnumEntityType;
-import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrRecordEntityType;
-import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrSchemaStatement;
+import uq.pac.rsvp.policy.ast.antlrschema.statement.*;
 import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrBuiltinType;
 import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrRecordType;
 import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrTypeReference;
@@ -16,6 +13,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static uq.pac.rsvp.Assertion.require;
+import static uq.pac.rsvp.policy.ast.antlrschema.parser.AntlrSchemaTypeVisitor.unquote;
 
 class AntlrSchemaStatementVisitor extends AntlrSourceVisitor<AntlrSchemaStatement> {
 
@@ -35,7 +33,7 @@ class AntlrSchemaStatementVisitor extends AntlrSourceVisitor<AntlrSchemaStatemen
 
         if (ctx.strings() != null) {
             Set<String> names = ctx.strings().STRING().stream()
-                    .map(s -> AntlrSchemaTypeVisitor.unquote(s.getText()))
+                    .map(s -> unquote(s.getText()))
                     .collect(Collectors.toSet());
             return new AntlrEnumEntityType(namespace, name, Collections.emptySet(), names, location(ctx));
         } else {
@@ -59,8 +57,61 @@ class AntlrSchemaStatementVisitor extends AntlrSourceVisitor<AntlrSchemaStatemen
         return new AntlrCommonType(namespace, ctx.typename().getText(), definition, location(ctx));
     }
 
+    private String getNornalisedActionName(CedarschemaParser.NameContext ctx) {
+        String actionName = ctx.getText();
+        if (ctx.STRING() == null) {
+            actionName = '"' + actionName + '"';
+        }
+        return "Action::" + actionName;
+    }
+
     @Override
     public AntlrSchemaStatement visitAction(CedarschemaParser.ActionContext ctx) {
-        return null;
+        require(ctx.name().size() == 1); // FIXME
+
+        // Quoted action name in the form Action::"name"
+        String actionName = getNornalisedActionName(ctx.name(0));
+
+        // Member of references
+        Set<AntlrTypeReference> references = Collections.emptySet();
+        if (ctx.actionRefs() != null) {
+            references = ctx.actionRefs().actionRef()
+                    .stream()
+                    .map(ref -> {
+                        String name;
+                        String namespace;
+                        if (ref.name() != null) {
+                            namespace = this.namespace;
+                            name = getNornalisedActionName(ref.name());
+                        } else {
+                            namespace = ref.path() == null ? this.namespace : ref.path().getText();
+                            name = "Action::" + ref.STRING();
+                        }
+                        return new AntlrTypeReference(namespace, name, location(ref));
+                    }).collect(Collectors.toUnmodifiableSet());
+        }
+
+        Set<AntlrTypeReference> principalTypes = Collections.emptySet();
+        Set<AntlrTypeReference> resourceTypes = Collections.emptySet();
+        AntlrRecordType context = new AntlrRecordType(Collections.emptyMap(), SourceLoc.MISSING);
+
+        CedarschemaParser.AppliesToContext appliesTo = ctx.appliesTo();
+
+        if (appliesTo != null) {
+            principalTypes = appliesTo.paths(0).path().stream()
+                        .map(p -> (AntlrTypeReference) types.visit(p))
+                        .collect(Collectors.toSet());
+            resourceTypes = appliesTo.paths(1).path().stream()
+                    .map(p -> (AntlrTypeReference) types.visit(p))
+                    .collect(Collectors.toSet());
+
+            if (appliesTo.record() != null) {
+                context = (AntlrRecordType) types.visit(appliesTo.record());
+            }
+        }
+        AntlrActionApplication appliesToNode =
+                new AntlrActionApplication(principalTypes, resourceTypes, context);
+
+        return new AntlrAction(namespace, actionName, references, appliesToNode, location(ctx));
     }
 }

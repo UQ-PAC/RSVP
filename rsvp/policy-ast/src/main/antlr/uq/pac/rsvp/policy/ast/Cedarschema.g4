@@ -90,7 +90,7 @@ type:
 ;
 
 // Action references: identifiers, strings or entity references with 'Action' sub-type
-actionRef: name | (path '::')? STRING ;
+actionRef: name | (path '::')? 'Action' '::' STRING ;
 actionRefs: actionRef | '[' actionRef (',' actionRef)* ']';
 
 entityNames: ID (',' ID)*;
@@ -106,7 +106,7 @@ action:
 appliesTo: APPLIES '{'
     PRINCIPAL ':' paths ','
     RESOURCE ':' paths
-    (',' CONTEXT ':' record)?
+    (',' | (',' CONTEXT ':' record))?
 '}';
 
 typename: ID;

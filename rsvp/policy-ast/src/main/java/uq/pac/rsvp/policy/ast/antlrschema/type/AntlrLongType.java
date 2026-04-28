@@ -2,7 +2,7 @@ package uq.pac.rsvp.policy.ast.antlrschema.type;
 
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaValueVisitor;
-import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVoidVisitor;
+import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
 public class AntlrLongType extends AntlrBuiltinType {
@@ -16,12 +16,17 @@ public class AntlrLongType extends AntlrBuiltinType {
     }
 
     @Override
+    public boolean equals(Object other) {
+        return other instanceof AntlrLongType;
+    }
+
+    @Override
     public String toString() {
         return "Long";
     }
 
     @Override
-    public void accept(AntlrSchemaVoidVisitor visitor) {
+    public void accept(AntlrSchemaVisitor visitor) {
         visitor.visitLong(this);
     }
 

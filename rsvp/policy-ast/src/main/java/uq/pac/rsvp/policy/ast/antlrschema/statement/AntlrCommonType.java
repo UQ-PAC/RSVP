@@ -3,7 +3,7 @@ package uq.pac.rsvp.policy.ast.antlrschema.statement;
 import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrBuiltinType;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaValueVisitor;
-import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVoidVisitor;
+import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
 public class AntlrCommonType extends AntlrSchemaStatement {
@@ -25,7 +25,7 @@ public class AntlrCommonType extends AntlrSchemaStatement {
     }
 
     @Override
-    public void accept(AntlrSchemaVoidVisitor visitor) {
+    public void accept(AntlrSchemaVisitor visitor) {
         visitor.visitCommon(this);
     }
 

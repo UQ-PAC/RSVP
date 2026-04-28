@@ -2,7 +2,7 @@ package uq.pac.rsvp.policy.ast.antlrschema.type;
 
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaValueVisitor;
-import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVoidVisitor;
+import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
 public class AntlrDateTimeType extends AntlrBuiltinType {
@@ -21,7 +21,12 @@ public class AntlrDateTimeType extends AntlrBuiltinType {
     }
 
     @Override
-    public void accept(AntlrSchemaVoidVisitor visitor) {
+    public boolean equals(Object other) {
+        return other instanceof AntlrDateTimeType;
+    }
+
+    @Override
+    public void accept(AntlrSchemaVisitor visitor) {
         visitor.visitDateTime(this);
     }
 

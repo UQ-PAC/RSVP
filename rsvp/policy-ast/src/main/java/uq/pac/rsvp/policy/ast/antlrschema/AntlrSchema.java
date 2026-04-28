@@ -3,6 +3,7 @@ package uq.pac.rsvp.policy.ast.antlrschema;
 import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrSchemaStatement;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import static uq.pac.rsvp.Assertion.require;
 
@@ -17,6 +18,10 @@ public class AntlrSchema {
 
     public AntlrSchemaStatement get(String name) {
         return statements.get(name);
+    }
+
+    public Stream<AntlrSchemaStatement> statements() {
+        return statements.values().stream();
     }
 
     @Override

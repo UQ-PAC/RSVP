@@ -1,11 +1,10 @@
 package uq.pac.rsvp.policy.ast.antlrschema.statement;
 
-import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrBooleanType;
 import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrRecordType;
 import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrTypeReference;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaValueVisitor;
-import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVoidVisitor;
+import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
 import java.util.Set;
@@ -30,7 +29,7 @@ public class AntlrRecordEntityType extends AntlrEntityType {
     }
 
     @Override
-    public void accept(AntlrSchemaVoidVisitor visitor) {
+    public void accept(AntlrSchemaVisitor visitor) {
         visitor.visitRecordEntity(this);
     }
 

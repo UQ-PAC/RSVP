@@ -2,7 +2,8 @@ package uq.pac.rsvp.policy.ast.antlrschema.type;
 
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaValueVisitor;
-import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVoidVisitor;
+import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVisitor;
+import uq.pac.rsvp.policy.ast.schema.common.IpAddressType;
 import uq.pac.rsvp.support.SourceLoc;
 
 public class AntlrIpAddressType extends AntlrBuiltinType {
@@ -21,8 +22,13 @@ public class AntlrIpAddressType extends AntlrBuiltinType {
     }
 
     @Override
-    public void accept(AntlrSchemaVoidVisitor visitor) {
+    public void accept(AntlrSchemaVisitor visitor) {
         visitor.visitIpAddress(this);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof IpAddressType;
     }
 
     @Override

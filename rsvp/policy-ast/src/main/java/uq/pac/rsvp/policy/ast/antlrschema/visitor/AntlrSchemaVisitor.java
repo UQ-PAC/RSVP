@@ -7,7 +7,7 @@ import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrEnumEntityType;
 import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrRecordEntityType;
 import uq.pac.rsvp.policy.ast.antlrschema.type.*;
 
-public interface AntlrSchemaVoidVisitor {
+public interface AntlrSchemaVisitor {
     void visitSchema(AntlrSchema schema);
 
     // Statements

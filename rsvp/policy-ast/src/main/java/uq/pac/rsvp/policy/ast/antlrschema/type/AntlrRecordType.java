@@ -2,7 +2,7 @@ package uq.pac.rsvp.policy.ast.antlrschema.type;
 
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaValueVisitor;
-import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVoidVisitor;
+import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
 import java.util.Map;
@@ -97,12 +97,20 @@ public class AntlrRecordType extends AntlrBuiltinType {
         return toString(this, "");
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof AntlrRecordType rec) {
+            return this.attributes.equals(rec.attributes);
+        }
+        return false;
+    }
+
     public boolean isEmpty() {
         return attributes.isEmpty();
     }
 
     @Override
-    public void accept(AntlrSchemaVoidVisitor visitor) {
+    public void accept(AntlrSchemaVisitor visitor) {
         visitor.visitRecord(this);
     }
 

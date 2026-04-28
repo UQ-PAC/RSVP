@@ -145,6 +145,14 @@ public class SchemaParseTest {
             "-type Record = Bool;",
             "-type Entity = Bool;",
             "-type Extension = Bool;",
+            "-namespace A { type Bool = Bool; }",
+            "-namespace A { type Boolean = Bool; }",
+            "-namespace A { type Long = Bool; }",
+            "-namespace A { type String = Bool; }",
+            "-namespace A { type Set = Bool; }",
+            "-namespace A { type Record = Bool; }",
+            "-namespace A { type Entity = Bool; }",
+            "-namespace A { type Extension = Bool; }",
 
             // In addition to what Cedar insists on, RSVP adds built-in extension types
             // to avoid shadowing issues
@@ -153,6 +161,11 @@ public class SchemaParseTest {
             "~type decimal = Bool;",
             "~type duration = Bool;",
             "~type ipaddr = Bool;",
+            "~namespace A { type Action = Bool; }",
+            "~namespace A { type datetime = Bool; }",
+            "~namespace A { type decimal = Bool; }",
+            "~namespace A { type duration = Bool; }",
+            "~namespace A { type ipaddr = Bool; }",
 
             // Annotations: any component can be annotated
             "@annotation namespace A {}",

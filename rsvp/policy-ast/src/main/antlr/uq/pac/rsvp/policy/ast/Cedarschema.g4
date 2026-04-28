@@ -84,9 +84,9 @@ record:
 set: 'Set' '<' type '>';
 
 type:
-    path        # namedType
-    | record    # recordType
-    | set       # setType
+    path
+    | record
+    | set
 ;
 
 // Action references: identifiers, strings or entity references with 'Action' sub-type

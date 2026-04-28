@@ -15,8 +15,8 @@ class SchemaTypeVisitor extends SourceVisitor<CommonTypeDefinition> {
     }
 
     @Override
-    public CommonTypeDefinition visitNamedType(CedarschemaParser.NamedTypeContext ctx) {
-        return new UnresolvedTypeReference(ctx.path().getText());
+    public CommonTypeDefinition visitPath(CedarschemaParser.PathContext ctx) {
+        return new UnresolvedTypeReference(ctx.getText());
     }
 
     public static String unquote(String s) {
@@ -38,17 +38,8 @@ class SchemaTypeVisitor extends SourceVisitor<CommonTypeDefinition> {
     }
 
     @Override
-    public CommonTypeDefinition visitRecordType(CedarschemaParser.RecordTypeContext ctx) {
-        return ctx.record().accept(this);
-    }
-
-    @Override
     public CommonTypeDefinition visitSet(CedarschemaParser.SetContext ctx) {
         return new SetTypeDefinition(ctx.type().accept(this));
     }
 
-    @Override
-    public CommonTypeDefinition visitSetType(CedarschemaParser.SetTypeContext ctx) {
-        return ctx.set().accept(this);
-    }
 }

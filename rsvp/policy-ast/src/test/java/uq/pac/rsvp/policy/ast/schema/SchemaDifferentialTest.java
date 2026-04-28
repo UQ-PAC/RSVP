@@ -1,16 +1,32 @@
 package uq.pac.rsvp.policy.ast.schema;
 
 import org.junit.jupiter.api.Test;
-import uq.pac.rsvp.RsvpException;
-
-import java.net.URL;
-import java.nio.file.Path;
+import uq.pac.rsvp.policy.ast.antlrschema.parser.AntlrSchemaParser;
 
 public class SchemaDifferentialTest {
 
     @Test
-    void test() throws RsvpException {
-        URL url = ClassLoader.getSystemResource("healthcare.cedarschema");
-        Schema schema = Schema.parseCedarSchema(Path.of(url.getPath()));
+    void test() {
+        AntlrSchemaParser.parse("text.txt", SCHEMA_TEXT);
     }
+
+    private static String SCHEMA_TEXT = """
+            type FileAttr = String;
+            type DirAttr = String;
+            type FilePermission = {
+                read: Bool,
+                write: Bool,
+                exec: Bool,
+                attr: FileAttr
+            };
+
+            type DirPermission = {
+                read: Bool,
+                write: Bool,
+                exec: Bool,
+                attr: DirAttr
+            };
+
+            type Path = String;
+            """;
 }

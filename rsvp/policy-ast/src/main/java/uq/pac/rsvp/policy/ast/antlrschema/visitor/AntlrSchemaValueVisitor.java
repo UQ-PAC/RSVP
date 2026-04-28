@@ -25,7 +25,7 @@ public interface AntlrSchemaValueVisitor<T> {
     T visitSet(AntlrSetType type);
 
     // Type references
-    T visitReference(AntlrReferenceType type);
+    T visitReference(AntlrTypeReference type);
 
     // Primitive types
     T visitBoolean(AntlrBooleanType type);

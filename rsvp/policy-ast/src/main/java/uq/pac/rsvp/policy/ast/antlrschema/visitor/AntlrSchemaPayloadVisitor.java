@@ -25,7 +25,7 @@ public interface AntlrSchemaPayloadVisitor<T> {
     void visitSet(AntlrSetType type, T payload);
 
     // Type references
-    void visitReference(AntlrReferenceType type, T payload);
+    void visitReference(AntlrTypeReference type, T payload);
 
     // Primitive types
     void visitBoolean(AntlrBooleanType type, T payload);

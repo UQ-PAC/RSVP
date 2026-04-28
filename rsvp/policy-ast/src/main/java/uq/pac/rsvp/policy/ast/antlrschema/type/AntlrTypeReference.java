@@ -5,22 +5,32 @@ import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaValueVisitor;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVoidVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
-public class AntlrReferenceType extends AntlrBuiltinType {
+public class AntlrTypeReference extends AntlrBuiltinType {
 
     private final String name;
+    private final String namespace;
 
-    public AntlrReferenceType(String name, SourceLoc location) {
+    public AntlrTypeReference(String namespace, String name, SourceLoc location) {
         super(location);
         this.name = name;
+        this.namespace = namespace;
     }
 
     public String getName() {
+        return namespace.isEmpty() ? name : namespace + "::" + name;
+    }
+
+    public String getBaseName() {
+        return name;
+    }
+
+    public String getNamespace() {
         return name;
     }
 
     @Override
     public String toString() {
-        return "_::" + name;
+        return "(R) " + getName();
     }
 
     @Override

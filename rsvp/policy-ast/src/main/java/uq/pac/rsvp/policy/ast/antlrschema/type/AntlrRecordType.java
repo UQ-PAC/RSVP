@@ -68,21 +68,29 @@ public class AntlrRecordType extends AntlrBuiltinType {
         return attributes.get(new Attribute(attr));
     }
 
+    private String toString(AntlrBuiltinType type, String indent) {
+        if (type instanceof AntlrRecordType rec) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("{").append("\n");
+            rec.getAttributes().forEach((a, t) -> {
+                sb.append(indent).append("    ")
+                        .append('"')
+                        .append(a.toString())
+                        .append('"')
+                        .append(": ")
+                        .append(toString(t, indent + "    "))
+                        .append(",\n");
+            });
+            sb.append(indent).append("}");
+            return sb.toString();
+        } else {
+            return type.toString();
+        }
+    }
+
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{").append("\n");
-        attributes.forEach((attr, type) -> {
-            sb.append("    ")
-                    .append('"')
-                    .append(attr.toString())
-                    .append('"')
-                    .append(": ")
-                    .append(type.toString())
-                    .append(",\n");
-        });
-        sb.append("}");
-        return sb.toString();
+        return toString(this, "");
     }
 
     @Override

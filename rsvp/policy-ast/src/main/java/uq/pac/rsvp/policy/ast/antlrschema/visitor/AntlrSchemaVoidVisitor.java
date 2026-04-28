@@ -25,7 +25,7 @@ public interface AntlrSchemaVoidVisitor {
     void visitSet(AntlrSetType type);
 
     // Type references
-    void visitReference(AntlrReferenceType type);
+    void visitReference(AntlrTypeReference type);
 
     // Primitive types
     void visitBoolean(AntlrBooleanType type);

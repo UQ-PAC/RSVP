@@ -1,24 +1,38 @@
 package uq.pac.rsvp.policy.ast.antlrschema.parser;
 
+import org.antlr.v4.runtime.RuleContext;
 import uq.pac.rsvp.policy.ast.CedarschemaParser;
 import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrBuiltinType;
 import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrRecordType;
-import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrReferenceType;
+import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrTypeReference;
 import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrSetType;
 import uq.pac.rsvp.support.FileSource;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 class AntlrSchemaTypeVisitor extends AntlrSourceVisitor<AntlrBuiltinType> {
 
-    public AntlrSchemaTypeVisitor(FileSource fs) {
+    private final String namespace;
+
+    public AntlrSchemaTypeVisitor(FileSource fs, String namespace) {
         super(fs);
+        this.namespace = namespace;
     }
 
     @Override
     public AntlrBuiltinType visitPath(CedarschemaParser.PathContext ctx) {
-        return new AntlrReferenceType(ctx.getText(), location(ctx));
+        String namespace;
+        if (ctx.ident().size() == 1) {
+            namespace = this.namespace;
+        } else {
+            namespace = ctx.ident().subList(0, ctx.ident().size() - 1).stream()
+                    .map(RuleContext::getText)
+                    .collect(Collectors.joining("::"));
+        }
+        String name = ctx.ident(ctx.ident().size() - 1).getText();
+        return new AntlrTypeReference(namespace, name, location(ctx));
     }
 
     public static String unquote(String s) {

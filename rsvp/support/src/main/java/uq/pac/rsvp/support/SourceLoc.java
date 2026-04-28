@@ -15,7 +15,7 @@ public class SourceLoc {
     private final LineLoc start;
     private final LineLoc end;
 
-    SourceLoc(String file, int offset, int len, LineLoc start, LineLoc end) {
+    public SourceLoc(String file, int offset, int len, LineLoc start, LineLoc end) {
         this.file = file;
         this.offset = offset;
         this.len = len;

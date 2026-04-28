@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -22,6 +23,7 @@ import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitorImpl;
+import uq.pac.rsvp.policy.datalog.invariant.InvariantAssignment;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestSet;
@@ -31,6 +33,11 @@ import uq.pac.rsvp.support.reporting.Report;
 import uq.pac.rsvp.support.reporting.Report.Severity;
 
 public class Verification {
+
+    private static SourceLoc mapSourceLoc(String filename, SourceLoc original) {
+        return new SourceLoc(filename, original.offset, original.len, original.getStartLoc(),
+                original.getEndLoc());
+    }
 
     public static Set<Report> verifyPolicies(String policyFilename, Path policiesPath, Path schemaPath, Path entities,
             String invariantsFilename, Path invariantsPath)
@@ -177,7 +184,30 @@ public class Verification {
         Map<Invariant,InvariantResult> invariantResults = translation.getInvariantResult();
         invariantResults.forEach((k, v) -> {
             if (!v.holds()) {
-                Report r = new Report(Severity.Error, "Invariant does not hold", k.getSourceLoc());
+                Set<InvariantAssignment> assignments = v.getAssignments();
+                String examples = "";
+                if (!assignments.isEmpty()) {
+                    if (assignments.size() == 1) {
+                        examples = "Counterexample: " + assignments.iterator().next().toString();
+                    }
+                    else {
+                        examples = "Counterexamples: ";
+                        Iterator<InvariantAssignment> i = assignments.iterator();
+                        for (int count = 0; count < 3 && i.hasNext(); count++) {
+                            if (count != 0) {
+                                examples += ", ";
+                            }
+                            examples += i.next().toString();
+                        }
+                        if (i.hasNext()) {
+                            examples += " (and " + (assignments.size() - 3) + " more)";
+                        }
+                    }
+                }
+
+                SourceLoc newLoc = mapSourceLoc(invariantsFilename, k.getSourceLoc());
+
+                Report r = new Report(Severity.Error, "Invariant does not hold", examples, newLoc);
                 results.add(r);
             }
         });

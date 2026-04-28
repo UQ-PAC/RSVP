@@ -33,4 +33,13 @@ public interface AntlrSchemaVoidVisitor {
     void visitLong(AntlrLongType type);
 
     void visitString(AntlrStringType type);
+
+    // Extension types
+    void visitIpAddress(AntlrIpAddressType type);
+
+    void visitDecimal(AntlrDecimalType type);
+
+    void visitDateTime(AntlrDateTimeType type);
+
+    void visitDuration(AntlrDurationType type);
 }

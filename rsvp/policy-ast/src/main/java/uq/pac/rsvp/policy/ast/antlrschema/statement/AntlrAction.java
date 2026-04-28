@@ -21,7 +21,7 @@ public class AntlrAction extends AntlrSchemaStatement {
 
     @Override
     public String toString() {
-        String in = memberOf.isEmpty() ? " " : " in " + memberOf;
+        String in = memberOf.isEmpty() ? " " : " in " + memberOf + " ";
         return "action " + getName() + in + appliesTo + ";";
     }
 

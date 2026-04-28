@@ -33,4 +33,13 @@ public interface AntlrSchemaValueVisitor<T> {
     T visitLong(AntlrLongType type);
 
     T visitString(AntlrStringType type);
+
+    // Extension types
+    T visitIpAddress(AntlrIpAddressType type);
+
+    T visitDecimal(AntlrDecimalType type);
+
+    T visitDateTime(AntlrDateTimeType type);
+
+    T visitDuration(AntlrDurationType type);
 }

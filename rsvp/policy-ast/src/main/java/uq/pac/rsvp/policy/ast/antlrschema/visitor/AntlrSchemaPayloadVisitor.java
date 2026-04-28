@@ -33,4 +33,13 @@ public interface AntlrSchemaPayloadVisitor<T> {
     void visitLong(AntlrLongType type, T payload);
 
     void visitString(AntlrStringType type, T payload);
+
+    // Extension types
+    void visitIpAddress(AntlrIpAddressType type, T payload);
+
+    void visitDecimal(AntlrDecimalType type, T payload);
+
+    void visitDateTime(AntlrDateTimeType type, T payload);
+
+    void visitDuration(AntlrDurationType type, T payload);
 }

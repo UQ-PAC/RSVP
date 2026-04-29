@@ -15,13 +15,12 @@
  */
 package uq.pac.childclinic.doctor;
 
-import java.util.Collection;
+import java.util.Optional;
 
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.Repository;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -35,24 +34,14 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Sam Brannen
  * @author Michael Isvy
  */
-public interface DoctorRepository extends Repository<Doctor, Integer> {
+public interface DoctorRepository extends JpaRepository<Doctor, Integer> {
 
-	/**
-	 * Retrieve all <code>Doctor</code>s from the data store.
-	 * @return a <code>Collection</code> of <code>Doctor</code>s
-	 */
+	@EntityGraph(attributePaths = { "clinics", "specialties" })
 	@Transactional(readOnly = true)
-	@Cacheable("doctors")
-	Collection<Doctor> findAll() throws DataAccessException;
+	Page<Doctor> findByLastNameStartingWith(String lastName, Pageable pageable);
 
-	/**
-	 * Retrieve all <code>Doctor</code>s from data store in Pages
-	 * @param pageable
-	 * @return
-	 * @throws DataAccessException
-	 */
+	@EntityGraph(attributePaths = { "clinics", "specialties" })
 	@Transactional(readOnly = true)
-	@Cacheable("doctors")
-	Page<Doctor> findAll(Pageable pageable) throws DataAccessException;
+	Optional<Doctor> findById(Integer id);
 
 }

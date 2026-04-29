@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'doctors')}">
+<body>
+
+  <h2 th:text="#{doctor}">Doctor</h2>
+  <form th:object="${doctor}" class="form-horizontal" id="add-doctor-form" method="post">
+    <div class="form-group has-feedback">
+      <input th:replace="~{fragments/inputField :: input (#{firstName}, 'firstName', 'text')}" />
+      <input th:replace="~{fragments/inputField :: input (#{lastName}, 'lastName', 'text')}" />
+
+      <div class="control-group">
+        <label class="col-sm-2 control-label" th:text="#{specialties}">Specialties</label>
+        <div class="col-sm-10">
+          <select th:field="*{specialties}" class="form-control" multiple="multiple">
+            <option th:each="specialty : ${specialties}" th:value="${specialty.name}" th:text="${specialty.name}">Specialty</option>
+          </select>
+          <span class="help-inline" th:errors="*{specialties}">[error]</span>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="col-sm-2 control-label" th:text="#{clinics}">Clinics</label>
+        <div class="col-sm-10">
+          <select th:field="*{clinics}" class="form-control" multiple="multiple">
+            <option th:each="clinic : ${clinics}" th:value="${clinic.clinicName}" th:text="${clinic.clinicName}">Clinic</option>
+          </select>
+          <span class="help-inline" th:errors="*{clinics}">[error]</span>
+        </div>
+      </div>
+
+    </div>
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-10">
+        <button th:with="text=${doctor['new']} ? #{addDoctor} : #{updateDoctor}" class="btn btn-primary" type="submit"
+          th:text="${text}">Submit</button>
+      </div>
+    </div>
+  </form>
+
+</body>
+</html>

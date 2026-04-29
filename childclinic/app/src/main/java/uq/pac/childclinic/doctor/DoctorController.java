@@ -15,31 +15,40 @@
  */
 package uq.pac.childclinic.doctor;
 
-import com.cedarpolicy.value.EntityUID;
-import com.cedarpolicy.value.Value;
-
-import jakarta.servlet.http.HttpSession;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.cedarpolicy.value.EntityUID;
+
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import uq.pac.childclinic.cedar.CedarAuthorization;
 import uq.pac.childclinic.cedar.CedarRequest;
 import uq.pac.childclinic.cedar.CedarService;
+import uq.pac.childclinic.system.Clinic;
+import uq.pac.childclinic.system.ClinicRepository;
 
 /**
  * @author Juergen Hoeller
@@ -50,116 +59,191 @@ import uq.pac.childclinic.cedar.CedarService;
 @Controller
 class DoctorController {
 
-	private final DoctorRepository doctorRepository;
+	private static final String VIEWS_DOCTOR_CREATE_OR_UPDATE_FORM = "doctors/createOrUpdateDoctorForm";
+
+	private final DoctorRepository doctors;
+
+	private final SpecialtyRepository specialties;
+
+	private final ClinicRepository clinics;
 
 	private final CedarService cedarService;
 
-	public DoctorController(DoctorRepository doctorRepository, CedarService cedarService) {
-		this.doctorRepository = doctorRepository;
+	public DoctorController(DoctorRepository doctors, SpecialtyRepository specialties, ClinicRepository clinics,
+			CedarService cedarService) {
+		this.doctors = doctors;
+		this.specialties = specialties;
+		this.clinics = clinics;
 		this.cedarService = cedarService;
 	}
 
-	@GetMapping("/doctors.html")
+	@ModelAttribute("specialties")
+	public Collection<Specialty> populateSpecialties() {
+		return this.specialties.findAll();
+	}
+
+	@ModelAttribute("clinics")
+	public Collection<Clinic> populateClinics() {
+		return this.clinics.findClinics();
+	}
+
+	@InitBinder("doctor")
+	public void initDoctorBinder(WebDataBinder dataBinder) {
+		dataBinder.setDisallowedFields("id");
+	}
+
+	@GetMapping("/doctors/find")
 	@CedarAuthorization(action = "ListEmployees", resourceType = "Clinic", resourceId = "Any", validate = true)
-	public String showDoctorsList(@RequestParam(defaultValue = "1") int page, Model model, HttpSession session) {
-		// Here we are returning an object of type 'Doctors' rather than a collection of Doctor
-		// objects so it is simpler for Object-Xml mapping
-		Doctors doctors = new Doctors();
+	public String initFindForm(Model model) {
+		model.addAttribute("doctor", new Doctor());
+		return "doctors/findDoctors";
+	}
+
+	@GetMapping("/doctors")
+	@CedarAuthorization(action = "ListEmployees", resourceType = "Clinic", resourceId = "Any", validate = true)
+	public String showDoctorsList(@RequestParam(defaultValue = "1") int page, Doctor doctor, BindingResult result,
+			Model model, HttpSession session) {
+		String lastName = doctor.getLastName() == null ? "" : doctor.getLastName();
+
+		List<Doctor> allMatchingDoctors = this.doctors.findByLastNameStartingWith(lastName, Pageable.unpaged())
+			.getContent();
+
+		if (allMatchingDoctors.isEmpty()) {
+			result.rejectValue("lastName", "notFound", "No doctors found.");
+			return "doctors/findDoctors";
+		}
 
 		String principalId = (String) session.getAttribute("currentUser");
-		if (session.getAttribute("currentUser") == null) {
-			principalId = "Guest";
-		}
+		principalId = principalId == null ? "Guest" : principalId;
 
 		System.out.println("Cookie principalId: " + principalId);
 
 		EntityUID principal;
 		if (principalId.equals("Guest")) {
-			principal = EntityUID.parse("ChildClinic::Guest::\"Unknown\"")
+			principal = EntityUID.parse("ChildrenClinic::Guest::\"Unknown\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 		else {
-			principal = EntityUID.parse("ChildClinic::Employee::\"" + principalId + "\"")
+			principal = EntityUID.parse("ChildrenClinic::Employee::\"" + principalId + "\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 
-		Collection<Doctor> allDoctors = doctorRepository.findAll();
-
-		List<Doctor> authorizedDoctors = allDoctors.stream().filter(doctor -> {
-			EntityUID action = EntityUID.parse("ChildClinic::Action::\"" + "ViewEmployee" + "\"")
+		EntityUID action = EntityUID.parse("ChildrenClinic::Action::\"ViewEmployee\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
-			EntityUID resource = EntityUID
-				.parse("ChildClinic::Employee::\"" + doctor.getFirstName() + " " + doctor.getLastName() + "\"")
+
+		Map<Integer, String> authorizationMap = new HashMap<>();
+		Map<Integer, String> cedarResourceMap = new HashMap<>();
+
+		List<Doctor> authorized = allMatchingDoctors.stream().filter(d -> {
+			String resourceName = d.getFirstName() + " " + d.getLastName();
+			EntityUID resource = EntityUID.parse("ChildrenClinic::Employee::\"" + resourceName + "\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
-			Map<String, Value> contextMap = new HashMap<>();
-			CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
-			ResponseEntity<String> response = cedarService.checkAccess(cedarReq);
-			return response.getBody().startsWith("Access Granted.");
+
+			String access = cedarService
+				.checkAccess(new CedarRequest(principal, action, resource, new HashMap<>(), true))
+				.getBody();
+			authorizationMap.put(d.getId(), access);
+			cedarResourceMap.put(d.getId(), "ChildrenClinic::Employee::\"" + resourceName + "\"");
+			return access != null && access.startsWith("Access Granted.");
 		}).collect(Collectors.toList());
 
-		doctors.getDoctorsList().addAll(authorizedDoctors);
+		if (authorized.size() == 1 && allMatchingDoctors.size() == 1) {
+			return "redirect:/doctors/" + authorized.iterator().next().getId();
+		}
 
 		Pageable pageable = PageRequest.of(page - 1, 5);
 		int start = (int) pageable.getOffset();
-		int end = Math.min((start + pageable.getPageSize()), authorizedDoctors.size());
-		
-		List<Doctor> pageContent;
-		if (start > authorizedDoctors.size()) {
-		    pageContent = List.of();
-		} else {
-		    pageContent = authorizedDoctors.subList(start, end);
-		}
+		int end = Math.min((start + pageable.getPageSize()), authorized.size());
+		List<Doctor> pageContent = start > authorized.size() ? List.of()
+				: authorized.subList(start, end);
+		Page<Doctor> paginated = new PageImpl<>(pageContent, pageable, authorized.size());
 
-		Page<Doctor> filteredPaginated = new PageImpl<>(pageContent, pageable, authorizedDoctors.size());
-
-		return addPaginationModel(page, filteredPaginated, model);
-	}
-
-	private String addPaginationModel(int page, Page<Doctor> paginated, Model model) {
-		List<Doctor> listDoctors = paginated.getContent();
+		model.addAttribute("listDoctors", paginated.getContent());
 		model.addAttribute("currentPage", page);
 		model.addAttribute("totalPages", paginated.getTotalPages());
 		model.addAttribute("totalItems", paginated.getTotalElements());
-		model.addAttribute("listDoctors", listDoctors);
+		model.addAttribute("authorizationMap", authorizationMap);
+		model.addAttribute("cedarPrincipal", principal.toString());
+		model.addAttribute("cedarAction", action.toString());
+		model.addAttribute("cedarResourceMap", cedarResourceMap);
+
 		return "doctors/doctorsList";
 	}
 
-	@GetMapping({ "/doctors" })
-	@CedarAuthorization(action = "ListEmployees", resourceType = "Clinic", resourceId = "Any", validate = true)
-	public @ResponseBody Doctors showResourcesDoctorsList(HttpSession session) {
-		// Here we are returning an object of type 'Doctors' rather than a collection of Doctor
-		// objects so it is simpler for JSon/Object mapping
-		Doctors doctors = new Doctors();
+	@GetMapping("/doctors/{doctorId}")
+	@CedarAuthorization(action = "ViewEmployee", resourceType = "Employee", validate = true)
+	public ModelAndView showDoctor(@PathVariable("doctorId") int doctorId) {
+		ModelAndView mav = new ModelAndView("doctors/doctorDetails");
+		Doctor doctor = this.doctors.findById(doctorId)
+			.orElseThrow(() -> new IllegalArgumentException("Doctor not found for identifier: " + doctorId));
+		mav.addObject("doctor", doctor);
+		return mav;
+	}
 
-		String principalId = (String) session.getAttribute("currentUser");
-		if (principalId == null) {
-			principalId = "Guest";
+	@GetMapping("/doctors/new")
+	@CedarAuthorization(action = "AddEmployee", resourceType = "Clinic", resourceId = "Any", validate = true)
+	public String initCreationForm(Model model) {
+		model.addAttribute("doctor", new Doctor());
+		return VIEWS_DOCTOR_CREATE_OR_UPDATE_FORM;
+	}
+
+	@PostMapping("/doctors/new")
+	@CedarAuthorization(action = "AddEmployee", resourceType = "Clinic", resourceId = "Any", validate = true)
+	public String processCreationForm(@Valid Doctor doctor, BindingResult result,
+			RedirectAttributes redirectAttributes) {
+		if (StringUtils.hasLength(doctor.getLastName()) && StringUtils.hasLength(doctor.getFirstName())
+				&& doctor.isNew()) {
+			boolean duplicateExists = doctors.findByLastNameStartingWith(doctor.getLastName(), PageRequest.of(0, 50))
+				.getContent()
+				.stream()
+				.anyMatch(d -> d.getFirstName().equalsIgnoreCase(doctor.getFirstName()));
+
+			if (duplicateExists) {
+				result.rejectValue("firstName", "duplicate", "A doctor with this first and last name already exists.");
+			}
+		}
+		if (result.hasErrors())
+			return VIEWS_DOCTOR_CREATE_OR_UPDATE_FORM;
+		this.doctors.save(doctor);
+		redirectAttributes.addFlashAttribute("message", "New Doctor has been added.");
+		return "redirect:/doctors/" + doctor.getId();
+	}
+
+	@GetMapping("/doctors/{doctorId}/edit")
+	@CedarAuthorization(action = "EditEmployee", resourceType = "Employee", validate = true)
+	public String initUpdateForm(@PathVariable("doctorId") int doctorId, Model model) {
+		Doctor doctor = this.doctors.findById(doctorId)
+			.orElseThrow(() -> new IllegalArgumentException("Doctor not found for identifier: " + doctorId));
+		model.addAttribute("doctor", doctor);
+		return VIEWS_DOCTOR_CREATE_OR_UPDATE_FORM;
+	}
+
+	@PostMapping("/doctors/{doctorId}/edit")
+	@CedarAuthorization(action = "EditEmployee", resourceType = "Employee", validate = true)
+	public String processUpdateForm(@Valid Doctor doctor, BindingResult result, @PathVariable("doctorId") int doctorId,
+			RedirectAttributes redirectAttributes) {
+		if (StringUtils.hasLength(doctor.getLastName()) && StringUtils.hasLength(doctor.getFirstName())) {
+			boolean duplicateExists = this.doctors
+				.findByLastNameStartingWith(doctor.getLastName(), PageRequest.of(0, 50))
+				.getContent()
+				.stream()
+				.anyMatch(d -> d.getFirstName().equalsIgnoreCase(doctor.getFirstName())
+						&& !Objects.equals(d.getId(), doctorId));
+
+			if (duplicateExists) {
+				result.rejectValue("firstName", "duplicate", "A doctor with this first and last name already exists.");
+			}
+		}
+		if (result.hasErrors()) {
+			redirectAttributes.addFlashAttribute("error", "There was an error in updating the doctor.");
+			return VIEWS_DOCTOR_CREATE_OR_UPDATE_FORM;
 		}
 
-		EntityUID principal;
-		if (principalId.equals("Guest")) {
-			principal = EntityUID.parse("ChildClinic::Guest::\"Unknown\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
-		}
-		else {
-			principal = EntityUID.parse("ChildClinic::Employee::\"" + principalId + "\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
-		}
+		doctor.setId(doctorId);
+		this.doctors.save(doctor);
 
-		List<Doctor> authorizedDoctors = this.doctorRepository.findAll().stream().filter(doctor -> {
-			EntityUID action = EntityUID.parse("ChildClinic::Action::\"" + "ViewEmployee" + "\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
-			EntityUID resource = EntityUID
-				.parse("ChildClinic::Employee::\"" + doctor.getFirstName() + " " + doctor.getLastName() + "\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
-			Map<String, Value> contextMap = new HashMap<>();
-			CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap, true);
-			ResponseEntity<String> response = cedarService.checkAccess(cedarReq);
-			return response.getBody().startsWith("Access Granted.");
-		}).collect(Collectors.toList());
-
-		doctors.getDoctorsList().addAll(authorizedDoctors);
-		return doctors;
+		redirectAttributes.addFlashAttribute("message", "Doctor Values Updated.");
+		return "redirect:/doctors/{doctorId}";
 	}
 
 }

@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Simple domain object representing a list of doctors. Mostly here to be used for
- * the 'doctors' {@link org.springframework.web.servlet.view.xml.MarshallingView}.
+ * Simple domain object representing a list of doctors. Mostly here to be used for the
+ * 'doctors' {@link org.springframework.web.servlet.view.xml.MarshallingView}.
  *
  * @author Arjen Poutsma
  */

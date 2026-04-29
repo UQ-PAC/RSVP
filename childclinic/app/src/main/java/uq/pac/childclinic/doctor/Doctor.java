@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.core.style.ToStringCreator;
+
 import uq.pac.childclinic.model.Person;
 
 /**
@@ -70,6 +72,23 @@ public class Doctor extends Person {
 
 	public void addSpecialty(Specialty specialty) {
 		getSpecialtiesInternal().add(specialty);
+	}
+
+	public String getSpecialtyDescriptions() {
+		if (this.specialties == null || this.specialties.isEmpty()) {
+			return "Generalist";
+		}
+		return this.specialties.stream().map(Specialty::getName).sorted().collect(Collectors.joining(", "));
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringCreator(this).append("id", this.getId())
+			.append("new", this.isNew())
+			.append("lastName", this.getLastName())
+			.append("firstName", this.getFirstName())
+			.append("specialties", this.getSpecialties())
+			.toString();
 	}
 
 }

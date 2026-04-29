@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'doctors')}">
+<body>
+  <h2 th:text="#{doctorInformation}">Doctor Information</h2>
+
+  <div th:if="${message}" class="alert alert-success" id="success-message">
+    <span th:text="${message}"></span>
+  </div>
+  <div th:if="${error}" class="alert alert-danger" id="error-message">
+    <span th:text="${error}"></span>
+  </div>
+
+  <table class="table table-striped" th:object="${doctor}">
+    <tr>
+      <th th:text="#{name}">Name</th>
+      <td><b th:text="*{firstName + ' ' + lastName}"></b></td>
+    </tr>
+    <tr>
+      <th th:text="#{specialties}">Specialties</th>
+       <td th:text="${doctor.specialtyDescriptions}"></td>
+    </tr>
+    <tr>
+      <th th:text="#{clinics}">Clinics</th>
+      <td th:text="*{clinicDescriptions}"></td>
+    </tr>
+  </table>
+
+  <a th:href="@{/doctors/__${doctor.id}__/edit}" class="btn btn-primary" th:text="#{editDoctor}">Edit Doctor</a>
+
+  <script>
+    function hideMessages() {
+      setTimeout(function () {
+        var successMessage = document.getElementById("success-message");
+        var errorMessage = document.getElementById("error-message");
+        if (successMessage) successMessage.style.display = "none";
+        if (errorMessage) errorMessage.style.display = "none";
+      }, 3000); 
+    }
+    hideMessages();
+  </script>
+</body>
+</html>

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uq.pac.childclinic.parent;
+package uq.pac.childclinic.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,11 +24,6 @@ import jakarta.persistence.Table;
 
 import java.io.Serializable;
 
-import uq.pac.childclinic.model.Identifiable;
-
-/**
- * @author Juergen Hoeller Can be Cat, Dog, Hamster...
- */
 @Entity
 @Table(name = "genders")
 public class Gender implements Serializable, Identifiable {

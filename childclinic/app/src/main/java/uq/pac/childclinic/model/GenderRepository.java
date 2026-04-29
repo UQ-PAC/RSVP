@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uq.pac.childclinic.parent;
+package uq.pac.childclinic.model;
 
 import java.util.List;
 

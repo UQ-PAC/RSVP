@@ -1,31 +1,25 @@
 package uq.pac.rsvp.web;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.ErrorResponseException;
-import org.springframework.web.multipart.MultipartFile;
-
-import com.google.common.hash.Hashing;
-
 import uq.pac.rsvp.RsvpException;
-import uq.pac.rsvp.verification.Verification;
-import uq.pac.rsvp.verification.ConfigurationException;
 import uq.pac.rsvp.support.reporting.Report;
-import uq.pac.rsvp.support.util.Pair;
+import uq.pac.rsvp.verification.ConfigurationException;
+import uq.pac.rsvp.verification.Verification;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class VerificationService {
@@ -38,16 +32,20 @@ public class VerificationService {
     public Set<Report> runVerification(VerificationFileset verification)
             throws RsvpException, IOException, InterruptedException {
 
-        Set<List<Pair<String, Path>>> policies = new HashSet<>();
+        Map<String, String> filenames = new HashMap<>();
+
+        Set<List<Path>> policies = new HashSet<>();
         Set<Path> schemas = new HashSet<>();
         Set<Path> entities = new HashSet<>();
-        Set<Pair<String, Path>> invariants = new HashSet<>();
+        Set<Path> invariants = new HashSet<>();
 
         for (List<String> versionedPolicy : verification.getPolicyFiles()) {
-            List<Pair<String, Path>> group = new ArrayList<>();
+            List<Path> group = new ArrayList<>();
 
             for (String policy : versionedPolicy) {
-                group.add(new Pair<String, Path>(policy, fileService.getPath(policy)));
+                Path path = fileService.getPath(policy);
+                group.add(path);
+                filenames.put(path.toString(), policy);
             }
 
             policies.add(group);
@@ -55,23 +53,30 @@ public class VerificationService {
         }
 
         for (String schema : verification.getSchemas()) {
-            schemas.add(fileService.getPath(schema));
+            Path path = fileService.getPath(schema);
+            schemas.add(path);
+            filenames.put(path.toString(), schema);
         }
 
         for (String entitiesFile : verification.getEntities()) {
-            entities.add(fileService.getPath(entitiesFile));
+            Path path = fileService.getPath(entitiesFile);
+            entities.add(path);
+            filenames.put(path.toString(), entitiesFile);
         }
 
         for (String invariantsFile : verification.getInvariants()) {
-            invariants.add(new Pair<String, Path>(invariantsFile, fileService.getPath(invariantsFile)));
+            Path path = fileService.getPath(invariantsFile);
+            invariants.add(path);
+            filenames.put(path.toString(), invariantsFile);
         }
 
         try {
 
             Set<Report> result = Verification.verifyPolicies(policies, schemas, entities, invariants);
-            logger.info("Generated " + result.size() + " reports");
 
-            return result;
+            logger.info("Generated {} reports", result.size());
+
+            return result.stream().map(report -> report.remap(filenames)).collect(Collectors.toSet());
         } catch (ConfigurationException e) {
             logger.error(e.getMessage());
             throw new ErrorResponseException(HttpStatus.BAD_REQUEST);

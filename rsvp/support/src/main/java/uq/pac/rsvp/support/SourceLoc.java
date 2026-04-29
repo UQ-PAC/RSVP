@@ -1,13 +1,13 @@
 package uq.pac.rsvp.support;
 
 /**
- * Describes a location (range) within a textual source, given by offset (0-based) and length,
+ * Describes a location (range) within a textual source, given by offset
+ * (0-based) and length,
  * as well as line and column (1-based).
  */
 public class SourceLoc {
 
-    public static final SourceLoc MISSING =
-            new SourceLoc(null, -1, 0, null, null);
+    public static final SourceLoc MISSING = new SourceLoc(null, -1, 0, null, null);
 
     public final String file;
     public final int offset;
@@ -15,7 +15,7 @@ public class SourceLoc {
     private final LineLoc start;
     private final LineLoc end;
 
-    public SourceLoc(String file, int offset, int len, LineLoc start, LineLoc end) {
+    SourceLoc(String file, int offset, int len, LineLoc start, LineLoc end) {
         this.file = file;
         this.offset = offset;
         this.len = len;
@@ -42,5 +42,22 @@ public class SourceLoc {
             loc += " [%s-%s]".formatted(start.toString(), end.toString());
         }
         return loc;
+    }
+
+    /**
+     * Create a new source location identical to this one, but with the supplied
+     * file name.
+     *
+     * @param filename the name of the new file to use
+     * @return a new {@code SourceLoc} that references the specified file name, or
+     *         {@code SourceLoc.MISSING} if this location is
+     *         {@code SourceLoc.MISSING}
+     */
+    public SourceLoc cloneForFile(String filename) {
+        if (this == MISSING) {
+            return MISSING;
+        }
+
+        return new SourceLoc(filename, offset, len, start, end);
     }
 }

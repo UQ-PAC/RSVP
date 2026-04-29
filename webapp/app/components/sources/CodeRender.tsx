@@ -5,7 +5,7 @@ import hljs from "highlight.js";
 import { Roboto_Mono } from "next/font/google";
 import { JSX, useEffect, useRef } from "react";
 
-import { FileType, Report } from "../../types";
+import { FileType, Report, SourceLoc } from "../../types";
 import {
   ExpansionState,
   useFocus,
@@ -58,9 +58,7 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
         }).value
       : text;
 
-  reports.forEach((report) => {
-    const loc = report.primarySourceLocation;
-
+  const processSourceLoc = (report: Report, loc: SourceLoc) => {
     if (!loc.startLoc || !loc.endLoc) return;
 
     const lines = content.slice(loc.offset, loc.offset + loc.len).split("\n");
@@ -106,6 +104,11 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
       reportsByLine[line].push({ report, start, end });
       offset += lineContent.length + 1;
     }
+  };
+
+  reports.forEach((report) => {
+    processSourceLoc(report, report.primarySourceLocation);
+    report.sourceLocations.forEach((loc) => processSourceLoc(report, loc));
   });
 
   const code: JSX.Element[] = [];

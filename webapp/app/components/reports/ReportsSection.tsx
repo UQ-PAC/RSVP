@@ -32,6 +32,9 @@ export function ReportsSection({
     <div className={`reports-section reports-section-${severity}`}>
       <span className="reports-section-header">
         <h4 className="reports-section-title">{title}</h4>
+        <span className="reports-section-count">
+          ({reports.flatMap((report) => report[1]).length})
+        </span>
         <ToggleAll name="reports-section" toggle={toggleAll} />
       </span>
 

@@ -8,7 +8,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import cx from "classnames";
 import { useEffect, useRef } from "react";
-import { Report } from "../../types";
+import { Report, SourceLoc } from "../../types";
 import { ExpansionState, useFocusDispatch } from "../providers/FocusContext";
 import {
   useSelection,
@@ -52,6 +52,15 @@ export function ReportItem({ report }: ReportItemParams) {
       : report.severity === "warn"
         ? faCircleExclamation
         : faCircleInfo;
+
+  const toStr = (loc: SourceLoc) =>
+    `${loc.source?.file.name}:${loc.startLoc?.line}:${loc.startLoc?.column}`;
+
+  const locStr =
+    report.sourceLocations.reduce<string>(
+      (str: string, loc: SourceLoc) => `${str}, ${toStr(loc)}`,
+      `  (${toStr(report.primarySourceLocation)}`,
+    ) + ")";
 
   return (
     <div
@@ -98,9 +107,7 @@ export function ReportItem({ report }: ReportItemParams) {
           className={`report-item-message report-item-message-${report.severity}`}
         >
           {report.message}
-          <span className="report-item-line-info">
-            {`  (${report.primarySourceLocation.source?.file.name}:${report.primarySourceLocation.startLoc?.line}:${report.primarySourceLocation.startLoc?.column})`}
-          </span>
+          <span className="report-item-line-info">{locStr}</span>
         </span>
 
         {!!report.messageDetail?.length && (

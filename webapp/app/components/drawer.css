@@ -12,6 +12,7 @@
     padding: 1rem 0;
     position: relative;
     align-items: stretch;
+    z-index: 3;
   }
 
   .drawer.expanded {

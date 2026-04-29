@@ -52,6 +52,7 @@ export function ReportsGroup({ section, name, reports }: ReportsGroupProps) {
           icon={expanded ? faMinusSquare : faPlusSquare}
         />
         <span className="reports-group-title">{name}</span>
+        <span className="reports-group-count">({reports.length})</span>
       </div>
       {expanded && (
         <div className="reports-group-content">

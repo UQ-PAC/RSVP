@@ -109,13 +109,13 @@ function doVerify(context: VerificationState): VerificationState {
       });
     });
 
-    const newGroup = {
-      ...group,
+    const newGroup: VerificationGroup = {
+      // ...group,
+      files: cloneFiles(group.files),
+      diffs: cloneDiffs(group.diffs),
       byId: fileResolution.then(({ byId }) => byId),
       reports: fileResolution.then(({ request, resolveFilenames }) =>
-        verify(request)
-          .then((reports) => reports.map(resolveFilenames))
-          .catch((err) => console.error("spaghetti")),
+        verify(request).then((reports) => reports.map(resolveFilenames)),
       ),
     };
 
@@ -140,7 +140,7 @@ function doAdd(
     ...emptyVerificationGroup,
   };
   const newContext = { ...context };
-  const newGroup = { ...group };
+  const newGroup = { ...group, files: cloneFiles(group.files) };
 
   // Add file as a version of another file
   if (action.original && action.file) {
@@ -294,7 +294,7 @@ function doRemove(
   }
 
   const newContext = { ...context };
-  const newGroup = { ...group };
+  const newGroup = { ...group, files: cloneFiles(group.files) };
 
   if (action.original && action.file) {
     // Remove version
@@ -324,7 +324,7 @@ function doRemove(
     newGroup.files = [
       ...group.files.filter((file) => file.original !== action.file),
     ];
-    // Delete any associated reports (TODO: multiple source locations)
+    // Delete any associated reports
     newGroup.reports = group.reports?.then((reports) =>
       reports.filter(
         (report) => report.primarySourceLocation.source !== action.file,
@@ -359,7 +359,6 @@ async function sortFilesById(group: VerificationGroup): Promise<{
     };
 
     const versions: VersionDict = {};
-
     const all: VerificationFileDict = {};
 
     const mapId = async (file: VerificationFile) => {
@@ -374,19 +373,21 @@ async function sortFilesById(group: VerificationGroup): Promise<{
     Promise.all(group.files.map((file) => mapId(file.original)))
       .then(() =>
         Promise.all(
-          group.files.flatMap((file) =>
-            getServerId(file.original).then((originalId) => {
-              if (file.versions.length) {
-                versions[originalId] = [];
-              }
-              return file.versions.map((version) =>
-                getServerId(version).then((id) => {
-                  all[id] = version;
-                  versions[originalId].push(id);
-                }),
-              );
-            }),
-          ),
+          group.files
+            .map((file) =>
+              getServerId(file.original).then((originalId) => {
+                if (file.versions.length) {
+                  versions[originalId] = [];
+                }
+                return file.versions.map((version) =>
+                  getServerId(version).then((id) => {
+                    all[id] = version;
+                    versions[originalId].push(id);
+                  }),
+                );
+              }),
+            )
+            .flat(),
         ),
       )
       .then(() => {
@@ -410,4 +411,21 @@ async function sortFilesById(group: VerificationGroup): Promise<{
 
 async function getServerId(file: VerificationFile): Promise<string> {
   return file.resolved.then((resolved) => resolved.serverId);
+}
+
+function cloneFiles(files: VersionedFileList): VersionedFileList {
+  return files.map(({ original, versions }) => ({
+    original,
+    versions: [...versions],
+  }));
+}
+
+function cloneDiffs(diffs: DiffDict): DiffDict {
+  const clone = {};
+
+  Object.keys(diffs).forEach((group) => {
+    clone[group] = { ...diffs[group] };
+  });
+
+  return clone;
 }

@@ -2,17 +2,17 @@
 
 import { useReducer } from "react";
 import {
-  emptySelection,
-  selectionReducer,
-  SelectionContext,
-  SelectionDispatchContext,
-} from "./SelectionContext";
-import {
-  focusReducer,
+  emptyFocus,
   FocusContext,
   FocusDispatchContext,
-  emptyFocus,
+  focusReducer,
 } from "./FocusContext";
+import {
+  emptySelection,
+  SelectionContext,
+  SelectionDispatchContext,
+  selectionReducer,
+} from "./SelectionContext";
 import {
   emptyVerification,
   VerificationContext,

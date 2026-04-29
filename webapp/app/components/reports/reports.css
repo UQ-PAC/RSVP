@@ -22,7 +22,15 @@
 
   .reports-section .reports-section-title {
     font-weight: 600;
+  }
+
+  .reports-section .reports-section-count {
     flex-grow: 1;
+    font-size: 0.8rem;
+    margin-left: 0.3rem;
+    color: var(--color-gray-800);
+    font-weight: 700;
+    align-self: center;
   }
 
   .reports-group-header {
@@ -78,6 +86,15 @@
 
   .reports-group-header .reports-group-title {
     margin-bottom: 0.1rem;
+  }
+
+  .reports-group-header .reports-group-count {
+    font-size: 0.7rem;
+    margin-bottom: 0.1rem;
+    line-height: 1.5rem;
+    margin-left: 0.2rem;
+    color: var(--color-gray-700);
+    font-weight: 600;
   }
 
   .report-item {

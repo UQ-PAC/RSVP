@@ -96,6 +96,36 @@
             </ul>
           </li>
 
+          <li class="nav-item mt-2 mt-lg-0 ms-lg-3 d-flex align-items-center justify-content-end justify-content-lg-start">
+            <button type="button" class="btn btn-primary my-auto" data-bs-toggle="modal" data-bs-target="#cedarLogsModal" title="Cedar Logs">
+              <img th:src="@{/resources/images/cedar-logo-small.svg}" alt="Cedar Logo" style="max-height: 50px; width: auto;" />
+            </button>
+            <div class="modal fade" id="cedarLogsModal" tabindex="-1" aria-labelledby="Cedar Authorisation Logs" aria-hidden="true">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="Cedar Authorisation Logs">Cedar Authorisation Logs</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+                    <ul class="list-group" th:if="${(cedarLogs != null and !cedarLogs.isEmpty()) or (authorizationMap != null and !authorizationMap.isEmpty())}">
+                      <li class="list-group-item" th:if="${cedarLogs != null and !cedarLogs.isEmpty()}" th:each="log : ${cedarLogs}" th:utext="${@cedarFormatter.format(log)}" th:classappend="${#strings.contains(log, 'Access Granted')} ? 'list-group-item-success' : (${#strings.contains(log, 'Access Denied')} ? 'list-group-item-danger' : 'list-group-item-warning')"></li>
+                      <li class="list-group-item" th:if="${authorizationMap != null and !authorizationMap.isEmpty()}" th:each="entry : ${authorizationMap}" th:classappend="${#strings.contains(entry.value, 'Access Granted')} ? 'list-group-item-success' : (${#strings.contains(entry.value, 'Access Denied')} ? 'list-group-item-danger' : 'list-group-item-warning')">
+                          <span th:utext="${@cedarFormatter.format('Item Request: Principal=' + cedarPrincipal + ', Action=' + cedarAction + ', Resource=' + (cedarResourceMap != null ? cedarResourceMap[entry.key] : 'Unknown ID ' + entry.key) + ' | Response: ' + entry.value)}"></span>
+                      </li>
+                    </ul>
+                    <p th:if="${(cedarLogs == null or cedarLogs.isEmpty()) and (authorizationMap == null or authorizationMap.isEmpty())}" class="text-muted">
+                      No Cedar policy evaluations occurred during the execution of this request.
+                    </p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+
         </ul>
       </div>
     </div>

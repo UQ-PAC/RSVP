@@ -34,6 +34,8 @@ public class CedarAspect {
 
 	private final JdbcTemplate jdbcTemplate;
 
+	private final CedarLogContext cedarLogContext;
+
 	private static final String USER_ID_SESSION_ATTRIBUTE = "currentUser";
 
 	private static final String CONTEXT_PARAM_PREFIX = "cedar-context-";
@@ -51,9 +53,10 @@ public class CedarAspect {
 			"Visit", new ResourceMetadata("SELECT description FROM visits WHERE entity_id = ?",
 					rs -> rs.get("description").toString()));
 
-	public CedarAspect(CedarService cedarService, JdbcTemplate jdbcTemplate) {
+	public CedarAspect(CedarService cedarService, JdbcTemplate jdbcTemplate, CedarLogContext cedarLogContext) {
 		this.cedarService = cedarService;
 		this.jdbcTemplate = jdbcTemplate;
+		this.cedarLogContext = cedarLogContext;
 	}
 
 	@Before("@annotation(CedarAuthorization) || @annotation(CedarAuthorizations)")
@@ -121,6 +124,10 @@ public class CedarAspect {
 			// System.out.println("Cedar response status code: " +
 			// response.getStatusCode());
 			// System.out.println("Cedar response body: " + response.getBody());
+
+			String logEntry = "Page Request: Principal=" + principal + ", Action=" + action + ", Resource=" + resource
+					+ " | Response: " + response.getBody();
+			this.cedarLogContext.addLog(logEntry);
 
             // Any single rejection immediately terminates the invocation
 			if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null

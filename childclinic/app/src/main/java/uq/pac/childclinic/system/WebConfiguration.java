@@ -4,11 +4,13 @@ import java.util.Locale;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
-import org.springframework.web.servlet.LocaleResolver;
+
+import uq.pac.childclinic.cedar.CedarLogInterceptor;
 
 /**
  * Configures internationalization (i18n) support for the application.
@@ -21,8 +23,13 @@ import org.springframework.web.servlet.LocaleResolver;
  * @author Anuj Ashok Potdar
  */
 @Configuration
-@SuppressWarnings("unused")
 public class WebConfiguration implements WebMvcConfigurer {
+
+	private final CedarLogInterceptor cedarLogInterceptor;
+
+	public WebConfiguration(CedarLogInterceptor cedarLogInterceptor) {
+		this.cedarLogInterceptor = cedarLogInterceptor;
+	}
 
 	/**
 	 * Uses session storage to remember the user’s language setting across requests.
@@ -55,6 +62,7 @@ public class WebConfiguration implements WebMvcConfigurer {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(localeChangeInterceptor());
+		registry.addInterceptor(this.cedarLogInterceptor);
 	}
 
 }

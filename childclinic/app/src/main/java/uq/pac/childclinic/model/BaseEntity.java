@@ -84,13 +84,10 @@ public class BaseEntity implements Serializable, Identifiable {
 	}
 
 	public String getClinicDescriptions() {
-        if (this.clinics == null || this.clinics.isEmpty()) {
-            return "No Assigned Clinics";
-        }
-        return this.clinics.stream()
-            .map(Clinic::getClinicName)
-            .sorted()
-            .collect(Collectors.joining(", "));
-    }
+		if (this.clinics == null || this.clinics.isEmpty()) {
+			return "No Assigned Clinics";
+		}
+		return this.clinics.stream().map(Clinic::getClinicName).sorted().collect(Collectors.joining(", "));
+	}
 
 }

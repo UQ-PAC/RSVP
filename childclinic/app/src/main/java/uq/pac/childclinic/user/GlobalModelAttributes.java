@@ -25,7 +25,9 @@ public class GlobalModelAttributes {
 
 		final String activeUsername = (sessionUser != null) ? sessionUser : "Guest";
 
+		System.out.println(System.lineSeparator());
 		System.out.println("activeUsername: " + activeUsername);
+		System.out.println(System.lineSeparator());
 
 		User currentUser = this.userRepository.findByUsername(activeUsername).orElseGet(() -> {
 			User transientUser = new User();
@@ -35,12 +37,9 @@ public class GlobalModelAttributes {
 
 		Iterable<User> dynamicUsers = this.userRepository.findAll();
 
-		// 1. Populate the Model for standard view rendering
 		model.addAttribute("currentUser", currentUser);
 		model.addAttribute("dynamicUsers", dynamicUsers);
 
-		// 2. Populate the Request Attributes to persist through exceptions and /error
-		// forwards
 		request.setAttribute("currentUser", currentUser);
 		request.setAttribute("dynamicUsers", dynamicUsers);
 	}

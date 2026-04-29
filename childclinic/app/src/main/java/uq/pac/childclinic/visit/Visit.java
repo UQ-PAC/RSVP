@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uq.pac.childclinic.parent;
+package uq.pac.childclinic.visit;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
@@ -25,9 +28,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import uq.pac.childclinic.adult.Adult;
 import uq.pac.childclinic.model.BaseEntity;
 
 /**
@@ -52,6 +58,11 @@ public class Visit extends BaseEntity {
 	@JoinColumn(name = "confidentiality_id", nullable = false)
 	@NotNull
 	private Confidentiality confidentiality;
+
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "visit_adults", joinColumns = @JoinColumn(name = "visit_id"),
+			inverseJoinColumns = @JoinColumn(name = "adult_id"))
+	private Set<Adult> responsibleAdults = new LinkedHashSet<>();
 
 	/**
 	 * Creates a new instance of Visit for the current date
@@ -82,6 +93,14 @@ public class Visit extends BaseEntity {
 
 	public void setConfidentiality(Confidentiality confidentiality) {
 		this.confidentiality = confidentiality;
+	}
+
+	public Set<Adult> getResponsibleAdults() {
+		return responsibleAdults;
+	}
+
+	public void setResponsibleAdults(Set<Adult> responsibleAdults) {
+		this.responsibleAdults = responsibleAdults;
 	}
 
 }

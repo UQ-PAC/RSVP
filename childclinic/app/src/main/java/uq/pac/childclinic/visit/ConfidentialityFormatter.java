@@ -1,4 +1,4 @@
-package uq.pac.childclinic.parent;
+package uq.pac.childclinic.visit;
 
 import java.text.ParseException;
 import java.util.Collection;
@@ -10,7 +10,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ConfidentialityFormatter implements Formatter<Confidentiality> {
-    private final ConfidentialityRepository confidentialities;
+
+	private final ConfidentialityRepository confidentialities;
 
 	public ConfidentialityFormatter(ConfidentialityRepository confidentialities) {
 		this.confidentialities = confidentialities;
@@ -32,4 +33,5 @@ public class ConfidentialityFormatter implements Formatter<Confidentiality> {
 		}
 		throw new ParseException("Confidentiality not found: " + text, 0);
 	}
+
 }

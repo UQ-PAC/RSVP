@@ -46,21 +46,33 @@
             <span th:text="#{home}">Home</span>
           </li>
 
-          <li th:replace="~{::menuItem ('/parents/find','parents','find parents','search',#{findParents})}">
-            <span class="fa fa-search" aria-hidden="true"></span>
-            <span th:text="#{findParents}">Find parents</span>
-          </li>
+          <th:block th:if="${navCanListPatients}">
+            <li th:replace="~{::menuItem ('/patients/find','patients','patients','th-list',#{patients})}">
+                <span class="fa fa-th-list" aria-hidden="true"></span>
+                <span th:text="#{patients}">Patients</span>
+            </li>
+          </th:block>
 
-          <li th:replace="~{::menuItem ('/doctors.html','doctors','doctors','th-list',#{doctors})}">
+          <th:block th:if="${navCanListAdults}">
+            <li th:replace="~{::menuItem ('/adults/find','adults','adults','th-list',#{adults})}">
+                <span class="fa fa-th-list" aria-hidden="true"></span>
+                <span th:text="#{adults}">Adults</span>
+            </li>
+          </th:block>
+
+          <th:block th:if="${navCanListEmployees}">
+            <li th:replace="~{::menuItem ('/secretaries/find','secretaries','secretaries','th-list',#{secretaries})}">
+              <span class="fa fa-th-list" aria-hidden="true"></span>
+              <span th:text="#{secretaries}">Secretaries</span>
+          </li>
+          </th:block>
+
+          <th:block th:if="${navCanListEmployees}">
+            <li th:replace="~{::menuItem ('/doctors/find','doctors','doctors','th-list',#{doctors})}">
             <span class="fa fa-th-list" aria-hidden="true"></span>
             <span th:text="#{doctors}">Doctors</span>
           </li>
-
-          <li
-            th:replace="~{::menuItem ('/oups','error','trigger a RuntimeException to see how it is handled','exclamation-triangle',#{error})}">
-            <span class="fa exclamation-triangle" aria-hidden="true"></span>
-            <span th:text="#{error}">Error</span>
-          </li>
+          </th:block>
 
         </ul>
 

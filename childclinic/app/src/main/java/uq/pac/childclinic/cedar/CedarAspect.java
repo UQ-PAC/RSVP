@@ -43,13 +43,20 @@ public class CedarAspect {
 	private record ResourceMetadata(String sqlQuery, Function<Map<String, Object>, String> nameExtractor) {
 	}
 
-	private static final Map<String, ResourceMetadata> RESOURCE_REGISTRY = Map.of("Parent",
-			new ResourceMetadata("SELECT first_name, last_name FROM parents WHERE entity_id = ?",
-					rs -> rs.get("first_name") + " " + rs.get("last_name")),
-			"Doctor",
+	private static final Map<String, ResourceMetadata> RESOURCE_REGISTRY = Map.of("Doctor",
 			new ResourceMetadata("SELECT first_name, last_name FROM doctors WHERE entity_id = ?",
 					rs -> rs.get("first_name") + " " + rs.get("last_name")),
-			"Child", new ResourceMetadata("SELECT name FROM children WHERE entity_id = ?", rs -> rs.get("name").toString()),
+			"Employee",
+			new ResourceMetadata("SELECT username FROM users WHERE entity_id = ?", rs -> rs.get("username").toString()),
+			"Patient",
+			new ResourceMetadata("SELECT first_name, last_name FROM patients WHERE entity_id = ?",
+					rs -> rs.get("first_name") + " " + rs.get("last_name")),
+			"ResponsibleAdult",
+			new ResourceMetadata("SELECT first_name, last_name FROM adults WHERE entity_id = ?",
+					rs -> rs.get("first_name") + " " + rs.get("last_name")),
+			"Secretary",
+			new ResourceMetadata("SELECT first_name, last_name FROM secretaries WHERE entity_id = ?",
+					rs -> rs.get("first_name") + " " + rs.get("last_name")),
 			"Visit", new ResourceMetadata("SELECT description FROM visits WHERE entity_id = ?",
 					rs -> rs.get("description").toString()));
 

@@ -1,4 +1,4 @@
-package uq.pac.childclinic.parent;
+package uq.pac.childclinic.visit;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,7 +14,8 @@ import uq.pac.childclinic.model.Identifiable;
 @Entity
 @Table(name = "confidentialities")
 public class Confidentiality implements Serializable, Identifiable {
-    @Id
+
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
@@ -47,4 +48,5 @@ public class Confidentiality implements Serializable, Identifiable {
 		String name = this.getName();
 		return (name != null) ? name : "<null>";
 	}
+
 }

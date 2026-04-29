@@ -315,7 +315,7 @@
     .source-file-render
     .code
     > .source-file-line-content.source-report.source-report-err {
-    border-right: 1px solid var(--color-err-darker);
+    border-right: 1px solid var(--color-red-300);
   }
 
   .source-file-empty-diff {
@@ -327,51 +327,51 @@
 
   /********  report highlighting  ********/
 
-  .source-report.source-report-info.hovered {
+  .source-report.source-report-info.hovered-info {
     background-color: var(--color-info-mid);
   }
 
-  .source-report.source-report-warn.hovered {
+  .source-report.source-report-warn.hovered-warn {
     background-color: var(--color-warn-mid);
   }
 
-  .source-report.source-report-err.hovered {
+  .source-report.source-report-err.hovered-err {
     background-color: var(--color-err-mid);
   }
 
-  .source-report.source-report-info.selected {
+  .source-report.source-report-info.selected-info {
     background-color: var(--color-info-light);
   }
 
-  .source-report.source-report-warn.selected {
+  .source-report.source-report-warn.selected-warn {
     background-color: var(--color-warn-light);
   }
 
-  .source-report.source-report-err.selected {
+  .source-report.source-report-err.selected-err {
     background-color: var(--color-err-light);
   }
 
-  .source-report.selected .source-report-text-highlight-info {
+  .source-report.selected-info .source-report-text-highlight-info {
     background-color: var(--color-info-mid);
   }
 
-  .source-report.selected .source-report-text-highlight-warn {
+  .source-report.selected-warn .source-report-text-highlight-warn {
     background-color: var(--color-warn-mid);
   }
 
-  .source-report.selected .source-report-text-highlight-err {
+  .source-report.selected-err .source-report-text-highlight-err {
     background-color: var(--color-err-mid);
   }
 
-  .source-report.hovered .source-report-text-highlight-info {
+  .source-report.hovered-info .source-report-text-highlight-info {
     background-color: var(--color-info-darker);
   }
 
-  .source-report.hovered .source-report-text-highlight-warn {
+  .source-report.hovered-warn .source-report-text-highlight-warn {
     background-color: var(--color-warn-darker);
   }
 
-  .source-report.hovered .source-report-text-highlight-err {
+  .source-report.hovered-err .source-report-text-highlight-err {
     background-color: var(--color-err-darker);
   }
 
@@ -384,7 +384,7 @@
     border-left: 1px solid var(--color-warn-darker);
   }
   .source-file-line-number.source-report-err {
-    border-right: 1px solid var(--color-err-darker);
-    border-left: 1px solid var(--color-err-darker);
+    border-right: 1px solid var(--color-red-300);
+    border-left: 1px solid var(--color-red-300);
   }
 }

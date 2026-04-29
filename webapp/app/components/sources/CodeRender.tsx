@@ -1,11 +1,10 @@
 "use client";
 
 import cx from "classnames";
-import hljs from "highlight.js";
 import { Roboto_Mono } from "next/font/google";
-import { JSX, useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
-import { FileType, Report, SourceLoc } from "../../types";
+import { FileType, Report, ReportSeverity, SourceLoc } from "../../types";
 import {
   ExpansionState,
   useFocus,
@@ -17,18 +16,23 @@ import {
 } from "../providers/SelectionContext";
 
 import "./CodeHighlight";
+import { CodeLine, ReportLine } from "./CodeLine";
+
+const robotoMono = Roboto_Mono({
+  subsets: ["latin"],
+});
 interface CodeRenderParams {
   content: string;
   syntax: FileType;
   reports: Report[];
 }
 
-const robotoMono = Roboto_Mono({
-  subsets: ["latin"],
-});
+type ReportLineDict = {
+  [line: number]: ReportLine[];
+};
 
 export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
-  const { selected, hovered, scroll } = useSelection();
+  const { selected, hovered, scroll, loc } = useSelection();
   const selectionDispatch = useSelectionDispatch();
 
   const { drawer: drawerFocus } = useFocus();
@@ -36,7 +40,6 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
 
   // Scroll selected policy into view
   const focus = useRef<HTMLSpanElement>(null);
-
   useEffect(() => {
     if (focus.current && scroll === "source") {
       focus.current.scrollIntoView({
@@ -45,217 +48,143 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
         behavior: "smooth",
       });
     }
-  }, [scroll, focus, selected]);
+  }, [scroll, focus, selected, loc]);
 
-  const reportsByLine: {
-    [line: number]: { report: Report; start?: number; end?: number }[];
-  } = {};
+  // Only re-calculate if reports or content change (not selection or hover)
+  const { lines, reportsByLine } = useMemo(() => {
+    const reportsByLine: ReportLineDict = {};
+    const lines = content.split("\n");
 
-  const highlight = (text: string) =>
-    syntax !== "text"
-      ? hljs.highlight(text, {
-          language: syntax,
-        }).value
-      : text;
+    const processSourceLoc = (report: Report, loc: SourceLoc) => {
+      if (!loc.startLoc || !loc.endLoc) return;
 
-  const processSourceLoc = (report: Report, loc: SourceLoc) => {
-    if (!loc.startLoc || !loc.endLoc) return;
+      const reportLines = lines.slice(loc.startLoc.line - 1, loc.endLoc.line);
+      const nLines = reportLines.length;
 
-    const lines = content.slice(loc.offset, loc.offset + loc.len).split("\n");
-    const nLines = lines.length;
+      let offset = loc.offset;
 
-    // const nLines = loc.endLoc.line - loc.startLoc.line;
+      const partial =
+        `${reportLines.at(0)?.substring(0, loc.startLoc.column - 1)}`.trim()
+          .length || content.charAt(loc.offset + loc.len) !== "\n";
 
-    let offset = loc.offset;
-
-    const partial =
-      loc.startLoc.column !== 1 ||
-      content.charAt(loc.offset + loc.len) !== "\n";
-
-    for (
-      let line = loc.startLoc.line;
-      line < loc.startLoc.line + nLines;
-      line++
-    ) {
-      if (!reportsByLine[line]) {
-        reportsByLine[line] = [];
-      }
-
-      const lineContent = lines[line - loc.startLoc.line];
-
-      let start: number | undefined = undefined;
-      let end: number | undefined = undefined;
-
-      if (partial) {
-        if (line === loc.startLoc.line && loc.startLoc.column !== 1) {
-          start = loc.startLoc.column - 1;
-        } else {
-          const trimmed = lineContent.trimStart();
-          start = lineContent.length - trimmed.length || 1;
+      for (
+        let line = loc.startLoc.line;
+        line < loc.startLoc.line + nLines;
+        line++
+      ) {
+        if (!reportsByLine[line]) {
+          reportsByLine[line] = [];
         }
 
-        if (line === loc.startLoc.line + nLines - 1) {
-          end = loc.offset + loc.len - offset + start;
-        } else {
-          end = start + lineContent.length;
-        }
-      }
+        const lineContent = reportLines[line - loc.startLoc.line];
 
-      reportsByLine[line].push({ report, start, end });
-      offset += lineContent.length + 1;
-    }
-  };
+        let start: number | undefined = undefined;
+        let end: number | undefined = undefined;
 
-  reports.forEach((report) => {
-    processSourceLoc(report, report.primarySourceLocation);
-    report.sourceLocations.forEach((loc) => processSourceLoc(report, loc));
-  });
-
-  const code: JSX.Element[] = [];
-
-  code.push(
-    <span key="line-0" className="source-file-empty-line-number">
-      {" "}
-    </span>,
-    <span
-      key="0"
-      className="source-file-line-content source-file-empty-line"
-    ></span>,
-  );
-
-  content.split("\n").forEach((line, i) => {
-    const n = i + 1;
-    const report = reportsByLine[n];
-
-    // FIXME: multiple reports per line
-    const relevant = report?.reduce((result, current) => {
-      switch (result.report.severity) {
-        case "err":
-          return result;
-        case "warn":
-          return current.report.severity === "err" ? current : result;
-        case "info":
-          return current;
-      }
-    });
-
-    const id = relevant?.report.id;
-
-    const isSelected = relevant && hovered !== id && selected === id;
-    const isHovered = relevant && hovered === id;
-
-    let highlighted: string | undefined = undefined;
-
-    // FIXME:
-    if (relevant?.start || relevant?.end) {
-      const begin = relevant?.start
-        ? highlight(line.slice(0, relevant.start - 1))
-        : "";
-      const mid =
-        `<span class="source-report-text-highlight source-report-text-highlight-${relevant?.report.severity}"` +
-        `data-report="${relevant?.report.id}">${highlight(
-          line.slice(relevant?.start ? relevant.start - 1 : 0, relevant?.end),
-        )}</span>`;
-      const end = relevant?.end ? highlight(line.slice(relevant.end)) : "";
-
-      highlighted = begin + mid + end;
-    } else {
-      highlighted = highlight(line);
-    }
-
-    const click = relevant
-      ? () => {
-          if (selected !== id) {
-            if (drawerFocus.expansions["right"] !== ExpansionState.Expanded) {
-              focusDispatch({
-                type: "focus",
-                target: "drawer",
-                focus: { key: "left", value: ExpansionState.Collapsed },
-              });
-              focusDispatch({
-                type: "focus",
-                target: "drawer",
-                focus: {
-                  key: "right",
-                  value: ExpansionState.Expanded,
-                },
-              });
-            }
-
-            focusDispatch({
-              type: "focus",
-              target: "report-group",
-              focus: {
-                key: `${relevant?.report.severity}-${relevant?.report.primarySourceLocation.source?.file.name}`,
-                value: ExpansionState.Expanded,
-              },
-            });
+        if (partial) {
+          if (line === loc.startLoc.line && loc.startLoc.column !== 1) {
+            start = loc.startLoc.column - 1;
+          } else {
+            const trimmed = lineContent.trimStart();
+            start = lineContent.length - trimmed.length || 1;
           }
 
-          selectionDispatch({
-            type: "click",
-            id: id,
-            scroll: selected !== id ? "report" : "none",
-          });
+          if (line === loc.startLoc.line + nLines - 1) {
+            end = loc.offset + loc.len - offset + start;
+          } else {
+            end = start + lineContent.length;
+          }
         }
-      : undefined;
 
-    const mouseEnter = relevant
-      ? () =>
-          selectionDispatch({
-            type: "mouseEnter",
-            id: id,
-            scroll: "none",
-          })
-      : undefined;
+        reportsByLine[line].push({ report, loc, start, end });
+        offset += lineContent.length + 1;
+      }
+    };
 
-    const mouseLeave = relevant
-      ? () =>
-          selectionDispatch({
-            type: "mouseLeave",
-            id: id,
-            scroll: "none",
-          })
-      : undefined;
+    reports.forEach((report) => {
+      processSourceLoc(report, report.primarySourceLocation);
+      report.sourceLocations.forEach((loc) => processSourceLoc(report, loc));
+    });
 
-    const numberClass = cx(
-      "source-file-line-number",
-      report?.length && "source-report",
-      relevant?.report.severity && `source-report-${relevant.report.severity}`,
-      (isHovered || isSelected) && "selected",
-    );
-    const contentClass = cx(
-      "source-file-line-content",
-      report?.length && "source-report",
-      relevant?.report.severity && `source-report-${relevant.report.severity}`,
-      isHovered && "hovered",
-      isSelected && "selected",
-    );
+    return { lines, reportsByLine };
+  }, [reports, content]);
 
-    code.push(
-      <span key={`line-${n}`} className={numberClass}></span>,
-      <span
-        key={n}
-        className={contentClass}
-        data-report={id}
-        ref={
-          relevant &&
-          selected === id &&
-          relevant?.report.primarySourceLocation.startLoc?.line === n
-            ? focus
-            : undefined
-        }
-        dangerouslySetInnerHTML={{ __html: highlighted }}
-        onClick={click}
-        onMouseEnter={mouseEnter}
-        onMouseLeave={mouseLeave}
-      ></span>,
-    );
-  });
+  const click = (id: string, severity: ReportSeverity, loc: SourceLoc) => {
+    if (selected !== id) {
+      if (drawerFocus.expansions["right"] !== ExpansionState.Expanded) {
+        focusDispatch({
+          type: "focus",
+          target: "drawer",
+          focus: { key: "left", value: ExpansionState.Collapsed },
+        });
+        focusDispatch({
+          type: "focus",
+          target: "drawer",
+          focus: {
+            key: "right",
+            value: ExpansionState.Expanded,
+          },
+        });
+      }
+
+      focusDispatch({
+        type: "focus",
+        target: "report-group",
+        focus: {
+          key: `${severity}-${loc.source?.file.name}`,
+          value: ExpansionState.Expanded,
+        },
+      });
+    }
+
+    selectionDispatch({
+      type: "click",
+      id: id,
+      scroll: selected !== id ? "report" : "none",
+    });
+  };
+
+  const mouseEnter = (id: string) =>
+    selectionDispatch({
+      type: "mouseEnter",
+      id: id,
+      scroll: "none",
+    });
+
+  const mouseLeave = (id: string) =>
+    selectionDispatch({
+      type: "mouseLeave",
+      id: id,
+      scroll: "none",
+    });
 
   return (
     <div className={cx("source-file-render", robotoMono.className)}>
-      <pre className="code">{code}</pre>
+      <pre className="code">
+        <span className="source-file-empty-line-number"> </span>
+        <span className="source-file-line-content source-file-empty-line" />
+        {lines
+          .map((line, i) => {
+            const n = i + 1;
+            return { line, reports: reportsByLine[n], n };
+          })
+          .map(({ line, reports, n }) => (
+            <CodeLine
+              key={n}
+              n={n}
+              focus={focus}
+              line={line}
+              syntax={syntax}
+              reports={reports}
+              selected={selected}
+              hovered={hovered}
+              selectedLoc={loc}
+              onclick={click}
+              onenter={mouseEnter}
+              onleave={mouseLeave}
+            />
+          ))}
+      </pre>
     </div>
   );
 }

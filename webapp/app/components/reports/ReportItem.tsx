@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import cx from "classnames";
 import { useEffect, useRef } from "react";
 import { Report, SourceLoc } from "../../types";
+import { getIdentifier, toSourceStr } from "../../util";
 import { ExpansionState, useFocusDispatch } from "../providers/FocusContext";
 import {
   useSelection,
@@ -53,20 +54,66 @@ export function ReportItem({ report }: ReportItemParams) {
         ? faCircleExclamation
         : faCircleInfo;
 
-  const toStr = (loc: SourceLoc) =>
-    `${loc.source?.file.name}:${loc.startLoc?.line}:${loc.startLoc?.column}`;
+  const locDesc = report.sourceLocations.length
+    ? "Multiple locations"
+    : toSourceStr(report.primarySourceLocation);
 
-  const locStr =
-    report.sourceLocations.reduce<string>(
-      (str: string, loc: SourceLoc) => `${str}, ${toStr(loc)}`,
-      `  (${toStr(report.primarySourceLocation)}`,
-    ) + ")";
+  const clickLoc = (e, report: Report, loc?: SourceLoc) => {
+    e.stopPropagation();
+    const target = loc ?? report.primarySourceLocation;
+    target.source?.resolved
+      .then((uploaded) => uploaded.serverId)
+      .then((id) =>
+        focusDispatch({
+          type: "focus",
+          target: "source-file",
+          focus: { key: id, value: ExpansionState.Expanded },
+        }),
+      );
+    selectionDispatch({
+      type: "click",
+      scroll: "source",
+      loc: `${report.id}:${getIdentifier(target)}`,
+    });
+  };
+
+  const enterLoc = (e, report: Report, loc?: SourceLoc) => {
+    const target = loc ?? report.primarySourceLocation;
+    selectionDispatch({
+      type: "mouseEnter",
+      scroll: "none",
+      loc: `${report.id}:${getIdentifier(target)}`,
+    });
+  };
+
+  const leaveLoc = (e, report: Report, loc?: SourceLoc) => {
+    const target = loc ?? report.primarySourceLocation;
+    selectionDispatch({
+      type: "mouseLeave",
+      scroll: "none",
+      loc: `${report.id}:${getIdentifier(target)}`,
+    });
+  };
 
   return (
     <div
       id={`report-${report.id}`}
       ref={element}
       className={className}
+      onClick={() => {
+        if (!isSelected) {
+          report.primarySourceLocation.source?.resolved
+            .then((uploaded) => uploaded.serverId)
+            .then((id) =>
+              focusDispatch({
+                type: "focus",
+                target: "source-file",
+                focus: { key: id, value: ExpansionState.Expanded },
+              }),
+            );
+        }
+        selectionDispatch({ type: "click", id: report.id, scroll: "source" });
+      }}
       onMouseEnter={() =>
         selectionDispatch({
           type: "mouseEnter",
@@ -82,23 +129,7 @@ export function ReportItem({ report }: ReportItemParams) {
         })
       }
     >
-      <div
-        className="report-item-header"
-        onClick={() => {
-          if (!isSelected) {
-            report.primarySourceLocation.source?.resolved
-              .then((uploaded) => uploaded.serverId)
-              .then((id) =>
-                focusDispatch({
-                  type: "focus",
-                  target: "source-file",
-                  focus: { key: id, value: ExpansionState.Expanded },
-                }),
-              );
-          }
-          selectionDispatch({ type: "click", id: report.id, scroll: "source" });
-        }}
-      >
+      <div className="report-item-header">
         <FontAwesomeIcon
           className="report-item-icon report-item-icon-severity"
           icon={icon}
@@ -106,17 +137,41 @@ export function ReportItem({ report }: ReportItemParams) {
         <span
           className={`report-item-message report-item-message-${report.severity}`}
         >
+          <span className="report-item-line-info">{locDesc}:</span>{" "}
           {report.message}
-          <span className="report-item-line-info">{locStr}</span>
         </span>
 
-        {!!report.messageDetail?.length && (
+        {(!!report.messageDetail?.length ||
+          !!report.sourceLocations.length) && (
           <FontAwesomeIcon
             className="report-item-icon report-item-icon-expand"
             icon={isSelected ? faCaretUp : faCaretDown}
           />
         )}
       </div>
+      {isSelected && !!report.sourceLocations.length && (
+        <div className="report-item-source-location-list">
+          <span
+            className="report-item-source-location"
+            onClick={(e) => clickLoc(e, report)}
+            onMouseEnter={(e) => enterLoc(e, report)}
+            onMouseLeave={(e) => leaveLoc(e, report)}
+          >
+            {toSourceStr(report.primarySourceLocation)}
+          </span>
+          {report.sourceLocations.map((loc) => (
+            <span
+              key={getIdentifier(loc)}
+              className="report-item-source-location"
+              onClick={(e) => clickLoc(e, report, loc)}
+              onMouseEnter={(e) => enterLoc(e, report, loc)}
+              onMouseLeave={(e) => leaveLoc(e, report, loc)}
+            >
+              {toSourceStr(loc)}
+            </span>
+          ))}
+        </div>
+      )}
       {isSelected && !!report.messageDetail?.length && (
         <div className="report-item-message-detail">{report.messageDetail}</div>
       )}

@@ -76,8 +76,9 @@
   --color-warn-darker: var(--color-amber-300);
   --color-warn-darkest: var(--color-amber-600);
   --color-err-light: var(--color-red-100);
-  --color-err-mid: var(--color-red-200);
-  --color-err-darker: var(--color-red-300);
+  --color-err-mid: #fcd4d4;
+  --color-err-darker: #fdc3c3;
+
   --color-err-darkest: var(--color-red-800);
 }
 

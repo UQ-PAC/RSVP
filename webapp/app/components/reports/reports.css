@@ -102,24 +102,25 @@
     flex-direction: column;
     padding: 0.5rem 1rem 0.5rem 0.5rem;
     margin-left: 0.4rem;
+    cursor: pointer;
   }
 
   .report-item .report-item-header {
     display: flex;
     gap: 0.5rem;
     font-weight: 500;
-    cursor: pointer;
+    justify-content: space-between;
   }
-
   .report-item .report-item-message {
     color: var(--color-gray-600);
+    flex-grow: 1;
   }
 
   .report-item .report-item-message .report-item-line-info {
     color: var(--color-gray-700);
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     line-height: 1rem;
-    font-weight: 400;
+    font-weight: 500;
   }
   .report-item.report-item-info.selected .report-item-message,
   .report-item.report-item-info.hovered .report-item-message {
@@ -139,6 +140,7 @@
   .report-item .report-item-icon {
     margin-right: 0.3rem;
     margin-top: 0.3rem;
+    width: initial !important; /* override FA style */
   }
 
   .report-item .report-item-message {
@@ -146,11 +148,51 @@
   }
 
   .report-item .report-item-message-detail {
-    /* margin: 0.2rem; */
     margin-top: 0.5rem;
     color: var(--color-gray-700);
     font-size: 0.9rem;
   }
+
+  .report-item .report-item-source-location-list {
+    display: flex;
+    flex-direction: column;
+    margin-left: 1.4rem;
+    justify-items: baseline;
+  }
+
+  .report-item .report-item-source-location-list .report-item-source-location {
+    font-size: 0.7rem;
+    line-height: 1.1rem;
+    cursor: pointer;
+    padding: 0.1rem 0.5rem;
+    align-self: flex-start;
+  }
+
+  .report-item
+    .report-item-source-location-list
+    .report-item-source-location::before {
+    content: "↳";
+    margin-right: 0.2rem;
+  }
+
+  .report-item.report-item-info
+    .report-item-source-location-list
+    .report-item-source-location:hover {
+    background-color: var(--color-info-darker);
+  }
+
+  .report-item.report-item-warn
+    .report-item-source-location-list
+    .report-item-source-location:hover {
+    background-color: var(--color-warn-darker);
+  }
+
+  .report-item.report-item-err
+    .report-item-source-location-list
+    .report-item-source-location:hover {
+    background-color: var(--color-err-darker);
+  }
+
   .report-item.report-item-info {
     border-left: 0.2rem solid var(--color-info-darker);
   }

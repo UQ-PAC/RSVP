@@ -1,4 +1,10 @@
-import { FileType, Report, VerificationFile, VersionedFile } from "./types";
+import {
+  FileType,
+  Report,
+  SourceLoc,
+  VerificationFile,
+  VersionedFile,
+} from "./types";
 
 function compareReports(a: Report, b: Report): number {
   return a.primarySourceLocation.offset - b.primarySourceLocation.offset;
@@ -30,4 +36,12 @@ export function getFileType(file: File): FileType {
   } else {
     return "text";
   }
+}
+
+export function getIdentifier(loc: SourceLoc): string {
+  return `${loc.file}:${loc.offset}:${loc.len}`;
+}
+
+export function toSourceStr(loc: SourceLoc): string {
+  return `Line ${loc.startLoc?.line}, column ${loc.startLoc?.column}`;
 }

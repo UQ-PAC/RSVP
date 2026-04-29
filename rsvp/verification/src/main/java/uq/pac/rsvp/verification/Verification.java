@@ -310,16 +310,17 @@ public class Verification {
             int p = random.nextInt(100);
             SourceLoc loc = entry.getSourceLoc();
 
-            if (loc != SourceLoc.MISSING) {
+            if (!loc.isEmpty()) {
                 if (p <= probability) {
-                    reports.add(generateRandomReport(loc));
+                    String[] name = entry.getClass().getName().split("\\.");
+                    reports.add(generateRandomReport(loc, name[name.length - 1]));
                 } else if (p <= probability * 2) {
                     additionalLocations.add(loc);
                 }
             }
         }
 
-        private Report generateRandomReport(SourceLoc loc) {
+        private Report generateRandomReport(SourceLoc loc, String nodeType) {
             int s = random.nextInt(100);
             int m = random.nextInt(100);
             int d = random.nextInt(100);
@@ -336,7 +337,7 @@ public class Verification {
                 additionalLocations.clear();
             }
 
-            return new Report(severity, message, detail, loc, additional);
+            return new Report(severity, "(" + nodeType + "): " + message, detail, loc, additional);
         }
 
     }

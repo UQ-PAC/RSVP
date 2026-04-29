@@ -110,9 +110,7 @@ function doVerify(context: VerificationState): VerificationState {
     });
 
     const newGroup: VerificationGroup = {
-      // ...group,
-      files: cloneFiles(group.files),
-      diffs: cloneDiffs(group.diffs),
+      ...group,
       byId: fileResolution.then(({ byId }) => byId),
       reports: fileResolution.then(({ request, resolveFilenames }) =>
         verify(request).then((reports) => reports.map(resolveFilenames)),
@@ -140,7 +138,7 @@ function doAdd(
     ...emptyVerificationGroup,
   };
   const newContext = { ...context };
-  const newGroup = { ...group, files: cloneFiles(group.files) };
+  const newGroup = { ...group };
 
   // Add file as a version of another file
   if (action.original && action.file) {
@@ -294,7 +292,7 @@ function doRemove(
   }
 
   const newContext = { ...context };
-  const newGroup = { ...group, files: cloneFiles(group.files) };
+  const newGroup = { ...group };
 
   if (action.original && action.file) {
     // Remove version
@@ -411,21 +409,4 @@ async function sortFilesById(group: VerificationGroup): Promise<{
 
 async function getServerId(file: VerificationFile): Promise<string> {
   return file.resolved.then((resolved) => resolved.serverId);
-}
-
-function cloneFiles(files: VersionedFileList): VersionedFileList {
-  return files.map(({ original, versions }) => ({
-    original,
-    versions: [...versions],
-  }));
-}
-
-function cloneDiffs(diffs: DiffDict): DiffDict {
-  const clone = {};
-
-  Object.keys(diffs).forEach((group) => {
-    clone[group] = { ...diffs[group] };
-  });
-
-  return clone;
 }

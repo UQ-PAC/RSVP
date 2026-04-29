@@ -114,18 +114,18 @@ public class CedarAspect {
 			}
 
 			EntityUID action = EntityUID.parse("ChildrenClinic::Action::\"" + requiresAuthorization.action() + "\"")
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
 
-            EntityUID resource = resolveResourceUid(request, requiresAuthorization);
+			EntityUID resource = resolveResourceUid(request, requiresAuthorization);
 
-            boolean validateRequest = requiresAuthorization.validate();
+			boolean validateRequest = requiresAuthorization.validate();
 
 			CedarRequest authorizationRequest = new CedarRequest(principal, action, resource, contextMap,
 					validateRequest);
 
 			// System.out.println("Cedar request: " + authorizationRequest.toString());
 
-            ResponseEntity<String> response = cedarService.checkAccess(authorizationRequest);
+			ResponseEntity<String> response = cedarService.checkAccess(authorizationRequest);
 
 			// // Prints Cedar response to console.
 			// System.out.println("Cedar response status code: " +
@@ -136,7 +136,7 @@ public class CedarAspect {
 					+ " | Response: " + response.getBody();
 			this.cedarLogContext.addLog(logEntry);
 
-            // Any single rejection immediately terminates the invocation
+			// Any single rejection immediately terminates the invocation
 			if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null
 					|| !response.getBody().startsWith("Access Granted.")) {
 				String prefix = """
@@ -148,8 +148,8 @@ public class CedarAspect {
 						%s
 						""".formatted(response.getBody().replaceAll("(?m)^" + prefix, ""));
 				throw new CedarDeniedException(body);
-            }
-        }
+			}
+		}
 	}
 
 	private String extractPrincipalFromSession(HttpServletRequest request) {

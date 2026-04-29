@@ -64,14 +64,14 @@
             <li th:replace="~{::menuItem ('/secretaries/find','secretaries','secretaries','th-list',#{secretaries})}">
               <span class="fa fa-th-list" aria-hidden="true"></span>
               <span th:text="#{secretaries}">Secretaries</span>
-          </li>
+            </li>
           </th:block>
 
           <th:block th:if="${navCanListEmployees}">
             <li th:replace="~{::menuItem ('/doctors/find','doctors','doctors','th-list',#{doctors})}">
-            <span class="fa fa-th-list" aria-hidden="true"></span>
-            <span th:text="#{doctors}">Doctors</span>
-          </li>
+              <span class="fa fa-th-list" aria-hidden="true"></span>
+              <span th:text="#{doctors}">Doctors</span>
+            </li>
           </th:block>
 
         </ul>

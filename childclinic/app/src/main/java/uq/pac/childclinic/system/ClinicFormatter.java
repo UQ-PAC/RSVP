@@ -10,7 +10,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ClinicFormatter implements Formatter<Clinic> {
-    private final ClinicRepository clinics;
+
+	private final ClinicRepository clinics;
 
 	public ClinicFormatter(ClinicRepository clinics) {
 		this.clinics = clinics;
@@ -32,4 +33,5 @@ public class ClinicFormatter implements Formatter<Clinic> {
 		}
 		throw new ParseException("Clinic not found: " + text, 0);
 	}
+
 }

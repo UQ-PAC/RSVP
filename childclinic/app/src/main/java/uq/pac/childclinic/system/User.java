@@ -31,6 +31,11 @@ public class User implements Serializable {
 			inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles;
 
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "user_levels", joinColumns = @JoinColumn(name = "user_id"),
+			inverseJoinColumns = @JoinColumn(name = "level_id"))
+	private Set<Level> levels;
+
 	public Integer getId() {
 		return entity_id;
 	}
@@ -75,6 +80,21 @@ public class User implements Serializable {
 			return "No Additional Details.";
 		}
 		return this.roles.stream().map(Role::getName).sorted().collect(Collectors.joining(", "));
+	}
+
+	public Set<Level> getLevels() {
+		return levels;
+	}
+
+	public void setLevels(Set<Level> levels) {
+		this.levels = levels;
+	}
+
+	public String getLevelDescriptions() {
+		if (this.levels == null || this.levels.isEmpty()) {
+			return "No Additional Details.";
+		}
+		return this.levels.stream().map(Level::getName).sorted().collect(Collectors.joining(", "));
 	}
 
 }

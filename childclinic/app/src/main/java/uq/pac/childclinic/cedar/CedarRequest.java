@@ -60,7 +60,9 @@ public class CedarRequest {
 
 	@Override
 	public String toString() {
-		return "{principal = " + this.getPrincipal() + ", action = " + this.getAction() + ", resource = " + this.getResource() + ", context = " + this.getContext() + ", validateRequest = " + this.isValidateRequest() + "}";
+		return "{principal = " + this.getPrincipal() + ", action = " + this.getAction() + ", resource = "
+				+ this.getResource() + ", context = " + this.getContext() + ", validateRequest = "
+				+ this.isValidateRequest() + "}";
 	}
 
 }

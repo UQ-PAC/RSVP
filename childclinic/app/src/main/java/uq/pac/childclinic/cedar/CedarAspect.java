@@ -72,11 +72,11 @@ public class CedarAspect {
 
 		EntityUID principal;
 		if (principalId.equals("Guest")) {
-			principal = EntityUID.parse("ChildClinic::Guest::\"Unknown\"")
+			principal = EntityUID.parse("ChildrenClinic::Guest::\"Unknown\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 		else {
-			principal = EntityUID.parse("ChildClinic::Employee::\"" + principalId + "\"")
+			principal = EntityUID.parse("ChildrenClinic::Employee::\"" + principalId + "\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 
@@ -89,37 +89,42 @@ public class CedarAspect {
 
 		for (CedarAuthorization requiresAuthorization : annotations) {
 			// Prints requests and cookie to console.
-			System.out
-				.println(System.lineSeparator() + "Cedar request resourceType: " + requiresAuthorization.resourceType());
+			System.out.println(System.lineSeparator());
+			System.out.println("Cedar request resourceType: " + requiresAuthorization.resourceType());
 
 			if (requiresAuthorization.resourceId().equals("")) {
-				System.out.println("HTTP request resourceId: " + extractResourceId(request, requiresAuthorization.resourceType()));
+				System.out.println(
+						"HTTP request resourceId: " + extractResourceId(request, requiresAuthorization.resourceType()));
 				System.out.println("Cedar resource: " + resolveResourceUid(request, requiresAuthorization).toString());
 			}
 			else {
 				System.out.println("Cedar request resourceId: " + requiresAuthorization.resourceId());
-				System.out.println("HTTP resource: " + extractResourceId(request, requiresAuthorization.resourceType()));
+				System.out
+					.println("HTTP resource: " + extractResourceId(request, requiresAuthorization.resourceType()));
 			}
 
-            EntityUID action = EntityUID.parse("ChildClinic::Action::\"" + requiresAuthorization.action() + "\"")
+			EntityUID action = EntityUID.parse("ChildrenClinic::Action::\"" + requiresAuthorization.action() + "\"")
                     .orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
 
             EntityUID resource = resolveResourceUid(request, requiresAuthorization);
 
             boolean validateRequest = requiresAuthorization.validate();
 
-            CedarRequest authorizationRequest = new CedarRequest(principal, action, resource, contextMap, validateRequest);
+			CedarRequest authorizationRequest = new CedarRequest(principal, action, resource, contextMap,
+					validateRequest);
 
-			System.out.println("Cedar request: " + authorizationRequest.toString());
+			// System.out.println("Cedar request: " + authorizationRequest.toString());
 
             ResponseEntity<String> response = cedarService.checkAccess(authorizationRequest);
 
-			// Prints Cedar response to console.
-			System.out.println("Cedar response status code: " + response.getStatusCode());
-			System.out.println("Cedar response body: " + response.getBody());
+			// // Prints Cedar response to console.
+			// System.out.println("Cedar response status code: " +
+			// response.getStatusCode());
+			// System.out.println("Cedar response body: " + response.getBody());
 
             // Any single rejection immediately terminates the invocation
-            if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null || !response.getBody().startsWith("Access Granted.")) {
+			if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null
+					|| !response.getBody().startsWith("Access Granted.")) {
 				String prefix = """
 						Access Denied.
 						""";
@@ -143,7 +148,8 @@ public class CedarAspect {
 
 	private String extractResourceId(HttpServletRequest request, String resourceType) {
 		@SuppressWarnings("unchecked")
-		Map<String, String> pathVariables = (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+		Map<String, String> pathVariables = (Map<String, String>) request
+			.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
 		if (pathVariables != null && !pathVariables.isEmpty()) {
 			String expectedKey = resourceType.toLowerCase() + "Id";
@@ -155,7 +161,12 @@ public class CedarAspect {
 			String entityIdString = pathVariables.get(expectedKey);
 
 			if (entityIdString == null) {
-				entityIdString = pathVariables.entrySet().stream().filter(entry -> entry.getKey().toLowerCase().endsWith("id")).map(Map.Entry::getValue).findFirst().orElse(null);
+				entityIdString = pathVariables.entrySet()
+					.stream()
+					.filter(entry -> entry.getKey().toLowerCase().endsWith("id"))
+					.map(Map.Entry::getValue)
+					.findFirst()
+					.orElse(null);
 			}
 
 			if (entityIdString != null) {
@@ -171,13 +182,13 @@ public class CedarAspect {
 	private EntityUID resolveResourceUid(HttpServletRequest request, CedarAuthorization requiresAuthorization) {
 		String authorizationResourceType = requiresAuthorization.resourceType();
 
-		// String authorizationResourceId = requiresAuthorization.resourceId();
-
-		// if (authorizationResourceId != "") {
-		// 	return EntityUID.parse("ChildClinic::" + authorizationResourceType + "::\"" + authorizationResourceId + "\"")
-		// 		.orElseThrow(() -> new IllegalArgumentException(
-		// 				"Invalid Resource UID format generated for: " + authorizationResourceId + "."));
-		// }
+		String authorizationResourceId = requiresAuthorization.resourceId();
+		if (!authorizationResourceId.isEmpty()) {
+			return EntityUID
+				.parse("ChildrenClinic::" + authorizationResourceType + "::\"" + authorizationResourceId + "\"")
+				.orElseThrow(() -> new IllegalArgumentException(
+						"Invalid Resource UID format generated for: " + authorizationResourceId + "."));
+		}
 
 		String requestResourceIdentifier = extractResourceId(request, authorizationResourceType);
 
@@ -196,14 +207,15 @@ public class CedarAspect {
 				}
 			}
 			catch (NumberFormatException | EmptyResultDataAccessException | NullPointerException exception) {
-				// Retains the default numeric identifier if parsing, resolution, or formatting fails.
+				// Retains the default numeric identifier if parsing, resolution, or
+				// formatting fails.
 			}
 
 		}
 
 		final String finalResourceIdentifier = requestResourceIdentifier;
 
-		return EntityUID.parse("ChildClinic::" + authorizationResourceType + "::\"" + finalResourceIdentifier + "\"")
+		return EntityUID.parse("ChildrenClinic::" + authorizationResourceType + "::\"" + finalResourceIdentifier + "\"")
 			.orElseThrow(() -> new IllegalArgumentException(
 					"Invalid Resource UID format generated for: " + finalResourceIdentifier + "."));
 	}

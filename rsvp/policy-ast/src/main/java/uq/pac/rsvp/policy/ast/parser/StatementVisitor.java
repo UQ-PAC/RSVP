@@ -8,6 +8,7 @@ import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.ast.invariant.Quantifier;
 import uq.pac.rsvp.support.FileSource;
 
+import static uq.pac.rsvp.Assertion.require;
 import static uq.pac.rsvp.policy.ast.expr.BinaryExpression.BinaryOp.*;
 
 import java.util.ArrayList;
@@ -123,7 +124,7 @@ class StatementVisitor extends SourceVisitor<Statement> {
 
         if (ctx.annotation() != null) {
             ctx.annotation().forEach(a -> {
-                String value = null;
+                String value = "";
                 if (a.STRING() != null) {
                     value = unquote(a.STRING().getText());
                 }
@@ -144,12 +145,18 @@ class StatementVisitor extends SourceVisitor<Statement> {
                 .effect(effect)
                 .location(location(ctx));
 
-        if (ctx.when() != null) {
-            builder.and(ctx.when().expression().accept(expressions));
-        }
-
-        if (ctx.unless() != null) {
-            builder.andNot(ctx.unless().expression().accept(expressions));
+        if (ctx.condition() != null) {
+            ctx.condition().forEach(cond -> {
+                Expression e = cond.expression().accept(expressions);
+                if (cond.WHEN() != null) {
+                    require(cond.UNLESS() == null);
+                    builder.and(e);
+                } else if (cond.UNLESS() != null) {
+                    builder.andNot(e);
+                } else {
+                    throw new AssertionError("Unknown condition");
+                }
+            });
         }
 
         return builder.build();

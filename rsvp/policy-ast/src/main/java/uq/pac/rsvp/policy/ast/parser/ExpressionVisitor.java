@@ -6,10 +6,7 @@ import uq.pac.rsvp.policy.ast.CedarParser;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.support.FileSource;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static uq.pac.rsvp.policy.ast.expr.BinaryExpression.BinaryOp.*;
@@ -131,6 +128,7 @@ class ExpressionVisitor extends SourceVisitor<Expression> {
             case "<" -> Less;
             case ">=" -> GreaterEq;
             case "<=" -> LessEq;
+            case "like" -> Like;
             default -> throw new AssertionError("unreachable");
         };
         return new BinaryExpression(ctx.expression(0).accept(this), op,
@@ -162,7 +160,7 @@ class ExpressionVisitor extends SourceVisitor<Expression> {
                 object = new PropertyAccessExpression(object, prop);
             }
         }
-        String fun = ctx.ID().getText();
+        String fun = ctx.type().getText();
         List<Expression> args = Collections.emptyList();
         if (ctx.expressionList() != null) {
             args = ctx.expressionList().expression().stream()
@@ -175,6 +173,22 @@ class ExpressionVisitor extends SourceVisitor<Expression> {
     @Override
     public Expression visitTypeExpr(CedarParser.TypeExprContext ctx) {
         return visitType(ctx.type());
+    }
+
+    @Override
+    public Expression visitRecordExpr(CedarParser.RecordExprContext ctx) {
+        Map<String, Expression> attributes = new HashMap<>();
+        if (ctx.attributes() != null) {
+            for (CedarParser.AttributeContext ac : ctx.attributes().attribute()) {
+                String name = ac.attributeName().getText();
+                if (ac.attributeName().STRING() != null) {
+                    name = name.substring(1, name.length() - 1);
+                }
+                Expression expr = ac.expression().accept(this);
+                attributes.put(name, expr);
+            }
+        }
+        return new RecordExpression(attributes, location(ctx));
     }
 
     @Override

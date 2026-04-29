@@ -25,6 +25,10 @@ public class RecordExpression extends Expression {
         this(null, SourceLoc.MISSING);
     }
 
+    public RecordExpression(SourceLoc location) {
+        this(null, location);
+    }
+
     public Map<String, Expression> getProperties() {
         return Map.copyOf(props);
     }

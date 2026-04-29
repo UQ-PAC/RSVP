@@ -8,6 +8,7 @@ NONE: 'none';
 IS: 'is';
 IN: 'in';
 HAS: 'has';
+LIKE: 'like';
 WHERE: 'where';
 TRUE: 'true';
 FALSE: 'false';
@@ -66,11 +67,18 @@ type: ID ('::' ID)*;
 // Literal entity, such as App::Account::"Alice"
 entity: type '::' STRING;
 
+attributeName:
+    ID | STRING;
+attribute:
+    attributeName ':' expression;
+attributes:
+    attribute (',' attribute)* ','?;
+
 expression :
       literal                                                          # literalExpr
     | variable                                                         # variableExpr
     | property                                                         # propertyExpr
-    | (property '.')? ID '(' expressionList? ')'                       # callExpr
+    | (property '.')? type '(' expressionList? ')'                     # callExpr
     | type                                                             # typeExpr
     | entity                                                           # entityExpr
     | STRING                                                           # stringExpr
@@ -80,11 +88,12 @@ expression :
     | expression HAS attr=(ID | STRING)                                # hasExpr
     | '(' expression ')'                                               # groupingExpr
     | '[' expressionList? ']'                                          # setExpr
+    | '{' attributes? '}'                                              # recordExpr
     | '!' expression                                                   # negationExpr
     | '-' expression                                                   # arithNegationExpr
     | expression op='*' expression                                     # arithExpr
     | expression op=('-' | '+') expression                             # arithExpr
-    | expression op=(EQ | NEQ | GT | LT | GTE | LTE) expression        # comparisonExpr
+    | expression op=(EQ | NEQ | GT | LT | GTE | LTE | LIKE) expression # comparisonExpr
     | expression '&&' expression                                       # conjunctionExpr
     | expression '||' expression                                       # disjunctionExpr
     | IF expression THEN expression ELSE expression                    # conditionalExpr
@@ -103,8 +112,7 @@ invariant:
 ;
 
 annotation: '@' ID | '@' ID '(' STRING ')';
-when: WHEN '{' expression '}';
-unless: UNLESS '{' expression '}';
+condition: (WHEN | UNLESS) '{' expression '}';
 
 principal:
     PRINCIPAL
@@ -132,9 +140,8 @@ action:
 policy:
     annotation*
     perm=(PERMIT | FORBID)
-       '(' principal ',' action ',' resource ')'
-        when?
-        unless?
+    '(' principal ',' action ',' resource ')'
+    condition*
     ';'
 ;
 

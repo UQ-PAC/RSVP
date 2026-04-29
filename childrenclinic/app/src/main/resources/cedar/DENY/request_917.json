@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"James Carter\"",
-  "resource": "ChildrenClinic::ResponsibleAdult::\"Betty Davis\"",
+  "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
+  "resource": "ChildrenClinic::ResponsibleAdult::\"Jean Coleman\"",
   "action": "ChildrenClinic::Action::\"ViewAdult\"",
   "context": {}
 }

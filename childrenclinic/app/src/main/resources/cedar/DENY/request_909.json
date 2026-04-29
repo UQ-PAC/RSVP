@@ -1,5 +1,5 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Sharon Jenkins\"",
+  "principal": "ChildrenClinic::Guest::\"Unknown\"",
   "resource": "ChildrenClinic::Visit::\"Rosy Rodriquez 1\"",
   "action": "ChildrenClinic::Action::\"ViewVisit\"",
   "context": {}

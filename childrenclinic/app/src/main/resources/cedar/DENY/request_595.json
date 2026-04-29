@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Carl Bradford\"",
-  "resource": "ChildrenClinic::ResponsibleAdult::\"Carlos Estaban\"",
+  "principal": "ChildrenClinic::Employee::\"Linda Douglas\"",
+  "resource": "ChildrenClinic::ResponsibleAdult::\"George Franklin\"",
   "action": "ChildrenClinic::Action::\"ViewAdult\"",
   "context": {}
 }

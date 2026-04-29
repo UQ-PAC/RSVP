@@ -23,7 +23,7 @@ import uq.pac.childrenclinic.doctor.Doctor;
 import uq.pac.childrenclinic.model.BaseEntity;
 import uq.pac.childrenclinic.model.Person;
 
-public class ChildClinicRuntimeHints implements RuntimeHintsRegistrar {
+public class ChildrenClinicRuntimeHints implements RuntimeHintsRegistrar {
 
 	@Override
 	public void registerHints(RuntimeHints hints, ClassLoader classLoader) {

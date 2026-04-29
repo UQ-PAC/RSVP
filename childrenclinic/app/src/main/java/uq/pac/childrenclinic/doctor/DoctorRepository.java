@@ -23,8 +23,6 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uq.pac.childclinic.doctor.Doctor;
-
 /**
  * Repository class for <code>Doctor</code> domain objects All method names are compliant
  * with Spring Data naming conventions so this interface can easily be extended for Spring

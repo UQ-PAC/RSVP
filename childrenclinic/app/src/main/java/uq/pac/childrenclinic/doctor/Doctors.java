@@ -17,7 +17,6 @@ package uq.pac.childrenclinic.doctor;
 
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import uq.pac.childclinic.doctor.Doctor;
 
 import java.util.ArrayList;
 import java.util.List;

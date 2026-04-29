@@ -21,7 +21,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import uq.pac.childclinic.doctor.Doctor;
 import uq.pac.childrenclinic.model.Identifiable;
 
 import java.io.Serializable;

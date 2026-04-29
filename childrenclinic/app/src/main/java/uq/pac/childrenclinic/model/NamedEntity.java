@@ -18,7 +18,6 @@ package uq.pac.childrenclinic.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotBlank;
-import uq.pac.childclinic.model.BaseEntity;
 
 /**
  * Simple JavaBean domain object adds a name property to <code>BaseEntity</code>. Used as

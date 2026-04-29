@@ -9,9 +9,6 @@ import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.policy.PolicySet;
 import com.cedarpolicy.model.schema.Schema;
 
-import uq.pac.childclinic.cedar.CedarPolicyMapper;
-import uq.pac.childclinic.cedar.CedarRequest;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

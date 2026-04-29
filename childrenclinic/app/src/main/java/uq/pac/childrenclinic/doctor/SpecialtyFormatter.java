@@ -5,8 +5,6 @@ import java.util.Locale;
 import org.springframework.format.Formatter;
 import org.springframework.stereotype.Component;
 
-import uq.pac.childclinic.doctor.Specialty;
-
 @Component
 public class SpecialtyFormatter implements Formatter<Specialty> {
 

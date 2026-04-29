@@ -6,8 +6,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.Table;
-import uq.pac.childclinic.system.Clinic;
-import uq.pac.childclinic.system.Role;
 import jakarta.persistence.ManyToMany;
 
 import java.io.Serializable;

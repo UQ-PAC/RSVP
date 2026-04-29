@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpSession;
 import uq.pac.childrenclinic.cedar.CedarRequest;
 import uq.pac.childrenclinic.cedar.CedarService;
 
-@ControllerAdvice(basePackages = "uq.pac.childclinic")
+@ControllerAdvice(basePackages = "uq.pac.childrenclinic")
 public class GlobalNavigationAdvice {
 
 	private final CedarService cedarService;

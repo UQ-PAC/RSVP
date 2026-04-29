@@ -23,7 +23,6 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import jakarta.xml.bind.annotation.XmlElement;
-import uq.pac.childclinic.doctor.Specialty;
 import uq.pac.childrenclinic.model.Person;
 
 import java.util.Comparator;

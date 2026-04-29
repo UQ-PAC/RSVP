@@ -44,9 +44,6 @@ import com.cedarpolicy.value.EntityUID;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import uq.pac.childclinic.doctor.Doctor;
-import uq.pac.childclinic.doctor.DoctorRepository;
-import uq.pac.childclinic.doctor.Specialty;
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
 import uq.pac.childrenclinic.cedar.CedarRequest;
 import uq.pac.childrenclinic.cedar.CedarService;

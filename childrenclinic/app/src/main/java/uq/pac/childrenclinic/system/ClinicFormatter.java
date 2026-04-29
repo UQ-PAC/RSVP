@@ -8,8 +8,6 @@ import java.util.Objects;
 import org.springframework.format.Formatter;
 import org.springframework.stereotype.Component;
 
-import uq.pac.childclinic.system.Clinic;
-
 @Component
 public class ClinicFormatter implements Formatter<Clinic> {
 

@@ -6,11 +6,6 @@ import com.cedarpolicy.value.Value;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import uq.pac.childclinic.cedar.CedarAuthorization;
-import uq.pac.childclinic.cedar.CedarDeniedException;
-import uq.pac.childclinic.cedar.CedarRequest;
-import uq.pac.childclinic.cedar.CedarService;
-import uq.pac.childclinic.cedar.ResourceMetadata;
 
 import java.lang.reflect.Method;
 import java.util.Enumeration;

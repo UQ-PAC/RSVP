@@ -20,20 +20,17 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.annotation.ImportRuntimeHints;
 
-import uq.pac.childclinic.ChildClinicApplication;
-import uq.pac.childclinic.ChildClinicRuntimeHints;
-
 /**
- * ChildClinic Spring Boot Application.
+ * ChildrenClinic Spring Boot Application.
  *
  * @author Dave Syer
  */
 @SpringBootApplication
-@ImportRuntimeHints(ChildClinicRuntimeHints.class)
-public class ChildClinicApplication {
+@ImportRuntimeHints(ChildrenClinicRuntimeHints.class)
+public class ChildrenClinicApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ChildClinicApplication.class, args);
+		SpringApplication.run(ChildrenClinicApplication.class, args);
 	}
 
 }

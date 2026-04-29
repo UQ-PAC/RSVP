@@ -66,23 +66,17 @@
 
         <ul class="nav navbar-nav ms-auto align-items-right">
 
-          <!-- <li class="nav-item d-flex align-items-center">
-            <span class="navbar-text text-light ms-3" th:if="${currentUser != null and currentUser.username != 'Guest'}" th:text="${currentUser.username}"></span>
-            <span class="navbar-text text-light ms-3" th:unless="${currentUser != null and currentUser.username != 'Guest'}" th:text="Guest"></span>
-          </li> -->
-
-          <li class="nav-item d-flex align-items-center">
-            <span class="navbar-text text-light ms-3" th:if="${currentUser != null and currentUser.username != 'Guest'}" th:text="${currentUser.getRoleDescriptions() + ' @ ' + currentUser.getClinicDescriptions()}"></span>
-          </li>
-
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <span class="fa fa-user" aria-hidden="true"></span>
-                <span th:if="${currentUser != null and currentUser.username != 'Guest'}" th:text="${currentUser.username}"></span>
-                <span th:unless="${currentUser != null and currentUser.username != 'Guest'}" th:text="Guest"></span>
+            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="fa fa-user flex-shrink-0" aria-hidden="true"></span>
+                <div class="d-flex flex-column text-start flex-grow-1 overflow-hidden">
+                  <span class="fw-bold text-truncate" th:if="${currentUser != null and currentUser.username != 'Guest'}" th:text="${currentUser.username}"></span>
+                  <span class="fw-bold text-truncate" th:unless="${currentUser != null and currentUser.username != 'Guest'}" th:text="Guest"></span>
+                  <small class="text-white-50 mt-1 text-wrap lh-sm" th:if="${currentUser != null and currentUser.username != 'Guest'}" th:text="${currentUser.getRoleDescriptions() + ' (' + currentUser.getLevelDescriptions() + ') @ ' + currentUser.getClinicDescriptions()}"></small>
+                  <small class="text-white-50 mt-1 text-wrap lh-sm" th:unless="${currentUser != null and currentUser.username != 'Guest'}" th:text="Unknown"></small>
+                </div>
             </a>
             <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarDropdown">
-                <li><h6 class="dropdown-header">System Users</h6></li>
                 <li><a class="dropdown-item" href="/switch-user?username=Guest">Guest</a></li>
 
                 <li><hr class="dropdown-divider"></li>
@@ -91,7 +85,7 @@
                 <li th:each="user : ${dynamicUsers}">
                     <a class="dropdown-item" 
                       th:href="@{/switch-user(username=${user.username})}"
-                      th:text="${user.username + ' (' + user.getRoleDescriptions() + ' @ ' + user.getClinicDescriptions() + ')'}">Dynamic User</a>
+                      th:text="${user.username + ' : ' + user.getRoleDescriptions() + ' (' + user.getLevelDescriptions() + ')' + ' @ ' + user.getClinicDescriptions()}">Dynamic User</a>
                 </li>
             </ul>
           </li>

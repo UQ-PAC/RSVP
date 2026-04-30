@@ -12,19 +12,44 @@
   <h2 th:text="#{somethingHappened}">Something happened...</h2>
 
   <!-- Status-specific error message -->
-  <p th:switch="${status}">
-    <span th:case="403" th:text="#{error.403}">Access denied.</span>
-    <span th:case="404" th:text="#{error.404}">The requested page was not found.</span>
-    <span th:case="500" th:text="#{error.500}">An internal server error occurred.</span>
-    <span th:case="*" th:text="#{error.general}">An unexpected error occurred.</span>
-  </p>
+  <div th:switch="${status}" class="my-4">
+    
+    <!-- 403: Access Denied (Warning/Orange) -->
+    <div th:case="403" class="alert alert-warning d-flex align-items-center shadow-sm" role="alert">
+      <i class="fa fa-lock fs-2 me-3" aria-hidden="true"></i>
+      <div>
+        <h5 class="alert-heading mb-1">403 Forbidden</h5>
+        <span th:text="#{error.403}">Access denied.</span>
+      </div>
+    </div>
 
-  <br>
+    <!-- 404: Not Found (Info/Blue) -->
+    <div th:case="404" class="alert alert-info d-flex align-items-center shadow-sm" role="alert">
+      <i class="fa fa-search fs-2 me-3" aria-hidden="true"></i>
+      <div>
+        <h5 class="alert-heading mb-1">404 Not Found</h5>
+        <span th:text="#{error.404}">The requested page was not found.</span>
+      </div>
+    </div>
 
-  <!-- Exception message (for developers) -->
-  <div class="row" id="exception-message-box">
-    <h4>Authorisation Query Results</h4>
-    <p th:text="${message}">Exception message.</p>
+    <!-- 500: Server Error (Danger/Red) -->
+    <div th:case="500" class="alert alert-danger d-flex align-items-center shadow-sm" role="alert">
+      <i class="fa fa-exclamation-triangle fs-2 me-3" aria-hidden="true"></i>
+      <div>
+        <h5 class="alert-heading mb-1">500 Server Error</h5>
+        <span th:text="#{error.500}">An internal server error occurred.</span>
+      </div>
+    </div>
+
+    <!-- General/Fallback Error (Secondary/Grey) -->
+    <div th:case="*" class="alert alert-secondary d-flex align-items-center shadow-sm" role="alert">
+      <i class="fa fa-exclamation-circle fs-2 me-3" aria-hidden="true"></i>
+      <div>
+        <h5 class="alert-heading mb-1">Unexpected Error</h5>
+        <span th:text="#{error.general}">An unexpected error occurred.</span>
+      </div>
+    </div>
+    
   </div>
 
 </body>

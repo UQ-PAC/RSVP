@@ -1,6 +1,6 @@
 package uq.pac.rsvp.policy.ast.parser;
 
-import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import uq.pac.rsvp.policy.ast.CedarParser;
 import uq.pac.rsvp.policy.ast.expr.*;
@@ -100,7 +100,8 @@ class ExpressionVisitor extends SourceVisitor<Expression> {
 
     @Override
     public Expression visitIsExpr(CedarParser.IsExprContext ctx) {
-        return new BinaryExpression(ctx.expression().accept(this), Is, visitType(ctx.type()), location(ctx));
+        return new BinaryExpression(ctx.expression().accept(this), Is,
+                ctx.type().accept(this), location(ctx));
     }
 
     @Override
@@ -116,7 +117,7 @@ class ExpressionVisitor extends SourceVisitor<Expression> {
             attr = attr.substring(1, attr.length() - 1);
         }
         return new BinaryExpression(ctx.expression().accept(this),
-                HasAttr, new StringExpression(attr), location(ctx));
+                HasAttr, new StringExpression(attr, location(ctx.attr)), location(ctx));
     }
 
     @Override
@@ -149,18 +150,8 @@ class ExpressionVisitor extends SourceVisitor<Expression> {
 
     @Override
     public Expression visitCallExpr(CedarParser.CallExprContext ctx) {
-        Expression object = null;
-        if (ctx.property() != null) {
-            List<String> properties = ctx.property().variable().stream()
-                    .map(RuleContext::getText)
-                    .collect(Collectors.toList());
-            object = new VariableExpression(properties.removeFirst());
-            while (!properties.isEmpty()) {
-                String prop = properties.removeFirst();
-                object = new PropertyAccessExpression(object, prop);
-            }
-        }
-        String fun = ctx.type().getText();
+        Expression object = ctx.property() != null ? visitProperty(ctx.property()) : null;
+        String fun = ctx.functionName().getText();
         List<Expression> args = Collections.emptyList();
         if (ctx.expressionList() != null) {
             args = ctx.expressionList().expression().stream()
@@ -208,16 +199,20 @@ class ExpressionVisitor extends SourceVisitor<Expression> {
     }
 
     @Override
-    public Expression visitPropertyExpr(CedarParser.PropertyExprContext ctx) {
-        List<String> properties = ctx.property().variable().stream()
-                .map(RuleContext::getText)
-                .collect(Collectors.toList());
-        Expression object = new VariableExpression(properties.removeFirst());
+    public Expression visitProperty(CedarParser.PropertyContext ctx) {
+        List<ParserRuleContext> properties = new ArrayList<>(ctx.variable());
+        ParserRuleContext var = properties.removeFirst();
+        Expression object = new VariableExpression(var.getText(), location(var));
         while (!properties.isEmpty()) {
-            String prop = properties.removeFirst();
-            object = new PropertyAccessExpression(object, prop);
+            ParserRuleContext prop = properties.removeFirst();
+            object = new PropertyAccessExpression(object, prop.getText(), location(prop));
         }
         return object;
+    }
+
+    @Override
+    public Expression visitPropertyExpr(CedarParser.PropertyExprContext ctx) {
+        return ctx.property().accept(this);
     }
 
     @Override

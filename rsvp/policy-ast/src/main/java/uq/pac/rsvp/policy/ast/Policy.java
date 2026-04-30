@@ -117,18 +117,26 @@ public class Policy extends Statement {
             this.location = SourceLoc.MISSING;
         }
 
-        public Builder and(Expression e) {
+        public Builder and(Expression e, SourceLoc loc) {
             if (e != null) {
-                this.condition = condition == null ? e : new BinaryExpression(e, And, condition);
+                this.condition = condition == null ? e : new BinaryExpression(e, And, condition, loc);
+            }
+            return this;
+        }
+
+        public Builder and(Expression e) {
+            return and(e, SourceLoc.MISSING);
+        }
+
+        public Builder andNot(Expression e, SourceLoc loc) {
+            if (e != null) {
+                return and(new UnaryExpression(Not, e, loc), loc);
             }
             return this;
         }
 
         public Builder andNot(Expression e) {
-            if (e != null) {
-                return and(new UnaryExpression(Not, e));
-            }
-            return this;
+            return andNot(e, SourceLoc.MISSING);
         }
 
         public Builder name(String name) {

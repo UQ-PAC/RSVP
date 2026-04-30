@@ -1,5 +1,6 @@
 package uq.pac.rsvp.policy.ast.parser;
 
+import org.antlr.v4.runtime.tree.TerminalNode;
 import uq.pac.rsvp.policy.ast.CedarParser;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.Statement;
@@ -7,12 +8,15 @@ import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.ast.invariant.Quantifier;
 import uq.pac.rsvp.support.FileSource;
+import uq.pac.rsvp.support.SourceLoc;
 
 import static uq.pac.rsvp.Assertion.require;
 import static uq.pac.rsvp.policy.ast.expr.BinaryExpression.BinaryOp.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 class StatementVisitor extends SourceVisitor<Statement> {
 
@@ -53,7 +57,7 @@ class StatementVisitor extends SourceVisitor<Statement> {
                         TypeExpression type = (TypeExpression) expressions.visitType(tv.type());
                         return new Quantifier.Variable(var, type);
                     }).toList();
-            quantifier = new Quantifier(scope, variables);
+            quantifier = new Quantifier(scope, variables, location(ctx.quantifier()));
         }
         return new Invariant(quantifier, expr, location(ctx));
     }
@@ -65,57 +69,74 @@ class StatementVisitor extends SourceVisitor<Statement> {
         return null;
     }
 
-    private Expression getPrincipalExpression(CedarParser.PrincipalContext ctx) {
-        List<Expression> exprs = new ArrayList<>(2);
-        VariableExpression var = new VariableExpression(ctx.PRINCIPAL().getText());
-        if (ctx.EQ() != null) {
-            exprs.add(new BinaryExpression(var, Eq, expressions.visitEntity(ctx.entity())));
-        }
-        if (ctx.IN() != null) {
-            exprs.add(new BinaryExpression(var, In, expressions.visitEntity(ctx.entity())));
-        }
-        if (ctx.IS() != null) {
-            exprs.add(new BinaryExpression(var, Is, expressions.visitType(ctx.type())));
+    private final SourceLoc OMITTED = SourceLoc.empty();
+
+    private Expression getVariableScopeExpression(TerminalNode term, CedarParser.VariableScopeContext ctx) {
+        VariableExpression var = new VariableExpression(term.getText(), location(term));
+
+        // Location for the entire rule context
+        SourceLoc loc = SourceLoc.MISSING;
+
+        List<BinaryExpression> exprs = new ArrayList<>(2);
+        if (ctx != null) {
+            if (ctx.EQ() != null) {
+                exprs.add(new BinaryExpression(var, Eq, expressions.visitEntity(ctx.entity()), OMITTED));
+            }
+            if (ctx.IN() != null) {
+                exprs.add(new BinaryExpression(var, In, expressions.visitEntity(ctx.entity()), OMITTED));
+            }
+            if (ctx.IS() != null) {
+                exprs.add(new BinaryExpression(var, Is, expressions.visitType(ctx.type()), OMITTED));
+            }
+            loc = location(term.getSymbol(), ctx.stop);
         }
 
         return switch (exprs.size()) {
             case 0 -> null;
-            case 1 -> exprs.getFirst();
-            case 2 -> new BinaryExpression(exprs.getFirst(), And, exprs.getLast());
+            // The case with one expression, which maps to a binary expression
+            // In this case we can just set the location
+            case 1 -> {
+                BinaryExpression e = exprs.getFirst();
+                yield new BinaryExpression(e.getLeft(), e.getOp(), e.getRight(), loc);
+            }
+            // The case with two expressions, i.e., var is ... in ...
+            // The individual locations are unset, but the overall location can be
+            case 2 -> new BinaryExpression(exprs.getFirst(), And, exprs.getLast(), loc);
             default -> throw new AssertionError("unreachable");
         };
+    }
+
+    private Expression getPrincipalExpression(CedarParser.PrincipalContext ctx) {
+        return getVariableScopeExpression(ctx.PRINCIPAL(), ctx.variableScope());
     }
 
     private Expression getResourceExpression(CedarParser.ResourceContext ctx) {
-        List<Expression> exprs = new ArrayList<>(2);
-        VariableExpression var = new VariableExpression(ctx.RESOURCE().getText());
-        if (ctx.EQ() != null) {
-            exprs.add(new BinaryExpression(var, Eq, expressions.visitEntity(ctx.entity())));
-        }
-        if (ctx.IN() != null) {
-            exprs.add(new BinaryExpression(var, In, expressions.visitEntity(ctx.entity())));
-        }
-        if (ctx.IS() != null) {
-            exprs.add(new BinaryExpression(var, Is, expressions.visitType(ctx.type())));
-        }
-
-        return switch (exprs.size()) {
-            case 0 -> null;
-            case 1 -> exprs.getFirst();
-            case 2 -> new BinaryExpression(exprs.getFirst(), And, exprs.getLast());
-            default -> throw new AssertionError("unreachable");
-        };
+        return getVariableScopeExpression(ctx.RESOURCE(), ctx.variableScope());
     }
 
     private Expression getActionExpression(CedarParser.ActionContext ctx) {
-        VariableExpression var = new VariableExpression(ctx.ACTION().getText());
+        VariableExpression var = new VariableExpression(ctx.ACTION().getText(), location(ctx.ACTION()));
+        // form: action == entity
         if (ctx.EQ() != null) {
-            return new BinaryExpression(var, Eq, expressions.visitEntity(ctx.entity(0)));
+            return new BinaryExpression(var, Eq, expressions.visitEntity(ctx.entity(0)), location(ctx));
         }
-        return ctx.entity().stream()
-                .map(e -> new BinaryExpression(var, In, expressions.visitEntity(e)))
-                .reduce((a, b) -> new BinaryExpression(a, Or, b))
-                .orElse(null);
+
+        // form: action in [...] | entity
+        if (ctx.IN() != null && !ctx.entity().isEmpty()) {
+            Set<Expression> entities = ctx.entity().stream()
+                    .map(expressions::visitEntity)
+                    .collect(Collectors.toSet());
+            Expression elements = entities.size() == 1 ?
+                    // Single element
+                    entities.stream().findAny().orElseThrow() :
+                    // Multiple
+                    new SetExpression(entities, location(
+                            ctx.LBRACKET().getSymbol(),
+                            ctx.RBRACKET().getSymbol()));
+            // Set location on the entire expression
+            return new BinaryExpression(var, In, elements, location(ctx));
+        }
+        return null;
     }
 
     @Override
@@ -139,9 +160,9 @@ class StatementVisitor extends SourceVisitor<Statement> {
         };
 
         builder.name(naming.getName())
-                .and(getPrincipalExpression(ctx.principal()))
-                .and(getResourceExpression(ctx.resource()))
-                .and(getActionExpression(ctx.action()))
+                .and(getPrincipalExpression(ctx.principal()), OMITTED)
+                .and(getResourceExpression(ctx.resource()), OMITTED)
+                .and(getActionExpression(ctx.action()), OMITTED)
                 .effect(effect)
                 .location(location(ctx));
 
@@ -150,9 +171,9 @@ class StatementVisitor extends SourceVisitor<Statement> {
                 Expression e = cond.expression().accept(expressions);
                 if (cond.WHEN() != null) {
                     require(cond.UNLESS() == null);
-                    builder.and(e);
+                    builder.and(e, OMITTED);
                 } else if (cond.UNLESS() != null) {
-                    builder.andNot(e);
+                    builder.andNot(e, OMITTED);
                 } else {
                     throw new AssertionError("Unknown condition");
                 }

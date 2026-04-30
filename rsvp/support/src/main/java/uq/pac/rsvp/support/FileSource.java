@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Support class used to calculate line/column from an offset
@@ -153,4 +154,36 @@ public class FileSource {
         return new SourceLoc(file, offset, length, start, end);
     }
 
+    /**
+     * Generate range starting at the location {@code start} and ending at {@code end}
+     */
+    public SourceLoc getSourceLoc(SourceLoc start, SourceLoc end) {
+        // Ensure that the start location precedes the end one
+        if (start.offset > end.offset || (start.offset == end.offset && start.len > end.len)) {
+            throw new RuntimeException("End location %s precedes start location %s".formatted(end.toString(), start.toString()));
+        }
+        int offset = start.offset;
+        int length = end.offset + end.len - offset;
+        return getSourceLoc(offset, length);
+    }
+
+    /**
+     * Check whether the source location is valid (assuming it has been created by the same FileSource).
+     * The source location is valid if the file name matches the filename of this file source,
+     * the offset/column combination describes a valid range and line/column pairs match those
+     * computed from offset and length
+     */
+    public boolean isValid(SourceLoc loc) {
+        if (!Objects.equals(this.file, loc.getFile()) ||
+                loc.getEndLoc() == null || loc.getStartLoc() == null) {
+            return false;
+        }
+
+        if (!isValid(loc.offset + 1) || !isValid(loc.offset + loc.len)) {
+            return false;
+        }
+
+        return getLineLoc(loc.offset + 1).equals(loc.getStartLoc()) &&
+                getLineLoc(loc.offset + loc.len).equals(loc.getEndLoc());
+    }
 }

@@ -1,6 +1,8 @@
 package uq.pac.rsvp.policy.ast.parser;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import uq.pac.rsvp.policy.ast.CedarBaseVisitor;
 import uq.pac.rsvp.support.FileSource;
 import uq.pac.rsvp.support.LineLoc;
@@ -14,13 +16,29 @@ class SourceVisitor<T> extends CedarBaseVisitor<T> {
         this.fs = fs;
     }
 
-    protected SourceLoc location(ParserRuleContext context) {
-        int startLine = context.start.getLine(),
-                startColumn = context.start.getCharPositionInLine() + 1,
-                endLine = context.stop.getLine(),
-                endColumn = context.stop.getCharPositionInLine() + context.stop.getText().length();
+    protected SourceLoc location(Token start, Token stop) {
+        int startLine = start.getLine(),
+                startColumn = start.getCharPositionInLine() + 1,
+                endLine = stop.getLine(),
+                endColumn = stop.getCharPositionInLine() + stop.getText().length();
         return fs.getSourceLoc(
                 new LineLoc(startLine, startColumn),
                 new LineLoc(endLine, endColumn));
+    }
+
+    protected SourceLoc location(Token start) {
+        return location(start, start);
+    }
+
+    protected SourceLoc location(ParserRuleContext context) {
+        return location(context.start, context.stop);
+    }
+
+    protected SourceLoc location(ParserRuleContext start, ParserRuleContext stop) {
+        return location(start.start, stop.stop);
+    }
+
+    protected SourceLoc location(TerminalNode context) {
+        return location(context.getSymbol());
     }
 }

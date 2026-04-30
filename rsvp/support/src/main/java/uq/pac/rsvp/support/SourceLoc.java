@@ -1,5 +1,7 @@
 package uq.pac.rsvp.support;
 
+import java.util.Objects;
+
 /**
  * Describes a location (range) within a textual source, given by offset
  * (0-based) and length,
@@ -35,13 +37,44 @@ public class SourceLoc {
         return end;
     }
 
-    @Override
-    public String toString() {
-        String loc = "%s:%d:%d".formatted(file, offset, len);
+    public String toString(boolean includeFile) {
+        if (this.isEmpty()) {
+            return "<unknown>";
+        }
+        String loc = "%d:%d".formatted(offset, len);
         if (start != null && end != null) {
             loc += " [%s-%s]".formatted(start.toString(), end.toString());
         }
-        return loc;
+        return includeFile ? file + ":" + loc : loc;
+    }
+
+    @Override
+    public String toString() {
+        return toString(true);
+    }
+
+    public boolean isEmpty() {
+        return this.equals(MISSING);
+    }
+
+    public static SourceLoc empty() {
+        return new SourceLoc(null, -1, 0, null, null);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        } else if (other == this) {
+            return true;
+        } else if (other instanceof SourceLoc loc) {
+            return Objects.equals(this.file, loc.file) &&
+                    loc.offset == this.offset &&
+                    loc.len == this.len &&
+                    Objects.equals(loc.getStartLoc(), start) &&
+                    Objects.equals(loc.getEndLoc(), end);
+        }
+        return false;
     }
 
     /**

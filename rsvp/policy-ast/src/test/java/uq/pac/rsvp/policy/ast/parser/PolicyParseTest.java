@@ -2,14 +2,14 @@ package uq.pac.rsvp.policy.ast.parser;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicyProgram;
+import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
 
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.Collection;
+
 
 public class PolicyParseTest {
 
@@ -117,8 +117,7 @@ public class PolicyParseTest {
             "permit (principal, action, resource) when { b } when { a } unless { c };",
     })
     void testPolicyCondition(String text) {
-        Policy policy = PolicyProgram.parse(text).policies().findFirst().orElseThrow();
-        System.out.println(policy.getCondition());
+        PolicyProgram.parse(text).policies().findFirst().orElseThrow();
     }
 
     @ParameterizedTest
@@ -133,11 +132,9 @@ public class PolicyParseTest {
         "permit-all.cedar",
         "permit-and-forbid.cedar",
         "policy-with-has.cedar"
-
     })
     void testParse(String file) throws IOException {
         URL url = ClassLoader.getSystemResource(file);
-        Collection<Policy> policies = PolicyProgram.parse(Path.of(url.getPath())).getPolicies();
+        PolicyProgram.parse(Path.of(url.getPath())).getPolicies();
     }
-
 }

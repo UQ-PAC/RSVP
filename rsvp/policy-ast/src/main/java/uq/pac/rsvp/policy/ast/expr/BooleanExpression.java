@@ -2,7 +2,7 @@ package uq.pac.rsvp.policy.ast.expr;
 
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
-import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;;
+import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
 public class BooleanExpression extends Expression {
 
@@ -40,6 +40,14 @@ public class BooleanExpression extends Expression {
     @Override
     public String toString() {
         return String.valueOf(value);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof BooleanExpression b) {
+            return this.value == b.value;
+        }
+        return false;
     }
 
 }

@@ -64,6 +64,9 @@ property: variable ('.' variable )*;
 // Entity or action type, such as App::Account
 type: ID ('::' ID)*;
 
+// function names 
+functionName: type;
+
 // Literal entity, such as App::Account::"Alice"
 entity: type '::' STRING;
 
@@ -78,7 +81,7 @@ expression :
       literal                                                          # literalExpr
     | variable                                                         # variableExpr
     | property                                                         # propertyExpr
-    | (property '.')? type '(' expressionList? ')'                     # callExpr
+    | (property '.')? functionName '(' expressionList? ')'             # callExpr
     | type                                                             # typeExpr
     | entity                                                           # entityExpr
     | STRING                                                           # stringExpr
@@ -114,27 +117,26 @@ invariant:
 annotation: '@' ID | '@' ID '(' STRING ')';
 condition: (WHEN | UNLESS) '{' expression '}';
 
+// variable scope for both resources and principals
+variableScope:
+    EQ entity
+    | IN entity
+    | IS type
+    | IS type IN entity;
+
 principal:
-    PRINCIPAL
-    | PRINCIPAL EQ entity
-    | PRINCIPAL IN entity
-    | PRINCIPAL IS type
-    | PRINCIPAL IS type IN entity
+    PRINCIPAL variableScope?
 ;
 
 resource:
-    RESOURCE
-    | RESOURCE EQ entity
-    | RESOURCE IN entity
-    | RESOURCE IS type
-    | RESOURCE IS type IN entity
+    RESOURCE variableScope?
 ;
 
 action:
     ACTION
-    | ACTION EQ entity
-    | ACTION IN entity
-    | ACTION IN '[' entity (',' entity)* ']'
+    (EQ entity
+    | IN entity
+    | IN '[' entity (',' entity)* ']')?
 ;
 
 policy:

@@ -34,6 +34,7 @@ import jakarta.validation.Valid;
 import uq.pac.childrenclinic.adult.Adult;
 import uq.pac.childrenclinic.adult.AdultRepository;
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
+import uq.pac.childrenclinic.cedar.CedarDeniedException;
 import uq.pac.childrenclinic.cedar.CedarLogContext;
 import uq.pac.childrenclinic.cedar.CedarRequest;
 import uq.pac.childrenclinic.cedar.CedarService;
@@ -209,16 +210,137 @@ public class PatientController {
 	}
 
 	@GetMapping("/patients/new")
-	@CedarAuthorization(action = "AddPatient", resourceType = "Clinic", resourceId = "Any", validate = true)
-	public String initCreationForm(Model model) {
+	public String initCreationForm(Model model, HttpSession session) {
+		String principalId = (String) session.getAttribute("currentUser");
+		principalId = principalId == null ? "Guest" : principalId;
+
+		EntityUID principal;
+		if ("Guest".equals(principalId)) {
+			principal = EntityUID.parse("ChildrenClinic::Guest::\"Unknown\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal."));
+		} else {
+			principal = EntityUID.parse("ChildrenClinic::Employee::\"" + principalId + "\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal."));
+		}
+
+		EntityUID action = EntityUID.parse("ChildrenClinic::Action::\"AddPatient\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Action."));
+
+		Collection<Clinic> allClinics = this.clinics.findClinics();
+
+		// Evaluate Cedar for each Clinic and log the result.
+		boolean isAuthorized = false;
+		List<String> denialReasons = new ArrayList<>();
+
+		for (Clinic clinic : allClinics) {
+			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
+			EntityUID resource = EntityUID.parse("ChildrenClinic::Clinic::\"" + cedarClinicId + "\"")
+            	.orElseThrow(() -> new IllegalArgumentException("Invalid Resource format."));
+
+			CedarRequest request = new CedarRequest(principal, action, resource, new HashMap<>(), true);
+			ResponseEntity<String> response = cedarService.checkAccess(request);
+			String accessBody = response.getBody();
+
+			String logEntry = "Page Request: Principal=" + principal + ", Action=" + action + ", Resource=" + resource
+					+ " | Response: " + accessBody;
+			this.cedarLogContext.addLog(logEntry);
+
+			if (response.getStatusCode().is2xxSuccessful() && accessBody != null && accessBody.startsWith("Access Granted.")) {
+				isAuthorized = true;
+			} else {
+				if (accessBody != null) {
+					denialReasons.add(accessBody);
+				}
+			}
+		}
+
+		// Deny Access if no clinics passed the check.
+		if (!isAuthorized) {
+			String prefix = "Access Denied.\n";
+			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
+
+			if (!denialReasons.isEmpty()) {
+				// Combine all denial reasons and strip out the redundant prefix from each.
+				for (String reason : denialReasons) {
+					exceptionBody.append(reason.replaceAll("(?m)^" + prefix, "")).append("\n");
+				}
+			} else {
+				exceptionBody.append("You do not have permission to add patients to any assigned clinics.");
+			}
+
+			throw new CedarDeniedException(exceptionBody.toString().trim());
+		}
+
 		model.addAttribute("patient", new Patient());
 		return VIEWS_PATIENT_CREATE_OR_UPDATE_FORM;
 	}
 
 	@PostMapping("/patients/new")
-	@CedarAuthorization(action = "AddPatient", resourceType = "Clinic", resourceId = "Any", validate = true)
 	public String processCreationForm(@Valid Patient patient, BindingResult result,
-			RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes, HttpSession session) {
+		String principalId = (String) session.getAttribute("currentUser");
+		principalId = principalId == null ? "Guest" : principalId;
+
+		EntityUID principal;
+		if ("Guest".equals(principalId)) {
+			principal = EntityUID.parse("ChildrenClinic::Guest::\"Unknown\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal."));
+		} else {
+			principal = EntityUID.parse("ChildrenClinic::Employee::\"" + principalId + "\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal."));
+		}
+
+		EntityUID action = EntityUID.parse("ChildrenClinic::Action::\"AddPatient\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Action."));
+
+		// Evaluate Cedar for all the submitted Clinics.
+		boolean isAuthorized = true;
+		List<String> denialReasons = new ArrayList<>();
+
+		Collection<Clinic> submittedClinics = patient.getClinics();
+
+		if (submittedClinics == null || submittedClinics.isEmpty()) {
+			isAuthorized = false;
+			denialReasons.add("You must assign the Patient to at least one valid Clinic.");
+		} else {
+			for (Clinic clinic : submittedClinics) {
+				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
+				EntityUID resource = EntityUID.parse("ChildrenClinic::Clinic::\"" + cedarClinicId + "\"")
+					.orElseThrow(() -> new IllegalArgumentException("Invalid Resource."));
+
+				CedarRequest request = new CedarRequest(principal, action, resource, new HashMap<>(), true);
+				ResponseEntity<String> response = cedarService.checkAccess(request);
+				String accessBody = response.getBody();
+
+				String logEntry = "Page Request: Principal=" + principal + ", Action=" + action + ", Resource=" + resource
+						+ " | Response: " + accessBody;
+				this.cedarLogContext.addLog(logEntry);
+
+				if (!response.getStatusCode().is2xxSuccessful() || accessBody == null || !accessBody.startsWith("Access Granted.")) {
+					isAuthorized = false;
+					if (accessBody != null) {
+						denialReasons.add(accessBody);
+					}
+				}
+			}
+		}
+
+		// Deny Access if any checks failed.
+		if (!isAuthorized) {
+			String prefix = "Access Denied.\n";
+			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
+			
+			if (!denialReasons.isEmpty()) {
+				for (String reason : denialReasons) {
+					exceptionBody.append(reason.replaceAll("(?m)^" + prefix, "")).append("\n");
+				}
+			} else {
+				exceptionBody.append("You do not have permission to add patients to one or more of the selected clinics.");
+			}
+			
+			throw new CedarDeniedException(exceptionBody.toString().trim());
+		}
+
 		if (StringUtils.hasLength(patient.getLastName()) && StringUtils.hasLength(patient.getFirstName())
 				&& patient.isNew()) {
 			boolean duplicateExists = patients.findByLastNameStartingWith(patient.getLastName(), PageRequest.of(0, 50))
@@ -230,8 +352,11 @@ public class PatientController {
 				result.rejectValue("firstName", "duplicate", "A patient with this first and last name already exists");
 			}
 		}
-		if (result.hasErrors())
+
+		if (result.hasErrors()) {
 			return VIEWS_PATIENT_CREATE_OR_UPDATE_FORM;
+		}
+
 		this.patients.save(patient);
 		redirectAttributes.addFlashAttribute("message", "New Patient has been added.");
 		return "redirect:/patients/" + patient.getId();

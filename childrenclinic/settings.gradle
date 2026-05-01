@@ -1,2 +1,2 @@
-rootProject.name = 'uq-pac-childclinic'
+rootProject.name = 'uq-pac-childrenclinic'
 include('app')

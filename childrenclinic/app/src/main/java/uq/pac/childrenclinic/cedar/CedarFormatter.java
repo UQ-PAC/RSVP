@@ -20,7 +20,7 @@ public class CedarFormatter {
         text = text.replace(" | ", "<br/>");
         
         // Appends a line break after commas.
-        text = text.replace(",", ",<br/>");
+        text = text.replace("\",", ",<br/>");
         
         // Appends a line break after "Request:".
         text = text.replace("Request:", "Request:<br/>");

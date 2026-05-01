@@ -9,9 +9,10 @@ import uq.pac.rsvp.policy.ast.antlrschema.AntlrSchema;
 import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrSchemaStatement;
 import uq.pac.rsvp.support.FileSource;
 
-import java.lang.module.ResolutionException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * Parsing cedar policies and invariants as a collection of statements
@@ -23,6 +24,12 @@ public class AntlrSchemaParser {
                                 String msg, RecognitionException e) {
             throw new ParseCancellationException("Parse error: " + line + ":" + pos + " " + msg);
         }
+    }
+
+    public static AntlrSchema parse(Path path) throws IOException {
+        String file = path.getFileName().toString();
+        String text = Files.readString(path);
+        return parse(file, text);
     }
 
     public static AntlrSchema parse(String file, String text) {
@@ -38,16 +45,7 @@ public class AntlrSchemaParser {
         parser.addErrorListener(errorListener);
 
         FileSource source = new FileSource(file, text);
-        Map<String, AntlrSchemaStatement> components = new HashMap<>();
-
-        Consumer<AntlrSchemaStatement> add = stmt -> {
-            AntlrSchemaStatement s = components.get(stmt.getBaseName());
-            if (s != null) {
-                throw new ResolutionException("Statement %s illegally shadows %s"
-                        .formatted(stmt.getName(), s.getName()));
-            }
-            components.put(stmt.getName(), stmt);
-        };
+        List<AntlrSchemaStatement> components = new ArrayList<>();
 
         return new CedarschemaBaseVisitor<AntlrSchema>() {
             @Override
@@ -55,14 +53,14 @@ public class AntlrSchemaParser {
                 AntlrSchemaStatementVisitor statements = new AntlrSchemaStatementVisitor(source, "");
 
                 for (CedarschemaParser.StatementContext s : ctx.statement()) {
-                    add.accept(statements.visit(s));
+                    components.add(statements.visit(s));
                 }
 
                 for (CedarschemaParser.NamespaceContext ns : ctx.namespace()) {
                     String namespace  = ns.path().getText();
                     statements = new AntlrSchemaStatementVisitor(source, namespace);
                     for (CedarschemaParser.StatementContext s : ns.statement()) {
-                        add.accept(statements.visit(s));
+                        components.add(statements.visit(s));
                     }
                 }
                 return new AntlrSchema(components);

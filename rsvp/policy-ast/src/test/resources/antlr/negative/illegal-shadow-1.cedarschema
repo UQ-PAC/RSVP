@@ -1,0 +1,4 @@
+entity Foo;
+entity Foo;
+
+// EXPECTED: Reference (R) Foo illegally shadowed

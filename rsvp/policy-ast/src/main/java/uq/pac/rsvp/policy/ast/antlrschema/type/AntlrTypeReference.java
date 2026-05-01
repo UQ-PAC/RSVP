@@ -5,6 +5,8 @@ import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaValueVisitor;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
+import java.util.Objects;
+
 public class AntlrTypeReference extends AntlrBuiltinType {
 
     private final String name;
@@ -14,6 +16,10 @@ public class AntlrTypeReference extends AntlrBuiltinType {
         super(location);
         this.name = name;
         this.namespace = namespace;
+    }
+
+    public AntlrTypeReference(String namespace, String name) {
+        this(namespace, name, SourceLoc.MISSING);
     }
 
     public String getName() {
@@ -30,11 +36,20 @@ public class AntlrTypeReference extends AntlrBuiltinType {
 
     @Override
     public boolean equals(Object other) {
-        if (other instanceof AntlrTypeReference ref) {
+        if (other == null) {
+            return false;
+        } else if (other == this) {
+            return true;
+        } else if (other instanceof AntlrTypeReference ref) {
             return ref.namespace.equals(this.namespace) &&
                     ref.name.equals(this.name);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(namespace, name);
     }
 
     @Override

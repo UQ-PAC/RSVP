@@ -1,0 +1,4 @@
+entity Foo;
+type Foo = String;
+
+// EXPECTED: Reference (R) Foo illegally shadowed

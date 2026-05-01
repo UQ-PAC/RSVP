@@ -1,0 +1,6 @@
+entity Foo;
+namespace Bar {
+    type Foo = String;
+}
+
+// EXPECTED: Reference (R) Foo illegally shadowed

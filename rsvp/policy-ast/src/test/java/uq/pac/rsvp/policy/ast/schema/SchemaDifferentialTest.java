@@ -1,51 +1,74 @@
 package uq.pac.rsvp.policy.ast.schema;
 
-import org.junit.jupiter.api.Test;
-import uq.pac.rsvp.policy.ast.antlrschema.AntlrSchema;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.policy.ast.antlrschema.parser.AntlrSchemaParser;
+
+import java.io.IOException;
+import java.lang.module.ResolutionException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SchemaDifferentialTest {
 
-    @Test
-    void test() {
-        AntlrSchema schema = AntlrSchemaParser.parse("text.txt", SCHEMA_TEXT);
-        System.out.println(schema);
+    public final static Path ROOTDIR =
+            Path.of(System.getProperty("test.rootdir")).toAbsolutePath();
+    public final static Path RESOURCEDIR =
+            Path.of(ROOTDIR.toString(), "src", "test", "resources");
+
+    public static Path getResourceDir(String ...names) {
+        return Path.of(RESOURCEDIR.toString(), names);
     }
 
-    private final static String SCHEMA_TEXT = """
-            namespace HealthCareApp {
-                entity Role enum ["Admin", "Doctor", "InsuranceRep"];
-                entity User in [Role];
-                entity InfoType;
-                entity Info in [InfoType] {
-                    provider: User,
-                    patient: User
-                };
-                action createAppointment in [updateAppointment] appliesTo {
-                    principal: [User],
-                    resource: [Info],
-                    context: {
-                        referrer: User,
-                        detail: AppointmentDetails
-                    }
-                };
-                action updateAppointment appliesTo {
-                    principal: [User],
-                    resource: [Info],
-                };
-                action deleteAppointment appliesTo {
-                    principal: [User],
-                    resource: [Info],
-                };
-                action listAppointments appliesTo {
-                    principal: [User],
-                    resource: [Info],
-                };
-                type AppointmentDetails = {
-                    reason: String,
-                    cost: Long,
-                };
-                type Diagnosis = String;
+    public static List<Path> findFiles(Path dir, String ext) {
+        try (Stream<Path> paths = Files.list(dir)) {
+            List<Path> files = new ArrayList<>();
+            paths.forEach(p -> {
+                if (Files.isRegularFile(p) && p.toString().endsWith(ext)) {
+                    files.add(p);
+                } else if (Files.isDirectory(p)) {
+                    files.addAll(findFiles(p, ext));
+                }
+            });
+            return files;
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+    }
+
+    // Negative test catching resolution errors
+    @TestFactory
+    Collection<DynamicTest> test() {
+        Path dir = getResourceDir("antlr", "negative");
+        return findFiles(dir, ".cedarschema").stream().map(path -> {
+
+            String oracle;
+            String prefix = "// EXPECTED:";
+            try {
+                oracle = Files.readAllLines(path).stream()
+                        .map(String::trim)
+                        .filter(l -> l.startsWith(prefix))
+                        .map(s -> s.substring(prefix.length()).trim())
+                        .findFirst()
+                        .orElseThrow();
+            } catch (IOException e) {
+                throw new RuntimeException(e.getCause());
             }
-            """;
+
+            return DynamicTest.dynamicTest(path.getFileName().toString(), () -> {
+                try {
+                    AntlrSchemaParser.parse(path);
+                } catch (ResolutionException e) {
+                    assertEquals(oracle, e.getMessage().trim());
+                }
+            });
+        }).toList();
+    }
+
 }

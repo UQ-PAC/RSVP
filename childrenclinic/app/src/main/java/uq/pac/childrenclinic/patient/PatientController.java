@@ -1,5 +1,6 @@
 package uq.pac.childrenclinic.patient;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -32,6 +34,7 @@ import jakarta.validation.Valid;
 import uq.pac.childrenclinic.adult.Adult;
 import uq.pac.childrenclinic.adult.AdultRepository;
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
+import uq.pac.childrenclinic.cedar.CedarLogContext;
 import uq.pac.childrenclinic.cedar.CedarRequest;
 import uq.pac.childrenclinic.cedar.CedarService;
 import uq.pac.childrenclinic.model.Gender;
@@ -54,13 +57,16 @@ public class PatientController {
 
 	private final CedarService cedarService;
 
+	private final CedarLogContext cedarLogContext;
+
 	public PatientController(PatientRepository patients, GenderRepository genders, ClinicRepository clinics,
-			AdultRepository adults, CedarService cedarService) {
+			AdultRepository adults, CedarService cedarService, CedarLogContext cedarLogContext) {
 		this.patients = patients;
 		this.genders = genders;
 		this.clinics = clinics;
 		this.adults = adults;
 		this.cedarService = cedarService;
+		this.cedarLogContext = cedarLogContext;
 	}
 
 	@ModelAttribute("genders")
@@ -69,8 +75,39 @@ public class PatientController {
 	}
 
 	@ModelAttribute("clinics")
-	public Collection<Clinic> populateClinics() {
-		return this.clinics.findClinics();
+	public Collection<Clinic> populateClinics(HttpSession session) {
+		Collection<Clinic> allClinics = this.clinics.findClinics();
+
+		String principalId = (String) session.getAttribute("currentUser");
+		principalId = principalId == null ? "Guest" : principalId;
+
+		EntityUID principal;
+		if (principalId.equals("Guest")) {
+			principal = EntityUID.parse("ChildrenClinic::Guest::\"Unknown\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
+		} else {
+			principal = EntityUID.parse("ChildrenClinic::Employee::\"" + principalId + "\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
+		}
+
+		EntityUID action = EntityUID.parse("ChildrenClinic::Action::\"ViewClinic\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
+
+		return allClinics.stream().filter(clinic -> {
+			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
+			EntityUID resource = EntityUID.parse("ChildrenClinic::Clinic::\"" + cedarClinicId + "\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
+
+			CedarRequest request = new CedarRequest(principal, action, resource, new HashMap<>(), true);
+			ResponseEntity<String> response = cedarService.checkAccess(request);
+			String accessBody = response.getBody();
+
+			String logEntry = "Item Request: Principal=" + principal + ", Action=" + action + ", Resource=" + resource
+					+ " | Response: " + accessBody;
+			this.cedarLogContext.addLog(logEntry);
+
+			return accessBody != null && accessBody.startsWith("Access Granted.");
+		}).collect(Collectors.toList());
 	}
 
 	@ModelAttribute("adults")

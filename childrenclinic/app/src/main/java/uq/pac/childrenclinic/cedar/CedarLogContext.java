@@ -22,7 +22,21 @@ public class CedarLogContext implements Serializable {
 	}
 
 	public List<String> getLogs() {
-		return new ArrayList<>(this.logs);
+		List<String> sortedLogs = new ArrayList<>(this.logs);
+
+		sortedLogs.sort((log1, log2) -> {
+			boolean isPage1 = log1 != null && log1.startsWith("Page Request");
+			boolean isPage2 = log2 != null && log2.startsWith("Page Request");
+
+			if (isPage1 && !isPage2) {
+				return -1;
+			} else if (!isPage1 && isPage2) {
+				return 1;
+			}
+			return 0;
+		});
+
+		return sortedLogs;
 	}
 
 	public void clearLogs() {

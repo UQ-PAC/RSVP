@@ -16,6 +16,7 @@
 
 package uq.pac.childrenclinic.system;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,6 +32,7 @@ import com.cedarpolicy.value.EntityUID;
 
 import jakarta.servlet.http.HttpSession;
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
+import uq.pac.childrenclinic.cedar.CedarLogContext;
 import uq.pac.childrenclinic.cedar.CedarRequest;
 import uq.pac.childrenclinic.cedar.CedarService;
 import uq.pac.childrenclinic.doctor.Doctor;
@@ -41,11 +43,17 @@ class WelcomeController {
 
 	private final DoctorRepository doctors;
 
+	private final ClinicRepository clinics;
+
 	private final CedarService cedarService;
 
-	public WelcomeController(DoctorRepository doctors, CedarService cedarService) {
+	private final CedarLogContext cedarLogContext;
+
+	public WelcomeController(DoctorRepository doctors, ClinicRepository clinics, CedarService cedarService, CedarLogContext cedarLogContext) {
 		this.doctors = doctors;
+		this.clinics = clinics;
 		this.cedarService = cedarService;
+		this.cedarLogContext = cedarLogContext;
 	}
 
 	@GetMapping("/")
@@ -151,12 +159,30 @@ class WelcomeController {
 	private boolean isAuthorized(EntityUID principal, String actionStr) {
 		EntityUID action = EntityUID.parse("ChildrenClinic::Action::\"" + actionStr + "\"")
 			.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
-		EntityUID resource = EntityUID.parse("ChildrenClinic::Clinic::\"Any\"")
-			.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
 
-		String access = cedarService.checkAccess(new CedarRequest(principal, action, resource, new HashMap<>(), true))
-			.getBody();
-		return access != null && access.startsWith("Access Granted.");
+		Collection<Clinic> allClinics = this.clinics.findClinics();
+		boolean hasAccess = false;
+
+		for (Clinic clinic : allClinics) {
+			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
+
+			EntityUID resource = EntityUID.parse("ChildrenClinic::Clinic::\"" + cedarClinicId + "\"")
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
+
+			CedarRequest request = new CedarRequest(principal, action, resource, new HashMap<>(), true);
+			String accessBody = cedarService.checkAccess(request).getBody();
+
+			String logEntry = "Item Request: Principal=" + principal + ", Action=" + action + ", Resource=" + resource
+					+ " | Response: " + accessBody;
+			this.cedarLogContext.addLog(logEntry);
+
+			// If access is granted for AT LEAST ONE clinic, the user gets the menu option
+			if (accessBody != null && accessBody.startsWith("Access Granted.")) {
+				hasAccess = true;
+			}
+		}
+
+		return hasAccess;
 	}
 
 }

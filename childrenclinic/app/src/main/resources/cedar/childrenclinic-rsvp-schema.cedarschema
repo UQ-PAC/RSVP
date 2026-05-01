@@ -45,6 +45,12 @@ namespace ChildrenClinic {
     action EmployeeOperations;
     action PatientOperations;
 
+    action ViewClinic in [EmployeeOperations, PatientOperations] appliesTo {
+        principal: [Employee, Guest],
+        resource: Clinic,
+        context: { }
+    };
+
     action ListEmployees in EmployeeOperations appliesTo {
         principal: [Employee, Guest],
         resource: Clinic,

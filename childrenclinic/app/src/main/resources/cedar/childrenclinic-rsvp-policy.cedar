@@ -258,3 +258,15 @@ unless {
                                     ChildrenClinic::EmployeeRole::"Doctor"])
     )
 };
+
+// 'policy14'
+// Every Employee can view the Clinics they are assigned to.
+@id("Policy: Every Employee can view the Clinics they are assigned to.")
+permit (
+    principal is ChildrenClinic::Employee,
+    action == ChildrenClinic::Action::"ViewClinic",
+    resource is ChildrenClinic::Clinic
+)
+when {
+    principal.clinics.contains(resource)
+};

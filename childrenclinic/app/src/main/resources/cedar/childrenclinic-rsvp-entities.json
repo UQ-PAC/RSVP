@@ -605,6 +605,15 @@
     },
 
     {
+        "uid": { "type": "ChildrenClinic::Action", "id": "ViewClinic" },
+        "attrs": { },
+        "parents": [
+            { "__entity": { "type": "ChildrenClinic::Action", "id": "EmployeeOperations" } },
+            { "__entity": { "type": "ChildrenClinic::Action", "id": "PatientOperations" } }
+        ]
+    },
+
+    {
         "uid": { "type": "ChildrenClinic::Action", "id": "ListEmployees" },
         "attrs": { },
         "parents": [

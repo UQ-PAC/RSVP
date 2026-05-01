@@ -59,6 +59,10 @@ Every `Visit` must have one entity `Patient` as their `patient`, at least one en
 
 Actions are separated into two groups, `EmployeeOperations` and `PatientOperations`, and every action applies to a principal whose entity is either `Employee` or `Guest`.
 
+#### Both `EmployeeOperations` and `PatientOperations`
+
+Action `ViewClinic` applies to a resource whose entity is `Clinic`.
+
 #### `EmployeeOperations`
 
 Actions `ListEmployees` and `AddEmployee` apply to a resource whose entity is `Clinic`.

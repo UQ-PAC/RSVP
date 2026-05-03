@@ -1,6 +1,0 @@
-entity Foo;
-namespace Bar {
-    entity Foo;
-}
-
-// EXPECTED: Reference (R) Foo illegally shadowed

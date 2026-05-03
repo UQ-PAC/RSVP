@@ -74,7 +74,7 @@ subprojects {
         implementation 'com.cedarpolicy:cedar-java:4.8.0-rsvp-4:uber'
 
         implementation 'com.google.code.gson:gson:2.13.2'
-        implementation libs.guava
+        implementation 'com.google.guava:guava:33.6.0-jre'
         implementation 'com.fasterxml.jackson.core:jackson-databind:2.20.0'
         implementation 'org.springframework.boot:spring-boot-starter-web:4.0.3'
         

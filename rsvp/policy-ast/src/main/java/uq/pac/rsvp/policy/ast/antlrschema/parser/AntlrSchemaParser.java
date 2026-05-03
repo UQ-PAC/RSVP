@@ -63,7 +63,7 @@ public class AntlrSchemaParser {
                         components.add(statements.visit(s));
                     }
                 }
-                return new AntlrSchema(components);
+                return AntlrSchema.build(components);
             }
         }.visit(parser.schema());
     }

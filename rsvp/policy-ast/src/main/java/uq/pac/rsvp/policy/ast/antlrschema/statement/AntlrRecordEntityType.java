@@ -14,8 +14,8 @@ public class AntlrRecordEntityType extends AntlrEntityType {
     private final AntlrRecordType shape;
     private final Set<AntlrTypeReference> memberOf;
 
-    public AntlrRecordEntityType(String namespace, String name, Set<AntlrTypeReference> memberOf, AntlrRecordType shape, SourceLoc location) {
-        super(namespace, name, location);
+    public AntlrRecordEntityType(AntlrTypeReference ref, Set<AntlrTypeReference> memberOf, AntlrRecordType shape, SourceLoc location) {
+        super(ref, location);
         this.shape = shape;
         this.memberOf = Set.copyOf(memberOf);
     }

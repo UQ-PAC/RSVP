@@ -23,7 +23,13 @@ public class AntlrTypeReference extends AntlrBuiltinType {
     }
 
     public String getName() {
-        return namespace.isEmpty() ? name : namespace + "::" + name;
+        String prefix = "";
+        if (namespace == null) {
+            prefix = "???::";
+        } else if (!namespace.isEmpty()) {
+            prefix = namespace + "::";
+        }
+        return prefix + name;
     }
 
     public String getBaseName() {
@@ -31,7 +37,7 @@ public class AntlrTypeReference extends AntlrBuiltinType {
     }
 
     public String getNamespace() {
-        return name;
+        return namespace;
     }
 
     @Override
@@ -54,7 +60,7 @@ public class AntlrTypeReference extends AntlrBuiltinType {
 
     @Override
     public String toString() {
-        return "(R) " + getName();
+        return getName();
     }
 
     @Override

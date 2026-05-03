@@ -1,0 +1,87 @@
+// Checking resolution of references within the 'in' clauses of actions
+
+// ### B
+// EXPECTED: Invalid type reference: A
+entity B in A;
+
+// ### Wrong type
+// EXPECTED: Expected entity reference: A
+type A = Bool;
+entity B in A;
+
+// EXPECTED: Invalid type reference: A
+action A;
+entity B in A;
+
+// ### A, B
+// EXPECTED: success
+entity A;
+entity B in A;
+
+// EXPECTED: Invalid type reference: Foo::A
+entity A;
+entity B in Foo::A;
+
+// ### Foo::A, B
+// EXPECTED: Invalid type reference: A
+namespace Foo {
+    entity A;
+}
+entity B in A;
+
+// EXPECTED: Success
+namespace Foo {
+    entity A;
+}
+entity B in Foo::A;
+
+// ### A, Foo::B
+// EXPECTED: success
+entity A;
+namespace Foo {
+    entity B in A;
+}
+
+// EXPECTED: Invalid type reference: Foo::A
+entity A;
+namespace Foo {
+    entity B in Foo::A;
+}
+
+// ### Foo::A, Bar::B
+// EXPECTED: Invalid type reference: A
+namespace Foo {
+    entity A;
+}
+namespace Bar {
+    entity B in A;
+}
+
+// EXPECTED: Invalid type reference: Bar::A
+namespace Foo {
+    entity A;
+}
+namespace Bar {
+    entity B in Bar::A;
+}
+
+// EXPECTED: success
+namespace Foo {
+    entity A;
+}
+namespace Bar {
+    entity B in Foo::A;
+}
+
+// ### Foo::A, Foo::B
+// EXPECTED: Success
+namespace Foo {
+    entity A;
+    entity B in A;
+}
+
+// EXPECTED: Success
+namespace Foo {
+    entity A;
+    entity B in Foo::A;
+}

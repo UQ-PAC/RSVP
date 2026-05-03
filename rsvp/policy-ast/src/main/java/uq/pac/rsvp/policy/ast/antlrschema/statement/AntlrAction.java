@@ -13,8 +13,8 @@ public class AntlrAction extends AntlrSchemaStatement {
     private final Set<AntlrTypeReference> memberOf;
     private final AntlrActionApplication appliesTo;
 
-    public AntlrAction(String namespace, String name, Set<AntlrTypeReference> memberOf, AntlrActionApplication appliesTo, SourceLoc location) {
-        super(namespace, name, location);
+    public AntlrAction(AntlrTypeReference ref, Set<AntlrTypeReference> memberOf, AntlrActionApplication appliesTo, SourceLoc location) {
+        super(ref, location);
         this.memberOf = memberOf;
         this.appliesTo = appliesTo;
     }
@@ -22,7 +22,7 @@ public class AntlrAction extends AntlrSchemaStatement {
     @Override
     public String toString() {
         String in = memberOf.isEmpty() ? " " : " in " + memberOf + " ";
-        return "action " + getName() + in + appliesTo + ";";
+        return "action " + getBaseName() + in + appliesTo + ";";
     }
 
     public Set<AntlrTypeReference> getMemberOf() {

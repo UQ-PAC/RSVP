@@ -167,6 +167,42 @@ public class SchemaParseTest {
             "~namespace A { type duration = Bool; }",
             "~namespace A { type ipaddr = Bool; }",
 
+            // Cedar still allows entity type names as built-in types
+            // This defeats the purpose of type name restrictions really,
+            // so for the moment we disallow that
+            "~entity Bool;",
+            "~entity Boolean;",
+            "~entity Long;",
+            "~entity String;",
+            "~entity Set;",
+            "~entity Record;",
+            "~entity Entity;",
+            "~entity Extension;",
+            "~namespace A { entity Bool; }",
+            "~namespace A { entity Boolean; }",
+            "~namespace A { entity Long; }",
+            "~namespace A { entity String; }",
+            "~namespace A { entity Set; }",
+            "~namespace A { entity Record; }",
+            "~namespace A { entity Entity; }",
+            "~namespace A { entity Extension; }",
+
+            // In addition to what Cedar insists on, RSVP adds built-in extension types
+            // to avoid shadowing issues
+            "~entity datetime;",
+            "~entity decimal;",
+            "~entity duration;",
+            "~entity ipaddr;",
+            "~namespace A { entity datetime; }",
+            "~namespace A { entity decimal; }",
+            "~namespace A { entity duration; }",
+            "~namespace A { entity ipaddr; }",
+
+            // Entities cannot be named action, and this is fair enough,
+            // but why common types can be named Action beats me
+            "-entity Action;",
+            "-namespace A { entity Action; }",
+
             // Annotations: any component can be annotated
             "@annotation namespace A {}",
             "@a @b(\"c\") namespace A {}",
@@ -196,7 +232,6 @@ public class SchemaParseTest {
             "entity A { appliesTo: String };",
             "entity A { enum: String };",
             "-entity A { in: String };",
-
     })
     void test(String text) throws InternalException {
         boolean cedarPositive = true;

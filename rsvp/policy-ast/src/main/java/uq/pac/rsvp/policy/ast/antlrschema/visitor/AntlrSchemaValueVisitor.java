@@ -8,38 +8,68 @@ import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrRecordEntityType;
 import uq.pac.rsvp.policy.ast.antlrschema.type.*;
 
 public interface AntlrSchemaValueVisitor<T> {
-    T visitSchema(AntlrSchema schema);
+    default T visitSchema(AntlrSchema schema) {
+        throw new AssertionError();
+    }
 
     // Statements
-    T visitRecordEntity(AntlrRecordEntityType entity);
+    default T visitRecordEntity(AntlrRecordEntityType entity) {
+        throw new AssertionError();
+    }
 
-    T visitEnumEntity(AntlrEnumEntityType entity);
+    default T visitEnumEntity(AntlrEnumEntityType entity) {
+        throw new AssertionError();
+    }
 
-    T visitAction(AntlrAction action);
+    default T visitAction(AntlrAction action) {
+        throw new AssertionError();
+    }
 
-    T visitCommon(AntlrCommonType type);
+    default T visitCommon(AntlrCommonType type) {
+        throw new AssertionError();
+    }
 
     // Compound types
-    T visitRecord(AntlrRecordType type);
+    default T visitRecord(AntlrRecordType type) {
+        throw new AssertionError();
+    }
 
-    T visitSet(AntlrSetType type);
+    default T visitSet(AntlrSetType type) {
+        throw new AssertionError();
+    }
 
     // Type references
-    T visitReference(AntlrTypeReference type);
+    default T visitReference(AntlrTypeReference type) {
+        throw new AssertionError();
+    }
 
     // Primitive types
-    T visitBoolean(AntlrBooleanType type);
+    default T visitBoolean(AntlrBooleanType type) {
+        throw new AssertionError();
+    }
 
-    T visitLong(AntlrLongType type);
+    default T visitLong(AntlrLongType type) {
+        throw new AssertionError();
+    }
 
-    T visitString(AntlrStringType type);
+    default T visitString(AntlrStringType type) {
+        throw new AssertionError();
+    }
 
     // Extension types
-    T visitIpAddress(AntlrIpAddressType type);
+    default T visitIpAddress(AntlrIpAddressType type) {
+        throw new AssertionError();
+    }
 
-    T visitDecimal(AntlrDecimalType type);
+    default T visitDecimal(AntlrDecimalType type) {
+        throw new AssertionError();
+    }
 
-    T visitDateTime(AntlrDateTimeType type);
+    default T visitDateTime(AntlrDateTimeType type) {
+        throw new AssertionError();
+    }
 
-    T visitDuration(AntlrDurationType type);
+    default T visitDuration(AntlrDurationType type) {
+        throw new AssertionError();
+    }
 }

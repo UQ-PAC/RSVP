@@ -4,7 +4,7 @@ import uq.pac.rsvp.policy.ast.antlrschema.AntlrSchema;
 import uq.pac.rsvp.policy.ast.antlrschema.statement.*;
 import uq.pac.rsvp.policy.ast.antlrschema.type.*;
 
-class AntlrSchemaVisitorAdapter implements AntlrSchemaVisitor {
+public class AntlrSchemaVisitorAdapter implements AntlrSchemaVisitor {
 
     @Override
     public void visitSchema(AntlrSchema schema) {

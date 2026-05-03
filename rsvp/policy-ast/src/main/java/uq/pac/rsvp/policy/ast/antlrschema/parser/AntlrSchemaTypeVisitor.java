@@ -25,7 +25,9 @@ class AntlrSchemaTypeVisitor extends AntlrSourceVisitor<AntlrBuiltinType> {
     public AntlrBuiltinType visitPath(CedarschemaParser.PathContext ctx) {
         String namespace;
         if (ctx.ident().size() == 1) {
-            namespace = this.namespace;
+            // At this point namespace cannot be determined
+            // Ensure this method is not invoked for entity, cation and types definitions
+            namespace  = null;
         } else {
             namespace = ctx.ident().subList(0, ctx.ident().size() - 1).stream()
                     .map(RuleContext::getText)

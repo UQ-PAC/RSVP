@@ -1,0 +1,33 @@
+// EXPECTED: Reference Foo illegally shadowed
+entity Foo;
+entity Foo;
+
+// EXPECTED: Reference Foo illegally shadowed
+entity Foo;
+type Foo = String;
+
+// EXPECTED: Reference Foo illegally shadowed
+entity Foo;
+namespace Bar {
+    entity Foo;
+}
+
+// EXPECTED: Reference Foo illegally shadowed
+entity Foo;
+namespace Bar {
+    type Foo = String;
+}
+
+// EXPECTED: Reference Foo illegally shadowed
+namespace Bar {
+    entity Foo;
+}
+entity Foo;
+
+// EXPECTED: Reference Foo illegally shadowed
+namespace Bar {
+    type Foo = String;
+}
+entity Foo;
+
+

@@ -2,12 +2,12 @@ package uq.pac.rsvp.policy.ast.parser;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import uq.pac.rsvp.policy.ast.Policy;
-import uq.pac.rsvp.policy.ast.PolicyAstNode;
-import uq.pac.rsvp.policy.ast.PolicyProgram;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.ast.invariant.Quantifier;
+import uq.pac.rsvp.policy.ast.policy.Policy;
+import uq.pac.rsvp.policy.ast.policy.PolicyAstNode;
+import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 import uq.pac.rsvp.support.FileSource;
 import uq.pac.rsvp.support.SourceLoc;

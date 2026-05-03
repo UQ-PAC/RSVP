@@ -1,0 +1,132 @@
+// Checking resolution of references within the 'in' clauses of actions
+
+// ### B
+// EXPECTED: Invalid type reference: Action::"A"
+action B in A;
+
+// EXPECTED: Invalid type reference: Action::"A"
+action B in Action::"A";
+
+// EXPECTED: Invalid type reference: Foo::Action::"A"
+action B in Foo::Action::"A";
+
+// ### Wrong type
+// EXPECTED: Invalid type reference: Action::"A"
+type A = Bool;
+action B in A;
+
+// EXPECTED: Invalid type reference: Action::"A"
+type A = Bool;
+action B in Action::"A";
+
+// EXPECTED: Invalid type reference: Action::"A"
+entity A;
+action B in A;
+
+// EXPECTED: Invalid type reference: Action::"A"
+entity A;
+action B in Action::"A";
+
+// ### A, B
+// EXPECTED: success
+action A;
+action B in A;
+
+// EXPECTED: success
+action A;
+action B in Action::"A";
+
+// EXPECTED: Invalid type reference: Foo::Action::"A"
+action A;
+action B in Foo::Action::"A";
+
+// ### Foo::A, B
+// EXPECTED: Invalid type reference: Action::"A"
+namespace Foo {
+    action A;
+}
+action B in A;
+
+// EXPECTED: Invalid type reference: Action::"A"
+namespace Foo {
+    action A;
+}
+action B in Action::"A";
+
+// EXPECTED: success
+namespace Foo {
+    action A;
+}
+action B in Foo::Action::"A";
+
+// ### A, Foo::B
+// EXPECTED: success
+action A;
+namespace Foo {
+    action B in A;
+}
+
+// EXPECTED: success
+action A;
+namespace Foo {
+    action B in Action::"A";
+}
+
+// EXPECTED: Invalid type reference: Foo::Action::"A"
+action A;
+namespace Foo {
+    action B in Foo::Action::"A";
+}
+
+// ### Bar::A, Foo::B
+
+// EXPECTED: Invalid type reference: Action::"A"
+namespace Bar {
+    action A;
+}
+namespace Foo {
+    action B in A;
+}
+
+// EXPECTED: Invalid type reference: Action::"A"
+namespace Bar {
+    action A;
+}
+namespace Foo {
+    action B in Action::"A";
+}
+
+// EXPECTED: Invalid type reference: Foo::Action::"A"
+namespace Bar {
+    action A;
+}
+namespace Foo {
+    action B in Foo::Action::"A";
+}
+
+// EXPECTED: success
+namespace Bar {
+    action A;
+}
+namespace Foo {
+    action B in Bar::Action::"A";
+}
+
+// ### Foo::A, Foo::B
+// EXPECTED: Success
+namespace Foo {
+    action A;
+    action B in A;
+}
+
+// EXPECTED: Success
+namespace Foo {
+    action A;
+    action B in Action::"A";
+}
+
+// EXPECTED: Success
+namespace Foo {
+    action A;
+    action B in Foo::Action::"A";
+}

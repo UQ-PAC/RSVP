@@ -1,6 +1,7 @@
 package uq.pac.rsvp.policy.ast.antlrschema.statement;
 
 import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrBuiltinType;
+import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrTypeReference;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaValueVisitor;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVisitor;
@@ -10,8 +11,8 @@ public class AntlrCommonType extends AntlrSchemaStatement {
 
     private final AntlrBuiltinType definition;
 
-    public AntlrCommonType(String namespace, String name, AntlrBuiltinType definition, SourceLoc location) {
-        super(namespace, name, location);
+    public AntlrCommonType(AntlrTypeReference ref, AntlrBuiltinType definition, SourceLoc location) {
+        super(ref, location);
         this.definition = definition;
     }
 
@@ -21,7 +22,7 @@ public class AntlrCommonType extends AntlrSchemaStatement {
 
     @Override
     public String toString() {
-        return "type " + getName() + " = " + definition + ";";
+        return "type " + getBaseName() + " = " + definition + ";";
     }
 
     @Override

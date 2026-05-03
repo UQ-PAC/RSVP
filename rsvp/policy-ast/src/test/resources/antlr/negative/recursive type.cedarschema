@@ -1,0 +1,39 @@
+// EXPECTED: Recursive definition of type: A
+type A = { r: A };
+
+// EXPECTED: Recursive definition of type: Foo::A
+namespace Foo {
+    type A = { r: A };
+}
+
+// EXPECTED: Recursive definition of type: Foo::A
+namespace Foo {
+    type A = { r: Foo::A };
+}
+
+// EXPECTED: Mutually recursive definition of types: A, B
+type A = { r: B };
+type B = { r: A };
+
+// EXPECTED: Mutually recursive definition of types: Foo::A, Bar::B
+namespace Foo {
+    type A = { r: Bar::B };
+}
+
+namespace Bar {
+    type B = { r: Foo::A };
+}
+
+// EXPECTED: Mutually recursive definition of types: Baz::C, Foo::A
+namespace Foo {
+    type A = { r: Bar::B };
+}
+
+namespace Bar {
+    type B = { r: Baz::C };
+}
+
+namespace Baz {
+    type C = { r: Foo::A };
+}
+

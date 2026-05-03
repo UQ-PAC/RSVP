@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 public class AntlrEnumEntityType extends AntlrEntityType {
     private final Set<String> names;
 
-    public AntlrEnumEntityType(String namespace, String name, Set<AntlrTypeReference> memberOf, Set<String> names, SourceLoc location) {
-        super(namespace, name, location);
+    public AntlrEnumEntityType(AntlrTypeReference ref, Set<AntlrTypeReference> memberOf, Set<String> names, SourceLoc location) {
+        super(ref, location);
         this.names = Set.copyOf(names);
     }
 

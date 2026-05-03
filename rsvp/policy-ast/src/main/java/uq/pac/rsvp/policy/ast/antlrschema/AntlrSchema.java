@@ -1,18 +1,27 @@
 package uq.pac.rsvp.policy.ast.antlrschema;
 
-import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrSchemaStatement;
-import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrTypeReference;
+import com.google.common.graph.Graph;
+import com.google.common.graph.GraphBuilder;
+import com.google.common.graph.Graphs;
+import com.google.common.graph.MutableGraph;
+import uq.pac.rsvp.policy.ast.antlrschema.parser.AntlrStatementResolutionVisitor;
+import uq.pac.rsvp.policy.ast.antlrschema.statement.*;
+import uq.pac.rsvp.policy.ast.antlrschema.type.*;
+import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVisitorAdapter;
+import uq.pac.rsvp.policy.ast.schema.SchemaResolutionException;
 
-import java.lang.module.ResolutionException;
 import java.util.*;
 import java.util.stream.Stream;
+
+import static java.util.Objects.requireNonNull;
 
 public class AntlrSchema {
 
     private final Map<AntlrTypeReference, AntlrSchemaStatement> statements;
 
-    public AntlrSchema(List<AntlrSchemaStatement> statements) {
-        this.statements = validate(statements);
+    // Private constructor for internal purposes
+    private AntlrSchema(Map<AntlrTypeReference, AntlrSchemaStatement> statements) {
+        this.statements = Collections.unmodifiableMap(statements);
     }
 
     public AntlrSchemaStatement get(AntlrTypeReference ref) {
@@ -21,6 +30,13 @@ public class AntlrSchema {
 
     public Stream<AntlrSchemaStatement> statements() {
         return statements.values().stream();
+    }
+
+    /**
+     * Check whether a reference corresponds to an actual construct within a schema
+     */
+    public boolean isValid(AntlrTypeReference reference) {
+        return statements.containsKey(reference);
     }
 
     @Override
@@ -49,7 +65,20 @@ public class AntlrSchema {
         return sb.toString();
     }
 
-    private static Map<AntlrTypeReference, AntlrSchemaStatement> validate(List<AntlrSchemaStatement> statements) {
+    // Build and validate Cedar schema
+    public static AntlrSchema build(Collection<AntlrSchemaStatement> statements) {
+        // Ensure no illegal shadowing
+        AntlrSchema result = uniquenessPass(statements);
+        result = shallowResolutionPass(result);
+        result = typeDependencyPass(result);
+        return result;
+    }
+
+    // The first step of schema generation.
+    // The resulting schema contains no duplicates (i.e., illegally shadowed statements)
+    // This includes similarly named statements within the same namespace and conflicts with
+    // global
+    private static AntlrSchema uniquenessPass(Collection<AntlrSchemaStatement> statements) {
         // Sort the list of statements such that entities from the global namespace come first
         statements = statements.stream()
                 .sorted(Comparator.comparingInt(a -> a.getNamespace().length()))
@@ -58,17 +87,79 @@ public class AntlrSchema {
         Map<AntlrTypeReference, AntlrSchemaStatement> types = new HashMap<>();
         for (AntlrSchemaStatement stmt : statements) {
             AntlrTypeReference ref = stmt.getReference();
-            // Try and lookup the reference by nane or by basename in case it exists in the global namespace
+            // Try and lookup the reference by name or by basename in case it exists in the global namespace
             AntlrSchemaStatement lookup = types.containsKey(ref) ?
                     types.get(ref) : types.get(new AntlrTypeReference("", ref.getBaseName()));
             if (lookup != null) {
-                throw new ResolutionException("Reference %s illegally shadowed "
+                throw new SchemaResolutionException("Reference %s illegally shadowed"
                         .formatted(lookup.getReference()));
             }
             types.put(ref, stmt);
         }
-        return Collections.unmodifiableMap(types);
+
+        return new AntlrSchema(types);
     }
 
+    // The second stage of resolution.
+    // - Ensure all references are valid
+    // - Resolve references to built-in primitive types (references to common types persist)
+    private static AntlrSchema shallowResolutionPass(AntlrSchema schema) {
+        Map<AntlrTypeReference, AntlrSchemaStatement> resolved = new HashMap<>();
+        schema.statements.forEach((ref, stmt) -> {
+            AntlrStatementResolutionVisitor resolver =
+                    new AntlrStatementResolutionVisitor(schema, stmt.getNamespace());
+            resolved.put(ref, stmt.compute(resolver));
+        });
+        return new AntlrSchema(resolved);
+    }
 
+    // The third stage of resolution:
+    // ensure that definition of common types are not recursive
+    private static AntlrSchema typeDependencyPass(AntlrSchema schema) {
+        MutableGraph<AntlrTypeReference> typeGraphBuilder = GraphBuilder
+                .directed()
+                .allowsSelfLoops(true)
+                .build();
+
+        schema.statements()
+                .map(s -> s instanceof AntlrCommonType t ? t : null)
+                .filter(Objects::nonNull)
+                .forEach(c -> {
+                    typeGraphBuilder.addNode(c.getReference());
+                    c.getDefinition().accept(new AntlrSchemaVisitorAdapter() {
+                        @Override
+                        public void visitReference(AntlrTypeReference type) {
+                            AntlrSchemaStatement stmt = requireNonNull(schema.get(type));
+                            if (stmt instanceof AntlrCommonType ct) {
+                                typeGraphBuilder.putEdge(c.getReference(), ct.getReference());
+                            }
+                        }
+                    });
+                });
+
+        // First check for self-recursion, as later on after building the transitive closure
+        // we cannot distinguish from initial edges or edges built by transitive closure
+        for (AntlrTypeReference node : typeGraphBuilder.nodes()) {
+            if (typeGraphBuilder.successors(node).contains(node)) {
+                throw new SchemaResolutionException("Recursive definition of type: " + node);
+            }
+        }
+
+        // Build transitive closure for cycle detection
+        Graph<AntlrTypeReference> typeGraph =
+                Graphs.transitiveClosure(typeGraphBuilder,
+                        Graphs.TransitiveClosureSelfLoopStrategy.ADD_SELF_LOOPS_FOR_CYCLES);
+
+        for (AntlrTypeReference src : typeGraph.nodes()) {
+            for (AntlrTypeReference dest : typeGraph.nodes()) {
+                if (typeGraph.hasEdgeConnecting(src, dest) && typeGraph.hasEdgeConnecting(dest, src)) {
+                    if (!src.equals(dest)) {
+                        throw new SchemaResolutionException(
+                                "Mutually recursive definition of types: %s, %s".formatted(src, dest));
+                    }
+                }
+            }
+        }
+        return schema;
+    }
 }

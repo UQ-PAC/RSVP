@@ -6,28 +6,26 @@ import uq.pac.rsvp.support.SourceLoc;
 
 public abstract class AntlrSchemaStatement extends AntlrSchemaAstNode {
 
-    private final String namespace;
-    private final String name;
+    private final AntlrTypeReference reference;
 
-    public AntlrSchemaStatement(String namespace, String name, SourceLoc location) {
+    public AntlrSchemaStatement(AntlrTypeReference reference, SourceLoc location) {
         super(location);
-        this.namespace = namespace;
-        this.name = name;
-    }
-
-    public String getBaseName() {
-        return name;
-    }
-
-    public String getNamespace() {
-        return namespace;
+        this.reference = reference;
     }
 
     public AntlrTypeReference getReference() {
-        return new AntlrTypeReference(namespace, name);
+        return reference;
     }
 
     public String getName() {
-        return namespace.isEmpty() ? name : namespace + "::" + name;
+        return reference.getName();
+    }
+
+    public String getNamespace() {
+        return reference.getNamespace();
+    }
+
+    public String getBaseName() {
+        return reference.getBaseName();
     }
 }

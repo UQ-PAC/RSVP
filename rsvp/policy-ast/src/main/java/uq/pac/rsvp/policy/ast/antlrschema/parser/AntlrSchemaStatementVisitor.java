@@ -15,6 +15,9 @@ import java.util.stream.Collectors;
 import static uq.pac.rsvp.Assertion.require;
 import static uq.pac.rsvp.policy.ast.antlrschema.parser.AntlrSchemaTypeVisitor.unquote;
 
+/**
+ * A top-level visitor generating schema statements from the parser
+ */
 class AntlrSchemaStatementVisitor extends AntlrSourceVisitor<AntlrSchemaStatement> {
 
     private final AntlrSchemaTypeVisitor types;
@@ -30,12 +33,13 @@ class AntlrSchemaStatementVisitor extends AntlrSourceVisitor<AntlrSchemaStatemen
     public AntlrSchemaStatement visitEntity(CedarschemaParser.EntityContext ctx) {
         require(ctx.entityNames().ID().size() == 1);
         String name = ctx.entityNames().ID(0).getText();
+        AntlrTypeReference ref = new AntlrTypeReference(namespace, name);
 
         if (ctx.strings() != null) {
             Set<String> names = ctx.strings().STRING().stream()
                     .map(s -> unquote(s.getText()))
                     .collect(Collectors.toSet());
-            return new AntlrEnumEntityType(namespace, name, Collections.emptySet(), names, location(ctx));
+            return new AntlrEnumEntityType(ref, Collections.emptySet(), names, location(ctx));
         } else {
             AntlrRecordType shape = new AntlrRecordType(Collections.emptyMap(), SourceLoc.MISSING);
             if (ctx.record() != null) {
@@ -47,17 +51,18 @@ class AntlrSchemaStatementVisitor extends AntlrSourceVisitor<AntlrSchemaStatemen
                         .map(p -> (AntlrTypeReference) types.visit(p))
                         .collect(Collectors.toSet());
             }
-            return new AntlrRecordEntityType(namespace, name, refs, shape, location(ctx));
+            return new AntlrRecordEntityType(ref, refs, shape, location(ctx));
         }
     }
 
     @Override
     public AntlrSchemaStatement visitCommon(CedarschemaParser.CommonContext ctx) {
         AntlrBuiltinType definition = types.visit(ctx.type());
-        return new AntlrCommonType(namespace, ctx.typename().getText(), definition, location(ctx));
+        AntlrTypeReference reference = new AntlrTypeReference(namespace, ctx.typename().getText());
+        return new AntlrCommonType(reference, definition, location(ctx));
     }
 
-    private String getNornalisedActionName(CedarschemaParser.NameContext ctx) {
+    private String getNormalisedActionName(CedarschemaParser.NameContext ctx) {
         String actionName = ctx.getText();
         if (ctx.STRING() == null) {
             actionName = '"' + actionName + '"';
@@ -70,7 +75,8 @@ class AntlrSchemaStatementVisitor extends AntlrSourceVisitor<AntlrSchemaStatemen
         require(ctx.name().size() == 1); // FIXME
 
         // Quoted action name in the form Action::"name"
-        String actionName = getNornalisedActionName(ctx.name(0));
+        String actionName = getNormalisedActionName(ctx.name(0));
+        AntlrTypeReference actionReference = new AntlrTypeReference(namespace, actionName);
 
         // Member of references
         Set<AntlrTypeReference> references = Collections.emptySet();
@@ -81,10 +87,10 @@ class AntlrSchemaStatementVisitor extends AntlrSourceVisitor<AntlrSchemaStatemen
                         String name;
                         String namespace;
                         if (ref.name() != null) {
-                            namespace = this.namespace;
-                            name = getNornalisedActionName(ref.name());
+                            namespace = null;
+                            name = getNormalisedActionName(ref.name());
                         } else {
-                            namespace = ref.path() == null ? this.namespace : ref.path().getText();
+                            namespace = ref.path() == null ? null : ref.path().getText();
                             name = "Action::" + ref.STRING();
                         }
                         return new AntlrTypeReference(namespace, name, location(ref));
@@ -111,7 +117,6 @@ class AntlrSchemaStatementVisitor extends AntlrSourceVisitor<AntlrSchemaStatemen
         }
         AntlrActionApplication appliesToNode =
                 new AntlrActionApplication(principalTypes, resourceTypes, context);
-
-        return new AntlrAction(namespace, actionName, references, appliesToNode, location(ctx));
+        return new AntlrAction(actionReference, references, appliesToNode, location(ctx));
     }
 }

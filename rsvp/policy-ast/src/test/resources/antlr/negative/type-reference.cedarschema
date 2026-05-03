@@ -1,0 +1,82 @@
+// Checking resolution of references within the 'attr' clauses of actions
+
+// ### B
+// EXPECTED: Invalid type reference: A
+type B = { attr: A };
+
+// EXPECTED: Invalid type reference: A
+action A;
+type B = { attr: A };
+
+// ### A, B
+// EXPECTED: success
+type A = String;
+type B = { attr: A };
+
+// EXPECTED: Invalid type reference: Foo::A
+type A = String;
+type B = { attr: Foo::A };
+
+// ### Foo::A, B
+// EXPECTED: Invalid type reference: A
+namespace Foo {
+    type A = String;
+}
+type B = { attr: A };
+
+// EXPECTED: Success
+namespace Foo {
+    type A = String;
+}
+type B = { attr: Foo::A };
+
+// ### A, Foo::B
+// EXPECTED: success
+type A = String;
+namespace Foo {
+    type B = { attr: A };
+}
+
+// EXPECTED: Invalid type reference: Foo::A
+type A = String;
+namespace Foo {
+    type B = { attr: Foo::A };
+}
+
+// ### Foo::A, Bar::B
+// EXPECTED: Invalid type reference: A
+namespace Foo {
+    type A = String;
+}
+namespace Bar {
+    type B = { attr: A };
+}
+
+// EXPECTED: Invalid type reference: Bar::A
+namespace Foo {
+    type A = String;
+}
+namespace Bar {
+    entity B { attr : Bar::A };
+}
+
+// EXPECTED: success
+namespace Foo {
+    type A = String;
+}
+namespace Bar {
+    type B = { attr: Foo::A };
+}
+
+// ### Foo::A, Foo::B
+// EXPECTED: Success
+namespace Foo {
+    type A = String;
+    type B = { attr: A };
+}
+
+// EXPECTED: Success
+namespace Foo {
+    type A = String;
+    type B = { attr: Foo::A };
+}

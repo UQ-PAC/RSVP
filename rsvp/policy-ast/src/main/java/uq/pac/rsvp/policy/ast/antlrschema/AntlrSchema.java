@@ -44,6 +44,60 @@ public class AntlrSchema {
         return AntlrSchemaParser.parse(file.toString(), Files.readString(file));
     }
 
+    private <E extends AntlrSchemaStatement> Stream<E> statementStream(Class<E> target) {
+        return statements.values().stream()
+                .filter(target::isInstance)
+                .map(target::cast);
+    }
+
+    public Stream<AntlrEntityType> entityTypes() {
+        return statementStream(AntlrEntityType.class);
+    }
+
+    public Stream<AntlrEnumEntityType> enumEntityTypes() {
+        return statementStream(AntlrEnumEntityType.class);
+    }
+
+    public Stream<AntlrRecordEntityType> recordEntityTypes() {
+        return statementStream(AntlrRecordEntityType.class);
+    }
+
+    public Stream<AntlrAction> actions() {
+        return statementStream(AntlrAction.class);
+    }
+
+    public Stream<AntlrCommonType> types() {
+        return statementStream(AntlrCommonType.class);
+    }
+
+    private <E extends AntlrSchemaStatement> E getTypedStatement(AntlrTypeReference reference, Class<E> target) {
+        AntlrSchemaStatement stmt = statements.get(reference);
+        if (target.isInstance(stmt)) {
+            return target.cast(stmt);
+        }
+        return null;
+    }
+
+    public AntlrEntityType getEntityType(AntlrTypeReference ref) {
+        return getTypedStatement(ref, AntlrEntityType.class);
+    }
+
+    public AntlrRecordEntityType getRecordEntityType(AntlrTypeReference ref) {
+        return getTypedStatement(ref, AntlrRecordEntityType.class);
+    }
+
+    public AntlrEnumEntityType getEnumEntityType(AntlrTypeReference ref) {
+        return getTypedStatement(ref, AntlrEnumEntityType.class);
+    }
+
+    public AntlrCommonType getCommonType(AntlrTypeReference ref) {
+        return getTypedStatement(ref, AntlrCommonType.class);
+    }
+
+    public AntlrAction getAction(AntlrTypeReference ref) {
+        return getTypedStatement(ref, AntlrAction.class);
+    }
+
     /**
      * Check whether a reference corresponds to an actual construct within a schema
      */

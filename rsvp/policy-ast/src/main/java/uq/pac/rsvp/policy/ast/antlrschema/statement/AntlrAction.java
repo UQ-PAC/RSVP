@@ -22,7 +22,7 @@ public class AntlrAction extends AntlrSchemaStatement {
     @Override
     public String toString() {
         String in = memberOf.isEmpty() ? " " : " in " + memberOf + " ";
-        return "action " + getBaseName() + in + appliesTo + ";";
+        return "action " + getBaseName().replace("Action::", "") + in + appliesTo + ";";
     }
 
     public Set<AntlrTypeReference> getMemberOf() {

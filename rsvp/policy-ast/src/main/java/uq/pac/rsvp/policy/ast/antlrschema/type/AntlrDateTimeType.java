@@ -17,7 +17,7 @@ public class AntlrDateTimeType extends AntlrBuiltinType {
 
     @Override
     public String toString() {
-        return "datetime";
+        return "__cedar::datetime";
     }
 
     @Override

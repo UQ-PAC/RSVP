@@ -32,7 +32,7 @@ public class AntlrRecordType extends AntlrBuiltinType {
 
         @Override
         public String toString() {
-            return name + (required ? "" : "?");
+            return "\"" + name + "\"" + (required ? "" : "?");
         }
 
         @Override
@@ -77,9 +77,7 @@ public class AntlrRecordType extends AntlrBuiltinType {
                 sb.append("{").append("\n");
                 rec.getAttributes().forEach((a, t) -> {
                     sb.append(indent).append("    ")
-                            .append('"')
                             .append(a.toString())
-                            .append('"')
                             .append(": ")
                             .append(toString(t, indent + "    "))
                             .append(",\n");

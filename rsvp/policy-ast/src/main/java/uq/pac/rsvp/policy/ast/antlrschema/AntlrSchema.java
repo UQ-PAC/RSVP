@@ -4,12 +4,16 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.Graphs;
 import com.google.common.graph.MutableGraph;
+import uq.pac.rsvp.policy.ast.antlrschema.parser.AntlrSchemaParser;
 import uq.pac.rsvp.policy.ast.antlrschema.parser.AntlrStatementResolutionVisitor;
 import uq.pac.rsvp.policy.ast.antlrschema.statement.*;
 import uq.pac.rsvp.policy.ast.antlrschema.type.*;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVisitorAdapter;
 import uq.pac.rsvp.policy.ast.schema.SchemaResolutionException;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -30,6 +34,14 @@ public class AntlrSchema {
 
     public Stream<AntlrSchemaStatement> statements() {
         return statements.values().stream();
+    }
+
+    public static AntlrSchema parse(String file, String text) {
+        return AntlrSchemaParser.parse(file, text);
+    }
+
+    public static AntlrSchema parse(Path file) throws IOException {
+        return AntlrSchemaParser.parse(file.toString(), Files.readString(file));
     }
 
     /**

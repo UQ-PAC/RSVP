@@ -50,7 +50,8 @@ class AntlrSchemaTypeVisitor extends AntlrSourceVisitor<AntlrBuiltinType> {
         ctx.attribute().forEach(a -> {
             AntlrBuiltinType type = a.type().accept(this);
             String attrName = unquote(a.name().getText());
-            attributes.put(new AntlrRecordType.Attribute(attrName), type);
+            boolean required = a.OPTIONAL() == null;
+            attributes.put(new AntlrRecordType.Attribute(attrName, required), type);
         });
         return new AntlrRecordType(attributes, location(ctx));
     }

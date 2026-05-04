@@ -3,6 +3,9 @@ package uq.pac.rsvp.policy.ast.antlrschema.statement;
 import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrRecordType;
 import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrTypeReference;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static uq.pac.rsvp.Assertion.require;
@@ -13,9 +16,9 @@ public class AntlrActionApplication {
     private final Set<AntlrTypeReference> resourceTypes;
     private final AntlrRecordType context;
 
-    public AntlrActionApplication(Set<AntlrTypeReference> principal, Set<AntlrTypeReference> resource, AntlrRecordType context) {
-        this.principalTypes = Set.copyOf(principal);
-        this.resourceTypes = Set.copyOf(resource);
+    public AntlrActionApplication(Collection<AntlrTypeReference> principal, Collection<AntlrTypeReference> resource, AntlrRecordType context) {
+        this.principalTypes = Collections.unmodifiableSet(new LinkedHashSet<>(principal));
+        this.resourceTypes = Collections.unmodifiableSet(new LinkedHashSet<>(resource));
         this.context = context;
 
         // If principal types are omitted, so are context and resources

@@ -17,7 +17,7 @@ public class AntlrBooleanType extends AntlrBuiltinType {
 
     @Override
     public String toString() {
-        return "Bool";
+        return "__cedar::Bool";
     }
 
     @Override

@@ -22,7 +22,7 @@ public class AntlrLongType extends AntlrBuiltinType {
 
     @Override
     public String toString() {
-        return "Long";
+        return "__cedar::Long";
     }
 
     @Override

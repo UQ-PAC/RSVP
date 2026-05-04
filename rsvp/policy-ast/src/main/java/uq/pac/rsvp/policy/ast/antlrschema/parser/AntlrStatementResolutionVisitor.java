@@ -8,6 +8,7 @@ import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrTypeReference;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaValueVisitor;
 import uq.pac.rsvp.policy.ast.schema.SchemaResolutionException;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -66,10 +67,10 @@ public class AntlrStatementResolutionVisitor implements AntlrSchemaValueVisitor<
         AntlrTypeReference ref = validateEntityReference(entity.getReference());
         // Entity reference itself should be fully set and resolved during definition
         require(ref.equals(entity.getReference()));
-        Set<AntlrTypeReference> memberOf = entity.getMemberOf()
+        Collection<AntlrTypeReference> memberOf = entity.getMemberOf()
                 .stream()
                 .map(this::validateEntityReference)
-                .collect(Collectors.toSet());
+                .toList();
         AntlrRecordType shape = (AntlrRecordType) entity.getShape().compute(types);
         return new AntlrRecordEntityType(ref, memberOf, shape, entity.getSourceLoc());
     }
@@ -97,14 +98,14 @@ public class AntlrStatementResolutionVisitor implements AntlrSchemaValueVisitor<
 
         AntlrActionApplication appliesTo = action.getApplication();
         // Check principal and resource types
-        Set<AntlrTypeReference> principalTypes = appliesTo.getPrincipalTypes()
+        Collection<AntlrTypeReference> principalTypes = appliesTo.getPrincipalTypes()
                 .stream()
                 .map(this::validateEntityReference)
-                .collect(Collectors.toSet());
-        Set<AntlrTypeReference> resourceTypes = appliesTo.getResourceTypes()
+                .toList();
+        Collection<AntlrTypeReference> resourceTypes = appliesTo.getResourceTypes()
                 .stream()
                 .map(this::validateEntityReference)
-                .collect(Collectors.toSet());
+                .toList();
         // Check context
         AntlrRecordType context = (AntlrRecordType) appliesTo.getContext().compute(types);
         appliesTo = new AntlrActionApplication(principalTypes, resourceTypes, context);

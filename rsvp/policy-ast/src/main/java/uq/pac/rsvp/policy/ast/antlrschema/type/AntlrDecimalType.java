@@ -17,7 +17,7 @@ public class AntlrDecimalType extends AntlrBuiltinType {
 
     @Override
     public String toString() {
-        return "decimal";
+        return "__cedar::decimal";
     }
 
     @Override

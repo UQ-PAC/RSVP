@@ -17,7 +17,7 @@ public class AntlrStringType extends AntlrBuiltinType {
 
     @Override
     public String toString() {
-        return "String";
+        return "__cedar::String";
     }
 
     @Override

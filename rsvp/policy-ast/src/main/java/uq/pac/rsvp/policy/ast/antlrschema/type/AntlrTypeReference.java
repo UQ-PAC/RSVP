@@ -47,7 +47,7 @@ public class AntlrTypeReference extends AntlrBuiltinType {
         } else if (other == this) {
             return true;
         } else if (other instanceof AntlrTypeReference ref) {
-            return ref.namespace.equals(this.namespace) &&
+            return Objects.equals(ref.namespace, this.namespace) &&
                     ref.name.equals(this.name);
         }
         return false;

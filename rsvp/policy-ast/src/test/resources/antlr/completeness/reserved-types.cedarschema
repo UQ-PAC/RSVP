@@ -1,0 +1,11 @@
+entity Person {
+    name: __cedar::String,
+    age: __cedar::Long,
+    worth: __cedar::decimal,
+    bedtime: __cedar::datetime,
+    address: __cedar::ipaddr,
+};
+entity Sleep {
+    duration: __cedar::duration,
+    deep: __cedar::Bool,
+};

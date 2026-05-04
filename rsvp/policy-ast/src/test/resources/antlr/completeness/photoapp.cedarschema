@@ -10,7 +10,8 @@ entity Account = {
 
 entity Album = {
     owner: Account,
-    visibility: Visibility
+    visibility: Visibility,
+    year?: Long
 };
 
 entity Photo = {

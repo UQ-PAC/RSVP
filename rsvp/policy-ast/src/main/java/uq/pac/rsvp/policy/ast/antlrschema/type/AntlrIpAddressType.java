@@ -18,7 +18,7 @@ public class AntlrIpAddressType extends AntlrBuiltinType {
 
     @Override
     public String toString() {
-        return "ipaddr";
+        return "__cedar::ipaddr";
     }
 
     @Override

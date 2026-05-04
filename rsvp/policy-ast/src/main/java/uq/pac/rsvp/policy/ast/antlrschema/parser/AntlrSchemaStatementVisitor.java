@@ -8,6 +8,7 @@ import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrTypeReference;
 import uq.pac.rsvp.support.FileSource;
 import uq.pac.rsvp.support.SourceLoc;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,9 +37,9 @@ class AntlrSchemaStatementVisitor extends AntlrSourceVisitor<AntlrSchemaStatemen
         AntlrTypeReference ref = new AntlrTypeReference(namespace, name);
 
         if (ctx.strings() != null) {
-            Set<String> names = ctx.strings().STRING().stream()
+            Collection<String> names = ctx.strings().STRING().stream()
                     .map(s -> unquote(s.getText()))
-                    .collect(Collectors.toSet());
+                    .toList();
             return new AntlrEnumEntityType(ref, Collections.emptySet(), names, location(ctx));
         } else {
             AntlrRecordType shape = new AntlrRecordType(Collections.emptyMap(), SourceLoc.MISSING);
@@ -97,19 +98,19 @@ class AntlrSchemaStatementVisitor extends AntlrSourceVisitor<AntlrSchemaStatemen
                     }).collect(Collectors.toUnmodifiableSet());
         }
 
-        Set<AntlrTypeReference> principalTypes = Collections.emptySet();
-        Set<AntlrTypeReference> resourceTypes = Collections.emptySet();
+        Collection<AntlrTypeReference> principalTypes = Collections.emptySet();
+        Collection<AntlrTypeReference> resourceTypes = Collections.emptySet();
         AntlrRecordType context = new AntlrRecordType(Collections.emptyMap(), SourceLoc.MISSING);
 
         CedarschemaParser.AppliesToContext appliesTo = ctx.appliesTo();
 
         if (appliesTo != null) {
             principalTypes = appliesTo.paths(0).path().stream()
-                        .map(p -> (AntlrTypeReference) types.visit(p))
-                        .collect(Collectors.toSet());
+                    .map(p -> (AntlrTypeReference) types.visit(p))
+                    .toList();
             resourceTypes = appliesTo.paths(1).path().stream()
                     .map(p -> (AntlrTypeReference) types.visit(p))
-                    .collect(Collectors.toSet());
+                    .toList();
 
             if (appliesTo.record() != null) {
                 context = (AntlrRecordType) types.visit(appliesTo.record());

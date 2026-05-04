@@ -1,0 +1,10 @@
+namespace DataCollectionApp {
+    entity User {
+        nicknames: Set<String>,
+        preferences: {
+            diet: String,
+            colour: Colour,
+        },
+    };
+    entity Colour enum ["red", "green", "blue", "purple", "pink", "yellow"];
+}

@@ -6,15 +6,18 @@ import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaValueVisitor;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class AntlrEnumEntityType extends AntlrEntityType {
     private final Set<String> names;
 
-    public AntlrEnumEntityType(AntlrTypeReference ref, Set<AntlrTypeReference> memberOf, Set<String> names, SourceLoc location) {
+    public AntlrEnumEntityType(AntlrTypeReference ref, Set<AntlrTypeReference> memberOf, Collection<String> names, SourceLoc location) {
         super(ref, location);
-        this.names = Set.copyOf(names);
+        this.names = Collections.unmodifiableSet(new LinkedHashSet<>(names));
     }
 
     public Set<String> getEnumNames() {

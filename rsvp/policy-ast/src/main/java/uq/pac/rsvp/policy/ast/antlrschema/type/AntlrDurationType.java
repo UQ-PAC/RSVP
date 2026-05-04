@@ -22,7 +22,7 @@ public class AntlrDurationType extends AntlrBuiltinType {
 
     @Override
     public String toString() {
-        return "duration";
+        return "__cedar::duration";
     }
 
     @Override

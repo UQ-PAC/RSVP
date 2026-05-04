@@ -4,7 +4,7 @@ import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrTypeReference;
 import uq.pac.rsvp.support.SourceLoc;
 
 public abstract class AntlrEntityType extends AntlrSchemaStatement {
-    public AntlrEntityType(AntlrTypeReference ref, SourceLoc location) {
-        super(ref, location);
+    public AntlrEntityType(AntlrTypeReference ref, AntlrAnnotations annotations, SourceLoc location) {
+        super(ref, annotations, location);
     }
 }

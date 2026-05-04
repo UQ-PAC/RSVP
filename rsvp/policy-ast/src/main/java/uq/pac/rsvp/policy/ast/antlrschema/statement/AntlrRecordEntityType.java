@@ -17,8 +17,8 @@ public class AntlrRecordEntityType extends AntlrEntityType {
     private final AntlrRecordType shape;
     private final Set<AntlrTypeReference> memberOf;
 
-    public AntlrRecordEntityType(AntlrTypeReference ref, Collection<AntlrTypeReference> memberOf, AntlrRecordType shape, SourceLoc location) {
-        super(ref, location);
+    public AntlrRecordEntityType(AntlrTypeReference ref, Collection<AntlrTypeReference> memberOf, AntlrRecordType shape, AntlrAnnotations annotations, SourceLoc location) {
+        super(ref, annotations, location);
         this.shape = shape;
         this.memberOf = Collections.unmodifiableSet(new LinkedHashSet<>(memberOf));
     }
@@ -62,6 +62,6 @@ public class AntlrRecordEntityType extends AntlrEntityType {
                 .append(shape)
                 .append(";");
 
-        return sb.toString();
+        return getAnnotations().toString() + sb.toString();
     }
 }

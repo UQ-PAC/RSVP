@@ -7,10 +7,12 @@ import uq.pac.rsvp.support.SourceLoc;
 public abstract class AntlrSchemaStatement extends AntlrSchemaAstNode {
 
     private final AntlrTypeReference reference;
+    private final AntlrAnnotations annotations;
 
-    public AntlrSchemaStatement(AntlrTypeReference reference, SourceLoc location) {
+    public AntlrSchemaStatement(AntlrTypeReference reference, AntlrAnnotations annotations, SourceLoc location) {
         super(location);
         this.reference = reference;
+        this.annotations = annotations;
     }
 
     public AntlrTypeReference getReference() {
@@ -27,5 +29,9 @@ public abstract class AntlrSchemaStatement extends AntlrSchemaAstNode {
 
     public String getBaseName() {
         return reference.getBaseName();
+    }
+
+    public AntlrAnnotations getAnnotations() {
+        return annotations;
     }
 }

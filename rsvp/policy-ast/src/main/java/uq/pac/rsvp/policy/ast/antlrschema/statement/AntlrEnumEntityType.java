@@ -15,8 +15,9 @@ import java.util.stream.Collectors;
 public class AntlrEnumEntityType extends AntlrEntityType {
     private final Set<String> names;
 
-    public AntlrEnumEntityType(AntlrTypeReference ref, Set<AntlrTypeReference> memberOf, Collection<String> names, SourceLoc location) {
-        super(ref, location);
+    public AntlrEnumEntityType(AntlrTypeReference ref, Set<AntlrTypeReference> memberOf,
+                               Collection<String> names, AntlrAnnotations annotations, SourceLoc location) {
+        super(ref, annotations, location);
         this.names = Collections.unmodifiableSet(new LinkedHashSet<>(names));
     }
 
@@ -44,6 +45,6 @@ public class AntlrEnumEntityType extends AntlrEntityType {
         String values = names.stream()
                 .map(n -> '"' + n + '"')
                 .collect(Collectors.joining(", "));
-        return "entity %s enum [ %s ];".formatted(getBaseName(), values);
+        return getAnnotations().toString() + "entity %s enum [ %s ];".formatted(getBaseName(), values);
     }
 }

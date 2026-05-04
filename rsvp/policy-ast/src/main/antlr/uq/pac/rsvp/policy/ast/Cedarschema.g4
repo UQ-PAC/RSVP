@@ -95,12 +95,11 @@ actionRefs: actionRef | '[' actionRef (',' actionRef)* ']';
 
 entityNames: ID (',' ID)*;
 entity:
-    ENTITY entityNames ('in' paths)? ('='? record)? ';'
-    | ENTITY entityNames ENUM '[' strings ']' ';'
+    annotation* ENTITY entityNames (('in' paths)? ('='? record)? | ENUM '[' strings ']') ';'
 ;
 
 action:
-    ACTION name (',' name)? (IN actionRefs)? appliesTo? ';'
+    annotation* ACTION name (',' name)? (IN actionRefs)? appliesTo? ';'
 ;
 
 appliesTo: APPLIES '{'
@@ -111,12 +110,12 @@ appliesTo: APPLIES '{'
 
 typename: ID;
 common:
-    TYPE typename '=' type ';'
+    annotation* TYPE typename '=' type ';'
 ;
 
 annotation: '@' ident ('(' STRING ')')?;
 
-statement: annotation* (entity | action | common);
+statement: entity | action | common;
 
 namespace:
     annotation* NAMESPACE path '{' statement* '}';

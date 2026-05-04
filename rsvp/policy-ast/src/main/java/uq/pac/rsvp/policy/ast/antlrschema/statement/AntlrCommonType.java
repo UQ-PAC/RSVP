@@ -11,8 +11,8 @@ public class AntlrCommonType extends AntlrSchemaStatement {
 
     private final AntlrBuiltinType definition;
 
-    public AntlrCommonType(AntlrTypeReference ref, AntlrBuiltinType definition, SourceLoc location) {
-        super(ref, location);
+    public AntlrCommonType(AntlrTypeReference ref, AntlrBuiltinType definition, AntlrAnnotations annotations, SourceLoc location) {
+        super(ref, annotations, location);
         this.definition = definition;
     }
 
@@ -22,7 +22,7 @@ public class AntlrCommonType extends AntlrSchemaStatement {
 
     @Override
     public String toString() {
-        return "type " + getBaseName() + " = " + definition + ";";
+        return getAnnotations().toString() + "type " + getBaseName() + " = " + definition + ";";
     }
 
     @Override

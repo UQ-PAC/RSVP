@@ -25,7 +25,6 @@ import java.util.stream.Stream;
 import static com.cedarpolicy.model.schema.Schema.JsonOrCedar.Json;
 import static org.junit.jupiter.api.Assertions.*;
 
-
 public class AntlrSchemaTest {
 
     private final static StdLogger LOGGER = new StdLogger();

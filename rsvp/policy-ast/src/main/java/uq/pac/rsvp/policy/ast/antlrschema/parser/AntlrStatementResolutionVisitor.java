@@ -72,7 +72,7 @@ public class AntlrStatementResolutionVisitor implements AntlrSchemaValueVisitor<
                 .map(this::validateEntityReference)
                 .toList();
         AntlrRecordType shape = (AntlrRecordType) entity.getShape().compute(types);
-        return new AntlrRecordEntityType(ref, memberOf, shape, entity.getSourceLoc());
+        return new AntlrRecordEntityType(ref, memberOf, shape, entity.getAnnotations(), entity.getSourceLoc());
     }
 
     @Override
@@ -110,13 +110,13 @@ public class AntlrStatementResolutionVisitor implements AntlrSchemaValueVisitor<
         AntlrRecordType context = (AntlrRecordType) appliesTo.getContext().compute(types);
         appliesTo = new AntlrActionApplication(principalTypes, resourceTypes, context);
         // rebuild action
-        return new AntlrAction(ref, memberOf, appliesTo, action.getSourceLoc());
+        return new AntlrAction(ref, memberOf, appliesTo, action.getAnnotations(), action.getSourceLoc());
     }
 
     @Override
     public AntlrSchemaStatement visitCommon(AntlrCommonType type) {
         validateNamespace(type);
         AntlrBuiltinType definition = type.getDefinition().compute(types);
-        return new AntlrCommonType(type.getReference(), definition, type.getSourceLoc());
+        return new AntlrCommonType(type.getReference(), definition, type.getAnnotations(), type.getSourceLoc());
     }
 }

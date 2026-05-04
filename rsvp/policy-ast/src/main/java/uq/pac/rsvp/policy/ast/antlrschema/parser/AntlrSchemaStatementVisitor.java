@@ -10,6 +10,7 @@ import uq.pac.rsvp.support.SourceLoc;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,17 +31,31 @@ class AntlrSchemaStatementVisitor extends AntlrSourceVisitor<AntlrSchemaStatemen
         this.types = new AntlrSchemaTypeVisitor(fs, namespace);
     }
 
+    private static AntlrAnnotations getAnnotations(List<CedarschemaParser.AnnotationContext> ctx) {
+        AntlrAnnotations.Builder builder = new AntlrAnnotations.Builder();
+        if (ctx != null) {
+            ctx.forEach(a -> {
+                String value = a.STRING() == null ? "" : unquote(a.STRING().getText());
+                String key = a.ident().getText();
+                builder.add(key, value);
+            });
+        }
+        return builder.build();
+    }
+
     @Override
     public AntlrSchemaStatement visitEntity(CedarschemaParser.EntityContext ctx) {
         require(ctx.entityNames().ID().size() == 1);
         String name = ctx.entityNames().ID(0).getText();
         AntlrTypeReference ref = new AntlrTypeReference(namespace, name);
 
+        AntlrAnnotations annotations = getAnnotations(ctx.annotation());
+
         if (ctx.strings() != null) {
             Collection<String> names = ctx.strings().STRING().stream()
                     .map(s -> unquote(s.getText()))
                     .toList();
-            return new AntlrEnumEntityType(ref, Collections.emptySet(), names, location(ctx));
+            return new AntlrEnumEntityType(ref, Collections.emptySet(), names, annotations, location(ctx));
         } else {
             AntlrRecordType shape = new AntlrRecordType(Collections.emptyMap(), SourceLoc.MISSING);
             if (ctx.record() != null) {
@@ -52,15 +67,16 @@ class AntlrSchemaStatementVisitor extends AntlrSourceVisitor<AntlrSchemaStatemen
                         .map(p -> (AntlrTypeReference) types.visit(p))
                         .collect(Collectors.toSet());
             }
-            return new AntlrRecordEntityType(ref, refs, shape, location(ctx));
+            return new AntlrRecordEntityType(ref, refs, shape, annotations, location(ctx));
         }
     }
 
     @Override
     public AntlrSchemaStatement visitCommon(CedarschemaParser.CommonContext ctx) {
         AntlrBuiltinType definition = types.visit(ctx.type());
+        AntlrAnnotations annotations = getAnnotations(ctx.annotation());
         AntlrTypeReference reference = new AntlrTypeReference(namespace, ctx.typename().getText());
-        return new AntlrCommonType(reference, definition, location(ctx));
+        return new AntlrCommonType(reference, definition, annotations, location(ctx));
     }
 
     private String getNormalisedActionName(CedarschemaParser.NameContext ctx) {
@@ -78,6 +94,7 @@ class AntlrSchemaStatementVisitor extends AntlrSourceVisitor<AntlrSchemaStatemen
         // Quoted action name in the form Action::"name"
         String actionName = getNormalisedActionName(ctx.name(0));
         AntlrTypeReference actionReference = new AntlrTypeReference(namespace, actionName);
+        AntlrAnnotations annotations = getAnnotations(ctx.annotation());
 
         // Member of references
         Set<AntlrTypeReference> references = Collections.emptySet();
@@ -118,6 +135,6 @@ class AntlrSchemaStatementVisitor extends AntlrSourceVisitor<AntlrSchemaStatemen
         }
         AntlrActionApplication appliesToNode =
                 new AntlrActionApplication(principalTypes, resourceTypes, context);
-        return new AntlrAction(actionReference, references, appliesToNode, location(ctx));
+        return new AntlrAction(actionReference, references, appliesToNode, annotations, location(ctx));
     }
 }

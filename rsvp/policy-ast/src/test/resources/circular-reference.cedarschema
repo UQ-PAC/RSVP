@@ -1,5 +1,0 @@
-namespace App {
-    entity Account = {
-        friend: Account
-    };
-}

@@ -10,10 +10,11 @@ import org.junit.jupiter.params.provider.ValueSource;
 import uq.pac.rsvp.policy.ast.CedarschemaBaseVisitor;
 import uq.pac.rsvp.policy.ast.CedarschemaLexer;
 import uq.pac.rsvp.policy.ast.CedarschemaParser;
+import uq.pac.rsvp.policy.ast.antlrschema.parser.AntlrSchemaParser;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class SchemaParseTest {
+public class AntlrSchemaParseTest {
 
     /**
      * Basic testing for Cedarschema grammar of cedar schemas
@@ -277,7 +278,7 @@ public class SchemaParseTest {
     }
 
     static String parse(String text) {
-        SchemaParser.ThrowingErrorListener errorListener = new SchemaParser.ThrowingErrorListener();
+        AntlrSchemaParser.ThrowingErrorListener errorListener = new AntlrSchemaParser.ThrowingErrorListener();
 
         CedarschemaLexer lexer = new CedarschemaLexer(CharStreams.fromString(text));
         lexer.removeErrorListeners();

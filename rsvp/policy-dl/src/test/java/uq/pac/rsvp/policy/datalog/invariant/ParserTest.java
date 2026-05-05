@@ -4,7 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
-import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.StdLogger;
 
 import java.util.Arrays;
@@ -127,12 +126,5 @@ public class ParserTest {
         });
 
         assertEquals(EXPECTED.trim(), sb.toString().trim());
-    }
-
-    // Some components of the invariant checking rely on the fact that boolean type
-    // object are only equal if they are the same object.
-    @Test
-    void equals() {
-        assertNotEquals(new BooleanType(), new BooleanType());
     }
 }

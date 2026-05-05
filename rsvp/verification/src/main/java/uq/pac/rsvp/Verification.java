@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+import uq.pac.rsvp.policy.ast.antlrschema.AntlrSchema;
 import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.AstNode;
 import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
@@ -15,7 +16,6 @@ import uq.pac.rsvp.policy.ast.expr.RecordExpression;
 import uq.pac.rsvp.policy.ast.expr.SetExpression;
 import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
-import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitorImpl;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 import uq.pac.rsvp.policy.datalog.translation.Request;
@@ -181,7 +181,7 @@ public class Verification {
         return results;
     }
 
-    public static Set<Report> verify(Collection<Policy> policies, Schema schema) {
+    public static Set<Report> verify(Collection<Policy> policies, AntlrSchema schema) {
         RandomReportGenerator generator = new RandomReportGenerator();
         policies.forEach(p -> p.accept(generator));
         return generator.reports;

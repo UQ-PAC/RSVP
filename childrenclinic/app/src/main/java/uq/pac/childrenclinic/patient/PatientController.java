@@ -133,8 +133,7 @@ public class PatientController {
 		Pageable pageable = PageRequest.of(page - 1, 5);
 		int start = (int) pageable.getOffset();
 		int end = Math.min((start + pageable.getPageSize()), authorized.size());
-		List<Patient> pageContent = start > authorized.size() ? List.of()
-				: authorized.subList(start, end);
+		List<Patient> pageContent = start > authorized.size() ? List.of() : authorized.subList(start, end);
 		Page<Patient> paginated = new PageImpl<>(pageContent, pageable, authorized.size());
 
 		model.addAttribute("listPatients", paginated.getContent());
@@ -174,7 +173,8 @@ public class PatientController {
 
 			if (result.isGranted()) {
 				isAuthorized = true;
-			} else if (result.responseBody() != null) {
+			}
+			else if (result.responseBody() != null) {
 				denialReasons.add(result.responseBody());
 			}
 		}
@@ -185,11 +185,13 @@ public class PatientController {
 			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
 
 			if (!denialReasons.isEmpty()) {
-				// Combine all denial reasons and strip out the redundant prefix from each.
+				// Combine all denial reasons and strip out the redundant prefix from
+				// each.
 				for (String reason : denialReasons) {
 					exceptionBody.append(reason.replaceAll("(?m)^" + prefix, "")).append("\n");
 				}
-			} else {
+			}
+			else {
 				exceptionBody.append("You do not have permission to add patients to any assigned clinics.");
 			}
 
@@ -214,7 +216,8 @@ public class PatientController {
 		if (submittedClinics == null || submittedClinics.isEmpty()) {
 			isAuthorized = false;
 			denialReasons.add("You must assign the Patient to at least one valid Clinic.");
-		} else {
+		}
+		else {
 			for (Clinic clinic : submittedClinics) {
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 				var evalResult = cedarEvaluator.evaluate(principal, "AddPatient", "Clinic", cedarClinicId, "Page");
@@ -232,15 +235,17 @@ public class PatientController {
 		if (!isAuthorized) {
 			String prefix = "Access Denied.\n";
 			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
-			
+
 			if (!denialReasons.isEmpty()) {
 				for (String reason : denialReasons) {
 					exceptionBody.append(reason.replaceAll("(?m)^" + prefix, "")).append("\n");
 				}
-			} else {
-				exceptionBody.append("You do not have permission to add patients to one or more of the selected clinics.");
 			}
-			
+			else {
+				exceptionBody
+					.append("You do not have permission to add patients to one or more of the selected clinics.");
+			}
+
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
@@ -249,9 +254,9 @@ public class PatientController {
 			boolean duplicateExists = patients.findByLastNameStartingWith(patient.getLastName(), PageRequest.of(0, 50))
 				.getContent()
 				.stream()
-				.anyMatch(p -> p.getFirstName().equalsIgnoreCase(patient.getFirstName()) &&
-						  p.getBirthDate().equals(patient.getBirthDate()) &&
-						  p.getGender().equals(patient.getGender()));
+				.anyMatch(p -> p.getFirstName().equalsIgnoreCase(patient.getFirstName())
+						&& p.getBirthDate().equals(patient.getBirthDate())
+						&& p.getGender().equals(patient.getGender()));
 
 			if (duplicateExists) {
 				result.rejectValue("firstName", "duplicate", "A patient with this first and last name already exists");
@@ -303,7 +308,7 @@ public class PatientController {
 		var patientEval = cedarEvaluator.evaluate(principal, "EditPatient", "Patient", resourceName, "Page");
 
 		if (!patientEval.isGranted()) {
-			throw new CedarDeniedException("Access Denied: You do not have permission to edit this patient.\n" 
+			throw new CedarDeniedException("Access Denied: You do not have permission to edit this patient.\n"
 					+ (patientEval.responseBody() != null ? patientEval.responseBody() : ""));
 		}
 
@@ -336,11 +341,11 @@ public class PatientController {
 		if (StringUtils.hasLength(patient.getLastName()) && StringUtils.hasLength(patient.getFirstName())) {
 			boolean duplicateExists = this.patients
 				.findByLastNameStartingWith(patient.getLastName(), PageRequest.of(0, 50))
-				.getContent().stream()
-				.anyMatch(p -> p.getFirstName().equalsIgnoreCase(patient.getFirstName()) &&
-						  p.getBirthDate().equals(patient.getBirthDate()) &&
-						  p.getGender().equals(patient.getGender()) &&
-						  !Objects.equals(p.getId(), patientId));
+				.getContent()
+				.stream()
+				.anyMatch(p -> p.getFirstName().equalsIgnoreCase(patient.getFirstName())
+						&& p.getBirthDate().equals(patient.getBirthDate()) && p.getGender().equals(patient.getGender())
+						&& !Objects.equals(p.getId(), patientId));
 
 			if (duplicateExists) {
 				result.rejectValue("firstName", "duplicate", "A patient with this first and last name already exists.");
@@ -357,8 +362,9 @@ public class PatientController {
 		for (Clinic existingClinic : existingPatient.getClinics()) {
 			String cedarClinicId = existingClinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 			var viewEval = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Background");
-			
-			// If the user did NOT have permission to view this clinic, it means it wasn't in the form. 
+
+			// If the user did NOT have permission to view this clinic, it means it wasn't
+			// in the form.
 			// We must re-add it to the final payload to prevent it from being deleted.
 			if (!viewEval.isGranted()) {
 				finalClinics.add(existingClinic);

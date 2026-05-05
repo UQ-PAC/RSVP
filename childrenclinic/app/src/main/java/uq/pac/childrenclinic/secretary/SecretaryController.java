@@ -53,7 +53,8 @@ public class SecretaryController {
 
 	private final CedarProgrammaticEvaluator cedarEvaluator;
 
-	public SecretaryController(SecretaryRepository secretaries, GenderRepository genders, ClinicRepository clinics, CedarProgrammaticEvaluator cedarEvaluator) {
+	public SecretaryController(SecretaryRepository secretaries, GenderRepository genders, ClinicRepository clinics,
+			CedarProgrammaticEvaluator cedarEvaluator) {
 		this.secretaries = secretaries;
 		this.genders = genders;
 		this.clinics = clinics;
@@ -123,8 +124,7 @@ public class SecretaryController {
 		Pageable pageable = PageRequest.of(page - 1, 5);
 		int start = (int) pageable.getOffset();
 		int end = Math.min((start + pageable.getPageSize()), authorized.size());
-		List<Secretary> pageContent = start > authorized.size() ? List.of()
-				: authorized.subList(start, end);
+		List<Secretary> pageContent = start > authorized.size() ? List.of() : authorized.subList(start, end);
 		Page<Secretary> paginated = new PageImpl<>(pageContent, pageable, authorized.size());
 
 		model.addAttribute("listSecretaries", paginated.getContent());
@@ -164,7 +164,8 @@ public class SecretaryController {
 
 			if (result.isGranted()) {
 				isAuthorized = true;
-			} else if (result.responseBody() != null) {
+			}
+			else if (result.responseBody() != null) {
 				denialReasons.add(result.responseBody());
 			}
 		}
@@ -175,11 +176,13 @@ public class SecretaryController {
 			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
 
 			if (!denialReasons.isEmpty()) {
-				// Combine all denial reasons and strip out the redundant prefix from each.
+				// Combine all denial reasons and strip out the redundant prefix from
+				// each.
 				for (String reason : denialReasons) {
 					exceptionBody.append(reason.replaceAll("(?m)^" + prefix, "")).append("\n");
 				}
-			} else {
+			}
+			else {
 				exceptionBody.append("You do not have permission to add secretaries to any assigned clinics.");
 			}
 
@@ -204,7 +207,8 @@ public class SecretaryController {
 		if (submittedClinics == null || submittedClinics.isEmpty()) {
 			isAuthorized = false;
 			denialReasons.add("You must assign the Secretary to at least one valid Clinic.");
-		} else {
+		}
+		else {
 			for (Clinic clinic : submittedClinics) {
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 				var evalResult = cedarEvaluator.evaluate(principal, "AddEmployee", "Clinic", cedarClinicId, "Page");
@@ -222,15 +226,17 @@ public class SecretaryController {
 		if (!isAuthorized) {
 			String prefix = "Access Denied.\n";
 			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
-			
+
 			if (!denialReasons.isEmpty()) {
 				for (String reason : denialReasons) {
 					exceptionBody.append(reason.replaceAll("(?m)^" + prefix, "")).append("\n");
 				}
-			} else {
-				exceptionBody.append("You do not have permission to add secretaries to one or more of the selected clinics.");
 			}
-			
+			else {
+				exceptionBody
+					.append("You do not have permission to add secretaries to one or more of the selected clinics.");
+			}
+
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
@@ -240,9 +246,9 @@ public class SecretaryController {
 				.findByLastNameStartingWith(secretary.getLastName(), PageRequest.of(0, 50))
 				.getContent()
 				.stream()
-				.anyMatch(s -> s.getFirstName().equalsIgnoreCase(secretary.getFirstName()) &&
-						  s.getBirthDate().equals(secretary.getBirthDate()) &&
-						  s.getGender().equals(secretary.getGender()));
+				.anyMatch(s -> s.getFirstName().equalsIgnoreCase(secretary.getFirstName())
+						&& s.getBirthDate().equals(secretary.getBirthDate())
+						&& s.getGender().equals(secretary.getGender()));
 
 			if (duplicateExists) {
 				result.rejectValue("firstName", "duplicate",
@@ -280,7 +286,7 @@ public class SecretaryController {
 		var secretaryEval = cedarEvaluator.evaluate(principal, "EditSecretary", "Secretary", resourceName, "Page");
 
 		if (!secretaryEval.isGranted()) {
-			throw new CedarDeniedException("Access Denied: You do not have permission to edit this secretary.\n" 
+			throw new CedarDeniedException("Access Denied: You do not have permission to edit this secretary.\n"
 					+ (secretaryEval.responseBody() != null ? secretaryEval.responseBody() : ""));
 		}
 
@@ -315,10 +321,9 @@ public class SecretaryController {
 				.findByLastNameStartingWith(secretary.getLastName(), PageRequest.of(0, 50))
 				.getContent()
 				.stream()
-				.anyMatch(s -> s.getFirstName().equalsIgnoreCase(secretary.getFirstName()) &&
-						  s.getBirthDate().equals(secretary.getBirthDate()) &&
-						  s.getGender().equals(secretary.getGender()) &&
-						  !Objects.equals(s.getId(), secretaryId));
+				.anyMatch(s -> s.getFirstName().equalsIgnoreCase(secretary.getFirstName())
+						&& s.getBirthDate().equals(secretary.getBirthDate())
+						&& s.getGender().equals(secretary.getGender()) && !Objects.equals(s.getId(), secretaryId));
 
 			if (duplicateExists) {
 				result.rejectValue("firstName", "duplicate",
@@ -336,8 +341,9 @@ public class SecretaryController {
 		for (Clinic existingClinic : existingSecretary.getClinics()) {
 			String cedarClinicId = existingClinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 			var viewEval = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Background");
-			
-			// If the user did NOT have permission to view this clinic, it means it wasn't in the form. 
+
+			// If the user did NOT have permission to view this clinic, it means it wasn't
+			// in the form.
 			// We must re-add it to the final payload to prevent it from being deleted.
 			if (!viewEval.isGranted()) {
 				finalClinics.add(existingClinic);

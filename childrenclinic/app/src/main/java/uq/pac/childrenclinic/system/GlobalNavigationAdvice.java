@@ -40,20 +40,23 @@ public class GlobalNavigationAdvice {
 
 		if (principalId.equals("Guest")) {
 			return EntityUID.parse("ChildrenClinic::Guest::\"Unknown\"")
-					.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
-		} else {
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
+		}
+		else {
 			return EntityUID.parse("ChildrenClinic::Employee::\"" + principalId + "\"")
-					.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 	}
 
 	private boolean isAuthorized(EntityUID principal, String actionStr) {
 		EntityUID action = EntityUID.parse("ChildrenClinic::Action::\"" + actionStr + "\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
+			.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
 		EntityUID resource = EntityUID.parse("ChildrenClinic::Clinic::\"Any\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
+			.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
 
-		String access = cedarService.checkAccess(new CedarRequest(principal, action, resource, new HashMap<>(), true)).getBody();
+		String access = cedarService.checkAccess(new CedarRequest(principal, action, resource, new HashMap<>(), true))
+			.getBody();
 		return access != null && access.startsWith("Access Granted.");
 	}
+
 }

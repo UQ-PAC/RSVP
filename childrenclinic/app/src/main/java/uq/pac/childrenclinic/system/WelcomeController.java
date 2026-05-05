@@ -45,7 +45,8 @@ class WelcomeController {
 
 	private final CedarProgrammaticEvaluator cedarEvaluator;
 
-	public WelcomeController(DoctorRepository doctors, ClinicRepository clinics, CedarProgrammaticEvaluator cedarEvaluator) {
+	public WelcomeController(DoctorRepository doctors, ClinicRepository clinics,
+			CedarProgrammaticEvaluator cedarEvaluator) {
 		this.doctors = doctors;
 		this.clinics = clinics;
 		this.cedarEvaluator = cedarEvaluator;

@@ -53,7 +53,8 @@ public class AdultController {
 
 	private final CedarProgrammaticEvaluator cedarEvaluator;
 
-	public AdultController(AdultRepository adults, GenderRepository genders, ClinicRepository clinics, CedarProgrammaticEvaluator cedarEvaluator) {
+	public AdultController(AdultRepository adults, GenderRepository genders, ClinicRepository clinics,
+			CedarProgrammaticEvaluator cedarEvaluator) {
 		this.adults = adults;
 		this.genders = genders;
 		this.clinics = clinics;
@@ -165,7 +166,8 @@ public class AdultController {
 
 			if (result.isGranted()) {
 				isAuthorized = true;
-			} else if (result.responseBody() != null) {
+			}
+			else if (result.responseBody() != null) {
 				denialReasons.add(result.responseBody());
 			}
 		}
@@ -176,24 +178,26 @@ public class AdultController {
 			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
 
 			if (!denialReasons.isEmpty()) {
-				// Combine all denial reasons and strip out the redundant prefix from each.
+				// Combine all denial reasons and strip out the redundant prefix from
+				// each.
 				for (String reason : denialReasons) {
 					exceptionBody.append(reason.replaceAll("(?m)^" + prefix, "")).append("\n");
 				}
-			} else {
+			}
+			else {
 				exceptionBody.append("You do not have permission to add adults to any assigned clinics.");
 			}
 
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
-
 		model.addAttribute("adult", new Adult());
 		return VIEWS_ADULT_CREATE_OR_UPDATE_FORM;
 	}
 
 	@PostMapping("/adults/new")
-	public String processCreationForm(@Valid Adult adult, BindingResult result, RedirectAttributes redirectAttributes, HttpSession session) {
+	public String processCreationForm(@Valid Adult adult, BindingResult result, RedirectAttributes redirectAttributes,
+			HttpSession session) {
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
 		// Evaluate Cedar for all the submitted Clinics.
@@ -205,7 +209,8 @@ public class AdultController {
 		if (submittedClinics == null || submittedClinics.isEmpty()) {
 			isAuthorized = false;
 			denialReasons.add("You must assign the Adult to at least one valid Clinic.");
-		} else {
+		}
+		else {
 			for (Clinic clinic : submittedClinics) {
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 				var evalResult = cedarEvaluator.evaluate(principal, "AddAdult", "Clinic", cedarClinicId, "Page");
@@ -223,15 +228,17 @@ public class AdultController {
 		if (!isAuthorized) {
 			String prefix = "Access Denied.\n";
 			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
-			
+
 			if (!denialReasons.isEmpty()) {
 				for (String reason : denialReasons) {
 					exceptionBody.append(reason.replaceAll("(?m)^" + prefix, "")).append("\n");
 				}
-			} else {
-				exceptionBody.append("You do not have permission to add adults to one or more of the selected clinics.");
 			}
-			
+			else {
+				exceptionBody
+					.append("You do not have permission to add adults to one or more of the selected clinics.");
+			}
+
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
@@ -240,16 +247,16 @@ public class AdultController {
 			boolean duplicateExists = adults.findByLastNameStartingWith(adult.getLastName(), PageRequest.of(0, 50))
 				.getContent()
 				.stream()
-				.anyMatch(a -> a.getFirstName().equalsIgnoreCase(adult.getFirstName()) &&
-						  a.getBirthDate().equals(adult.getBirthDate()) &&
-						  a.getGender().equals(adult.getGender()));
+				.anyMatch(a -> a.getFirstName().equalsIgnoreCase(adult.getFirstName())
+						&& a.getBirthDate().equals(adult.getBirthDate()) && a.getGender().equals(adult.getGender()));
 
 			if (duplicateExists) {
-				result.rejectValue("firstName", "duplicate", "An adult with this first and last name, birth date, and gender already exists.");
+				result.rejectValue("firstName", "duplicate",
+						"An adult with this first and last name, birth date, and gender already exists.");
 			}
 		}
 
-		if (result.hasErrors()){
+		if (result.hasErrors()) {
 			return VIEWS_ADULT_CREATE_OR_UPDATE_FORM;
 		}
 
@@ -285,7 +292,7 @@ public class AdultController {
 		var adultEval = cedarEvaluator.evaluate(principal, "EditAdult", "Adult", resourceName, "Page");
 
 		if (!adultEval.isGranted()) {
-			throw new CedarDeniedException("Access Denied: You do not have permission to edit this adult.\n" 
+			throw new CedarDeniedException("Access Denied: You do not have permission to edit this adult.\n"
 					+ (adultEval.responseBody() != null ? adultEval.responseBody() : ""));
 		}
 
@@ -319,13 +326,13 @@ public class AdultController {
 			boolean duplicateExists = this.adults.findByLastNameStartingWith(adult.getLastName(), PageRequest.of(0, 50))
 				.getContent()
 				.stream()
-				.anyMatch(a -> a.getFirstName().equalsIgnoreCase(adult.getFirstName()) &&
-						  a.getBirthDate().equals(adult.getBirthDate()) &&
-						  a.getGender().equals(adult.getGender()) &&
-						  !Objects.equals(a.getId(), adultId));
+				.anyMatch(a -> a.getFirstName().equalsIgnoreCase(adult.getFirstName())
+						&& a.getBirthDate().equals(adult.getBirthDate()) && a.getGender().equals(adult.getGender())
+						&& !Objects.equals(a.getId(), adultId));
 
 			if (duplicateExists) {
-				result.rejectValue("firstName", "duplicate", "An adult with this first and last name, birth date, and gender already exists.");
+				result.rejectValue("firstName", "duplicate",
+						"An adult with this first and last name, birth date, and gender already exists.");
 			}
 		}
 
@@ -339,8 +346,9 @@ public class AdultController {
 		for (Clinic existingClinic : existingAdult.getClinics()) {
 			String cedarClinicId = existingClinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 			var viewEval = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Background");
-			
-			// If the user did NOT have permission to view this clinic, it means it wasn't in the form. 
+
+			// If the user did NOT have permission to view this clinic, it means it wasn't
+			// in the form.
 			// We must re-add it to the final payload to prevent it from being deleted.
 			if (!viewEval.isGranted()) {
 				finalClinics.add(existingClinic);

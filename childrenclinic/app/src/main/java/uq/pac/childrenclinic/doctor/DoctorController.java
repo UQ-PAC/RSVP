@@ -76,8 +76,8 @@ class DoctorController {
 
 	private final CedarProgrammaticEvaluator cedarEvaluator;
 
-	public DoctorController(DoctorRepository doctors, GenderRepository genders, SpecialtyRepository specialties, ClinicRepository clinics,
-			CedarProgrammaticEvaluator cedarEvaluator) {
+	public DoctorController(DoctorRepository doctors, GenderRepository genders, SpecialtyRepository specialties,
+			ClinicRepository clinics, CedarProgrammaticEvaluator cedarEvaluator) {
 		this.doctors = doctors;
 		this.genders = genders;
 		this.specialties = specialties;
@@ -152,8 +152,7 @@ class DoctorController {
 		Pageable pageable = PageRequest.of(page - 1, 5);
 		int start = (int) pageable.getOffset();
 		int end = Math.min((start + pageable.getPageSize()), authorized.size());
-		List<Doctor> pageContent = start > authorized.size() ? List.of()
-				: authorized.subList(start, end);
+		List<Doctor> pageContent = start > authorized.size() ? List.of() : authorized.subList(start, end);
 		Page<Doctor> paginated = new PageImpl<>(pageContent, pageable, authorized.size());
 
 		model.addAttribute("listDoctors", paginated.getContent());
@@ -193,7 +192,8 @@ class DoctorController {
 
 			if (result.isGranted()) {
 				isAuthorized = true;
-			} else if (result.responseBody() != null) {
+			}
+			else if (result.responseBody() != null) {
 				denialReasons.add(result.responseBody());
 			}
 		}
@@ -204,11 +204,13 @@ class DoctorController {
 			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
 
 			if (!denialReasons.isEmpty()) {
-				// Combine all denial reasons and strip out the redundant prefix from each.
+				// Combine all denial reasons and strip out the redundant prefix from
+				// each.
 				for (String reason : denialReasons) {
 					exceptionBody.append(reason.replaceAll("(?m)^" + prefix, "")).append("\n");
 				}
-			} else {
+			}
+			else {
 				exceptionBody.append("You do not have permission to add doctors to any assigned clinics.");
 			}
 
@@ -220,8 +222,8 @@ class DoctorController {
 	}
 
 	@PostMapping("/doctors/new")
-	public String processCreationForm(@Valid Doctor doctor, BindingResult result,
-			RedirectAttributes redirectAttributes, HttpSession session) {
+	public String processCreationForm(@Valid Doctor doctor, BindingResult result, RedirectAttributes redirectAttributes,
+			HttpSession session) {
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
 		// Evaluate Cedar for all the submitted Clinics.
@@ -233,7 +235,8 @@ class DoctorController {
 		if (submittedClinics == null || submittedClinics.isEmpty()) {
 			isAuthorized = false;
 			denialReasons.add("You must assign the Doctor to at least one valid Clinic.");
-		} else {
+		}
+		else {
 			for (Clinic clinic : submittedClinics) {
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 				var evalResult = cedarEvaluator.evaluate(principal, "AddEmployee", "Clinic", cedarClinicId, "Page");
@@ -251,15 +254,17 @@ class DoctorController {
 		if (!isAuthorized) {
 			String prefix = "Access Denied.\n";
 			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
-			
+
 			if (!denialReasons.isEmpty()) {
 				for (String reason : denialReasons) {
 					exceptionBody.append(reason.replaceAll("(?m)^" + prefix, "")).append("\n");
 				}
-			} else {
-				exceptionBody.append("You do not have permission to add doctors to one or more of the selected clinics.");
 			}
-			
+			else {
+				exceptionBody
+					.append("You do not have permission to add doctors to one or more of the selected clinics.");
+			}
+
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
@@ -268,12 +273,12 @@ class DoctorController {
 			boolean duplicateExists = doctors.findByLastNameStartingWith(doctor.getLastName(), PageRequest.of(0, 50))
 				.getContent()
 				.stream()
-				.anyMatch(d -> d.getFirstName().equalsIgnoreCase(doctor.getFirstName()) &&
-						  d.getBirthDate().equals(doctor.getBirthDate()) &&
-						  d.getGender().equals(doctor.getGender()));
+				.anyMatch(d -> d.getFirstName().equalsIgnoreCase(doctor.getFirstName())
+						&& d.getBirthDate().equals(doctor.getBirthDate()) && d.getGender().equals(doctor.getGender()));
 
 			if (duplicateExists) {
-				result.rejectValue("firstName", "duplicate", "A doctor with this first and last name, birth date, and gender already exists.");
+				result.rejectValue("firstName", "duplicate",
+						"A doctor with this first and last name, birth date, and gender already exists.");
 			}
 		}
 
@@ -307,7 +312,7 @@ class DoctorController {
 		var doctorEval = cedarEvaluator.evaluate(principal, "EditDoctor", "Doctor", resourceName, "Page");
 
 		if (!doctorEval.isGranted()) {
-			throw new CedarDeniedException("Access Denied: You do not have permission to edit this doctor.\n" 
+			throw new CedarDeniedException("Access Denied: You do not have permission to edit this doctor.\n"
 					+ (doctorEval.responseBody() != null ? doctorEval.responseBody() : ""));
 		}
 
@@ -342,13 +347,13 @@ class DoctorController {
 				.findByLastNameStartingWith(doctor.getLastName(), PageRequest.of(0, 50))
 				.getContent()
 				.stream()
-				.anyMatch(d -> d.getFirstName().equalsIgnoreCase(doctor.getFirstName()) &&
-						  d.getBirthDate().equals(doctor.getBirthDate()) &&
-						  d.getGender().equals(doctor.getGender()) &&
-						  !Objects.equals(d.getId(), doctorId));
+				.anyMatch(d -> d.getFirstName().equalsIgnoreCase(doctor.getFirstName())
+						&& d.getBirthDate().equals(doctor.getBirthDate()) && d.getGender().equals(doctor.getGender())
+						&& !Objects.equals(d.getId(), doctorId));
 
 			if (duplicateExists) {
-				result.rejectValue("firstName", "duplicate", "A doctor with this first and last name, birth date, and gender already exists.");
+				result.rejectValue("firstName", "duplicate",
+						"A doctor with this first and last name, birth date, and gender already exists.");
 			}
 		}
 
@@ -362,8 +367,9 @@ class DoctorController {
 		for (Clinic existingClinic : existingDoctor.getClinics()) {
 			String cedarClinicId = existingClinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 			var viewEval = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Background");
-			
-			// If the user did NOT have permission to view this clinic, it means it wasn't in the form. 
+
+			// If the user did NOT have permission to view this clinic, it means it wasn't
+			// in the form.
 			// We must re-add it to the final payload to prevent it from being deleted.
 			if (!viewEval.isGranted()) {
 				finalClinics.add(existingClinic);

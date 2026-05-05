@@ -71,7 +71,8 @@ class VisitController {
 	private final CedarProgrammaticEvaluator cedarEvaluator;
 
 	public VisitController(PatientRepository patients, ConfidentialityRepository confidentialities,
-			ClinicRepository clinics, AdultRepository adults, DoctorRepository doctors, CedarProgrammaticEvaluator cedarEvaluator) {
+			ClinicRepository clinics, AdultRepository adults, DoctorRepository doctors,
+			CedarProgrammaticEvaluator cedarEvaluator) {
 		this.patients = patients;
 		this.confidentialities = confidentialities;
 		this.clinics = clinics;
@@ -134,11 +135,12 @@ class VisitController {
 
 		String resourceName = patient.getFirstName() + " " + patient.getLastName();
 		var patientEval = cedarEvaluator.evaluate(principal, "EditPatient", "Patient", resourceName, "Page");
-		if (!patientEval.isGranted()) throw new CedarDeniedException("Access Denied.\n" + patientEval.responseBody());
+		if (!patientEval.isGranted())
+			throw new CedarDeniedException("Access Denied.\n" + patientEval.responseBody());
 
 		boolean isAuthorized = true;
 		List<String> denialReasons = new ArrayList<>();
-		
+
 		Collection<Clinic> submittedClinics = visit.getClinics();
 		if (submittedClinics == null || submittedClinics.isEmpty()) {
 			throw new CedarDeniedException("You must assign the visit to at least one valid clinic.");
@@ -147,17 +149,19 @@ class VisitController {
 		for (Clinic clinic : submittedClinics) {
 			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 			var clinicEval = cedarEvaluator.evaluate(principal, "EditPatient", "Clinic", cedarClinicId, "Page");
-			
+
 			if (!clinicEval.isGranted()) {
 				isAuthorized = false;
-				if (clinicEval.responseBody() != null) denialReasons.add(clinicEval.responseBody());
+				if (clinicEval.responseBody() != null)
+					denialReasons.add(clinicEval.responseBody());
 			}
 		}
 
 		if (!isAuthorized) {
 			String prefix = "Access Denied.\n";
 			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
-			for (String reason : denialReasons) exceptionBody.append(reason.replaceAll("(?m)^" + prefix, "")).append("\n");
+			for (String reason : denialReasons)
+				exceptionBody.append(reason.replaceAll("(?m)^" + prefix, "")).append("\n");
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 

@@ -30,7 +30,8 @@ public class CedarLogContext implements Serializable {
 
 			if (isPage1 && !isPage2) {
 				return -1;
-			} else if (!isPage1 && isPage2) {
+			}
+			else if (!isPage1 && isPage2) {
 				return 1;
 			}
 			return 0;

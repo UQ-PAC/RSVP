@@ -15,8 +15,10 @@
  */
 package uq.pac.childrenclinic.visit;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,11 +31,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.cedarpolicy.value.EntityUID;
+
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import uq.pac.childrenclinic.adult.Adult;
 import uq.pac.childrenclinic.adult.AdultRepository;
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
-import uq.pac.childrenclinic.cedar.CedarService;
+import uq.pac.childrenclinic.cedar.CedarDeniedException;
+import uq.pac.childrenclinic.cedar.CedarProgrammaticEvaluator;
+import uq.pac.childrenclinic.doctor.Doctor;
+import uq.pac.childrenclinic.doctor.DoctorRepository;
 import uq.pac.childrenclinic.patient.Patient;
 import uq.pac.childrenclinic.patient.PatientRepository;
 import uq.pac.childrenclinic.system.Clinic;
@@ -58,15 +66,18 @@ class VisitController {
 
 	private final AdultRepository adults;
 
-	private final CedarService cedarService;
+	private final DoctorRepository doctors;
+
+	private final CedarProgrammaticEvaluator cedarEvaluator;
 
 	public VisitController(PatientRepository patients, ConfidentialityRepository confidentialities,
-			ClinicRepository clinics, AdultRepository adults, CedarService cedarService) {
+			ClinicRepository clinics, AdultRepository adults, DoctorRepository doctors, CedarProgrammaticEvaluator cedarEvaluator) {
 		this.patients = patients;
 		this.confidentialities = confidentialities;
 		this.clinics = clinics;
 		this.adults = adults;
-		this.cedarService = cedarService;
+		this.doctors = doctors;
+		this.cedarEvaluator = cedarEvaluator;
 	}
 
 	@InitBinder("visit")
@@ -80,8 +91,15 @@ class VisitController {
 	}
 
 	@ModelAttribute("clinics")
-	public Collection<Clinic> populateClinics() {
-		return this.clinics.findClinics();
+	public Collection<Clinic> populateClinics(HttpSession session) {
+		Collection<Clinic> allClinics = this.clinics.findClinics();
+		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
+
+		return allClinics.stream().filter(clinic -> {
+			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
+			var result = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Item");
+			return result.isGranted();
+		}).collect(Collectors.toList());
 	}
 
 	@ModelAttribute("patient")
@@ -94,10 +112,13 @@ class VisitController {
 		return this.adults.findAll();
 	}
 
+	@ModelAttribute("doctors")
+	public Collection<Doctor> populateDoctors() {
+		return this.doctors.findAll();
+	}
+
 	@GetMapping("/patients/{patientId}/visits/new")
 	@CedarAuthorization(action = "EditPatient", resourceType = "Patient", validate = true)
-	// public String initNewVisitForm(@PathVariable("patientId") int patientId,
-	// Map<String, Object> model) {
 	public String initNewVisitForm(@PathVariable("patientId") int patientId, Model model) {
 		Patient patient = this.patients.findById(patientId).orElseThrow();
 		Visit visit = new Visit();
@@ -107,107 +128,47 @@ class VisitController {
 	}
 
 	@PostMapping("/patients/{patientId}/visits/new")
-	@CedarAuthorization(action = "EditPatient", resourceType = "Patient", validate = true)
 	public String processNewVisitForm(@ModelAttribute Patient patient, @Valid Visit visit, BindingResult result,
-			RedirectAttributes redirectAttributes) {
-		if (result.hasErrors())
+			RedirectAttributes redirectAttributes, HttpSession session) {
+		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
+
+		String resourceName = patient.getFirstName() + " " + patient.getLastName();
+		var patientEval = cedarEvaluator.evaluate(principal, "EditPatient", "Patient", resourceName, "Page");
+		if (!patientEval.isGranted()) throw new CedarDeniedException("Access Denied.\n" + patientEval.responseBody());
+
+		boolean isAuthorized = true;
+		List<String> denialReasons = new ArrayList<>();
+		
+		Collection<Clinic> submittedClinics = visit.getClinics();
+		if (submittedClinics == null || submittedClinics.isEmpty()) {
+			throw new CedarDeniedException("You must assign the visit to at least one valid clinic.");
+		}
+
+		for (Clinic clinic : submittedClinics) {
+			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
+			var clinicEval = cedarEvaluator.evaluate(principal, "EditPatient", "Clinic", cedarClinicId, "Page");
+			
+			if (!clinicEval.isGranted()) {
+				isAuthorized = false;
+				if (clinicEval.responseBody() != null) denialReasons.add(clinicEval.responseBody());
+			}
+		}
+
+		if (!isAuthorized) {
+			String prefix = "Access Denied.\n";
+			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
+			for (String reason : denialReasons) exceptionBody.append(reason.replaceAll("(?m)^" + prefix, "")).append("\n");
+			throw new CedarDeniedException(exceptionBody.toString().trim());
+		}
+
+		if (result.hasErrors()) {
 			return "patients/createOrUpdateVisitForm";
+		}
+
 		patient.addVisit(visit);
 		this.patients.save(patient);
-		redirectAttributes.addFlashAttribute("message", "Your visit has been booked.");
+		redirectAttributes.addFlashAttribute("message", "Visit has been booked.");
 		return "redirect:/patients/{patientId}";
 	}
-
-	// /**
-	// * Called before each and every @RequestMapping annotated method. 2 goals: - Make
-	// sure
-	// * we always have fresh data - Since we do not use the session scope, make sure that
-	// * Child object always has an id (Even though id is not part of the form fields)
-	// * @param childId
-	// * @return Child
-	// */
-	// @ModelAttribute("visit")
-	// public Visit loadChildWithVisit(@PathVariable("parentId") int parentId,
-	// @PathVariable("childId") int childId,
-	// Map<String, Object> model) {
-	// Optional<Parent> optionalParent = parents.findById(parentId);
-	// Parent parent = optionalParent.orElseThrow(() -> new IllegalArgumentException(
-	// "Parent not found with id: " + parentId + ". Please ensure the ID is correct."));
-
-	// Child child = parent.getChild(childId);
-	// if (child == null) {
-	// throw new IllegalArgumentException(
-	// "Child with id " + childId + " not found for parent with id " + parentId + ".");
-	// }
-	// model.addAttribute("child", child);
-	// model.addAttribute("parent", parent);
-
-	// Visit visit = new Visit();
-	// child.addVisit(visit);
-	// return visit;
-	// }
-
-	// // Spring MVC calls method loadChildWithVisit(...) before initNewVisitForm is
-	// // called
-	// @GetMapping("/parents/{parentId}/children/{childId}/visits/new")
-	// @CedarAuthorization(action = "ViewPatient", resourceType = "Parent", validate =
-	// true)
-	// @CedarAuthorization(action = "ViewPatient", resourceType = "Child", validate =
-	// true)
-	// @CedarAuthorization(action = "EditPatient", resourceType = "Child", validate =
-	// true)
-	// @CedarAuthorization(action = "AddPatient", resourceType = "Child", validate = true)
-	// public String initNewVisitForm(Child child, HttpSession session) {
-	// String principalId = (String) session.getAttribute("currentUser");
-	// if (session.getAttribute("currentUser") == null) {
-	// principalId = "Guest";
-	// }
-
-	// System.out.println("Cookie principalId: " + principalId);
-
-	// EntityUID principal;
-	// if (principalId.equals("Guest")) {
-	// principal = EntityUID.parse("ChildrenClinic::Guest::\"Unknown\"")
-	// .orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
-	// }
-	// else {
-	// principal = EntityUID.parse("ChildrenClinic::Employee::\"" + principalId + "\"")
-	// .orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
-	// }
-
-	// EntityUID action = EntityUID.parse("ChildrenClinic::Action::\"" + "EditPatient" +
-	// "\"")
-	// .orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
-	// EntityUID resource = EntityUID.parse("ChildrenClinic::Child::\"" + child.getName()
-	// + "\"")
-	// .orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
-	// Map<String, Value> contextMap = new HashMap<>();
-	// CedarRequest cedarReq = new CedarRequest(principal, action, resource, contextMap,
-	// true);
-	// ResponseEntity<String> response = cedarService.checkAccess(cedarReq);
-	// if (!response.getBody().startsWith("Access Granted.")) {
-	// throw new SecurityException("Access Denied to modify Child.");
-	// }
-
-	// return "children/createOrUpdateVisitForm";
-	// }
-
-	// // Spring MVC calls method loadChildWithVisit(...) before processNewVisitForm is
-	// // called
-	// @PostMapping("/parents/{parentId}/children/{childId}/visits/new")
-	// @CedarAuthorization(action = "EditPatient", resourceType = "Child", validate =
-	// true)
-	// public String processNewVisitForm(@ModelAttribute Parent parent,
-	// @PathVariable("childId") int childId, @Valid Visit visit,
-	// BindingResult result, RedirectAttributes redirectAttributes) {
-	// if (result.hasErrors()) {
-	// return "children/createOrUpdateVisitForm";
-	// }
-
-	// parent.addVisit(childId, visit);
-	// this.parents.save(parent);
-	// redirectAttributes.addFlashAttribute("message", "Your visit has been booked.");
-	// return "redirect:/parents/{parentId}";
-	// }
 
 }

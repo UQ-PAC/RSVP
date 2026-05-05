@@ -3,16 +3,17 @@ package uq.pac.childrenclinic.patient;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -35,9 +36,7 @@ import uq.pac.childrenclinic.adult.Adult;
 import uq.pac.childrenclinic.adult.AdultRepository;
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
 import uq.pac.childrenclinic.cedar.CedarDeniedException;
-import uq.pac.childrenclinic.cedar.CedarLogContext;
-import uq.pac.childrenclinic.cedar.CedarRequest;
-import uq.pac.childrenclinic.cedar.CedarService;
+import uq.pac.childrenclinic.cedar.CedarProgrammaticEvaluator;
 import uq.pac.childrenclinic.model.Gender;
 import uq.pac.childrenclinic.model.GenderRepository;
 import uq.pac.childrenclinic.system.Clinic;
@@ -56,18 +55,15 @@ public class PatientController {
 
 	private final AdultRepository adults;
 
-	private final CedarService cedarService;
-
-	private final CedarLogContext cedarLogContext;
+	private final CedarProgrammaticEvaluator cedarEvaluator;
 
 	public PatientController(PatientRepository patients, GenderRepository genders, ClinicRepository clinics,
-			AdultRepository adults, CedarService cedarService, CedarLogContext cedarLogContext) {
+			AdultRepository adults, CedarProgrammaticEvaluator cedarEvaluator) {
 		this.patients = patients;
 		this.genders = genders;
 		this.clinics = clinics;
 		this.adults = adults;
-		this.cedarService = cedarService;
-		this.cedarLogContext = cedarLogContext;
+		this.cedarEvaluator = cedarEvaluator;
 	}
 
 	@ModelAttribute("genders")
@@ -78,36 +74,12 @@ public class PatientController {
 	@ModelAttribute("clinics")
 	public Collection<Clinic> populateClinics(HttpSession session) {
 		Collection<Clinic> allClinics = this.clinics.findClinics();
-
-		String principalId = (String) session.getAttribute("currentUser");
-		principalId = principalId == null ? "Guest" : principalId;
-
-		EntityUID principal;
-		if (principalId.equals("Guest")) {
-			principal = EntityUID.parse("ChildrenClinic::Guest::\"Unknown\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
-		} else {
-			principal = EntityUID.parse("ChildrenClinic::Employee::\"" + principalId + "\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
-		}
-
-		EntityUID action = EntityUID.parse("ChildrenClinic::Action::\"ViewClinic\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
+		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
 		return allClinics.stream().filter(clinic -> {
 			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-			EntityUID resource = EntityUID.parse("ChildrenClinic::Clinic::\"" + cedarClinicId + "\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
-
-			CedarRequest request = new CedarRequest(principal, action, resource, new HashMap<>(), true);
-			ResponseEntity<String> response = cedarService.checkAccess(request);
-			String accessBody = response.getBody();
-
-			String logEntry = "Item Request: Principal=" + principal + ", Action=" + action + ", Resource=" + resource
-					+ " | Response: " + accessBody;
-			this.cedarLogContext.addLog(logEntry);
-
-			return accessBody != null && accessBody.startsWith("Access Granted.");
+			var result = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Item");
+			return result.isGranted();
 		}).collect(Collectors.toList());
 	}
 
@@ -142,38 +114,16 @@ public class PatientController {
 			return "patients/findPatients";
 		}
 
-		String principalId = (String) session.getAttribute("currentUser");
-		principalId = principalId == null ? "Guest" : principalId;
-
-		System.out.println("Cookie principalId: " + principalId);
-
-		EntityUID principal;
-		if (principalId.equals("Guest")) {
-			principal = EntityUID.parse("ChildrenClinic::Guest::\"Unknown\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
-		}
-		else {
-			principal = EntityUID.parse("ChildrenClinic::Employee::\"" + principalId + "\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
-		}
-
-		EntityUID action = EntityUID.parse("ChildrenClinic::Action::\"ViewPatient\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
-
+		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 		Map<Integer, String> authorizationMap = new HashMap<>();
 		Map<Integer, String> cedarResourceMap = new HashMap<>();
 
 		List<Patient> authorized = allMatchingPatients.stream().filter(p -> {
 			String resourceName = p.getFirstName() + " " + p.getLastName();
-			EntityUID resource = EntityUID.parse("ChildrenClinic::Patient::\"" + resourceName + "\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
-
-			String access = cedarService
-				.checkAccess(new CedarRequest(principal, action, resource, new HashMap<>(), true))
-				.getBody();
-			authorizationMap.put(p.getId(), access);
+			var evalResult = cedarEvaluator.evaluate(principal, "ViewPatient", "Patient", resourceName, "Item");
+			authorizationMap.put(p.getId(), evalResult.responseBody());
 			cedarResourceMap.put(p.getId(), "ChildrenClinic::Patient::\"" + resourceName + "\"");
-			return access != null && access.startsWith("Access Granted.");
+			return evalResult.isGranted();
 		}).collect(Collectors.toList());
 
 		if (authorized.size() == 1 && allMatchingPatients.size() == 1) {
@@ -193,7 +143,7 @@ public class PatientController {
 		model.addAttribute("totalItems", paginated.getTotalElements());
 		model.addAttribute("authorizationMap", authorizationMap);
 		model.addAttribute("cedarPrincipal", principal.toString());
-		model.addAttribute("cedarAction", action.toString());
+		model.addAttribute("cedarAction", "ChildrenClinic::Action::\"ViewPatient\"");
 		model.addAttribute("cedarResourceMap", cedarResourceMap);
 
 		return "patients/patientsList";
@@ -211,21 +161,7 @@ public class PatientController {
 
 	@GetMapping("/patients/new")
 	public String initCreationForm(Model model, HttpSession session) {
-		String principalId = (String) session.getAttribute("currentUser");
-		principalId = principalId == null ? "Guest" : principalId;
-
-		EntityUID principal;
-		if ("Guest".equals(principalId)) {
-			principal = EntityUID.parse("ChildrenClinic::Guest::\"Unknown\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal."));
-		} else {
-			principal = EntityUID.parse("ChildrenClinic::Employee::\"" + principalId + "\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal."));
-		}
-
-		EntityUID action = EntityUID.parse("ChildrenClinic::Action::\"AddPatient\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Action."));
-
+		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 		Collection<Clinic> allClinics = this.clinics.findClinics();
 
 		// Evaluate Cedar for each Clinic and log the result.
@@ -234,23 +170,12 @@ public class PatientController {
 
 		for (Clinic clinic : allClinics) {
 			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-			EntityUID resource = EntityUID.parse("ChildrenClinic::Clinic::\"" + cedarClinicId + "\"")
-            	.orElseThrow(() -> new IllegalArgumentException("Invalid Resource format."));
+			var result = cedarEvaluator.evaluate(principal, "AddPatient", "Clinic", cedarClinicId, "Page");
 
-			CedarRequest request = new CedarRequest(principal, action, resource, new HashMap<>(), true);
-			ResponseEntity<String> response = cedarService.checkAccess(request);
-			String accessBody = response.getBody();
-
-			String logEntry = "Page Request: Principal=" + principal + ", Action=" + action + ", Resource=" + resource
-					+ " | Response: " + accessBody;
-			this.cedarLogContext.addLog(logEntry);
-
-			if (response.getStatusCode().is2xxSuccessful() && accessBody != null && accessBody.startsWith("Access Granted.")) {
+			if (result.isGranted()) {
 				isAuthorized = true;
-			} else {
-				if (accessBody != null) {
-					denialReasons.add(accessBody);
-				}
+			} else if (result.responseBody() != null) {
+				denialReasons.add(result.responseBody());
 			}
 		}
 
@@ -278,20 +203,7 @@ public class PatientController {
 	@PostMapping("/patients/new")
 	public String processCreationForm(@Valid Patient patient, BindingResult result,
 			RedirectAttributes redirectAttributes, HttpSession session) {
-		String principalId = (String) session.getAttribute("currentUser");
-		principalId = principalId == null ? "Guest" : principalId;
-
-		EntityUID principal;
-		if ("Guest".equals(principalId)) {
-			principal = EntityUID.parse("ChildrenClinic::Guest::\"Unknown\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal."));
-		} else {
-			principal = EntityUID.parse("ChildrenClinic::Employee::\"" + principalId + "\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal."));
-		}
-
-		EntityUID action = EntityUID.parse("ChildrenClinic::Action::\"AddPatient\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Action."));
+		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
 		// Evaluate Cedar for all the submitted Clinics.
 		boolean isAuthorized = true;
@@ -305,21 +217,12 @@ public class PatientController {
 		} else {
 			for (Clinic clinic : submittedClinics) {
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-				EntityUID resource = EntityUID.parse("ChildrenClinic::Clinic::\"" + cedarClinicId + "\"")
-					.orElseThrow(() -> new IllegalArgumentException("Invalid Resource."));
+				var evalResult = cedarEvaluator.evaluate(principal, "AddPatient", "Clinic", cedarClinicId, "Page");
 
-				CedarRequest request = new CedarRequest(principal, action, resource, new HashMap<>(), true);
-				ResponseEntity<String> response = cedarService.checkAccess(request);
-				String accessBody = response.getBody();
-
-				String logEntry = "Page Request: Principal=" + principal + ", Action=" + action + ", Resource=" + resource
-						+ " | Response: " + accessBody;
-				this.cedarLogContext.addLog(logEntry);
-
-				if (!response.getStatusCode().is2xxSuccessful() || accessBody == null || !accessBody.startsWith("Access Granted.")) {
+				if (!evalResult.isGranted()) {
 					isAuthorized = false;
-					if (accessBody != null) {
-						denialReasons.add(accessBody);
+					if (evalResult.responseBody() != null) {
+						denialReasons.add(evalResult.responseBody());
 					}
 				}
 			}
@@ -346,7 +249,9 @@ public class PatientController {
 			boolean duplicateExists = patients.findByLastNameStartingWith(patient.getLastName(), PageRequest.of(0, 50))
 				.getContent()
 				.stream()
-				.anyMatch(p -> p.getFirstName().equalsIgnoreCase(patient.getFirstName()));
+				.anyMatch(p -> p.getFirstName().equalsIgnoreCase(patient.getFirstName()) &&
+						  p.getBirthDate().equals(patient.getBirthDate()) &&
+						  p.getGender().equals(patient.getGender()));
 
 			if (duplicateExists) {
 				result.rejectValue("firstName", "duplicate", "A patient with this first and last name already exists");
@@ -387,16 +292,55 @@ public class PatientController {
 	 * @return The logical view name or redirection directive.
 	 */
 	@PostMapping("/patients/{patientId}/edit")
-	@CedarAuthorization(action = "EditPatient", resourceType = "Patient", validate = true)
 	public String processUpdateForm(@Valid Patient patient, BindingResult result,
-			@PathVariable("patientId") int patientId, RedirectAttributes redirectAttributes) {
+			@PathVariable("patientId") int patientId, RedirectAttributes redirectAttributes, HttpSession session) {
+		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
+
+		Patient existingPatient = this.patients.findById(patientId)
+			.orElseThrow(() -> new IllegalArgumentException("Patient not found: " + patientId));
+
+		String resourceName = existingPatient.getFirstName() + " " + existingPatient.getLastName();
+		var patientEval = cedarEvaluator.evaluate(principal, "EditPatient", "Patient", resourceName, "Page");
+
+		if (!patientEval.isGranted()) {
+			throw new CedarDeniedException("Access Denied: You do not have permission to edit this patient.\n" 
+					+ (patientEval.responseBody() != null ? patientEval.responseBody() : ""));
+		}
+
+		boolean isAuthorized = true;
+		List<String> denialReasons = new ArrayList<>();
+		Collection<Clinic> submittedClinics = patient.getClinics();
+
+		if (submittedClinics != null) {
+			for (Clinic clinic : submittedClinics) {
+				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
+				var clinicEval = cedarEvaluator.evaluate(principal, "EditPatient", "Clinic", cedarClinicId, "Page");
+				if (!clinicEval.isGranted()) {
+					isAuthorized = false;
+					if (clinicEval.responseBody() != null) {
+						denialReasons.add(clinicEval.responseBody());
+					}
+				}
+			}
+		}
+
+		if (!isAuthorized) {
+			String prefix = "Access Denied.\n";
+			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
+			for (String reason : denialReasons) {
+				exceptionBody.append(reason.replaceAll("(?m)^" + prefix, "")).append("\n");
+			}
+			throw new CedarDeniedException(exceptionBody.toString().trim());
+		}
+
 		if (StringUtils.hasLength(patient.getLastName()) && StringUtils.hasLength(patient.getFirstName())) {
 			boolean duplicateExists = this.patients
 				.findByLastNameStartingWith(patient.getLastName(), PageRequest.of(0, 50))
-				.getContent()
-				.stream()
-				.anyMatch(p -> p.getFirstName().equalsIgnoreCase(patient.getFirstName())
-						&& !Objects.equals(p.getId(), patientId));
+				.getContent().stream()
+				.anyMatch(p -> p.getFirstName().equalsIgnoreCase(patient.getFirstName()) &&
+						  p.getBirthDate().equals(patient.getBirthDate()) &&
+						  p.getGender().equals(patient.getGender()) &&
+						  !Objects.equals(p.getId(), patientId));
 
 			if (duplicateExists) {
 				result.rejectValue("firstName", "duplicate", "A patient with this first and last name already exists.");
@@ -408,10 +352,23 @@ public class PatientController {
 			return VIEWS_PATIENT_CREATE_OR_UPDATE_FORM;
 		}
 
+		Set<Clinic> finalClinics = new HashSet<>(submittedClinics != null ? submittedClinics : new ArrayList<>());
+
+		for (Clinic existingClinic : existingPatient.getClinics()) {
+			String cedarClinicId = existingClinic.getClinicName().replaceFirst("^Clinic\\s+", "");
+			var viewEval = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Background");
+			
+			// If the user did NOT have permission to view this clinic, it means it wasn't in the form. 
+			// We must re-add it to the final payload to prevent it from being deleted.
+			if (!viewEval.isGranted()) {
+				finalClinics.add(existingClinic);
+			}
+		}
+		patient.setClinics(finalClinics);
+
 		patient.setId(patientId);
 		this.patients.save(patient);
-
-		redirectAttributes.addFlashAttribute("message", "Patient Values Updated.");
+		redirectAttributes.addFlashAttribute("message", "Patient values updated.");
 		return "redirect:/patients/{patientId}";
 	}
 

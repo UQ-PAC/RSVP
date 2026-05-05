@@ -32,9 +32,7 @@ import com.cedarpolicy.value.EntityUID;
 
 import jakarta.servlet.http.HttpSession;
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
-import uq.pac.childrenclinic.cedar.CedarLogContext;
-import uq.pac.childrenclinic.cedar.CedarRequest;
-import uq.pac.childrenclinic.cedar.CedarService;
+import uq.pac.childrenclinic.cedar.CedarProgrammaticEvaluator;
 import uq.pac.childrenclinic.doctor.Doctor;
 import uq.pac.childrenclinic.doctor.DoctorRepository;
 
@@ -45,46 +43,34 @@ class WelcomeController {
 
 	private final ClinicRepository clinics;
 
-	private final CedarService cedarService;
+	private final CedarProgrammaticEvaluator cedarEvaluator;
 
-	private final CedarLogContext cedarLogContext;
-
-	public WelcomeController(DoctorRepository doctors, ClinicRepository clinics, CedarService cedarService, CedarLogContext cedarLogContext) {
+	public WelcomeController(DoctorRepository doctors, ClinicRepository clinics, CedarProgrammaticEvaluator cedarEvaluator) {
 		this.doctors = doctors;
 		this.clinics = clinics;
-		this.cedarService = cedarService;
-		this.cedarLogContext = cedarLogContext;
+		this.cedarEvaluator = cedarEvaluator;
 	}
 
 	@GetMapping("/")
 	@CedarAuthorization(action = "ListEmployees", resourceType = "Clinic", resourceId = "Any", validate = true)
 	public String welcome(Model model, HttpSession session) {
 		List<Doctor> allDoctors = this.doctors.findByLastNameStartingWith("", Pageable.unpaged()).getContent();
-
-		EntityUID principal = resolvePrincipal(session);
-
-		EntityUID action = EntityUID.parse("ChildrenClinic::Action::\"ViewEmployee\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
+		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
 		Map<Integer, String> authorizationMap = new HashMap<>();
 		Map<Integer, String> cedarResourceMap = new HashMap<>();
 
 		for (Doctor d : allDoctors) {
 			String resourceName = d.getFirstName() + " " + d.getLastName();
-			EntityUID resource = EntityUID.parse("ChildrenClinic::Employee::\"" + resourceName + "\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
-
-			String access = cedarService
-				.checkAccess(new CedarRequest(principal, action, resource, new HashMap<>(), true))
-				.getBody();
-			authorizationMap.put(d.getId(), access);
+			var evalResult = cedarEvaluator.evaluate(principal, "ViewEmployee", "Employee", resourceName, "Item");
+			authorizationMap.put(d.getId(), evalResult.responseBody());
 			cedarResourceMap.put(d.getId(), "ChildrenClinic::Employee::\"" + resourceName + "\"");
 		}
 
 		model.addAttribute("listDoctors", allDoctors);
 		model.addAttribute("authorizationMap", authorizationMap);
 		model.addAttribute("cedarPrincipal", principal.toString());
-		model.addAttribute("cedarAction", action.toString());
+		model.addAttribute("cedarAction", "ChildrenClinic::Action::\"ViewEmployee\"");
 		model.addAttribute("cedarResourceMap", cedarResourceMap);
 
 		Map<String, String> searchOptions = new LinkedHashMap<>();
@@ -123,7 +109,7 @@ class WelcomeController {
 	public String processGlobalSearch(@RequestParam(name = "entityType", defaultValue = "patient") String entityType,
 			@RequestParam(name = "query", defaultValue = "") String query, HttpSession session) {
 
-		EntityUID principal = resolvePrincipal(session);
+		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
 		if ("patient".equalsIgnoreCase(entityType) && isAuthorized(principal, "ListPatients")) {
 			return "redirect:/patients?lastName=" + query;
@@ -142,42 +128,17 @@ class WelcomeController {
 		}
 	}
 
-	private EntityUID resolvePrincipal(HttpSession session) {
-		String principalId = (String) session.getAttribute("currentUser");
-		principalId = principalId == null ? "Guest" : principalId;
-
-		if (principalId.equals("Guest")) {
-			return EntityUID.parse("ChildrenClinic::Guest::\"Unknown\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
-		}
-		else {
-			return EntityUID.parse("ChildrenClinic::Employee::\"" + principalId + "\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
-		}
-	}
-
 	private boolean isAuthorized(EntityUID principal, String actionStr) {
-		EntityUID action = EntityUID.parse("ChildrenClinic::Action::\"" + actionStr + "\"")
-			.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
-
 		Collection<Clinic> allClinics = this.clinics.findClinics();
 		boolean hasAccess = false;
 
 		for (Clinic clinic : allClinics) {
 			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 
-			EntityUID resource = EntityUID.parse("ChildrenClinic::Clinic::\"" + cedarClinicId + "\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
-
-			CedarRequest request = new CedarRequest(principal, action, resource, new HashMap<>(), true);
-			String accessBody = cedarService.checkAccess(request).getBody();
-
-			String logEntry = "Item Request: Principal=" + principal + ", Action=" + action + ", Resource=" + resource
-					+ " | Response: " + accessBody;
-			this.cedarLogContext.addLog(logEntry);
+			var result = cedarEvaluator.evaluate(principal, actionStr, "Clinic", cedarClinicId, "Item");
 
 			// If access is granted for AT LEAST ONE clinic, the user gets the menu option
-			if (accessBody != null && accessBody.startsWith("Access Granted.")) {
+			if (result.isGranted()) {
 				hasAccess = true;
 			}
 		}

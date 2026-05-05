@@ -20,9 +20,9 @@ You can start the application on the command-line as follows:
 You can then access the ChildrenClinic at <http://localhost:8080/>.
 
 The command above will load the default Cedar files:
-- Schema: `src/main/resources/cedar/childrenclinic-rsvp-schema.cedarschema`
-- Entities: `src/main/resources/cedar/childrenclinic-rsvp-entities.json`
-- Policy: `src/main/resources/cedar/childrenclinic-rsvp-policy.cedar`
+- Schema: `app/src/main/resources/cedar/childrenclinic-rsvp-schema.cedarschema`
+- Entities: `app/src/main/resources/cedar/childrenclinic-rsvp-entities.json`
+- Policy: `app/src/main/resources/cedar/childrenclinic-rsvp-policy.cedar`
 
 You can change the default Cedar Policy by running, instead:
 
@@ -51,7 +51,7 @@ These are set up so that you can run the apps in your IDE to get fast feedback a
 
 ## Compiling the CSS
 
-There is a `childrenclinic.css` in `src/main/resources/static/resources/css`.
+There is a `childrenclinic.css` in `app/src/main/resources/static/resources/css`.
 It was generated from the `childrenclinic.scss` source, combined with the [Bootstrap](https://getbootstrap.com/) library.
 If you make changes to the `scss`, or upgrade Bootstrap, you will need to re-compile the CSS resources using the Maven profile "css", i.e. `./mvnw package -P css`.
 There is no build profile for Gradle to compile the CSS.
@@ -60,9 +60,11 @@ There is no build profile for Gradle to compile the CSS.
 
 |Spring Boot Configuration | Class or Java property files  |
 |--------------------------|---|
-|The Main Class | [ChildrenClinicApplication](src/main/java/org/springframework/samples/childrenclinic/ChildrenClinicApplication.java) |
-|Properties Files | [application.properties](src/main/resources) |
-|Caching | [CacheConfiguration](src/main/java/org/springframework/samples/childrenclinic/system/CacheConfiguration.java) |
+|ChildrenClinic README | [README](README.md) (this file) |
+|The Main Class | [ChildrenClinicApplication](app/src/main/java/uq/pac/childrenclinic/ChildrenClinicApplication.java) |
+|Properties Files | [application.properties](app/src/main/resources/application.properties) |
+|Caching | [CacheConfiguration](app/src/main/java/uq/pac/childrenclinic/system/CacheConfiguration.java) |
+|Cedar Authorization Files README | [README](app/src/main/resources/cedar/README.md) |
 
 ## License
 

@@ -122,7 +122,7 @@ public class Translation {
         // For the moment we do not support arbitrary action names as Cedar does,
         // just standard non-empty identifiers
         AntlrSchema rsvpSchema = AntlrSchema.parse(schemaFile);
-        Pattern actionPattern = Pattern.compile("^Action::\"[A-Za-z_][A-Za-z_0-9]+\"$");
+        Pattern actionPattern = Pattern.compile("^Action::\"[A-Za-z_][A-Za-z_0-9]*\"$");
         rsvpSchema.actions().forEach(a -> {
             if (!actionPattern.matcher(a.getBaseName()).matches()) {
                 throw new TranslationError("Unsupported action name: " + a.getName());
@@ -130,7 +130,7 @@ public class Translation {
         });
 
         // Same for enum values
-        Pattern enumEntityPattern = Pattern.compile("^[A-Za-z_][A-Za-z_0-9]+$");
+        Pattern enumEntityPattern = Pattern.compile("^[A-Za-z_][A-Za-z_0-9]*$");
         rsvpSchema.enumEntityTypes().forEach(t -> {
             t.getEnumNames().forEach(en -> {
                 if (!enumEntityPattern.matcher(en).matches()) {

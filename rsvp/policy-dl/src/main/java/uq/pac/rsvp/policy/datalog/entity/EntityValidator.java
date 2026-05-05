@@ -1,6 +1,7 @@
 package uq.pac.rsvp.policy.datalog.entity;
 
 import uq.pac.rsvp.policy.ast.antlrschema.AntlrSchema;
+import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrCommonType;
 import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrEntityType;
 import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrEnumEntityType;
 import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrRecordEntityType;
@@ -203,5 +204,10 @@ public class EntityValidator implements AntlrSchemaPayloadVisitor<EntityValue> {
     @Override
     public void visitString(AntlrStringType type, EntityValue payload) {
         expectedType(payload, StringValue.class, "string");
+    }
+
+    @Override
+    public void visitCommon(AntlrCommonType type, EntityValue payload) {
+        type.getDefinition().process(this, payload);
     }
 }

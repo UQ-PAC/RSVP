@@ -15,6 +15,12 @@
  */
 package uq.pac.childrenclinic.visit;
 
+import java.time.LocalDate;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -27,13 +33,8 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import uq.pac.childrenclinic.adult.Adult;
+import uq.pac.childrenclinic.doctor.Doctor;
 import uq.pac.childrenclinic.model.BaseEntity;
-
-import java.time.LocalDate;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * Simple JavaBean domain object representing a visit.
@@ -62,6 +63,11 @@ public class Visit extends BaseEntity {
 	@JoinTable(name = "visit_adults", joinColumns = @JoinColumn(name = "visit_id"),
 			inverseJoinColumns = @JoinColumn(name = "adult_id"))
 	private Set<Adult> responsibleAdults = new LinkedHashSet<>();
+
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "visit_doctors", joinColumns = @JoinColumn(name = "visit_id"),
+			inverseJoinColumns = @JoinColumn(name = "doctor_id"))
+	private Set<Doctor> doctors = new LinkedHashSet<>();
 
 	/**
 	 * Creates a new instance of Visit for the current date
@@ -100,6 +106,14 @@ public class Visit extends BaseEntity {
 
 	public void setResponsibleAdults(Set<Adult> responsibleAdults) {
 		this.responsibleAdults = responsibleAdults;
+	}
+
+	public Set<Doctor> getDoctors() {
+		return doctors;
+	}
+
+	public void setDoctors(Set<Doctor> doctors) {
+		this.doctors = doctors;
 	}
 
 }

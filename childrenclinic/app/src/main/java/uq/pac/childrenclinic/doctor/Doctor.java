@@ -15,16 +15,7 @@
  */
 package uq.pac.childrenclinic.doctor;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.PrimaryKeyJoinColumn;
-import jakarta.persistence.Table;
-import jakarta.xml.bind.annotation.XmlElement;
-import uq.pac.childrenclinic.model.Person;
-
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +23,23 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.core.style.ToStringCreator;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.xml.bind.annotation.XmlElement;
+import uq.pac.childrenclinic.model.Gender;
+import uq.pac.childrenclinic.model.Person;
 
 /**
  * Simple JavaBean domain object representing a doctor.
@@ -46,10 +54,41 @@ import org.springframework.core.style.ToStringCreator;
 @PrimaryKeyJoinColumn(name = "entity_id")
 public class Doctor extends Person {
 
+	@Column(name = "birth_date")
+	@NotNull
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate birthDate;
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "gender_id")
+	@NotNull
+	private Gender gender;
+
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "doctor_specialties", joinColumns = @JoinColumn(name = "doctor_id"),
 			inverseJoinColumns = @JoinColumn(name = "specialty_id"))
 	private Set<Specialty> specialties;
+
+	@Column(name = "telephone")
+	@NotBlank
+	@Pattern(regexp = "^\\+?[0-9\\-\\s]{10,20}$", message = "{telephone.invalid}")
+	private String telephone;
+
+	public LocalDate getBirthDate() {
+		return this.birthDate;
+	}
+
+	public void setBirthDate(LocalDate birthDate) {
+		this.birthDate = birthDate;
+	}
+
+	public Gender getGender() {
+		return this.gender;
+	}
+
+	public void setGender(Gender gender) {
+		this.gender = gender;
+	}
 
 	protected Set<Specialty> getSpecialtiesInternal() {
 		if (this.specialties == null) {
@@ -80,6 +119,14 @@ public class Doctor extends Person {
 		return this.specialties.stream().map(Specialty::getName).sorted().collect(Collectors.joining(", "));
 	}
 
+	public String getTelephone() {
+		return this.telephone;
+	}
+
+	public void setTelephone(String telephone) {
+		this.telephone = telephone;
+	}
+
 	@Override
 	public String toString() {
 		return new ToStringCreator(this).append("id", this.getId())
@@ -87,6 +134,9 @@ public class Doctor extends Person {
 			.append("lastName", this.getLastName())
 			.append("firstName", this.getFirstName())
 			.append("specialties", this.getSpecialties())
+			.append("telephone", this.getTelephone())
+			.append("birthDate", this.getBirthDate())
+			.append("gender", this.getGender())
 			.toString();
 	}
 

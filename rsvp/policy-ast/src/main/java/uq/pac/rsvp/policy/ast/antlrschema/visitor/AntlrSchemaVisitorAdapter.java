@@ -45,7 +45,7 @@ public class AntlrSchemaVisitorAdapter implements AntlrSchemaVisitor {
     }
 
     @Override
-    public void visitReference(AntlrTypeReference type) {}
+    public void visitTypeReference(AntlrTypeReference type) {}
 
     @Override
     public void visitBoolean(AntlrBooleanType type) {}

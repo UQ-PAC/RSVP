@@ -8,23 +8,14 @@ import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 public class AntlrRecordEntityType extends AntlrEntityType {
 
     private final AntlrRecordType shape;
-    private final Set<AntlrTypeReference> memberOf;
 
     public AntlrRecordEntityType(AntlrTypeReference ref, Collection<AntlrTypeReference> memberOf, AntlrRecordType shape, AntlrAnnotations annotations, SourceLoc location) {
-        super(ref, annotations, location);
+        super(ref, memberOf, annotations, location);
         this.shape = shape;
-        this.memberOf = Collections.unmodifiableSet(new LinkedHashSet<>(memberOf));
-    }
-
-    public Set<AntlrTypeReference> getMemberOf() {
-        return memberOf;
     }
 
     public AntlrRecordType getShape() {
@@ -51,8 +42,8 @@ public class AntlrRecordEntityType extends AntlrEntityType {
         StringBuilder sb = new StringBuilder();
 
         String in = "";
-        if (!memberOf.isEmpty()) {
-            in = " in " + memberOf.stream().map(AntlrTypeReference::getName).toList();
+        if (!getMemberOf().isEmpty()) {
+            in = " in " + getMemberOf().stream().map(AntlrTypeReference::getName).toList();
         }
 
         sb.append("entity ")
@@ -62,6 +53,6 @@ public class AntlrRecordEntityType extends AntlrEntityType {
                 .append(shape)
                 .append(";");
 
-        return getAnnotations().toString() + sb.toString();
+        return getAnnotations().toString() + sb;
     }
 }

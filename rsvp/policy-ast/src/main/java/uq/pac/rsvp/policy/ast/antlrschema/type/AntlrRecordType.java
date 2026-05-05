@@ -5,6 +5,7 @@ import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaValueVisitor;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
+import java.util.Collections;
 import java.util.Map;
 
 public class AntlrRecordType extends AntlrBuiltinType {
@@ -60,12 +61,24 @@ public class AntlrRecordType extends AntlrBuiltinType {
         this.attributes = Map.copyOf(attributes);
     }
 
+    public AntlrRecordType(Map<Attribute, AntlrBuiltinType> attributes) {
+        this(attributes, SourceLoc.MISSING);
+    }
+
+    public AntlrRecordType() {
+        this(Collections.emptyMap(), SourceLoc.MISSING);
+    }
+
     public Map<Attribute, AntlrBuiltinType> getAttributes() {
         return attributes;
     }
 
     public AntlrBuiltinType getAttribute(String attr) {
         return attributes.get(new Attribute(attr));
+    }
+
+    public boolean hasAttribute(String attr) {
+        return attributes.containsKey(new Attribute(attr));
     }
 
     private String toString(AntlrBuiltinType type, String indent) {

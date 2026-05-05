@@ -61,7 +61,7 @@ public class AntlrTypesResolutionVisitor implements AntlrSchemaValueVisitor<Antl
     }
 
     @Override
-    public AntlrBuiltinType visitReference(AntlrTypeReference type) {
+    public AntlrBuiltinType visitTypeReference(AntlrTypeReference type) {
         // First we need to check whether we are dealing with a built-in or extension type,
         // i.e., a type that cannot be shadowed
         Function<SourceLoc, AntlrBuiltinType> constructor = isPrimitiveType(type.getBaseName());

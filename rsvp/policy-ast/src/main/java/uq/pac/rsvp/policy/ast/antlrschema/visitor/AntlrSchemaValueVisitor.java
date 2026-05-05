@@ -39,7 +39,7 @@ public interface AntlrSchemaValueVisitor<T> {
     }
 
     // Type references
-    default T visitReference(AntlrTypeReference type) {
+    default T visitTypeReference(AntlrTypeReference type) {
         throw new AssertionError();
     }
 

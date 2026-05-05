@@ -65,16 +65,16 @@ public class AntlrTypeReference extends AntlrBuiltinType {
 
     @Override
     public void accept(AntlrSchemaVisitor visitor) {
-        visitor.visitReference(this);
+        visitor.visitTypeReference(this);
     }
 
     @Override
     public <T> T compute(AntlrSchemaValueVisitor<T> visitor) {
-        return visitor.visitReference(this);
+        return visitor.visitTypeReference(this);
     }
 
     @Override
     public <T> void process(AntlrSchemaPayloadVisitor<T> visitor, T payload) {
-        visitor.visitReference(this, payload);
+        visitor.visitTypeReference(this, payload);
     }
 }

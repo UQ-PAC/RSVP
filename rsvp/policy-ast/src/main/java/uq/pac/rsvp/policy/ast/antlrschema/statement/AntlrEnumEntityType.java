@@ -1,5 +1,6 @@
 package uq.pac.rsvp.policy.ast.antlrschema.statement;
 
+import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrRecordType;
 import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrTypeReference;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaValueVisitor;
@@ -17,7 +18,7 @@ public class AntlrEnumEntityType extends AntlrEntityType {
 
     public AntlrEnumEntityType(AntlrTypeReference ref, Set<AntlrTypeReference> memberOf,
                                Collection<String> names, AntlrAnnotations annotations, SourceLoc location) {
-        super(ref, annotations, location);
+        super(ref, memberOf, annotations, location);
         this.names = Collections.unmodifiableSet(new LinkedHashSet<>(names));
     }
 
@@ -46,5 +47,10 @@ public class AntlrEnumEntityType extends AntlrEntityType {
                 .map(n -> '"' + n + '"')
                 .collect(Collectors.joining(", "));
         return getAnnotations().toString() + "entity %s enum [ %s ];".formatted(getBaseName(), values);
+    }
+
+    @Override
+    public AntlrRecordType getShape() {
+        return new AntlrRecordType(Collections.emptyMap(), SourceLoc.MISSING);
     }
 }

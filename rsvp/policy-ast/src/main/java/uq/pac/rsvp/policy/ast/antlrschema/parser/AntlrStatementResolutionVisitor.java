@@ -30,7 +30,7 @@ public class AntlrStatementResolutionVisitor implements AntlrSchemaValueVisitor<
     private AntlrTypeReference validateReference(AntlrTypeReference ref,
                Class<? extends AntlrSchemaStatement> expectedCls, String expectedMsg) {
 
-        AntlrTypeReference type = (AntlrTypeReference) types.visitReference(ref);
+        AntlrTypeReference type = (AntlrTypeReference) types.visitTypeReference(ref);
         AntlrSchemaStatement stmt = schema.get(type);
 
         // The previous visitor should have ensured resolution

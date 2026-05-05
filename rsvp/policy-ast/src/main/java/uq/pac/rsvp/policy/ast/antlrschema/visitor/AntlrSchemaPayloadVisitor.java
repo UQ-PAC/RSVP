@@ -8,38 +8,68 @@ import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrRecordEntityType;
 import uq.pac.rsvp.policy.ast.antlrschema.type.*;
 
 public interface AntlrSchemaPayloadVisitor<T> {
-    void visitSchema(AntlrSchema schema, T payload);
+    default void visitSchema(AntlrSchema schema, T payload) {
+        throw new AssertionError();
+    }
 
     // Statements
-    void visitRecordEntity(AntlrRecordEntityType entity, T payload);
+    default void visitRecordEntity(AntlrRecordEntityType entity, T payload) {
+        throw new AssertionError();
+    }
 
-    void visitEnumEntity(AntlrEnumEntityType entity, T payload);
+    default void visitEnumEntity(AntlrEnumEntityType entity, T payload) {
+        throw new AssertionError();
+    }
 
-    void visitAction(AntlrAction action, T payload);
+    default void visitAction(AntlrAction action, T payload) {
+        throw new AssertionError();
+    }
 
-    void visitCommon(AntlrCommonType type, T payload);
+    default void visitCommon(AntlrCommonType type, T payload) {
+        throw new AssertionError();
+    }
 
     // Compound types
-    void visitRecord(AntlrRecordType type, T payload);
+    default void visitRecord(AntlrRecordType type, T payload) {
+        throw new AssertionError();
+    }
 
-    void visitSet(AntlrSetType type, T payload);
+    default void visitSet(AntlrSetType type, T payload) {
+        throw new AssertionError();
+    }
 
     // Type references
-    void visitReference(AntlrTypeReference type, T payload);
+    default void visitTypeReference(AntlrTypeReference type, T payload) {
+        throw new AssertionError();
+    }
 
     // Primitive types
-    void visitBoolean(AntlrBooleanType type, T payload);
+    default void visitBoolean(AntlrBooleanType type, T payload) {
+        throw new AssertionError();
+    }
 
-    void visitLong(AntlrLongType type, T payload);
+    default void visitLong(AntlrLongType type, T payload) {
+        throw new AssertionError();
+    }
 
-    void visitString(AntlrStringType type, T payload);
+    default void visitString(AntlrStringType type, T payload) {
+        throw new AssertionError();
+    }
 
     // Extension types
-    void visitIpAddress(AntlrIpAddressType type, T payload);
+    default void visitIpAddress(AntlrIpAddressType type, T payload) {
+        throw new AssertionError();
+    }
 
-    void visitDecimal(AntlrDecimalType type, T payload);
+    default void visitDecimal(AntlrDecimalType type, T payload) {
+        throw new AssertionError();
+    }
 
-    void visitDateTime(AntlrDateTimeType type, T payload);
+    default void visitDateTime(AntlrDateTimeType type, T payload) {
+        throw new AssertionError();
+    }
 
-    void visitDuration(AntlrDurationType type, T payload);
+    default void visitDuration(AntlrDurationType type, T payload) {
+        throw new AssertionError();
+    }
 }

@@ -78,6 +78,10 @@ public class AntlrSchema {
         return null;
     }
 
+    public AntlrSchemaStatement getStatement(AntlrTypeReference ref) {
+        return statements.get(ref);
+    }
+
     public AntlrEntityType getEntityType(AntlrTypeReference ref) {
         return getTypedStatement(ref, AntlrEntityType.class);
     }
@@ -194,7 +198,7 @@ public class AntlrSchema {
                     typeGraphBuilder.addNode(c.getReference());
                     c.getDefinition().accept(new AntlrSchemaVisitorAdapter() {
                         @Override
-                        public void visitReference(AntlrTypeReference type) {
+                        public void visitTypeReference(AntlrTypeReference type) {
                             AntlrSchemaStatement stmt = requireNonNull(schema.get(type));
                             if (stmt instanceof AntlrCommonType ct) {
                                 typeGraphBuilder.putEdge(c.getReference(), ct.getReference());

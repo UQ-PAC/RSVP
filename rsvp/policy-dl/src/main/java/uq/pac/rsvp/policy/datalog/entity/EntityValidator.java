@@ -1,10 +1,14 @@
 package uq.pac.rsvp.policy.datalog.entity;
 
+import uq.pac.rsvp.policy.ast.antlrschema.AntlrSchema;
+import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrEntityType;
+import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrEnumEntityType;
+import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrRecordEntityType;
+import uq.pac.rsvp.policy.ast.antlrschema.type.*;
+import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.entity.*;
 import uq.pac.rsvp.policy.ast.schema.*;
 import uq.pac.rsvp.policy.ast.schema.common.*;
-import uq.pac.rsvp.policy.ast.visitor.SchemaPayloadVisitor;
-import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,15 +21,15 @@ import static uq.pac.rsvp.Assertion.require;
 /**
  * Validation of a set of entities with respect to a schema.
  * <p>
- * The main API function is {@link EntityValidator#validate(Schema, EntitySet)}
+ * The main API function is {@link EntityValidator#validate(AntlrSchema, EntitySet)}
  * that ensures that the set of entities is consistent with the provided schema
  * and returns a possibly updated set of entities. For instance, if the input
  * set does not include entities from enum-style entity definitions this validator
  * will generate them
  */
-public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
+public class EntityValidator implements AntlrSchemaPayloadVisitor<EntityValue> {
 
-    private final Schema schema;
+    private final AntlrSchema schema;
     private final EntitySet entities;
     // UIDs of all entities
     private Set<EntityReference> uids;
@@ -33,14 +37,14 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
     private final Set<EntityReference> references;
     private final static Pattern ESCAPED = Pattern.compile("[\b\t\n\r\"\\\\]");
 
-    private EntityValidator(Schema schema, EntitySet entities) {
+    private EntityValidator(AntlrSchema schema, EntitySet entities) {
         this.schema = schema;
         this.entities = entities;
         this.uids = new HashSet<>();
         this.references = new HashSet<>();
     }
 
-    public static EntitySet validate(Schema schema, EntitySet entities) {
+    public static EntitySet validate(AntlrSchema schema, EntitySet entities) {
         return new EntityValidator(schema, entities).validate();
     }
 
@@ -52,8 +56,8 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
 
         // At this point euids contain all references
         // Add references from enums
-        schema.entityTypes().forEach(e -> {
-            for (String name : e.getEntityNamesEnum()) {
+        schema.enumEntityTypes().forEach(e -> {
+            for (String name : e.getEnumNames()) {
                 EntityReference ref = new EntityReference(e.getName(), name);
                 if (!uids.contains(ref)) {
                     uids.add(ref);
@@ -92,10 +96,13 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
             throw new EntityException(euid.getSourceLoc(), "Internal entity id: " + euid.getId());
         }
 
-        EntityTypeDefinition def = schema.getEntityType(euid.getType());
+        // That's not the exact reference, but it has the same effect because of the structure
+        // FIXME: Need to reconsider this though
+        AntlrEntityType def = schema.getEntityType(new AntlrTypeReference("", euid.getType()));
         if (def == null) {
-            Set<String> actionTypes =
-                    schema.actions().stream().map(ActionDefinition::getType).collect(Collectors.toSet());
+            Set<String> actionTypes = schema.actions()
+                    .map(a -> a.getReference().getNamespace())
+                    .collect(Collectors.toSet());
             if (actionTypes.contains(euid.getType())) {
                 throw new EntityException(entity.getSourceLoc(), "Action entity: " + entity.getEuid());
             } else {
@@ -107,8 +114,8 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
         for (EntityReference value : entity.getParents()) {
             if (value instanceof EntityReference parent) {
                 // FIXME: Cache
-                Set<String> memberOf = def.getMemberOfTypes().stream()
-                        .map(EntityTypeDefinition::getName)
+                Set<String> memberOf = def.getMemberOf().stream()
+                        .map(AntlrTypeReference::getName)
                         .collect(Collectors.toSet());
                 memberOf.add(def.getName());
                 if (!memberOf.contains(parent.getType())) {
@@ -128,14 +135,14 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
     }
 
     @Override
-    public void visitRecordTypeDefinition(RecordTypeDefinition rec, EntityValue payload) {
+    public void visitRecord(AntlrRecordType rec, EntityValue payload) {
         RecordValue value = expectedType(payload, RecordValue.class, "record");
         rec.getAttributes().forEach((attr, type) -> {
-            EntityValue attrValue = value.getValue(new AttributeName(attr));
+            EntityValue attrValue = value.getValue(new AttributeName(attr.getName()));
             if (attrValue != null) {
                 type.process(this, attrValue);
             }
-            if (attrValue == null && type.isRequired()) {
+            if (attrValue == null && attr.isRequired()) {
                 throw new EntityException(payload.getSourceLoc(), "Missing attribute: " + attr);
             }
         });
@@ -148,26 +155,18 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
     }
 
     @Override
-    public void visitSetTypeDefinition(SetTypeDefinition type, EntityValue payload) {
+    public void visitSet(AntlrSetType type, EntityValue payload) {
         SetValue value = expectedType(payload, SetValue.class, "set");
         value.getValues().forEach(v -> type.getElementType().process(this, v));
     }
 
     @Override
-    public void visitEntityTypeReference(EntityTypeReference type, EntityValue payload) {
+    public void visitRecordEntity(AntlrRecordEntityType type, EntityValue payload) {
         EntityReference ref = expectedType(payload, EntityReference.class, "entity reference");
-        EntityTypeDefinition definition = type.getDefinition();
 
-        if (!definition.getName().equals(ref.getType())) {
-            throw new EntityException(payload.getSourceLoc(), "Unexpected type: expected" + definition.getName() + ", got " + ref.getType());
-        }
-
-        // FIXME: Need to check if enum supports no values
-        if (!definition.getEntityNamesEnum().isEmpty()) {
-            if (!definition.getEntityNamesEnum().contains(ref.getId())) {
-                throw new EntityException(payload.getSourceLoc(), "Unexpected ID " + ref.getId() +
-                        " for type " + definition.getName() + ", expected one of " + definition.getEntityNamesEnum());
-            }
+        if (!type.getName().equals(ref.getType())) {
+            throw new EntityException(payload.getSourceLoc(),
+                    "Unexpected type: expected" + type.getName() + ", got " + ref.getType());
         }
 
         // Track all references
@@ -175,62 +174,39 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
     }
 
     @Override
-    public void visitBoolean(BooleanType type, EntityValue payload) {
+    public void visitEnumEntity(AntlrEnumEntityType type, EntityValue payload) {
+        EntityReference ref = expectedType(payload, EntityReference.class, "entity reference");
+
+        if (!type.getName().equals(ref.getType())) {
+            throw new EntityException(payload.getSourceLoc(), "Unexpected type: expected" + type.getName() + ", got " + ref.getType());
+        }
+
+        if (!type.getEnumNames().contains(ref.getId())) {
+            throw new EntityException(payload.getSourceLoc(), "Unexpected ID " + ref.getId() +
+                    " for type " + type.getName() + ", expected one of " + type.getEnumNames());
+        }
+
+        // Track all references
+        references.add(ref);
+    }
+
+    @Override
+    public void visitBoolean(AntlrBooleanType type, EntityValue payload) {
         expectedType(payload, BooleanValue.class, "boolean");
     }
 
     @Override
-    public void visitCommonTypeReference(CommonTypeReference type, EntityValue payload) {
-        type.getDefinition().process(this, payload);
+    public void visitTypeReference(AntlrTypeReference reference, EntityValue payload) {
+        schema.getStatement(reference).process(this, payload);
     }
 
     @Override
-    public void visitLong(LongType type, EntityValue payload) {
+    public void visitLong(AntlrLongType type, EntityValue payload) {
         expectedType(payload, LongValue.class, "long");
     }
 
     @Override
-    public void visitString(StringType type, EntityValue payload) {
+    public void visitString(AntlrStringType type, EntityValue payload) {
         expectedType(payload, StringValue.class, "string");
-    }
-
-    @Override
-    public void visitDateTime(DateTimeType type, EntityValue payload) {
-        throw new EntityException(payload.getSourceLoc(), "Unsupported element: " + payload);
-    }
-
-    @Override
-    public void visitDecimal(DecimalType type, EntityValue payload) {
-        throw new EntityException(payload.getSourceLoc(), "Unsupported element: " + payload);
-    }
-
-    @Override
-    public void visitDuration(DurationType type, EntityValue payload) {
-        throw new EntityException(payload.getSourceLoc(), "Unsupported element: " + payload);
-    }
-
-    @Override
-    public void visitIpAddress(IpAddressType type, EntityValue payload) {
-        throw new EntityException(payload.getSourceLoc(), "Unsupported element: " + payload);
-    }
-
-    @Override
-    public void visitUnresolvedTypeReference(UnresolvedTypeReference type, EntityValue payload) {
-        throw new TranslationError("Unresolved reference in schema: " + type);
-    }
-
-    @Override
-    public void visitSchema(Schema schema, EntityValue payload) {
-        throw new TranslationError("Schema in type visitor");
-    }
-
-    @Override
-    public void visitEntityTypeDefinition(EntityTypeDefinition type, EntityValue payload) {
-        throw new TranslationError("Entity definition in type in visitor");
-    }
-
-    @Override
-    public void visitActionDefinition(ActionDefinition action, EntityValue payload) {
-        throw new TranslationError("Action definition in type in visitor");
     }
 }

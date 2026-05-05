@@ -1,10 +1,10 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
+import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrBooleanType;
 import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.ast.invariant.Quantifier;
-import uq.pac.rsvp.policy.ast.schema.common.BooleanType;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantFunctionValidator;
 
@@ -63,9 +63,11 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
                     return true;
                 }
                 if (e instanceof CallExpression call) {
+                    // FIXME: We only need to find out the return type here, so supplying works
+                    // for the time being.
                     InvariantFunctionValidator.FunctionValidator val =
-                            InvariantFunctionValidator.getValidator(call.getFunc());
-                    return val != null && val.getReturnType() instanceof BooleanType;
+                            InvariantFunctionValidator.getValidator(call.getFunc(), null);
+                    return val != null && val.getReturnType() instanceof AntlrBooleanType;
                 }
                 return false;
             };

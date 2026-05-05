@@ -3,9 +3,8 @@ package uq.pac.rsvp.policy.datalog.entity;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
-import uq.pac.rsvp.RsvpException;
+import uq.pac.rsvp.policy.ast.antlrschema.AntlrSchema;
 import uq.pac.rsvp.policy.ast.entity.*;
-import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.TestUtil;
 import uq.pac.rsvp.support.SourceLoc;
 
@@ -20,11 +19,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class EntityValidationTest {
 
     private static final Path RESOURCES = TestUtil.getResourceDir("entity");
-    private static final Schema SCHEMA;
+    private static final AntlrSchema SCHEMA;
     static {
         try {
-            SCHEMA = Schema.parseCedarSchema(Path.of(RESOURCES.toString(), "entity.cedarschema"));
-        } catch (RsvpException e) {
+            SCHEMA = AntlrSchema.parse(Path.of(RESOURCES.toString(), "entity.cedarschema"));
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

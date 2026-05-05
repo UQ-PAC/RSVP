@@ -4,9 +4,9 @@ import org.fusesource.jansi.Ansi;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import uq.pac.rsvp.RsvpException;
+import uq.pac.rsvp.policy.ast.antlrschema.AntlrSchema;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
-import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.TestUtil;
 import uq.pac.rsvp.policy.datalog.entity.EntityValidator;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
@@ -25,7 +25,7 @@ public class TypingTest {
 
     public TypingTest() throws RsvpException, IOException, IllegalAccessException {
         Path schemaPath = TestUtil.getResourceDir( "invariant", "schema.cedarschema");
-        Schema schema = Schema.parseCedarSchema(schemaPath);
+        AntlrSchema schema = AntlrSchema.parse(schemaPath);
         Path entitiesPath = TestUtil.getResourceDir("invariant", "entities.json");
         EntitySet entities = EntityValidator.validate(schema, EntitySet.parse(entitiesPath));
         this.validator = new InvariantValidator(schema, entities);

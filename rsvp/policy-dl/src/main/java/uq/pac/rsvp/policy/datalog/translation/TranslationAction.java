@@ -1,7 +1,7 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import uq.pac.rsvp.policy.ast.schema.ActionDefinition;
-import uq.pac.rsvp.policy.ast.schema.Schema;
+import uq.pac.rsvp.policy.ast.antlrschema.AntlrSchema;
+import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrAction;
 import uq.pac.rsvp.policy.datalog.ast.*;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
 
@@ -44,24 +44,24 @@ public class TranslationAction {
     private final List<DLFact> actionParent;
 
     public TranslationAction(TranslationSchema translationSchema) {
-        Schema schema = translationSchema.getSchema();
+        AntlrSchema schema = translationSchema.getSchema();
 
         List<DLStatement> actionFacts = new ArrayList<>(),
                 actionPrincipalRules = new ArrayList<>(),
                 actionResourceRules = new ArrayList<>();
         List<DLFact> actionParents = new ArrayList<>();
 
-        for (ActionDefinition def : schema.actions()) {
-            DLTerm term = DLTerm.lit(def.getQualifiedName());
+        for (AntlrAction def : schema.actions().toList()) {
+            DLTerm term = DLTerm.lit(def.getName());
             actionFacts.add(new DLFact(ActionRuleDecl, term));
 
             actionParents.add(new DLFact(ParentOfRuleDecl, term, term));
             def.getMemberOf().forEach(ad -> {
-                actionParents.add(new DLFact(ParentOfRuleDecl, DLTerm.lit(ad.getQualifiedName()), term));
+                actionParents.add(new DLFact(ParentOfRuleDecl, DLTerm.lit(ad.getName()), term));
             });
 
             DLAtom headWP = new DLAtom(ActionPrincipalRuleDecl, term, PrincipalVar);
-            List<DLStatement> apRules = def.getAppliesToPrincipalTypes().stream()
+            List<DLStatement> apRules = def.getApplication().getPrincipalTypes().stream()
                     .map(e -> {
                         DLRuleDecl tn = translationSchema.getTranslationEntityType(e.getName()).getEntityRuleDecl();
                         DLAtom tail = new DLAtom(tn, PrincipalVar);
@@ -70,7 +70,7 @@ public class TranslationAction {
             actionPrincipalRules.addAll(apRules);
 
             DLAtom headWR = new DLAtom(ActionResourceRuleDecl, term, PrincipalVar);
-            List<DLStatement> arRules = def.getAppliesToResourceTypes().stream()
+            List<DLStatement> arRules = def.getApplication().getResourceTypes().stream()
                     .map(e -> {
                         DLRuleDecl tn = translationSchema.getTranslationEntityType(e.getName()).getEntityRuleDecl();
                         DLAtom tail = new DLAtom(tn, PrincipalVar);

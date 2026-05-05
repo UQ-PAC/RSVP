@@ -13,7 +13,7 @@ import org.fusesource.jansi.Ansi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
-import uq.pac.rsvp.RsvpException;
+import uq.pac.rsvp.policy.ast.antlrschema.AntlrSchema;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.datalog.TestUtil;
 import uq.pac.rsvp.policy.datalog.entity.EntityValidator;
@@ -131,7 +131,7 @@ public class TranslationTest {
      * Differential test for Cedar and RSVP.
      * The test runs both, RSVP and Cedar authorisation engines and compares the results that should agree
      */
-    void differentialTest(TestInput test) throws IOException, AuthException, RsvpException, IllegalAccessException {
+    void differentialTest(TestInput test) throws IOException, AuthException, IllegalAccessException {
         logger.info(YELLOW, "Policy: " + test.policy)
                 .info(MAGENTA, "Datalog specification: " + test.datalogDir + "/" + TranslationConstants.ProgramName)
                 .fine(CYAN, Files.readString(test.policy));
@@ -149,8 +149,7 @@ public class TranslationTest {
         // Validate Entities
         // FIXME: Add overall validation
         EntitySet rsvpEntities = EntitySet.parse(test.entities);
-        uq.pac.rsvp.policy.ast.schema.Schema rsvpSchema =
-                uq.pac.rsvp.policy.ast.schema.Schema.parseCedarSchema(test.schema);
+        AntlrSchema rsvpSchema = AntlrSchema.parse(test.schema);
         EntityValidator.validate(rsvpSchema, rsvpEntities);
 
         Translation translation = new Translation(test.schema, test.policy,

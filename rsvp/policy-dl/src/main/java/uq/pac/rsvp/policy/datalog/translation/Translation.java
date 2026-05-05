@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,10 +33,10 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Multimap;
 
 import uq.pac.rsvp.RsvpException;
+import uq.pac.rsvp.policy.ast.antlrschema.AntlrSchema;
 import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
-import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.ast.DLAtom;
 import uq.pac.rsvp.policy.datalog.ast.DLDeclTerm;
 import uq.pac.rsvp.policy.datalog.ast.DLFact;
@@ -55,7 +54,7 @@ import uq.pac.rsvp.policy.datalog.invariant.InvariantValidator;
  */
 public class Translation {
 
-    private final Schema schema;
+    private final AntlrSchema schema;
     private final Collection<Policy> policies;
     private final EntitySet entities;
     private final Collection<Invariant> invariants;
@@ -94,7 +93,7 @@ public class Translation {
         }
     }
 
-    record InputSet(Schema schema, Collection<Policy> policies, EntitySet entities, Collection<Invariant> invariants) {}
+    record InputSet(AntlrSchema schema, Collection<Policy> policies, EntitySet entities, Collection<Invariant> invariants) {}
 
     static InputSet validate(Path schemaFile, Path policyFile, Path entityFile, Path invariantsFile) throws IOException, AuthException, RsvpException, IllegalAccessException {
         EntitySet entities = EntitySet.parse(entityFile);
@@ -122,14 +121,8 @@ public class Translation {
 
         // For the moment we do not support arbitrary action names as Cedar does,
         // just standard non-empty identifiers
-        Schema rsvpSchema = Schema.parseCedarSchema(schemaFile);
-        rsvpSchema.actions().forEach(a -> {
-            Arrays.stream(a.getName().split("::")).forEach(s -> {
-                if (!s.matches("^[A-ZA-z_][A-Za-z_0-9]+$")) {
-                    throw new TranslationError("Unsupported action name: " + a.getName());
-                }
-            });
-        });
+        // FIXME: I think they are supported now but this needs to be confirmed and formalised
+        AntlrSchema rsvpSchema = AntlrSchema.parse(schemaFile);
 
         // FIXME: This needs to be moved to entity validation
         // For the moment we also do not support entity names that have the same
@@ -137,8 +130,8 @@ public class Translation {
         List<String> entityNames = entities.getEntities().stream()
                 .map(e -> e.getEuid().getId())
                 .collect(Collectors.toCollection(ArrayList::new));
-        rsvpSchema.entityTypes()
-                .forEach(et -> entityNames.addAll(et.getEntityNamesEnum()));
+        rsvpSchema.enumEntityTypes()
+                .forEach(et -> entityNames.addAll(et.getEnumNames()));
         for (String en : entityNames) {
             if (en.contains(OUTPUT_DELIMITER)) {
                 throw new TranslationError("Unsupported entity name: " + en);
@@ -184,7 +177,7 @@ public class Translation {
         return new InputSet(rsvpSchema, policies, entities, invariants);
     }
 
-    private DLProgram translate(Schema schema, Collection<Policy> policies, EntitySet entities, Collection<Invariant> invariants) {
+    private DLProgram translate(AntlrSchema schema, Collection<Policy> policies, EntitySet entities, Collection<Invariant> invariants) {
         TranslationSchema translationSchema = new TranslationSchema(schema);
         TranslationEntitySet translationEntities = new TranslationEntitySet(entities, translationSchema);
         Collection<TranslationPolicy> translationPermitPolicies = policies.stream()
@@ -382,7 +375,7 @@ public class Translation {
         return result;
     }
 
-    public Schema getSchema() {
+    public AntlrSchema getSchema() {
         return schema;
     }
 

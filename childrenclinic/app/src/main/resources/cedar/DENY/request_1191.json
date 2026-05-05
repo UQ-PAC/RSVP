@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Linda Douglas\"",
-  "resource": "ChildrenClinic::Visit::\"Jewel Rodriquez 1\"",
+  "principal": "ChildrenClinic::Employee::\"Carl Bradford\"",
+  "resource": "ChildrenClinic::Visit::\"Jewel Rodriquez 2\"",
   "action": "ChildrenClinic::Action::\"DeleteVisit\"",
   "context": {}
 }

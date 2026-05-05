@@ -8,20 +8,23 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import cx from "classnames";
 import { useEffect, useRef } from "react";
-import { Report, SourceLoc } from "../../types";
-import { getSourceIdentifier, getSourceStr } from "../../util";
-import { ExpansionState, useFocusDispatch } from "../providers/FocusContext";
+import {
+  ExpansionState,
+  useFocusDispatch,
+} from "../../lib/context/FocusContext";
 import {
   useSelection,
   useSelectionDispatch,
-} from "../providers/SelectionContext";
+} from "../../lib/context/SelectionContext";
+import { Report, SourceLoc } from "../../lib/types";
+import { getSourceIdentifier, getSourceStr } from "../../lib/util";
 
 interface ReportItemParams {
   report: Report;
 }
 
 export function ReportItem({ report }: ReportItemParams) {
-  const { selected, hovered, scroll } = useSelection();
+  const { selected, hovered, scroll, loc } = useSelection();
   const selectionDispatch = useSelectionDispatch();
   const focusDispatch = useFocusDispatch();
 
@@ -54,13 +57,16 @@ export function ReportItem({ report }: ReportItemParams) {
         ? faCircleExclamation
         : faCircleInfo;
 
-  const locDesc = report.sourceLocations.length
-    ? "Multiple locations"
-    : getSourceStr(report.primarySourceLocation);
+  const locDesc =
+    report.sourceLocations.length == 0
+      ? undefined
+      : report.sourceLocations.length > 1
+        ? "Multiple locations"
+        : getSourceStr(report.sourceLocations[0].location);
 
   const clickLoc = (e, report: Report, loc?: SourceLoc) => {
     e.stopPropagation();
-    const target = loc ?? report.primarySourceLocation;
+    const target = loc ?? report.sourceLocations[0].location;
     target.source?.resolved
       .then((uploaded) => uploaded.serverId)
       .then((id) =>
@@ -71,26 +77,19 @@ export function ReportItem({ report }: ReportItemParams) {
         }),
       );
     selectionDispatch({
-      type: "click",
       scroll: "source",
       loc: `${report.id}:${getSourceIdentifier(target)}`,
     });
+    console.log(JSON.stringify(loc));
   };
 
+  // TODO: refactor
   const enterLoc = (e, report: Report, loc?: SourceLoc) => {
-    const target = loc ?? report.primarySourceLocation;
+    e.stopPropagation();
+    const target = loc ?? report.sourceLocations[0].location;
     selectionDispatch({
-      type: "mouseEnter",
       scroll: "none",
-      loc: `${report.id}:${getSourceIdentifier(target)}`,
-    });
-  };
-
-  const leaveLoc = (e, report: Report, loc?: SourceLoc) => {
-    const target = loc ?? report.primarySourceLocation;
-    selectionDispatch({
-      type: "mouseLeave",
-      scroll: "none",
+      hovered: "",
       loc: `${report.id}:${getSourceIdentifier(target)}`,
     });
   };
@@ -102,7 +101,7 @@ export function ReportItem({ report }: ReportItemParams) {
       className={className}
       onClick={() => {
         if (!isSelected) {
-          report.primarySourceLocation.source?.resolved
+          report.sourceLocations[0]?.location.source?.resolved
             .then((uploaded) => uploaded.serverId)
             .then((id) =>
               focusDispatch({
@@ -111,21 +110,31 @@ export function ReportItem({ report }: ReportItemParams) {
                 focus: { key: id, value: ExpansionState.Expanded },
               }),
             );
+          selectionDispatch({
+            selected: report.id,
+            loc: `${report.id}:${getSourceIdentifier(report.sourceLocations[0].location)}`,
+            scroll: "source",
+          });
+        } else {
+          selectionDispatch({
+            selected: "",
+            scroll: "none",
+            loc: undefined,
+          });
         }
-        selectionDispatch({ type: "click", id: report.id, scroll: "source" });
       }}
-      onMouseEnter={() =>
+      onMouseOver={() =>
         selectionDispatch({
-          type: "mouseEnter",
-          id: report.id,
+          hovered: report.id,
           scroll: "none",
+          loc: undefined,
         })
       }
-      onMouseLeave={() =>
+      onMouseOut={() =>
         selectionDispatch({
-          type: "mouseLeave",
-          id: report.id,
+          hovered: "",
           scroll: "none",
+          loc: undefined,
         })
       }
     >
@@ -137,45 +146,56 @@ export function ReportItem({ report }: ReportItemParams) {
         <span
           className={`report-item-message report-item-message-${report.severity}`}
         >
-          <span className="report-item-line-info">{locDesc}:</span>{" "}
+          {locDesc && (
+            <span className="report-item-line-info">{locDesc}: </span>
+          )}
           {report.message}
         </span>
 
         {(!!report.messageDetail?.length ||
-          !!report.sourceLocations.length) && (
+          report.sourceLocations.length > 1) && (
           <FontAwesomeIcon
             className="report-item-icon report-item-icon-expand"
             icon={isSelected ? faCaretUp : faCaretDown}
           />
         )}
       </div>
-      {isSelected && !!report.sourceLocations.length && (
-        <div className="report-item-source-location-list">
-          <span
-            className="report-item-source-location"
-            onClick={(e) => clickLoc(e, report)}
-            onMouseEnter={(e) => enterLoc(e, report)}
-            onMouseLeave={(e) => leaveLoc(e, report)}
-          >
-            {getSourceStr(report.primarySourceLocation)}
-          </span>
-          {report.sourceLocations.map((loc) => (
-            <span
-              key={getSourceIdentifier(loc)}
-              className="report-item-source-location"
-              onClick={(e) => clickLoc(e, report, loc)}
-              onMouseEnter={(e) => enterLoc(e, report, loc)}
-              onMouseLeave={(e) => leaveLoc(e, report, loc)}
-            >
-              {(loc.file !== report.primarySourceLocation.file
-                ? loc.source?.file.name + ": "
-                : "") + getSourceStr(loc)}
-            </span>
-          ))}
-        </div>
-      )}
       {isSelected && !!report.messageDetail?.length && (
         <div className="report-item-message-detail">{report.messageDetail}</div>
+      )}
+      {isSelected && report.sourceLocations.length > 1 && (
+        <div className="report-item-source-location-list">
+          {report.sourceLocations.map(({ message, location }) => {
+            const id = getSourceIdentifier(location);
+            const className = cx(
+              "report-item-source-location",
+              loc === `${report.id}:${id}` && "hovered",
+            );
+
+            return (
+              <span
+                key={id}
+                className={className}
+                onClick={(e) => clickLoc(e, report, location)}
+                onMouseOver={(e) => enterLoc(e, report, location)}
+                onMouseOut={() =>
+                  selectionDispatch({
+                    scroll: "none",
+                    hovered: "",
+                  })
+                }
+              >
+                <span className="location">
+                  {(location.file !== report.sourceLocations[0].location.file
+                    ? location.source?.filename + ": "
+                    : "") + getSourceStr(location)}
+                </span>
+
+                {!!message && <span className="message">: {message}</span>}
+              </span>
+            );
+          })}
+        </div>
       )}
     </div>
   );

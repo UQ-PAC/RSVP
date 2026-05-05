@@ -16,6 +16,8 @@
 /rsvp/webserver/bin
 /rsvp/policy-ast/build
 /rsvp/policy-ast/bin
+/rsvp/policy-dl/build
+/rsvp/policy-dl/bin
 /rsvp/rsvp-tmp
 /rsvp/support/bin
 /rsvp/support/build

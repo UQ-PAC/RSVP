@@ -6,19 +6,19 @@ import {
   FocusContext,
   FocusDispatchContext,
   focusReducer,
-} from "./FocusContext";
+} from "../../lib/context/FocusContext";
 import {
   emptySelection,
   SelectionContext,
   SelectionDispatchContext,
   selectionReducer,
-} from "./SelectionContext";
+} from "../../lib/context/SelectionContext";
 import {
   emptyVerification,
   VerificationContext,
   VerificationDispatchContext,
   verificationReducer,
-} from "./VerificationContext";
+} from "../../lib/context/VerificationContext";
 
 export function ContextProvider({ children }) {
   const [verificationContext, verificationDispatch] = useReducer(

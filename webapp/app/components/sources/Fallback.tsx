@@ -4,7 +4,7 @@ import {
   ExpansionState,
   useFocus,
   useFocusDispatch,
-} from "../providers/FocusContext";
+} from "../../lib/context/FocusContext";
 
 interface FallbackProps {
   instruction: string;
@@ -19,8 +19,9 @@ export function Fallback({ instruction, target }: FallbackProps) {
     <p className="source-files-instruction">
       <a
         className="source-files-upload-link"
+        data-testid="source-files-upload-link"
         onClick={() => {
-          if (drawerFocus.expansions["left"] == ExpansionState.Collapsed) {
+          if (drawerFocus.expansions.left == ExpansionState.Collapsed) {
             focusDispatch({
               type: "focus",
               target: "drawer",

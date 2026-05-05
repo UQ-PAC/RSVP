@@ -1,8 +1,8 @@
-import cx from "classnames";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { UploadedFile, VerificationFile } from "../../types";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import cx from "classnames";
 import { useDrag } from "react-dnd";
+import { UploadedFile, VerificationFile } from "../../lib/types";
 import { useDragRef } from "./DragDropRef";
 
 interface DraggableFileProps {
@@ -30,7 +30,7 @@ export function DraggableFile({ file, resolved, remove }: DraggableFileProps) {
 
   return (
     <span ref={ref} className={className}>
-      <span className="uploaded-file-name">{file.file.name}</span>
+      <span className="uploaded-file-name">{file.filename}</span>
       <FontAwesomeIcon
         className="uploaded-file-delete-icon"
         icon={faXmark}

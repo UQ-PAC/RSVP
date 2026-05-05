@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <button
+    class="create-policy-context-button"
+    data-testid="create-policy-context-button"
+  >
+    <div
+      data-icon="faPlus"
+      data-testid="font-awesome-icon"
+    />
+    <span
+      class="create-policy-context-button-text"
+    >
+      Create policy set
+    </span>
+  </button>
+</DocumentFragment>
+`;

@@ -1,18 +1,16 @@
 package uq.pac.rsvp.verification;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import uq.pac.rsvp.policy.ast.FileSet;
+import uq.pac.rsvp.support.reporting.Report;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.jupiter.api.Test;
-
-import uq.pac.rsvp.support.reporting.Report;
-import uq.pac.rsvp.verification.Verification.VerificationResult;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class VerificationTest {
 
@@ -26,10 +24,11 @@ public class VerificationTest {
         Path policy = childrenClinic1.resolve("childrenclinic-rsvp-policy.cedar");
         Path schema = childrenClinic1.resolve("childrenclinic-rsvp-schema.cedarschema");
 
-        VerificationResult result = Verification.verifyPolicies(Set.of(List.of(policy)),
-                Set.of(schema), Set.of(entities), Collections.emptySet());
+        FileSet fileset = new FileSet().addEntities(entities).addPolicies(policy).addSchema(schema);
 
-        assertTrue(result.getReports().isEmpty());
+        VerificationResult result = Verification.verifyPolicies(fileset);
+
+        assertTrue(result.reports().isEmpty());
     }
 
     @Test
@@ -44,18 +43,18 @@ public class VerificationTest {
         Path policy = childrenClinic2.resolve("childrenclinic-rsvp-policy.cedar");
         Path schema = childrenClinic1.resolve("childrenclinic-rsvp-schema.cedarschema");
 
-        VerificationResult result = Verification.verifyPolicies(Set.of(List.of(policy)),
-                Set.of(schema), Set.of(entities), Collections.emptySet());
+        FileSet fileset = new FileSet().addEntities(entities).addPolicies(policy).addSchema(schema);
 
-        assertEquals(2, result.getReports().size());
+        VerificationResult result = Verification.verifyPolicies(fileset);
 
-        Set<String> expectedMsgs = new HashSet<>();
-        expectedMsgs.addAll(List.of(
+        assertEquals(2, result.reports().size());
+
+        Set<String> expectedMsgs = new HashSet<>(List.of(
                 "Policy 'policy8' does not match any requests that are not also matched by policy 'policy6'",
                 "Policy 'policy14' does not match any requests that are not also matched by policy 'policy6'"
-                ));
+        ));
 
-        for (Report report : result.getReports()) {
+        for (Report report : result.reports()) {
             assertTrue(expectedMsgs.remove(report.getMessage()));
         }
     }

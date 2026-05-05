@@ -30,6 +30,7 @@ export function NewGroupForm({
     <form className="create-analysis-group-form">
       <input
         className={cx("create-analysis-group-text-input", invalid && "invalid")}
+        data-testid="create-analysis-group-text-input"
         type="text"
         placeholder={placeholder}
         onChange={(e) => {
@@ -49,6 +50,7 @@ export function NewGroupForm({
       <span className="create-analysis-group-buttons">
         <button
           className="cancel-create-analysis-group-button"
+          data-testid="cancel-create-analysis-group-button"
           onClick={(e) => {
             e.preventDefault();
             cancel();
@@ -59,6 +61,7 @@ export function NewGroupForm({
         </button>
         <button
           className="create-analysis-group-button"
+          data-testid="create-analysis-group-button"
           disabled={invalid}
           onClick={(e) => {
             e.preventDefault();

@@ -25,7 +25,7 @@ public class Request {
 
     public Request(String id) {
         this.id = id;
-        String [] components = id.split(OUTPUT_DELIMITER.toString());
+        String[] components = id.split(OUTPUT_DELIMITER.toString());
         if (components.length != 3) {
             throw new TranslationError("Invalid request format: %s", id);
         }
@@ -89,6 +89,14 @@ public class Request {
 
     public String getAction() {
         return action;
+    }
+
+    public boolean known() {
+        return !principal.contains("???") && !resource.contains("???");
+    }
+
+    public String toHumanReadableString() {
+        return "%s can perform %s on %s".formatted(principal, action.substring(8), resource);
     }
 
     @Override

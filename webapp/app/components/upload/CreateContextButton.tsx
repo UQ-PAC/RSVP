@@ -7,7 +7,11 @@ interface CreateContextButtonProps {
 
 export function CreateContextButton({ onclick }: CreateContextButtonProps) {
   return (
-    <button className="create-policy-context-button" onClick={onclick}>
+    <button
+      className="create-policy-context-button"
+      data-testid="create-policy-context-button"
+      onClick={onclick}
+    >
       <FontAwesomeIcon
         className="create-policy-context-button-icon"
         icon={faPlus}

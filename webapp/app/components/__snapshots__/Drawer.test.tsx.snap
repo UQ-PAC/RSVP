@@ -1,0 +1,229 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`handles no children 1`] = `
+<DocumentFragment>
+  <div
+    class="drawer drawer-right expanded"
+  >
+    <div
+      class="drawer-tab"
+      data-testid="drawer-tab"
+    >
+      <div
+        data-icon="faCaretRight"
+        data-testid="font-awesome-icon"
+      />
+    </div>
+    <div
+      class="drawer-container"
+    >
+      <h3
+        class="drawer-title"
+      >
+        Empty
+      </h3>
+      <div
+        class="drawer-content"
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders left collapsed 1`] = `
+<DocumentFragment>
+  <div
+    class="drawer drawer-left"
+  >
+    <div
+      class="drawer-tab"
+      data-testid="drawer-tab"
+    >
+      <div
+        data-icon="faCaretRight"
+        data-testid="font-awesome-icon"
+      />
+    </div>
+    <div
+      class="drawer-container"
+    >
+      <h3
+        class="drawer-title"
+      >
+        Left
+      </h3>
+      <div
+        class="drawer-content"
+      >
+        <div />
+        <div />
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders left expanded 1`] = `
+<DocumentFragment>
+  <div
+    class="drawer drawer-left expanded"
+  >
+    <div
+      class="drawer-tab"
+      data-testid="drawer-tab"
+    >
+      <div
+        data-icon="faCaretLeft"
+        data-testid="font-awesome-icon"
+      />
+    </div>
+    <div
+      class="drawer-container"
+    >
+      <h3
+        class="drawer-title"
+      >
+        Left
+      </h3>
+      <div
+        class="drawer-content"
+      >
+        <div />
+        <div />
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders right collapsed 1`] = `
+<DocumentFragment>
+  <div
+    class="drawer drawer-right"
+  >
+    <div
+      class="drawer-tab"
+      data-testid="drawer-tab"
+    >
+      <div
+        data-icon="faCaretLeft"
+        data-testid="font-awesome-icon"
+      />
+    </div>
+    <div
+      class="drawer-container"
+    >
+      <h3
+        class="drawer-title"
+      >
+        Right
+      </h3>
+      <div
+        class="drawer-content"
+      >
+        <div />
+        <div />
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders right expanded 1`] = `
+<DocumentFragment>
+  <div
+    class="drawer drawer-right expanded"
+  >
+    <div
+      class="drawer-tab"
+      data-testid="drawer-tab"
+    >
+      <div
+        data-icon="faCaretRight"
+        data-testid="font-awesome-icon"
+      />
+    </div>
+    <div
+      class="drawer-container"
+    >
+      <h3
+        class="drawer-title"
+      >
+        Right
+      </h3>
+      <div
+        class="drawer-content"
+      >
+        <div />
+        <div />
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`triggers collapse 1`] = `
+<DocumentFragment>
+  <div
+    class="drawer drawer-left expanded"
+  >
+    <div
+      class="drawer-tab"
+      data-testid="drawer-tab"
+    >
+      <div
+        data-icon="faCaretLeft"
+        data-testid="font-awesome-icon"
+      />
+    </div>
+    <div
+      class="drawer-container"
+    >
+      <h3
+        class="drawer-title"
+      >
+        Collapse Me
+      </h3>
+      <div
+        class="drawer-content"
+      >
+        <div />
+        <div />
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`triggers expansion 1`] = `
+<DocumentFragment>
+  <div
+    class="drawer drawer-left"
+  >
+    <div
+      class="drawer-tab"
+      data-testid="drawer-tab"
+    >
+      <div
+        data-icon="faCaretRight"
+        data-testid="font-awesome-icon"
+      />
+    </div>
+    <div
+      class="drawer-container"
+    >
+      <h3
+        class="drawer-title"
+      >
+        Expand Me
+      </h3>
+      <div
+        class="drawer-content"
+      >
+        <div />
+        <div />
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;

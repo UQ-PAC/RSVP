@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <span
+    class="toggle-all test-toggle-all"
+  >
+    <a
+      class="expand-all test-expand-all"
+      data-testid="expand-all"
+    >
+      EXPAND ALL
+    </a>
+    <span>
+      |
+    </span>
+    <a
+      class="collapse-all test-collapse-all"
+      data-testid="collapse-all"
+    >
+      COLLAPSE ALL
+    </a>
+  </span>
+</DocumentFragment>
+`;

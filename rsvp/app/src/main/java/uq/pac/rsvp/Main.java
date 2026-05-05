@@ -1,14 +1,16 @@
 package uq.pac.rsvp;
 
+import uq.pac.rsvp.policy.ast.FileSet;
 import uq.pac.rsvp.support.reporting.Report;
+import uq.pac.rsvp.support.util.Pair;
 import uq.pac.rsvp.verification.ConfigurationException;
 import uq.pac.rsvp.verification.Verification;
+import uq.pac.rsvp.verification.VerificationResult;
+import uq.pac.rsvp.verification.impact.RequestStatus;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -18,15 +20,7 @@ import java.util.Set;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-
-        class PolicyFileSet {
-            Set<Path> schemaPaths = new HashSet<>();
-            Set<List<Path>> policiesPaths = new HashSet<>();
-            Set<Path> entitiesPaths = new HashSet<>();
-            Set<Path> invariantsPaths = new HashSet<>();
-        }
-
-        PolicyFileSet fileSet = new PolicyFileSet();
+        FileSet fileset = new FileSet();
 
         // Parse each command line arg as a policy ast file
         for (int i = 0; i < args.length; i++) {
@@ -38,23 +32,21 @@ public class Main {
                     System.exit(1);
                 }
                 Path schemaPath = Path.of(args[i]).toAbsolutePath();
-                fileSet.schemaPaths.add(schemaPath);
+                fileset.addSchema(schemaPath);
             } else if (arg.equals("--policies") || arg.equals("-p")) {
-                i++;
-                if (i == args.length) {
+                if (i == args.length - 1) {
                     System.err.println("Error: --policies/-p requires an argument");
                     System.exit(1);
                 }
-                Path policiesPath = Path.of(args[i]).toAbsolutePath();
+
+                List<Path> versions = new ArrayList<>();
+
                 // If more than one, treat them as versions of the same file:
-                if (fileSet.policiesPaths.isEmpty()) {
-                    List<Path> versions = new ArrayList<>();
-                    versions.add(policiesPath);
-                    fileSet.policiesPaths.add(versions);
-                } else {
-                    List<Path> versions = fileSet.policiesPaths.iterator().next();
-                    versions.add(policiesPath);
+                while (i < args.length - 1 && !args[i + 1].startsWith("-")) {
+                    versions.add(Path.of(args[++i]).toAbsolutePath());
                 }
+
+                fileset.addPolicies(versions.toArray(new Path[0]));
             } else if (arg.equals("--entities") || arg.equals("-e")) {
                 i++;
                 if (i == args.length) {
@@ -62,7 +54,7 @@ public class Main {
                     System.exit(1);
                 }
                 Path entitiesPath = Path.of(args[i]).toAbsolutePath();
-                fileSet.entitiesPaths.add(entitiesPath);
+                fileset.addEntities(entitiesPath);
             } else if (arg.equals("--invariants") || arg.equals("-i")) {
                 i++;
                 if (i == args.length) {
@@ -70,25 +62,32 @@ public class Main {
                     System.exit(1);
                 }
                 Path invariantsPath = Path.of(args[i]).toAbsolutePath();
-                fileSet.entitiesPaths.add(invariantsPath);
+                fileset.addInvariants(invariantsPath);
             }
         }
 
         try {
-            Verification.VerificationResult result = Verification.verifyPolicies(fileSet.policiesPaths,
-                    fileSet.schemaPaths, fileSet.entitiesPaths, fileSet.invariantsPaths);
-            Set<Report> reports = result.getReports();
+            VerificationResult result = Verification.verifyPolicies(fileset);
+            Set<Report> reports = result.reports();
             for (Report report : reports) {
                 System.out.println(report.toString());
             }
 
-            Collection<Verification.RequestStatus> v = result.getChangeImpact();
-            if (v != null) {
-                System.out.println("\nChange impact:\n-----------------------");
-                for (Verification.RequestStatus requestStatus : v) {
+            for (Pair<String, String> pair : fileset.getVersionPairs()) {
+                List<RequestStatus> impact = Verification.getImpact(pair.getKey(), pair.getValue(), result.cache());
+
+                System.out.println("\nChange impact: " + pair.getKey() + " -> " + pair.getValue());
+                System.out.println("-----------------------");
+                for (RequestStatus requestStatus : impact) {
                     System.out.println(requestStatus.toString());
                 }
+
             }
+
+        } catch (IOException io) {
+            System.err.println("IO Error");
+            io.printStackTrace();
+            System.exit(1);
         } catch (InterruptedException ie) {
             System.err.println("Interrupted.");
             System.exit(1);

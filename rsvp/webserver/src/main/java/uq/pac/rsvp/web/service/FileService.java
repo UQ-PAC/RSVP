@@ -1,4 +1,4 @@
-package uq.pac.rsvp.web;
+package uq.pac.rsvp.web.service;
 
 import com.google.common.hash.Hashing;
 import org.slf4j.Logger;
@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.ErrorResponseException;
 import org.springframework.web.multipart.MultipartFile;
+import uq.pac.rsvp.web.context.VerificationSession;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -23,9 +24,14 @@ public class FileService {
 
     @Autowired
     VerificationSession session;
-
+    
     public String createTempFile(MultipartFile file) throws IOException {
         String filename = file.getOriginalFilename();
+
+        if (filename == null) {
+            throw new IOException("Missing filename");
+        }
+
         int ext = filename.lastIndexOf('.');
 
         Path tmp = Files.createTempFile(filename.substring(0, ext), ext > -1 ? filename.substring(ext) : null);

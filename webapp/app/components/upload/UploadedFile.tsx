@@ -1,12 +1,12 @@
 import { faCodeCompare, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { JSX } from "react";
-import { VerificationFile } from "../../types";
+import { VerificationFile } from "../../lib/types";
 
 interface UploadedFileProps {
   file: VerificationFile;
   remove: (file: VerificationFile) => void;
-  children?: JSX.Element[];
+  children?: JSX.Element | JSX.Element[];
   addChild?: (file: VerificationFile) => void;
 }
 
@@ -19,7 +19,7 @@ export function UploadedFile({
   return (
     <div className="uploaded-file-container">
       <span className="uploaded-file">
-        <span className="uploaded-file-name">{file.file.name}</span>
+        <span className="uploaded-file-name">{file.filename}</span>
         {addChild && (
           <FontAwesomeIcon
             className="uploaded-file-version-icon"
@@ -33,7 +33,7 @@ export function UploadedFile({
           onClick={() => remove(file)}
         />
       </span>
-      <div className="uploaded-file-versions">{children}</div>
+      {!!children && <div className="uploaded-file-versions">{children}</div>}
     </div>
   );
 }

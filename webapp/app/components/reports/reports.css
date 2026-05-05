@@ -13,6 +13,10 @@
     padding: 0.75rem 0.5rem 0;
   }
 
+  .reports-container:has(.progress-spinner-icon) {
+    margin-top: 6rem;
+  }
+
   .reports-section .reports-section-header {
     display: flex;
     align-items: center;
@@ -43,35 +47,6 @@
 
   .reports-group-content {
     margin-left: 0.5rem;
-  }
-
-  .reports-instruction.verifying {
-    color: var(--color-gray-500);
-    font-weight: 500;
-    text-align: center;
-  }
-
-  .verification-progress-icon {
-    font-size: 2rem;
-    color: var(--color-gray-400);
-    margin: 6rem auto 1rem;
-  }
-
-  .verification-progress-icon path {
-    animation-name: spinner;
-    animation-duration: 1s;
-    animation-iteration-count: infinite;
-    transform-origin: 50% 50%;
-    animation-timing-function: linear;
-  }
-
-  @keyframes spinner {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(359deg);
-    }
   }
 
   .reports-group-header:hover {
@@ -148,9 +123,10 @@
   }
 
   .report-item .report-item-message-detail {
-    margin-top: 0.5rem;
+    margin: 0.5rem 0;
+    padding-left: 1.8rem;
     color: var(--color-gray-700);
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
 
   .report-item .report-item-source-location-list {
@@ -164,8 +140,30 @@
     font-size: 0.7rem;
     line-height: 1.1rem;
     cursor: pointer;
-    padding: 0.1rem 0.5rem;
+    padding: 0.1rem 0 0.1rem 1.5rem;
     align-self: flex-start;
+
+    /* padding-left: 1.5rem; */
+    text-indent: -0.9rem;
+    /* padding-right: 0; */
+    margin-right: 0.9rem;
+    display: block;
+    width: 100%;
+  }
+
+  .report-item
+    .report-item-source-location-list
+    .report-item-source-location
+    .location {
+    font-weight: 500;
+    color: var(--color-gray-700);
+  }
+
+  .report-item
+    .report-item-source-location-list
+    .report-item-source-location
+    .message {
+    font-weight: 300;
   }
 
   .report-item
@@ -177,20 +175,46 @@
 
   .report-item.report-item-info
     .report-item-source-location-list
-    .report-item-source-location:hover {
+    .report-item-source-location:hover,
+  .report-item.report-item-info.hovered
+    .report-item-source-location-list
+    .report-item-source-location.hovered:not(:hover) {
     background-color: var(--color-info-darker);
   }
 
   .report-item.report-item-warn
     .report-item-source-location-list
-    .report-item-source-location:hover {
+    .report-item-source-location:hover,
+  .report-item.report-item-warn.hovered
+    .report-item-source-location-list
+    .report-item-source-location.hovered:not(:hover) {
     background-color: var(--color-warn-darker);
   }
 
   .report-item.report-item-err
     .report-item-source-location-list
-    .report-item-source-location:hover {
+    .report-item-source-location:hover,
+  .report-item.report-item-err.hovered
+    .report-item-source-location-list
+    .report-item-source-location.hovered:not(:hover) {
     background-color: var(--color-err-darker);
+  }
+
+  .report-item.report-item-info
+    .report-item-source-location-list
+    .report-item-source-location.hovered:not(:hover) {
+    background-color: var(--color-info-mid);
+  }
+
+  .report-item.report-item-warn
+    .report-item-source-location-list
+    .report-item-source-location.hovered:not(:hover) {
+    background-color: var(--color-warn-mid);
+  }
+  .report-item.report-item-err
+    .report-item-source-location-list
+    .report-item-source-location.hovered:not(:hover) {
+    background-color: var(--color-err-mid);
   }
 
   .report-item.report-item-info {

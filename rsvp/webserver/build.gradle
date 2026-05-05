@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation project(':verification')
     implementation project(':support')
+    implementation project(':policy-ast')
+    implementation project(':verification')
 }

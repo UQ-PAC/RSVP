@@ -8,7 +8,8 @@ import com.google.gson.annotations.SerializedName;
 import uq.pac.rsvp.support.SourceLoc;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Set;
+import java.util.Collections;
+import java.util.List;
 
 public class Report {
 
@@ -35,26 +36,48 @@ public class Report {
         }
     }
 
+    public static class LocationMessage {
+        private final SourceLoc location;
+        private final String message;
+
+        public LocationMessage(SourceLoc location, String message) {
+            this.location = location;
+            this.message = message;
+        }
+
+        public SourceLoc getLocation() {
+            return location;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        @Override
+        public String toString() {
+            return "%s: %s".formatted(location.toString(), message);
+        }
+    }
+
     private final HashCode id;
     private final Severity severity;
     private final String message;
     private final String detail;
-    private final SourceLoc primary;
-    private final Set<SourceLoc> locations;
+    private final List<LocationMessage> locations;
 
-    public Report(Severity severity, String message, String detail, SourceLoc primary, SourceLoc... locations) {
+    public Report(Severity severity, String message, String detail, LocationMessage... locations) {
         this.severity = severity;
         this.message = message;
         this.detail = detail;
-        this.primary = primary;
-        this.locations = Set.of(locations);
+        this.locations = locations == null ? Collections.emptyList() : List.of(locations);
         this.id = Hashing.sha256().hashString(
-                severity.name + message + detail + primary.toString() + this.locations.toString(),
+                severity.name + message + detail + this.locations,
                 StandardCharsets.UTF_8);
+
     }
 
-    public Report(Severity severity, String message, SourceLoc primary, SourceLoc... locations) {
-        this(severity, message, "", primary, locations);
+    public Report(Severity severity, String message, LocationMessage... locations) {
+        this(severity, message, "", locations);
     }
 
     public String getId() {
@@ -73,12 +96,8 @@ public class Report {
         return detail;
     }
 
-    public SourceLoc getPrimarySourceLocation() {
-        return primary;
-    }
-
-    public Set<SourceLoc> getSourceLocations() {
-        return Set.copyOf(locations);
+    public List<LocationMessage> getSourceLocations() {
+        return List.copyOf(locations);
     }
 
     @Override

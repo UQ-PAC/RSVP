@@ -1,0 +1,118 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <div
+    class="uploaded-file-container"
+  >
+    <span
+      class="uploaded-file"
+    >
+      <span
+        class="uploaded-file-name"
+      >
+        test-file
+      </span>
+      <div
+        data-icon="faXmark"
+        data-testid="font-awesome-icon-faXmark"
+      />
+    </span>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders 2`] = `
+<DocumentFragment>
+  <div
+    class="uploaded-file-container"
+  >
+    <span
+      class="uploaded-file"
+    >
+      <span
+        class="uploaded-file-name"
+      >
+        test-file
+      </span>
+      <div
+        data-icon="faCodeCompare"
+        data-testid="font-awesome-icon-faCodeCompare"
+      />
+      <div
+        data-icon="faXmark"
+        data-testid="font-awesome-icon-faXmark"
+      />
+    </span>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders 3`] = `
+<DocumentFragment>
+  <div
+    class="uploaded-file-container"
+  >
+    <span
+      class="uploaded-file"
+    >
+      <span
+        class="uploaded-file-name"
+      >
+        test-file
+      </span>
+      <div
+        data-icon="faCodeCompare"
+        data-testid="font-awesome-icon-faCodeCompare"
+      />
+      <div
+        data-icon="faXmark"
+        data-testid="font-awesome-icon-faXmark"
+      />
+    </span>
+    <div
+      class="uploaded-file-versions"
+    >
+      <div
+        data-testid="nested-file"
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders 4`] = `
+<DocumentFragment>
+  <div
+    class="uploaded-file-container"
+  >
+    <span
+      class="uploaded-file"
+    >
+      <span
+        class="uploaded-file-name"
+      >
+        test-file
+      </span>
+      <div
+        data-icon="faCodeCompare"
+        data-testid="font-awesome-icon-faCodeCompare"
+      />
+      <div
+        data-icon="faXmark"
+        data-testid="font-awesome-icon-faXmark"
+      />
+    </span>
+    <div
+      class="uploaded-file-versions"
+    >
+      <div
+        data-testid="nested-file-one"
+      />
+      <div
+        data-testid="nested-file-two"
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;

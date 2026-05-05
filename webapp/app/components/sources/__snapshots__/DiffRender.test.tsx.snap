@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renders diff 1`] = `
+<DocumentFragment>
+  <div
+    class="source-file-diff source-file-empty-diff"
+    data-testid="empty-diff-render"
+  />
+</DocumentFragment>
+`;
+
+exports[`renders diff 2`] = `
+<DocumentFragment>
+  <div
+    class="source-file-diff roboto-mono"
+    data-testid="diff-render"
+  />
+  <div
+    class="diff-impact"
+  >
+    <span
+      class="diff-impact-information-message"
+    >
+      Run verification to see the impact of these changes.
+    </span>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders empty 1`] = `
+<DocumentFragment>
+  <div
+    class="source-file-diff source-file-empty-diff"
+    data-testid="empty-diff-render"
+  />
+</DocumentFragment>
+`;
+
+exports[`renders empty 2`] = `
+<DocumentFragment>
+  <div
+    class="source-file-diff source-file-empty-diff"
+    data-testid="empty-diff-render"
+  />
+</DocumentFragment>
+`;

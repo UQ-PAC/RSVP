@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   devIndicators: false,
   enablePrerenderSourceMaps: true,
-  // reactStrictMode: false,
+  reactStrictMode: false,
   async rewrites() {
     return [
       {

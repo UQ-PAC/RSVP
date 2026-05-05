@@ -5,36 +5,43 @@ import {
   faPlusSquare,
 } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Report } from "../../types";
 import {
   ExpansionState,
   useFocus,
   useFocusDispatch,
-} from "../providers/FocusContext";
-import { useSelectionDispatch } from "../providers/SelectionContext";
+} from "../../lib/context/FocusContext";
+import { useSelectionDispatch } from "../../lib/context/SelectionContext";
+import { Report } from "../../lib/types";
 import { ReportItem } from "./ReportItem";
 
 interface ReportsGroupProps {
   section: string;
+  id: string;
   name: string;
   reports: Report[];
 }
 
 // TODO: organise by filename (collapsible)
-export function ReportsGroup({ section, name, reports }: ReportsGroupProps) {
+export function ReportsGroup({
+  section,
+  id,
+  name,
+  reports,
+}: ReportsGroupProps) {
   const { "report-group": groupFocus } = useFocus();
   const focusDispatch = useFocusDispatch();
   const selectionDispatch = useSelectionDispatch();
 
-  const groupKey = `${section}-${name}`;
+  const groupKey = `${section}-${id}`;
   const expanded = !groupFocus.expansions[groupKey];
 
   return (
     <div className="reports-group">
       <div
         className="reports-group-header"
+        data-testid={`reports-group-${id}-header`}
         onClick={() => {
-          selectionDispatch({ type: "other", scroll: "none" });
+          selectionDispatch({ scroll: "none" });
           focusDispatch({
             type: "focus",
             target: "report-group",

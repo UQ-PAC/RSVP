@@ -7,7 +7,7 @@ import {
   ExpansionState,
   useFocus,
   useFocusDispatch,
-} from "./providers/FocusContext";
+} from "../lib/context/FocusContext";
 
 import "./drawer.css";
 
@@ -34,6 +34,7 @@ export function Drawer({ title, side, children }: DrawerProps) {
     <div className={className}>
       <div
         className="drawer-tab"
+        data-testid="drawer-tab"
         onClick={() =>
           dispatch({
             type: "focus",

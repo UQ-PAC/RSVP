@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { verify } from "./requests";
 import { Report, VerificationRequest } from "./types";
 import { sortReports } from "./util";
@@ -8,11 +9,6 @@ jest.mock("./util", () => ({
 
 const reportMock: Report = {
   id: "foo",
-  primarySourceLocation: {
-    file: "bar",
-    offset: 0,
-    len: 0,
-  },
   sourceLocations: [],
   severity: "info",
   message: "",
@@ -29,14 +25,15 @@ beforeAll(() => {
       text: () => Promise.resolve("text data"),
       ok: true,
       status: 200,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any),
   );
 });
 
+test("upload", async () => {});
+
 test("verify", async () => {
   const request: VerificationRequest = {
-    policyFiles: [],
+    policies: [],
     schemas: [],
     entities: [],
     invariants: [],

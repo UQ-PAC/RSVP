@@ -1,17 +1,46 @@
 package uq.pac.rsvp.verification;
 
 import uq.pac.rsvp.policy.ast.AstNode;
+import uq.pac.rsvp.policy.ast.FileSet;
 import uq.pac.rsvp.policy.ast.entity.Entity;
 import uq.pac.rsvp.policy.ast.entity.EntityReference;
 import uq.pac.rsvp.policy.ast.entity.EntityValue;
 import uq.pac.rsvp.policy.ast.entity.RecordValue;
+import uq.pac.rsvp.policy.ast.policy.Invariant;
 import uq.pac.rsvp.policy.ast.policy.Policy;
-import uq.pac.rsvp.policy.ast.policy.expr.*;
+import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
+import uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.CallExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.ConditionalExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.PropertyAccessExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.RecordExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.SetExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitorImpl;
+import uq.pac.rsvp.policy.ast.schema.Schema;
+import uq.pac.rsvp.policy.ast.schema.statement.ActionDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.CommonTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.RecordEntityTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.type.BooleanType;
+import uq.pac.rsvp.policy.ast.schema.type.DateTimeType;
+import uq.pac.rsvp.policy.ast.schema.type.DecimalType;
+import uq.pac.rsvp.policy.ast.schema.type.DurationType;
+import uq.pac.rsvp.policy.ast.schema.type.IpAddressType;
+import uq.pac.rsvp.policy.ast.schema.type.LongType;
+import uq.pac.rsvp.policy.ast.schema.type.RecordType;
+import uq.pac.rsvp.policy.ast.schema.type.SetType;
+import uq.pac.rsvp.policy.ast.schema.type.StringType;
+import uq.pac.rsvp.policy.ast.schema.type.TypeReference;
+import uq.pac.rsvp.policy.ast.schema.visitor.SchemaVisitorAdapter;
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.support.reporting.Report;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -19,24 +48,156 @@ public class RandomReportGenerator {
     private final Random random;
     private final Set<SourceLoc> additionalLocations;
 
+    public static Set<Report> generateRandomReports(FileSet fileset) throws IOException, IllegalAccessException {
+        Set<Report> results = new HashSet<>();
+
+        fileset.loadFiles();
+
+        Schema schema = Schema.of(fileset.getSchemaStatements());
+        PolicyProgram policyProgram = fileset.getPolicyProgram();
+        Collection<Policy> policyAst = policyProgram.getPolicies();
+        Collection<Invariant> invariantAst = policyProgram.getInvariants();
+        Set<Entity> entitySet = fileset.getEntities();
+
+        RandomReportGenerator randomGenerator = new RandomReportGenerator();
+        RandomReportGenerator.RandomEntityReportGenerator entityReportGenerator = new RandomEntityReportGenerator(randomGenerator);
+        RandomReportGenerator.RandomPolicyReportGenerator policyReportGenerator = new RandomPolicyReportGenerator(randomGenerator);
+        RandomReportGenerator.RandomSchemaReportGenerator schemaReportGenerator = new RandomSchemaReportGenerator(randomGenerator);
+
+        schema.accept(schemaReportGenerator);
+        policyAst.forEach(policy -> policy.accept(policyReportGenerator));
+        invariantAst.forEach(invariant -> invariant.accept(policyReportGenerator));
+        entitySet.forEach(entity -> entityReportGenerator.maybeAddRandomReports(entity, 20));
+
+        results.add(randomGenerator.generateRandomReport(null, "Mystery"));
+        results.add(randomGenerator.generateRandomReport(null, "Mystery"));
+        results.add(randomGenerator.generateRandomReport(null, "Mystery"));
+        
+        results.addAll(schemaReportGenerator.reports);
+        results.addAll(policyReportGenerator.reports);
+        results.addAll(entityReportGenerator.reports);
+
+        return results;
+    }
+
     public RandomReportGenerator() {
         random = new Random();
         additionalLocations = new HashSet<>();
     }
 
-    public static class RandomPolicyReportGenerator extends PolicyVisitorImpl {
+    private static class RandomSchemaReportGenerator extends SchemaVisitorAdapter {
 
-        public final Set<Report> reports;
+        private final Set<Report> reports;
         private final RandomReportGenerator generator;
 
-        public RandomPolicyReportGenerator(RandomReportGenerator generator) {
+        private RandomSchemaReportGenerator(RandomReportGenerator generator) {
+            reports = new HashSet<>();
+            this.generator = generator;
+        }
+
+        @Override
+        public void visitRecordEntity(RecordEntityTypeDefinition entity) {
+            maybeAddRandomReport(entity, 30);
+            super.visitRecordEntity(entity);
+        }
+
+        @Override
+        public void visitEnumEntity(EnumEntityTypeDefinition entity) {
+            maybeAddRandomReport(entity, 30);
+        }
+
+        @Override
+        public void visitAction(ActionDefinition action) {
+            maybeAddRandomReport(action, 30);
+            super.visitAction(action);
+        }
+
+        @Override
+        public void visitCommon(CommonTypeDefinition type) {
+            maybeAddRandomReport(type, 30);
+            super.visitCommon(type);
+        }
+
+        @Override
+        public void visitRecord(RecordType type) {
+            maybeAddRandomReport(type, 20);
+            super.visitRecord(type);
+        }
+
+        @Override
+        public void visitSet(SetType type) {
+            maybeAddRandomReport(type, 5);
+            super.visitSet(type);
+        }
+
+        @Override
+        public void visitTypeReference(TypeReference type) {
+            maybeAddRandomReport(type, 5);
+        }
+
+        @Override
+        public void visitBoolean(BooleanType type) {
+            maybeAddRandomReport(type, 5);
+        }
+
+        @Override
+        public void visitLong(LongType type) {
+            maybeAddRandomReport(type, 5);
+        }
+
+        @Override
+        public void visitString(StringType type) {
+            maybeAddRandomReport(type, 5);
+        }
+
+        @Override
+        public void visitIpAddress(IpAddressType type) {
+            maybeAddRandomReport(type, 5);
+        }
+
+        @Override
+        public void visitDecimal(DecimalType type) {
+            maybeAddRandomReport(type, 5);
+        }
+
+        @Override
+        public void visitDateTime(DateTimeType type) {
+            maybeAddRandomReport(type, 5);
+        }
+
+        @Override
+        public void visitDuration(DurationType type) {
+            maybeAddRandomReport(type, 5);
+        }
+
+        private void maybeAddRandomReport(AstNode entry, int probability) {
+            int p = generator.nextRandomNumber();
+            SourceLoc loc = entry.getSourceLoc();
+
+            if (!loc.isEmpty()) {
+                if (p <= probability) {
+                    String[] name = entry.getClass().getName().split("\\.");
+                    reports.add(generator.generateRandomReport(loc, name[name.length - 1]));
+                } else if (p <= probability * 2) {
+                    generator.addAdditionalLocation(loc);
+                }
+            }
+        }
+    }
+
+    private static class RandomPolicyReportGenerator extends PolicyVisitorImpl {
+
+        private final Set<Report> reports;
+        private final RandomReportGenerator generator;
+
+        private RandomPolicyReportGenerator(RandomReportGenerator generator) {
             reports = new HashSet<>();
             this.generator = generator;
         }
 
         @Override
         public void visitPolicy(Policy policy) {
-            maybeAddRandomReport(policy, 50);
+            maybeAddRandomReport(policy, 30);
             super.visitPolicy(policy);
         }
 
@@ -97,16 +258,16 @@ public class RandomReportGenerator {
         }
     }
 
-    public static class RandomEntityReportGenerator {
-        public final Set<Report> reports;
+    private static class RandomEntityReportGenerator {
+        private final Set<Report> reports;
         private final RandomReportGenerator generator;
 
-        public RandomEntityReportGenerator(RandomReportGenerator generator) {
+        private RandomEntityReportGenerator(RandomReportGenerator generator) {
             reports = new HashSet<>();
             this.generator = generator;
         }
 
-        public void maybeAddRandomReports(Entity entity, int probability) {
+        private void maybeAddRandomReports(Entity entity, int probability) {
             int p = generator.nextRandomNumber();
             SourceLoc loc = entity.getSourceLoc();
 
@@ -176,14 +337,21 @@ public class RandomReportGenerator {
         String message = m < 34 ? "Fantastic. Great move. Well done Angus." : m < 67 ? "Ugly implementation" : "Who thought this was a good idea?";
         String detail = d < 50 ? "" : "This is a very detailed report. " + "Look at all of the details that are included here. " + "So many details that need to be included in the report so that you can fully understand it.";
 
-        SourceLoc[] additional = new SourceLoc[0];
+        List<Report.LocationMessage> locations = new ArrayList<>();
 
-        if (l < 25) {
-            additional = additionalLocations.toArray(new SourceLoc[0]);
-            additionalLocations.clear();
+        if (loc != null) {
+            locations.add(new Report.LocationMessage(loc, "Prime location"));
+
+            if (!additionalLocations.isEmpty() && l < 25) {
+                for (SourceLoc additionalLocation : additionalLocations) {
+                    int e = random.nextInt(100);
+                    locations.add(new Report.LocationMessage(additionalLocation, e < 34 ? "This is a problematic location" : e < 67 ? "Spectacular location" : ""));
+                }
+                additionalLocations.clear();
+            }
         }
 
-        return new Report(severity, "(" + entryType + "): " + message, detail, loc, additional);
+        return new Report(severity, "(" + entryType + "): " + message, detail, locations.toArray(new Report.LocationMessage[0]));
     }
 
     private void addAdditionalLocation(SourceLoc loc) {

@@ -1,12 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import Home from "./page";
 
-jest.mock("next/font/google", () => ({
-  Roboto_Mono: jest.fn().mockReturnValue({ className: "" }),
-  Lexend_Deca: jest.fn().mockReturnValue({ className: "" }),
-  Lexend_Giga: jest.fn().mockReturnValue({ className: "" }),
-}));
-
 jest.mock("./components/providers/ContextProvider", () => ({
   ContextProvider: jest.fn(({ children }) => (
     <div data-testid="context-provider">{children}</div>
@@ -42,5 +36,6 @@ test("renders", () => {
   const { asFragment } = render(<Home />);
   expect(asFragment()).toMatchSnapshot();
   const header = screen.getByTestId("header");
+  expect(header).toBeInTheDocument();
   expect(header).toHaveAttribute("data-subheading", "Policy Verification");
 });

@@ -1,0 +1,233 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`creates policy set 1`] = `
+<DocumentFragment>
+  <div
+    class="upload-container"
+  >
+    <div
+      data-group="group one"
+      data-testid="analysis-group-provider"
+    >
+      <div
+        data-testid="analysis-group"
+      />
+    </div>
+    <div
+      data-group="group two"
+      data-testid="analysis-group-provider"
+    >
+      <div
+        data-testid="analysis-group"
+      />
+    </div>
+    <div
+      data-group="group three"
+      data-testid="analysis-group-provider"
+    >
+      <div
+        data-testid="analysis-group"
+      />
+    </div>
+    <div
+      data-existing="group one group two group three"
+      data-index="4"
+      data-testid="new-group-form"
+    />
+  </div>
+</DocumentFragment>
+`;
+
+exports[`creates policy set 2`] = `
+<DocumentFragment>
+  <div
+    class="upload-container"
+  >
+    <div
+      data-group="group one"
+      data-testid="analysis-group-provider"
+    >
+      <div
+        data-testid="analysis-group"
+      />
+    </div>
+    <div
+      data-group="group two"
+      data-testid="analysis-group-provider"
+    >
+      <div
+        data-testid="analysis-group"
+      />
+    </div>
+    <div
+      data-group="group three"
+      data-testid="analysis-group-provider"
+    >
+      <div
+        data-testid="analysis-group"
+      />
+    </div>
+    <div
+      data-testid="create-context-button"
+    />
+  </div>
+</DocumentFragment>
+`;
+
+exports[`opens create policy form 1`] = `
+<DocumentFragment>
+  <div
+    class="upload-container"
+  >
+    <div
+      data-group="group one"
+      data-testid="analysis-group-provider"
+    >
+      <div
+        data-testid="analysis-group"
+      />
+    </div>
+    <div
+      data-group="group two"
+      data-testid="analysis-group-provider"
+    >
+      <div
+        data-testid="analysis-group"
+      />
+    </div>
+    <div
+      data-group="group three"
+      data-testid="analysis-group-provider"
+    >
+      <div
+        data-testid="analysis-group"
+      />
+    </div>
+    <div
+      data-testid="create-context-button"
+    />
+  </div>
+</DocumentFragment>
+`;
+
+exports[`opens create policy form 2`] = `
+<DocumentFragment>
+  <div
+    class="upload-container"
+  >
+    <div
+      data-group="group one"
+      data-testid="analysis-group-provider"
+    >
+      <div
+        data-testid="analysis-group"
+      />
+    </div>
+    <div
+      data-group="group two"
+      data-testid="analysis-group-provider"
+    >
+      <div
+        data-testid="analysis-group"
+      />
+    </div>
+    <div
+      data-group="group three"
+      data-testid="analysis-group-provider"
+    >
+      <div
+        data-testid="analysis-group"
+      />
+    </div>
+    <div
+      data-existing="group one group two group three"
+      data-index="4"
+      data-testid="new-group-form"
+    />
+  </div>
+</DocumentFragment>
+`;
+
+exports[`opens create policy form 3`] = `
+<DocumentFragment>
+  <div
+    class="upload-container"
+  >
+    <div
+      data-group="group one"
+      data-testid="analysis-group-provider"
+    >
+      <div
+        data-testid="analysis-group"
+      />
+    </div>
+    <div
+      data-group="group two"
+      data-testid="analysis-group-provider"
+    >
+      <div
+        data-testid="analysis-group"
+      />
+    </div>
+    <div
+      data-group="group three"
+      data-testid="analysis-group-provider"
+    >
+      <div
+        data-testid="analysis-group"
+      />
+    </div>
+    <div
+      data-testid="create-context-button"
+    />
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <div
+    class="upload-container"
+  >
+    <div
+      data-group="group one"
+      data-testid="analysis-group-provider"
+    >
+      <div
+        data-testid="analysis-group"
+      />
+    </div>
+    <div
+      data-group="group two"
+      data-testid="analysis-group-provider"
+    >
+      <div
+        data-testid="analysis-group"
+      />
+    </div>
+    <div
+      data-group="group three"
+      data-testid="analysis-group-provider"
+    >
+      <div
+        data-testid="analysis-group"
+      />
+    </div>
+    <div
+      data-testid="create-context-button"
+    />
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders 2`] = `
+<DocumentFragment>
+  <div
+    class="upload-container"
+  >
+    <div
+      data-testid="create-context-button"
+    />
+  </div>
+</DocumentFragment>
+`;

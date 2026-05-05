@@ -26,20 +26,20 @@ export async function download(id: string): Promise<string> {
 
 // TODO: check if response is OK
 export async function verify(request: VerificationRequest): Promise<Report[]> {
-  return (
-    fetch("/api/verify", {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-      body: JSON.stringify(request),
-    })
-      .then((res) => res.json())
-      .then(sortReports)
-      // Return no reports on error, error response will be logged already
-      .catch(() => [])
-  );
+  return fetch("/api/verify", {
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify(request),
+  })
+    .then((res) => res.json())
+    .then(sortReports)
+    .catch((err) => {
+      console.error(err);
+      return [];
+    });
 }
 
 export async function diff(
@@ -54,4 +54,13 @@ export async function diff(
   ];
 
   return fetch(`/api/diff?${params.join("&")}`).then((res) => res.text());
+}
+
+export async function impact(
+  original: string,
+  updated: string,
+): Promise<string> {
+  const params = [`original=${original}`, `updated=${updated}`];
+
+  return fetch(`/api/impact?${params.join("&")}`).then((res) => res.text());
 }

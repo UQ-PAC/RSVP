@@ -6,10 +6,15 @@ import com.google.common.graph.Graphs;
 import com.google.common.graph.MutableGraph;
 import uq.pac.rsvp.policy.ast.schema.parser.SchemaParser;
 import uq.pac.rsvp.policy.ast.schema.parser.StatementResolutionVisitor;
-import uq.pac.rsvp.policy.ast.schema.statement.*;
-import uq.pac.rsvp.policy.ast.schema.type.*;
-import uq.pac.rsvp.policy.ast.schema.visitor.SchemaPayloadVisitor;
+import uq.pac.rsvp.policy.ast.schema.statement.ActionDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.CommonTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.EntityTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.RecordEntityTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.SchemaStatement;
+import uq.pac.rsvp.policy.ast.schema.type.TypeReference;
 import uq.pac.rsvp.policy.ast.schema.visitor.SchemaComputationVisitor;
+import uq.pac.rsvp.policy.ast.schema.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.schema.visitor.SchemaVisitor;
 import uq.pac.rsvp.policy.ast.schema.visitor.SchemaVisitorAdapter;
 import uq.pac.rsvp.support.SourceLoc;
@@ -17,7 +22,15 @@ import uq.pac.rsvp.support.SourceLoc;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
@@ -40,12 +53,20 @@ public class Schema extends SchemaAstNode {
         return statements.values().stream();
     }
 
+    public Stream<Map.Entry<TypeReference, SchemaStatement>> entries() {
+        return statements.entrySet().stream();
+    }
+
     public static Schema parse(String file, String text) {
         return SchemaParser.parse(file, text);
     }
 
     public static Schema parse(Path file) throws IOException {
         return SchemaParser.parse(file.toString(), Files.readString(file));
+    }
+
+    public static Schema of(Map<TypeReference, SchemaStatement> statements) {
+        return new Schema(statements, SourceLoc.MISSING);
     }
 
     private <E extends SchemaStatement> Stream<E> statementStream(Class<E> target) {

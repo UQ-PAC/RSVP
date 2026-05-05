@@ -9,13 +9,13 @@ import { faCodeCompare } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import cx from "classnames";
 import { useEffect, useRef, useState } from "react";
-import { Report, VerificationFile, VersionedFile } from "../../types";
 import {
   ExpansionState,
   useFocus,
   useFocusDispatch,
-} from "../providers/FocusContext";
-import { useSelectionDispatch } from "../providers/SelectionContext";
+} from "../../lib/context/FocusContext";
+import { useSelectionDispatch } from "../../lib/context/SelectionContext";
+import { Report, VerificationFile, VersionedFile } from "../../lib/types";
 import { CodeRender } from "./CodeRender";
 import { DiffRender } from "./DiffRender";
 import { SourceVersionSelect } from "./SourceVersionSelect";
@@ -25,19 +25,10 @@ type IdentifiedFile = { file: VerificationFile; id: string };
 interface SourceFileParams {
   source: VersionedFile;
   reports: Promise<Report[]>;
-  getDiff: (
-    original: VerificationFile,
-    updated: VerificationFile,
-  ) => Promise<string>;
   setFocus: (original: string, updated?: string) => void;
 }
 
-export function SourceFile({
-  source,
-  reports,
-  getDiff,
-  setFocus,
-}: SourceFileParams) {
+export function SourceFile({ source, reports, setFocus }: SourceFileParams) {
   const {
     "source-file": { expansions },
   } = useFocus();
@@ -64,8 +55,12 @@ export function SourceFile({
 
   // Focus initialisation
   useEffect(() => {
+    // Initially focus on most recent file
     if (!focus.current) {
-      focus.current = source.original.resolved
+      const init =
+        source.versions?.[source.versions.length - 1] ?? source.original;
+
+      focus.current = init.resolved
         .then((uploaded) => uploaded.serverId)
         .then((id) => {
           setFocus(id);
@@ -73,6 +68,7 @@ export function SourceFile({
         });
     }
 
+    // Initialise focus state IDs for this file and all versions
     source.original.resolved.then((uploaded) => {
       Promise.all(
         source.versions.map((version) =>
@@ -120,7 +116,7 @@ export function SourceFile({
     });
   }, [source.original, source.versions, focusDispatch, setFocus]);
 
-  // Set focused files based on focus state
+  // Set focused files based on current focus state
   useEffect(() => {
     focus.current =
       focus.current
@@ -148,7 +144,7 @@ export function SourceFile({
             single.file.resolved
               .then((uploaded) => uploaded.content)
               .then((content) => {
-                setFilename(single?.file.file.name);
+                setFilename(single?.file.filename);
                 setCode(content);
               });
           } else {
@@ -190,16 +186,25 @@ export function SourceFile({
 
   const render =
     original && updated ? (
-      <DiffRender diff={getDiff(original.file, updated.file)} />
+      <DiffRender
+        original={original.file}
+        updated={updated.file}
+        originalId={original.id}
+        updatedId={updated.id}
+      />
     ) : (
       <CodeRender
-        file={source.original}
+        file={original?.file ?? source.original}
         content={code}
-        reports={resolvedReports.filter(
+        reports={resolvedReports?.filter(
           (report) =>
-            report.primarySourceLocation.source === source.original ||
             report.sourceLocations.some(
-              (loc) => loc.source === source.original,
+              (loc) => loc.location.source === source.original,
+            ) ||
+            source.versions.some((version) =>
+              report.sourceLocations.some(
+                (loc) => loc.location.source === version,
+              ),
             ),
         )}
       />
@@ -210,7 +215,7 @@ export function SourceFile({
       <div
         className="source-file-header"
         onClick={() => {
-          selectionDispatch({ type: "other", scroll: "none" });
+          selectionDispatch({ scroll: "none" });
           focus.current?.then((key) => {
             focusDispatch({
               type: "focus",
@@ -238,8 +243,8 @@ export function SourceFile({
           <SourceVersionSelect
             versions={versionIds}
             versionNames={[
-              source.original.file.name,
-              ...source.versions.map((file) => file.file.name),
+              source.original.filename,
+              ...source.versions.map((file) => file.filename),
             ]}
             selectedOriginal={original.id}
             selectedUpdate={updated?.id}

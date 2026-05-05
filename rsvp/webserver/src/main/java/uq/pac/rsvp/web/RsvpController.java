@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,14 +17,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.support.reporting.Report;
+import uq.pac.rsvp.verification.VerificationResult;
+import uq.pac.rsvp.web.context.VerificationSession;
+import uq.pac.rsvp.web.service.DiffService;
+import uq.pac.rsvp.web.service.FileService;
+import uq.pac.rsvp.web.service.VerificationService;
 
 import java.io.IOException;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+
 
 @RestController
 @SpringBootApplication
+@EnableAsync
 public class RsvpController {
 
     Logger logger = LoggerFactory.getLogger(RsvpController.class);
@@ -37,38 +45,53 @@ public class RsvpController {
     @Autowired
     DiffService diffService;
 
+    @Autowired
+    VerificationSession session;
+
+
     @PostMapping(path = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public String upload(@RequestPart MultipartFile file) throws IOException {
+    public CompletableFuture<String> upload(@RequestPart MultipartFile file) throws IOException {
         logger.info("POST /upload ({})", file.getOriginalFilename());
-        return fileService.createTempFile(file);
+        return CompletableFuture.completedFuture(fileService.createTempFile(file));
 
     }
 
     @GetMapping("/file/{id}")
-    public String getFile(@PathVariable String id) throws IOException {
+    public CompletableFuture<String> getFile(@PathVariable String id) throws IOException {
         logger.info("GET /file/{}", id);
-        return fileService.readFile(id);
+        return CompletableFuture.completedFuture(fileService.readFile(id));
     }
 
     @DeleteMapping("/file/{id}")
-    public String deleteFile(@PathVariable String id) throws IOException {
+    public CompletableFuture<String> deleteFile(@PathVariable String id) throws IOException {
         logger.info("DELETE /file/{}", id);
-        return fileService.deleteFile(id);
+        return CompletableFuture.completedFuture(fileService.deleteFile(id));
     }
 
     @PostMapping("/verify")
-    public Set<Report> verify(
-            @Validated @RequestBody VerificationFileset verification)
-            throws RsvpException, IOException, InterruptedException, IllegalAccessException {
+    public CompletableFuture<Set<Report>> verify(
+            @Validated @RequestBody VerificationRequestFileset fileset) {
         logger.info("POST /verify");
-        return verificationService.runVerification(verification);
+
+        CompletableFuture<VerificationResult> result = CompletableFuture.supplyAsync(() -> verificationService.runVerification(fileset));
+        session.setResult(result);
+
+        return result.thenApply(VerificationResult::reports);
     }
 
     @GetMapping("/diff")
-    public String diff(@RequestParam String original, @RequestParam String originalName, @RequestParam String updated,
-                       @RequestParam String updatedName) throws IOException {
+    public CompletableFuture<String> diff(@RequestParam String original, @RequestParam String originalName, @RequestParam String updated,
+                                          @RequestParam String updatedName) throws IOException {
         logger.info("GET /diff ? {} & {}", original, updated);
-        return diffService.getDiff(original, originalName, updated, updatedName);
+        return CompletableFuture.completedFuture(diffService.getDiff(original, originalName, updated, updatedName));
+    }
+
+    @GetMapping("/impact")
+    public CompletableFuture<String> impact(@RequestParam String original, @RequestParam String updated) {
+        logger.info("GET /impact ? {} & {}", original, updated);
+
+        // Wait until verification has completed execution before querying impact
+        return session.getResult().thenApply(result -> diffService.getImpact(original, updated, result.cache()));
     }
 
     public static void main(String[] args) {

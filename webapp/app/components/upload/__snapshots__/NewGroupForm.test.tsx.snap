@@ -1,0 +1,303 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`cancels group creation 1`] = `
+<DocumentFragment>
+  <form
+    class="create-analysis-group-form"
+  >
+    <input
+      class="create-analysis-group-text-input"
+      data-testid="create-analysis-group-text-input"
+      placeholder="Policy Set 100"
+      type="text"
+    />
+    <span
+      class="create-analysis-group-buttons"
+    >
+      <button
+        class="cancel-create-analysis-group-button"
+        data-testid="cancel-create-analysis-group-button"
+      >
+        <div
+          data-icon="faCircleXmark"
+          data-testid="font-awesome-icon"
+        />
+        <span
+          class="button-text"
+        >
+          Cancel
+        </span>
+      </button>
+      <button
+        class="create-analysis-group-button"
+        data-testid="create-analysis-group-button"
+      >
+        <div
+          data-icon="faCirclePlus"
+          data-testid="font-awesome-icon"
+        />
+        <span
+          class="button-text"
+        >
+          Create
+        </span>
+      </button>
+    </span>
+  </form>
+</DocumentFragment>
+`;
+
+exports[`creates group 1`] = `
+<DocumentFragment>
+  <form
+    class="create-analysis-group-form"
+  >
+    <input
+      class="create-analysis-group-text-input"
+      data-testid="create-analysis-group-text-input"
+      placeholder="Policy Set 7"
+      type="text"
+    />
+    <span
+      class="create-analysis-group-buttons"
+    >
+      <button
+        class="cancel-create-analysis-group-button"
+        data-testid="cancel-create-analysis-group-button"
+      >
+        <div
+          data-icon="faCircleXmark"
+          data-testid="font-awesome-icon"
+        />
+        <span
+          class="button-text"
+        >
+          Cancel
+        </span>
+      </button>
+      <button
+        class="create-analysis-group-button"
+        data-testid="create-analysis-group-button"
+      >
+        <div
+          data-icon="faCirclePlus"
+          data-testid="font-awesome-icon"
+        />
+        <span
+          class="button-text"
+        >
+          Create
+        </span>
+      </button>
+    </span>
+  </form>
+</DocumentFragment>
+`;
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <form
+    class="create-analysis-group-form"
+  >
+    <input
+      class="create-analysis-group-text-input"
+      data-testid="create-analysis-group-text-input"
+      placeholder="Policy Set 0"
+      type="text"
+    />
+    <span
+      class="create-analysis-group-buttons"
+    >
+      <button
+        class="cancel-create-analysis-group-button"
+        data-testid="cancel-create-analysis-group-button"
+      >
+        <div
+          data-icon="faCircleXmark"
+          data-testid="font-awesome-icon"
+        />
+        <span
+          class="button-text"
+        >
+          Cancel
+        </span>
+      </button>
+      <button
+        class="create-analysis-group-button"
+        data-testid="create-analysis-group-button"
+      >
+        <div
+          data-icon="faCirclePlus"
+          data-testid="font-awesome-icon"
+        />
+        <span
+          class="button-text"
+        >
+          Create
+        </span>
+      </button>
+    </span>
+  </form>
+</DocumentFragment>
+`;
+
+exports[`validates group name 1`] = `
+<DocumentFragment>
+  <form
+    class="create-analysis-group-form"
+  >
+    <input
+      class="create-analysis-group-text-input invalid"
+      data-testid="create-analysis-group-text-input"
+      placeholder="Policy Set 35"
+      type="text"
+    />
+    <span
+      class="input-error-message-container"
+    >
+      <span
+        class="input-error-message"
+      >
+        Policy set already exists
+      </span>
+    </span>
+    <span
+      class="create-analysis-group-buttons"
+    >
+      <button
+        class="cancel-create-analysis-group-button"
+        data-testid="cancel-create-analysis-group-button"
+      >
+        <div
+          data-icon="faCircleXmark"
+          data-testid="font-awesome-icon"
+        />
+        <span
+          class="button-text"
+        >
+          Cancel
+        </span>
+      </button>
+      <button
+        class="create-analysis-group-button"
+        data-testid="create-analysis-group-button"
+        disabled=""
+      >
+        <div
+          data-icon="faCirclePlus"
+          data-testid="font-awesome-icon"
+        />
+        <span
+          class="button-text"
+        >
+          Create
+        </span>
+      </button>
+    </span>
+  </form>
+</DocumentFragment>
+`;
+
+exports[`validates group name 2`] = `
+<DocumentFragment>
+  <form
+    class="create-analysis-group-form"
+  >
+    <input
+      class="create-analysis-group-text-input"
+      data-testid="create-analysis-group-text-input"
+      placeholder="Policy Set 35"
+      type="text"
+    />
+    <span
+      class="create-analysis-group-buttons"
+    >
+      <button
+        class="cancel-create-analysis-group-button"
+        data-testid="cancel-create-analysis-group-button"
+      >
+        <div
+          data-icon="faCircleXmark"
+          data-testid="font-awesome-icon"
+        />
+        <span
+          class="button-text"
+        >
+          Cancel
+        </span>
+      </button>
+      <button
+        class="create-analysis-group-button"
+        data-testid="create-analysis-group-button"
+      >
+        <div
+          data-icon="faCirclePlus"
+          data-testid="font-awesome-icon"
+        />
+        <span
+          class="button-text"
+        >
+          Create
+        </span>
+      </button>
+    </span>
+  </form>
+</DocumentFragment>
+`;
+
+exports[`validates group name 3`] = `
+<DocumentFragment>
+  <form
+    class="create-analysis-group-form"
+  >
+    <input
+      class="create-analysis-group-text-input invalid"
+      data-testid="create-analysis-group-text-input"
+      placeholder="Policy Set 35"
+      type="text"
+    />
+    <span
+      class="input-error-message-container"
+    >
+      <span
+        class="input-error-message"
+      >
+        Policy set already exists
+      </span>
+    </span>
+    <span
+      class="create-analysis-group-buttons"
+    >
+      <button
+        class="cancel-create-analysis-group-button"
+        data-testid="cancel-create-analysis-group-button"
+      >
+        <div
+          data-icon="faCircleXmark"
+          data-testid="font-awesome-icon"
+        />
+        <span
+          class="button-text"
+        >
+          Cancel
+        </span>
+      </button>
+      <button
+        class="create-analysis-group-button"
+        data-testid="create-analysis-group-button"
+        disabled=""
+      >
+        <div
+          data-icon="faCirclePlus"
+          data-testid="font-awesome-icon"
+        />
+        <span
+          class="button-text"
+        >
+          Create
+        </span>
+      </button>
+    </span>
+  </form>
+</DocumentFragment>
+`;

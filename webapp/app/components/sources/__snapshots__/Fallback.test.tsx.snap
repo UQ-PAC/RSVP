@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <p
+    class="source-files-instruction"
+  >
+    <a
+      class="source-files-upload-link"
+      data-testid="source-files-upload-link"
+    >
+      Clap your hands
+    </a>
+     to run verification.
+  </p>
+</DocumentFragment>
+`;
+
+exports[`renders 2`] = `
+<DocumentFragment>
+  <p
+    class="source-files-instruction"
+  >
+    <a
+      class="source-files-upload-link"
+      data-testid="source-files-upload-link"
+    >
+      Do a dance
+    </a>
+     to run verification on your face.
+  </p>
+</DocumentFragment>
+`;

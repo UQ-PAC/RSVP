@@ -1,7 +1,11 @@
 "use client";
 
 import { faFileLines } from "@fortawesome/free-regular-svg-icons";
-import { faCodeCompare } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCodeCompare,
+  faFileCircleMinus,
+  faFileCirclePlus,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import cx from "classnames";
 import { JSX } from "react";
@@ -82,7 +86,7 @@ export function SourceVersionSelect({
             <div className="source-comparison-tabs">
               <FontAwesomeIcon
                 className="source-compare-icon"
-                icon={faCodeCompare}
+                icon={faFileCircleMinus}
               />
               <div className="source-comparison-original">
                 {versions.slice(0, -1).map((version, i) => {
@@ -117,7 +121,7 @@ export function SourceVersionSelect({
               </div>
               <FontAwesomeIcon
                 className="source-compare-icon"
-                icon={faCodeCompare}
+                icon={faFileCirclePlus}
               />
               <div className="source-comparison-updated">
                 {versions.slice(originalIndex + 1).map((version, i) => {

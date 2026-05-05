@@ -6,25 +6,36 @@ import com.cedarpolicy.model.AuthorizationRequest;
 import com.cedarpolicy.model.AuthorizationResponse;
 import com.cedarpolicy.model.AuthorizationSuccessResponse;
 import com.cedarpolicy.model.entity.Entities;
+import com.cedarpolicy.model.entity.Entity;
 import com.cedarpolicy.model.exception.AuthException;
 import com.cedarpolicy.model.policy.PolicySet;
 import com.cedarpolicy.model.schema.Schema;
 import com.google.devtools.common.options.OptionsParser;
-import com.google.gson.*;
+import com.google.gson.FormattingStyle;
 import com.google.gson.stream.JsonWriter;
 import uq.pac.rsvp.RsvpException;
+import uq.pac.rsvp.StdLogger;
+import uq.pac.rsvp.policy.ast.FileSet;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestAuth;
 import uq.pac.rsvp.policy.datalog.translation.Translation;
-import uq.pac.rsvp.StdLogger;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-import static org.fusesource.jansi.Ansi.Color.*;
+import static org.fusesource.jansi.Ansi.Color.BLUE;
+import static org.fusesource.jansi.Ansi.Color.DEFAULT;
+import static org.fusesource.jansi.Ansi.Color.GREEN;
+import static org.fusesource.jansi.Ansi.Color.RED;
+import static org.fusesource.jansi.Ansi.Color.YELLOW;
 import static uq.pac.rsvp.Assertion.require;
 
 public class Driver {
@@ -61,15 +72,21 @@ public class Driver {
         return null;
     }
 
-    private static void validate(RequestAuth rsvpAuth, Path schemaFile, Path policyFile, Path entitiesFile) throws IOException, AuthException {
+    private static void validate(RequestAuth rsvpAuth, FileSet fileset) throws IOException, AuthException {
         AuthorizationEngine cedarAuth = new BasicAuthorizationEngine();
-        Entities cedarEntities = Entities.parse(entitiesFile);
 
-        Schema cedarSchema = Schema.parse(Schema.JsonOrCedar.Cedar, Files.readString(schemaFile));
-        PolicySet cedarPolicies = PolicySet.parsePolicies(policyFile);
+        Set<Entity> cedarEntitySet = new HashSet<>();
+        for (String entityFile : fileset.getEntitiesStrings()) {
+            cedarEntitySet.addAll(Entities.parse(entityFile).getEntities());
+        }
 
-        int [] rsvpRequestCounter = new int [2];
-        int [] cedarRequestCounter = new int [2];
+        Entities cedarEntities = new Entities(cedarEntitySet);
+
+        Schema cedarSchema = Schema.parse(Schema.JsonOrCedar.Cedar, fileset.getSchemaString());
+        PolicySet cedarPolicies = PolicySet.parsePolicies(fileset.getPolicyString());
+
+        int[] rsvpRequestCounter = new int[2];
+        int[] cedarRequestCounter = new int[2];
         for (Request rsvpRequest : rsvpAuth.getActionableRequests()) {
             RequestAuth.Decision rsvpDecision = rsvpAuth.authorize(rsvpRequest);
             require(rsvpDecision == RequestAuth.Decision.Deny ||
@@ -137,7 +154,7 @@ public class Driver {
         writer.close();
     }
 
-    public static void main(String[] args) throws IOException, AuthException, InterruptedException, RsvpException {
+    public static void main(String[] args) throws IOException, AuthException, InterruptedException, RsvpException, IllegalAccessException {
         OptionsParser parser = OptionsParser.newOptionsParser(DriverOptions.class);
         parser.parseAndExitUponError(args);
         DriverOptions options = parser.getOptions(DriverOptions.class);
@@ -148,10 +165,13 @@ public class Driver {
             System.exit(2);
         }
 
-        Path schemaFile = requiredFile(optionsMap, "schema");
-        Path policyFile = requiredFile(optionsMap, "policies");
-        Path entitiesFile = requiredFile(optionsMap, "entities");
-        Path invariantFile = requiredFile(optionsMap, "invariants");
+        FileSet fileset = new FileSet()
+                .addSchema(requiredFile(optionsMap, "schema"))
+                .addPolicies(requiredFile(optionsMap, "policies"))
+                .addEntities(requiredFile(optionsMap, "entities"))
+                .addInvariants(requiredFile(optionsMap, "invariants"))
+                .loadFiles();
+
         String dlDir = requiredOpt(optionsMap, "datalog-dir", String.class);
         Path dlPath = Path.of(dlDir);
 
@@ -159,14 +179,13 @@ public class Driver {
             error("Datalog destination: " + dlPath + " is not a directory");
         }
 
-        Translation translation =
-                new Translation(schemaFile, policyFile, entitiesFile, invariantFile, dlPath);
+        Translation translation = new Translation(fileset, dlPath);
         RequestAuth rsvpAuth = new RequestAuth(translation);
         logger.info(YELLOW, "Datalog output written to directory: " + dlPath.toAbsolutePath());
         writeRequests(Path.of(dlPath.toString(), "auth.json"), rsvpAuth);
 
         if (options.validate) {
-            validate(rsvpAuth, schemaFile, policyFile, entitiesFile);
+            validate(rsvpAuth, fileset);
         }
 
         System.exit(0);

@@ -1,48 +1,50 @@
 "use client";
 
 import { faTrashCan } from "@fortawesome/free-regular-svg-icons";
+import { faExclamation } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import cx from "classnames";
 import { useRef } from "react";
-import { remove, upload } from "../../requests";
-import { VerificationFile } from "../../types";
-import { getFileType } from "../../util";
-import { ExpansionState, useFocusDispatch } from "../providers/FocusContext";
 import {
-  emptyVerificationGroup,
-  useVerification,
-  useVerificationDispatch,
-} from "../providers/VerificationContext";
+  useAnalysisGroup,
+  useAnalysisGroupDispatch,
+} from "../../lib/context/AnalysisGroupContext";
+import {
+  ExpansionState,
+  useFocusDispatch,
+} from "../../lib/context/FocusContext";
+import { remove, upload } from "../../lib/requests";
+import { VerificationFile } from "../../lib/types";
+import { checkAnalysisGroup, getFileType } from "../../lib/util";
 import { FileInput } from "./FileInput";
 import { HiddenFileInput } from "./HiddenFileInput";
 import { UploadedFile } from "./UploadedFile";
 
 interface AnalysisGroupProps {
-  name: string;
   removeGroup: () => void;
 }
 
-export function AnalysisGroup({ name, removeGroup }: AnalysisGroupProps) {
+export function AnalysisGroup({ removeGroup }: AnalysisGroupProps) {
   const versionOriginFile = useRef<VerificationFile>(null);
   const versionInputRef = useRef<HTMLInputElement>(null);
 
-  const context = useVerification();
-  const dispatch = useVerificationDispatch();
-  const focusDispatch = useFocusDispatch();
+  const { name, files, verifyRequested } = useAnalysisGroup();
+  const dispatch = useAnalysisGroupDispatch();
 
-  const { files } = context[name] ?? emptyVerificationGroup;
+  const focus = useFocusDispatch();
 
   const addFiles = (toAdd: File[], original?: VerificationFile) =>
     toAdd.forEach((file) => {
       dispatch({
         type: "add",
-        group: name,
         file: {
           file,
+          filename: file.name,
           filetype: getFileType(file),
           resolved: upload(file).then((uploaded) => {
             if (!original) {
               // Expand added file if completely new file (not a version)
-              focusDispatch({
+              focus({
                 type: "focus",
                 target: "source-file",
                 focus: {
@@ -77,26 +79,36 @@ export function AnalysisGroup({ name, removeGroup }: AnalysisGroupProps) {
     versionInputRef.current?.click();
   };
 
+  const { hasPolicy, hasSchema, hasEntities, error } =
+    checkAnalysisGroup(files);
+
   const removeFile = (file: VerificationFile, original?: VerificationFile) => {
     file.resolved.then((uploaded) => {
       remove(uploaded.serverId);
 
       if (!original) {
         // File is original, de-register focus group
-        focusDispatch({
+        focus({
           type: "deregister",
           target: "source-file",
           deregister: uploaded.serverId,
         });
       }
     });
-    dispatch({ type: "remove", group: name, file, original });
+    dispatch({ type: "remove", file, original });
   };
 
   return (
     <div className="analysis-group">
       <span className="analysis-group-header">
-        <h4 className="analysis-group-title">{name}</h4>
+        <h4
+          className={cx(
+            "analysis-group-title",
+            error && verifyRequested && "error",
+          )}
+        >
+          {name}
+        </h4>
         <FontAwesomeIcon
           className="analysis-group-delete-icon"
           icon={faTrashCan}
@@ -125,6 +137,37 @@ export function AnalysisGroup({ name, removeGroup }: AnalysisGroupProps) {
           </UploadedFile>
         ))}
       </div>
+      {verifyRequested && error && (
+        <div className="analysis-group-errors">
+          {!hasPolicy && (
+            <span className="analysis-group-error">
+              <FontAwesomeIcon
+                className="analysis-group-error-icon"
+                icon={faExclamation}
+              />
+              At least one policy file is required
+            </span>
+          )}
+          {!hasSchema && (
+            <span className="analysis-group-error">
+              <FontAwesomeIcon
+                className="analysis-group-error-icon"
+                icon={faExclamation}
+              />
+              At least one schema file is required
+            </span>
+          )}
+          {!hasEntities && (
+            <span className="analysis-group-error">
+              <FontAwesomeIcon
+                className="analysis-group-error-icon"
+                icon={faExclamation}
+              />
+              At least one entities file is required
+            </span>
+          )}
+        </div>
+      )}
       <FileInput addFiles={addFiles} />
       <HiddenFileInput
         ref={versionInputRef}

@@ -1,0 +1,132 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <div
+    class="reports-group"
+  >
+    <div
+      class="reports-group-header"
+      data-testid="reports-group-test-file-one.txt-header"
+    >
+      <div
+        data-icon="faMinusSquare"
+        data-testid="font-awesome-icon"
+      />
+      <span
+        class="reports-group-title"
+      >
+        test-file-one.txt (2)
+      </span>
+      <span
+        class="reports-group-count"
+      >
+        (2)
+      </span>
+    </div>
+    <div
+      class="reports-group-content"
+    >
+      <div
+        data-reportid="one"
+        data-testid="report-item"
+      />
+      <div
+        data-reportid="two"
+        data-testid="report-item"
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders 2`] = `
+<DocumentFragment>
+  <div
+    class="reports-group"
+  >
+    <div
+      class="reports-group-header"
+      data-testid="reports-group-test-file-one.txt-header"
+    >
+      <div
+        data-icon="faPlusSquare"
+        data-testid="font-awesome-icon"
+      />
+      <span
+        class="reports-group-title"
+      >
+        test-file-one.txt
+      </span>
+      <span
+        class="reports-group-count"
+      >
+        (2)
+      </span>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`triggers expansion 1`] = `
+<DocumentFragment>
+  <div
+    class="reports-group"
+  >
+    <div
+      class="reports-group-header"
+      data-testid="reports-group-test-file-one.txt-header"
+    >
+      <div
+        data-icon="faPlusSquare"
+        data-testid="font-awesome-icon"
+      />
+      <span
+        class="reports-group-title"
+      >
+        test-file-one.txt
+      </span>
+      <span
+        class="reports-group-count"
+      >
+        (2)
+      </span>
+    </div>
+  </div>
+  <div
+    class="reports-group"
+  >
+    <div
+      class="reports-group-header"
+      data-testid="reports-group-test-file-two.txt-header"
+    >
+      <div
+        data-icon="faMinusSquare"
+        data-testid="font-awesome-icon"
+      />
+      <span
+        class="reports-group-title"
+      >
+        test-file-two.txt
+      </span>
+      <span
+        class="reports-group-count"
+      >
+        (2)
+      </span>
+    </div>
+    <div
+      class="reports-group-content"
+    >
+      <div
+        data-reportid="three"
+        data-testid="report-item"
+      />
+      <div
+        data-reportid="four"
+        data-testid="report-item"
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;

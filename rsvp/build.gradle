@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    subprojects.each { sub -> 
+    subprojects.each { sub ->
         testReportAggregation project(':' + sub.name)
         jacocoAggregation project(':' + sub.name)
     };
@@ -25,10 +25,10 @@ dependencies {
 
 reporting {
     reports {
-        testAggregateTestReport(AggregateTestReport) { 
+        testAggregateTestReport(AggregateTestReport) {
             testSuiteName = "test"
         }
-        testSuiteCodeCoverageReport(JacocoCoverageReport) { 
+        testSuiteCodeCoverageReport(JacocoCoverageReport) {
             testSuiteName = "test"
         }
     }
@@ -59,10 +59,10 @@ subprojects {
         implementation 'com.cedarpolicy:cedar-java:4.8.0:uber'
 
         implementation 'com.google.code.gson:gson:2.13.2'
-        implementation 'com.google.guava:guava:33.6.0-jre'
+        implementation libs.guava
         implementation 'com.fasterxml.jackson.core:jackson-databind:2.20.0'
         implementation 'org.springframework.boot:spring-boot-starter-web:4.0.3'
-        
+
         // Generate diffs
         implementation "io.github.java-diff-utils:java-diff-utils:4.12"
 
@@ -71,7 +71,7 @@ subprojects {
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
         // Parameterised tests
         testImplementation "org.junit.jupiter:junit-jupiter-params:5.10.0"
-        
+
 
     }
 

@@ -178,6 +178,28 @@
     font-weight: 600;
   }
 
+  .analysis-group .analysis-group-title.error {
+    color: var(--color-red-700);
+  }
+
+  .analysis-group .analysis-group-errors {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+  }
+
+  .analysis-group .analysis-group-errors .analysis-group-error {
+    color: var(--color-red-700);
+    font-size: 0.8rem;
+    line-height: 1.25rem;
+  }
+
+  .analysis-group .analysis-group-errors .analysis-group-error-icon {
+    font-size: 0.6rem;
+    margin-right: 0.1rem;
+    margin-bottom: 0.04rem;
+  }
+
   .file-input {
     padding: 0.5rem;
   }

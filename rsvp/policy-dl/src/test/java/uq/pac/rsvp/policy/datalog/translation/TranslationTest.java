@@ -12,19 +12,30 @@ import org.fusesource.jansi.Ansi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
-import uq.pac.rsvp.policy.datalog.TestUtil;
-import uq.pac.rsvp.policy.ast.policy.Invariant;
-import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 import uq.pac.rsvp.StdLogger;
+import uq.pac.rsvp.policy.ast.FileSet;
+import uq.pac.rsvp.policy.ast.policy.Invariant;
+import uq.pac.rsvp.policy.datalog.TestUtil;
+import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.fusesource.jansi.Ansi.Color.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.fusesource.jansi.Ansi.Color.BLUE;
+import static org.fusesource.jansi.Ansi.Color.CYAN;
+import static org.fusesource.jansi.Ansi.Color.GREEN;
+import static org.fusesource.jansi.Ansi.Color.MAGENTA;
+import static org.fusesource.jansi.Ansi.Color.YELLOW;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Souffle datalog translation testing
@@ -127,7 +138,7 @@ public class TranslationTest {
      * Differential test for Cedar and RSVP.
      * The test runs both, RSVP and Cedar authorisation engines and compares the results that should agree
      */
-    void differentialTest(TestInput test) throws IOException, AuthException {
+    void differentialTest(TestInput test) throws IOException, AuthException, IllegalAccessException {
         logger.info(YELLOW, "Policy: " + test.policy)
                 .info(MAGENTA, "Datalog specification: " + test.datalogDir + "/" + TranslationConstants.ProgramName)
                 .fine(CYAN, Files.readString(test.policy));
@@ -142,8 +153,14 @@ public class TranslationTest {
             logger.warning("Empty policy: " + test.policy);
         }
 
-        Translation translation = new Translation(test.schema, test.policy,
-                test.entities, test.invariants, test.datalogDir);
+        FileSet fileset = new FileSet()
+                .addSchema(test.schema)
+                .addPolicies(test.policy)
+                .addEntities(test.entities)
+                .addInvariants(test.invariants)
+                .loadFiles();
+
+        Translation translation = new Translation(fileset, test.datalogDir);
 
         RequestAuth rsvpAuth = new RequestAuth(translation);
         assertTrue(Collections.disjoint(rsvpAuth.getForbiddenRequests().getRequests(),
@@ -164,8 +181,8 @@ public class TranslationTest {
         com.cedarpolicy.model.schema.Schema cedarSchema = com.cedarpolicy.model.schema.Schema.parse(com.cedarpolicy.model.schema.Schema.JsonOrCedar.Cedar, Files.readString(test.schema));
         PolicySet cedarPolicies = PolicySet.parsePolicies(test.policy);
 
-        int [] rsvpRequestCounter = new int [2];
-        int [] cedarRequestCounter = new int [2];
+        int[] rsvpRequestCounter = new int[2];
+        int[] cedarRequestCounter = new int[2];
         for (Request rsvpRequest : rsvpAuth.getActionableRequests()) {
             RequestAuth.Decision rsvpDecision = rsvpAuth.authorize(rsvpRequest);
             assertTrue(rsvpDecision == RequestAuth.Decision.Deny ||
@@ -194,10 +211,10 @@ public class TranslationTest {
         }
         logger.attr(Ansi.Attribute.INTENSITY_BOLD)
                 .info(GREEN, "RSVP Requests (allow/deny): %d/%d\n",
-                rsvpAuth.getActionableRequests().size(), rsvpRequestCounter[0], rsvpRequestCounter[1]);
+                        rsvpAuth.getActionableRequests().size(), rsvpRequestCounter[0], rsvpRequestCounter[1]);
         logger.attr(Ansi.Attribute.INTENSITY_BOLD)
                 .info(BLUE, "Cedar Requests (allow/deny): %d/%d\n",
-                rsvpAuth.getActionableRequests().size(), cedarRequestCounter[0], cedarRequestCounter[1]);
+                        rsvpAuth.getActionableRequests().size(), cedarRequestCounter[0], cedarRequestCounter[1]);
         assertArrayEquals(rsvpRequestCounter, cedarRequestCounter, "Mismatched request decisions found");
     }
 }

@@ -1,27 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Report, ReportSeverity } from "../../types";
-import { useVerification } from "../providers/VerificationContext";
-import { ReportsSection } from "./ReportsSection";
+import { useVerification } from "../../lib/context/VerificationContext";
+import { Report, ReportSeverity, VerificationFile } from "../../lib/types";
+import { ReportGroup, ReportsSection } from "./ReportsSection";
 
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ProgressSpinner } from "../shared/ProgressSpinner";
 import "./reports.css";
 
-type GroupedReports = [string, Report[]][];
-
 export function ReportViewer() {
-  const [info, setInfo] = useState<GroupedReports>([]);
-  const [warn, setWarn] = useState<GroupedReports>([]);
-  const [err, setErr] = useState<GroupedReports>([]);
+  const [info, setInfo] = useState<ReportGroup[]>([]);
+  const [warn, setWarn] = useState<ReportGroup[]>([]);
+  const [err, setErr] = useState<ReportGroup[]>([]);
 
   const [progress, setProgress] = useState(false);
-  const [verified, setVerified] = useState(false);
 
   const verificationContext = useVerification();
 
-  // TODO: sort by group?
   useEffect(() => {
     const unresolved: Promise<Report[]>[] = Object.values(verificationContext)
       .filter(({ reports }) => !!reports)
@@ -39,13 +34,12 @@ export function ReportViewer() {
       setProgress(false);
 
       if (reports && reports.length) {
-        setVerified(true);
-
-        setInfo(sortByFile("info", reports));
-        setWarn(sortByFile("warn", reports));
-        setErr(sortByFile("err", reports));
+        sortByFile("info", reports).then((sorted) => setInfo(sorted));
+        sortByFile("warn", reports).then((sorted) => setWarn(sorted));
+        sortByFile("err", reports).then((sorted) => setErr(sorted));
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [verificationContext]);
 
   const count = info.length + warn.length + err.length;
@@ -55,15 +49,7 @@ export function ReportViewer() {
       {!progress && !count && (
         <p className="reports-instruction no-reports">No reports to display</p>
       )}
-      {progress && (
-        <FontAwesomeIcon
-          className="verification-progress-icon"
-          icon={faSpinner}
-        />
-      )}
-      {progress && (
-        <p className="reports-instruction verifying">Verifying policies...</p>
-      )}
+      {progress && <ProgressSpinner text="Verifying policies..." />}
       {!!err?.length && (
         <ReportsSection title="Errors" severity="err" reports={err} />
       )}
@@ -76,33 +62,48 @@ export function ReportViewer() {
     </div>
   );
 
-  // FIXME: use serverId not filename
-  function sortByFile(
+  async function sortByFile(
     severity: ReportSeverity,
     reports?: Report[],
-  ): [string, Report[]][] {
+  ): Promise<ReportGroup[]> {
     if (!reports) return [];
 
-    return Object.entries(
+    return Promise.all(
       reports
         .filter((report) => report.severity === severity)
-        .reduce(
+        .map((report) => {
+          if (
+            report.sourceLocations.length &&
+            report.sourceLocations[0].location.source
+          ) {
+            const primaryFile = report.sourceLocations[0].location
+              .source as VerificationFile;
+            return primaryFile.resolved.then((uploaded) => ({
+              id: uploaded.serverId,
+              filename: primaryFile.filename ?? primaryFile.file.name,
+              report,
+            }));
+          } else {
+            return Promise.resolve({ id: "other", filename: "Other", report });
+          }
+        }),
+    ).then((resolved) =>
+      Object.entries(
+        resolved.reduce(
           (
-            sorted: { [filename: string]: Report[] },
-            report: Report,
-          ): { [filename: string]: Report[] } => {
-            const source = report.primarySourceLocation.source?.file.name;
-            if (source) {
-              if (!sorted[source]) {
-                sorted[source] = [];
-              }
-
-              sorted[source].push(report);
+            sorted: { [id: string]: { filename: string; reports: Report[] } },
+            current: { report: Report; id: string; filename: string },
+          ): { [id: string]: { filename: string; reports: Report[] } } => {
+            if (!sorted[current.id]) {
+              sorted[current.id] = { filename: current.filename, reports: [] };
             }
+
+            sorted[current.id].reports.push(current.report);
             return sorted;
           },
           {},
         ),
+      ),
     );
   }
 }

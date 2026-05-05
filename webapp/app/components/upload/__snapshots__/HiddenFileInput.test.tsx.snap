@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <input
+    accept=".txt"
+    data-testid="hidden-file-input"
+    multiple=""
+    style="display: none;"
+    type="file"
+  />
+</DocumentFragment>
+`;

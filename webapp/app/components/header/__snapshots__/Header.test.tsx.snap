@@ -1,0 +1,56 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renders with subheading 1`] = `
+<DocumentFragment>
+  <div
+    class="app-header"
+  >
+    <div
+      class="header-left-align"
+    >
+      <h1
+        class="title large-text bold-text lexend-giga"
+      >
+        Test Heading
+      </h1>
+      <h2
+        class="subtitle med-text"
+      >
+        Test Subheading
+      </h2>
+    </div>
+    <div
+      class="header-right-align"
+    >
+      <div
+        data-testid="verify-button"
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders without subheading 1`] = `
+<DocumentFragment>
+  <div
+    class="app-header"
+  >
+    <div
+      class="header-left-align"
+    >
+      <h1
+        class="title large-text bold-text lexend-giga"
+      >
+        Test Heading
+      </h1>
+    </div>
+    <div
+      class="header-right-align"
+    >
+      <div
+        data-testid="verify-button"
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;

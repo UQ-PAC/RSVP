@@ -136,9 +136,10 @@
   }
 
   .source-file-header .source-compare-icon {
-    color: var(--color-gray-500);
+    color: var(--color-gray-400);
     align-self: center;
     justify-self: center;
+    font-size: 1rem;
   }
 
   /* Hide scrollbar for Chrome, Safari and Opera */
@@ -189,8 +190,11 @@
 
   .source-file-header .source-file-version.selected {
     background-color: var(--color-gray-100);
-    cursor: default;
     color: var(--color-gray-700);
+  }
+
+  .source-file.expanded .source-file-header .source-file-version.selected {
+    cursor: default;
   }
 
   .source-file.expanded
@@ -318,11 +322,20 @@
     border-right: 1px solid var(--color-red-300);
   }
 
-  .source-file-empty-diff {
-    font-family: var(--font-sans);
-    padding: 1rem 2rem;
+  /******* Diffs *******/
+
+  .diff-impact {
+    display: flex;
+    border-top: 1px solid var(--color-gray-300);
+  }
+
+  .source-file-empty-diff,
+  .diff-impact .diff-impact-information-message,
+  .diff-impact .source-file-empty-impact {
+    margin: 2rem;
+    color: var(--color-gray-500);
+    flex-grow: 1;
     text-align: center;
-    color: var(--color-gray-600);
   }
 
   /********  report highlighting  ********/
@@ -351,27 +364,27 @@
     background-color: var(--color-err-light);
   }
 
-  .source-report.selected-info .source-report-text-highlight-info {
+  .source-report.selected-info .source-report-text-highlight-info.selected {
     background-color: var(--color-info-mid);
   }
 
-  .source-report.selected-warn .source-report-text-highlight-warn {
+  .source-report.selected-warn .source-report-text-highlight-warn.selected {
     background-color: var(--color-warn-mid);
   }
 
-  .source-report.selected-err .source-report-text-highlight-err {
+  .source-report.selected-err .source-report-text-highlight-err.selected {
     background-color: var(--color-err-mid);
   }
 
-  .source-report.hovered-info .source-report-text-highlight-info {
+  .source-report.hovered-info .source-report-text-highlight-info.hovered {
     background-color: var(--color-info-darker);
   }
 
-  .source-report.hovered-warn .source-report-text-highlight-warn {
+  .source-report.hovered-warn .source-report-text-highlight-warn.hovered {
     background-color: var(--color-warn-darker);
   }
 
-  .source-report.hovered-err .source-report-text-highlight-err {
+  .source-report.hovered-err .source-report-text-highlight-err.hovered {
     background-color: var(--color-err-darker);
   }
 

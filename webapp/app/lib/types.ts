@@ -21,8 +21,10 @@ export interface SourceLoc {
 
 export interface Report {
   id: string;
-  primarySourceLocation: SourceLoc;
-  sourceLocations: SourceLoc[];
+  sourceLocations: {
+    message: string;
+    location: SourceLoc;
+  }[];
   severity: ReportSeverity;
   message: string;
   messageDetail?: string;
@@ -31,7 +33,7 @@ export interface Report {
 export type VersionedPolicy = string[];
 
 export interface VerificationRequest {
-  policyFiles: VersionedPolicy[];
+  policies: VersionedPolicy[];
   schemas: string[];
   entities: string[];
   invariants: string[];
@@ -44,6 +46,7 @@ export interface UploadedFile {
 
 export interface VerificationFile {
   file: File;
+  filename: string;
   filetype: FileType;
   resolved: Promise<UploadedFile>;
 }
@@ -51,4 +54,20 @@ export interface VerificationFile {
 export interface VersionedFile {
   original: VerificationFile;
   versions: VerificationFile[];
+}
+
+export type VerificationFileDict = { [id: string]: VerificationFile };
+export type VersionedFileList = VersionedFile[];
+export type VersionDict = { [id: string]: string[] };
+export type DiffDict = { [id: string]: { [id: string]: string } };
+export interface AnalysisGroup {
+  name: string;
+  files: VersionedFileList;
+  byId?: Promise<VerificationFileDict>;
+  reports?: Promise<Report[]>;
+  diffs: DiffDict;
+  impacts?: DiffDict;
+  verifyRequested: boolean;
+  verifyPending: boolean;
+  verifyCompleted?: Promise<boolean>;
 }

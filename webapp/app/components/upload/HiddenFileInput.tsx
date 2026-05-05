@@ -22,6 +22,7 @@ export function HiddenFileInput({
       onChange={handleFileInput}
       style={{ display: "none" }}
       accept={accept}
+      data-testid="hidden-file-input"
     />
   );
 }

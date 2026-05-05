@@ -1,14 +1,19 @@
 "use client";
 
-import { Report, ReportSeverity } from "../../types";
-import { ExpansionState, useFocusDispatch } from "../providers/FocusContext";
+import {
+  ExpansionState,
+  useFocusDispatch,
+} from "../../lib/context/FocusContext";
+import { Report, ReportSeverity } from "../../lib/types";
 import { ToggleAll } from "../shared/ToggleAll";
 import { ReportsGroup } from "./ReportsGroup";
+
+export type ReportGroup = [string, { filename: string; reports: Report[] }];
 
 interface ReportsSectionProps {
   title: string;
   severity: ReportSeverity;
-  reports: [string, Report[]][];
+  reports: ReportGroup[];
 }
 
 export function ReportsSection({
@@ -33,17 +38,18 @@ export function ReportsSection({
       <span className="reports-section-header">
         <h4 className="reports-section-title">{title}</h4>
         <span className="reports-section-count">
-          ({reports.flatMap((report) => report[1]).length})
+          ({reports.flatMap((report) => report[1].reports).length})
         </span>
         <ToggleAll name="reports-section" toggle={toggleAll} />
       </span>
 
-      {reports.map(([group, items]) => (
+      {reports.map(([group, { filename, reports }]) => (
         <ReportsGroup
           key={`${severity}-${group}`}
           section={severity}
-          name={group}
-          reports={items}
+          name={filename}
+          id={group}
+          reports={reports}
         />
       ))}
     </div>

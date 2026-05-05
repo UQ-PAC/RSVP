@@ -14,13 +14,15 @@ You will need to create these credentials in GitHub and supply them to Gradle as
 
 1. Create a personal access token with `read:packages` permission:
 
-   Account Settings > Developer settings > Personal access tokens > Tokens (classic) > Generate new token (classic) > check `read:packages` > Generate token
+   Account Settings > Developer settings > Personal access tokens > Tokens (classic) > Generate new token (classic) >
+   check `read:packages` > Generate token
 
 2. Add the system properties to your user-scoped properties file (`~/.gradle/gradle.properties`):
    ```
    systemProp.packages.user=<your_github_username>
    systemProp.packages.token=<your_personal_access_token>
    ```
+
 ### Soufflé
 
 Soufflé is required to build and run the `policy-dl` project, and can be installed using a package manager:
@@ -44,6 +46,7 @@ Soufflé is required to build and run the `policy-dl` project, and can be instal
   ./gradlew build
   ```
 
+
 - Run tests and generate reports:
 
   ```
@@ -51,7 +54,9 @@ Soufflé is required to build and run the `policy-dl` project, and can be instal
   ```
 
   Test report: `build/reports/tests/test/aggregated-results/index.html`
+
   Coverage report: `build/reports/jacoco/testSuiteCodeCoverageReport/html/index.html`
+
 
 - Run CLI application:
 
@@ -61,16 +66,15 @@ Soufflé is required to build and run the `policy-dl` project, and can be instal
 
   Arguments include:
 
-  - `--schema <file>`/`-s <file>` - specify schema file
-  - `--policies <file>`/`-p <file>` - specify policies file
-  - `--entities <file>`/`-e <file>` - specify entities JSON file
-  - `--invariants <file>`/`-i <file>` - specify invariants file (optional)
+    - Specify a schema file: `--schema <file>`/`-s <file>`
+    - Specify one or more policies files: `--policies <files>`/`-p <files>`
 
-  Note that the various file types can be supplied more than once, but except in the case of
-  policies this currently results in analysis using one of the files arbitrarily. For policy files,
-  specifying two files will cause the two files to be interpreted as versions of the same policy set
-  and will trigger change impact analysis (other analysis is performed on the later version of the
-  policies, i.e. the file specified 2nd on the command line).
+      Files specified after a single `--policies` or `-p` argument will be treated as versions of the same file in the
+      order they are specified. To specify multiple policy files that aren't versions of the same file, supply them
+      separately (with `--policies` or `-p` before each file).
+    - Specify an entities JSON file: `--entities <file>`/`-e <file>`
+    - Specify an invariants file (optional): `--invariants <file>`/`-i <file>`
+
 
 - Run web server:
 

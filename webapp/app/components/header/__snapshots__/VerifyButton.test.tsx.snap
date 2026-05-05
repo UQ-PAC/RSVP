@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <button
+    class="verify-button"
+    data-testid="verify-button"
+  >
+    <div
+      data-icon="faFileShield"
+      data-testid="font-awesome-icon"
+    />
+    <span
+      class="verify-button-text lexend-deca"
+    >
+      Verify
+    </span>
+  </button>
+</DocumentFragment>
+`;

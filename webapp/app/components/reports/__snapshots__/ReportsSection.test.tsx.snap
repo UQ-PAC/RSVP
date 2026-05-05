@@ -1,0 +1,124 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <div
+    class="reports-section reports-section-warn"
+  >
+    <span
+      class="reports-section-header"
+    >
+      <h4
+        class="reports-section-title"
+      >
+        Silly Mistakes
+      </h4>
+      <span
+        class="reports-section-count"
+      >
+        (5)
+      </span>
+      <div
+        data-name="reports-section"
+        data-testid="toggle-all"
+      />
+    </span>
+    <div
+      data-name="group one"
+      data-reportcount="2"
+      data-section="warn"
+      data-testid="reports-section-group-one"
+    />
+    <div
+      data-name="group two"
+      data-reportcount="3"
+      data-section="warn"
+      data-testid="reports-section-group-two"
+    />
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders 2`] = `
+<DocumentFragment>
+  <div
+    class="reports-section reports-section-warn"
+  >
+    <span
+      class="reports-section-header"
+    >
+      <h4
+        class="reports-section-title"
+      >
+        Silly Mistakes
+      </h4>
+      <span
+        class="reports-section-count"
+      >
+        (3)
+      </span>
+      <div
+        data-name="reports-section"
+        data-testid="toggle-all"
+      />
+    </span>
+    <div
+      data-name="group five"
+      data-reportcount="0"
+      data-section="warn"
+      data-testid="reports-section-group-five"
+    />
+    <div
+      data-name="group two"
+      data-reportcount="3"
+      data-section="warn"
+      data-testid="reports-section-group-two"
+    />
+  </div>
+</DocumentFragment>
+`;
+
+exports[`toggles group expansions 1`] = `
+<DocumentFragment>
+  <div
+    class="reports-section reports-section-err"
+  >
+    <span
+      class="reports-section-header"
+    >
+      <h4
+        class="reports-section-title"
+      >
+        Expanded Section
+      </h4>
+      <span
+        class="reports-section-count"
+      >
+        (6)
+      </span>
+      <div
+        data-name="reports-section"
+        data-testid="toggle-all"
+      />
+    </span>
+    <div
+      data-name="group one"
+      data-reportcount="2"
+      data-section="err"
+      data-testid="reports-section-group-one"
+    />
+    <div
+      data-name="group two"
+      data-reportcount="3"
+      data-section="err"
+      data-testid="reports-section-group-two"
+    />
+    <div
+      data-name="group three"
+      data-reportcount="1"
+      data-section="err"
+      data-testid="reports-section-group-three"
+    />
+  </div>
+</DocumentFragment>
+`;

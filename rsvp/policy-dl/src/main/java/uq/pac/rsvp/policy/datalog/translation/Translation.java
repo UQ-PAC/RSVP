@@ -1,7 +1,35 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
-import static uq.pac.rsvp.Assertion.require;
+import com.cedarpolicy.AuthorizationEngine;
+import com.cedarpolicy.BasicAuthorizationEngine;
+import com.cedarpolicy.model.DetailedError;
+import com.cedarpolicy.model.EntityValidationRequest;
+import com.cedarpolicy.model.ValidationRequest;
+import com.cedarpolicy.model.ValidationResponse;
+import com.cedarpolicy.model.entity.Entities;
+import com.cedarpolicy.model.exception.AuthException;
+import com.cedarpolicy.model.policy.PolicySet;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Multimap;
+import uq.pac.rsvp.policy.ast.FileSet;
+import uq.pac.rsvp.policy.ast.entity.Entity;
+import uq.pac.rsvp.policy.ast.entity.EntitySet;
+import uq.pac.rsvp.policy.ast.policy.Invariant;
+import uq.pac.rsvp.policy.ast.policy.Policy;
+import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
+import uq.pac.rsvp.policy.ast.schema.Schema;
+import uq.pac.rsvp.policy.ast.schema.type.TypeReference;
+import uq.pac.rsvp.policy.datalog.ast.DLAtom;
+import uq.pac.rsvp.policy.datalog.ast.DLDeclTerm;
+import uq.pac.rsvp.policy.datalog.ast.DLFact;
+import uq.pac.rsvp.policy.datalog.ast.DLProgram;
+import uq.pac.rsvp.policy.datalog.ast.DLRule;
+import uq.pac.rsvp.policy.datalog.ast.DLRuleDecl;
+import uq.pac.rsvp.policy.datalog.ast.DLTerm;
+import uq.pac.rsvp.policy.datalog.entity.EntityValidator;
+import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
+import uq.pac.rsvp.policy.datalog.invariant.InvariantValidator;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -19,36 +47,23 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.cedarpolicy.AuthorizationEngine;
-import com.cedarpolicy.BasicAuthorizationEngine;
-import com.cedarpolicy.model.DetailedError;
-import com.cedarpolicy.model.EntityValidationRequest;
-import com.cedarpolicy.model.ValidationRequest;
-import com.cedarpolicy.model.ValidationResponse;
-import com.cedarpolicy.model.entity.Entities;
-import com.cedarpolicy.model.exception.AuthException;
-import com.cedarpolicy.model.policy.PolicySet;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Multimap;
-
-import uq.pac.rsvp.policy.ast.entity.Entity;
-import uq.pac.rsvp.policy.ast.schema.Schema;
-import uq.pac.rsvp.policy.ast.policy.Policy;
-import uq.pac.rsvp.policy.ast.entity.EntitySet;
-import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
-import uq.pac.rsvp.policy.ast.schema.type.TypeReference;
-import uq.pac.rsvp.policy.datalog.ast.DLAtom;
-import uq.pac.rsvp.policy.datalog.ast.DLDeclTerm;
-import uq.pac.rsvp.policy.datalog.ast.DLFact;
-import uq.pac.rsvp.policy.datalog.ast.DLProgram;
-import uq.pac.rsvp.policy.datalog.ast.DLRule;
-import uq.pac.rsvp.policy.datalog.ast.DLRuleDecl;
-import uq.pac.rsvp.policy.datalog.ast.DLTerm;
-import uq.pac.rsvp.policy.datalog.entity.EntityValidator;
-import uq.pac.rsvp.policy.ast.policy.Invariant;
-import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
-import uq.pac.rsvp.policy.datalog.invariant.InvariantValidator;
+import static uq.pac.rsvp.Assertion.require;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.AttributeRuleDecl;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.ForbidRuleDecl;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.HasAttributeRuleDecl;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.NullifiedRequestsRuleDecl;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.OUTPUT_DELIMITER;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.OUTPUT_EXT;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.ParentOfRuleDecl;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.PermitRuleDecl;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.PermittedRequestsRuleDecl;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.ProgramName;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.TmpRecordType;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.UndefinedEntityUIDName;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.makeAtom;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.makeForbiddenRequestsRule;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.makeIODirectives;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.makePermittedRequestsRule;
 
 /**
  * Putting translation of the cedar schema, entities, policies and context together
@@ -65,10 +80,14 @@ public class Translation {
     private final BiMap<Policy, DLRuleDecl> policyDeclarations;
     private final BiMap<Invariant, DLRuleDecl> invariantDeclarations;
 
-    public Translation(Path schemaFile, Path policiesFile, Path entitiesFile, Path invariantFile, Path datalogDir) {
+    public Translation(FileSet fileset, Path datalogDir) {
+        this(fileset, datalogDir, FileSet.LATEST);
+    }
+
+    public Translation(FileSet fileset, Path datalogDir, String policyVersion) {
         this.datalogDir = datalogDir;
         try {
-            InputSet validated = validate(schemaFile, policiesFile, entitiesFile, invariantFile);
+            InputSet validated = validate(fileset, policyVersion);
             this.schema = validated.schema;
             this.entities = validated.entities;
             this.policies = validated.policies;
@@ -93,11 +112,17 @@ public class Translation {
         }
     }
 
-    record InputSet(Schema schema, Collection<Policy> policies, EntitySet entities, Collection<Invariant> invariants) {}
+    record InputSet(Schema schema, Collection<Policy> policies, EntitySet entities, Collection<Invariant> invariants) {
+    }
 
-    static InputSet validate(Path schemaFile, Path policyFile, Path entityFile, Path invariantsFile)
+    static InputSet validate(FileSet fileset)
             throws IOException, AuthException, IllegalAccessException {
-        EntitySet entities = EntitySet.parse(entityFile);
+        return validate(fileset, FileSet.LATEST);
+    }
+
+    static InputSet validate(FileSet fileset, String policyVersion)
+            throws IOException, AuthException, IllegalAccessException {
+        EntitySet entities = new EntitySet(fileset.getEntities());
 
         Set<Entity> filteredEntities = entities.stream().filter(e -> {
             return !TypeReference.parse(e.getEuid().getType()).getBaseName().equals("Action");
@@ -105,8 +130,8 @@ public class Translation {
         entities = new EntitySet(filteredEntities);
 
         com.cedarpolicy.model.schema.Schema cedarSchema =
-                new com.cedarpolicy.model.schema.Schema(Files.readString(schemaFile));
-        PolicySet cedarPolicies = PolicySet.parsePolicies(policyFile);
+                new com.cedarpolicy.model.schema.Schema(fileset.getSchemaString());
+        PolicySet cedarPolicies = PolicySet.parsePolicies(fileset.getPolicyString(policyVersion));
 
         ValidationRequest vReq = new ValidationRequest(cedarSchema, cedarPolicies);
         AuthorizationEngine engine = new BasicAuthorizationEngine();
@@ -121,14 +146,17 @@ public class Translation {
             throw new TranslationError("Schema/Policy validation failed: \n" + err);
         }
 
-        EntityValidationRequest eReq =
-                new EntityValidationRequest(cedarSchema,
-                        Entities.parse(entityFile).getEntities().stream().toList());
+        List<com.cedarpolicy.model.entity.Entity> cedarEntities = new ArrayList<>();
+        for (String entityFile : fileset.getEntitiesStrings()) {
+            cedarEntities.addAll(Entities.parse(entityFile).getEntities());
+        }
+
+        EntityValidationRequest eReq = new EntityValidationRequest(cedarSchema, cedarEntities);
         engine.validateEntities(eReq);
 
         // For the moment we do not support arbitrary action names as Cedar does,
         // just standard non-empty identifiers
-        Schema rsvpSchema = Schema.parse(schemaFile);
+        Schema rsvpSchema = Schema.of(fileset.getSchemaStatements());
         Pattern actionPattern = Pattern.compile("^Action::\"[A-Za-z_][A-Za-z_0-9]*\"$");
         rsvpSchema.actions().forEach(a -> {
             if (!actionPattern.matcher(a.getBaseName()).matches()) {
@@ -163,25 +191,9 @@ public class Translation {
 
         entities = EntityValidator.validate(rsvpSchema, entities);
 
-        // FIXME: For the moment (while RSVP-native policy validation is not yet ready)
-        //        we expect inputs and policies in separate files. This is so we can validate
-        //        policies against schema via Cedar utilities. Eventually, however, invariants
-        //        and policies files should be merged into one, i.e., a file contains a policy set
-        //        that should uphold the invariants from the same file
-        Collection<Invariant> invariants = List.of();
-        if (invariantsFile != null) {
-            PolicyProgram invariantProgram = PolicyProgram.parse(invariantsFile);
-            if (!invariantProgram.getPolicies().isEmpty()) {
-                throw new TranslationError("Invariants found in the policy source: " + policyFile);
-            }
-            invariants = invariantProgram.getInvariants();
-        }
-
-        PolicyProgram policyProgram = PolicyProgram.parse(policyFile);
-        Collection<Policy> policies = policyProgram.getPolicies();
-        if (!policyProgram.getInvariants().isEmpty()) {
-            throw new TranslationError("Policies found in the invariant source: " + invariantsFile);
-        }
+        PolicyProgram program = fileset.getPolicyProgram(policyVersion);
+        Collection<Policy> policies = program.getPolicies();
+        Collection<Invariant> invariants = program.getInvariants();
 
         InvariantValidator invariantValidator = new InvariantValidator(rsvpSchema);
         invariants.forEach(invariantValidator::validate);
@@ -210,8 +222,8 @@ public class Translation {
         for (TranslationEntityDefinition type : translationSchema.getDefinitions()) {
             // Entity definition facts
             builder.comment("Entity: " + type.getName())
-                .add(type.getEntityRuleDecl())
-                .add(facts.get(type.getEntityRuleDecl().getName()));
+                    .add(type.getEntityRuleDecl())
+                    .add(facts.get(type.getEntityRuleDecl().getName()));
         }
 
         // Attribute relation
@@ -284,9 +296,9 @@ public class Translation {
         }
 
         builder.comment("All permitted requests")
-            .add(makePermittedRequestsRule().getStatements())
-            .comment("All forbidden requests")
-            .add(makeForbiddenRequestsRule().getStatements());
+                .add(makePermittedRequestsRule().getStatements())
+                .comment("All forbidden requests")
+                .add(makeForbiddenRequestsRule().getStatements());
 
         builder.comment("Invariants");
         for (Invariant invariant : invariants) {
@@ -298,7 +310,7 @@ public class Translation {
         }
 
         builder.comment("I/O")
-            .add(makeIODirectives(output));
+                .add(makeIODirectives(output));
 
         return builder.build();
     }
@@ -307,7 +319,7 @@ public class Translation {
      * Assuming the datalog output .csv file contains requests of the form {@code principal TAB resource TAB action}
      * load them as a request set
      *
-     * @param csv CSV results file within that directory
+     * @param csv  CSV results file within that directory
      * @param name name of the policy that generated that result
      */
     private RequestSet loadRequests(Path csv, String name) {

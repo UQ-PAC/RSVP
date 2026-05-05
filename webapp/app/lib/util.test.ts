@@ -1,16 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Report, VersionedFile } from "./types";
-import { getFileType, sortReports, sortSources } from "./util";
+import {
+  getFileType,
+  getSourceIdentifier,
+  getSourceStr,
+  sortReports,
+  sortSources,
+} from "./util";
 
 test("sort reports", () => {
   const report = (id: string, offset: number): Report => ({
     id,
-    primarySourceLocation: {
-      file: "bar",
-      offset,
-      len: 0,
-    },
-    sourceLocations: [],
+    sourceLocations: [
+      {
+        message: "",
+        location: {
+          file: "bar",
+          offset,
+          len: 0,
+        },
+      },
+    ],
     severity: "info",
     message: "",
   });
@@ -36,9 +46,7 @@ test("sort sources", () => {
   const source = (id: number, name: string): VersionedFile => ({
     original: {
       id,
-      file: {
-        name,
-      } as any,
+      filename: name,
     } as any,
     versions: [],
   });
@@ -77,6 +85,39 @@ test("get file type", () => {
   expect(getFileType(file("invariant"))).toBe("text");
 });
 
-test("get source identifier", () => {});
+test("get source identifier", () => {
+  expect(
+    getSourceIdentifier({
+      file: "",
+      offset: 0,
+      len: 0,
+    }),
+  ).toBe(":0:0");
+  expect(
+    getSourceIdentifier({
+      file: "foo",
+      offset: 1234,
+      len: 5678,
+    }),
+  ).toBe("foo:1234:5678");
+});
 
-//   test("get source string", () => {});
+test("get source string", () => {
+  const baseLoc = {
+    file: "",
+    offset: 0,
+    len: 0,
+  };
+
+  const loc = (line: number, column: number) => ({
+    ...baseLoc,
+    startLoc: {
+      line,
+      column,
+    },
+  });
+
+  expect(getSourceStr(loc(0, 0))).toBe("Line 0, column 0");
+  expect(getSourceStr(loc(5678, 1234))).toBe("Line 5678, column 1234");
+  expect(getSourceStr(baseLoc)).toBe("Line undefined, column undefined");
+});

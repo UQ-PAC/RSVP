@@ -1,11 +1,8 @@
 package uq.pac.rsvp.policy.datalog.invariant;
 
 import uq.pac.rsvp.policy.ast.antlrschema.AntlrSchema;
-import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrEntityType;
 import uq.pac.rsvp.policy.ast.antlrschema.type.*;
-import uq.pac.rsvp.policy.ast.schema.common.*;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
-import uq.pac.rsvp.support.SourceLoc;
 
 import java.util.List;
 import java.util.Map;
@@ -21,28 +18,30 @@ public class InvariantTyping {
 
     private final AntlrSchema schema;
 
+    public AntlrSchema getSchema() {
+        return schema;
+    }
+
     public record TypeTest(Function<AntlrBuiltinType, Boolean> test, String expected) { }
 
-    final static TypeTest TBoolean = new TypeTest(t -> t == BooleanType, "Boolean");
-    final static TypeTest TLong = new TypeTest(t -> t == LongType, "Long");
-    final static TypeTest TString = new TypeTest(t -> t == StringType, "String");
+    final static TypeTest TBoolean = new TypeTest(t -> t.equals(BooleanType), "__cedar::Boolean");
+    final static TypeTest TLong = new TypeTest(t -> t.equals(LongType), "__cedar::Long");
+    final static TypeTest TString = new TypeTest(t -> t.equals(StringType), "__cedar::String");
     final static TypeTest TTypeOfEntity = new TypeTest(t -> t == TypeOfEntityType, "Entity");
     final static TypeTest TSet = new TypeTest(t -> t instanceof AntlrSetType, "Set<?>");
     final static TypeTest TRecord = new TypeTest(
             t -> t instanceof AntlrRecordType, "Record, Entity, Action");
-    final TypeTest TEntityOrAction = new TypeTest(
+    final static TypeTest TEntityOrAction = new TypeTest(
             t -> isEntity(t) || isAction(t), "Entity, Action");
-    final TypeTest TEntity = new TypeTest(this::isEntity, "Entity");
-    final TypeTest TAction = new TypeTest(this::isAction, "Action");
+    final static TypeTest TEntity = new TypeTest(InvariantTyping::isEntity, "Entity");
+    final static TypeTest TAction = new TypeTest(InvariantTyping::isAction, "Action");
 
-    private boolean isAction(AntlrBuiltinType type) {
-        return type instanceof AntlrTypeReference ref &&
-                schema.getEntityType(ref) != null;
+    private static boolean isAction(AntlrBuiltinType type) {
+        return type instanceof AntlrTypeReference ref && ref.getName().equals("Action");
     }
 
-    private boolean isEntity(AntlrBuiltinType type) {
-        return type instanceof AntlrTypeReference ref &&
-                schema.getEntityType(ref) != null;
+    private static boolean isEntity(AntlrBuiltinType type) {
+        return type instanceof AntlrTypeReference ref && !ref.getName().equals("Action");
     }
 
     static TypeTest expect(AntlrBuiltinType actual, TypeTest ...tests) {
@@ -87,10 +86,5 @@ public class InvariantTyping {
             case AntlrTypeReference c -> c;
             default -> throw new TranslationError("Unsupported type: " + def);
         };
-    }
-
-    AntlrRecordType convert(AntlrEntityType def) {
-        AntlrRecordType ct = (AntlrRecordType) convert(def.getShape());
-        return new AntlrRecordType(ct.getAttributes(), SourceLoc.MISSING);
     }
 }

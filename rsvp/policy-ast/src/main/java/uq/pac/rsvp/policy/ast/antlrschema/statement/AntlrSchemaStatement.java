@@ -15,7 +15,7 @@ public abstract class AntlrSchemaStatement extends AntlrSchemaAstNode {
         this.annotations = annotations;
     }
 
-    public AntlrTypeReference getReference() {
+    public AntlrTypeReference getTypeReference() {
         return reference;
     }
 

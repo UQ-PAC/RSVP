@@ -28,5 +28,5 @@
     }
 ]
 
-// @MESSAGE: Missing attribute: private
+// @MESSAGE: Missing attribute: "private"
 // @LOCATION: 583:115 [21:21-25:13]

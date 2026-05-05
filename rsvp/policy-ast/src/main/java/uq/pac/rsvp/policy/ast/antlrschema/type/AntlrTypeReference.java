@@ -1,5 +1,6 @@
 package uq.pac.rsvp.policy.ast.antlrschema.type;
 
+import uq.pac.rsvp.policy.ast.antlrschema.parser.AntlrTypeReferenceParser;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaValueVisitor;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaVisitor;
@@ -16,6 +17,10 @@ public class AntlrTypeReference extends AntlrBuiltinType {
         super(location);
         this.name = name;
         this.namespace = namespace;
+    }
+
+    public static AntlrTypeReference parse(String text) {
+        return AntlrTypeReferenceParser.parse(text.trim());
     }
 
     public AntlrTypeReference(String namespace, String name) {

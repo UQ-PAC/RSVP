@@ -87,9 +87,9 @@ public class AntlrTypesResolutionVisitor implements AntlrSchemaValueVisitor<Antl
             if (global != null && local != null) {
                 throw new ResolutionException("Illegal shadowing of type: " + type.getBaseName());
             } else if (global != null) {
-                return global.getReference();
+                return global.getTypeReference();
             } else if (local != null) {
-                return local.getReference();
+                return local.getTypeReference();
             } else {
                 throw new SchemaResolutionException("Invalid type reference: " + type.getBaseName());
             }
@@ -98,7 +98,7 @@ public class AntlrTypesResolutionVisitor implements AntlrSchemaValueVisitor<Antl
             if (stmt == null) {
                 throw new SchemaResolutionException("Invalid type reference: " + type.getName());
             }
-            return stmt.getReference();
+            return stmt.getTypeReference();
         }
     }
 

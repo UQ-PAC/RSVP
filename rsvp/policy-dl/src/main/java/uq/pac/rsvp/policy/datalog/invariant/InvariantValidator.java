@@ -1,38 +1,38 @@
 package uq.pac.rsvp.policy.datalog.invariant;
 
 import uq.pac.rsvp.policy.ast.antlrschema.AntlrSchema;
-import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrAction;
+import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrCommonType;
+import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrEntityType;
+import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrEnumEntityType;
 import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrBuiltinType;
 import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrRecordType;
+import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrTypeReference;
 import uq.pac.rsvp.policy.ast.policy.Policy;
-import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.ast.invariant.Quantifier;
-import uq.pac.rsvp.policy.ast.schema.common.*;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
-import uq.pac.rsvp.policy.datalog.translation.TranslationConstants;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static uq.pac.rsvp.policy.datalog.invariant.InvariantTyping.*;
 import static uq.pac.rsvp.Assertion.require;
 
 public class InvariantValidator implements PolicyComputationVisitor<AntlrBuiltinType> {
-    private final Map<String, AntlrRecordType> types;
-    private final Map<String, AntlrRecordType> variables;
-    private final Map<String, AntlrRecordType> entities;
-    private final Map<String, AntlrRecordType> actions;
+    // Overall custom-types including actions types and entity types
+    private final Set<AntlrTypeReference> types;
+    // Types of quantifier variables
+    private final Map<String, AntlrTypeReference> variables;
+    // Types of entities
+    private final AntlrSchema schema;
     private final InvariantTyping typing;
 
     private InvariantValidator(InvariantValidator factory, Invariant invariant) {
-        this.types = Map.copyOf(factory.types);
-        this.entities = Map.copyOf(factory.entities);
-        this.actions = Map.copyOf(factory.actions);
+        this.types = Set.copyOf(factory.types);
         this.variables = getVariables(invariant, types);
         this.typing = factory.typing;
+        this.schema = factory.schema;
     }
 
     /**
@@ -42,46 +42,38 @@ public class InvariantValidator implements PolicyComputationVisitor<AntlrBuiltin
      * constructor that copies general data from this factory object, computes invariant-specific
      * information and does validation.
      */
-    public InvariantValidator(AntlrSchema schema, EntitySet entities) {
-        this.types = new HashMap<>();
+    public InvariantValidator(AntlrSchema schema) {
+        this.types = new HashSet<>();
         this.variables = null;
         this.typing = new InvariantTyping(schema);
+        this.schema = schema;
 
         // Build types from entities
-        schema.entityTypes()
-                .forEach(e -> types.put(e.getName(), typing.convert(e)));
+        schema.entityTypes().forEach(e -> types.add(e.getTypeReference()));
         // Build types from actions
-        schema.actions()
-                .forEach(e -> types.put(e.getName(), new AntlrRecordType()));
-
-        // FIXME: ensure entities and actions have types
-        this.entities = entities.getEntities().stream().collect(Collectors.toMap(
-                e -> e.getEuid().getReference(),
-                e -> types.get(e.getEuid().getType())));
-
-		// Put in undefined references
-        schema.enumEntityTypes()
-                .filter(e -> e.getEnumNames().isEmpty())
-                .map(TranslationConstants::getUndefinedEUID)
-                .forEach(uid -> this.entities.put(uid.toCedarExpr(), types.get(uid.getType().toString())));
-
-        this.actions = schema.actions().collect(Collectors.toMap(
-            AntlrAction::getName, a -> types.get(a.getNamespace())
-        ));
+        schema.actions().forEach(e -> types.add(new AntlrTypeReference(e.getNamespace(), "Action")));
     }
 
-    private static Map<String, AntlrRecordType> getVariables(Invariant invariant, Map<String, AntlrRecordType> types) {
-        Map<String, AntlrRecordType> variables = new HashMap<>();
+    private static Map<String, AntlrTypeReference> getVariables(Invariant invariant, Set<AntlrTypeReference> types) {
+        Map<String, AntlrTypeReference> variables = new HashMap<>();
         invariant.getQuantifier().getVariables().forEach(var -> {
-            if (!types.containsKey(var.type().getValue())) {
+            // Variable type
+            AntlrTypeReference typeRef = AntlrTypeReference.parse(var.type().getValue());
+            String varName = var.name().getReference();
+
+            // Check for duplicate variables
+            if (variables.containsKey(varName)) {
+                throw new Error("duplicate variable name: %s in quantifier: %s", varName, invariant.getQuantifier());
+            }
+
+            // FIXME: Action types are not handled here
+            // Ensure types exist
+            if (!types.contains(typeRef)) {
                 throw new Error("invalid type: %s in quantifier: %s. Available types: %s",
-                        var.type(), invariant.getQuantifier(), types.keySet());
+                        var.type(), invariant.getQuantifier(), types);
             }
-            if (variables.containsKey(var.name().getReference())) {
-                throw new Error("duplicate variable name: %s in quantifier: %s",
-                        var.name(), invariant.getQuantifier());
-            }
-            variables.put(var.name().getReference(), types.get(var.type().getValue()));
+
+            variables.put(varName, typeRef);
         });
         return variables;
     }
@@ -122,7 +114,7 @@ public class InvariantValidator implements PolicyComputationVisitor<AntlrBuiltin
             }
             case Eq, Neq -> {
                 // FIXME: we need record here as well
-                expectCompatible(lhs, rhs, TBoolean, TLong, TString, typing.TEntityOrAction);
+                expectCompatible(lhs, rhs, TBoolean, TLong, TString, TEntityOrAction);
                 yield BooleanType;
             }
             case Or, And -> {
@@ -130,17 +122,17 @@ public class InvariantValidator implements PolicyComputationVisitor<AntlrBuiltin
                 yield BooleanType;
             }
             case HasAttr -> {
-                expect(lhs, typing.TEntityOrAction, TRecord);
+                expect(lhs, TEntityOrAction, TRecord);
                 expect(rhs, TString);
                 yield BooleanType;
             }
             case Is -> {
-                expect(lhs, typing.TEntityOrAction);
+                expect(lhs, TEntityOrAction);
                 expect(rhs, TTypeOfEntity);
                 yield BooleanType;
             }
             case In -> {
-                expectCompatible(lhs, rhs, typing.TEntityOrAction);
+                expectCompatible(lhs, rhs, TEntityOrAction);
                 yield BooleanType;
             }
             default -> throw new TranslationError("Unsupported");
@@ -150,16 +142,19 @@ public class InvariantValidator implements PolicyComputationVisitor<AntlrBuiltin
     @Override
     public AntlrBuiltinType visitPropertyAccessExpr(PropertyAccessExpression expr) {
         AntlrBuiltinType objectType = collect(expr.getObject());
-        // FIXME: Commented out
-//        if (objectType instanceof AntlrTypeReference ref) {
-//            objectType = types.get(ref.getDefinition().getName());
-//        }
-//        if (objectType instanceof AntlrRecordType rec) {
-//            AntlrBuiltinType attrType = rec.getAttributeType(expr.getProperty());
-//            if (attrType != null) {
-//                return attrType;
-//            }
-//        }
+        if (objectType instanceof AntlrTypeReference ref) {
+            objectType = switch (typing.getSchema().get(ref)) {
+                case AntlrEntityType t -> t.getShape();
+                case AntlrCommonType t -> t.getDefinition();
+                default -> null;
+            };
+        }
+        if (objectType instanceof AntlrRecordType rec) {
+            AntlrBuiltinType attrType = rec.getAttribute(expr.getProperty());
+            if (attrType != null) {
+                return attrType;
+            }
+        }
         throw new Error("Invalid property access: %s [%s: %s]", expr, expr.getObject(), objectType.toString());
     }
 
@@ -204,36 +199,49 @@ public class InvariantValidator implements PolicyComputationVisitor<AntlrBuiltin
 
     @Override
     public AntlrBuiltinType visitEntityExpr(EntityExpression expr) {
-        String name = expr.getQualifiedName();
-        if (entities.containsKey(name)) {
-            return entities.get(name);
+        AntlrTypeReference ref = AntlrTypeReference.parse(expr.getType());
+
+        AntlrEnumEntityType enumType = schema.getEnumEntityType(ref);
+        // We do not check specific entities, but since enum
+        // entities are specified by the schema we check if they exist
+        if (enumType != null && !enumType.getEnumNames().contains(expr.getName())) {
+            throw new Error("invalid enum entity reference: %s", expr.getQualifiedName());
         }
-        throw new Error("invalid type reference: %s", name);
+
+        if (types.contains(ref)) {
+            return ref;
+        }
+        throw new Error("invalid type reference: %s", expr.getQualifiedName());
     }
 
     @Override
     public AntlrBuiltinType visitActionExpr(ActionExpression expr) {
-        String name = expr.getQualifiedName();
-        if (actions.containsKey(name)) {
-            return actions.get(name);
+        AntlrTypeReference action = AntlrTypeReference.parse(expr.getQualifiedName());
+        if (schema.getAction(action) == null) {
+            throw new Error("invalid action: " + action);
         }
-        throw new Error("invalid type reference: %s", name);
+        AntlrTypeReference ref = AntlrTypeReference.parse(expr.getType());
+        if (types.contains(ref)) {
+            return ref;
+        }
+        throw new Error("invalid type reference: %s", ref);
     }
 
     @Override
     public AntlrBuiltinType visitTypeExpr(TypeExpression expr) {
-        if (types.containsKey(expr.getValue())) {
+        AntlrTypeReference ref = AntlrTypeReference.parse(expr.getValue());
+        if (types.contains(ref)) {
             return TypeOfEntityType;
         }
         throw new Error("invalid type: %s in type expression: %s. Available types: %s",
-                expr.getValue(), expr, types.keySet());
+                expr.getValue(), expr, types);
     }
 
     @Override
     public AntlrBuiltinType visitCallExpr(CallExpression expr) {
         String name = expr.getFunc();
         InvariantFunctionValidator.FunctionValidator validator =
-                InvariantFunctionValidator.getValidator(name, typing);
+                InvariantFunctionValidator.getValidator(name);
         if (validator == null) {
             throw new Error("Function: %s not registered", name);
         }

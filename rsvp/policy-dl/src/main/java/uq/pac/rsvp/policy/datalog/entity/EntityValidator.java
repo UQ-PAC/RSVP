@@ -7,8 +7,6 @@ import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrRecordEntityType;
 import uq.pac.rsvp.policy.ast.antlrschema.type.*;
 import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.entity.*;
-import uq.pac.rsvp.policy.ast.schema.*;
-import uq.pac.rsvp.policy.ast.schema.common.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -96,14 +94,11 @@ public class EntityValidator implements AntlrSchemaPayloadVisitor<EntityValue> {
             throw new EntityException(euid.getSourceLoc(), "Internal entity id: " + euid.getId());
         }
 
-        // That's not the exact reference, but it has the same effect because of the structure
-        // FIXME: Need to reconsider this though
-        AntlrEntityType def = schema.getEntityType(new AntlrTypeReference("", euid.getType()));
+        // Here we parse only the type. Then, if this is an action reference then the type name is 'Action'
+        AntlrTypeReference ref = AntlrTypeReference.parse(euid.getType());
+        AntlrEntityType def = schema.getEntityType(ref);
         if (def == null) {
-            Set<String> actionTypes = schema.actions()
-                    .map(a -> a.getReference().getNamespace())
-                    .collect(Collectors.toSet());
-            if (actionTypes.contains(euid.getType())) {
+            if (ref.getBaseName().equals("Action")) {
                 throw new EntityException(entity.getSourceLoc(), "Action entity: " + entity.getEuid());
             } else {
                 throw new EntityException(entity.getSourceLoc(), "Undefined entity type: " + euid.getType());

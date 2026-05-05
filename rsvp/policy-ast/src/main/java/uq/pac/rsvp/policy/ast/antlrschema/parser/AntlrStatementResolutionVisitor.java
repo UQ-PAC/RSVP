@@ -58,15 +58,15 @@ public class AntlrStatementResolutionVisitor implements AntlrSchemaValueVisitor<
     // That a statement is created in the same namespace where type
     // resolution happens
     private void validateNamespace(AntlrSchemaStatement stmt) {
-        require(stmt.getReference().getNamespace().equals(types.getNamespace()));
+        require(stmt.getTypeReference().getNamespace().equals(types.getNamespace()));
     }
 
     @Override
     public AntlrSchemaStatement visitRecordEntity(AntlrRecordEntityType entity) {
         validateNamespace(entity);
-        AntlrTypeReference ref = validateEntityReference(entity.getReference());
+        AntlrTypeReference ref = validateEntityReference(entity.getTypeReference());
         // Entity reference itself should be fully set and resolved during definition
-        require(ref.equals(entity.getReference()));
+        require(ref.equals(entity.getTypeReference()));
         Collection<AntlrTypeReference> memberOf = entity.getMemberOf()
                 .stream()
                 .map(this::validateEntityReference)
@@ -78,18 +78,18 @@ public class AntlrStatementResolutionVisitor implements AntlrSchemaValueVisitor<
     @Override
     public AntlrSchemaStatement visitEnumEntity(AntlrEnumEntityType entity) {
         validateNamespace(entity);
-        AntlrTypeReference ref = validateEntityReference(entity.getReference());
+        AntlrTypeReference ref = validateEntityReference(entity.getTypeReference());
         // Entity reference itself should be fully set and resolved during definition
-        require(ref.equals(entity.getReference()));
+        require(ref.equals(entity.getTypeReference()));
         return entity;
     }
 
     @Override
     public AntlrSchemaStatement visitAction(AntlrAction action) {
         validateNamespace(action);
-        AntlrTypeReference ref = validateActionReference(action.getReference());
+        AntlrTypeReference ref = validateActionReference(action.getTypeReference());
         // Entity reference itself should be fully set and resolved during definition
-        require(ref.equals(action.getReference()));
+        require(ref.equals(action.getTypeReference()));
         // Check member-of references
         Set<AntlrTypeReference> memberOf = action.getMemberOf()
                 .stream()
@@ -117,6 +117,6 @@ public class AntlrStatementResolutionVisitor implements AntlrSchemaValueVisitor<
     public AntlrSchemaStatement visitCommon(AntlrCommonType type) {
         validateNamespace(type);
         AntlrBuiltinType definition = type.getDefinition().compute(types);
-        return new AntlrCommonType(type.getReference(), definition, type.getAnnotations(), type.getSourceLoc());
+        return new AntlrCommonType(type.getTypeReference(), definition, type.getAnnotations(), type.getSourceLoc());
     }
 }

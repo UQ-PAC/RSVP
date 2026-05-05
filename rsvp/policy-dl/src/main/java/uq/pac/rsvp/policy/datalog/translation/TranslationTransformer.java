@@ -66,7 +66,7 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
                     // FIXME: We only need to find out the return type here, so supplying works
                     // for the time being.
                     InvariantFunctionValidator.FunctionValidator val =
-                            InvariantFunctionValidator.getValidator(call.getFunc(), null);
+                            InvariantFunctionValidator.getValidator(call.getFunc());
                     return val != null && val.getReturnType() instanceof AntlrBooleanType;
                 }
                 return false;

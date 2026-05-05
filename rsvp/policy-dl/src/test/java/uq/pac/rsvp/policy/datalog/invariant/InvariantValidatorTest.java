@@ -3,12 +3,9 @@ package uq.pac.rsvp.policy.datalog.invariant;
 import org.fusesource.jansi.Ansi;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.antlrschema.AntlrSchema;
-import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
 import uq.pac.rsvp.policy.datalog.TestUtil;
-import uq.pac.rsvp.policy.datalog.entity.EntityValidator;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 import uq.pac.rsvp.StdLogger;
 
@@ -18,17 +15,15 @@ import java.nio.file.Path;
 import static org.fusesource.jansi.Ansi.Color.*;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class TypingTest {
+public class InvariantValidatorTest {
     StdLogger logger = new StdLogger();
 
     private final InvariantValidator validator;
 
-    public TypingTest() throws RsvpException, IOException, IllegalAccessException {
+    public InvariantValidatorTest() throws IOException {
         Path schemaPath = TestUtil.getResourceDir( "invariant", "schema.cedarschema");
         AntlrSchema schema = AntlrSchema.parse(schemaPath);
-        Path entitiesPath = TestUtil.getResourceDir("invariant", "entities.json");
-        EntitySet entities = EntityValidator.validate(schema, EntitySet.parse(entitiesPath));
-        this.validator = new InvariantValidator(schema, entities);
+        this.validator = new InvariantValidator(schema);
     }
 
     @ParameterizedTest
@@ -51,10 +46,14 @@ public class TypingTest {
             // Invalid entity name (type reference)
             "ok: principal == Account::\"Alice\" for all principal: Account",
             "no: principal == Accounts::\"Alice\" for all principal: Account",
-            "no: principal == Account::\"Alic\" for all principal: Account",
+            // Even though the entity does not exist, from type perspective this is valid
+            "ok: principal == Account::\"Alic\" for all principal: Account",
+            "ok: principal == Role::\"User\" for all principal: Account",
+            "no: principal == Role::\"Driver\" for all principal: Account",
 
             // Invalid action name (type reference)
             "ok: action == Action::\"createAlbum\" for all action: Action",
+            // We still check actions since they are specified by the schema
             "no: action == Action::\"createAlbu\" for all action: Action",
             "no: action == Actions::\"createAlbum\" for all action: Action",
 
@@ -144,8 +143,9 @@ public class TypingTest {
             "no: alice.age in Account::\"Alice\" for all alice: Account",
 
             // '???' entities
+            // Type checking does not check whether entities exist
             "ok: alice == Account::\"???\" for some alice: Photoapp::Action",
-            // No undefined entities for roles
+            // But since actions are specified by the schema they are checked
             "no: alice == Action::\"???\" for some alice: Photoapp::Action",
             // Nor for enum-based entities
             "no: alice == Role::\"???\" for some alice: Photoapp::Action",

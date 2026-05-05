@@ -1,7 +1,10 @@
 package uq.pac.rsvp.policy.ast.entity;
 
+import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrTypeReference;
 import uq.pac.rsvp.support.SourceLoc;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -19,6 +22,13 @@ public class EntityReference extends EntityValue {
 
     public EntityReference(String type, String id) {
         this(type, id, SourceLoc.MISSING);
+    }
+
+    // FIXME: Remove
+    public AntlrTypeReference getSchemaReference() {
+        List<String> parts = Arrays.asList(type.split("::"));
+        String namespace = String.join("::", parts.subList(0, parts.size() - 1));
+        return new AntlrTypeReference(namespace, parts.getLast());
     }
 
     public String getId() {

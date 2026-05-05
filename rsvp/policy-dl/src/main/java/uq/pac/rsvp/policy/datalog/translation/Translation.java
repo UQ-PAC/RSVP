@@ -121,8 +121,23 @@ public class Translation {
 
         // For the moment we do not support arbitrary action names as Cedar does,
         // just standard non-empty identifiers
-        // FIXME: I think they are supported now but this needs to be confirmed and formalised
         AntlrSchema rsvpSchema = AntlrSchema.parse(schemaFile);
+        Pattern actionPattern = Pattern.compile("^Action::\"[A-Za-z_][A-Za-z_0-9]+\"$");
+        rsvpSchema.actions().forEach(a -> {
+            if (!actionPattern.matcher(a.getBaseName()).matches()) {
+                throw new TranslationError("Unsupported action name: " + a.getName());
+            }
+        });
+
+        // Same for enum values
+        Pattern enumEntityPattern = Pattern.compile("^[A-Za-z_][A-Za-z_0-9]+$");
+        rsvpSchema.enumEntityTypes().forEach(t -> {
+            t.getEnumNames().forEach(en -> {
+                if (!enumEntityPattern.matcher(en).matches()) {
+                    throw new TranslationError("Unsupported enum name: " + en);
+                }
+            });
+        });
 
         // FIXME: This needs to be moved to entity validation
         // For the moment we also do not support entity names that have the same
@@ -171,7 +186,7 @@ public class Translation {
             throw new TranslationError("Policies found in the invariant source: " + invariantsFile);
         }
 
-        InvariantValidator invariantValidator = new InvariantValidator(rsvpSchema, entities);
+        InvariantValidator invariantValidator = new InvariantValidator(rsvpSchema);
         invariants.forEach(invariantValidator::validate);
 
         return new InputSet(rsvpSchema, policies, entities, invariants);

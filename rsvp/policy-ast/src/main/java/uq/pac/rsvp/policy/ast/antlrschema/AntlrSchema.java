@@ -156,13 +156,13 @@ public class AntlrSchema {
 
         Map<AntlrTypeReference, AntlrSchemaStatement> types = new HashMap<>();
         for (AntlrSchemaStatement stmt : statements) {
-            AntlrTypeReference ref = stmt.getReference();
+            AntlrTypeReference ref = stmt.getTypeReference();
             // Try and lookup the reference by name or by basename in case it exists in the global namespace
             AntlrSchemaStatement lookup = types.containsKey(ref) ?
                     types.get(ref) : types.get(new AntlrTypeReference("", ref.getBaseName()));
             if (lookup != null) {
                 throw new SchemaResolutionException("Reference %s illegally shadowed"
-                        .formatted(lookup.getReference()));
+                        .formatted(lookup.getTypeReference()));
             }
             types.put(ref, stmt);
         }
@@ -195,13 +195,13 @@ public class AntlrSchema {
                 .map(s -> s instanceof AntlrCommonType t ? t : null)
                 .filter(Objects::nonNull)
                 .forEach(c -> {
-                    typeGraphBuilder.addNode(c.getReference());
+                    typeGraphBuilder.addNode(c.getTypeReference());
                     c.getDefinition().accept(new AntlrSchemaVisitorAdapter() {
                         @Override
                         public void visitTypeReference(AntlrTypeReference type) {
                             AntlrSchemaStatement stmt = requireNonNull(schema.get(type));
                             if (stmt instanceof AntlrCommonType ct) {
-                                typeGraphBuilder.putEdge(c.getReference(), ct.getReference());
+                                typeGraphBuilder.putEdge(c.getTypeReference(), ct.getTypeReference());
                             }
                         }
                     });

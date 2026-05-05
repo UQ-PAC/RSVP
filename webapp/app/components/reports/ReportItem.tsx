@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import cx from "classnames";
 import { useEffect, useRef } from "react";
 import { Report, SourceLoc } from "../../types";
-import { getIdentifier, toSourceStr } from "../../util";
+import { getSourceIdentifier, getSourceStr } from "../../util";
 import { ExpansionState, useFocusDispatch } from "../providers/FocusContext";
 import {
   useSelection,
@@ -56,7 +56,7 @@ export function ReportItem({ report }: ReportItemParams) {
 
   const locDesc = report.sourceLocations.length
     ? "Multiple locations"
-    : toSourceStr(report.primarySourceLocation);
+    : getSourceStr(report.primarySourceLocation);
 
   const clickLoc = (e, report: Report, loc?: SourceLoc) => {
     e.stopPropagation();
@@ -73,7 +73,7 @@ export function ReportItem({ report }: ReportItemParams) {
     selectionDispatch({
       type: "click",
       scroll: "source",
-      loc: `${report.id}:${getIdentifier(target)}`,
+      loc: `${report.id}:${getSourceIdentifier(target)}`,
     });
   };
 
@@ -82,7 +82,7 @@ export function ReportItem({ report }: ReportItemParams) {
     selectionDispatch({
       type: "mouseEnter",
       scroll: "none",
-      loc: `${report.id}:${getIdentifier(target)}`,
+      loc: `${report.id}:${getSourceIdentifier(target)}`,
     });
   };
 
@@ -91,7 +91,7 @@ export function ReportItem({ report }: ReportItemParams) {
     selectionDispatch({
       type: "mouseLeave",
       scroll: "none",
-      loc: `${report.id}:${getIdentifier(target)}`,
+      loc: `${report.id}:${getSourceIdentifier(target)}`,
     });
   };
 
@@ -157,17 +157,19 @@ export function ReportItem({ report }: ReportItemParams) {
             onMouseEnter={(e) => enterLoc(e, report)}
             onMouseLeave={(e) => leaveLoc(e, report)}
           >
-            {toSourceStr(report.primarySourceLocation)}
+            {getSourceStr(report.primarySourceLocation)}
           </span>
           {report.sourceLocations.map((loc) => (
             <span
-              key={getIdentifier(loc)}
+              key={getSourceIdentifier(loc)}
               className="report-item-source-location"
               onClick={(e) => clickLoc(e, report, loc)}
               onMouseEnter={(e) => enterLoc(e, report, loc)}
               onMouseLeave={(e) => leaveLoc(e, report, loc)}
             >
-              {toSourceStr(loc)}
+              {(loc.file !== report.primarySourceLocation.file
+                ? loc.source?.file.name + ": "
+                : "") + getSourceStr(loc)}
             </span>
           ))}
         </div>

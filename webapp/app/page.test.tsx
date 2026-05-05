@@ -38,11 +38,9 @@ jest.mock("./components/upload/FileUploader", () => ({
   FileUploader: jest.fn(() => <div data-testid="file-uploader" />),
 }));
 
-describe("App", () => {
-  test("renders", () => {
-    const { asFragment } = render(<Home />);
-    expect(asFragment()).toMatchSnapshot();
-    const header = screen.getByTestId("header");
-    expect(header).toHaveAttribute("data-subheading", "Policy Verification");
-  });
+test("renders", () => {
+  const { asFragment } = render(<Home />);
+  expect(asFragment()).toMatchSnapshot();
+  const header = screen.getByTestId("header");
+  expect(header).toHaveAttribute("data-subheading", "Policy Verification");
 });

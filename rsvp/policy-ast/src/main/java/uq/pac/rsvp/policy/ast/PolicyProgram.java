@@ -1,13 +1,13 @@
 package uq.pac.rsvp.policy.ast;
 
-import org.antlr.v4.runtime.*;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.ast.parser.PolicyParser;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -58,5 +58,9 @@ public class PolicyProgram {
 
     public static PolicyProgram parse(String file, String text) {
         return new PolicyProgram(PolicyParser.parse(file, text));
+    }
+
+    public static PolicyProgram of(Collection<Statement> statements) {
+        return new PolicyProgram(statements);
     }
 }

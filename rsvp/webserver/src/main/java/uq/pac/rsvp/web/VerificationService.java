@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.ErrorResponseException;
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.support.reporting.Report;
+import uq.pac.rsvp.support.util.Pair;
 import uq.pac.rsvp.verification.ConfigurationException;
 import uq.pac.rsvp.verification.Verification;
 
@@ -19,7 +20,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class VerificationService {
@@ -30,44 +30,33 @@ public class VerificationService {
     FileService fileService;
 
     public Set<Report> runVerification(VerificationFileset verification)
-            throws RsvpException, IOException, InterruptedException {
+            throws RsvpException, IOException, InterruptedException, IllegalAccessException {
 
-        Map<String, String> filenames = new HashMap<>();
-
-        Set<List<Path>> policies = new HashSet<>();
-        Set<Path> schemas = new HashSet<>();
-        Set<Path> entities = new HashSet<>();
-        Set<Path> invariants = new HashSet<>();
+        Set<List<Pair<String, Path>>> policies = new HashSet<>();
+        Map<String, Path> schemas = new HashMap<>();
+        Map<String, Path> entities = new HashMap<>();
+        Map<String, Path> invariants = new HashMap<>();
 
         for (List<String> versionedPolicy : verification.getPolicyFiles()) {
-            List<Path> group = new ArrayList<>();
+            List<Pair<String, Path>> group = new ArrayList<>();
 
             for (String policy : versionedPolicy) {
-                Path path = fileService.getPath(policy);
-                group.add(path);
-                filenames.put(path.toString(), policy);
+                group.add(new Pair<>(policy, fileService.getPath(policy)));
             }
 
             policies.add(group);
-
         }
 
         for (String schema : verification.getSchemas()) {
-            Path path = fileService.getPath(schema);
-            schemas.add(path);
-            filenames.put(path.toString(), schema);
+            schemas.put(schema, fileService.getPath(schema));
         }
 
         for (String entitiesFile : verification.getEntities()) {
-            Path path = fileService.getPath(entitiesFile);
-            entities.add(path);
-            filenames.put(path.toString(), entitiesFile);
+            entities.put(entitiesFile, fileService.getPath(entitiesFile));
         }
 
         for (String invariantsFile : verification.getInvariants()) {
-            Path path = fileService.getPath(invariantsFile);
-            invariants.add(path);
-            filenames.put(path.toString(), invariantsFile);
+            invariants.put(invariantsFile, fileService.getPath(invariantsFile));
         }
 
         try {
@@ -76,7 +65,7 @@ public class VerificationService {
 
             logger.info("Generated {} reports", result.size());
 
-            return result.stream().map(report -> report.remap(filenames)).collect(Collectors.toSet());
+            return result;
         } catch (ConfigurationException e) {
             logger.error(e.getMessage());
             throw new ErrorResponseException(HttpStatus.BAD_REQUEST);

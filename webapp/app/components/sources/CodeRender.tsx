@@ -4,7 +4,12 @@ import cx from "classnames";
 import { Roboto_Mono } from "next/font/google";
 import { useEffect, useMemo, useRef } from "react";
 
-import { FileType, Report, ReportSeverity, SourceLoc } from "../../types";
+import {
+  Report,
+  ReportSeverity,
+  SourceLoc,
+  VerificationFile,
+} from "../../types";
 import {
   ExpansionState,
   useFocus,
@@ -22,8 +27,8 @@ const robotoMono = Roboto_Mono({
   subsets: ["latin"],
 });
 interface CodeRenderParams {
+  file: VerificationFile;
   content: string;
-  syntax: FileType;
   reports: Report[];
 }
 
@@ -31,7 +36,7 @@ type ReportLineDict = {
   [line: number]: ReportLine[];
 };
 
-export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
+export function CodeRender({ file, content, reports }: CodeRenderParams) {
   const { selected, hovered, scroll, loc } = useSelection();
   const selectionDispatch = useSelectionDispatch();
 
@@ -56,6 +61,7 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
     const lines = content.split("\n");
 
     const processSourceLoc = (report: Report, loc: SourceLoc) => {
+      if (loc.source !== file) return;
       if (!loc.startLoc || !loc.endLoc) return;
 
       const reportLines = lines.slice(loc.startLoc.line - 1, loc.endLoc.line);
@@ -63,9 +69,19 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
 
       let offset = loc.offset;
 
-      const partial =
-        `${reportLines.at(0)?.substring(0, loc.startLoc.column - 1)}`.trim()
-          .length || content.charAt(loc.offset + loc.len) !== "\n";
+      // Check whether the report location covers the entire line
+      // so that it can be rendered as a block
+      const startOffset =
+        !!`${reportLines.at(0)?.substring(0, loc.startLoc.column - 1)}`.trim()
+          .length;
+      const endOffset =
+        content.charAt(loc.offset + loc.len) !== "\n" &&
+        !(
+          file.filetype === "entities" &&
+          content.substring(loc.offset + loc.len, loc.offset + loc.len + 2) ===
+            ",\n"
+        );
+      const partial = startOffset || endOffset;
 
       for (
         let line = loc.startLoc.line;
@@ -107,7 +123,7 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
     });
 
     return { lines, reportsByLine };
-  }, [reports, content]);
+  }, [file, reports, content]);
 
   const click = (id: string, severity: ReportSeverity, loc: SourceLoc) => {
     if (selected !== id) {
@@ -174,7 +190,7 @@ export function CodeRender({ content, syntax, reports }: CodeRenderParams) {
               n={n}
               focus={focus}
               line={line}
-              syntax={syntax}
+              syntax={file.filetype}
               reports={reports}
               selected={selected}
               hovered={hovered}

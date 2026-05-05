@@ -8,7 +8,6 @@ import com.google.gson.annotations.SerializedName;
 import uq.pac.rsvp.support.SourceLoc;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 import java.util.Set;
 
 public class Report {
@@ -90,25 +89,5 @@ public class Report {
     @Override
     public int hashCode() {
         return id.asInt();
-    }
-
-    /**
-     * Create a new report identical to this one but with all source locations
-     * remapped to files based on the supplied mapping.
-     *
-     * @param filenames the mapping of original -> remapped source file names
-     * @return a new {@code Report} with all source locations referencing the
-     *         supplied file names or {@code SourceLoc.MISSING}
-     */
-    public Report remap(Map<String, String> filenames) {
-
-        SourceLoc[] additionalLocations = new SourceLoc[locations.size()];
-
-        int i = 0;
-        for (SourceLoc loc : locations) {
-            additionalLocations[i++] = loc.cloneForFile(filenames.get(loc.file));
-        }
-
-        return new Report(severity, message, detail, primary.cloneForFile(filenames.get(primary.file)), additionalLocations);
     }
 }

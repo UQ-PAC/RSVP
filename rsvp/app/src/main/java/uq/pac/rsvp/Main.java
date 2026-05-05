@@ -1,14 +1,14 @@
 package uq.pac.rsvp;
 
+import uq.pac.rsvp.support.reporting.Report;
+import uq.pac.rsvp.verification.ConfigurationException;
+import uq.pac.rsvp.verification.Verification;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import uq.pac.rsvp.support.reporting.Report;
-import uq.pac.rsvp.verification.ConfigurationException;
-import uq.pac.rsvp.verification.Verification;
 
 /**
  * CLI application to run analysis of Cedar policies/invariants.
@@ -37,8 +37,7 @@ public class Main {
                 }
                 Path schemaPath = Path.of(args[i]).toAbsolutePath();
                 fileSet.schemaPaths.add(schemaPath);
-            }
-            else if (arg.equals("--policies") || arg.equals("-p")) {
+            } else if (arg.equals("--policies") || arg.equals("-p")) {
                 i++;
                 if (i == args.length) {
                     System.err.println("Error: --policies/-p requires an argument");
@@ -46,8 +45,7 @@ public class Main {
                 }
                 Path policiesPath = Path.of(args[i]).toAbsolutePath();
                 fileSet.policiesPaths.add(List.of(policiesPath));
-            }
-            else if (arg.equals("--entities") || arg.equals("-e")) {
+            } else if (arg.equals("--entities") || arg.equals("-e")) {
                 i++;
                 if (i == args.length) {
                     System.err.println("Error: --entities/-e requires an argument");
@@ -55,8 +53,7 @@ public class Main {
                 }
                 Path entitiesPath = Path.of(args[i]).toAbsolutePath();
                 fileSet.entitiesPaths.add(entitiesPath);
-            }
-            else if (arg.equals("--invariants") || arg.equals("-i")) {
+            } else if (arg.equals("--invariants") || arg.equals("-i")) {
                 i++;
                 if (i == args.length) {
                     System.err.println("Error: --invariants/-i requires an argument");
@@ -72,16 +69,13 @@ public class Main {
                 for (Report report : reports) {
                     System.out.println(report.toString());
                 }
-            }
-            catch (InterruptedException ie) {
+            } catch (InterruptedException ie) {
                 System.err.println("Interrupted.");
                 System.exit(1);
-            }
-            catch (ConfigurationException ce) {
+            } catch (ConfigurationException ce) {
                 System.err.println("Configuration issue: " + ce.getMessage());
                 System.exit(1);
-            }
-            catch (RsvpException rsvpe) {
+            } catch (RsvpException | IllegalAccessException rsvpe) {
                 rsvpe.printStackTrace();
                 System.exit(1);
             }

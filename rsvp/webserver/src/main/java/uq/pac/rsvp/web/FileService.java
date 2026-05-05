@@ -1,12 +1,6 @@
 package uq.pac.rsvp.web;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
-
+import com.google.common.hash.Hashing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +9,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.ErrorResponseException;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.google.common.hash.Hashing;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class FileService {
@@ -37,7 +36,7 @@ public class FileService {
                 .toString();
 
         session.addFile(hash, tmp);
-        logger.info("Created: {} ({})", tmp.toString(), hash);
+        logger.info("Created: {} ({})", tmp, hash);
 
         return hash;
     }

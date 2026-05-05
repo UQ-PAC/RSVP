@@ -38,10 +38,10 @@ export function getFileType(file: File): FileType {
   }
 }
 
-export function getIdentifier(loc: SourceLoc): string {
+export function getSourceIdentifier(loc: SourceLoc): string {
   return `${loc.file}:${loc.offset}:${loc.len}`;
 }
 
-export function toSourceStr(loc: SourceLoc): string {
+export function getSourceStr(loc: SourceLoc): string {
   return `Line ${loc.startLoc?.line}, column ${loc.startLoc?.column}`;
 }

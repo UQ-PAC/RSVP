@@ -1,8 +1,5 @@
 package uq.pac.rsvp.web;
 
-import java.io.IOException;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +16,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.support.reporting.Report;
+
+import java.io.IOException;
+import java.util.Set;
 
 @RestController
 @SpringBootApplication
@@ -38,7 +37,7 @@ public class RsvpController {
     @Autowired
     DiffService diffService;
 
-    @PostMapping(path = "/upload", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PostMapping(path = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public String upload(@RequestPart MultipartFile file) throws IOException {
         logger.info("POST /upload ({})", file.getOriginalFilename());
         return fileService.createTempFile(file);
@@ -60,14 +59,14 @@ public class RsvpController {
     @PostMapping("/verify")
     public Set<Report> verify(
             @Validated @RequestBody VerificationFileset verification)
-            throws RsvpException, IOException, InterruptedException {
+            throws RsvpException, IOException, InterruptedException, IllegalAccessException {
         logger.info("POST /verify");
         return verificationService.runVerification(verification);
     }
 
     @GetMapping("/diff")
     public String diff(@RequestParam String original, @RequestParam String originalName, @RequestParam String updated,
-            @RequestParam String updatedName) throws IOException {
+                       @RequestParam String updatedName) throws IOException {
         logger.info("GET /diff ? {} & {}", original, updated);
         return diffService.getDiff(original, originalName, updated, updatedName);
     }

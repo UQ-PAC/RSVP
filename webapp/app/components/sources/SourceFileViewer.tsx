@@ -1,6 +1,6 @@
 "use client";
 
-import { Report, VerificationFile, VersionedFile } from "../../types";
+import { VerificationFile } from "../../types";
 import { useVerification } from "../providers/VerificationContext";
 import { Fallback } from "./Fallback";
 import { SourceFile } from "./SourceFile";
@@ -31,21 +31,6 @@ export function SourceFileViewer() {
       });
     }
   };
-
-  const filterReports = (
-    source: VersionedFile,
-    reports?: Promise<Report[]>,
-  ): Promise<Report[]> =>
-    reports?.then((reports) =>
-      reports.filter(
-        // TODO: multiple locations
-        (report) =>
-          report.primarySourceLocation.source === source.original ||
-          source.versions.some(
-            (version) => report.primarySourceLocation.source === version,
-          ),
-      ),
-    ) ?? Promise.resolve([]);
 
   const getDiffs = async (
     group: string,
@@ -107,7 +92,7 @@ export function SourceFileViewer() {
                 <SourceFile
                   key={key}
                   source={source}
-                  reports={filterReports(source, group.reports)}
+                  reports={group.reports ?? Promise.resolve([])}
                   getDiff={(original, updated) =>
                     getDiffs(name, original, updated)
                   }

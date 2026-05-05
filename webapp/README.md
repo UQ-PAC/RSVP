@@ -31,6 +31,12 @@ If you ever delete the `node_modules` directory or `pnpm-lock.yaml`, or if you e
   pnpm test
   ```
 
+- Run a single test file
+
+  ```
+  pnpm test app/util.test.ts
+  ```
+
 - Start the development server:
 
   ```

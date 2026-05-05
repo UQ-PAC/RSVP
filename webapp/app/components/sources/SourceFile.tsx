@@ -193,10 +193,14 @@ export function SourceFile({
       <DiffRender diff={getDiff(original.file, updated.file)} />
     ) : (
       <CodeRender
+        file={source.original}
         content={code}
-        syntax={source.original.filetype}
         reports={resolvedReports.filter(
-          (report) => report.primarySourceLocation.source === original?.file,
+          (report) =>
+            report.primarySourceLocation.source === source.original ||
+            report.sourceLocations.some(
+              (loc) => loc.source === source.original,
+            ),
         )}
       />
     );

@@ -1,37 +1,32 @@
 package uq.pac.rsvp.verification;
 
 import uq.pac.rsvp.RsvpException;
-import uq.pac.rsvp.policy.ast.AstNode;
 import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.PolicyProgram;
-import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
-import uq.pac.rsvp.policy.ast.expr.CallExpression;
-import uq.pac.rsvp.policy.ast.expr.ConditionalExpression;
-import uq.pac.rsvp.policy.ast.expr.PropertyAccessExpression;
-import uq.pac.rsvp.policy.ast.expr.RecordExpression;
-import uq.pac.rsvp.policy.ast.expr.SetExpression;
-import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
+import uq.pac.rsvp.policy.ast.Statement;
+import uq.pac.rsvp.policy.ast.entity.Entity;
+import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
-import uq.pac.rsvp.policy.ast.visitor.PolicyVisitorImpl;
+import uq.pac.rsvp.policy.ast.parser.PolicyParser;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantAssignment;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestSet;
 import uq.pac.rsvp.policy.datalog.translation.Translation;
-import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.support.reporting.Report;
 import uq.pac.rsvp.support.reporting.Report.Severity;
+import uq.pac.rsvp.support.util.Pair;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 
@@ -39,11 +34,41 @@ public class Verification {
 
     static final boolean TESTING = false;
 
-    public static Set<Report> verifyPolicies(Set<List<Path>> policies, Set<Path> schemas, Set<Path> entities, Set<Path> invariants) throws RsvpException, IOException, ConfigurationException, InterruptedException {
+    public static Set<Report> verifyPolicies(Set<List<Path>> policies, Set<Path> schemas, Set<Path> entities, Set<Path> invariants) throws RsvpException, IOException, ConfigurationException, InterruptedException, IllegalAccessException {
+        Set<List<Pair<String, Path>>> policyFiles = new HashSet<>();
+        Map<String, Path> schemaFiles = new HashMap<>();
+        Map<String, Path> entityFiles = new HashMap<>();
+        Map<String, Path> invariantFiles = new HashMap<>();
 
-        Set<Report> results = new HashSet<>();
+        for (List<Path> versionedPolicy : policies) {
+            List<Pair<String, Path>> group = new ArrayList<>();
 
+            for (Path policy : versionedPolicy) {
+                group.add(new Pair<>(policy.toString(), policy));
+            }
+
+            policyFiles.add(group);
+        }
+
+        for (Path schema : schemas) {
+            schemaFiles.put(schema.toString(), schema);
+        }
+
+        for (Path entitiesFile : entities) {
+            entityFiles.put(entities.toString(), entitiesFile);
+        }
+
+        for (Path invariantsFile : invariants) {
+            invariantFiles.put(invariantsFile.toString(), invariantsFile);
+        }
+
+
+        return verifyPolicies(policyFiles, schemaFiles, entityFiles, invariantFiles);
+    }
+
+    public static Set<Report> verifyPolicies(Set<List<Pair<String, Path>>> policies, Map<String, Path> schemas, Map<String, Path> entities, Map<String, Path> invariants) throws RsvpException, IOException, ConfigurationException, InterruptedException, IllegalAccessException {
         if (!TESTING) {
+            // TODO: use PolicyParser instead of PolicyProgram and pass file name separately
             if (policies.isEmpty() || policies.iterator().next().isEmpty()) {
                 throw new ConfigurationException("No policies provided");
             }
@@ -56,12 +81,13 @@ public class Verification {
                 throw new ConfigurationException("No entities provided");
             }
 
-            // TODO: handle multiples
-            List<Path> policyVersions = policies.iterator().next();
-            Path policiesPath = policyVersions.get(policyVersions.size() - 1);
-            Path schemaPath = schemas.iterator().next();
-            Path entitiesPath = entities.iterator().next();
-            Path invariantsPath = invariants.iterator().next();
+            Set<Report> results = new HashSet<>();
+
+            List<Pair<String, Path>> policyVersions = policies.iterator().next();
+            Path policiesPath = policyVersions.getLast().getValue();
+            Path schemaPath = schemas.values().iterator().next();
+            Path entitiesPath = entities.values().iterator().next();
+            Path invariantsPath = invariants.values().iterator().next();
 
             Path dlPath = Files.createTempDirectory("rsvp-");
 
@@ -216,130 +242,53 @@ public class Verification {
                     results.add(r);
                 }
             });
+            return results;
+
         } else {
-            results.addAll(generateRandomReports(policies));
+            return generateRandomReports(policies, schemas, entities, invariants);
         }
 
-        return results;
     }
 
 
-    public static Set<Report> generateRandomReports(Set<List<Path>> policies) throws RsvpException, IOException, ConfigurationException, InterruptedException {
+    public static Set<Report> generateRandomReports(Set<List<Pair<String, Path>>> policies, Map<String, Path> schemas, Map<String, Path> entities, Map<String, Path> invariants) throws IOException, InterruptedException, IllegalAccessException {
         Set<Report> results = new HashSet<>();
 
-        for (List<Path> policyFile : policies) {
-            Path policiesPath = policyFile.get(policyFile.size() - 1);
+        List<Statement> programStatements = new ArrayList<>();
+        Set<Entity> entitySet = new HashSet<>();
 
-            RandomReportGenerator generator = new RandomReportGenerator();
-
-            PolicyProgram policyProgram = PolicyProgram.parse(policiesPath);
-            Collection<Policy> parsed = policyProgram.getPolicies();
-
-            parsed.forEach(policy -> policy.accept(generator));
-
-            results.addAll(generator.reports);
+        for (List<Pair<String, Path>> policyFile : policies) {
+            Pair<String, Path> latest = policyFile.getLast();
+            programStatements.addAll(PolicyParser.parse(latest.getKey(), Files.readString(latest.getValue())));
         }
+
+        for (Map.Entry<String, Path> invariantsFile : invariants.entrySet()) {
+            programStatements.addAll(PolicyParser.parse(invariantsFile.getKey(), Files.readString(invariantsFile.getValue())));
+        }
+
+        RandomReportGenerator randomGenerator = new RandomReportGenerator();
+
+        for (Map.Entry<String, Path> entitiesFile : entities.entrySet()) {
+            entitySet.addAll(EntitySet.parse(entitiesFile.getKey(), Files.readString(entitiesFile.getValue())).getEntities());
+        }
+
+        RandomReportGenerator.RandomEntityReportGenerator entityReportGenerator = new RandomReportGenerator.RandomEntityReportGenerator(randomGenerator);
+        entitySet.forEach(entity -> entityReportGenerator.maybeAddRandomReports(entity, 20));
+
+        results.addAll(entityReportGenerator.reports);
+
+        RandomReportGenerator.RandomPolicyReportGenerator policyReportGenerator = new RandomReportGenerator.RandomPolicyReportGenerator(randomGenerator);
+
+        PolicyProgram policyProgram = PolicyProgram.of(programStatements);
+        Collection<Policy> policyAst = policyProgram.getPolicies();
+        Collection<Invariant> invariantAst = policyProgram.getInvariants();
+
+        policyAst.forEach(policy -> policy.accept(policyReportGenerator));
+        invariantAst.forEach(invariant -> invariant.accept(policyReportGenerator));
+
+        results.addAll(policyReportGenerator.reports);
 
         Thread.sleep(1000);
         return results;
     }
-
-    private static class RandomReportGenerator extends PolicyVisitorImpl {
-
-        public final Set<Report> reports;
-
-        private final Random random;
-
-        private final Set<SourceLoc> additionalLocations;
-
-        RandomReportGenerator() {
-            reports = new HashSet<>();
-            random = new Random();
-            additionalLocations = new HashSet<>();
-        }
-
-        @Override
-        public void visitPolicy(Policy policy) {
-            maybeAddRandomReport(policy, 50);
-            super.visitPolicy(policy);
-        }
-
-        @Override
-        public void visitBinaryExpr(BinaryExpression expr) {
-            maybeAddRandomReport(expr, 5);
-            super.visitBinaryExpr(expr);
-        }
-
-        @Override
-        public void visitCallExpr(CallExpression expr) {
-            maybeAddRandomReport(expr, 5);
-            super.visitCallExpr(expr);
-        }
-
-        @Override
-        public void visitConditionalExpr(ConditionalExpression expr) {
-            maybeAddRandomReport(expr, 5);
-            super.visitConditionalExpr(expr);
-        }
-
-        @Override
-        public void visitPropertyAccessExpr(PropertyAccessExpression expr) {
-            maybeAddRandomReport(expr, 5);
-            super.visitPropertyAccessExpr(expr);
-        }
-
-        @Override
-        public void visitRecordExpr(RecordExpression expr) {
-            maybeAddRandomReport(expr, 5);
-            super.visitRecordExpr(expr);
-        }
-
-        @Override
-        public void visitSetExpr(SetExpression expr) {
-            maybeAddRandomReport(expr, 5);
-            super.visitSetExpr(expr);
-        }
-
-        @Override
-        public void visitUnaryExpr(UnaryExpression expr) {
-            maybeAddRandomReport(expr, 5);
-            super.visitUnaryExpr(expr);
-        }
-
-        private void maybeAddRandomReport(AstNode entry, int probability) {
-            int p = random.nextInt(100);
-            SourceLoc loc = entry.getSourceLoc();
-
-            if (!loc.isEmpty()) {
-                if (p <= probability) {
-                    String[] name = entry.getClass().getName().split("\\.");
-                    reports.add(generateRandomReport(loc, name[name.length - 1]));
-                } else if (p <= probability * 2) {
-                    additionalLocations.add(loc);
-                }
-            }
-        }
-
-        private Report generateRandomReport(SourceLoc loc, String nodeType) {
-            int s = random.nextInt(100);
-            int m = random.nextInt(100);
-            int d = random.nextInt(100);
-            int l = random.nextInt(100);
-
-            Severity severity = s < 34 ? Severity.Info : s < 67 ? Severity.Warning : Severity.Error;
-            String message = m < 34 ? "Fantastic. Great move. Well done Angus." : m < 67 ? "Ugly implementation" : "Who thought this was a good idea?";
-            String detail = d < 50 ? "" : "This is a very detailed report. " + "Look at all of the details that are included here. " + "So many details that need to be included in the report so that you can fully understand it.";
-
-            SourceLoc[] additional = new SourceLoc[0];
-
-            if (l < 25) {
-                additional = additionalLocations.toArray(new SourceLoc[0]);
-                additionalLocations.clear();
-            }
-
-            return new Report(severity, "(" + nodeType + "): " + message, detail, loc, additional);
-        }
-
-    }
-
 }

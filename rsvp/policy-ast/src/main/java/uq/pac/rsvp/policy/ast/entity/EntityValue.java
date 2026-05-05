@@ -9,5 +9,4 @@ public abstract class EntityValue extends AstNode {
         super(location);
     }
 
-
 }

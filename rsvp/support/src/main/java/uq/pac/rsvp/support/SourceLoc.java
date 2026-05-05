@@ -76,21 +76,4 @@ public class SourceLoc {
         }
         return false;
     }
-
-    /**
-     * Create a new source location identical to this one, but with the supplied
-     * file name.
-     *
-     * @param filename the name of the new file to use
-     * @return a new {@code SourceLoc} that references the specified file name, or
-     *         {@code SourceLoc.MISSING} if this location is
-     *         {@code SourceLoc.MISSING}
-     */
-    public SourceLoc cloneForFile(String filename) {
-        if (this == MISSING) {
-            return MISSING;
-        }
-
-        return new SourceLoc(filename, offset, len, start, end);
-    }
 }

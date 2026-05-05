@@ -4,7 +4,7 @@ import cx from "classnames";
 import hljs from "highlight.js";
 import { JSX, Ref, useMemo } from "react";
 import { FileType, Report, ReportSeverity, SourceLoc } from "../../types";
-import { getIdentifier } from "../../util";
+import { getSourceIdentifier } from "../../util";
 
 export interface ReportLine {
   report: Report;
@@ -115,7 +115,7 @@ export function CodeLine({
       const outermost = i === reportsByPrecedence.length - 1;
 
       const targetLoc = selectedLoc
-        ? selectedLoc === `${id}:${getIdentifier(loc)}`
+        ? selectedLoc === `${id}:${getSourceIdentifier(loc)}`
         : true;
 
       const outerHover = reportsByPrecedence.some(

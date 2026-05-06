@@ -1,4 +1,4 @@
-package uq.pac.rsvp.policy.ast.policy.parser;
+package uq.pac.rsvp.policy.ast.policy;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;

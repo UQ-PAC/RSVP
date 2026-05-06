@@ -3,8 +3,6 @@ package uq.pac.rsvp.policy.ast.policy;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import uq.pac.rsvp.policy.ast.CedarParser;
 import uq.pac.rsvp.policy.ast.policy.expr.*;
-import uq.pac.rsvp.policy.ast.policy.parser.ExpressionVisitor;
-import uq.pac.rsvp.policy.ast.policy.parser.CedarSourceVisitor;
 import uq.pac.rsvp.support.FileSource;
 import uq.pac.rsvp.support.SourceLoc;
 
@@ -23,10 +21,10 @@ class PolicyStatementVisitor extends CedarSourceVisitor<PolicyStatement> {
 
     private static class PolicyNaming {
         private int index = 0;
-        private static final String basename = "policy";
+        private static final String BASENAME = "policy";
 
         public String getName(String annotation) {
-            return annotation != null ? annotation : basename + index++;
+            return annotation != null ? annotation : BASENAME + index++;
         }
 
         public String getName() {

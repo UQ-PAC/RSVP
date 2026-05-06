@@ -1,4 +1,4 @@
-package uq.pac.rsvp.policy.ast.policy.parser;
+package uq.pac.rsvp.policy.ast.policy;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;

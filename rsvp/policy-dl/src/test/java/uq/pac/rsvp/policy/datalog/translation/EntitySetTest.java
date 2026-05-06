@@ -2,7 +2,8 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.value.*;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.policy.ast.entity.*;
 import uq.pac.rsvp.policy.datalog.TestUtil;
 
@@ -18,38 +19,42 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class EntitySetTest {
 
-    private final static Path TESTDIR = Path.of(TestUtil.RESOURCEDIR.toString(), "entity");
+    @TestFactory
+    List<DynamicTest> differentialTest() {
+        Path path = TestUtil.getResourceDir("translation");
+        return TestUtil.findFiles(path, ".json").stream()
+                .map(p -> DynamicTest.dynamicTest(p.getParent().getFileName().toString(), () -> {
+                    buildTest(p);
+                }))
+                .toList();
+    }
 
     // Take all the entities from the translation sets and compare them with what Cedar gets
-    @Test
-    void buildTest() throws IOException, IllegalAccessException {
-        Path path = TestUtil.getResourceDir("translation");
-        for (Path ep : TestUtil.findFiles(path, ".json")) {
-            Entities cedarEntities = Entities.parse(ep);
-            List<Entity> rsvpEntities = EntitySet.parse(ep).stream().toList();
-            assertEquals(cedarEntities.getEntities().size(), rsvpEntities.size());
+    void buildTest(Path path) throws IOException, IllegalAccessException {
+        Entities cedarEntities = Entities.parse(path);
+        List<Entity> rsvpEntities = EntitySet.parse(path).stream().toList();
+        assertEquals(cedarEntities.getEntities().size(), rsvpEntities.size());
 
-            Map<String, Entity> rsvpEntityMap = new HashMap<>();
-            rsvpEntities.forEach(e -> rsvpEntityMap.put(e.getEuid().getReference(), e));
+        Map<String, Entity> rsvpEntityMap = new HashMap<>();
+        rsvpEntities.forEach(e -> rsvpEntityMap.put(e.getEuid().getReference(), e));
 
-            Map<String, com.cedarpolicy.model.entity.Entity> cedarEntityMap = new HashMap<>();
-            cedarEntities.getEntities().forEach(e -> cedarEntityMap.put(e.getEUID().toCedarExpr(), e));
+        Map<String, com.cedarpolicy.model.entity.Entity> cedarEntityMap = new HashMap<>();
+        cedarEntities.getEntities().forEach(e -> cedarEntityMap.put(e.getEUID().toCedarExpr(), e));
 
-            assertEquals(cedarEntityMap.size(), rsvpEntityMap.size());
+        assertEquals(cedarEntityMap.size(), rsvpEntityMap.size());
 
-            for (String uid : rsvpEntityMap.keySet()) {
-                Entity r = rsvpEntityMap.get(uid);
-                com.cedarpolicy.model.entity.Entity c = cedarEntityMap.get(uid);
+        for (String uid : rsvpEntityMap.keySet()) {
+            Entity r = rsvpEntityMap.get(uid);
+            com.cedarpolicy.model.entity.Entity c = cedarEntityMap.get(uid);
 
-                assertNotNull(r);
-                assertNotNull(c);
+            assertNotNull(r);
+            assertNotNull(c);
 
-                assertEquals(r.getEuid(), cedarToRsvp(c.getEUID()));
-                assertEquals(r.getAttrs(), cedarToRsvp(new CedarMap(c.attrs)));
-                assertEquals(r.getParents(), c.parentsEUIDs.stream().map(this::cedarToRsvp)
-                        .map(e -> (EntityReference) e)
-                        .collect(Collectors.toSet()));
-            }
+            assertEquals(r.getEuid(), cedarToRsvp(c.getEUID()));
+            assertEquals(r.getAttrs(), cedarToRsvp(new CedarMap(c.attrs)));
+            assertEquals(r.getParents(), c.parentsEUIDs.stream().map(this::cedarToRsvp)
+                    .map(e -> (EntityReference) e)
+                    .collect(Collectors.toSet()));
         }
     }
 

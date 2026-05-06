@@ -1,6 +1,6 @@
 [
     {
-        "uid": {"__entity": {"type": "User", "id": "user_0"}},
+        "uid": { "type": "User", "id": "user_0" },
         "attrs": {
             "documentsAndFoldersWithViewAccess": {"__entity": {"type": "View", "id": "User user_0"}},
             "ownedDocuments": [
@@ -14,16 +14,16 @@
             ]
         },
         "parents": [
-            {"__entity": {"type": "Group", "id": "group_0"}}
+            { "type": "Group", "id": "group_0" }
         ]
     },
     {
-        "uid": {"__entity": {"type": "View", "id": "User user_0"}},
+        "uid": { "type": "View", "id": "User user_0" },
         "attrs": {},
         "parents": []
     },
     {
-        "uid": {"__entity": {"type": "User", "id": "user_1"}},
+        "uid": { "type": "User", "id": "user_1" },
         "attrs": {
             "documentsAndFoldersWithViewAccess": {"__entity": {"type": "View", "id": "User user_1"}},
             "ownedDocuments": [
@@ -35,16 +35,16 @@
             ]
         },
         "parents": [
-            {"__entity": {"type": "Group", "id": "group_1"}}
+            { "type": "Group", "id": "group_1" }
         ]
     },
     {
-        "uid": {"__entity": {"type": "View", "id": "User user_1"}},
+        "uid": { "type": "View", "id": "User user_1" },
         "attrs": {},
         "parents": []
     },
     {
-        "uid": {"__entity": {"type": "User", "id": "user_2"}},
+        "uid": { "type": "User", "id": "user_2" },
         "attrs": {
             "documentsAndFoldersWithViewAccess": {
                 "__entity": {"type": "View", "id": "User user_2"}},
@@ -57,108 +57,108 @@
             ]
         },
         "parents": [
-            {"__entity": {"type": "Group", "id": "group_0"}},
-            {"__entity": {"type": "Group", "id": "group_2"}}
+            { "type": "Group", "id": "group_0" },
+            { "type": "Group", "id": "group_2" }
         ]
     },
     {
-        "uid": {"__entity": {"type": "View", "id": "User user_2"}},
+        "uid": { "type": "View", "id": "User user_2" },
         "attrs": {},
         "parents": []
     },
     {
-        "uid": {"__entity": {"type": "Group", "id": "group_0"}},
+        "uid": { "type": "Group", "id": "group_0" },
         "attrs": {},
         "parents": []
     },
     {
-        "uid": {"__entity": {"type": "View", "id": "Group group_0"}},
+        "uid": { "type": "View", "id": "Group group_0" },
         "attrs": {},
         "parents": [
-            {"__entity": {"type": "View", "id": "User user_0"}},
-            {"__entity": {"type": "View", "id": "User user_2"}}
+            { "type": "View", "id": "User user_0" },
+            { "type": "View", "id": "User user_2" }
         ]
     },
     {
-        "uid": {"__entity": {"type": "Group", "id": "group_1"}},
+        "uid": { "type": "Group", "id": "group_1" },
         "attrs": {},
         "parents": []
     },
     {
-        "uid": {"__entity": {"type": "View", "id": "Group group_1"}},
+        "uid": { "type": "View", "id": "Group group_1" },
         "attrs": {},
         "parents": [
-            {"__entity": {"type": "View", "id": "User user_1"}}
+            { "type": "View", "id": "User user_1" }
         ]
     },
     {
-        "uid": {"__entity": {"type": "Group", "id": "group_2"}},
+        "uid": { "type": "Group", "id": "group_2" },
         "attrs": {},
         "parents": []
     },
     {
-        "uid": {"__entity": {"type": "View", "id": "Group group_2"}},
+        "uid": { "type": "View", "id": "Group group_2" },
         "attrs": {},
         "parents": [
-            {"__entity": {"type": "View", "id": "User user_2"}}
+            { "type": "View", "id": "User user_2" }
         ]
     },
     {
-        "uid": {"__entity": {"type": "Document", "id": "doc_0"}},
+        "uid": { "type": "Document", "id": "doc_0" },
         "attrs": {
             "isPublic": false
         },
         "parents": [
-            {"__entity": {"type": "View", "id": "User 1"}},
-            {"__entity": {"type": "View", "id": "Group 1"}}
+            { "type": "View", "id": "User 1" },
+            { "type": "View", "id": "Group 1" }
         ]
     },
     {
-        "uid": {"__entity": {"type": "Document", "id": "doc_1"}},
+        "uid": { "type": "Document", "id": "doc_1" },
         "attrs": {
             "isPublic": true
         },
         "parents": [
-            {"__entity": {"type": "Folder", "id": "folder_2"}},
-            {"__entity": {"type": "View", "id": "User 0"}},
-            {"__entity": {"type": "View", "id": "User 2"}},
-            {"__entity": {"type": "View", "id": "Group 2"}}
+            { "type": "Folder", "id": "folder_2" },
+            { "type": "View", "id": "User 0" },
+            { "type": "View", "id": "User 2" },
+            { "type": "View", "id": "Group 2" }
         ]
     },
     {
-        "uid": {"__entity": {"type": "Document", "id": "doc_2"}},
+        "uid": { "type": "Document", "id": "doc_2" },
         "attrs": {
             "isPublic": false
         },
         "parents": [
-            {"__entity": {"type": "Folder", "id": "folder_1"}},
-            {"__entity": {"type": "View", "id": "User 2"}}
+            { "type": "Folder", "id": "folder_1" },
+            { "type": "View", "id": "User 2" }
         ]
     },
     {
-        "uid": {"__entity": {"type": "Folder", "id": "folder_0"}},
+        "uid": { "type": "Folder", "id": "folder_0" },
         "attrs": {},
         "parents": [
-            {"__entity": {"type": "View", "id": "User 2"}},
-            {"__entity": {"type": "View", "id": "Group 1"}}
+            { "type": "View", "id": "User 2" },
+            { "type": "View", "id": "Group 1" }
         ]
     },
     {
-        "uid": {"__entity": {"type": "Folder", "id": "folder_1"}},
+        "uid": { "type": "Folder", "id": "folder_1" },
         "attrs": {},
         "parents": [
-            {"__entity": {"type": "Folder", "id": "folder_0"}},
-            {"__entity": {"type": "View", "id": "User 1"}},
-            {"__entity": {"type": "View", "id": "Group 1"}},
-            {"__entity": {"type": "View", "id": "Group 2"}}
+            { "type": "Folder", "id": "folder_0" },
+            { "type": "View", "id": "User 1" },
+            { "type": "View", "id": "Group 1" },
+            { "type": "View", "id": "Group 2" }
         ]
     },
     {
-        "uid": {"__entity": {"type": "Folder", "id": "folder_2"}},
+        "uid": { "type": "Folder", "id": "folder_2" },
         "attrs": {},
         "parents": [
-            {"__entity": {"type": "View", "id": "User 0"}},
-            {"__entity": {"type": "View", "id": "Group 1"}}
+            { "type": "View", "id": "User 0" },
+            { "type": "View", "id": "Group 1" }
         ]
     }
 ]

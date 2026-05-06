@@ -1,4 +1,4 @@
-package uq.pac.rsvp.policy.ast;
+package uq.pac.rsvp.policy.ast.policy;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -16,7 +16,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import uq.pac.rsvp.policy.ast.deserialisation.ExpressionDeserialiser;
-import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.support.SourceLoc;
 
 import uq.pac.rsvp.policy.ast.policy.Policy.Effect;

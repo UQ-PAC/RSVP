@@ -1,4 +1,4 @@
-package uq.pac.rsvp.policy.ast.expr;
+package uq.pac.rsvp.policy.ast.policy.expr;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -19,11 +19,7 @@ import com.google.gson.JsonParseException;
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.deserialisation.PolicyJsonParser;
 import uq.pac.rsvp.policy.ast.policy.Policy;
-import uq.pac.rsvp.policy.ast.PolicySet;
-import uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.Expression;
-import uq.pac.rsvp.policy.ast.policy.expr.TypeExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.VariableExpression;
+import uq.pac.rsvp.policy.ast.policy.PolicySet;
 import uq.pac.rsvp.support.SourceLoc;
 
 @DisplayName("Policy condition AST")

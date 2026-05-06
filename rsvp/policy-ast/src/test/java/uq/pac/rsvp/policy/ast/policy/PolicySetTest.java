@@ -1,4 +1,4 @@
-package uq.pac.rsvp.policy.ast;
+package uq.pac.rsvp.policy.ast.policy;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,12 +16,10 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.deserialisation.PolicyJsonParser;
-import uq.pac.rsvp.policy.ast.policy.PolicySet;
 import uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.CallExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.PropertyAccessExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.VariableExpression;
-import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitorImpl;
 
@@ -40,7 +38,7 @@ public class PolicySetTest {
                 "euid.cedar;[permit on: ((principal is Account) && ((action == Action::\"viewPhoto\") && true))]"
         })
         void testCedarExpressionParsing(String file, String expected) throws RsvpException {
-            URL url = ClassLoader.getSystemResource(file);
+            URL url = ClassLoader.getSystemResource("policy/" + file);
             PolicySet policies = PolicySet.parseCedarPolicySet(Path.of(url.getPath()));
             assertEquals(expected, policies.toString());
         }
@@ -148,7 +146,7 @@ public class PolicySetTest {
                 "permit-and-forbid.ast.json;[permit on: (principal == \"poppy\"), forbid on: (action == \"murder\")]"
         })
         void testDeserialisation(String file, String expected) throws IOException {
-            URL url = ClassLoader.getSystemResource(file);
+            URL url = ClassLoader.getSystemResource("policy/" + file);
             String json = Files.readString(Path.of(url.getPath()));
             PolicySet policies = PolicyJsonParser.parsePolicySet("file.json", json);
             assertEquals(expected, policies.toString());

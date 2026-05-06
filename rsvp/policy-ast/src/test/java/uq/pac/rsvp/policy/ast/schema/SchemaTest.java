@@ -106,7 +106,7 @@ public class SchemaTest {
     // Validation errors and legal behaviours
     @TestFactory
     Collection<DynamicTest> test() {
-        Path dir = getResourceDir("antlr", "validation");
+        Path dir = getResourceDir("schema", "validation");
         List<DynamicTest> tests = new ArrayList<>();
         findFiles(dir, ".cedarschema").forEach(path -> {
             try {
@@ -194,7 +194,7 @@ public class SchemaTest {
 
     @TestFactory
     List<DynamicTest> completeness() {
-        Path dir = getResourceDir("antlr", "completeness");
+        Path dir = getResourceDir("schema", "completeness");
         List<DynamicTest> tests = new ArrayList<>();
         findFiles(dir, ".cedarschema").forEach(path -> {
             DynamicTest test = DynamicTest.dynamicTest(path.getFileName().toString(),

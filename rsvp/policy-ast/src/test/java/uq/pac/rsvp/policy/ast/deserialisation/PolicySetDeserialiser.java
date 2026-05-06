@@ -2,7 +2,7 @@ package uq.pac.rsvp.policy.ast.deserialisation;
 
 import com.google.gson.*;
 import uq.pac.rsvp.policy.ast.policy.Policy;
-import uq.pac.rsvp.policy.ast.PolicySet;
+import uq.pac.rsvp.policy.ast.policy.PolicySet;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

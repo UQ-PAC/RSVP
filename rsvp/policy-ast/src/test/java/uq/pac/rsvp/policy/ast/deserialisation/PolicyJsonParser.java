@@ -3,7 +3,7 @@ package uq.pac.rsvp.policy.ast.deserialisation;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import uq.pac.rsvp.policy.ast.PolicySet;
+import uq.pac.rsvp.policy.ast.policy.PolicySet;
 import uq.pac.rsvp.policy.ast.policy.expr.ActionExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.EntityExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.Expression;

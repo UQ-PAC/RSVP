@@ -1,4 +1,4 @@
-package uq.pac.rsvp.policy.ast.expr;
+package uq.pac.rsvp.policy.ast.policy.expr;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

@@ -1,4 +1,4 @@
-package uq.pac.rsvp.policy.ast.visitor;
+package uq.pac.rsvp.policy.ast.policy.visitor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -12,14 +12,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import uq.pac.rsvp.policy.ast.deserialisation.PolicyJsonParser;
-import uq.pac.rsvp.policy.ast.PolicySet;
+import uq.pac.rsvp.policy.ast.policy.PolicySet;
 import uq.pac.rsvp.policy.ast.policy.expr.BooleanExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.EntityExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.LongExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.SlotExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.StringExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.VariableExpression;
-import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitorImpl;
 
 @DisplayName("Abstract policy visitor")
 public class PolicyVisitorImplTest {

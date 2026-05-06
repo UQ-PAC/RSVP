@@ -123,22 +123,16 @@ public class CedarAspect {
 			CedarRequest authorizationRequest = new CedarRequest(principal, action, resource, contextMap,
 					validateRequest);
 
-			// System.out.println("Cedar request: " + authorizationRequest.toString());
-
 			ResponseEntity<String> response = cedarService.checkAccess(authorizationRequest);
-
-			// // Prints Cedar response to console.
-			// System.out.println("Cedar response status code: " +
-			// response.getStatusCode());
-			// System.out.println("Cedar response body: " + response.getBody());
 
 			String logEntry = "Page Request: Principal=" + principal + ", Action=" + action + ", Resource=" + resource
 					+ " | Response: " + response.getBody();
 			this.cedarLogContext.addLog(logEntry);
 
-			// Any single rejection immediately terminates the invocation
+			// Any single rejection immediately terminates the invocation.
 			if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null
 					|| !response.getBody().startsWith("Access Granted.")) {
+				String bodyString = response.getBody() != null ? response.getBody() : "No response body provided.";
 				String prefix = """
 						Access Denied.
 						""";
@@ -172,16 +166,12 @@ public class CedarAspect {
 				return pathVariables.get(expectedKey);
 			}
 
-			String entityIdString = pathVariables.get(expectedKey);
-
-			if (entityIdString == null) {
-				entityIdString = pathVariables.entrySet()
-					.stream()
-					.filter(entry -> entry.getKey().toLowerCase().endsWith("id"))
-					.map(Map.Entry::getValue)
-					.findFirst()
-					.orElse(null);
-			}
+			String entityIdString = pathVariables.entrySet()
+				.stream()
+				.filter(entry -> entry.getKey().toLowerCase().endsWith("id"))
+				.map(Map.Entry::getValue)
+				.findFirst()
+				.orElse(null);
 
 			if (entityIdString != null) {
 				return entityIdString;

@@ -32,7 +32,6 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Multimap;
 
-import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.entity.Entity;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.policy.Policy;
@@ -89,15 +88,15 @@ public class Translation {
 
             this.program = translate(schema, policies, entities, invariants);
             program.execute(datalogDir);
-
-        } catch (RsvpException | AuthException | IOException | RuntimeException | InterruptedException | IllegalAccessException e) {
+        } catch (Throwable e) {
             throw new TranslationError(e);
         }
     }
 
     record InputSet(Schema schema, Collection<Policy> policies, EntitySet entities, Collection<Invariant> invariants) {}
 
-    static InputSet validate(Path schemaFile, Path policyFile, Path entityFile, Path invariantsFile) throws IOException, AuthException, RsvpException, IllegalAccessException {
+    static InputSet validate(Path schemaFile, Path policyFile, Path entityFile, Path invariantsFile)
+            throws IOException, AuthException, IllegalAccessException {
         EntitySet entities = EntitySet.parse(entityFile);
 
         Set<Entity> filteredEntities = entities.stream().filter(e -> {
@@ -136,16 +135,6 @@ public class Translation {
                 throw new TranslationError("Unsupported action name: " + a.getName());
             }
         });
-
-        // Same for enum values
-//        Pattern enumEntityPattern = Pattern.compile("^[A-Za-z_][A-Za-z_0-9]*$");
-//        rsvpSchema.enumEntityTypes().forEach(t -> {
-//            t.getEnumNames().forEach(en -> {
-//                if (!enumEntityPattern.matcher(en).matches()) {
-//                    throw new TranslationError("Unsupported enum name: " + en);
-//                }
-//            });
-//        });
 
         // FIXME: This needs to be moved to entity validation
         // For the moment we also do not support entity names that have the same

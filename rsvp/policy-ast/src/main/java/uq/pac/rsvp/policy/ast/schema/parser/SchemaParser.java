@@ -2,12 +2,12 @@ package uq.pac.rsvp.policy.ast.schema.parser;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-import uq.pac.rsvp.policy.ast.CedarschemaBaseVisitor;
 import uq.pac.rsvp.policy.ast.CedarschemaLexer;
 import uq.pac.rsvp.policy.ast.CedarschemaParser;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.statement.SchemaStatement;
 import uq.pac.rsvp.support.FileSource;
+import uq.pac.rsvp.support.SourceLoc;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -47,7 +47,7 @@ public class SchemaParser {
         FileSource source = new FileSource(file, text);
         List<SchemaStatement> components = new ArrayList<>();
 
-        return new CedarschemaBaseVisitor<Schema>() {
+        return new SourceVisitor<Schema>(source) {
             @Override
             public Schema visitSchema(CedarschemaParser.SchemaContext ctx) {
                 SchemaStatementVisitor statements = new SchemaStatementVisitor(source, "");
@@ -63,7 +63,8 @@ public class SchemaParser {
                         components.add(statements.visit(s));
                     }
                 }
-                return Schema.build(components);
+                SourceLoc location = components.isEmpty() ? SourceLoc.MISSING : location(ctx);
+                return Schema.build(components, location);
             }
         }.visit(parser.schema());
     }

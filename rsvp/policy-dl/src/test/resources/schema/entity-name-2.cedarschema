@@ -1,3 +1,0 @@
-namespace RSVP::DL::Tmp::Record::Attr {
-    entity Type enum [ "SDA", "SDB" ];
-}

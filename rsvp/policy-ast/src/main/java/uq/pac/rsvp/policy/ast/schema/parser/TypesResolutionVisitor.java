@@ -81,15 +81,15 @@ public class TypesResolutionVisitor implements SchemaValueVisitor<BuiltinType> {
             SchemaStatement global = schema.get(new TypeReference("", type.getBaseName()));
             SchemaStatement local = null;
             if (!namespace.isEmpty()) {
-                local = schema.get(new TypeReference(namespace, type.getBaseName()));
+                local = schema.get(new TypeReference(namespace, type.getBaseName(), type.getSourceLoc()));
             }
 
             if (global != null && local != null) {
                 throw new ResolutionException("Illegal shadowing of type: " + type.getBaseName());
             } else if (global != null) {
-                return global.getTypeReference();
+                return global.getTypeReference().with(type.getSourceLoc());
             } else if (local != null) {
-                return local.getTypeReference();
+                return local.getTypeReference().with(type.getSourceLoc());
             } else {
                 throw new SchemaResolutionException("Invalid type reference: " + type.getBaseName());
             }
@@ -98,7 +98,7 @@ public class TypesResolutionVisitor implements SchemaValueVisitor<BuiltinType> {
             if (stmt == null) {
                 throw new SchemaResolutionException("Invalid type reference: " + type.getName());
             }
-            return stmt.getTypeReference();
+            return stmt.getTypeReference().with(type.getSourceLoc());
         }
     }
 

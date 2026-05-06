@@ -58,6 +58,10 @@ public class TypeReference extends BuiltinType {
         return false;
     }
 
+    public TypeReference with(SourceLoc location) {
+        return new TypeReference(namespace, name, location);
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(namespace, name);

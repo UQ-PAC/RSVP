@@ -1,0 +1,53 @@
+namespace Photo::App {
+    @id("Visibility")
+    @enumType
+    entity Visibility enum [ "Private", "Protected", "Public" ];
+    entity Role enum [ "User", "Admin" ];
+
+    type Name = String;
+    type Friends = Set<Account>;
+
+    @id("Metadata")
+    @commonType
+    type Metadata = {
+        name: Name,
+        size : Long,
+        type: String
+    };
+
+    @id("Account")
+    @recordType
+    entity Account = {
+        name: String,
+        age: Long,
+        role: Role,
+        friends: Friends,
+    };
+
+    entity Album = {
+        owner: Account,
+        visibility: Visibility,
+        year?: Long
+    };
+
+    entity Photo = {
+        album: Album,
+        data: Metadata,
+    };
+
+    action view appliesTo {
+        principal: Account,
+        resource: Account,
+        context: { }
+    };
+
+    @id("Visibility")
+    @actionType
+    action createAlbum in [ view ] appliesTo {
+        principal: Account,
+        resource: Account,
+        context: {
+            "authenticated": Bool
+        }
+    };
+}

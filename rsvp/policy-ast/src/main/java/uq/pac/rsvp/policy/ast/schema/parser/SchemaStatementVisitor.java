@@ -1,5 +1,6 @@
 package uq.pac.rsvp.policy.ast.schema.parser;
 
+import org.antlr.v4.runtime.tree.TerminalNode;
 import uq.pac.rsvp.policy.ast.CedarschemaParser;
 import uq.pac.rsvp.policy.ast.schema.statement.*;
 import uq.pac.rsvp.policy.ast.schema.type.BuiltinType;
@@ -46,8 +47,9 @@ class SchemaStatementVisitor extends SourceVisitor<SchemaStatement> {
     @Override
     public SchemaStatement visitEntity(CedarschemaParser.EntityContext ctx) {
         require(ctx.entityNames().ID().size() == 1);
+        TerminalNode id = ctx.entityNames().ID(0);
         String name = ctx.entityNames().ID(0).getText();
-        TypeReference ref = new TypeReference(namespace, name);
+        TypeReference ref = new TypeReference(namespace, id.getText(), location(id.getSymbol()));
 
         Annotations annotations = getAnnotations(ctx.annotation());
 
@@ -75,7 +77,7 @@ class SchemaStatementVisitor extends SourceVisitor<SchemaStatement> {
     public SchemaStatement visitCommon(CedarschemaParser.CommonContext ctx) {
         BuiltinType definition = types.visit(ctx.type());
         Annotations annotations = getAnnotations(ctx.annotation());
-        TypeReference reference = new TypeReference(namespace, ctx.typename().getText());
+        TypeReference reference = new TypeReference(namespace, ctx.typename().getText(), location(ctx.typename()));
         return new CommonType(reference, definition, annotations, location(ctx));
     }
 
@@ -93,7 +95,7 @@ class SchemaStatementVisitor extends SourceVisitor<SchemaStatement> {
 
         // Quoted action name in the form Action::"name"
         String actionName = getNormalisedActionName(ctx.name(0));
-        TypeReference actionReference = new TypeReference(namespace, actionName);
+        TypeReference actionReference = new TypeReference(namespace, actionName, location(ctx.name(0)));
         Annotations annotations = getAnnotations(ctx.annotation());
 
         // Member of references

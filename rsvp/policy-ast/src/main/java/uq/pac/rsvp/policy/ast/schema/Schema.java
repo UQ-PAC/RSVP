@@ -8,7 +8,11 @@ import uq.pac.rsvp.policy.ast.schema.parser.SchemaParser;
 import uq.pac.rsvp.policy.ast.schema.parser.StatementResolutionVisitor;
 import uq.pac.rsvp.policy.ast.schema.statement.*;
 import uq.pac.rsvp.policy.ast.schema.type.*;
+import uq.pac.rsvp.policy.ast.schema.visitor.SchemaPayloadVisitor;
+import uq.pac.rsvp.policy.ast.schema.visitor.SchemaValueVisitor;
+import uq.pac.rsvp.policy.ast.schema.visitor.SchemaVisitor;
 import uq.pac.rsvp.policy.ast.schema.visitor.SchemaVisitorAdapter;
+import uq.pac.rsvp.support.SourceLoc;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,12 +22,13 @@ import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
-public class Schema {
+public class Schema extends SchemaAstNode {
 
     private final Map<TypeReference, SchemaStatement> statements;
 
     // Private constructor for internal purposes
-    private Schema(Map<TypeReference, SchemaStatement> statements) {
+    private Schema(Map<TypeReference, SchemaStatement> statements, SourceLoc location) {
+        super(location);
         this.statements = Collections.unmodifiableMap(statements);
     }
 
@@ -135,9 +140,9 @@ public class Schema {
     }
 
     // Build and validate Cedar schema
-    public static Schema build(Collection<SchemaStatement> statements) {
+    public static Schema build(Collection<SchemaStatement> statements, SourceLoc location) {
         // Ensure no illegal shadowing
-        Schema result = uniquenessPass(statements);
+        Schema result = uniquenessPass(statements, location);
         result = shallowResolutionPass(result);
         result = typeDependencyPass(result);
         return result;
@@ -147,7 +152,7 @@ public class Schema {
     // The resulting schema contains no duplicates (i.e., illegally shadowed statements)
     // This includes similarly named statements within the same namespace and conflicts with
     // global
-    private static Schema uniquenessPass(Collection<SchemaStatement> statements) {
+    private static Schema uniquenessPass(Collection<SchemaStatement> statements, SourceLoc location) {
         // Sort the list of statements such that entities from the global namespace come first
         statements = statements.stream()
                 .sorted(Comparator.comparingInt(a -> a.getNamespace().length()))
@@ -166,7 +171,7 @@ public class Schema {
             types.put(ref, stmt);
         }
 
-        return new Schema(types);
+        return new Schema(types, location);
     }
 
     // The second stage of resolution.
@@ -179,7 +184,7 @@ public class Schema {
                     new StatementResolutionVisitor(schema, stmt.getNamespace());
             resolved.put(ref, stmt.compute(resolver));
         });
-        return new Schema(resolved);
+        return new Schema(resolved, schema.getSourceLoc());
     }
 
     // The third stage of resolution:
@@ -230,5 +235,20 @@ public class Schema {
             }
         }
         return schema;
+    }
+
+    @Override
+    public void accept(SchemaVisitor visitor) {
+        visitor.visitSchema(this);
+    }
+
+    @Override
+    public <T> T compute(SchemaValueVisitor<T> visitor) {
+        return visitor.visitSchema(this);
+    }
+
+    @Override
+    public <T> void process(SchemaPayloadVisitor<T> visitor, T payload) {
+        visitor.visitSchema(this, payload);
     }
 }

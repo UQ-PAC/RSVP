@@ -66,7 +66,6 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
                 throw new Error("duplicate variable name: %s in quantifier: %s", varName, invariant.getQuantifier());
             }
 
-            // FIXME: Action types are not handled here
             // Ensure types exist
             if (!types.contains(typeRef)) {
                 throw new Error("invalid type: %s in quantifier: %s. Available types: %s",

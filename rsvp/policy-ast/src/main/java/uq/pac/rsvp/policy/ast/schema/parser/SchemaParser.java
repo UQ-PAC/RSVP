@@ -53,14 +53,14 @@ public class SchemaParser {
                 SchemaStatementVisitor statements = new SchemaStatementVisitor(source, "");
 
                 for (CedarschemaParser.StatementContext s : ctx.statement()) {
-                    components.add(statements.visit(s));
+                    components.addAll(statements.visit(s));
                 }
 
                 for (CedarschemaParser.NamespaceContext ns : ctx.namespace()) {
                     String namespace  = ns.path().getText();
                     statements = new SchemaStatementVisitor(source, namespace);
                     for (CedarschemaParser.StatementContext s : ns.statement()) {
-                        components.add(statements.visit(s));
+                        components.addAll(statements.visit(s));
                     }
                 }
                 SourceLoc location = components.isEmpty() ? SourceLoc.MISSING : location(ctx);

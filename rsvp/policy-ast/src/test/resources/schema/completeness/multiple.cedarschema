@@ -1,0 +1,13 @@
+entity A, B enum [ "K", "L", "M" ];
+
+entity X, Y = {
+    size : Long,
+    type: String
+};
+
+action viewPhoto appliesTo {
+    principal: A,
+    resource: X
+};
+
+

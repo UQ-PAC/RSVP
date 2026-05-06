@@ -148,7 +148,7 @@ public class SchemaTest {
     }
 
     // Get a normalised representation of a cedar file with resolved types by converting it to
-    // json with resolved types and then back to cedar
+    // JSON with resolved types and then back to cedar
     static String getNormalisedCedarSchemaText(Path schemaPath) throws InterruptedException, IOException, InternalException {
 
 

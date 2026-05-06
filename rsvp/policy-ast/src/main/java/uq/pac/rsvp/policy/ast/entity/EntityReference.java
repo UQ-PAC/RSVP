@@ -1,10 +1,7 @@
 package uq.pac.rsvp.policy.ast.entity;
 
-import uq.pac.rsvp.policy.ast.schema.type.TypeReference;
 import uq.pac.rsvp.support.SourceLoc;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -22,13 +19,6 @@ public class EntityReference extends EntityValue {
 
     public EntityReference(String type, String id) {
         this(type, id, SourceLoc.MISSING);
-    }
-
-    // FIXME: Remove
-    public TypeReference getSchemaReference() {
-        List<String> parts = Arrays.asList(type.split("::"));
-        String namespace = String.join("::", parts.subList(0, parts.size() - 1));
-        return new TypeReference(namespace, parts.getLast());
     }
 
     public String getId() {

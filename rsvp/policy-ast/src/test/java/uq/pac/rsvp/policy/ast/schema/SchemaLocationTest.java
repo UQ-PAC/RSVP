@@ -115,9 +115,7 @@ public class SchemaLocationTest {
 
         @Override
         public void visitSet(SetType type) {
-            log("Set", type, () -> {
-                type.getElementType().accept(this);
-            });
+            log("Set", type, () -> type.getElementType().accept(this));
         }
 
         @Override

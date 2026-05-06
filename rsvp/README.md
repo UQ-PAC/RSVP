@@ -21,33 +21,6 @@ You will need to create these credentials in GitHub and supply them to Gradle as
    systemProp.packages.user=<your_github_username>
    systemProp.packages.token=<your_personal_access_token>
    ```
-
-### CedarJava
-
-The `policy-ast` project depends on [a fork of CedarJava](https://github.com/rebecca-odonoghue/cedar-java) which
-can be built locally or pulled from the GitHub Packages repository. Completing [the steps above](#github-packages)
-will enable you to pull the package directly from GitHub.
-
-To build CedarJava locally:
-
-1. Clone CedarJava somewhere on your machine:
-   ```
-   git clone git@github.com:rebecca-odonoghue/cedar-java.git
-   cd cedar-java
-   ```
-2. Build CedarJava:
-   ```
-   ./CedarJava/gradlew build -p ./CedarJava
-   ```
-3. Optionally, run the Rust test suite that is not executed as part of the Gradle build:
-   ```
-   cargo test --manifest-path CedarJavaFFI/Cargo.toml
-   ```
-4. Deploy CedarJava locally:
-   ```
-   ./CedarJava/gradlew publishToMavenLocal -p ./CedarJava
-   ```
-
 ### Soufflé
 
 Soufflé is required to build and run the `policy-dl` project, and can be installed using a package manager:
@@ -143,13 +116,6 @@ locally or pull them from GitHub Packages.
 
    ```
    repositories {
-       maven {
-           url = 'https://maven.pkg.github.com/rebecca-odonoghue/cedar-java'
-           credentials {
-               username = System.getProperty('packages.user')
-               password = System.getProperty('packages.token')
-           }
-       }
        maven {
            url = 'https://maven.pkg.github.com/UQ-PAC/RSVP'
            credentials {

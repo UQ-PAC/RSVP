@@ -62,23 +62,23 @@ public class Main {
                 Path invariantsPath = Path.of(args[i]).toAbsolutePath();
                 fileSet.entitiesPaths.add(invariantsPath);
             }
-
-            try {
-                Set<Report> reports = Verification.verifyPolicies(fileSet.policiesPaths,
-                        fileSet.schemaPaths, fileSet.entitiesPaths, fileSet.invariantsPaths);
-                for (Report report : reports) {
-                    System.out.println(report.toString());
-                }
-            } catch (InterruptedException ie) {
-                System.err.println("Interrupted.");
-                System.exit(1);
-            } catch (ConfigurationException ce) {
-                System.err.println("Configuration issue: " + ce.getMessage());
-                System.exit(1);
-            } catch (RsvpException | IllegalAccessException rsvpe) {
-                rsvpe.printStackTrace();
-                System.exit(1);
+        }
+        
+        try {
+            Set<Report> reports = Verification.verifyPolicies(fileSet.policiesPaths,
+                    fileSet.schemaPaths, fileSet.entitiesPaths, fileSet.invariantsPaths);
+            for (Report report : reports) {
+                System.out.println(report.toString());
             }
+        } catch (InterruptedException ie) {
+            System.err.println("Interrupted.");
+            System.exit(1);
+        } catch (ConfigurationException ce) {
+            System.err.println("Configuration issue: " + ce.getMessage());
+            System.exit(1);
+        } catch (RsvpException | IllegalAccessException rsvpe) {
+            rsvpe.printStackTrace();
+            System.exit(1);
         }
     }
 }

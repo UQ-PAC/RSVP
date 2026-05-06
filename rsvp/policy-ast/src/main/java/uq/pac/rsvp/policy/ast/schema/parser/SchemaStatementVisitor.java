@@ -21,7 +21,7 @@ import static uq.pac.rsvp.policy.ast.schema.parser.SchemaTypeVisitor.unquote;
 /**
  * A top-level visitor generating schema statements from the parser
  */
-class SchemaStatementVisitor extends SourceVisitor<SchemaStatement> {
+class SchemaStatementVisitor extends CedarschemaSourceVisitor<SchemaStatement> {
 
     private final SchemaTypeVisitor types;
     private final String namespace;

@@ -8,11 +8,11 @@ import uq.pac.rsvp.support.FileSource;
 import uq.pac.rsvp.support.LineLoc;
 import uq.pac.rsvp.support.SourceLoc;
 
-public class SourceVisitor<T> extends CedarBaseVisitor<T> {
+public class CedarSourceVisitor<T> extends CedarBaseVisitor<T> {
 
     private final FileSource fs;
 
-    public SourceVisitor(FileSource fs) {
+    public CedarSourceVisitor(FileSource fs) {
         this.fs = fs;
     }
 
@@ -32,10 +32,6 @@ public class SourceVisitor<T> extends CedarBaseVisitor<T> {
 
     protected SourceLoc location(ParserRuleContext context) {
         return location(context.start, context.stop);
-    }
-
-    protected SourceLoc location(ParserRuleContext start, ParserRuleContext stop) {
-        return location(start.start, stop.stop);
     }
 
     protected SourceLoc location(TerminalNode context) {

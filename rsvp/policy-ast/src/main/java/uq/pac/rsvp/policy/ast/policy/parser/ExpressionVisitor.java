@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.*;
 
-public class ExpressionVisitor extends SourceVisitor<Expression> {
+public class ExpressionVisitor extends CedarSourceVisitor<Expression> {
 
     public ExpressionVisitor(FileSource fs) {
         super(fs);

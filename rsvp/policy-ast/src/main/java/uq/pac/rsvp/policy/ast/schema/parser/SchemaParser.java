@@ -47,7 +47,7 @@ public class SchemaParser {
         FileSource source = new FileSource(file, text);
         List<SchemaStatement> components = new ArrayList<>();
 
-        return new SourceVisitor<Schema>(source) {
+        return new CedarschemaSourceVisitor<Schema>(source) {
             @Override
             public Schema visitSchema(CedarschemaParser.SchemaContext ctx) {
                 SchemaStatementVisitor statements = new SchemaStatementVisitor(source, "");

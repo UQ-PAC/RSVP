@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-class SchemaTypeVisitor extends SourceVisitor<BuiltinType> {
+class SchemaTypeVisitor extends CedarschemaSourceVisitor<BuiltinType> {
 
     private final String namespace;
 

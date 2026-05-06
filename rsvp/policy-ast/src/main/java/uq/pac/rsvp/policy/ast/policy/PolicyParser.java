@@ -4,7 +4,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import uq.pac.rsvp.policy.ast.CedarLexer;
 import uq.pac.rsvp.policy.ast.CedarParser;
-import uq.pac.rsvp.policy.ast.policy.parser.SourceVisitor;
+import uq.pac.rsvp.policy.ast.policy.parser.CedarSourceVisitor;
 import uq.pac.rsvp.support.FileSource;
 
 import java.util.Collection;
@@ -36,7 +36,7 @@ public class PolicyParser {
 
         FileSource fs = new FileSource(file, text);
         PolicyStatementVisitor visitor = new PolicyStatementVisitor(fs);
-        return new SourceVisitor<List<PolicyStatement>>(fs) {
+        return new CedarSourceVisitor<List<PolicyStatement>>(fs) {
             @Override
             public List<PolicyStatement> visitProgram(CedarParser.ProgramContext ctx) {
                 if (ctx.children != null) {

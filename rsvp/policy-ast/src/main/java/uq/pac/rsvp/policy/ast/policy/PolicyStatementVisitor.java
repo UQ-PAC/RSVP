@@ -4,7 +4,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import uq.pac.rsvp.policy.ast.CedarParser;
 import uq.pac.rsvp.policy.ast.policy.expr.*;
 import uq.pac.rsvp.policy.ast.policy.parser.ExpressionVisitor;
-import uq.pac.rsvp.policy.ast.policy.parser.SourceVisitor;
+import uq.pac.rsvp.policy.ast.policy.parser.CedarSourceVisitor;
 import uq.pac.rsvp.support.FileSource;
 import uq.pac.rsvp.support.SourceLoc;
 
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-class PolicyStatementVisitor extends SourceVisitor<PolicyStatement> {
+class PolicyStatementVisitor extends CedarSourceVisitor<PolicyStatement> {
 
     private final ExpressionVisitor expressions;
     private final PolicyNaming naming;

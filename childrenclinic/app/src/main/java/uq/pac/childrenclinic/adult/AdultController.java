@@ -303,7 +303,8 @@ public class AdultController {
 		if (submittedClinics != null) {
 			for (Clinic clinic : submittedClinics) {
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-				// Here we check for the "AddAdult" action, instead of "EditAdult", since the former applies to the "Clinic" resource.
+				// Here we check for the "AddAdult" action, instead of "EditAdult", since
+				// the former applies to the "Clinic" resource.
 				var clinicEval = cedarEvaluator.evaluate(principal, "AddAdult", "Clinic", cedarClinicId, "Page");
 				if (!clinicEval.isGranted()) {
 					isAuthorized = false;

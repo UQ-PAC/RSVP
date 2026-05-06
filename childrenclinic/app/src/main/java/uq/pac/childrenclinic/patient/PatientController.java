@@ -319,7 +319,8 @@ public class PatientController {
 		if (submittedClinics != null) {
 			for (Clinic clinic : submittedClinics) {
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-				// Here we check for the "AddPatient" action, instead of "EditPatient", since the former applies to the "Clinic" resource.
+				// Here we check for the "AddPatient" action, instead of "EditPatient",
+				// since the former applies to the "Clinic" resource.
 				var clinicEval = cedarEvaluator.evaluate(principal, "AddPatient", "Clinic", cedarClinicId, "Page");
 				if (!clinicEval.isGranted()) {
 					isAuthorized = false;

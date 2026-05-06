@@ -46,24 +46,23 @@ public class CedarAspect {
 	private record ResourceMetadata(String sqlQuery, Function<Map<String, Object>, String> nameExtractor) {
 	}
 
-	private static final Map<String, ResourceMetadata> RESOURCE_REGISTRY = Map.of(
-			"Doctor",
-			new ResourceMetadata("SELECT p.first_name, p.last_name FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE d.entity_id = ?",
-					rs -> rs.get("first_name") + " " + rs.get("last_name")),
-			"Employee",
-			new ResourceMetadata("SELECT username FROM users WHERE entity_id = ?",
-					rs -> rs.get("username").toString()),
+	private static final Map<String, ResourceMetadata> RESOURCE_REGISTRY = Map.of("Doctor", new ResourceMetadata(
+			"SELECT p.first_name, p.last_name FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE d.entity_id = ?",
+			rs -> rs.get("first_name") + " " + rs.get("last_name")), "Employee",
+			new ResourceMetadata("SELECT username FROM users WHERE entity_id = ?", rs -> rs.get("username").toString()),
 			"Patient",
-			new ResourceMetadata("SELECT p.first_name, p.last_name FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE pt.entity_id = ?",
+			new ResourceMetadata(
+					"SELECT p.first_name, p.last_name FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE pt.entity_id = ?",
 					rs -> rs.get("first_name") + " " + rs.get("last_name")),
 			"ResponsibleAdult",
-			new ResourceMetadata("SELECT p.first_name, p.last_name FROM adults a JOIN persons p ON a.entity_id = p.entity_id WHERE a.entity_id = ?",
+			new ResourceMetadata(
+					"SELECT p.first_name, p.last_name FROM adults a JOIN persons p ON a.entity_id = p.entity_id WHERE a.entity_id = ?",
 					rs -> rs.get("first_name") + " " + rs.get("last_name")),
 			"Secretary",
-			new ResourceMetadata("SELECT p.first_name, p.last_name FROM secretaries s JOIN persons p ON s.entity_id = p.entity_id WHERE s.entity_id = ?",
+			new ResourceMetadata(
+					"SELECT p.first_name, p.last_name FROM secretaries s JOIN persons p ON s.entity_id = p.entity_id WHERE s.entity_id = ?",
 					rs -> rs.get("first_name") + " " + rs.get("last_name")),
-			"Visit",
-			new ResourceMetadata("SELECT description FROM visits WHERE entity_id = ?",
+			"Visit", new ResourceMetadata("SELECT description FROM visits WHERE entity_id = ?",
 					rs -> rs.get("description").toString()));
 
 	private static final Logger logger = LoggerFactory.getLogger(CedarAspect.class);
@@ -106,7 +105,7 @@ public class CedarAspect {
 
 		for (CedarAuthorization requiresAuthorization : annotations) {
 			EntityUID action = EntityUID.parse("ChildrenClinic::Action::\"" + requiresAuthorization.action() + "\"")
-					.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
 			EntityUID resource = resolveResourceUid(request, requiresAuthorization);
 			String extractedResourceId = extractResourceId(request, requiresAuthorization.resourceType());
 
@@ -245,7 +244,8 @@ public class CedarAspect {
 							Integer count = this.jdbcTemplate.queryForObject(sql, Integer.class, principalId);
 							isAuthenticated = (count != null && count > 0);
 						}
-						catch (Exception exception) { }
+						catch (Exception exception) {
+						}
 					}
 					context.put(contextKey, new PrimString(String.valueOf(isAuthenticated)));
 				}

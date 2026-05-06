@@ -1,8 +1,8 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import uq.pac.rsvp.policy.ast.expr.CallExpression;
-import uq.pac.rsvp.policy.ast.expr.Expression;
-import uq.pac.rsvp.policy.ast.expr.PropertyAccessExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.CallExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.Expression;
+import uq.pac.rsvp.policy.ast.policy.expr.PropertyAccessExpression;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
 import java.util.HashMap;

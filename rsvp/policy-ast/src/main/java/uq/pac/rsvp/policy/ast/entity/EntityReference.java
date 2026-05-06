@@ -1,6 +1,6 @@
 package uq.pac.rsvp.policy.ast.entity;
 
-import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrTypeReference;
+import uq.pac.rsvp.policy.ast.schema.type.TypeReference;
 import uq.pac.rsvp.support.SourceLoc;
 
 import java.util.Arrays;
@@ -25,10 +25,10 @@ public class EntityReference extends EntityValue {
     }
 
     // FIXME: Remove
-    public AntlrTypeReference getSchemaReference() {
+    public TypeReference getSchemaReference() {
         List<String> parts = Arrays.asList(type.split("::"));
         String namespace = String.join("::", parts.subList(0, parts.size() - 1));
-        return new AntlrTypeReference(namespace, parts.getLast());
+        return new TypeReference(namespace, parts.getLast());
     }
 
     public String getId() {

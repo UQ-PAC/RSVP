@@ -16,13 +16,13 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.deserialisation.PolicyJsonParser;
-import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
-import uq.pac.rsvp.policy.ast.expr.CallExpression;
-import uq.pac.rsvp.policy.ast.expr.PropertyAccessExpression;
-import uq.pac.rsvp.policy.ast.expr.VariableExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.CallExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.PropertyAccessExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.VariableExpression;
 import uq.pac.rsvp.policy.ast.policy.Policy;
-import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
-import uq.pac.rsvp.policy.ast.visitor.PolicyVisitorImpl;
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitorImpl;
 
 @DisplayName("Policy set AST")
 public class PolicySetTest {

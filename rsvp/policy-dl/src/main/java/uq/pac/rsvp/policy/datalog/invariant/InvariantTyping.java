@@ -1,7 +1,7 @@
 package uq.pac.rsvp.policy.datalog.invariant;
 
-import uq.pac.rsvp.policy.ast.antlrschema.AntlrSchema;
-import uq.pac.rsvp.policy.ast.antlrschema.type.*;
+import uq.pac.rsvp.policy.ast.schema.Schema;
+import uq.pac.rsvp.policy.ast.schema.type.*;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 
 import java.util.List;
@@ -11,40 +11,40 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class InvariantTyping {
-    final static AntlrBooleanType BooleanType = new AntlrBooleanType();
-    final static AntlrStringType StringType = new AntlrStringType();
-    final static AntlrLongType LongType = new AntlrLongType();
-    final static AntlrBooleanType TypeOfEntityType = new AntlrBooleanType();
+    final static BooleanType BooleanType = new BooleanType();
+    final static StringType StringType = new StringType();
+    final static LongType LongType = new LongType();
+    final static BooleanType TypeOfEntityType = new BooleanType();
 
-    private final AntlrSchema schema;
+    private final Schema schema;
 
-    public AntlrSchema getSchema() {
+    public Schema getSchema() {
         return schema;
     }
 
-    public record TypeTest(Function<AntlrBuiltinType, Boolean> test, String expected) { }
+    public record TypeTest(Function<BuiltinType, Boolean> test, String expected) { }
 
     final static TypeTest TBoolean = new TypeTest(t -> t.equals(BooleanType), "__cedar::Boolean");
     final static TypeTest TLong = new TypeTest(t -> t.equals(LongType), "__cedar::Long");
     final static TypeTest TString = new TypeTest(t -> t.equals(StringType), "__cedar::String");
     final static TypeTest TTypeOfEntity = new TypeTest(t -> t == TypeOfEntityType, "Entity");
-    final static TypeTest TSet = new TypeTest(t -> t instanceof AntlrSetType, "Set<?>");
+    final static TypeTest TSet = new TypeTest(t -> t instanceof SetType, "Set<?>");
     final static TypeTest TRecord = new TypeTest(
-            t -> t instanceof AntlrRecordType, "Record, Entity, Action");
+            t -> t instanceof RecordType, "Record, Entity, Action");
     final static TypeTest TEntityOrAction = new TypeTest(
             t -> isEntity(t) || isAction(t), "Entity, Action");
     final static TypeTest TEntity = new TypeTest(InvariantTyping::isEntity, "Entity");
     final static TypeTest TAction = new TypeTest(InvariantTyping::isAction, "Action");
 
-    private static boolean isAction(AntlrBuiltinType type) {
-        return type instanceof AntlrTypeReference ref && ref.getName().equals("Action");
+    private static boolean isAction(BuiltinType type) {
+        return type instanceof TypeReference ref && ref.getName().equals("Action");
     }
 
-    private static boolean isEntity(AntlrBuiltinType type) {
-        return type instanceof AntlrTypeReference ref && !ref.getName().equals("Action");
+    private static boolean isEntity(BuiltinType type) {
+        return type instanceof TypeReference ref && !ref.getName().equals("Action");
     }
 
-    static TypeTest expect(AntlrBuiltinType actual, TypeTest ...tests) {
+    static TypeTest expect(BuiltinType actual, TypeTest ...tests) {
         for (TypeTest test : tests) {
             if (test.test().apply(actual)) {
                 return test;
@@ -55,35 +55,35 @@ public class InvariantTyping {
     }
 
 
-    static TypeTest expect(AntlrBuiltinType actual, List<TypeTest> tests) {
+    static TypeTest expect(BuiltinType actual, List<TypeTest> tests) {
         return expect(actual, tests.toArray(new TypeTest[0]));
     }
 
-    static TypeTest expectCompatible(AntlrBuiltinType one, AntlrBuiltinType another, TypeTest ...tests) {
+    static TypeTest expectCompatible(BuiltinType one, BuiltinType another, TypeTest ...tests) {
         return expect(another,  expect(one, tests));
     }
 
-    static TypeTest expectCompatible(AntlrBuiltinType one, AntlrBuiltinType another, List<TypeTest> tests) {
+    static TypeTest expectCompatible(BuiltinType one, BuiltinType another, List<TypeTest> tests) {
         return expectCompatible(one, another, tests.toArray(new TypeTest[0]));
     }
 
-    InvariantTyping(AntlrSchema schema) {
+    InvariantTyping(Schema schema) {
         this.schema = schema;
     }
 
-    AntlrBuiltinType convert(AntlrBuiltinType def) {
+    BuiltinType convert(BuiltinType def) {
         return switch (def) {
-            case AntlrBooleanType t -> BooleanType;
-            case AntlrLongType t -> LongType;
-            case AntlrStringType t -> StringType;
-            case AntlrSetType t -> new AntlrSetType(convert(t.getElementType()));
-            case AntlrRecordType t -> {
-                Map<AntlrRecordType.Attribute, AntlrBuiltinType> attrs = t.getAttributes().entrySet()
+            case BooleanType t -> BooleanType;
+            case LongType t -> LongType;
+            case StringType t -> StringType;
+            case SetType t -> new SetType(convert(t.getElementType()));
+            case RecordType t -> {
+                Map<RecordType.Attribute, BuiltinType> attrs = t.getAttributes().entrySet()
                         .stream()
                         .collect(Collectors.toMap(Map.Entry::getKey, v -> convert(v.getValue())));
-                yield new AntlrRecordType(attrs);
+                yield new RecordType(attrs);
             }
-            case AntlrTypeReference c -> c;
+            case TypeReference c -> c;
             default -> throw new TranslationError("Unsupported type: " + def);
         };
     }

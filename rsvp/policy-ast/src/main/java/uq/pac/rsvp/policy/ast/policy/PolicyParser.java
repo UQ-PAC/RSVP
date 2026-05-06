@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import uq.pac.rsvp.policy.ast.CedarLexer;
 import uq.pac.rsvp.policy.ast.CedarParser;
+import uq.pac.rsvp.policy.ast.policy.parser.SourceVisitor;
 import uq.pac.rsvp.support.FileSource;
 
 import java.util.Collection;

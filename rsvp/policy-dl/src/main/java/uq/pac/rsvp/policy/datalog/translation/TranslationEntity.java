@@ -1,6 +1,6 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrEntityType;
+import uq.pac.rsvp.policy.ast.schema.statement.EntityType;
 import uq.pac.rsvp.policy.ast.entity.*;
 import uq.pac.rsvp.policy.datalog.ast.*;
 
@@ -15,7 +15,7 @@ import static uq.pac.rsvp.Assertion.require;
 
 /**
  * Translation of a concrete entities to Datalog. As per entity definition
- * (see {@link AntlrEntityType}) a concrete entity translates into a collection
+ * (see {@link EntityType}) a concrete entity translates into a collection
  * of datalog facts for relations provided by the definition.
  */
 public class TranslationEntity {

@@ -1,9 +1,9 @@
 package uq.pac.rsvp.policy.datalog.invariant;
 
-import uq.pac.rsvp.policy.ast.expr.Expression;
-import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
-import uq.pac.rsvp.policy.ast.invariant.Quantifier;
-import uq.pac.rsvp.policy.ast.invariant.Invariant;
+import uq.pac.rsvp.policy.ast.policy.expr.Expression;
+import uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression;
+import uq.pac.rsvp.policy.ast.policy.Quantifier;
+import uq.pac.rsvp.policy.ast.policy.Invariant;
 
 /**
  * Transformation for invariants.

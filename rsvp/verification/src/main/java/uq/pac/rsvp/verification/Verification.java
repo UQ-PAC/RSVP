@@ -1,13 +1,18 @@
 package uq.pac.rsvp.verification;
 
 import uq.pac.rsvp.RsvpException;
-import uq.pac.rsvp.policy.ast.Policy;
-import uq.pac.rsvp.policy.ast.PolicyProgram;
-import uq.pac.rsvp.policy.ast.Statement;
-import uq.pac.rsvp.policy.ast.entity.Entity;
-import uq.pac.rsvp.policy.ast.entity.EntitySet;
-import uq.pac.rsvp.policy.ast.invariant.Invariant;
-import uq.pac.rsvp.policy.ast.parser.PolicyParser;
+import uq.pac.rsvp.policy.ast.AstNode;
+import uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.CallExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.ConditionalExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.PropertyAccessExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.RecordExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.SetExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression;
+import uq.pac.rsvp.policy.ast.policy.Invariant;
+import uq.pac.rsvp.policy.ast.policy.Policy;
+import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitorImpl;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantAssignment;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 import uq.pac.rsvp.policy.datalog.translation.Request;

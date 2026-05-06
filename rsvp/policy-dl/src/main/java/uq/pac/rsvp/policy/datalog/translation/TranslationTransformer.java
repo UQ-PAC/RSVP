@@ -1,11 +1,11 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrBooleanType;
+import uq.pac.rsvp.policy.ast.policy.expr.*;
+import uq.pac.rsvp.policy.ast.schema.type.BooleanType;
 import uq.pac.rsvp.policy.ast.policy.Policy;
-import uq.pac.rsvp.policy.ast.expr.*;
-import uq.pac.rsvp.policy.ast.invariant.Invariant;
-import uq.pac.rsvp.policy.ast.invariant.Quantifier;
-import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
+import uq.pac.rsvp.policy.ast.policy.Invariant;
+import uq.pac.rsvp.policy.ast.policy.Quantifier;
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantFunctionValidator;
 
 import java.util.*;
@@ -13,8 +13,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static uq.pac.rsvp.policy.ast.expr.BinaryExpression.BinaryOp.*;
-import static uq.pac.rsvp.policy.ast.expr.UnaryExpression.UnaryOp.*;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.*;
+import static uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression.UnaryOp.*;
 import static uq.pac.rsvp.Assertion.require;
 
 /**
@@ -67,7 +67,7 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
                     // for the time being.
                     InvariantFunctionValidator.FunctionValidator val =
                             InvariantFunctionValidator.getValidator(call.getFunc());
-                    return val != null && val.getReturnType() instanceof AntlrBooleanType;
+                    return val != null && val.getReturnType() instanceof BooleanType;
                 }
                 return false;
             };

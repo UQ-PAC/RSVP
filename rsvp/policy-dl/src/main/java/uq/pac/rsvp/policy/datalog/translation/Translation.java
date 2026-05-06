@@ -33,7 +33,7 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Multimap;
 
 import uq.pac.rsvp.RsvpException;
-import uq.pac.rsvp.policy.ast.antlrschema.AntlrSchema;
+import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
@@ -45,7 +45,7 @@ import uq.pac.rsvp.policy.datalog.ast.DLRule;
 import uq.pac.rsvp.policy.datalog.ast.DLRuleDecl;
 import uq.pac.rsvp.policy.datalog.ast.DLTerm;
 import uq.pac.rsvp.policy.datalog.entity.EntityValidator;
-import uq.pac.rsvp.policy.ast.invariant.Invariant;
+import uq.pac.rsvp.policy.ast.policy.Invariant;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantValidator;
 
@@ -54,7 +54,7 @@ import uq.pac.rsvp.policy.datalog.invariant.InvariantValidator;
  */
 public class Translation {
 
-    private final AntlrSchema schema;
+    private final Schema schema;
     private final Collection<Policy> policies;
     private final EntitySet entities;
     private final Collection<Invariant> invariants;
@@ -93,7 +93,7 @@ public class Translation {
         }
     }
 
-    record InputSet(AntlrSchema schema, Collection<Policy> policies, EntitySet entities, Collection<Invariant> invariants) {}
+    record InputSet(Schema schema, Collection<Policy> policies, EntitySet entities, Collection<Invariant> invariants) {}
 
     static InputSet validate(Path schemaFile, Path policyFile, Path entityFile, Path invariantsFile) throws IOException, AuthException, RsvpException, IllegalAccessException {
         EntitySet entities = EntitySet.parse(entityFile);
@@ -121,7 +121,7 @@ public class Translation {
 
         // For the moment we do not support arbitrary action names as Cedar does,
         // just standard non-empty identifiers
-        AntlrSchema rsvpSchema = AntlrSchema.parse(schemaFile);
+        Schema rsvpSchema = Schema.parse(schemaFile);
         Pattern actionPattern = Pattern.compile("^Action::\"[A-Za-z_][A-Za-z_0-9]*\"$");
         rsvpSchema.actions().forEach(a -> {
             if (!actionPattern.matcher(a.getBaseName()).matches()) {
@@ -192,7 +192,7 @@ public class Translation {
         return new InputSet(rsvpSchema, policies, entities, invariants);
     }
 
-    private DLProgram translate(AntlrSchema schema, Collection<Policy> policies, EntitySet entities, Collection<Invariant> invariants) {
+    private DLProgram translate(Schema schema, Collection<Policy> policies, EntitySet entities, Collection<Invariant> invariants) {
         TranslationSchema translationSchema = new TranslationSchema(schema);
         TranslationEntitySet translationEntities = new TranslationEntitySet(entities, translationSchema);
         Collection<TranslationPolicy> translationPermitPolicies = policies.stream()
@@ -390,7 +390,7 @@ public class Translation {
         return result;
     }
 
-    public AntlrSchema getSchema() {
+    public Schema getSchema() {
         return schema;
     }
 

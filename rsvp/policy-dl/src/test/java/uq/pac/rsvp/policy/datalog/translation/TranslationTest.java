@@ -8,16 +8,15 @@ import com.cedarpolicy.model.AuthorizationSuccessResponse;
 import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.exception.AuthException;
 import com.cedarpolicy.model.policy.PolicySet;
-import com.cedarpolicy.model.schema.Schema;
 import org.fusesource.jansi.Ansi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
-import uq.pac.rsvp.policy.ast.antlrschema.AntlrSchema;
+import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.datalog.TestUtil;
 import uq.pac.rsvp.policy.datalog.entity.EntityValidator;
-import uq.pac.rsvp.policy.ast.invariant.Invariant;
+import uq.pac.rsvp.policy.ast.policy.Invariant;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 import uq.pac.rsvp.StdLogger;
 
@@ -149,7 +148,7 @@ public class TranslationTest {
         // Validate Entities
         // FIXME: Add overall validation
         EntitySet rsvpEntities = EntitySet.parse(test.entities);
-        AntlrSchema rsvpSchema = AntlrSchema.parse(test.schema);
+        Schema rsvpSchema = Schema.parse(test.schema);
         EntityValidator.validate(rsvpSchema, rsvpEntities);
 
         Translation translation = new Translation(test.schema, test.policy,
@@ -171,7 +170,7 @@ public class TranslationTest {
         AuthorizationEngine cedarAuth = new BasicAuthorizationEngine();
         Entities cedarEntities = Entities.parse(test.entities);
 
-        Schema cedarSchema = Schema.parse(Schema.JsonOrCedar.Cedar, Files.readString(test.schema));
+        com.cedarpolicy.model.schema.Schema cedarSchema = com.cedarpolicy.model.schema.Schema.parse(com.cedarpolicy.model.schema.Schema.JsonOrCedar.Cedar, Files.readString(test.schema));
         PolicySet cedarPolicies = PolicySet.parsePolicies(test.policy);
 
         int [] rsvpRequestCounter = new int [2];

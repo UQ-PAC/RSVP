@@ -3,7 +3,7 @@ package uq.pac.rsvp.policy.datalog.invariant;
 import org.fusesource.jansi.Ansi;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import uq.pac.rsvp.policy.ast.antlrschema.AntlrSchema;
+import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
 import uq.pac.rsvp.policy.datalog.TestUtil;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
@@ -22,7 +22,7 @@ public class InvariantValidatorTest {
 
     public InvariantValidatorTest() throws IOException {
         Path schemaPath = TestUtil.getResourceDir( "invariant", "schema.cedarschema");
-        AntlrSchema schema = AntlrSchema.parse(schemaPath);
+        Schema schema = Schema.parse(schemaPath);
         this.validator = new InvariantValidator(schema);
     }
 

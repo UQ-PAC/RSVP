@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import uq.pac.rsvp.policy.ast.policy.expr.PropertyAccessExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.VariableExpression;
 
 
 @DisplayName("Property Access Expression")

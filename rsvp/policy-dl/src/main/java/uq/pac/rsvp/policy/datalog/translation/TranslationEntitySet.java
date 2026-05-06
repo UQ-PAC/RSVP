@@ -2,7 +2,7 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrRecordEntityType;
+import uq.pac.rsvp.policy.ast.schema.statement.RecordEntityType;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.datalog.ast.DLFact;
 
@@ -26,7 +26,7 @@ public class TranslationEntitySet {
         // Generate undefined (UID-only) entities omitting Enum entities
         // that have pre-defined names
         for (TranslationEntityDefinition def : schema.getDefinitions()) {
-            if (def.getEntityType() instanceof AntlrRecordEntityType) {
+            if (def.getEntityType() instanceof RecordEntityType) {
                 entityList.add(new TranslationEntity(def, TranslationConstants.getUndefinedEUID(def)));
             }
         }

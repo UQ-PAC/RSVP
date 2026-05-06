@@ -4,9 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import uq.pac.rsvp.policy.ast.PolicySet;
-import uq.pac.rsvp.policy.ast.expr.ActionExpression;
-import uq.pac.rsvp.policy.ast.expr.EntityExpression;
-import uq.pac.rsvp.policy.ast.expr.Expression;
+import uq.pac.rsvp.policy.ast.policy.expr.ActionExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.EntityExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.Expression;
 import uq.pac.rsvp.support.FileSource;
 import uq.pac.rsvp.support.SourceLoc;
 

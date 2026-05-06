@@ -2,8 +2,8 @@ package uq.pac.rsvp.policy.datalog.invariant;
 
 import java.util.Set;
 
-import uq.pac.rsvp.policy.ast.invariant.Quantifier;
-import uq.pac.rsvp.policy.ast.invariant.Invariant;
+import uq.pac.rsvp.policy.ast.policy.Quantifier;
+import uq.pac.rsvp.policy.ast.policy.Invariant;
 import uq.pac.rsvp.policy.datalog.translation.Relation;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 

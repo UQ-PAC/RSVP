@@ -3,9 +3,9 @@ package uq.pac.rsvp.policy.ast.deserialisation;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
-import uq.pac.rsvp.policy.ast.expr.ActionExpression;
-import uq.pac.rsvp.policy.ast.expr.EntityExpression;
-import uq.pac.rsvp.policy.ast.expr.EuidExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.ActionExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.EntityExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.EuidExpression;
 import uq.pac.rsvp.support.SourceLoc;
 
 import java.lang.reflect.Type;

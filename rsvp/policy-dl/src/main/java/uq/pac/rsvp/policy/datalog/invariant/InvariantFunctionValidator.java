@@ -1,7 +1,7 @@
 package uq.pac.rsvp.policy.datalog.invariant;
 
-import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrBuiltinType;
-import uq.pac.rsvp.policy.ast.antlrschema.type.AntlrSetType;
+import uq.pac.rsvp.policy.ast.schema.type.BuiltinType;
+import uq.pac.rsvp.policy.ast.schema.type.SetType;
 
 import java.util.*;
 
@@ -32,9 +32,9 @@ public class InvariantFunctionValidator {
         protected final String name;
         protected final List<InvariantTyping.TypeTest> self;
         protected final List<List<InvariantTyping.TypeTest>> arguments;
-        protected final AntlrBuiltinType returnType;
+        protected final BuiltinType returnType;
 
-        FunctionValidator(String name, List<InvariantTyping.TypeTest> self, List<List<InvariantTyping.TypeTest>> arguments, AntlrBuiltinType returnType) {
+        FunctionValidator(String name, List<InvariantTyping.TypeTest> self, List<List<InvariantTyping.TypeTest>> arguments, BuiltinType returnType) {
             this.name = name;
             this.self = self == null ? List.of() : self;
             this.arguments = List.copyOf(arguments);
@@ -45,9 +45,9 @@ public class InvariantFunctionValidator {
             return name;
         }
 
-        void post(AntlrBuiltinType actualSelf, List<AntlrBuiltinType> actualArguments) { }
+        void post(BuiltinType actualSelf, List<BuiltinType> actualArguments) { }
 
-        AntlrBuiltinType validate(AntlrBuiltinType actualSelf, List<AntlrBuiltinType> actualArguments) {
+        BuiltinType validate(BuiltinType actualSelf, List<BuiltinType> actualArguments) {
             if (actualSelf != null && self.isEmpty()) {
                 throw new InvariantValidator.Error("Function %s requires no object application", getName());
             } else if (actualSelf == null && !self.isEmpty()) {
@@ -68,7 +68,7 @@ public class InvariantFunctionValidator {
             return returnType;
         }
 
-        public AntlrBuiltinType getReturnType() {
+        public BuiltinType getReturnType() {
             return returnType;
         }
     }
@@ -88,12 +88,12 @@ public class InvariantFunctionValidator {
         }
 
         @Override
-        void post(AntlrBuiltinType actualSelf, List<AntlrBuiltinType> actualArguments) {
-            require(actualSelf instanceof AntlrSetType);
+        void post(BuiltinType actualSelf, List<BuiltinType> actualArguments) {
+            require(actualSelf instanceof SetType);
             require(actualArguments.size() == 1);
             require(arguments.size() == 1);
 
-            AntlrBuiltinType element = ((AntlrSetType) actualSelf).getElementType();
+            BuiltinType element = ((SetType) actualSelf).getElementType();
             InvariantTyping.expectCompatible(element, actualArguments.getFirst(), this.arguments.getFirst());
         }
     }
@@ -104,14 +104,14 @@ public class InvariantFunctionValidator {
         }
 
         @Override
-        void post(AntlrBuiltinType actualSelf, List<AntlrBuiltinType> actualArguments) {
-            require(actualSelf instanceof AntlrSetType);
+        void post(BuiltinType actualSelf, List<BuiltinType> actualArguments) {
+            require(actualSelf instanceof SetType);
             require(actualArguments.size() == 1);
-            require(actualArguments.getFirst() instanceof AntlrSetType);
+            require(actualArguments.getFirst() instanceof SetType);
             require(arguments.size() == 1);
 
-            AntlrBuiltinType selfElement = ((AntlrSetType) actualSelf).getElementType();
-            AntlrBuiltinType argElement = ((AntlrSetType) actualArguments.getFirst()).getElementType();
+            BuiltinType selfElement = ((SetType) actualSelf).getElementType();
+            BuiltinType argElement = ((SetType) actualArguments.getFirst()).getElementType();
 
             InvariantTyping.expectCompatible(selfElement, argElement,
                     getValidator("contains").arguments.getFirst());

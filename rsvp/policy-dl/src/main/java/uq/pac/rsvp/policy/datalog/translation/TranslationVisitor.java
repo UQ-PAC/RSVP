@@ -1,8 +1,8 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import uq.pac.rsvp.policy.ast.expr.*;
+import uq.pac.rsvp.policy.ast.policy.expr.*;
 import uq.pac.rsvp.policy.datalog.ast.*;
-import uq.pac.rsvp.policy.ast.invariant.Quantifier;
+import uq.pac.rsvp.policy.ast.policy.Quantifier;
 import uq.pac.rsvp.policy.datalog.visitors.VoidVisitorAdapter;
 
 import java.util.ArrayList;

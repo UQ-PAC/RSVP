@@ -1,6 +1,6 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import uq.pac.rsvp.policy.ast.antlrschema.AntlrSchema;
+import uq.pac.rsvp.policy.ast.schema.Schema;
 
 import java.util.*;
 
@@ -9,9 +9,9 @@ import java.util.*;
  */
 public class TranslationSchema {
     private final Map<String, TranslationEntityDefinition> entityTypes;
-    private final AntlrSchema schema;
+    private final Schema schema;
 
-    TranslationSchema(AntlrSchema schema) {
+    TranslationSchema(Schema schema) {
         this.schema = schema;
         Map<String, TranslationEntityDefinition> data = new HashMap<>();
         schema.entityTypes()
@@ -26,7 +26,7 @@ public class TranslationSchema {
         entityTypes = Collections.unmodifiableMap(data);
     }
 
-    public AntlrSchema getSchema() {
+    public Schema getSchema() {
         return schema;
     }
 

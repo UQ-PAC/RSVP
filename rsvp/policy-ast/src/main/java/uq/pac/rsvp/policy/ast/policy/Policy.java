@@ -4,18 +4,18 @@ import java.util.*;
 
 import com.google.gson.annotations.SerializedName;
 
-import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
-import uq.pac.rsvp.policy.ast.expr.BooleanExpression;
-import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.BooleanExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression;
 import uq.pac.rsvp.support.SourceLoc;
 
-import uq.pac.rsvp.policy.ast.expr.Expression;
-import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
-import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
+import uq.pac.rsvp.policy.ast.policy.expr.Expression;
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
 
 import static uq.pac.rsvp.policy.ast.policy.Policy.Effect.Permit;
-import static uq.pac.rsvp.policy.ast.expr.BinaryExpression.BinaryOp.And;
-import static uq.pac.rsvp.policy.ast.expr.UnaryExpression.UnaryOp.Not;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.And;
+import static uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression.UnaryOp.Not;
 
 public class Policy extends PolicyStatement {
 

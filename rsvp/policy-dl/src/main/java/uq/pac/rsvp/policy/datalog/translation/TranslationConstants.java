@@ -1,10 +1,10 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
 import com.cedarpolicy.value.EntityUID;
-import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrEntityType;
+import uq.pac.rsvp.policy.ast.schema.statement.EntityType;
 import uq.pac.rsvp.policy.ast.entity.EntityReference;
 import uq.pac.rsvp.policy.datalog.ast.*;
-import uq.pac.rsvp.policy.ast.invariant.Invariant;
+import uq.pac.rsvp.policy.ast.policy.Invariant;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -165,7 +165,7 @@ public class TranslationConstants {
 	/**
 	 * Get a declaration for a unary entity relation
 	*/
-    public static DLRuleDecl getEntityRuleDecl(AntlrEntityType entity) {
+    public static DLRuleDecl getEntityRuleDecl(EntityType entity) {
         String name = "Entity_" + entity.getName().replace(':', '_');
         DLDeclTerm term = new DLDeclTerm("euid", DLType.SYMBOL);
         return new DLRuleDecl(name, term);
@@ -243,7 +243,7 @@ public class TranslationConstants {
     /**
      * Get a UID from a definition
      */
-    public static EntityUID getEUID(AntlrEntityType def, String uid) {
+    public static EntityUID getEUID(EntityType def, String uid) {
         return EntityUID.parse("%s::\"%s\"".formatted(def.getName(), uid)).orElseThrow();
     }
 
@@ -264,7 +264,7 @@ public class TranslationConstants {
      * Get an unknown entity (UID) only. Abstraction over entities that can be given for
      * authorisation but are not in the provided list of entities
      */
-    public static EntityUID getUndefinedEUID(AntlrEntityType def) {
+    public static EntityUID getUndefinedEUID(EntityType def) {
         return getEUID(def, UndefinedEntityUIDName);
     }
 

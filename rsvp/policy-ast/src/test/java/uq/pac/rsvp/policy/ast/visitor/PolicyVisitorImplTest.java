@@ -13,12 +13,13 @@ import org.junit.jupiter.api.Test;
 
 import uq.pac.rsvp.policy.ast.deserialisation.PolicyJsonParser;
 import uq.pac.rsvp.policy.ast.PolicySet;
-import uq.pac.rsvp.policy.ast.expr.BooleanExpression;
-import uq.pac.rsvp.policy.ast.expr.EntityExpression;
-import uq.pac.rsvp.policy.ast.expr.LongExpression;
-import uq.pac.rsvp.policy.ast.expr.SlotExpression;
-import uq.pac.rsvp.policy.ast.expr.StringExpression;
-import uq.pac.rsvp.policy.ast.expr.VariableExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.BooleanExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.EntityExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.LongExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.SlotExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.StringExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.VariableExpression;
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitorImpl;
 
 @DisplayName("Abstract policy visitor")
 public class PolicyVisitorImplTest {

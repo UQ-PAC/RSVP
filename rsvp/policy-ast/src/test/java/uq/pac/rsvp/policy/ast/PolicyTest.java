@@ -20,12 +20,12 @@ import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.support.SourceLoc;
 
 import uq.pac.rsvp.policy.ast.policy.Policy.Effect;
-import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
-import uq.pac.rsvp.policy.ast.expr.BooleanExpression;
-import uq.pac.rsvp.policy.ast.expr.Expression;
-import uq.pac.rsvp.policy.ast.expr.StringExpression;
-import uq.pac.rsvp.policy.ast.expr.VariableExpression;
-import uq.pac.rsvp.policy.ast.expr.BinaryExpression.BinaryOp;
+import uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.BooleanExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.Expression;
+import uq.pac.rsvp.policy.ast.policy.expr.StringExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.VariableExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp;
 
 @DisplayName("Policy AST")
 public class PolicyTest {

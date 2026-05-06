@@ -1,7 +1,5 @@
 package uq.pac.rsvp.policy.ast.policy;
 
-import uq.pac.rsvp.policy.ast.invariant.Invariant;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

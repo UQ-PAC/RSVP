@@ -1,10 +1,10 @@
 package uq.pac.rsvp.policy.datalog.visitors;
 
 import uq.pac.rsvp.policy.ast.policy.Policy;
-import uq.pac.rsvp.policy.ast.expr.*;
-import uq.pac.rsvp.policy.ast.invariant.Invariant;
-import uq.pac.rsvp.policy.ast.invariant.Quantifier;
-import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
+import uq.pac.rsvp.policy.ast.policy.Invariant;
+import uq.pac.rsvp.policy.ast.policy.Quantifier;
+import uq.pac.rsvp.policy.ast.policy.expr.*;
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 
 public class ValueVisitorAdapter<T> implements PolicyComputationVisitor<T> {

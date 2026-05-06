@@ -1,12 +1,12 @@
 package uq.pac.rsvp.policy.datalog.entity;
 
-import uq.pac.rsvp.policy.ast.antlrschema.AntlrSchema;
-import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrCommonType;
-import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrEntityType;
-import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrEnumEntityType;
-import uq.pac.rsvp.policy.ast.antlrschema.statement.AntlrRecordEntityType;
-import uq.pac.rsvp.policy.ast.antlrschema.type.*;
-import uq.pac.rsvp.policy.ast.antlrschema.visitor.AntlrSchemaPayloadVisitor;
+import uq.pac.rsvp.policy.ast.schema.Schema;
+import uq.pac.rsvp.policy.ast.schema.statement.CommonType;
+import uq.pac.rsvp.policy.ast.schema.statement.EntityType;
+import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityType;
+import uq.pac.rsvp.policy.ast.schema.statement.RecordEntityType;
+import uq.pac.rsvp.policy.ast.schema.type.*;
+import uq.pac.rsvp.policy.ast.schema.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.entity.*;
 
 import java.util.HashSet;
@@ -20,15 +20,15 @@ import static uq.pac.rsvp.Assertion.require;
 /**
  * Validation of a set of entities with respect to a schema.
  * <p>
- * The main API function is {@link EntityValidator#validate(AntlrSchema, EntitySet)}
+ * The main API function is {@link EntityValidator#validate(Schema, EntitySet)}
  * that ensures that the set of entities is consistent with the provided schema
  * and returns a possibly updated set of entities. For instance, if the input
  * set does not include entities from enum-style entity definitions this validator
  * will generate them
  */
-public class EntityValidator implements AntlrSchemaPayloadVisitor<EntityValue> {
+public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
 
-    private final AntlrSchema schema;
+    private final Schema schema;
     private final EntitySet entities;
     // UIDs of all entities
     private Set<EntityReference> uids;
@@ -36,14 +36,14 @@ public class EntityValidator implements AntlrSchemaPayloadVisitor<EntityValue> {
     private final Set<EntityReference> references;
     private final static Pattern ESCAPED = Pattern.compile("[\b\t\n\r\"\\\\]");
 
-    private EntityValidator(AntlrSchema schema, EntitySet entities) {
+    private EntityValidator(Schema schema, EntitySet entities) {
         this.schema = schema;
         this.entities = entities;
         this.uids = new HashSet<>();
         this.references = new HashSet<>();
     }
 
-    public static EntitySet validate(AntlrSchema schema, EntitySet entities) {
+    public static EntitySet validate(Schema schema, EntitySet entities) {
         return new EntityValidator(schema, entities).validate();
     }
 
@@ -96,8 +96,8 @@ public class EntityValidator implements AntlrSchemaPayloadVisitor<EntityValue> {
         }
 
         // Here we parse only the type. Then, if this is an action reference then the type name is 'Action'
-        AntlrTypeReference ref = AntlrTypeReference.parse(euid.getType());
-        AntlrEntityType def = schema.getEntityType(ref);
+        TypeReference ref = TypeReference.parse(euid.getType());
+        EntityType def = schema.getEntityType(ref);
         if (def == null) {
             if (ref.getBaseName().equals("Action")) {
                 throw new EntityException(entity.getSourceLoc(), "Action entity: " + entity.getEuid());
@@ -111,7 +111,7 @@ public class EntityValidator implements AntlrSchemaPayloadVisitor<EntityValue> {
             if (value instanceof EntityReference parent) {
                 // FIXME: Cache
                 Set<String> memberOf = def.getMemberOf().stream()
-                        .map(AntlrTypeReference::getName)
+                        .map(TypeReference::getName)
                         .collect(Collectors.toSet());
                 memberOf.add(def.getName());
                 if (!memberOf.contains(parent.getType())) {
@@ -131,7 +131,7 @@ public class EntityValidator implements AntlrSchemaPayloadVisitor<EntityValue> {
     }
 
     @Override
-    public void visitRecord(AntlrRecordType rec, EntityValue payload) {
+    public void visitRecord(RecordType rec, EntityValue payload) {
         RecordValue value = expectedType(payload, RecordValue.class, "record");
         rec.getAttributes().forEach((attr, type) -> {
             EntityValue attrValue = value.getValue(new AttributeName(attr.getName()));
@@ -151,13 +151,13 @@ public class EntityValidator implements AntlrSchemaPayloadVisitor<EntityValue> {
     }
 
     @Override
-    public void visitSet(AntlrSetType type, EntityValue payload) {
+    public void visitSet(SetType type, EntityValue payload) {
         SetValue value = expectedType(payload, SetValue.class, "set");
         value.getValues().forEach(v -> type.getElementType().process(this, v));
     }
 
     @Override
-    public void visitRecordEntity(AntlrRecordEntityType type, EntityValue payload) {
+    public void visitRecordEntity(RecordEntityType type, EntityValue payload) {
         EntityReference ref = expectedType(payload, EntityReference.class, "entity reference");
 
         if (!type.getName().equals(ref.getType())) {
@@ -170,7 +170,7 @@ public class EntityValidator implements AntlrSchemaPayloadVisitor<EntityValue> {
     }
 
     @Override
-    public void visitEnumEntity(AntlrEnumEntityType type, EntityValue payload) {
+    public void visitEnumEntity(EnumEntityType type, EntityValue payload) {
         EntityReference ref = expectedType(payload, EntityReference.class, "entity reference");
 
         if (!type.getName().equals(ref.getType())) {
@@ -187,27 +187,27 @@ public class EntityValidator implements AntlrSchemaPayloadVisitor<EntityValue> {
     }
 
     @Override
-    public void visitBoolean(AntlrBooleanType type, EntityValue payload) {
+    public void visitBoolean(BooleanType type, EntityValue payload) {
         expectedType(payload, BooleanValue.class, "boolean");
     }
 
     @Override
-    public void visitTypeReference(AntlrTypeReference reference, EntityValue payload) {
+    public void visitTypeReference(TypeReference reference, EntityValue payload) {
         schema.getStatement(reference).process(this, payload);
     }
 
     @Override
-    public void visitLong(AntlrLongType type, EntityValue payload) {
+    public void visitLong(LongType type, EntityValue payload) {
         expectedType(payload, LongValue.class, "long");
     }
 
     @Override
-    public void visitString(AntlrStringType type, EntityValue payload) {
+    public void visitString(StringType type, EntityValue payload) {
         expectedType(payload, StringValue.class, "string");
     }
 
     @Override
-    public void visitCommon(AntlrCommonType type, EntityValue payload) {
+    public void visitCommon(CommonType type, EntityValue payload) {
         type.getDefinition().process(this, payload);
     }
 }

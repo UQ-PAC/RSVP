@@ -2,14 +2,14 @@ package uq.pac.rsvp.policy.ast.policy;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
 import uq.pac.rsvp.policy.ast.CedarParser;
-import uq.pac.rsvp.policy.ast.expr.*;
-import uq.pac.rsvp.policy.ast.invariant.Invariant;
-import uq.pac.rsvp.policy.ast.invariant.Quantifier;
+import uq.pac.rsvp.policy.ast.policy.expr.*;
+import uq.pac.rsvp.policy.ast.policy.parser.ExpressionVisitor;
+import uq.pac.rsvp.policy.ast.policy.parser.SourceVisitor;
 import uq.pac.rsvp.support.FileSource;
 import uq.pac.rsvp.support.SourceLoc;
 
 import static uq.pac.rsvp.Assertion.require;
-import static uq.pac.rsvp.policy.ast.expr.BinaryExpression.BinaryOp.*;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.*;
 
 import java.util.ArrayList;
 import java.util.List;

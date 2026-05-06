@@ -1,7 +1,7 @@
 package uq.pac.rsvp.policy.ast.deserialisation;
 
 import com.google.gson.*;
-import uq.pac.rsvp.policy.ast.expr.*;
+import uq.pac.rsvp.policy.ast.policy.expr.*;
 
 import java.lang.reflect.Type;
 

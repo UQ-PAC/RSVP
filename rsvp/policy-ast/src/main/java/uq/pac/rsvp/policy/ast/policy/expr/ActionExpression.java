@@ -14,12 +14,6 @@ public class ActionExpression extends EuidExpression {
         this(eid, entityType, SourceLoc.MISSING);
     }
 
-    // Used by Gson
-    @SuppressWarnings("unused")
-    private ActionExpression() {
-        this(null, null, SourceLoc.MISSING);
-    }
-
     @Override
     public void accept(PolicyVisitor visitor) {
         visitor.visitActionExpr(this);

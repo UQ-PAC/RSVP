@@ -90,11 +90,6 @@ public class VoidVisitorAdapter implements PolicyVisitor {
     }
 
     @Override
-    public void visitSlotExpr(SlotExpression expr) {
-        unsupported(expr);
-    }
-
-    @Override
     public void visitStringExpr(StringExpression expr) {
         unsupported(expr);
     }

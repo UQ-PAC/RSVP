@@ -1,7 +1,5 @@
 package uq.pac.rsvp.policy.ast.policy.expr;
 
-import com.google.gson.annotations.SerializedName;
-
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
@@ -12,7 +10,6 @@ public class ConditionalExpression extends Expression {
 
     private final Expression then;
 
-    @SerializedName("else")
     private final Expression els;
 
     public ConditionalExpression(Expression condition, Expression then, Expression els, SourceLoc source) {
@@ -24,12 +21,6 @@ public class ConditionalExpression extends Expression {
 
     public ConditionalExpression(Expression condition, Expression then, Expression els) {
         this(condition, then, els, SourceLoc.MISSING);
-    }
-
-    // Used by Gson
-    @SuppressWarnings("unused")
-    private ConditionalExpression() {
-        this(null, null, null, SourceLoc.MISSING);
     }
 
     public Expression getCondition() {
@@ -63,7 +54,7 @@ public class ConditionalExpression extends Expression {
         sb.append(then.toString());
         if (els != null) {
             sb.append("; else ");
-            sb.append(els.toString());
+            sb.append(els);
         }
         sb.append(')');
         return sb.toString();

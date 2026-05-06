@@ -1,7 +1,6 @@
 package uq.pac.rsvp.policy.ast.policy.expr;
 
 
-import java.util.Collections;
 import java.util.List;
 
 import uq.pac.rsvp.support.SourceLoc;
@@ -33,12 +32,6 @@ public class CallExpression extends Expression {
         this(func, args, null);
     }
 
-    // Used by Gson
-    @SuppressWarnings("unused")
-    private CallExpression() {
-        this(null, null, Collections.emptyList(), SourceLoc.MISSING);
-    }
-
     public Expression getSelf() {
         return self;
     }
@@ -65,7 +58,7 @@ public class CallExpression extends Expression {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         if (self != null) {
-            sb.append(self.toString());
+            sb.append(self);
             sb.append('.');
         }
         sb.append(func);

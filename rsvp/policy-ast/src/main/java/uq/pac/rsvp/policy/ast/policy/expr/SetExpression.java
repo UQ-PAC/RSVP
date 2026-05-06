@@ -23,10 +23,6 @@ public class SetExpression extends Expression {
         this(elements, SourceLoc.MISSING);
     }
 
-    private SetExpression() {
-        this(null, SourceLoc.MISSING);
-    }
-
     public Set<Expression> getElements() {
         return elements;
     }

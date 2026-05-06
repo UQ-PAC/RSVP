@@ -1,8 +1,6 @@
 package uq.pac.rsvp.policy.ast.policy.expr;
 
 
-import com.google.gson.annotations.SerializedName;
-
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
@@ -10,49 +8,20 @@ import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
 public class BinaryExpression extends Expression {
 
     public enum BinaryOp {
-        @SerializedName("eq")
         Eq,
-
-        @SerializedName("neq")
         Neq,
-
-        @SerializedName("and")
         And,
-
-        @SerializedName("or")
         Or,
-
-        @SerializedName("lt")
         Less,
-
-        @SerializedName("leq")
         LessEq,
-
-        @SerializedName("gt")
         Greater,
-
-        @SerializedName("geq")
         GreaterEq,
-
-        @SerializedName("add")
         Add,
-
-        @SerializedName("sub")
         Sub,
-
-        @SerializedName("mul")
         Mul,
-
-        @SerializedName("in")
         In,
-
-        @SerializedName("like")
         Like,
-
-        @SerializedName("is")
         Is,
-
-        @SerializedName("has")
         HasAttr
     }
 
@@ -69,12 +38,6 @@ public class BinaryExpression extends Expression {
 
     public BinaryExpression(Expression left, BinaryOp op, Expression right) {
         this(left, op, right, SourceLoc.MISSING);
-    }
-
-    // Used by Gson
-    @SuppressWarnings("unused")
-    private BinaryExpression() {
-        this(null, null, null, SourceLoc.MISSING);
     }
 
     public Expression getLeft() {

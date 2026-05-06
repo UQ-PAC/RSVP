@@ -94,11 +94,6 @@ public class ValueVisitorAdapter<T> implements PolicyComputationVisitor<T> {
     }
 
     @Override
-    public T visitSlotExpr(SlotExpression expr) {
-        return unsupported(expr);
-    }
-
-    @Override
     public T visitStringExpr(StringExpression expr) {
         return unsupported(expr);
     }

@@ -2,11 +2,6 @@ package uq.pac.rsvp.policy.ast.policy;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import uq.pac.rsvp.policy.ast.policy.Invariant;
-import uq.pac.rsvp.policy.ast.policy.Quantifier;
-import uq.pac.rsvp.policy.ast.policy.Policy;
-import uq.pac.rsvp.policy.ast.policy.PolicyAstNode;
-import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
 import uq.pac.rsvp.policy.ast.policy.expr.*;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
 import uq.pac.rsvp.support.FileSource;
@@ -157,11 +152,6 @@ public class PolicyLocationTest {
             @Override
             public void visitLongExpr(LongExpression expr) {
                 assertLocation(fs, expr);
-            }
-
-            @Override
-            public void visitSlotExpr(SlotExpression expr) {
-                throw new AssertionError("Unsupported");
             }
 
             @Override

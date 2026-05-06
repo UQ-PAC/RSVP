@@ -11,7 +11,6 @@ import uq.pac.rsvp.policy.ast.policy.expr.LongExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.PropertyAccessExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.RecordExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.SetExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.SlotExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.StringExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.TypeExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression;
@@ -49,8 +48,6 @@ public interface PolicyVisitor {
     void visitEntityExpr(EntityExpression expr);
 
     void visitLongExpr(LongExpression expr);
-
-    void visitSlotExpr(SlotExpression expr);
 
     void visitStringExpr(StringExpression expr);
 

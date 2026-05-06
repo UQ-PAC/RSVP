@@ -2,7 +2,7 @@ package uq.pac.rsvp.policy.ast.policy.expr;
 
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
-import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;;
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
 
 public class LongExpression extends Expression {
 
@@ -15,12 +15,6 @@ public class LongExpression extends Expression {
 
     public LongExpression(long value) {
         this(value, SourceLoc.MISSING);
-    }
-
-    // Used by Gson
-    @SuppressWarnings("unused")
-    private LongExpression() {
-        this(-1, SourceLoc.MISSING);
     }
 
     public long getValue() {

@@ -260,11 +260,6 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
     }
 
     @Override
-    public BuiltinType visitSlotExpr(SlotExpression expr) {
-        throw new TranslationError("unsupported element: " + expr);
-    }
-
-    @Override
     public BuiltinType visitPolicy(Policy policy) {
         throw new TranslationError("unsupported element: " + policy);
     }

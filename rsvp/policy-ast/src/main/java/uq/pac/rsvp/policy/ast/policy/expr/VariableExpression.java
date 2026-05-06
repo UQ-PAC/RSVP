@@ -17,12 +17,6 @@ public class VariableExpression extends Expression {
         this(ref, SourceLoc.MISSING);
     }
 
-    // Used by Gson
-    @SuppressWarnings("unused")
-    private VariableExpression() {
-        this(null, SourceLoc.MISSING);
-    }
-
     public String getReference() {
         return ref;
     }

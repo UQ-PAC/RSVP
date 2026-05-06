@@ -2,33 +2,19 @@ package uq.pac.rsvp.policy.ast.policy.expr;
 
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
-import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;;
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
 
 public class StringExpression extends Expression {
 
     private final String value;
-    private final boolean quoted;
-
-    public StringExpression(String value, boolean quoted, SourceLoc source) {
-        super(source);
-        this.value = value;
-        this.quoted = quoted || !NICE_PROP_NAME.matcher(value).matches();
-    }
 
     public StringExpression(String value, SourceLoc source) {
-        this(value, true, source);
-    }
-
-    public StringExpression(String value, boolean quoted) {
-        this(value, quoted, SourceLoc.MISSING);
+        super(source);
+        this.value = value;
     }
 
     public StringExpression(String value) {
         this(value, SourceLoc.MISSING);
-    }
-
-    public StringExpression() {
-        this("", SourceLoc.MISSING);
     }
 
     public String getValue() {

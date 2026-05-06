@@ -75,17 +75,17 @@ public class Main {
         }
 
         try {
-            VerificationResult result = Verification.verifyPolicies(fileSet.policiesPaths,
+            Verification.VerificationResult result = Verification.verifyPolicies(fileSet.policiesPaths,
                     fileSet.schemaPaths, fileSet.entitiesPaths, fileSet.invariantsPaths);
             Set<Report> reports = result.getReports();
             for (Report report : reports) {
                 System.out.println(report.toString());
             }
 
-            Collection<RequestStatus> v = result.getChangeImpact();
+            Collection<Verification.RequestStatus> v = result.getChangeImpact();
             if (v != null) {
                 System.out.println("\nChange impact:\n-----------------------");
-                for (RequestStatus requestStatus : v) {
+                for (Verification.RequestStatus requestStatus : v) {
                     System.out.println(requestStatus.toString());
                 }
             }

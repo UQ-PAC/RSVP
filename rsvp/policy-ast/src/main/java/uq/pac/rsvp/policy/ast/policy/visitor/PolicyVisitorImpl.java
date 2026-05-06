@@ -12,7 +12,6 @@ import uq.pac.rsvp.policy.ast.policy.expr.LongExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.PropertyAccessExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.RecordExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.SetExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.SlotExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.StringExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.TypeExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression;
@@ -108,9 +107,6 @@ public abstract class PolicyVisitorImpl implements PolicyVisitor {
 
     @Override
     public void visitLongExpr(LongExpression expr) {}
-
-    @Override
-    public void visitSlotExpr(SlotExpression expr) {}
 
     @Override
     public void visitStringExpr(StringExpression expr) {}

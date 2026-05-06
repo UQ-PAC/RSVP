@@ -16,12 +16,6 @@ public class TypeExpression extends Expression {
         this(value, SourceLoc.MISSING);
     }
 
-    // Used by Gson
-    @SuppressWarnings("unused")
-    private TypeExpression() {
-        this(null, SourceLoc.MISSING);
-    }
-
     public String getValue() {
         return value;
     }

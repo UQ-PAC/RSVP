@@ -199,9 +199,4 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
     public Expression visitQuantifier(Quantifier quantifier) {
         throw new TranslationError("Unsupported transformation for: " + quantifier);
     }
-
-    @Override
-    public Expression visitSlotExpr(SlotExpression expr) {
-        throw new TranslationError("Unsupported transformation for: " + expr);
-    }
 }

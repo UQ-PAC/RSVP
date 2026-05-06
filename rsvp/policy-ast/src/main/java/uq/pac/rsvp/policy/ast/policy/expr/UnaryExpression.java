@@ -1,17 +1,12 @@
 package uq.pac.rsvp.policy.ast.policy.expr;
 
-import com.google.gson.annotations.SerializedName;
-
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
 
 public class UnaryExpression extends Expression {
-    public static enum UnaryOp {
-        @SerializedName("not")
+    public enum UnaryOp {
         Not,
-
-        @SerializedName("neg")
         Neg
     }
 
@@ -26,12 +21,6 @@ public class UnaryExpression extends Expression {
 
     public UnaryExpression(UnaryOp op, Expression expr) {
         this(op, expr, SourceLoc.MISSING);
-    }
-
-    // Used by Gson
-    @SuppressWarnings("unused")
-    private UnaryExpression() {
-        this(null, null, SourceLoc.MISSING);
     }
 
     public UnaryOp getOp() {

@@ -1,12 +1,12 @@
 package uq.pac.rsvp.policy.ast.policy.expr;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
-import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;;
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
 
 public class RecordExpression extends Expression {
 
@@ -14,35 +14,23 @@ public class RecordExpression extends Expression {
 
     public RecordExpression(Map<String, Expression> props, SourceLoc source) {
         super(source);
-        this.props = props != null ? new HashMap<>(props) : new HashMap<>();
+        this.props = props != null ? Map.copyOf(props) : Collections.emptyMap();
     }
 
     public RecordExpression(Map<String, Expression> props) {
         this(props, SourceLoc.MISSING);
     }
 
-    public RecordExpression() {
-        this(null, SourceLoc.MISSING);
-    }
-
-    public RecordExpression(SourceLoc location) {
-        this(null, location);
-    }
-
     public Map<String, Expression> getProperties() {
-        return Map.copyOf(props);
+        return props;
     }
 
     public Set<String> getPropertyNames() {
-        return Set.copyOf(props.keySet());
+        return props.keySet();
     }
 
     public Expression getProperty(String name) {
         return props.get(name);
-    }
-
-    public void setProperty(String name, Expression expr) {
-        props.put(name, expr);
     }
 
     @Override

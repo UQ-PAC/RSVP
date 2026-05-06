@@ -29,6 +29,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.HandlerMapping;
 
+import uq.pac.childrenclinic.user.GlobalModelAttributes;
+
 @Aspect
 @Component
 public class CedarAspect {

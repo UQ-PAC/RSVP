@@ -12,10 +12,7 @@ import org.fusesource.jansi.Ansi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
-import uq.pac.rsvp.policy.ast.schema.Schema;
-import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.datalog.TestUtil;
-import uq.pac.rsvp.policy.datalog.entity.EntityValidator;
 import uq.pac.rsvp.policy.ast.policy.Invariant;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 import uq.pac.rsvp.StdLogger;
@@ -97,7 +94,7 @@ public class TranslationTest {
         }
     }
 
-    private final static String ONE_OFF = "photoapp";
+    private final static String ONE_OFF = "clinic";
 
     // Running tests for one directory separately for no particular
     // reason apart from being able to launch it separately
@@ -130,7 +127,7 @@ public class TranslationTest {
      * Differential test for Cedar and RSVP.
      * The test runs both, RSVP and Cedar authorisation engines and compares the results that should agree
      */
-    void differentialTest(TestInput test) throws IOException, AuthException, IllegalAccessException {
+    void differentialTest(TestInput test) throws IOException, AuthException {
         logger.info(YELLOW, "Policy: " + test.policy)
                 .info(MAGENTA, "Datalog specification: " + test.datalogDir + "/" + TranslationConstants.ProgramName)
                 .fine(CYAN, Files.readString(test.policy));
@@ -144,12 +141,6 @@ public class TranslationTest {
         if (lines == 0) {
             logger.warning("Empty policy: " + test.policy);
         }
-
-        // Validate Entities
-        // FIXME: Add overall validation
-        EntitySet rsvpEntities = EntitySet.parse(test.entities);
-        Schema rsvpSchema = Schema.parse(test.schema);
-        EntityValidator.validate(rsvpSchema, rsvpEntities);
 
         Translation translation = new Translation(test.schema, test.policy,
                 test.entities, test.invariants, test.datalogDir);

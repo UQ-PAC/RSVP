@@ -1,19 +1,13 @@
 package uq.pac.rsvp.verification;
 
 import uq.pac.rsvp.policy.ast.AstNode;
-import uq.pac.rsvp.policy.ast.Policy;
 import uq.pac.rsvp.policy.ast.entity.Entity;
 import uq.pac.rsvp.policy.ast.entity.EntityReference;
 import uq.pac.rsvp.policy.ast.entity.EntityValue;
 import uq.pac.rsvp.policy.ast.entity.RecordValue;
-import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
-import uq.pac.rsvp.policy.ast.expr.CallExpression;
-import uq.pac.rsvp.policy.ast.expr.ConditionalExpression;
-import uq.pac.rsvp.policy.ast.expr.PropertyAccessExpression;
-import uq.pac.rsvp.policy.ast.expr.RecordExpression;
-import uq.pac.rsvp.policy.ast.expr.SetExpression;
-import uq.pac.rsvp.policy.ast.expr.UnaryExpression;
-import uq.pac.rsvp.policy.ast.visitor.PolicyVisitorImpl;
+import uq.pac.rsvp.policy.ast.policy.Policy;
+import uq.pac.rsvp.policy.ast.policy.expr.*;
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitorImpl;
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.support.reporting.Report;
 

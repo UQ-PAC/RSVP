@@ -57,7 +57,7 @@ public class PolicyProgram {
         return new PolicyProgram(PolicyParser.parse(file, text));
     }
 
-    public static PolicyProgram of(Collection<Statement> statements) {
+    public static PolicyProgram of(Collection<PolicyStatement> statements) {
         return new PolicyProgram(statements);
     }
 }

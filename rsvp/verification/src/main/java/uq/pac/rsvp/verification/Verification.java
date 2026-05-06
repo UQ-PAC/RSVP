@@ -1,18 +1,9 @@
 package uq.pac.rsvp.verification;
 
 import uq.pac.rsvp.RsvpException;
-import uq.pac.rsvp.policy.ast.AstNode;
-import uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.CallExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.ConditionalExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.PropertyAccessExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.RecordExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.SetExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression;
-import uq.pac.rsvp.policy.ast.policy.Invariant;
-import uq.pac.rsvp.policy.ast.policy.Policy;
-import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
-import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitorImpl;
+import uq.pac.rsvp.policy.ast.entity.Entity;
+import uq.pac.rsvp.policy.ast.entity.EntitySet;
+import uq.pac.rsvp.policy.ast.policy.*;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantAssignment;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 import uq.pac.rsvp.policy.datalog.translation.Request;
@@ -390,7 +381,7 @@ public class Verification {
     public static Set<Report> generateRandomReports(Set<List<Pair<String, Path>>> policies, Map<String, Path> schemas, Map<String, Path> entities, Map<String, Path> invariants) throws IOException, InterruptedException, IllegalAccessException {
         Set<Report> results = new HashSet<>();
 
-        List<Statement> programStatements = new ArrayList<>();
+        List<PolicyStatement> programStatements = new ArrayList<>();
         Set<Entity> entitySet = new HashSet<>();
 
         for (List<Pair<String, Path>> policyFile : policies) {

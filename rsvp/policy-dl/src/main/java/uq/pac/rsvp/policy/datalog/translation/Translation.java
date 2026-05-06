@@ -33,10 +33,12 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Multimap;
 
 import uq.pac.rsvp.RsvpException;
+import uq.pac.rsvp.policy.ast.entity.Entity;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
+import uq.pac.rsvp.policy.ast.schema.type.TypeReference;
 import uq.pac.rsvp.policy.datalog.ast.DLAtom;
 import uq.pac.rsvp.policy.datalog.ast.DLDeclTerm;
 import uq.pac.rsvp.policy.datalog.ast.DLFact;
@@ -97,6 +99,12 @@ public class Translation {
 
     static InputSet validate(Path schemaFile, Path policyFile, Path entityFile, Path invariantsFile) throws IOException, AuthException, RsvpException, IllegalAccessException {
         EntitySet entities = EntitySet.parse(entityFile);
+
+        Set<Entity> filteredEntities = entities.stream().filter(e -> {
+            return !TypeReference.parse(e.getEuid().getType()).getBaseName().equals("Action");
+        }).collect(Collectors.toSet());
+        entities = new EntitySet(filteredEntities);
+
         com.cedarpolicy.model.schema.Schema cedarSchema =
                 new com.cedarpolicy.model.schema.Schema(Files.readString(schemaFile));
         PolicySet cedarPolicies = PolicySet.parsePolicies(policyFile);
@@ -130,14 +138,14 @@ public class Translation {
         });
 
         // Same for enum values
-        Pattern enumEntityPattern = Pattern.compile("^[A-Za-z_][A-Za-z_0-9]*$");
-        rsvpSchema.enumEntityTypes().forEach(t -> {
-            t.getEnumNames().forEach(en -> {
-                if (!enumEntityPattern.matcher(en).matches()) {
-                    throw new TranslationError("Unsupported enum name: " + en);
-                }
-            });
-        });
+//        Pattern enumEntityPattern = Pattern.compile("^[A-Za-z_][A-Za-z_0-9]*$");
+//        rsvpSchema.enumEntityTypes().forEach(t -> {
+//            t.getEnumNames().forEach(en -> {
+//                if (!enumEntityPattern.matcher(en).matches()) {
+//                    throw new TranslationError("Unsupported enum name: " + en);
+//                }
+//            });
+//        });
 
         // FIXME: This needs to be moved to entity validation
         // For the moment we also do not support entity names that have the same

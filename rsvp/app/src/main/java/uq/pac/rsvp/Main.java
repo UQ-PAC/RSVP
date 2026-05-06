@@ -3,8 +3,6 @@ package uq.pac.rsvp;
 import uq.pac.rsvp.support.reporting.Report;
 import uq.pac.rsvp.verification.ConfigurationException;
 import uq.pac.rsvp.verification.Verification;
-import uq.pac.rsvp.policy.ast.policy.Policy;
-import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
 
 import java.io.IOException;
 import java.nio.file.Path;

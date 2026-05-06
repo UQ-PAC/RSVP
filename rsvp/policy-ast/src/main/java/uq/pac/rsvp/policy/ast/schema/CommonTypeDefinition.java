@@ -4,7 +4,7 @@ import uq.pac.rsvp.policy.ast.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.visitor.SchemaVisitor;
 
-public abstract class CommonTypeDefinition implements SchemaItem {
+public abstract class CommonTypeDefinition extends SchemaStatement {
 
     private final String definitionName;
 

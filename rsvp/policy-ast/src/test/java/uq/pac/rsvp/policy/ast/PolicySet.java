@@ -11,6 +11,7 @@ import com.cedarpolicy.model.exception.InternalException;
 
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.deserialisation.PolicyJsonParser;
+import uq.pac.rsvp.policy.ast.policy.Policy;
 
 public class PolicySet {
 

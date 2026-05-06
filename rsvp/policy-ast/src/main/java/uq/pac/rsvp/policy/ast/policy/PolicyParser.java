@@ -1,10 +1,9 @@
-package uq.pac.rsvp.policy.ast.parser;
+package uq.pac.rsvp.policy.ast.policy;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import uq.pac.rsvp.policy.ast.CedarLexer;
 import uq.pac.rsvp.policy.ast.CedarParser;
-import uq.pac.rsvp.policy.ast.Statement;
 import uq.pac.rsvp.support.FileSource;
 
 import java.util.Collection;
@@ -22,7 +21,7 @@ public class PolicyParser {
         }
     }
 
-    public static Collection<Statement> parse(String file, String text) {
+    public static Collection<PolicyStatement> parse(String file, String text) {
         ThrowingErrorListener errorListener = new ThrowingErrorListener();
 
         CedarLexer lexer = new CedarLexer(CharStreams.fromString(text));
@@ -35,10 +34,10 @@ public class PolicyParser {
         parser.addErrorListener(errorListener);
 
         FileSource fs = new FileSource(file, text);
-        StatementVisitor visitor = new StatementVisitor(fs);
-        return new SourceVisitor<List<Statement>>(fs) {
+        PolicyStatementVisitor visitor = new PolicyStatementVisitor(fs);
+        return new SourceVisitor<List<PolicyStatement>>(fs) {
             @Override
-            public List<Statement> visitProgram(CedarParser.ProgramContext ctx) {
+            public List<PolicyStatement> visitProgram(CedarParser.ProgramContext ctx) {
                 if (ctx.children != null) {
                     return ctx.children.stream().map(c -> c.accept(visitor)).toList();
                 }

@@ -1,4 +1,4 @@
-package uq.pac.rsvp.policy.ast;
+package uq.pac.rsvp.policy.ast.policy;
 
 import java.util.*;
 
@@ -13,11 +13,11 @@ import uq.pac.rsvp.policy.ast.expr.Expression;
 import uq.pac.rsvp.policy.ast.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 
-import static uq.pac.rsvp.policy.ast.Policy.Effect.Permit;
+import static uq.pac.rsvp.policy.ast.policy.Policy.Effect.Permit;
 import static uq.pac.rsvp.policy.ast.expr.BinaryExpression.BinaryOp.And;
 import static uq.pac.rsvp.policy.ast.expr.UnaryExpression.UnaryOp.Not;
 
-public class Policy extends Statement {
+public class Policy extends PolicyStatement {
 
     public enum Effect {
         @SerializedName("permit")

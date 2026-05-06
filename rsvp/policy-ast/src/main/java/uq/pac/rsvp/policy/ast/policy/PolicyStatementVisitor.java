@@ -1,9 +1,7 @@
-package uq.pac.rsvp.policy.ast.parser;
+package uq.pac.rsvp.policy.ast.policy;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
 import uq.pac.rsvp.policy.ast.CedarParser;
-import uq.pac.rsvp.policy.ast.Policy;
-import uq.pac.rsvp.policy.ast.Statement;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.ast.invariant.Quantifier;
@@ -18,7 +16,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-class StatementVisitor extends SourceVisitor<Statement> {
+class PolicyStatementVisitor extends SourceVisitor<PolicyStatement> {
 
     private final ExpressionVisitor expressions;
     private final PolicyNaming naming;
@@ -36,14 +34,14 @@ class StatementVisitor extends SourceVisitor<Statement> {
         }
     }
 
-    public StatementVisitor(FileSource fs) {
+    public PolicyStatementVisitor(FileSource fs) {
         super(fs);
         this.expressions = new ExpressionVisitor(fs);
         this.naming = new PolicyNaming();
     }
 
     @Override
-    public Statement visitInvariant(CedarParser.InvariantContext ctx) {
+    public PolicyStatement visitInvariant(CedarParser.InvariantContext ctx) {
         // Invariant expression
         Expression expr = expressions.visit(ctx.expression());
         // Quantifier is optional (defaults to ALL) unless variables are specified,
@@ -62,7 +60,7 @@ class StatementVisitor extends SourceVisitor<Statement> {
         return new Invariant(quantifier, expr, location(ctx));
     }
 
-    private String unquote(String s) {
+    private static String unquote(String s) {
         if (s != null) {
             return s.substring(1, s.length() - 1);
         }
@@ -140,7 +138,7 @@ class StatementVisitor extends SourceVisitor<Statement> {
     }
 
     @Override
-    public Statement visitPolicy(CedarParser.PolicyContext ctx) {
+    public PolicyStatement visitPolicy(CedarParser.PolicyContext ctx) {
         Policy.Builder builder = new Policy.Builder();
 
         if (ctx.annotation() != null) {

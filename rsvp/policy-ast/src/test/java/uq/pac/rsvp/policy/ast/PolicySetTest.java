@@ -20,6 +20,7 @@ import uq.pac.rsvp.policy.ast.expr.BinaryExpression;
 import uq.pac.rsvp.policy.ast.expr.CallExpression;
 import uq.pac.rsvp.policy.ast.expr.PropertyAccessExpression;
 import uq.pac.rsvp.policy.ast.expr.VariableExpression;
+import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitor;
 import uq.pac.rsvp.policy.ast.visitor.PolicyVisitorImpl;
 

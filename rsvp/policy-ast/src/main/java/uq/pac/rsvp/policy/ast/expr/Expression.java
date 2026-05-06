@@ -1,7 +1,7 @@
 package uq.pac.rsvp.policy.ast.expr;
 
 import java.util.regex.Pattern;
-import uq.pac.rsvp.policy.ast.PolicyAstNode;
+import uq.pac.rsvp.policy.ast.policy.PolicyAstNode;
 import uq.pac.rsvp.support.SourceLoc;
 
 public abstract class Expression extends PolicyAstNode {

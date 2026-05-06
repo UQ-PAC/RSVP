@@ -1,6 +1,6 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import uq.pac.rsvp.policy.ast.Policy;
+import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.expr.*;
 import uq.pac.rsvp.policy.ast.invariant.Invariant;
 import uq.pac.rsvp.policy.ast.invariant.Quantifier;

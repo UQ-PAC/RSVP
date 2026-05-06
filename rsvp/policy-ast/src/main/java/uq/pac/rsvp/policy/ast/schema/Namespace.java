@@ -27,11 +27,25 @@ public class Namespace {
     }
 
     public Namespace(String name) {
-        this(name, null, null, null);
+        this(name, null, null);
     }
 
     public Namespace() {
-        this("", null, null, null);
+        this("");
+    }
+
+    public Namespace add(SchemaStatement statement) {
+        switch (statement) {
+            case EntityTypeDefinition ent ->
+                    entityTypes.put(ent.getName(), ent);
+            case ActionDefinition action ->
+                    actions.put(action.getName(), action);
+            case CommonTypeDefinition type ->
+                    commonTypes.put(type.getName(), type);
+            default ->
+                throw new AssertionError("unreachable");
+        }
+        return this;
     }
 
     public String getName() {

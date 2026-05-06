@@ -7,7 +7,7 @@ import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.statement.RecordEntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.type.*;
 
-public interface SchemaValueVisitor<T> {
+public interface SchemaComputationVisitor<T> {
     default T visitSchema(Schema schema) {
         throw new AssertionError();
     }

@@ -9,7 +9,7 @@ import uq.pac.rsvp.policy.ast.schema.parser.StatementResolutionVisitor;
 import uq.pac.rsvp.policy.ast.schema.statement.*;
 import uq.pac.rsvp.policy.ast.schema.type.*;
 import uq.pac.rsvp.policy.ast.schema.visitor.SchemaPayloadVisitor;
-import uq.pac.rsvp.policy.ast.schema.visitor.SchemaValueVisitor;
+import uq.pac.rsvp.policy.ast.schema.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.schema.visitor.SchemaVisitor;
 import uq.pac.rsvp.policy.ast.schema.visitor.SchemaVisitorAdapter;
 import uq.pac.rsvp.support.SourceLoc;
@@ -243,7 +243,7 @@ public class Schema extends SchemaAstNode {
     }
 
     @Override
-    public <T> T compute(SchemaValueVisitor<T> visitor) {
+    public <T> T compute(SchemaComputationVisitor<T> visitor) {
         return visitor.visitSchema(this);
     }
 

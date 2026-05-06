@@ -2,7 +2,7 @@ package uq.pac.rsvp.policy.ast.schema.statement;
 
 import uq.pac.rsvp.policy.ast.schema.type.TypeReference;
 import uq.pac.rsvp.policy.ast.schema.visitor.SchemaPayloadVisitor;
-import uq.pac.rsvp.policy.ast.schema.visitor.SchemaValueVisitor;
+import uq.pac.rsvp.policy.ast.schema.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.schema.visitor.SchemaVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
@@ -39,7 +39,7 @@ public class ActionDefinition extends SchemaStatement {
     }
 
     @Override
-    public <T> T compute(SchemaValueVisitor<T> visitor) {
+    public <T> T compute(SchemaComputationVisitor<T> visitor) {
         return visitor.visitAction(this);
     }
 

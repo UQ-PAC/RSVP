@@ -3,7 +3,7 @@ package uq.pac.rsvp.policy.ast.schema.parser;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.statement.*;
 import uq.pac.rsvp.policy.ast.schema.type.*;
-import uq.pac.rsvp.policy.ast.schema.visitor.SchemaValueVisitor;
+import uq.pac.rsvp.policy.ast.schema.visitor.SchemaComputationVisitor;
 import uq.pac.rsvp.policy.ast.schema.SchemaResolutionException;
 import uq.pac.rsvp.support.SourceLoc;
 
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 /**
  * Resolution for types in the presence of schema
  */
-public class TypesResolutionVisitor implements SchemaValueVisitor<BuiltinType> {
+public class TypesResolutionVisitor implements SchemaComputationVisitor<BuiltinType> {
 
     private final Schema schema;
     private final String namespace;

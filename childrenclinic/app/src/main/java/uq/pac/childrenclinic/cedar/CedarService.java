@@ -115,7 +115,7 @@ public class CedarService {
 					System.out.println("Cedar response body: " + body);
 					return ResponseEntity.ok(body);
 				}
-				else if (!isAllowed) {
+				else {
 					String joinedReasons = String.join("\n", resolvedReasons);
 					String body = """
 							Access Denied.
@@ -125,9 +125,6 @@ public class CedarService {
 					System.out.println("Cedar response status code: 403 FORBIDDEN");
 					System.out.println("Cedar response body: " + body);
 					return ResponseEntity.status(403).body(body);
-				}
-				else {
-					throw new Exception(errors.toString());
 				}
 			}
 			else {

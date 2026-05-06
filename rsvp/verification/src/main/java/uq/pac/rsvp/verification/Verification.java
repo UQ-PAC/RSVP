@@ -96,7 +96,10 @@ public class Verification {
         Path policiesPath = policyVersions.getLast().getValue();
         Path schemaPath = schemas.values().iterator().next();
         Path entitiesPath = entities.values().iterator().next();
-        Path invariantsPath = invariants.values().iterator().next();
+        Path invariantsPath = null;
+        if (!invariants.isEmpty()) {
+            invariantsPath = invariants.values().iterator().next();
+        }
 
         Path dlPath = Files.createTempDirectory("rsvp-");
 

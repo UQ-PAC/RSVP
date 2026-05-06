@@ -121,7 +121,6 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
         }
     }
 
-    // FIXME: incorporate source locations
     private static <T extends EntityValue> T expectedType(EntityValue payload, Class<T> cls, String kind) {
         require(payload != null);
         if (!cls.isInstance(payload)) {

@@ -12,9 +12,7 @@ import com.cedarpolicy.model.schema.Schema;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -96,12 +94,10 @@ public class CedarService {
 			if (response.type == AuthorizationResponse.SuccessOrFailure.Success) {
 				boolean isAllowed = false;
 				Set<String> resolvedReasons = new HashSet<>();
-				List<AuthorizationSuccessResponse.AuthorizationError> errors = new ArrayList<>();
 				if (response.success.isPresent()) {
 					AuthorizationSuccessResponse successResponse = response.success.get();
 					isAllowed = successResponse.isAllowed();
 					Set<String> reasons = successResponse.getReason();
-					errors = successResponse.getErrors();
 					resolvedReasons = CedarPolicyMapper.resolveReasons(reasons, this.policyIdMap);
 				}
 

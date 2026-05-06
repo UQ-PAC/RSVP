@@ -9,6 +9,7 @@
       <tr>
         <th th:text="#{name}">Name</th>
         <th th:text="#{specialties}">Specialties</th>
+        <th th:text="#{telephone}">Telephone</th>
         <th th:text="#{clinics}">Clinics</th>
       </tr>
     </thead>
@@ -18,6 +19,7 @@
           <a th:href="@{/doctors/__${doctor.id}__}" th:text="${doctor.firstName + ' ' + doctor.lastName}"></a>
         </td>
         <td th:text="${doctor.specialtyDescriptions}"></td>
+        <td th:text="${doctor.telephone}"></td>
         <td th:text="${doctor.clinicDescriptions}"></td>
       </tr>
     </tbody>

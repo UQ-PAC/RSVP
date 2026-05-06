@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'patients')}">
 
 <body>
@@ -24,7 +23,7 @@
       <td th:text="${patient.firstName}"></td>
       <td th:text="${patient.lastName}"></td>
       <td th:text="${#temporals.format(patient.birthDate, 'yyyy-MM-dd')}"></td>
-      <td th:text="${patient.gender}"></td>
+      <td th:text="${patient.gender?.name}"></td>
       <td th:text="${patient.clinicDescriptions}"></td>
     </tr>
   </table>
@@ -97,5 +96,4 @@
   </table>
 
 </body>
-
 </html>

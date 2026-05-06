@@ -5,8 +5,23 @@
   <h2 th:text="#{doctor}">Doctor</h2>
   <form th:object="${doctor}" class="form-horizontal" id="add-doctor-form" method="post">
     <div class="form-group has-feedback">
+
       <input th:replace="~{fragments/inputField :: input (#{firstName}, 'firstName', 'text')}" />
       <input th:replace="~{fragments/inputField :: input (#{lastName}, 'lastName', 'text')}" />
+
+      <input th:replace="~{fragments/inputField :: input (#{birthDate}, 'birthDate', 'date')}" />
+
+      <div class="control-group">
+        <label class="col-sm-2 control-label" th:text="#{gender}">Gender</label>
+        <div class="col-sm-10">
+          <select th:field="*{gender}" class="form-control">
+            <option th:each="gender : ${genders}" th:value="${gender.name}" th:text="${gender.name}">Gender</option>
+          </select>
+          <span class="help-inline" th:errors="*{gender}">[error]</span>
+        </div>
+      </div>
+
+      <input th:replace="~{fragments/inputField :: input (#{telephone}, 'telephone', 'text')}" />
 
       <div class="control-group">
         <label class="col-sm-2 control-label" th:text="#{specialties}">Specialties</label>

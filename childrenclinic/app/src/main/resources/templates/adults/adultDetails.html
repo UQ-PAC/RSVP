@@ -16,8 +16,20 @@
       <td><b th:text="*{firstName + ' ' + lastName}"></b></td>
     </tr>
     <tr>
+      <th th:text="#{birthDate}">Birth Date</th>
+      <td th:text="*{birthDate}"></td>
+    </tr>
+    <tr>
+      <th th:text="#{gender}">Gender</th>
+      <td th:text="*{gender?.name}"></td>
+    </tr>
+    <tr>
       <th th:text="#{telephone}">Telephone</th>
       <td th:text="*{telephone}"></td>
+    </tr>
+    <tr>
+      <th th:text="#{clinics}">Clinics</th>
+      <td th:text="*{clinicDescriptions}"></td>
     </tr>
   </table>
 

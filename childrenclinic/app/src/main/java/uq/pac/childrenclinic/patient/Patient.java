@@ -7,40 +7,25 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import uq.pac.childrenclinic.adult.Adult;
-import uq.pac.childrenclinic.model.Gender;
 import uq.pac.childrenclinic.model.Person;
 import uq.pac.childrenclinic.visit.Visit;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.springframework.core.style.ToStringCreator;
-import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name = "patients")
 @PrimaryKeyJoinColumn(name = "entity_id")
 public class Patient extends Person {
-
-	@Column(name = "birth_date")
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	@NotNull
-	private LocalDate birthDate;
-
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "gender_id")
-	@NotNull
-	private Gender gender;
 
 	@Column(name = "address")
 	@NotBlank
@@ -59,22 +44,6 @@ public class Patient extends Person {
 	@JoinColumn(name = "patient_id")
 	@OrderBy("date ASC")
 	private final Set<Visit> visits = new LinkedHashSet<>();
-
-	public LocalDate getBirthDate() {
-		return this.birthDate;
-	}
-
-	public void setBirthDate(LocalDate birthDate) {
-		this.birthDate = birthDate;
-	}
-
-	public Gender getGender() {
-		return this.gender;
-	}
-
-	public void setGender(Gender gender) {
-		this.gender = gender;
-	}
 
 	public String getAddress() {
 		return address;

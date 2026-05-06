@@ -36,11 +36,11 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public interface DoctorRepository extends JpaRepository<Doctor, Integer> {
 
-	@EntityGraph(attributePaths = { "clinics", "specialties" })
+	@EntityGraph(attributePaths = { "clinics", "gender", "specialties" })
 	@Transactional(readOnly = true)
 	Page<Doctor> findByLastNameStartingWith(String lastName, Pageable pageable);
 
-	@EntityGraph(attributePaths = { "clinics", "specialties" })
+	@EntityGraph(attributePaths = { "clinics", "gender", "specialties" })
 	@Transactional(readOnly = true)
 	Optional<Doctor> findById(Integer id);
 

@@ -10,11 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface SecretaryRepository extends JpaRepository<Secretary, Integer> {
 
-	@EntityGraph(attributePaths = { "clinics" })
+	@EntityGraph(attributePaths = { "clinics", "gender" })
 	@Transactional(readOnly = true)
 	Page<Secretary> findByLastNameStartingWith(String lastName, Pageable pageable);
 
-	@EntityGraph(attributePaths = { "clinics" })
+	@EntityGraph(attributePaths = { "clinics", "gender" })
 	@Transactional(readOnly = true)
 	Optional<Secretary> findById(Integer id);
 

@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'patients')}">
 
 <body>
@@ -12,16 +11,16 @@
         <th th:text="#{name}">Name</th>
         <th th:text="#{address}">Address</th>
         <th th:text="#{city}">City</th>
-        <th th:text="#{clinics}">Clinics</th> </tr>
+        <th th:text="#{clinics}">Clinics</th>
       </tr>
     </thead>
     <tbody>
       <tr th:each="patient : ${listPatients}">
         <td>
-          <a th:href="@{/patients/__${patient.id}__}" th:text="${patient.firstName + ' ' + patient.lastName}" /></a>
+          <a th:href="@{/patients/__${patient.id}__}" th:text="${patient.firstName + ' ' + patient.lastName}"></a>
         </td>
-        <td th:text="${patient.address}" />
-        <td th:text="${patient.city}" />
+        <td th:text="${patient.address}"></td>
+        <td th:text="${patient.city}"></td>
         <td th:text="${patient.clinicDescriptions}"></td>
       </tr>
     </tbody>
@@ -55,5 +54,4 @@
     </span>
   </div>
 </body>
-
 </html>

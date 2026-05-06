@@ -15,16 +15,28 @@
  */
 package uq.pac.childrenclinic.model;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * Simple JavaBean domain object representing an person.
  *
  * @author Ken Krebs
  */
-@MappedSuperclass
+@Entity
+@Table(name = "persons")
+@PrimaryKeyJoinColumn(name = "entity_id")
 public class Person extends BaseEntity {
 
 	@Column(name = "first_name")
@@ -34,6 +46,16 @@ public class Person extends BaseEntity {
 	@Column(name = "last_name")
 	@NotBlank
 	private String lastName;
+
+	@Column(name = "birth_date")
+	@NotNull
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate birthDate;
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "gender_id")
+	@NotNull
+	private Gender gender;
 
 	public String getFirstName() {
 		return this.firstName;
@@ -49,6 +71,22 @@ public class Person extends BaseEntity {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+	}
+
+	public LocalDate getBirthDate() {
+		return this.birthDate;
+	}
+
+	public void setBirthDate(LocalDate birthDate) {
+		this.birthDate = birthDate;
+	}
+
+	public Gender getGender() {
+		return this.gender;
+	}
+
+	public void setGender(Gender gender) {
+		this.gender = gender;
 	}
 
 }

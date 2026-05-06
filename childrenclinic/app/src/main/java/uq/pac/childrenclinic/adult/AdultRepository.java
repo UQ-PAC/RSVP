@@ -4,7 +4,9 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface AdultRepository extends JpaRepository<Adult, Integer> {
 
@@ -14,6 +16,8 @@ public interface AdultRepository extends JpaRepository<Adult, Integer> {
 	 * @param pageable The pagination execution parameters.
 	 * @return A paginated subset of matching Adult entities.
 	 */
+	@EntityGraph(attributePaths = { "clinics", "gender" })
+	@Transactional(readOnly = true)
 	Page<Adult> findByLastNameStartingWith(String lastName, Pageable pageable);
 
 	/**
@@ -21,6 +25,8 @@ public interface AdultRepository extends JpaRepository<Adult, Integer> {
 	 * key to search for.
 	 * @return An Optional containing the Adult if present.
 	 */
+	@EntityGraph(attributePaths = { "clinics", "gender" })
+	@Transactional(readOnly = true)
 	Optional<Adult> findById(Integer id);
 
 }

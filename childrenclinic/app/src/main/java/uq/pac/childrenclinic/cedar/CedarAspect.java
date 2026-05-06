@@ -48,21 +48,24 @@ public class CedarAspect {
 	private record ResourceMetadata(String sqlQuery, Function<Map<String, Object>, String> nameExtractor) {
 	}
 
-	private static final Map<String, ResourceMetadata> RESOURCE_REGISTRY = Map.of("Doctor",
-			new ResourceMetadata("SELECT first_name, last_name FROM doctors WHERE entity_id = ?",
+	private static final Map<String, ResourceMetadata> RESOURCE_REGISTRY = Map.of(
+			"Doctor",
+			new ResourceMetadata("SELECT p.first_name, p.last_name FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE d.entity_id = ?",
 					rs -> rs.get("first_name") + " " + rs.get("last_name")),
 			"Employee",
-			new ResourceMetadata("SELECT username FROM users WHERE entity_id = ?", rs -> rs.get("username").toString()),
+			new ResourceMetadata("SELECT username FROM users WHERE entity_id = ?",
+					rs -> rs.get("username").toString()),
 			"Patient",
-			new ResourceMetadata("SELECT first_name, last_name FROM patients WHERE entity_id = ?",
+			new ResourceMetadata("SELECT p.first_name, p.last_name FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE pt.entity_id = ?",
 					rs -> rs.get("first_name") + " " + rs.get("last_name")),
 			"ResponsibleAdult",
-			new ResourceMetadata("SELECT first_name, last_name FROM adults WHERE entity_id = ?",
+			new ResourceMetadata("SELECT p.first_name, p.last_name FROM adults a JOIN persons p ON a.entity_id = p.entity_id WHERE a.entity_id = ?",
 					rs -> rs.get("first_name") + " " + rs.get("last_name")),
 			"Secretary",
-			new ResourceMetadata("SELECT first_name, last_name FROM secretaries WHERE entity_id = ?",
+			new ResourceMetadata("SELECT p.first_name, p.last_name FROM secretaries s JOIN persons p ON s.entity_id = p.entity_id WHERE s.entity_id = ?",
 					rs -> rs.get("first_name") + " " + rs.get("last_name")),
-			"Visit", new ResourceMetadata("SELECT description FROM visits WHERE entity_id = ?",
+			"Visit",
+			new ResourceMetadata("SELECT description FROM visits WHERE entity_id = ?",
 					rs -> rs.get("description").toString()));
 
 	private static final Logger logger = LoggerFactory.getLogger(GlobalModelAttributes.class);

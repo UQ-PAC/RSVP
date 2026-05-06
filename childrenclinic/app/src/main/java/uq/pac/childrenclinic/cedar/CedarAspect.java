@@ -29,8 +29,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.HandlerMapping;
 
-import uq.pac.childrenclinic.user.GlobalModelAttributes;
-
 @Aspect
 @Component
 public class CedarAspect {
@@ -68,7 +66,7 @@ public class CedarAspect {
 			new ResourceMetadata("SELECT description FROM visits WHERE entity_id = ?",
 					rs -> rs.get("description").toString()));
 
-	private static final Logger logger = LoggerFactory.getLogger(GlobalModelAttributes.class);
+	private static final Logger logger = LoggerFactory.getLogger(CedarAspect.class);
 
 	public CedarAspect(CedarService cedarService, JdbcTemplate jdbcTemplate, CedarLogContext cedarLogContext) {
 		this.cedarService = cedarService;

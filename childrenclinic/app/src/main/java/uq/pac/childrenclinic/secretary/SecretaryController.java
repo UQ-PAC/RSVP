@@ -283,7 +283,7 @@ public class SecretaryController {
 			.orElseThrow(() -> new IllegalArgumentException("Secretary not found: " + secretaryId));
 
 		String resourceName = existingSecretary.getFirstName() + " " + existingSecretary.getLastName();
-		var secretaryEval = cedarEvaluator.evaluate(principal, "EditSecretary", "Secretary", resourceName, "Page");
+		var secretaryEval = cedarEvaluator.evaluate(principal, "EditEmployee", "Employee", resourceName, "Page");
 
 		if (!secretaryEval.isGranted()) {
 			throw new CedarDeniedException("Access Denied: You do not have permission to edit this secretary.\n"
@@ -297,7 +297,8 @@ public class SecretaryController {
 		if (submittedClinics != null) {
 			for (Clinic clinic : submittedClinics) {
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-				var clinicEval = cedarEvaluator.evaluate(principal, "EditSecretary", "Clinic", cedarClinicId, "Page");
+				// Here we check for the "AddEmployee" action, instead of "EditEmployee", since the former applies to the "Clinic" resource.
+				var clinicEval = cedarEvaluator.evaluate(principal, "AddEmployee", "Clinic", cedarClinicId, "Page");
 				if (!clinicEval.isGranted()) {
 					isAuthorized = false;
 					if (clinicEval.responseBody() != null) {

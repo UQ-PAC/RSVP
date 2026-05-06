@@ -289,7 +289,7 @@ public class AdultController {
 			.orElseThrow(() -> new IllegalArgumentException("Adult not found: " + adultId));
 
 		String resourceName = existingAdult.getFirstName() + " " + existingAdult.getLastName();
-		var adultEval = cedarEvaluator.evaluate(principal, "EditAdult", "Adult", resourceName, "Page");
+		var adultEval = cedarEvaluator.evaluate(principal, "EditAdult", "ResponsibleAdult", resourceName, "Page");
 
 		if (!adultEval.isGranted()) {
 			throw new CedarDeniedException("Access Denied: You do not have permission to edit this adult.\n"
@@ -303,7 +303,8 @@ public class AdultController {
 		if (submittedClinics != null) {
 			for (Clinic clinic : submittedClinics) {
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-				var clinicEval = cedarEvaluator.evaluate(principal, "EditAdult", "Clinic", cedarClinicId, "Page");
+				// Here we check for the "AddAdult" action, instead of "EditAdult", since the former applies to the "Clinic" resource.
+				var clinicEval = cedarEvaluator.evaluate(principal, "AddAdult", "Clinic", cedarClinicId, "Page");
 				if (!clinicEval.isGranted()) {
 					isAuthorized = false;
 					if (clinicEval.responseBody() != null) {

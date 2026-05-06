@@ -34,7 +34,7 @@ public class ExpressionTest {
         @Test
         @DisplayName("handles is expressions")
         void testTypeNode() throws RsvpException {
-            URL url = ClassLoader.getSystemResource("is.cedar");
+            URL url = ClassLoader.getSystemResource("policy/is.cedar");
             PolicySet policies = PolicySet.parseCedarPolicySet(Path.of(url.getPath()));
 
             Expression condition = policies.getFirst().getCondition();
@@ -58,7 +58,7 @@ public class ExpressionTest {
         @Test
         @DisplayName("handles basic expressions")
         void testDeserialisation() throws IOException, URISyntaxException {
-            URL url = ClassLoader.getSystemResource("expr.ast.json");
+            URL url = ClassLoader.getSystemResource("policy/expr.ast.json");
             String json = Files.readString(Path.of(url.toURI()));
             PolicySet policies = PolicyJsonParser.parsePolicySet("file.json", json,
                     Files.readString(Path.of(url.getPath())));
@@ -93,7 +93,7 @@ public class ExpressionTest {
         @Test
         @DisplayName("handles invalid types")
         void testInvalidAstFile() throws IOException, URISyntaxException {
-            URL url = ClassLoader.getSystemResource("invalid.ast.json");
+            URL url = ClassLoader.getSystemResource("policy/invalid.ast.json");
             String json = Files.readString(Path.of(url.toURI()));
             assertThrows(JsonParseException.class, () -> PolicyJsonParser.parsePolicySet("file.json", json));
         }
@@ -101,7 +101,7 @@ public class ExpressionTest {
         @Test
         @DisplayName("handles is expressions")
         void testTypeNode() throws IOException, URISyntaxException {
-            URL url = ClassLoader.getSystemResource("is.ast.json");
+            URL url = ClassLoader.getSystemResource("policy/is.ast.json");
             String json = Files.readString(Path.of(url.toURI()));
 
             PolicySet policies = PolicyJsonParser.parsePolicySet("file.json", json);

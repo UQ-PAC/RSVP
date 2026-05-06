@@ -60,7 +60,7 @@ public class PolicyVisitorImplTest {
 
     @Test
     void visitsParsedAst() throws IOException, URISyntaxException {
-        URL url = ClassLoader.getSystemResource("expr.ast.json");
+        URL url = ClassLoader.getSystemResource("policy/expr.ast.json");
         String json = Files.readString(Path.of(url.toURI()));
         PolicySet policies = PolicyJsonParser.parsePolicySet("file", json);
 

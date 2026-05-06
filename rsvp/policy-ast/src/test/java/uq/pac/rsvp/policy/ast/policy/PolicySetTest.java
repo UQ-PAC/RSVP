@@ -16,6 +16,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.deserialisation.PolicyJsonParser;
+import uq.pac.rsvp.policy.ast.policy.PolicySet;
 import uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.CallExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.PropertyAccessExpression;
@@ -47,7 +48,7 @@ public class PolicySetTest {
         @Test
         @DisplayName("handles annotations")
         void testAnnotationParsing() throws RsvpException {
-            URL url = ClassLoader.getSystemResource("annotation.cedar");
+            URL url = ClassLoader.getSystemResource("policy/annotation.cedar");
             PolicySet policies = PolicySet.parseCedarPolicySet(Path.of(url.getPath()));
             Policy policy = policies.getFirst();
             assertEquals(2, policy.getAnnotations().keySet().size());
@@ -58,7 +59,7 @@ public class PolicySetTest {
         @Test
         @DisplayName("handles 'has' in policy conditions")
         void testHasParsing() throws RsvpException {
-            URL url = ClassLoader.getSystemResource("policy-with-has.cedar");
+            URL url = ClassLoader.getSystemResource("policy/policy-with-has.cedar");
             PolicySet policies = PolicySet.parseCedarPolicySet(Path.of(url.getPath()));
             Policy policy = policies.getFirst();
             int stage[] = new int[] { 0 };
@@ -96,7 +97,7 @@ public class PolicySetTest {
         @Test
         @DisplayName("handles contains")
         void testContains() throws RsvpException {
-            URL url = ClassLoader.getSystemResource("contains.cedar");
+            URL url = ClassLoader.getSystemResource("policy/contains.cedar");
             PolicySet policies = PolicySet.parseCedarPolicySet(Path.of(url.getPath()));
             policies.forEach(p -> p.accept(new PolicyVisitorImpl() {
                 @Override

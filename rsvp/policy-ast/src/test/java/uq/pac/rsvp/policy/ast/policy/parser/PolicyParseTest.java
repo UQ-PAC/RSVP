@@ -121,16 +121,16 @@ public class PolicyParseTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-        "amazon-k8s.cedar",
-        "annotation.cedar",
-        "contains.cedar",
-        "empty.cedar",
-        "euid.cedar",
-        "healthcare.cedar",
-        "is.cedar",
-        "permit-all.cedar",
-        "permit-and-forbid.cedar",
-        "policy-with-has.cedar"
+            "policy/amazon-k8s.cedar",
+            "policy/annotation.cedar",
+            "policy/contains.cedar",
+            "policy/empty.cedar",
+            "policy/euid.cedar",
+            "policy/healthcare.cedar",
+            "policy/is.cedar",
+            "policy/permit-all.cedar",
+            "policy/permit-and-forbid.cedar",
+            "policy/policy-with-has.cedar"
     })
     void testParse(String file) throws IOException {
         URL url = ClassLoader.getSystemResource(file);

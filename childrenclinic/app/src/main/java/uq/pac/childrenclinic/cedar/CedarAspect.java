@@ -102,6 +102,11 @@ public class CedarAspect {
 		logger.info("Cedar context: {}", contextMap.toString());
 
 		for (CedarAuthorization requiresAuthorization : annotations) {
+			EntityUID action = EntityUID.parse("ChildrenClinic::Action::\"" + requiresAuthorization.action() + "\"")
+					.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
+			EntityUID resource = resolveResourceUid(request, requiresAuthorization);
+			String extractedResourceId = extractResourceId(request, requiresAuthorization.resourceType());
+
 			logger.info("Cedar request resourceType: {}", requiresAuthorization.resourceType());
 
 			if (requiresAuthorization.resourceId().equals("")) {
@@ -113,34 +118,30 @@ public class CedarAspect {
 				logger.info("HTTP resource: {}", extractedResourceId);
 			}
 
-			EntityUID action = EntityUID.parse("ChildrenClinic::Action::\"" + requiresAuthorization.action() + "\"")
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
-
-			EntityUID resource = resolveResourceUid(request, requiresAuthorization);
-
 			boolean validateRequest = requiresAuthorization.validate();
 
 			CedarRequest authorizationRequest = new CedarRequest(principal, action, resource, contextMap,
 					validateRequest);
 
 			ResponseEntity<String> response = cedarService.checkAccess(authorizationRequest);
+			String responseBody = response.getBody();
 
 			String logEntry = "Page Request: Principal=" + principal + ", Action=" + action + ", Resource=" + resource
-					+ " | Response: " + response.getBody();
+					+ " | Response: " + responseBody;
 			this.cedarLogContext.addLog(logEntry);
 
 			// Any single rejection immediately terminates the invocation.
-			if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null
-					|| !response.getBody().startsWith("Access Granted.")) {
-				String bodyString = response.getBody() != null ? response.getBody() : "No response body provided.";
+			if (!response.getStatusCode().is2xxSuccessful() || responseBody == null
+					|| !responseBody.startsWith("Access Granted.")) {
 				String prefix = """
 						Access Denied.
 						""";
+				String safeBody = responseBody != null ? responseBody : "No response body provided.";
 				String body = """
 						Access Denied by the Cedar Policy Engine.
 
 						%s
-						""".formatted(response.getBody().replaceAll("(?m)^" + prefix, ""));
+						""".formatted(safeBody.replaceAll("(?m)^" + prefix, ""));
 				throw new CedarDeniedException(body);
 			}
 		}
@@ -228,30 +229,26 @@ public class CedarAspect {
 		Map<String, Value> context = new HashMap<>();
 		Enumeration<String> parameterNames = request.getParameterNames();
 
-		if (parameterNames != null) {
-			while (parameterNames.hasMoreElements()) {
-				String paramName = parameterNames.nextElement();
-				if (paramName.regionMatches(true, 0, CONTEXT_PARAM_PREFIX, 0, CONTEXT_PARAM_PREFIX.length())) {
-					String contextKey = paramName.substring(CONTEXT_PARAM_PREFIX.length()).toLowerCase();
+		while (parameterNames.hasMoreElements()) {
+			String paramName = parameterNames.nextElement();
+			if (paramName.regionMatches(true, 0, CONTEXT_PARAM_PREFIX, 0, CONTEXT_PARAM_PREFIX.length())) {
+				String contextKey = paramName.substring(CONTEXT_PARAM_PREFIX.length()).toLowerCase();
 
-					if ("authenticated".equals(contextKey)) {
-						boolean isAuthenticated = false;
-						if (!"Guest".equals(principalId)) {
-							try {
-								String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
-								Integer count = this.jdbcTemplate.queryForObject(sql, Integer.class, principalId);
-								isAuthenticated = (count != null && count > 0);
-							}
-							catch (Exception exception) {
-								isAuthenticated = false;
-							}
+				if ("authenticated".equals(contextKey)) {
+					boolean isAuthenticated = false;
+					if (!"Guest".equals(principalId)) {
+						try {
+							String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
+							Integer count = this.jdbcTemplate.queryForObject(sql, Integer.class, principalId);
+							isAuthenticated = (count != null && count > 0);
 						}
-						context.put(contextKey, new PrimString(String.valueOf(isAuthenticated)));
+						catch (Exception exception) { }
 					}
-					else {
-						String paramValue = request.getParameter(paramName);
-						context.put(contextKey, new PrimString(paramValue));
-					}
+					context.put(contextKey, new PrimString(String.valueOf(isAuthenticated)));
+				}
+				else {
+					String paramValue = request.getParameter(paramName);
+					context.put(contextKey, new PrimString(paramValue));
 				}
 			}
 		}

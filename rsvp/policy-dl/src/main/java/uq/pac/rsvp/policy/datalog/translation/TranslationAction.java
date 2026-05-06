@@ -1,7 +1,7 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
 import uq.pac.rsvp.policy.ast.schema.Schema;
-import uq.pac.rsvp.policy.ast.schema.statement.Action;
+import uq.pac.rsvp.policy.ast.schema.statement.ActionDefinition;
 import uq.pac.rsvp.policy.datalog.ast.*;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
 
@@ -51,7 +51,7 @@ public class TranslationAction {
                 actionResourceRules = new ArrayList<>();
         List<DLFact> actionParents = new ArrayList<>();
 
-        for (Action def : schema.actions().toList()) {
+        for (ActionDefinition def : schema.actions().toList()) {
             DLTerm term = DLTerm.lit(def.getName());
             actionFacts.add(new DLFact(ActionRuleDecl, term));
 

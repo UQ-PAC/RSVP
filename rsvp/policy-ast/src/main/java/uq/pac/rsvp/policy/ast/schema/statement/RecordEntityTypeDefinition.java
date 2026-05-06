@@ -9,11 +9,11 @@ import uq.pac.rsvp.support.SourceLoc;
 
 import java.util.Collection;
 
-public class RecordEntityType extends EntityType {
+public class RecordEntityTypeDefinition extends EntityTypeDefinition {
 
     private final RecordType shape;
 
-    public RecordEntityType(TypeReference ref, Collection<TypeReference> memberOf, RecordType shape, Annotations annotations, SourceLoc location) {
+    public RecordEntityTypeDefinition(TypeReference ref, Collection<TypeReference> memberOf, RecordType shape, Annotations annotations, SourceLoc location) {
         super(ref, memberOf, annotations, location);
         this.shape = shape;
     }

@@ -1,10 +1,10 @@
 package uq.pac.rsvp.policy.datalog.entity;
 
 import uq.pac.rsvp.policy.ast.schema.Schema;
-import uq.pac.rsvp.policy.ast.schema.statement.CommonType;
-import uq.pac.rsvp.policy.ast.schema.statement.EntityType;
-import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityType;
-import uq.pac.rsvp.policy.ast.schema.statement.RecordEntityType;
+import uq.pac.rsvp.policy.ast.schema.statement.CommonTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.EntityTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.RecordEntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.type.*;
 import uq.pac.rsvp.policy.ast.schema.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.entity.*;
@@ -97,7 +97,7 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
 
         // Here we parse only the type. Then, if this is an action reference then the type name is 'Action'
         TypeReference ref = TypeReference.parse(euid.getType());
-        EntityType def = schema.getEntityType(ref);
+        EntityTypeDefinition def = schema.getEntityType(ref);
         if (def == null) {
             if (ref.getBaseName().equals("Action")) {
                 throw new EntityException(entity.getSourceLoc(), "Action entity: " + entity.getEuid());
@@ -157,7 +157,7 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
     }
 
     @Override
-    public void visitRecordEntity(RecordEntityType type, EntityValue payload) {
+    public void visitRecordEntity(RecordEntityTypeDefinition type, EntityValue payload) {
         EntityReference ref = expectedType(payload, EntityReference.class, "entity reference");
 
         if (!type.getName().equals(ref.getType())) {
@@ -170,7 +170,7 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
     }
 
     @Override
-    public void visitEnumEntity(EnumEntityType type, EntityValue payload) {
+    public void visitEnumEntity(EnumEntityTypeDefinition type, EntityValue payload) {
         EntityReference ref = expectedType(payload, EntityReference.class, "entity reference");
 
         if (!type.getName().equals(ref.getType())) {
@@ -207,7 +207,7 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
     }
 
     @Override
-    public void visitCommon(CommonType type, EntityValue payload) {
+    public void visitCommon(CommonTypeDefinition type, EntityValue payload) {
         type.getDefinition().process(this, payload);
     }
 }

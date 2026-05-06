@@ -9,11 +9,11 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public abstract class EntityType extends SchemaStatement {
+public abstract class EntityTypeDefinition extends SchemaStatement {
 
     private final Set<TypeReference> memberOf;
 
-    public EntityType(TypeReference ref, Collection<TypeReference> memberOf, Annotations annotations, SourceLoc location) {
+    public EntityTypeDefinition(TypeReference ref, Collection<TypeReference> memberOf, Annotations annotations, SourceLoc location) {
         super(ref, annotations, location);
         this.memberOf = Collections.unmodifiableSet(new LinkedHashSet<>(memberOf));
     }

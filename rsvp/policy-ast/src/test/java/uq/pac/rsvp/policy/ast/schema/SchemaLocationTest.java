@@ -65,7 +65,7 @@ public class SchemaLocationTest {
         }
 
         @Override
-        public void visitRecordEntity(RecordEntityType entity) {
+        public void visitRecordEntity(RecordEntityTypeDefinition entity) {
             log("Record Entity " + entity.getTypeReference().toString(), entity, () -> {
                 entity.getTypeReference().accept(this);
                 entity.getMemberOf().forEach(m -> m.accept(this));
@@ -74,7 +74,7 @@ public class SchemaLocationTest {
         }
 
         @Override
-        public void visitEnumEntity(EnumEntityType entity) {
+        public void visitEnumEntity(EnumEntityTypeDefinition entity) {
             log("Enum Entity " + entity.getTypeReference().toString(), entity, () -> {
                 entity.getTypeReference().accept(this);
                 entity.getMemberOf().forEach(m -> m.accept(this));
@@ -82,7 +82,7 @@ public class SchemaLocationTest {
         }
 
         @Override
-        public void visitAction(Action action) {
+        public void visitAction(ActionDefinition action) {
             log("Action " + action.getTypeReference().toString(), action, () -> {
                 action.getTypeReference().accept(this);
                 action.getMemberOf().forEach(m -> m.accept(this));
@@ -93,7 +93,7 @@ public class SchemaLocationTest {
         }
 
         @Override
-        public void visitCommon(CommonType type) {
+        public void visitCommon(CommonTypeDefinition type) {
             log("Type " + type.getTypeReference().toString(), type, () -> {
                 type.getTypeReference().accept(this);
                 type.getDefinition().accept(this);

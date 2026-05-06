@@ -57,7 +57,7 @@ class SchemaStatementVisitor extends SourceVisitor<SchemaStatement> {
             Collection<String> names = ctx.strings().STRING().stream()
                     .map(s -> unquote(s.getText()))
                     .toList();
-            return new EnumEntityType(ref, Collections.emptySet(), names, annotations, location(ctx));
+            return new EnumEntityTypeDefinition(ref, Collections.emptySet(), names, annotations, location(ctx));
         } else {
             RecordType shape = new RecordType(Collections.emptyMap(), SourceLoc.MISSING);
             if (ctx.record() != null) {
@@ -69,7 +69,7 @@ class SchemaStatementVisitor extends SourceVisitor<SchemaStatement> {
                         .map(p -> (TypeReference) types.visit(p))
                         .collect(Collectors.toSet());
             }
-            return new RecordEntityType(ref, refs, shape, annotations, location(ctx));
+            return new RecordEntityTypeDefinition(ref, refs, shape, annotations, location(ctx));
         }
     }
 
@@ -78,7 +78,7 @@ class SchemaStatementVisitor extends SourceVisitor<SchemaStatement> {
         BuiltinType definition = types.visit(ctx.type());
         Annotations annotations = getAnnotations(ctx.annotation());
         TypeReference reference = new TypeReference(namespace, ctx.typename().getText(), location(ctx.typename()));
-        return new CommonType(reference, definition, annotations, location(ctx));
+        return new CommonTypeDefinition(reference, definition, annotations, location(ctx));
     }
 
     private String getNormalisedActionName(CedarschemaParser.NameContext ctx) {
@@ -137,6 +137,6 @@ class SchemaStatementVisitor extends SourceVisitor<SchemaStatement> {
         }
         ActionApplication appliesToNode =
                 new ActionApplication(principalTypes, resourceTypes, context);
-        return new Action(actionReference, references, appliesToNode, annotations, location(ctx));
+        return new ActionDefinition(actionReference, references, appliesToNode, annotations, location(ctx));
     }
 }

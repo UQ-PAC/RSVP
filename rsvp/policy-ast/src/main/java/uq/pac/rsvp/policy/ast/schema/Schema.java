@@ -54,24 +54,24 @@ public class Schema extends SchemaAstNode {
                 .map(target::cast);
     }
 
-    public Stream<EntityType> entityTypes() {
-        return statementStream(EntityType.class);
+    public Stream<EntityTypeDefinition> entityTypes() {
+        return statementStream(EntityTypeDefinition.class);
     }
 
-    public Stream<EnumEntityType> enumEntityTypes() {
-        return statementStream(EnumEntityType.class);
+    public Stream<EnumEntityTypeDefinition> enumEntityTypes() {
+        return statementStream(EnumEntityTypeDefinition.class);
     }
 
-    public Stream<RecordEntityType> recordEntityTypes() {
-        return statementStream(RecordEntityType.class);
+    public Stream<RecordEntityTypeDefinition> recordEntityTypes() {
+        return statementStream(RecordEntityTypeDefinition.class);
     }
 
-    public Stream<Action> actions() {
-        return statementStream(Action.class);
+    public Stream<ActionDefinition> actions() {
+        return statementStream(ActionDefinition.class);
     }
 
-    public Stream<CommonType> types() {
-        return statementStream(CommonType.class);
+    public Stream<CommonTypeDefinition> types() {
+        return statementStream(CommonTypeDefinition.class);
     }
 
     private <E extends SchemaStatement> E getTypedStatement(TypeReference reference, Class<E> target) {
@@ -86,24 +86,24 @@ public class Schema extends SchemaAstNode {
         return statements.get(ref);
     }
 
-    public EntityType getEntityType(TypeReference ref) {
-        return getTypedStatement(ref, EntityType.class);
+    public EntityTypeDefinition getEntityType(TypeReference ref) {
+        return getTypedStatement(ref, EntityTypeDefinition.class);
     }
 
-    public RecordEntityType getRecordEntityType(TypeReference ref) {
-        return getTypedStatement(ref, RecordEntityType.class);
+    public RecordEntityTypeDefinition getRecordEntityType(TypeReference ref) {
+        return getTypedStatement(ref, RecordEntityTypeDefinition.class);
     }
 
-    public EnumEntityType getEnumEntityType(TypeReference ref) {
-        return getTypedStatement(ref, EnumEntityType.class);
+    public EnumEntityTypeDefinition getEnumEntityType(TypeReference ref) {
+        return getTypedStatement(ref, EnumEntityTypeDefinition.class);
     }
 
-    public CommonType getCommonType(TypeReference ref) {
-        return getTypedStatement(ref, CommonType.class);
+    public CommonTypeDefinition getCommonType(TypeReference ref) {
+        return getTypedStatement(ref, CommonTypeDefinition.class);
     }
 
-    public Action getAction(TypeReference ref) {
-        return getTypedStatement(ref, Action.class);
+    public ActionDefinition getAction(TypeReference ref) {
+        return getTypedStatement(ref, ActionDefinition.class);
     }
 
     /**
@@ -196,7 +196,7 @@ public class Schema extends SchemaAstNode {
                 .build();
 
         schema.statements()
-                .map(s -> s instanceof CommonType t ? t : null)
+                .map(s -> s instanceof CommonTypeDefinition t ? t : null)
                 .filter(Objects::nonNull)
                 .forEach(c -> {
                     typeGraphBuilder.addNode(c.getTypeReference());
@@ -204,7 +204,7 @@ public class Schema extends SchemaAstNode {
                         @Override
                         public void visitTypeReference(TypeReference type) {
                             SchemaStatement stmt = requireNonNull(schema.get(type));
-                            if (stmt instanceof CommonType ct) {
+                            if (stmt instanceof CommonTypeDefinition ct) {
                                 typeGraphBuilder.putEdge(c.getTypeReference(), ct.getTypeReference());
                             }
                         }

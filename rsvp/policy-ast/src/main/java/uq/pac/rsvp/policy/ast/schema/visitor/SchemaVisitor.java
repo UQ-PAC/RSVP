@@ -1,45 +1,75 @@
 package uq.pac.rsvp.policy.ast.schema.visitor;
 
 import uq.pac.rsvp.policy.ast.schema.*;
-import uq.pac.rsvp.policy.ast.schema.statement.Action;
-import uq.pac.rsvp.policy.ast.schema.statement.CommonType;
-import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityType;
-import uq.pac.rsvp.policy.ast.schema.statement.RecordEntityType;
+import uq.pac.rsvp.policy.ast.schema.statement.ActionDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.CommonTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.RecordEntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.type.*;
 
 public interface SchemaVisitor {
-    void visitSchema(Schema schema);
+    default void visitSchema(Schema schema) {
+        throw new AssertionError();
+    }
 
     // Statements
-    void visitRecordEntity(RecordEntityType entity);
+    default void visitRecordEntity(RecordEntityTypeDefinition entity) {
+        throw new AssertionError();
+    }
 
-    void visitEnumEntity(EnumEntityType entity);
+    default void visitEnumEntity(EnumEntityTypeDefinition entity) {
+        throw new AssertionError();
+    }
 
-    void visitAction(Action action);
+    default void visitAction(ActionDefinition action) {
+        throw new AssertionError();
+    }
 
-    void visitCommon(CommonType type);
+    default void visitCommon(CommonTypeDefinition type) {
+        throw new AssertionError();
+    }
 
     // Compound types
-    void visitRecord(RecordType type);
+    default void visitRecord(RecordType type) {
+        throw new AssertionError();
+    }
 
-    void visitSet(SetType type);
+    default void visitSet(SetType type) {
+        throw new AssertionError();
+    }
 
     // Type references
-    void visitTypeReference(TypeReference type);
+    default void visitTypeReference(TypeReference type) {
+        throw new AssertionError();
+    }
 
     // Primitive types
-    void visitBoolean(BooleanType type);
+    default void visitBoolean(BooleanType type) {
+        throw new AssertionError();
+    }
 
-    void visitLong(LongType type);
+    default void visitLong(LongType type) {
+        throw new AssertionError();
+    }
 
-    void visitString(StringType type);
+    default void visitString(StringType type) {
+        throw new AssertionError();
+    }
 
     // Extension types
-    void visitIpAddress(IpAddressType type);
+    default void visitIpAddress(IpAddressType type) {
+        throw new AssertionError();
+    }
 
-    void visitDecimal(DecimalType type);
+    default void visitDecimal(DecimalType type) {
+        throw new AssertionError();
+    }
 
-    void visitDateTime(DateTimeType type);
+    default void visitDateTime(DateTimeType type) {
+        throw new AssertionError();
+    }
 
-    void visitDuration(DurationType type);
+    default void visitDuration(DurationType type) {
+        throw new AssertionError();
+    }
 }

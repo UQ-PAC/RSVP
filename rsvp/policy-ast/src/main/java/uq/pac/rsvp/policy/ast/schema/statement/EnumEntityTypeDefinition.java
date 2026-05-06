@@ -13,11 +13,11 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class EnumEntityType extends EntityType {
+public class EnumEntityTypeDefinition extends EntityTypeDefinition {
     private final Set<String> names;
 
-    public EnumEntityType(TypeReference ref, Set<TypeReference> memberOf,
-                          Collection<String> names, Annotations annotations, SourceLoc location) {
+    public EnumEntityTypeDefinition(TypeReference ref, Set<TypeReference> memberOf,
+                                    Collection<String> names, Annotations annotations, SourceLoc location) {
         super(ref, memberOf, annotations, location);
         this.names = Collections.unmodifiableSet(new LinkedHashSet<>(names));
     }

@@ -1,6 +1,6 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import uq.pac.rsvp.policy.ast.schema.statement.EntityType;
+import uq.pac.rsvp.policy.ast.schema.statement.EntityTypeDefinition;
 import uq.pac.rsvp.policy.datalog.ast.DLProgram;
 import uq.pac.rsvp.policy.datalog.ast.DLRuleDecl;
 import uq.pac.rsvp.policy.datalog.ast.DLStatement;
@@ -40,13 +40,13 @@ public class TranslationEntityDefinition {
     /**
      * The underlying schema definition
      */
-    private final EntityType entity;
+    private final EntityTypeDefinition entity;
     /**
      * Entity relation declaration
      */
     private final DLRuleDecl entityDecl;
 
-    public TranslationEntityDefinition(EntityType entity) {
+    public TranslationEntityDefinition(EntityTypeDefinition entity) {
         this.entity = entity;
         this.name = entity.getName();
         this.entityDecl = TranslationConstants.getEntityRuleDecl(entity);
@@ -56,7 +56,7 @@ public class TranslationEntityDefinition {
         return entityDecl;
     }
 
-    public EntityType getEntityType() {
+    public EntityTypeDefinition getEntityType() {
         return entity;
     }
 

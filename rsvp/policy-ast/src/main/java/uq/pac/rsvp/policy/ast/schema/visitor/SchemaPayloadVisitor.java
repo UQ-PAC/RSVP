@@ -1,10 +1,10 @@
 package uq.pac.rsvp.policy.ast.schema.visitor;
 
 import uq.pac.rsvp.policy.ast.schema.Schema;
-import uq.pac.rsvp.policy.ast.schema.statement.Action;
-import uq.pac.rsvp.policy.ast.schema.statement.CommonType;
-import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityType;
-import uq.pac.rsvp.policy.ast.schema.statement.RecordEntityType;
+import uq.pac.rsvp.policy.ast.schema.statement.ActionDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.CommonTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.RecordEntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.type.*;
 
 public interface SchemaPayloadVisitor<T> {
@@ -13,19 +13,19 @@ public interface SchemaPayloadVisitor<T> {
     }
 
     // Statements
-    default void visitRecordEntity(RecordEntityType entity, T payload) {
+    default void visitRecordEntity(RecordEntityTypeDefinition entity, T payload) {
         throw new AssertionError();
     }
 
-    default void visitEnumEntity(EnumEntityType entity, T payload) {
+    default void visitEnumEntity(EnumEntityTypeDefinition entity, T payload) {
         throw new AssertionError();
     }
 
-    default void visitAction(Action action, T payload) {
+    default void visitAction(ActionDefinition action, T payload) {
         throw new AssertionError();
     }
 
-    default void visitCommon(CommonType type, T payload) {
+    default void visitCommon(CommonTypeDefinition type, T payload) {
         throw new AssertionError();
     }
 

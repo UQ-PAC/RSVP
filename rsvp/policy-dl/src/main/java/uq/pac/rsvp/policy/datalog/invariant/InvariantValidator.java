@@ -2,9 +2,9 @@ package uq.pac.rsvp.policy.datalog.invariant;
 
 import uq.pac.rsvp.policy.ast.policy.expr.*;
 import uq.pac.rsvp.policy.ast.schema.Schema;
-import uq.pac.rsvp.policy.ast.schema.statement.CommonType;
-import uq.pac.rsvp.policy.ast.schema.statement.EntityType;
-import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityType;
+import uq.pac.rsvp.policy.ast.schema.statement.CommonTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.EntityTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.type.BuiltinType;
 import uq.pac.rsvp.policy.ast.schema.type.RecordType;
 import uq.pac.rsvp.policy.ast.schema.type.TypeReference;
@@ -144,8 +144,8 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
         BuiltinType objectType = collect(expr.getObject());
         if (objectType instanceof TypeReference ref) {
             objectType = switch (typing.getSchema().get(ref)) {
-                case EntityType t -> t.getShape();
-                case CommonType t -> t.getDefinition();
+                case EntityTypeDefinition t -> t.getShape();
+                case CommonTypeDefinition t -> t.getDefinition();
                 default -> null;
             };
         }
@@ -201,7 +201,7 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
     public BuiltinType visitEntityExpr(EntityExpression expr) {
         TypeReference ref = TypeReference.parse(expr.getType());
 
-        EnumEntityType enumType = schema.getEnumEntityType(ref);
+        EnumEntityTypeDefinition enumType = schema.getEnumEntityType(ref);
         // We do not check specific entities, but since enum
         // entities are specified by the schema we check if they exist
         if (enumType != null && !enumType.getEnumNames().contains(expr.getName())) {

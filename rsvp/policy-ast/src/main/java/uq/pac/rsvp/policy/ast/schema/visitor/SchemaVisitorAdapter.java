@@ -12,16 +12,16 @@ public class SchemaVisitorAdapter implements SchemaVisitor {
     }
 
     @Override
-    public void visitRecordEntity(RecordEntityType entity) {
+    public void visitRecordEntity(RecordEntityTypeDefinition entity) {
         entity.getMemberOf().forEach(m -> m.accept(this));
         entity.getShape().accept(this);
     }
 
     @Override
-    public void visitEnumEntity(EnumEntityType entity) { }
+    public void visitEnumEntity(EnumEntityTypeDefinition entity) { }
 
     @Override
-    public void visitAction(Action action) {
+    public void visitAction(ActionDefinition action) {
         action.getMemberOf().forEach(r -> r.accept(this));
         ActionApplication appliesTo = action.getApplication();
         appliesTo.getPrincipalTypes().forEach(p -> p.accept(this));
@@ -30,7 +30,7 @@ public class SchemaVisitorAdapter implements SchemaVisitor {
     }
 
     @Override
-    public void visitCommon(CommonType type) {
+    public void visitCommon(CommonTypeDefinition type) {
         type.getDefinition().accept(this);
     }
 

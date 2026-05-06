@@ -46,11 +46,11 @@ public class StatementResolutionVisitor implements SchemaValueVisitor<SchemaStat
     }
 
     private TypeReference validateEntityReference(TypeReference ref) {
-        return validateReference(ref, EntityType.class, "entity");
+        return validateReference(ref, EntityTypeDefinition.class, "entity");
     }
 
     private TypeReference validateActionReference(TypeReference ref) {
-        return validateReference(ref, Action.class, "action");
+        return validateReference(ref, ActionDefinition.class, "action");
     }
 
     // The namespace for type resolution is supplied as an argument
@@ -62,7 +62,7 @@ public class StatementResolutionVisitor implements SchemaValueVisitor<SchemaStat
     }
 
     @Override
-    public SchemaStatement visitRecordEntity(RecordEntityType entity) {
+    public SchemaStatement visitRecordEntity(RecordEntityTypeDefinition entity) {
         validateNamespace(entity);
         TypeReference ref = validateEntityReference(entity.getTypeReference());
         // Entity reference itself should be fully set and resolved during definition
@@ -72,11 +72,11 @@ public class StatementResolutionVisitor implements SchemaValueVisitor<SchemaStat
                 .map(this::validateEntityReference)
                 .toList();
         RecordType shape = (RecordType) entity.getShape().compute(types);
-        return new RecordEntityType(ref, memberOf, shape, entity.getAnnotations(), entity.getSourceLoc());
+        return new RecordEntityTypeDefinition(ref, memberOf, shape, entity.getAnnotations(), entity.getSourceLoc());
     }
 
     @Override
-    public SchemaStatement visitEnumEntity(EnumEntityType entity) {
+    public SchemaStatement visitEnumEntity(EnumEntityTypeDefinition entity) {
         validateNamespace(entity);
         TypeReference ref = validateEntityReference(entity.getTypeReference());
         // Entity reference itself should be fully set and resolved during definition
@@ -85,7 +85,7 @@ public class StatementResolutionVisitor implements SchemaValueVisitor<SchemaStat
     }
 
     @Override
-    public SchemaStatement visitAction(Action action) {
+    public SchemaStatement visitAction(ActionDefinition action) {
         validateNamespace(action);
         TypeReference ref = validateActionReference(action.getTypeReference());
         // Entity reference itself should be fully set and resolved during definition
@@ -110,13 +110,13 @@ public class StatementResolutionVisitor implements SchemaValueVisitor<SchemaStat
         RecordType context = (RecordType) appliesTo.getContext().compute(types);
         appliesTo = new ActionApplication(principalTypes, resourceTypes, context);
         // rebuild action
-        return new Action(ref, memberOf, appliesTo, action.getAnnotations(), action.getSourceLoc());
+        return new ActionDefinition(ref, memberOf, appliesTo, action.getAnnotations(), action.getSourceLoc());
     }
 
     @Override
-    public SchemaStatement visitCommon(CommonType type) {
+    public SchemaStatement visitCommon(CommonTypeDefinition type) {
         validateNamespace(type);
         BuiltinType definition = type.getDefinition().compute(types);
-        return new CommonType(type.getTypeReference(), definition, type.getAnnotations(), type.getSourceLoc());
+        return new CommonTypeDefinition(type.getTypeReference(), definition, type.getAnnotations(), type.getSourceLoc());
     }
 }

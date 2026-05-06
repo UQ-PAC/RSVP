@@ -1,10 +1,10 @@
 package uq.pac.rsvp.policy.ast.schema.visitor;
 
 import uq.pac.rsvp.policy.ast.schema.*;
-import uq.pac.rsvp.policy.ast.schema.statement.Action;
-import uq.pac.rsvp.policy.ast.schema.statement.CommonType;
-import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityType;
-import uq.pac.rsvp.policy.ast.schema.statement.RecordEntityType;
+import uq.pac.rsvp.policy.ast.schema.statement.ActionDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.CommonTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.RecordEntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.type.*;
 
 public interface SchemaValueVisitor<T> {
@@ -13,19 +13,19 @@ public interface SchemaValueVisitor<T> {
     }
 
     // Statements
-    default T visitRecordEntity(RecordEntityType entity) {
+    default T visitRecordEntity(RecordEntityTypeDefinition entity) {
         throw new AssertionError();
     }
 
-    default T visitEnumEntity(EnumEntityType entity) {
+    default T visitEnumEntity(EnumEntityTypeDefinition entity) {
         throw new AssertionError();
     }
 
-    default T visitAction(Action action) {
+    default T visitAction(ActionDefinition action) {
         throw new AssertionError();
     }
 
-    default T visitCommon(CommonType type) {
+    default T visitCommon(CommonTypeDefinition type) {
         throw new AssertionError();
     }
 

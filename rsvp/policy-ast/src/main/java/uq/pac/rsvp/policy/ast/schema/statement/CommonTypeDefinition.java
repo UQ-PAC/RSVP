@@ -7,11 +7,11 @@ import uq.pac.rsvp.policy.ast.schema.visitor.SchemaValueVisitor;
 import uq.pac.rsvp.policy.ast.schema.visitor.SchemaVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
-public class CommonType extends SchemaStatement {
+public class CommonTypeDefinition extends SchemaStatement {
 
     private final BuiltinType definition;
 
-    public CommonType(TypeReference ref, BuiltinType definition, Annotations annotations, SourceLoc location) {
+    public CommonTypeDefinition(TypeReference ref, BuiltinType definition, Annotations annotations, SourceLoc location) {
         super(ref, annotations, location);
         this.definition = definition;
     }

@@ -8,12 +8,12 @@ import uq.pac.rsvp.support.SourceLoc;
 
 import java.util.Set;
 
-public class Action extends SchemaStatement {
+public class ActionDefinition extends SchemaStatement {
 
     private final Set<TypeReference> memberOf;
     private final ActionApplication appliesTo;
 
-    public Action(TypeReference ref, Set<TypeReference> memberOf, ActionApplication appliesTo, Annotations annotations, SourceLoc location) {
+    public ActionDefinition(TypeReference ref, Set<TypeReference> memberOf, ActionApplication appliesTo, Annotations annotations, SourceLoc location) {
         super(ref, annotations, location);
         this.memberOf = memberOf;
         this.appliesTo = appliesTo;

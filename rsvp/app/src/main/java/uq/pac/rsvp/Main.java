@@ -77,7 +77,6 @@ public class Main {
         }
 
         try {
-            System.out.println("*** Main policiesPaths size = " + fileSet.policiesPaths.size()); // XXX
             VerificationResult result = Verification.verifyPolicies(fileSet.policiesPaths,
                     fileSet.schemaPaths, fileSet.entitiesPaths, fileSet.invariantsPaths);
             Set<Report> reports = result.getReports();

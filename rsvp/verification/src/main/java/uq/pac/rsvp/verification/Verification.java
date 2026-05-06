@@ -13,6 +13,7 @@ import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestSet;
 import uq.pac.rsvp.policy.datalog.translation.Translation;
+import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.support.reporting.Report;
 import uq.pac.rsvp.support.reporting.Report.Severity;
 import uq.pac.rsvp.support.util.Pair;
@@ -33,6 +34,11 @@ import java.util.Set;
 public class Verification {
 
     static final boolean TESTING = false;
+
+    private static class RequestResult {
+        boolean permitted = false;
+        Set<Policy> policies = new HashSet<>();
+    }
 
     public static Set<Report> verifyPolicies(Set<List<Path>> policies, Set<Path> schemas, Set<Path> entities, Set<Path> invariants) throws RsvpException, IOException, ConfigurationException, InterruptedException, IllegalAccessException {
         Set<List<Pair<String, Path>>> policyFiles = new HashSet<>();
@@ -99,14 +105,7 @@ public class Verification {
         Map<Policy, RequestSet> policyResults = translation.getPolicyResult();
 
         // Generate the inverse map, request -> policy set:
-        Map<Request, Set<Policy>> requestPolicyMap = new HashMap<>();
-        policyResults.forEach((k, v) -> {
-            v.forEach(r -> {
-                requestPolicyMap.computeIfAbsent(r, y -> {
-                    return new HashSet<>();
-                }).add(k);
-            });
-        });
+        Map<Request, RequestResult> requestPolicyMap = createReverseMapping(policyResults);
 
         class PolicyAnalysisResult {
             // Whether the policy uniquely matches at least one request (i.e. there is no other
@@ -155,19 +154,19 @@ public class Verification {
         requestPolicyMap.forEach((k, v) -> {
             // The set (v) of policies matching the request has policies which may subsume each
             // other. But, any policy not in the set does not subsume any policy in the set:
-            v.forEach(p -> {
+            v.policies.forEach(p -> {
                 Set<Policy> subsumersOfP = analysisResults.get(p).subsumers;
-                subsumersOfP.removeIf(p2 -> !v.contains(p2));
+                subsumersOfP.removeIf(p2 -> !v.policies.contains(p2));
             });
 
-            if (v.size() == 1) {
-                analysisResults.get(v.iterator().next()).uniquelyMatchesRequest = true;
+            if (v.policies.size() == 1) {
+                analysisResults.get(v.policies.iterator().next()).uniquelyMatchesRequest = true;
             } else {
                 // If there is only a single forbid policy that matches, consider it a unique
                 // match. (We don't want to report that a forbid policy does not uniquely match
                 // requests just because those requests are otherwise permitted).
                 Policy singleForbid = null;
-                for (Policy p : v) {
+                for (Policy p : v.policies) {
                     if (p.isForbid()) {
                         if (singleForbid != null) {
                             singleForbid = null;
@@ -245,9 +244,43 @@ public class Verification {
                 results.add(r);
             }
         });
+
+        // Check and warn for umatched requests
+        int unmatchedRequests = 0;
+
+        for (Map.Entry<Request,Verification.RequestResult> requestEntry : requestPolicyMap.entrySet()) {
+            if (requestEntry.getValue().policies.isEmpty()) {
+                unmatchedRequests++;
+            }
+        }
+
+        if (unmatchedRequests > 0) {
+            results.add(new Report(Report.Severity.Warning,
+                    "There are " + unmatchedRequests + " requests that are not matched by any policy",
+                    SourceLoc.MISSING));
+        }
+
         return results;
     }
 
+    private static Map<Request, RequestResult> createReverseMapping(Map<Policy, RequestSet> policyResults) {
+        Map<Request, RequestResult> requestPolicyMap = new HashMap<>();
+        policyResults.forEach((k, v) -> {
+            v.forEach(r -> {
+                RequestResult rr = requestPolicyMap.computeIfAbsent(r, y -> {
+                    return new RequestResult();
+                });
+                if (k.isPermit() && rr.policies.isEmpty()) {
+                    rr.permitted = true;
+                }
+                if (k.isForbid()) {
+                    rr.permitted = false;
+                }
+                rr.policies.add(k);
+            });
+        });
+        return requestPolicyMap;
+    }
 
     public static Set<Report> generateRandomReports(Set<List<Pair<String, Path>>> policies, Map<String, Path> schemas, Map<String, Path> entities, Map<String, Path> invariants) throws IOException, InterruptedException, IllegalAccessException {
         Set<Report> results = new HashSet<>();

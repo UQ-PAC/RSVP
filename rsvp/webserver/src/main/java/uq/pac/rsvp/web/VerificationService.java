@@ -60,8 +60,7 @@ public class VerificationService {
         }
 
         try {
-
-            Set<Report> result = Verification.verifyPolicies(policies, schemas, entities, invariants);
+            Set<Report> result = Verification.verifyPolicies(policies, schemas, entities, invariants).getReports();
 
             logger.info("Generated {} reports", result.size());
 

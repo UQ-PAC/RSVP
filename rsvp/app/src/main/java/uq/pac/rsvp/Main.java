@@ -3,9 +3,13 @@ package uq.pac.rsvp;
 import uq.pac.rsvp.support.reporting.Report;
 import uq.pac.rsvp.verification.ConfigurationException;
 import uq.pac.rsvp.verification.Verification;
+import uq.pac.rsvp.verification.Verification.RequestStatus;
+import uq.pac.rsvp.verification.Verification.VerificationResult;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,7 +48,15 @@ public class Main {
                     System.exit(1);
                 }
                 Path policiesPath = Path.of(args[i]).toAbsolutePath();
-                fileSet.policiesPaths.add(List.of(policiesPath));
+                // If more than one, treat them as versions of the same file:
+                if (fileSet.policiesPaths.isEmpty()) {
+                    List<Path> versions = new ArrayList<>();
+                    versions.add(policiesPath);
+                    fileSet.policiesPaths.add(versions);
+                } else {
+                    List<Path> versions = fileSet.policiesPaths.iterator().next();
+                    versions.add(policiesPath);
+                }
             } else if (arg.equals("--entities") || arg.equals("-e")) {
                 i++;
                 if (i == args.length) {
@@ -63,12 +75,22 @@ public class Main {
                 fileSet.entitiesPaths.add(invariantsPath);
             }
         }
-        
+
         try {
-            Set<Report> reports = Verification.verifyPolicies(fileSet.policiesPaths,
+            System.out.println("*** Main policiesPaths size = " + fileSet.policiesPaths.size()); // XXX
+            VerificationResult result = Verification.verifyPolicies(fileSet.policiesPaths,
                     fileSet.schemaPaths, fileSet.entitiesPaths, fileSet.invariantsPaths);
+            Set<Report> reports = result.getReports();
             for (Report report : reports) {
                 System.out.println(report.toString());
+            }
+
+            Collection<RequestStatus> v = result.getChangeImpact();
+            if (v != null) {
+                System.out.println("\nChange impact:\n-----------------------");
+                for (RequestStatus requestStatus : v) {
+                    System.out.println(requestStatus.toString());
+                }
             }
         } catch (InterruptedException ie) {
             System.err.println("Interrupted.");

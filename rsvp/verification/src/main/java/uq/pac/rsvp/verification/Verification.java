@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 
@@ -40,7 +41,58 @@ public class Verification {
         Set<Policy> policies = new HashSet<>();
     }
 
-    public static Set<Report> verifyPolicies(Set<List<Path>> policies, Set<Path> schemas, Set<Path> entities, Set<Path> invariants) throws RsvpException, IOException, ConfigurationException, InterruptedException, IllegalAccessException {
+    /**
+     * A request (string with principal, action and resource) and its status (permitted or
+     * forbidden)
+     */
+    public static class RequestStatus {
+        private String request;
+        private boolean status;
+
+        public String getRequest() {
+            return request;
+        }
+
+        public boolean isPermitted() {
+            return status;
+        }
+
+        public RequestStatus(String request, boolean status) {
+            this.request = request;
+            this.status = status;
+        }
+
+        public String toString() {
+            return request + " - permitted: " + status;
+        }
+    }
+
+    /**
+     * The results of analysis, including reports and change impact (if performed).
+     */
+    public static class VerificationResult {
+        private Set<Report> reports;
+        private Collection<RequestStatus> changeImpact;
+
+        public Set<Report> getReports() {
+            return reports;
+        }
+
+        /**
+         * Get the change impact, in terms of requests and what their (permitted/forbidden) status
+         * has changed to.
+         */
+        public Collection<RequestStatus> getChangeImpact() {
+            return changeImpact;
+        }
+
+        public VerificationResult(Set<Report> reports, Collection<RequestStatus> changeImpact) {
+            this.reports = reports;
+            this.changeImpact = changeImpact;
+        }
+    }
+
+    public static VerificationResult verifyPolicies(Set<List<Path>> policies, Set<Path> schemas, Set<Path> entities, Set<Path> invariants) throws RsvpException, IOException, ConfigurationException, InterruptedException, IllegalAccessException {
         Set<List<Pair<String, Path>>> policyFiles = new HashSet<>();
         Map<String, Path> schemaFiles = new HashMap<>();
         Map<String, Path> entityFiles = new HashMap<>();
@@ -68,13 +120,13 @@ public class Verification {
             invariantFiles.put(invariantsFile.toString(), invariantsFile);
         }
 
-
         return verifyPolicies(policyFiles, schemaFiles, entityFiles, invariantFiles);
     }
 
-    public static Set<Report> verifyPolicies(Set<List<Pair<String, Path>>> policies, Map<String, Path> schemas, Map<String, Path> entities, Map<String, Path> invariants) throws RsvpException, IOException, ConfigurationException, InterruptedException, IllegalAccessException {
+    public static VerificationResult verifyPolicies(Set<List<Pair<String, Path>>> policies, Map<String, Path> schemas, Map<String, Path> entities, Map<String, Path> invariants) throws RsvpException, IOException, ConfigurationException, InterruptedException, IllegalAccessException {
         if (TESTING) {
-            return generateRandomReports(policies, schemas, entities, invariants);
+            Set<Report> reports = generateRandomReports(policies, schemas, entities, invariants);
+            return new VerificationResult(reports, null);
         }
 
         // TODO: use PolicyParser instead of PolicyProgram and pass file name separately
@@ -94,6 +146,10 @@ public class Verification {
 
         List<Pair<String, Path>> policyVersions = policies.iterator().next();
         Path policiesPath = policyVersions.getLast().getValue();
+        Path prevPoliciesPath = null;
+        if (policyVersions.size() >= 2) {
+            prevPoliciesPath = policyVersions.get(policyVersions.size() - 2).getValue();
+        }
         Path schemaPath = schemas.values().iterator().next();
         Path entitiesPath = entities.values().iterator().next();
         Path invariantsPath = null;
@@ -248,7 +304,7 @@ public class Verification {
             }
         });
 
-        // Check and warn for umatched requests
+        // Check and warn for unmatched requests
         int unmatchedRequests = 0;
 
         for (Map.Entry<Request,Verification.RequestResult> requestEntry : requestPolicyMap.entrySet()) {
@@ -263,7 +319,48 @@ public class Verification {
                     SourceLoc.MISSING));
         }
 
-        return results;
+        List<RequestStatus> changeImpact = null;
+
+        if (prevPoliciesPath != null) {
+            // Change impact analysis
+            changeImpact = new ArrayList<RequestStatus>();
+            Path dlPathPrev = Files.createTempDirectory("rsvp-");
+
+            Translation translationPrev = new Translation(schemaPath, prevPoliciesPath,
+                    entitiesPath, invariantsPath, dlPathPrev);
+            Map<Policy,RequestSet> prevPolicyResult = translationPrev.getPolicyResult();
+            Map<Request, RequestResult> prevRequestResults = createReverseMapping(prevPolicyResult);
+
+            // Determine which requests have changed from/to permit/forbid/uncovered;
+            // Check overall numbers (newly permitted/forbidden/unmatched vs old)
+            // Report which requests changed and why, for each reason;
+            // reasons:
+            //   - now forbidden, due to matching policy(s) 'x'
+            //   - now forbidden, due to no longer matching any policies after previously
+            //                    matching permit policy(s) 'x'
+            //   - now permitted, due to no longer matching forbid policy(s) 'x'
+            //   - no longer matches any policies (previously forbidden by policy(s) 'x')
+
+            for (Entry<Request, RequestResult> requestEntry : requestPolicyMap.entrySet()) {
+                RequestResult prevResult = prevRequestResults.get(requestEntry.getKey());
+                if (prevResult == null && requestEntry.getValue().permitted || requestEntry.getValue().permitted != prevResult.permitted) {
+                    changeImpact.add(new RequestStatus(requestEntry.getKey().getId(),
+                            requestEntry.getValue().permitted));
+                }
+            }
+
+            // Also need to check requests that are permitted previously, but no longer covered:
+            for (Entry<Request, RequestResult> requestEntry : prevRequestResults.entrySet()) {
+                if (requestEntry.getValue().permitted) {
+                    RequestResult currentResult = requestPolicyMap.get(requestEntry.getKey());
+                    if (currentResult == null ) {
+                        changeImpact.add(new RequestStatus(requestEntry.getKey().getId(), true));
+                    }
+                }
+            }
+        }
+
+        return new VerificationResult(results, changeImpact);
     }
 
     private static Map<Request, RequestResult> createReverseMapping(Map<Policy, RequestSet> policyResults) {

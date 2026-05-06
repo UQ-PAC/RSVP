@@ -5,6 +5,9 @@ import jakarta.servlet.http.HttpSession;
 import uq.pac.childrenclinic.system.User;
 import uq.pac.childrenclinic.system.UserRepository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 public class GlobalModelAttributes {
 
 	private final UserRepository userRepository;
+
+	private static final Logger logger = LoggerFactory.getLogger(GlobalModelAttributes.class);
 
 	public GlobalModelAttributes(UserRepository userRepository) {
 		this.userRepository = userRepository;
@@ -24,9 +29,7 @@ public class GlobalModelAttributes {
 
 		final String activeUsername = (sessionUser != null) ? sessionUser : "Guest";
 
-		System.out.println(System.lineSeparator());
-		System.out.println("activeUsername: " + activeUsername);
-		System.out.println(System.lineSeparator());
+		logger.info("activeUsername: {}", activeUsername);
 
 		User currentUser = this.userRepository.findByUsername(activeUsername).orElseGet(() -> {
 			User transientUser = new User();

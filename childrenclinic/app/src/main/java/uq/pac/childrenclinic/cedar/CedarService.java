@@ -19,6 +19,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -37,12 +40,12 @@ public class CedarService {
 
 	private Map<String, String> policyIdMap;
 
+	private static final Logger logger = LoggerFactory.getLogger(CedarService.class);
+
 	public CedarService(@Value("${policy.file:childrenclinic-rsvp-policy.cedar}") String policyFile) {
 		try {
 			this.policySet = PolicySet.parsePolicies(Path.of("src/main/resources/cedar/" + policyFile));
-			System.out.println(System.lineSeparator());
-			System.out.println("Cedar Policy file loaded: " + policyFile);
-			System.out.println(System.lineSeparator());
+			logger.info("Cedar Policy file loaded: {}", policyFile);
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Failed to parse Cedar Policy.", e);
@@ -84,13 +87,11 @@ public class CedarService {
 		try {
 			AuthorizationResponse response = engine.isAuthorized(request, this.policySet, this.entities);
 
-			// Prints Cedar request to console.
-			System.out.println("Cedar request: {principal = " + request.principalEUID + ", action = "
-					+ request.actionEUID + ", resource = " + request.resourceEUID + ", context = " + request.context
-					+ ", validateRequest = " + request.enableRequestValidation + "}");
+			logger.info("Cedar request: {principal = " + request.principalEUID + ", action = " + request.actionEUID
+					+ ", resource = " + request.resourceEUID + ", context = " + request.context + ", validateRequest = "
+					+ request.enableRequestValidation + "}");
 
-			// Prints Cedar decision to console.
-			System.out.println("Cedar raw response: " + response.toString());
+			logger.info("Cedar raw response: " + response.toString());
 
 			if (response.type == AuthorizationResponse.SuccessOrFailure.Success) {
 				boolean isAllowed = false;
@@ -110,9 +111,8 @@ public class CedarService {
 							Access Granted.
 							%s
 							""".formatted(joinedReasons);
-					// Prints Cedar response to console.
-					System.out.println("Cedar response status code: 200 OK");
-					System.out.println("Cedar response body: " + body);
+					logger.info("Cedar response status code: 200 OK");
+					logger.debug("Cedar response body: \n{}", body);
 					return ResponseEntity.ok(body);
 				}
 				else {
@@ -121,9 +121,8 @@ public class CedarService {
 							Access Denied.
 							%s
 							""".formatted(joinedReasons);
-					// Prints Cedar response to console.
-					System.out.println("Cedar response status code: 403 FORBIDDEN");
-					System.out.println("Cedar response body: " + body);
+					logger.warn("Cedar response status code: 403 FORBIDDEN");
+					logger.debug("Cedar response body: \n{}", body);
 					return ResponseEntity.status(403).body(body);
 				}
 			}
@@ -132,7 +131,7 @@ public class CedarService {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Authorization check failed: {}", e.getMessage(), e);
 			return ResponseEntity.internalServerError().body("Authorization check failed: " + e.getMessage());
 		}
 	}

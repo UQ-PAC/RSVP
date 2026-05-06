@@ -18,6 +18,9 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -60,6 +63,8 @@ public class CedarAspect {
 			"Visit", new ResourceMetadata("SELECT description FROM visits WHERE entity_id = ?",
 					rs -> rs.get("description").toString()));
 
+	private static final Logger logger = LoggerFactory.getLogger(GlobalModelAttributes.class);
+
 	public CedarAspect(CedarService cedarService, JdbcTemplate jdbcTemplate, CedarLogContext cedarLogContext) {
 		this.cedarService = cedarService;
 		this.jdbcTemplate = jdbcTemplate;
@@ -78,7 +83,7 @@ public class CedarAspect {
 
 		String principalId = extractPrincipalFromSession(request);
 
-		System.out.println("Cookie principalId: " + principalId);
+		logger.info("Cookie principalId: {}", principalId);
 
 		EntityUID principal;
 		if (principalId.equals("Guest")) {
@@ -94,23 +99,18 @@ public class CedarAspect {
 		Map<String, Value> contextMap = new HashMap<>();
 		contextMap.putAll(extractContextFromParameters(request, principalId));
 
-		// Prints Cedar context to console.
-		System.out.println("Cedar context: " + contextMap.toString());
+		logger.info("Cedar context: {}", contextMap.toString());
 
 		for (CedarAuthorization requiresAuthorization : annotations) {
-			// Prints requests and cookie to console.
-			System.out.println(System.lineSeparator());
-			System.out.println("Cedar request resourceType: " + requiresAuthorization.resourceType());
+			logger.info("Cedar request resourceType: {}", requiresAuthorization.resourceType());
 
 			if (requiresAuthorization.resourceId().equals("")) {
-				System.out.println(
-						"HTTP request resourceId: " + extractResourceId(request, requiresAuthorization.resourceType()));
-				System.out.println("Cedar resource: " + resolveResourceUid(request, requiresAuthorization).toString());
+				logger.info("HTTP request resourceId: {}", extractedResourceId);
+				logger.info("Cedar resource: {}", resource.toString());
 			}
 			else {
-				System.out.println("Cedar request resourceId: " + requiresAuthorization.resourceId());
-				System.out
-					.println("HTTP resource: " + extractResourceId(request, requiresAuthorization.resourceType()));
+				logger.info("Cedar request resourceId: {}", requiresAuthorization.resourceId());
+				logger.info("HTTP resource: {}", extractedResourceId);
 			}
 
 			EntityUID action = EntityUID.parse("ChildrenClinic::Action::\"" + requiresAuthorization.action() + "\"")

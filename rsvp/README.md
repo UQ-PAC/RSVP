@@ -83,8 +83,21 @@ Soufflé is required to build and run the `policy-dl` project, and can be instal
 - Run CLI application:
 
   ```
-  ./gradlew run --args="optional string of space separated args"
+  ./gradlew :app:run --args="optional string of space separated args"
   ```
+
+  Arguments include:
+
+  - `--schema <file>`/`-s <file>` - specify schema file
+  - `--policies <file>`/`-p <file>` - specify policies file
+  - `--entities <file>`/`-e <file>` - specify entities JSON file
+  - `--invariants <file>`/`-i <file>` - specify invariants file (optional)
+
+  Note that the various file types can be supplied more than once, but except in the case of
+  policies this currently results in analysis using one of the files arbitrarily. For policy files,
+  specifying two files will cause the two files to be interpreted as versions of the same policy set
+  and will trigger change impact analysis (other analysis is performed on the later version of the
+  policies, i.e. the file specified 2nd on the command line).
 
 - Run web server:
 

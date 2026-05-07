@@ -1,6 +1,7 @@
 package uq.pac.rsvp.policy.ast.schema;
 
 import org.junit.jupiter.api.Test;
+import uq.pac.rsvp.policy.ast.AstNode;
 import uq.pac.rsvp.policy.ast.schema.statement.*;
 import uq.pac.rsvp.policy.ast.schema.type.*;
 import uq.pac.rsvp.policy.ast.schema.visitor.SchemaVisitor;
@@ -40,7 +41,7 @@ public class SchemaLocationTest {
             return sb.toString();
         }
 
-        <E extends SchemaAstNode> void log(String msg, E node, Runnable consumer) {
+        void log(String msg, AstNode node, Runnable consumer) {
             indent += 3;
             log("%s at %s".formatted(msg, node.getSourceLoc().toString()));
             consumer.run();

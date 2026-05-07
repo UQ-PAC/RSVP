@@ -2,8 +2,6 @@ package uq.pac.rsvp.policy.ast.policy;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import uq.pac.rsvp.policy.ast.policy.Invariant;
-import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
 
 import java.io.IOException;
 import java.net.URL;

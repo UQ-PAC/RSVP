@@ -16,6 +16,7 @@ import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
 import static uq.pac.rsvp.policy.ast.policy.Policy.Effect.Permit;
 import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.And;
 import static uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression.UnaryOp.Not;
+import static uq.pac.rsvp.support.SourceLoc.MISSING;
 
 public class Policy extends PolicyStatement {
 
@@ -41,19 +42,19 @@ public class Policy extends PolicyStatement {
     }
 
     public Policy(Effect effect, Expression condition, Map<String, String> annotations) {
-        this(null, effect, condition, annotations, SourceLoc.MISSING);
+        this(null, effect, condition, annotations, MISSING);
     }
 
     public Policy(String name, Effect effect, Expression condition) {
-        this(name, effect, condition, null, SourceLoc.MISSING);
+        this(name, effect, condition, null, MISSING);
     }
 
     public Policy(Effect effect, Expression condition) {
-        this(null, effect, condition, null, SourceLoc.MISSING);
+        this(null, effect, condition, null, MISSING);
     }
 
     public Policy() {
-        this(null, Effect.Forbid, null, null, SourceLoc.MISSING);
+        this(null, Effect.Forbid, null, null, MISSING);
     }
 
     public boolean isPermit() {
@@ -114,7 +115,7 @@ public class Policy extends PolicyStatement {
             this.condition = null;
             this.name = null;
             this.annotations = new HashMap<>();
-            this.location = SourceLoc.MISSING;
+            this.location = MISSING;
         }
 
         public Builder and(Expression e, SourceLoc loc) {
@@ -125,7 +126,7 @@ public class Policy extends PolicyStatement {
         }
 
         public Builder and(Expression e) {
-            return and(e, SourceLoc.MISSING);
+            return and(e, MISSING);
         }
 
         public Builder andNot(Expression e, SourceLoc loc) {
@@ -136,7 +137,7 @@ public class Policy extends PolicyStatement {
         }
 
         public Builder andNot(Expression e) {
-            return andNot(e, SourceLoc.MISSING);
+            return andNot(e, MISSING);
         }
 
         public Builder name(String name) {
@@ -166,6 +167,10 @@ public class Policy extends PolicyStatement {
         public Policy build() {
             Expression cond = condition == null ? new BooleanExpression(true) : condition;
             return new Policy(name, effect, cond, annotations, location);
+        }
+
+        public Expression condition() {
+            return condition;
         }
     }
 }

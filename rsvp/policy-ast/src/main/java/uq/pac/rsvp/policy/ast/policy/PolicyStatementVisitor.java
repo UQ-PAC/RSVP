@@ -65,7 +65,13 @@ class PolicyStatementVisitor extends CedarSourceVisitor<PolicyStatement> {
         return null;
     }
 
-    private final SourceLoc OMITTED = SourceLoc.empty();
+    /**
+     * A policy is represented as a single expression built as a conjunction of syntactic elements.
+     * The following source location is used to indicate that the location of the element cannot be
+     * determined, for instance, if it is conjunction of the policy preamble. The location is
+     * made package-visible for testing purposes
+     */
+    final static SourceLoc OMITTED = SourceLoc.empty();
 
     private Expression getVariableScopeExpression(TerminalNode term, CedarParser.VariableScopeContext ctx) {
         VariableExpression var = new VariableExpression(term.getText(), location(term));
@@ -162,18 +168,22 @@ class PolicyStatementVisitor extends CedarSourceVisitor<PolicyStatement> {
                 .effect(effect)
                 .location(location(ctx));
 
-        if (ctx.condition() != null) {
-            ctx.condition().forEach(cond -> {
-                Expression e = cond.expression().accept(expressions);
-                if (cond.WHEN() != null) {
-                    require(cond.UNLESS() == null);
-                    builder.and(e, OMITTED);
-                } else if (cond.UNLESS() != null) {
-                    builder.andNot(e, OMITTED);
-                } else {
-                    throw new AssertionError("Unknown condition");
-                }
-            });
+        ctx.condition().forEach(cond -> {
+            Expression e = cond.expression().accept(expressions);
+            if (cond.WHEN() != null) {
+                require(cond.UNLESS() == null);
+                builder.and(e, OMITTED);
+            } else if (cond.UNLESS() != null) {
+                builder.andNot(e, OMITTED);
+            } else {
+                throw new AssertionError("Unknown condition");
+            }
+        });
+
+        // Unless specified, the policy condition it true
+        // Set it here so the omitted location can be used
+        if (builder.condition() == null) {
+            builder.and(new BooleanExpression(true, OMITTED));
         }
 
         return builder.build();

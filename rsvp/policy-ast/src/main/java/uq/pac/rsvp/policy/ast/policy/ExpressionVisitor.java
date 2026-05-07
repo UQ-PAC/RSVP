@@ -205,7 +205,7 @@ public class ExpressionVisitor extends CedarSourceVisitor<Expression> {
         Expression object = new VariableExpression(var.getText(), location(var));
         while (!properties.isEmpty()) {
             ParserRuleContext prop = properties.removeFirst();
-            object = new PropertyAccessExpression(object, prop.getText(), location(prop));
+            object = new PropertyAccessExpression(object, prop.getText(), location(var, prop));
         }
         return object;
     }

@@ -34,6 +34,10 @@ public class CedarSourceVisitor<T> extends CedarBaseVisitor<T> {
         return location(context.start, context.stop);
     }
 
+    protected SourceLoc location(ParserRuleContext start, ParserRuleContext stop) {
+        return location(start.start, stop.stop);
+    }
+
     protected SourceLoc location(TerminalNode context) {
         return location(context.getSymbol());
     }

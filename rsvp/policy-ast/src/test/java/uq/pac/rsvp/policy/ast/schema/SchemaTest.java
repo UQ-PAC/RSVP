@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.StdLogger;
+import uq.pac.rsvp.policy.ast.TestUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -22,53 +23,9 @@ import java.util.stream.Stream;
 
 import static com.cedarpolicy.model.schema.Schema.JsonOrCedar.Json;
 import static org.junit.jupiter.api.Assertions.*;
+import static uq.pac.rsvp.policy.ast.TestUtil.*;
 
 public class SchemaTest {
-
-    private final static StdLogger LOGGER = new StdLogger();
-
-    public final static Path ROOTDIR =
-            Path.of(System.getProperty("test.rootdir")).toAbsolutePath();
-    public final static Path RESOURCEDIR =
-            Path.of(ROOTDIR.toString(), "src", "test", "resources");
-    public final static Path TMPDIR =
-            Path.of(ROOTDIR.toString(), "build", "tmp");
-    public final static boolean GENERATE_ORACLES = false;
-    public final static Path CEDAR;
-
-    static {
-        CEDAR = findExecutable("cedar");
-        try {
-            Files.createDirectories(TMPDIR);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Test
-    void oracles() {
-        assertFalse(GENERATE_ORACLES);
-    }
-
-    public static Path getResourceDir(String ...names) {
-        return Path.of(RESOURCEDIR.toString(), names);
-    }
-
-    public static List<Path> findFiles(Path dir, String ext) {
-        try (Stream<Path> paths = Files.list(dir)) {
-            List<Path> files = new ArrayList<>();
-            paths.forEach(p -> {
-                if (Files.isRegularFile(p) && p.toString().endsWith(ext)) {
-                    files.add(p);
-                } else if (Files.isDirectory(p)) {
-                    files.addAll(findFiles(p, ext));
-                }
-            });
-            return files;
-        } catch (IOException e) {
-            throw new AssertionError(e);
-        }
-    }
 
     record ValidationTest(String name, String text, String expected) { }
 
@@ -106,9 +63,9 @@ public class SchemaTest {
     // Validation errors and legal behaviours
     @TestFactory
     Collection<DynamicTest> test() {
-        Path dir = getResourceDir("schema", "validation");
+        Path dir = TestUtil.getResourceDir("schema", "validation");
         List<DynamicTest> tests = new ArrayList<>();
-        findFiles(dir, ".cedarschema").forEach(path -> {
+        TestUtil.findFiles(dir, ".cedarschema").forEach(path -> {
             try {
                 readTests(path).forEach(t -> {
                     DynamicTest dt = DynamicTest.dynamicTest(t.name, () -> {
@@ -132,19 +89,6 @@ public class SchemaTest {
             }
         });
         return tests;
-    }
-
-    private static Path findExecutable(String executable) {
-        String sysPath = System.getenv("PATH");
-        return Stream.of(sysPath.split(Pattern.quote(File.pathSeparator)))
-                .map(Path::of)
-                .map(path -> {
-                    path = path.resolve(executable);
-                    return Files.isExecutable(path) ? path : null;
-                })
-                .filter(Objects::nonNull)
-                .findFirst()
-                .orElse(null);
     }
 
     // Get a normalised representation of a cedar file with resolved types by converting it to

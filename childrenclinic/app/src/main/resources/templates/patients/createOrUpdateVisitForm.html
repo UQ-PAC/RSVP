@@ -67,6 +67,17 @@
           <span class="help-inline" th:errors="*{responsibleAdults}">[error]</span>
         </div>
       </div>
+      <div class="control-group">
+        <label class="col-sm-2 control-label" th:text="#{doctors}">Doctors</label>
+        <div class="col-sm-10">
+          <select th:field="*{doctors}" class="form-control" multiple="multiple">
+            <option th:each="doctor : ${doctors}" 
+                    th:value="${doctor.id}" 
+                    th:text="${doctor.firstName + ' ' + doctor.lastName}">Doctor</option>
+          </select>
+          <span class="help-inline" th:errors="*{doctors}">[error]</span>
+        </div>
+      </div>
     </div>
 
     <div class="form-group">
@@ -85,12 +96,30 @@
       <th th:text="#{date}">Date</th>
       <th th:text="#{description}">Description</th>
       <th th:text="#{confidentiality}">Confidentiality</th>
+      <th th:text="#{doctors}">Doctors</th>
+      <th th:text="#{responsibleAdults}">Responsible Adults</th>
       <th th:text="#{clinics}">Clinics</th>
     </tr>
     <tr th:if="${!visit['new']}" th:each="visit : ${patient.visits}">
       <td th:text="${#temporals.format(visit.date, 'yyyy-MM-dd')}"></td>
       <td th:text=" ${visit.description}"></td>
       <td th:text="${visit?.confidentiality?.name}"></td>
+      <td>
+        <ul class="list-unstyled mb-0">
+          <li th:each="doctor : ${visit.doctors}"
+              th:text="${doctor.firstName + ' ' + doctor.lastName}"></li>
+          <li th:if="${visit.doctors == null or visit.doctors.isEmpty()}"
+              class="text-muted">None</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="list-unstyled mb-0">
+          <li th:each="adult : ${visit.responsibleAdults}"
+              th:text="${adult.firstName + ' ' + adult.lastName}"></li>
+          <li th:if="${visit.responsibleAdults == null or visit.responsibleAdults.isEmpty()}"
+              class="text-muted">None</li>
+        </ul>
+      </td>
       <td th:text="${visit?.clinicDescriptions}"></td>
     </tr>
   </table>

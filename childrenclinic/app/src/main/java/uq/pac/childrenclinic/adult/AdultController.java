@@ -1,5 +1,10 @@
 package uq.pac.childrenclinic.adult;
 
+import com.cedarpolicy.value.EntityUID;
+
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,6 +15,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -28,10 +34,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.cedarpolicy.value.EntityUID;
-
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
 import uq.pac.childrenclinic.cedar.CedarDeniedException;
 import uq.pac.childrenclinic.cedar.CedarProgrammaticEvaluator;
@@ -71,7 +73,10 @@ public class AdultController {
 		Collection<Clinic> allClinics = this.clinics.findClinics();
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
+		if (allClinics == null) return new ArrayList<>();
+
 		return allClinics.stream().filter(clinic -> {
+			if (clinic == null || clinic.getClinicName() == null) return false;
 			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 			var result = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Item");
 			return result.isGranted();
@@ -160,15 +165,18 @@ public class AdultController {
 		boolean isAuthorized = false;
 		List<String> denialReasons = new ArrayList<>();
 
-		for (Clinic clinic : allClinics) {
-			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-			var result = cedarEvaluator.evaluate(principal, "AddAdult", "Clinic", cedarClinicId, "Page");
+		if (allClinics != null) {
+			for (Clinic clinic : allClinics) {
+				if (clinic == null || clinic.getClinicName() == null) continue;
+				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
+				var result = cedarEvaluator.evaluate(principal, "AddAdult", "Clinic", cedarClinicId, "Page");
 
-			if (result.isGranted()) {
-				isAuthorized = true;
-			}
-			else if (result.responseBody() != null) {
-				denialReasons.add(result.responseBody());
+				if (result.isGranted()) {
+					isAuthorized = true;
+				}
+				else if (result.responseBody() != null) {
+					denialReasons.add(result.responseBody());
+				}
 			}
 		}
 
@@ -212,6 +220,7 @@ public class AdultController {
 		}
 		else {
 			for (Clinic clinic : submittedClinics) {
+				if (clinic == null || clinic.getClinicName() == null) continue;
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 				var evalResult = cedarEvaluator.evaluate(principal, "AddAdult", "Clinic", cedarClinicId, "Page");
 
@@ -248,7 +257,8 @@ public class AdultController {
 				.getContent()
 				.stream()
 				.anyMatch(a -> a.getFirstName().equalsIgnoreCase(adult.getFirstName())
-						&& a.getBirthDate().equals(adult.getBirthDate()) && a.getGender().equals(adult.getGender()));
+						&& Objects.equals(a.getBirthDate(), adult.getBirthDate())
+						&& Objects.equals(a.getGender(), adult.getGender()));
 
 			if (duplicateExists) {
 				result.rejectValue("firstName", "duplicate",
@@ -260,9 +270,17 @@ public class AdultController {
 			return VIEWS_ADULT_CREATE_OR_UPDATE_FORM;
 		}
 
-		this.adults.save(adult);
+		try {
+			this.adults.save(adult);
+		}
+		catch (DataIntegrityViolationException ex) {
+			result.rejectValue("firstName", "duplicate",
+					"A person with this first name, last name, birth date, and gender already exists.");
+			return VIEWS_ADULT_CREATE_OR_UPDATE_FORM;
+		}
+
 		redirectAttributes.addFlashAttribute("message", "New Adult has been added.");
-		return "redirect:/adults/find";
+		return "redirect:/adults/" + adult.getId();
 	}
 
 	/**
@@ -282,7 +300,7 @@ public class AdultController {
 	 */
 	@PostMapping("/adults/{adultId}/edit")
 	public String processUpdateForm(@Valid Adult adult, BindingResult result, @PathVariable("adultId") int adultId,
-			RedirectAttributes redirectAttributes, HttpSession session) {
+			RedirectAttributes redirectAttributes, HttpSession session, Model model) {
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
 		Adult existingAdult = this.adults.findById(adultId)
@@ -302,6 +320,7 @@ public class AdultController {
 
 		if (submittedClinics != null) {
 			for (Clinic clinic : submittedClinics) {
+				if (clinic == null || clinic.getClinicName() == null) continue;
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 				// Here we check for the "AddAdult" action, instead of "EditAdult", since
 				// the former applies to the "Clinic" resource.
@@ -324,12 +343,28 @@ public class AdultController {
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
+		Set<Clinic> finalClinics = new HashSet<>(submittedClinics != null ? submittedClinics : new ArrayList<>());
+
+		if (existingAdult.getClinics() != null) {
+			for (Clinic existingClinic : existingAdult.getClinics()) {
+				if (existingClinic == null || existingClinic.getClinicName() == null) continue;
+				String cedarClinicId = existingClinic.getClinicName().replaceFirst("^Clinic\\s+", "");
+				var viewEval = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Background");
+
+				if (!viewEval.isGranted()) {
+					finalClinics.add(existingClinic);
+				}
+			}
+		}
+		adult.setClinics(finalClinics);
+
 		if (StringUtils.hasLength(adult.getLastName()) && StringUtils.hasLength(adult.getFirstName())) {
 			boolean duplicateExists = this.adults.findByLastNameStartingWith(adult.getLastName(), PageRequest.of(0, 50))
 				.getContent()
 				.stream()
 				.anyMatch(a -> a.getFirstName().equalsIgnoreCase(adult.getFirstName())
-						&& a.getBirthDate().equals(adult.getBirthDate()) && a.getGender().equals(adult.getGender())
+						&& Objects.equals(a.getBirthDate(), adult.getBirthDate())
+						&& Objects.equals(a.getGender(), adult.getGender())
 						&& !Objects.equals(a.getId(), adultId));
 
 			if (duplicateExists) {
@@ -339,27 +374,22 @@ public class AdultController {
 		}
 
 		if (result.hasErrors()) {
-			redirectAttributes.addFlashAttribute("error", "There was an error in updating the adult.");
+			model.addAttribute("error", "There was an error in updating the adult.");
 			return VIEWS_ADULT_CREATE_OR_UPDATE_FORM;
 		}
 
-		Set<Clinic> finalClinics = new HashSet<>(submittedClinics != null ? submittedClinics : new ArrayList<>());
-
-		for (Clinic existingClinic : existingAdult.getClinics()) {
-			String cedarClinicId = existingClinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-			var viewEval = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Background");
-
-			// If the user did NOT have permission to view this clinic, it means it wasn't
-			// in the form.
-			// We must re-add it to the final payload to prevent it from being deleted.
-			if (!viewEval.isGranted()) {
-				finalClinics.add(existingClinic);
-			}
-		}
-		adult.setClinics(finalClinics);
-
 		adult.setId(adultId);
-		this.adults.save(adult);
+
+		try {
+			this.adults.save(adult);
+		}
+		catch (DataIntegrityViolationException ex) {
+			result.rejectValue("firstName", "duplicate",
+					"A person with this first name, last name, birth date, and gender already exists.");
+			model.addAttribute("error", "There was an error in updating the adult.");
+			return VIEWS_ADULT_CREATE_OR_UPDATE_FORM;
+		}
+
 		redirectAttributes.addFlashAttribute("message", "Adult values updated.");
 		return "redirect:/adults/{adultId}";
 	}

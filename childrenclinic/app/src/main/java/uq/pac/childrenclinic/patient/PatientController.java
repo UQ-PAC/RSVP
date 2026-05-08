@@ -1,15 +1,22 @@
 package uq.pac.childrenclinic.patient;
 
+import com.cedarpolicy.value.EntityUID;
+
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -28,15 +35,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.cedarpolicy.value.EntityUID;
-
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 import uq.pac.childrenclinic.adult.Adult;
 import uq.pac.childrenclinic.adult.AdultRepository;
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
 import uq.pac.childrenclinic.cedar.CedarDeniedException;
 import uq.pac.childrenclinic.cedar.CedarProgrammaticEvaluator;
+import uq.pac.childrenclinic.doctor.Doctor;
+import uq.pac.childrenclinic.doctor.DoctorRepository;
 import uq.pac.childrenclinic.model.Gender;
 import uq.pac.childrenclinic.model.GenderRepository;
 import uq.pac.childrenclinic.system.Clinic;
@@ -55,14 +60,21 @@ public class PatientController {
 
 	private final AdultRepository adults;
 
+	private final AdultAuthorityRepository authorities;
+
+	private final DoctorRepository doctorRepository;
+
 	private final CedarProgrammaticEvaluator cedarEvaluator;
 
 	public PatientController(PatientRepository patients, GenderRepository genders, ClinicRepository clinics,
-			AdultRepository adults, CedarProgrammaticEvaluator cedarEvaluator) {
+			AdultRepository adults, AdultAuthorityRepository authorities, DoctorRepository doctorRepository,
+			CedarProgrammaticEvaluator cedarEvaluator) {
 		this.patients = patients;
 		this.genders = genders;
 		this.clinics = clinics;
 		this.adults = adults;
+		this.authorities = authorities;
+		this.doctorRepository = doctorRepository;
 		this.cedarEvaluator = cedarEvaluator;
 	}
 
@@ -76,7 +88,10 @@ public class PatientController {
 		Collection<Clinic> allClinics = this.clinics.findClinics();
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
+		if (allClinics == null) return new ArrayList<>();
+
 		return allClinics.stream().filter(clinic -> {
+			if (clinic == null || clinic.getClinicName() == null) return false;
 			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 			var result = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Item");
 			return result.isGranted();
@@ -86,6 +101,16 @@ public class PatientController {
 	@ModelAttribute("adults")
 	public Collection<Adult> populateAdults() {
 		return this.adults.findAll();
+	}
+
+	@ModelAttribute("authorities")
+    public Collection<AdultAuthority> populateAuthorities() {
+        return this.authorities.findAll();
+    }
+
+	@ModelAttribute("doctors")
+	public Collection<Doctor> populateDoctors() {
+		return this.doctorRepository.findAll();
 	}
 
 	@InitBinder("patient")
@@ -109,7 +134,7 @@ public class PatientController {
 		List<Patient> allMatchingPatients = this.patients.findByLastNameStartingWith(lastName, Pageable.unpaged())
 			.getContent();
 
-		if (allMatchingPatients.isEmpty()) {
+		if (allMatchingPatients == null || allMatchingPatients.isEmpty()) {
 			result.rejectValue("lastName", "notFound", "No patients found.");
 			return "patients/findPatients";
 		}
@@ -119,10 +144,12 @@ public class PatientController {
 		Map<Integer, String> cedarResourceMap = new HashMap<>();
 
 		List<Patient> authorized = allMatchingPatients.stream().filter(p -> {
-			String resourceName = p.getFirstName() + " " + p.getLastName();
-			var evalResult = cedarEvaluator.evaluate(principal, "ViewPatient", "Patient", resourceName, "Item");
+			if (p == null) return false;
+			String resourceName = (p.getFirstName() != null ? p.getFirstName() : "") + " " + 
+			                      (p.getLastName() != null ? p.getLastName() : "");
+			var evalResult = cedarEvaluator.evaluate(principal, "ViewPatient", "Patient", resourceName.trim(), "Item");
 			authorizationMap.put(p.getId(), evalResult.responseBody());
-			cedarResourceMap.put(p.getId(), "ChildrenClinic::Patient::\"" + resourceName + "\"");
+			cedarResourceMap.put(p.getId(), "ChildrenClinic::Patient::\"" + resourceName.trim() + "\"");
 			return evalResult.isGranted();
 		}).collect(Collectors.toList());
 
@@ -167,15 +194,18 @@ public class PatientController {
 		boolean isAuthorized = false;
 		List<String> denialReasons = new ArrayList<>();
 
-		for (Clinic clinic : allClinics) {
-			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-			var result = cedarEvaluator.evaluate(principal, "AddPatient", "Clinic", cedarClinicId, "Page");
+		if (allClinics != null) {
+			for (Clinic clinic : allClinics) {
+				if (clinic != null && clinic.getClinicName() != null) {
+					String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
+					var result = cedarEvaluator.evaluate(principal, "AddPatient", "Clinic", cedarClinicId, "Page");
 
-			if (result.isGranted()) {
-				isAuthorized = true;
-			}
-			else if (result.responseBody() != null) {
-				denialReasons.add(result.responseBody());
+					if (result.isGranted()) {
+						isAuthorized = true;
+					} else if (result.responseBody() != null) {
+						denialReasons.add(result.responseBody());
+					}
+				}
 			}
 		}
 
@@ -204,14 +234,16 @@ public class PatientController {
 
 	@PostMapping("/patients/new")
 	public String processCreationForm(@Valid Patient patient, BindingResult result,
-			RedirectAttributes redirectAttributes, HttpSession session) {
+			@RequestParam(name = "clinics", required = false) Collection<Clinic> submittedClinics,
+			@RequestParam(name = "newAdultIds", required = false) List<Integer> adultIds,
+			@RequestParam(name = "newAuthorityId", required = false) Integer authorityId,
+			@RequestParam(name = "newDoctorIds", required = false) List<Integer> doctorIds,
+			RedirectAttributes redirectAttributes, HttpSession session, Model model) {
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
 		// Evaluate Cedar for all the submitted Clinics.
 		boolean isAuthorized = true;
 		List<String> denialReasons = new ArrayList<>();
-
-		Collection<Clinic> submittedClinics = patient.getClinics();
 
 		if (submittedClinics == null || submittedClinics.isEmpty()) {
 			isAuthorized = false;
@@ -219,17 +251,63 @@ public class PatientController {
 		}
 		else {
 			for (Clinic clinic : submittedClinics) {
-				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-				var evalResult = cedarEvaluator.evaluate(principal, "AddPatient", "Clinic", cedarClinicId, "Page");
+				if (clinic != null && clinic.getClinicName() != null) {
+					String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
+					var evalResult = cedarEvaluator.evaluate(principal, "AddPatient", "Clinic", cedarClinicId, "Page");
 
-				if (!evalResult.isGranted()) {
-					isAuthorized = false;
-					if (evalResult.responseBody() != null) {
-						denialReasons.add(evalResult.responseBody());
+					if (!evalResult.isGranted()) {
+						isAuthorized = false;
+						if (evalResult.responseBody() != null) {
+							denialReasons.add(evalResult.responseBody());
+						}
 					}
 				}
 			}
 		}
+
+		if (patient.getResponsibleAdults() == null) {
+			patient.setResponsibleAdults(new LinkedHashSet<>());
+		}
+		if (patient.getClinics() == null) {
+			patient.setClinics(new HashSet<>());
+		}
+
+		if (submittedClinics != null) {
+			patient.getClinics().addAll(submittedClinics);
+		}
+
+		if (adultIds != null && authorityId != null) {
+			AdultAuthority auth = authorities.findById(authorityId).orElse(null);
+			if (auth != null) {
+				for (Integer adId : adultIds) {
+					if (adId != null) {
+						Adult adult = adults.findById(adId).orElse(null);
+						if (adult != null) {
+							PatientAdult pa = new PatientAdult();
+							pa.setPatient(patient);
+							pa.setAdult(adult);
+							pa.setAuthority(auth);
+							patient.getResponsibleAdults().add(pa);
+						}
+					}
+				}
+			}
+		}
+
+		if (patient.getResponsibleAdults() == null || patient.getResponsibleAdults().isEmpty()) {
+			isAuthorized = false;
+			denialReasons.add("You must assign the Patient to at least one Responsible Adult.");
+		}
+
+		if (doctorIds != null && !doctorIds.isEmpty()) {
+            Set<Doctor> selectedDoctors = new LinkedHashSet<>();
+            for (Integer docId : doctorIds) {
+                if (docId != null) {
+                    doctorRepository.findById(docId).ifPresent(selectedDoctors::add);
+                }
+            }
+            patient.setDoctors(selectedDoctors);
+        }
 
 		// Deny Access if any checks failed.
 		if (!isAuthorized) {
@@ -254,20 +332,33 @@ public class PatientController {
 			boolean duplicateExists = patients.findByLastNameStartingWith(patient.getLastName(), PageRequest.of(0, 50))
 				.getContent()
 				.stream()
-				.anyMatch(p -> p.getFirstName().equalsIgnoreCase(patient.getFirstName())
-						&& p.getBirthDate().equals(patient.getBirthDate())
-						&& p.getGender().equals(patient.getGender()));
+				.anyMatch(p -> p != null && p.getFirstName() != null
+						&& p.getFirstName().equalsIgnoreCase(patient.getFirstName())
+						&& Objects.equals(p.getBirthDate(), patient.getBirthDate())
+						&& Objects.equals(p.getGender(), patient.getGender()));
 
 			if (duplicateExists) {
-				result.rejectValue("firstName", "duplicate", "A patient with this first and last name already exists");
+				result.rejectValue("firstName", "duplicate", "A patient with this first and last name, birth date, and gender already exists.");
 			}
 		}
 
 		if (result.hasErrors()) {
+			model.addAttribute("selectedAdultIds", adultIds);
+            model.addAttribute("selectedAuthorityId", authorityId);
 			return VIEWS_PATIENT_CREATE_OR_UPDATE_FORM;
 		}
 
-		this.patients.save(patient);
+		try {
+			this.patients.save(patient);
+		}
+		catch (DataIntegrityViolationException ex) {
+			result.rejectValue("firstName", "duplicate",
+					"A person with this first name, last name, birth date, and gender already exists.");
+			model.addAttribute("selectedAdultIds", adultIds);
+			model.addAttribute("selectedAuthorityId", authorityId);
+			return VIEWS_PATIENT_CREATE_OR_UPDATE_FORM;
+		}
+
 		redirectAttributes.addFlashAttribute("message", "New Patient has been added.");
 		return "redirect:/patients/" + patient.getId();
 	}
@@ -284,6 +375,24 @@ public class PatientController {
 	public String initUpdateForm(@PathVariable("patientId") int patientId, Model model) {
 		Patient patient = this.patients.findById(patientId)
 			.orElseThrow(() -> new IllegalArgumentException("Patient entity not found for identifier: " + patientId));
+		
+		if (patient.getResponsibleAdults() != null && !patient.getResponsibleAdults().isEmpty()) {
+            List<Integer> adultIds = patient.getResponsibleAdults().stream()
+                    .map(pa -> pa.getAdult().getId())
+                    .collect(Collectors.toList());
+            model.addAttribute("selectedAdultIds", adultIds);
+
+            Integer authId = patient.getResponsibleAdults().iterator().next().getAuthority().getId();
+            model.addAttribute("selectedAuthorityId", authId);
+        }
+
+		if (patient.getDoctors() != null && !patient.getDoctors().isEmpty()) {
+            List<Integer> selectedDoctorIds = patient.getDoctors().stream()
+                    .map(Doctor::getId)
+                    .collect(Collectors.toList());
+            model.addAttribute("selectedDoctorIds", selectedDoctorIds);
+        }
+
 		model.addAttribute("patient", patient);
 		return VIEWS_PATIENT_CREATE_OR_UPDATE_FORM;
 	}
@@ -298,13 +407,19 @@ public class PatientController {
 	 */
 	@PostMapping("/patients/{patientId}/edit")
 	public String processUpdateForm(@Valid Patient patient, BindingResult result,
-			@PathVariable("patientId") int patientId, RedirectAttributes redirectAttributes, HttpSession session) {
+			@PathVariable("patientId") int patientId,
+			@RequestParam(name = "clinics", required = false) Collection<Clinic> submittedClinics,
+			@RequestParam(name = "newAdultIds", required = false) List<Integer> adultIds,
+			@RequestParam(name = "newAuthorityId", required = false) Integer authorityId,
+			@RequestParam(name = "newDoctorIds", required = false) List<Integer> doctorIds,
+			RedirectAttributes redirectAttributes, HttpSession session, Model model) {
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
 		Patient existingPatient = this.patients.findById(patientId)
 			.orElseThrow(() -> new IllegalArgumentException("Patient not found: " + patientId));
 
-		String resourceName = existingPatient.getFirstName() + " " + existingPatient.getLastName();
+		String resourceName = (existingPatient.getFirstName() != null ? existingPatient.getFirstName() : "") + " " + 
+		                      (existingPatient.getLastName() != null ? existingPatient.getLastName() : "");
 		var patientEval = cedarEvaluator.evaluate(principal, "EditPatient", "Patient", resourceName, "Page");
 
 		if (!patientEval.isGranted()) {
@@ -312,25 +427,94 @@ public class PatientController {
 					+ (patientEval.responseBody() != null ? patientEval.responseBody() : ""));
 		}
 
+		// Evaluate Cedar for all the submitted Clinics.
 		boolean isAuthorized = true;
 		List<String> denialReasons = new ArrayList<>();
-		Collection<Clinic> submittedClinics = patient.getClinics();
 
-		if (submittedClinics != null) {
+		if (submittedClinics != null && !submittedClinics.isEmpty()) {
 			for (Clinic clinic : submittedClinics) {
-				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-				// Here we check for the "AddPatient" action, instead of "EditPatient",
-				// since the former applies to the "Clinic" resource.
-				var clinicEval = cedarEvaluator.evaluate(principal, "AddPatient", "Clinic", cedarClinicId, "Page");
-				if (!clinicEval.isGranted()) {
-					isAuthorized = false;
-					if (clinicEval.responseBody() != null) {
-						denialReasons.add(clinicEval.responseBody());
+				if (clinic != null && clinic.getClinicName() != null) {
+					String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
+					// Here we check for the "AddPatient" action, instead of "EditPatient",
+					// since the former applies to the "Clinic" resource.
+					var clinicEval = cedarEvaluator.evaluate(principal, "AddPatient", "Clinic", cedarClinicId, "Page");
+					if (!clinicEval.isGranted()) {
+						isAuthorized = false;
+						if (clinicEval.responseBody() != null) {
+							denialReasons.add(clinicEval.responseBody());
+						}
 					}
 				}
 			}
 		}
 
+		Set<Clinic> finalClinics = new HashSet<>(submittedClinics != null ? submittedClinics : new ArrayList<>());
+
+		if (existingPatient.getClinics() != null) {
+			for (Clinic existingClinic : existingPatient.getClinics()) {
+				if (existingClinic != null && existingClinic.getClinicName() != null) {
+					String cedarClinicId = existingClinic.getClinicName().replaceFirst("^Clinic\\s+", "");
+					var viewEval = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Background");
+
+					if (!viewEval.isGranted()) {
+						finalClinics.add(existingClinic);
+					}
+				}
+			}
+		}
+		patient.setClinics(finalClinics);
+
+		if (patient.getClinics() == null || patient.getClinics().isEmpty()) {
+			result.rejectValue("clinics", "NotEmpty", "At least one clinic must be assigned.");
+		}
+
+		// Carry over the existing responsible adults.
+		Set<PatientAdult> mergedAdults;
+		if (existingPatient.getResponsibleAdults() != null) {
+			mergedAdults = new LinkedHashSet<>(existingPatient.getResponsibleAdults());
+		} else {
+			mergedAdults = new LinkedHashSet<>();
+		}
+
+		// Collect the adult IDs already present to prevent duplicates.
+		Set<Integer> existingAdultIds = mergedAdults.stream()
+				.map(pa -> pa.getAdult().getId())
+				.collect(Collectors.toSet());
+
+		// Add only newly submitted adults that are not already in the set.
+		if (adultIds != null && authorityId != null) {
+			AdultAuthority auth = authorities.findById(authorityId).orElse(null);
+			if (auth != null) {
+				for (Integer adId : adultIds) {
+					if (adId != null && !existingAdultIds.contains(adId)) {
+						Adult adult = adults.findById(adId).orElse(null);
+						if (adult != null) {
+							PatientAdult pa = new PatientAdult(existingPatient, adult, auth);
+							mergedAdults.add(pa);
+						}
+					}
+				}
+			}
+		}
+
+		patient.setResponsibleAdults(mergedAdults);
+
+		if (patient.getResponsibleAdults() == null || patient.getResponsibleAdults().isEmpty()) {
+			isAuthorized = false;
+			denialReasons.add("You must assign the Patient to at least one Responsible Adult.");
+		}
+
+		if (doctorIds != null && !doctorIds.isEmpty()) {
+            Set<Doctor> selectedDoctors = new LinkedHashSet<>();
+            for (Integer docId : doctorIds) {
+                if (docId != null) {
+                    doctorRepository.findById(docId).ifPresent(selectedDoctors::add);
+                }
+            }
+            patient.setDoctors(selectedDoctors);
+        }
+
+		// Deny Access if any checks failed.
 		if (!isAuthorized) {
 			String prefix = "Access Denied.\n";
 			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
@@ -345,37 +529,38 @@ public class PatientController {
 				.findByLastNameStartingWith(patient.getLastName(), PageRequest.of(0, 50))
 				.getContent()
 				.stream()
-				.anyMatch(p -> p.getFirstName().equalsIgnoreCase(patient.getFirstName())
-						&& p.getBirthDate().equals(patient.getBirthDate()) && p.getGender().equals(patient.getGender())
-						&& !Objects.equals(p.getId(), patientId));
+				.anyMatch(p -> p != null && p.getFirstName() != null &&
+							p.getFirstName().equalsIgnoreCase(patient.getFirstName()) &&
+							Objects.equals(p.getBirthDate(), patient.getBirthDate()) && 
+							Objects.equals(p.getGender(), patient.getGender()) &&
+							!Objects.equals(p.getId(), patientId));
 
 			if (duplicateExists) {
-				result.rejectValue("firstName", "duplicate", "A patient with this first and last name already exists.");
+				result.rejectValue("firstName", "duplicate", "A patient with this first and last name, birth date, and gender already exists.");
 			}
 		}
 
 		if (result.hasErrors()) {
-			redirectAttributes.addFlashAttribute("error", "There was an error in updating the patient.");
+			model.addAttribute("selectedAdultIds", adultIds);
+			model.addAttribute("selectedAuthorityId", authorityId);
+			model.addAttribute("error", "There was an error in updating the patient.");
 			return VIEWS_PATIENT_CREATE_OR_UPDATE_FORM;
 		}
 
-		Set<Clinic> finalClinics = new HashSet<>(submittedClinics != null ? submittedClinics : new ArrayList<>());
-
-		for (Clinic existingClinic : existingPatient.getClinics()) {
-			String cedarClinicId = existingClinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-			var viewEval = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Background");
-
-			// If the user did NOT have permission to view this clinic, it means it wasn't
-			// in the form.
-			// We must re-add it to the final payload to prevent it from being deleted.
-			if (!viewEval.isGranted()) {
-				finalClinics.add(existingClinic);
-			}
-		}
-		patient.setClinics(finalClinics);
-
 		patient.setId(patientId);
-		this.patients.save(patient);
+
+		try {
+			this.patients.save(patient);
+		}
+		catch (DataIntegrityViolationException ex) {
+			result.rejectValue("firstName", "duplicate",
+					"A person with this first name, last name, birth date, and gender already exists.");
+			model.addAttribute("selectedAdultIds", adultIds);
+			model.addAttribute("selectedAuthorityId", authorityId);
+			model.addAttribute("error", "There was an error in updating the patient.");
+			return VIEWS_PATIENT_CREATE_OR_UPDATE_FORM;
+		}
+
 		redirectAttributes.addFlashAttribute("message", "Patient values updated.");
 		return "redirect:/patients/{patientId}";
 	}

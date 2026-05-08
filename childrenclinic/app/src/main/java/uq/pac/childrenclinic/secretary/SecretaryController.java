@@ -1,5 +1,10 @@
 package uq.pac.childrenclinic.secretary;
 
+import com.cedarpolicy.value.EntityUID;
+
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,6 +15,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -28,10 +34,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.cedarpolicy.value.EntityUID;
-
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
 import uq.pac.childrenclinic.cedar.CedarDeniedException;
 import uq.pac.childrenclinic.cedar.CedarProgrammaticEvaluator;
@@ -71,7 +73,10 @@ public class SecretaryController {
 		Collection<Clinic> allClinics = this.clinics.findClinics();
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
+		if (allClinics == null) return new ArrayList<>();
+
 		return allClinics.stream().filter(clinic -> {
+			if (clinic == null || clinic.getClinicName() == null) return false;
 			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 			var result = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Item");
 			return result.isGranted();
@@ -158,15 +163,18 @@ public class SecretaryController {
 		boolean isAuthorized = false;
 		List<String> denialReasons = new ArrayList<>();
 
-		for (Clinic clinic : allClinics) {
-			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-			var result = cedarEvaluator.evaluate(principal, "AddEmployee", "Clinic", cedarClinicId, "Page");
+		if (allClinics != null) {
+			for (Clinic clinic : allClinics) {
+				if (clinic == null || clinic.getClinicName() == null) continue;
+				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
+				var result = cedarEvaluator.evaluate(principal, "AddEmployee", "Clinic", cedarClinicId, "Page");
 
-			if (result.isGranted()) {
-				isAuthorized = true;
-			}
-			else if (result.responseBody() != null) {
-				denialReasons.add(result.responseBody());
+				if (result.isGranted()) {
+					isAuthorized = true;
+				}
+				else if (result.responseBody() != null) {
+					denialReasons.add(result.responseBody());
+				}
 			}
 		}
 
@@ -210,6 +218,7 @@ public class SecretaryController {
 		}
 		else {
 			for (Clinic clinic : submittedClinics) {
+				if (clinic == null || clinic.getClinicName() == null) continue;
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 				var evalResult = cedarEvaluator.evaluate(principal, "AddEmployee", "Clinic", cedarClinicId, "Page");
 
@@ -247,8 +256,8 @@ public class SecretaryController {
 				.getContent()
 				.stream()
 				.anyMatch(s -> s.getFirstName().equalsIgnoreCase(secretary.getFirstName())
-						&& s.getBirthDate().equals(secretary.getBirthDate())
-						&& s.getGender().equals(secretary.getGender()));
+						&& Objects.equals(s.getBirthDate(), secretary.getBirthDate())
+						&& Objects.equals(s.getGender(), secretary.getGender()));
 
 			if (duplicateExists) {
 				result.rejectValue("firstName", "duplicate",
@@ -260,7 +269,15 @@ public class SecretaryController {
 			return VIEWS_SECRETARY_CREATE_OR_UPDATE_FORM;
 		}
 
-		this.secretaries.save(secretary);
+		try {
+			this.secretaries.save(secretary);
+		}
+		catch (DataIntegrityViolationException ex) {
+			result.rejectValue("firstName", "duplicate",
+					"A person with this first name, last name, birth date, and gender already exists.");
+			return VIEWS_SECRETARY_CREATE_OR_UPDATE_FORM;
+		}
+
 		redirectAttributes.addFlashAttribute("message", "New Secretary has been added.");
 		return "redirect:/secretaries/" + secretary.getId();
 	}
@@ -276,7 +293,7 @@ public class SecretaryController {
 
 	@PostMapping("/secretaries/{secretaryId}/edit")
 	public String processUpdateForm(@Valid Secretary secretary, BindingResult result,
-			@PathVariable("secretaryId") int secretaryId, RedirectAttributes redirectAttributes, HttpSession session) {
+			@PathVariable("secretaryId") int secretaryId, RedirectAttributes redirectAttributes, HttpSession session, Model model) {
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
 		Secretary existingSecretary = this.secretaries.findById(secretaryId)
@@ -296,6 +313,7 @@ public class SecretaryController {
 
 		if (submittedClinics != null) {
 			for (Clinic clinic : submittedClinics) {
+				if (clinic == null || clinic.getClinicName() == null) continue;
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 				// Here we check for the "AddEmployee" action, instead of "EditEmployee",
 				// since the former applies to the "Clinic" resource.
@@ -318,14 +336,30 @@ public class SecretaryController {
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
+		Set<Clinic> finalClinics = new HashSet<>(submittedClinics != null ? submittedClinics : new ArrayList<>());
+
+		if (existingSecretary.getClinics() != null) {
+			for (Clinic existingClinic : existingSecretary.getClinics()) {
+				if (existingClinic == null || existingClinic.getClinicName() == null) continue;
+				String cedarClinicId = existingClinic.getClinicName().replaceFirst("^Clinic\\s+", "");
+				var viewEval = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Background");
+
+				if (!viewEval.isGranted()) {
+					finalClinics.add(existingClinic);
+				}
+			}
+		}
+		secretary.setClinics(finalClinics);
+
 		if (StringUtils.hasLength(secretary.getLastName()) && StringUtils.hasLength(secretary.getFirstName())) {
 			boolean duplicateExists = this.secretaries
 				.findByLastNameStartingWith(secretary.getLastName(), PageRequest.of(0, 50))
 				.getContent()
 				.stream()
 				.anyMatch(s -> s.getFirstName().equalsIgnoreCase(secretary.getFirstName())
-						&& s.getBirthDate().equals(secretary.getBirthDate())
-						&& s.getGender().equals(secretary.getGender()) && !Objects.equals(s.getId(), secretaryId));
+						&& Objects.equals(s.getBirthDate(), secretary.getBirthDate())
+						&& Objects.equals(s.getGender(), secretary.getGender())
+						&& !Objects.equals(s.getId(), secretaryId));
 
 			if (duplicateExists) {
 				result.rejectValue("firstName", "duplicate",
@@ -334,27 +368,22 @@ public class SecretaryController {
 		}
 
 		if (result.hasErrors()) {
-			redirectAttributes.addFlashAttribute("error", "There was an error in updating the secretary.");
+			model.addAttribute("error", "There was an error in updating the secretary.");
 			return VIEWS_SECRETARY_CREATE_OR_UPDATE_FORM;
 		}
 
-		Set<Clinic> finalClinics = new HashSet<>(submittedClinics != null ? submittedClinics : new ArrayList<>());
-
-		for (Clinic existingClinic : existingSecretary.getClinics()) {
-			String cedarClinicId = existingClinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-			var viewEval = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Background");
-
-			// If the user did NOT have permission to view this clinic, it means it wasn't
-			// in the form.
-			// We must re-add it to the final payload to prevent it from being deleted.
-			if (!viewEval.isGranted()) {
-				finalClinics.add(existingClinic);
-			}
-		}
-		secretary.setClinics(finalClinics);
-
 		secretary.setId(secretaryId);
-		this.secretaries.save(secretary);
+
+		try {
+			this.secretaries.save(secretary);
+		}
+		catch (DataIntegrityViolationException ex) {
+			result.rejectValue("firstName", "duplicate",
+					"A person with this first name, last name, birth date, and gender already exists.");
+			model.addAttribute("error", "There was an error in updating the secretary.");
+			return VIEWS_SECRETARY_CREATE_OR_UPDATE_FORM;
+		}
+
 		redirectAttributes.addFlashAttribute("message", "Secretary values updated.");
 		return "redirect:/secretaries/{secretaryId}";
 	}

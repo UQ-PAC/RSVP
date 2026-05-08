@@ -12,15 +12,16 @@ import jakarta.persistence.OrderBy;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import uq.pac.childrenclinic.adult.Adult;
-import uq.pac.childrenclinic.model.Person;
-import uq.pac.childrenclinic.visit.Visit;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.springframework.core.style.ToStringCreator;
+
+import uq.pac.childrenclinic.doctor.Doctor;
+import uq.pac.childrenclinic.model.Person;
+import uq.pac.childrenclinic.visit.Visit;
 
 @Entity
 @Table(name = "patients")
@@ -35,13 +36,16 @@ public class Patient extends Person {
 	@NotBlank
 	private String city;
 
-	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "patient_adults", joinColumns = @JoinColumn(name = "patient_id"),
-			inverseJoinColumns = @JoinColumn(name = "adult_id"))
-	private Set<Adult> responsibleAdults = new LinkedHashSet<>();
+	@OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+	private Set<PatientAdult> responsibleAdults = new LinkedHashSet<>();
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name = "patient_id")
+	@ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "patient_doctors",
+            joinColumns = @JoinColumn(name = "patient_id"),
+            inverseJoinColumns = @JoinColumn(name = "doctor_id"))
+    private Set<Doctor> doctors = new LinkedHashSet<>();
+
+	@OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@OrderBy("date ASC")
 	private final Set<Visit> visits = new LinkedHashSet<>();
 
@@ -61,13 +65,21 @@ public class Patient extends Person {
 		this.city = city;
 	}
 
-	public Set<Adult> getResponsibleAdults() {
+	public Set<PatientAdult> getResponsibleAdults() {
 		return responsibleAdults;
 	}
 
-	public void setResponsibleAdults(Set<Adult> responsibleAdults) {
+	public void setResponsibleAdults(Set<PatientAdult> responsibleAdults) {
 		this.responsibleAdults = responsibleAdults;
 	}
+
+	public Set<Doctor> getDoctors() {
+        return doctors;
+    }
+
+    public void setDoctors(Set<Doctor> doctors) {
+        this.doctors = doctors;
+    }
 
 	public Collection<Visit> getVisits() {
 		return this.visits;
@@ -75,6 +87,7 @@ public class Patient extends Person {
 
 	public void addVisit(Visit visit) {
 		getVisits().add(visit);
+		visit.setPatient(this);
 	}
 
 	@Override

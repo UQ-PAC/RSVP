@@ -1,13 +1,14 @@
 package uq.pac.childrenclinic.adult;
 
-import org.springframework.core.style.ToStringCreator;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+
+import org.springframework.core.style.ToStringCreator;
+
 import uq.pac.childrenclinic.model.Person;
 
 @Entity

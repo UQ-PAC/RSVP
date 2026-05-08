@@ -17,6 +17,7 @@ package uq.pac.childrenclinic.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,14 +27,17 @@ import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import uq.pac.childrenclinic.system.Clinic;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import uq.pac.childrenclinic.system.Clinic;
 
 /**
  * Simple JavaBean domain object with an id property. Used as a base class for objects
@@ -45,6 +49,7 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "entities")
 @Inheritance(strategy = InheritanceType.JOINED)
+@EntityListeners(EntityTypeListener.class)
 public class BaseEntity implements Serializable, Identifiable {
 
 	@Id
@@ -53,10 +58,20 @@ public class BaseEntity implements Serializable, Identifiable {
 	@SequenceGenerator(name = "entity_sequence_generator", sequenceName = "entities_sequence", allocationSize = 1)
 	private Integer id;
 
+	@Column(name = "created_at", updatable = false)
+	private LocalDateTime createdAt;
+
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "entity_clinics", joinColumns = @JoinColumn(name = "entity_id"),
 			inverseJoinColumns = @JoinColumn(name = "clinic_id"))
 	private Set<Clinic> clinics = new HashSet<>();
+
+	@PrePersist
+	protected void onCreate() {
+		if (this.createdAt == null) {
+			this.createdAt = LocalDateTime.now();
+		}
+	}
 
 	public Integer getId() {
 		return id;
@@ -68,6 +83,14 @@ public class BaseEntity implements Serializable, Identifiable {
 
 	public boolean isNew() {
 		return this.id == null;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
 	}
 
 	public Set<Clinic> getClinics() {
@@ -82,9 +105,13 @@ public class BaseEntity implements Serializable, Identifiable {
 		this.clinics.add(clinic);
 	}
 
+	public void removeClinic(Clinic clinic) {
+		this.clinics.remove(clinic);
+	}
+
 	public String getClinicDescriptions() {
 		if (this.clinics == null || this.clinics.isEmpty()) {
-			return "No Assigned Clinics";
+			return "No assigned Clinics.";
 		}
 		return this.clinics.stream().map(Clinic::getClinicName).sorted().collect(Collectors.joining(", "));
 	}

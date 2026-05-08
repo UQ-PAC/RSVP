@@ -15,12 +15,6 @@
  */
 package uq.pac.childrenclinic.visit;
 
-import java.time.LocalDate;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import org.springframework.format.annotation.DateTimeFormat;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -32,9 +26,17 @@ import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
 import uq.pac.childrenclinic.adult.Adult;
 import uq.pac.childrenclinic.doctor.Doctor;
 import uq.pac.childrenclinic.model.BaseEntity;
+import uq.pac.childrenclinic.patient.Patient;
 
 /**
  * Simple JavaBean domain object representing a visit.
@@ -48,6 +50,7 @@ import uq.pac.childrenclinic.model.BaseEntity;
 public class Visit extends BaseEntity {
 
 	@Column(name = "visit_date")
+	@NotNull
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate date;
 
@@ -58,6 +61,10 @@ public class Visit extends BaseEntity {
 	@JoinColumn(name = "confidentiality_id", nullable = false)
 	@NotNull
 	private Confidentiality confidentiality;
+
+	@ManyToOne
+	@JoinColumn(name = "patient_id", nullable = false)
+	private Patient patient;
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "visit_adults", joinColumns = @JoinColumn(name = "visit_id"),
@@ -98,6 +105,14 @@ public class Visit extends BaseEntity {
 
 	public void setConfidentiality(Confidentiality confidentiality) {
 		this.confidentiality = confidentiality;
+	}
+
+	public Patient getPatient() {
+		return this.patient;
+	}
+
+	public void setPatient(Patient patient) {
+		this.patient = patient;
 	}
 
 	public Set<Adult> getResponsibleAdults() {

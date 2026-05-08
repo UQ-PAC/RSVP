@@ -153,8 +153,8 @@ CREATE TABLE adults (
 
 CREATE TABLE patients (
   entity_id  INTEGER PRIMARY KEY,
-  address    VARCHAR(240),
-  city       VARCHAR(40),
+  address    VARCHAR(240) NOT NULL,
+  city       VARCHAR(40) NOT NULL,
   FOREIGN KEY (entity_id) REFERENCES persons(entity_id) ON DELETE CASCADE
 );
 

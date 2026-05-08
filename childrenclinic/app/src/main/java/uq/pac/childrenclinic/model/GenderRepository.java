@@ -18,6 +18,7 @@ package uq.pac.childrenclinic.model;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -34,6 +35,7 @@ public interface GenderRepository extends JpaRepository<Gender, Integer> {
 	 * @return a Collection of {@link Gender}s.
 	 */
 	@Query("SELECT g FROM Gender g ORDER BY g.name")
+	@Cacheable("genders")
 	List<Gender> findGenders();
 
 }

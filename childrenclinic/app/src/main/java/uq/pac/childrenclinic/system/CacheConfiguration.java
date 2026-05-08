@@ -39,6 +39,7 @@ class CacheConfiguration {
             cm.createCache("clinics", cacheConfiguration());
             cm.createCache("specialties", cacheConfiguration());
             cm.createCache("confidentialities", cacheConfiguration());
+            cm.createCache("authorities", cacheConfiguration());
         };
     }
 

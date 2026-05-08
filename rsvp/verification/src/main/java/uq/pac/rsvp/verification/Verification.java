@@ -300,21 +300,6 @@ public class Verification {
             }
         });
 
-        // Check and warn for unmatched requests
-        int unmatchedRequests = 0;
-
-        for (Map.Entry<Request,Verification.RequestResult> requestEntry : requestPolicyMap.entrySet()) {
-            if (requestEntry.getValue().policies.isEmpty()) {
-                unmatchedRequests++;
-            }
-        }
-
-        if (unmatchedRequests > 0) {
-            results.add(new Report(Report.Severity.Warning,
-                    "There are " + unmatchedRequests + " requests that are not matched by any policy",
-                    SourceLoc.MISSING));
-        }
-
         List<RequestStatus> changeImpact = null;
 
         if (prevPoliciesPath != null) {
@@ -336,6 +321,8 @@ public class Verification {
             //                    matching permit policy(s) 'x'
             //   - now permitted, due to no longer matching forbid policy(s) 'x'
             //   - no longer matches any policies (previously forbidden by policy(s) 'x')
+
+            // For now though, simply check which requests have changed status:
 
             for (Entry<Request, RequestResult> requestEntry : requestPolicyMap.entrySet()) {
                 RequestResult prevResult = prevRequestResults.get(requestEntry.getKey());

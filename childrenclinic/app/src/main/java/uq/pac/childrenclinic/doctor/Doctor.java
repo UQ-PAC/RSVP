@@ -33,7 +33,6 @@ import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.xml.bind.annotation.XmlElement;
 import uq.pac.childrenclinic.model.Person;
 
 /**
@@ -66,7 +65,6 @@ public class Doctor extends Person {
 		return this.specialties;
 	}
 
-	@XmlElement
 	public List<Specialty> getSpecialties() {
 		return getSpecialtiesInternal().stream()
 			.sorted(Comparator.comparing(Specialty::getName))

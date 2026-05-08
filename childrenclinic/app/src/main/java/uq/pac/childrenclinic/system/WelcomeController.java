@@ -16,7 +16,13 @@
 
 package uq.pac.childrenclinic.system;
 
+import com.cedarpolicy.value.EntityUID;
+
+import jakarta.servlet.http.HttpSession;
+
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.stream.Collectors;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,10 +33,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.util.UriUtils;
 
-import com.cedarpolicy.value.EntityUID;
-
-import jakarta.servlet.http.HttpSession;
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
 import uq.pac.childrenclinic.cedar.CedarProgrammaticEvaluator;
 import uq.pac.childrenclinic.doctor.Doctor;
@@ -61,14 +65,15 @@ class WelcomeController {
 		Map<Integer, String> authorizationMap = new HashMap<>();
 		Map<Integer, String> cedarResourceMap = new HashMap<>();
 
-		for (Doctor d : allDoctors) {
+		List<Doctor> authorized = allDoctors.stream().filter(d -> {
 			String resourceName = d.getFirstName() + " " + d.getLastName();
 			var evalResult = cedarEvaluator.evaluate(principal, "ViewEmployee", "Employee", resourceName, "Item");
 			authorizationMap.put(d.getId(), evalResult.responseBody());
 			cedarResourceMap.put(d.getId(), "ChildrenClinic::Employee::\"" + resourceName + "\"");
-		}
+			return evalResult.isGranted();
+		}).collect(Collectors.toList());
 
-		model.addAttribute("listDoctors", allDoctors);
+		model.addAttribute("listDoctors", authorized);
 		model.addAttribute("authorizationMap", authorizationMap);
 		model.addAttribute("cedarPrincipal", principal.toString());
 		model.addAttribute("cedarAction", "ChildrenClinic::Action::\"ViewEmployee\"");
@@ -111,18 +116,19 @@ class WelcomeController {
 			@RequestParam(name = "query", defaultValue = "") String query, HttpSession session) {
 
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
+		String encodedQuery = UriUtils.encode(query, StandardCharsets.UTF_8);
 
 		if ("patient".equalsIgnoreCase(entityType) && isAuthorized(principal, "ListPatients")) {
-			return "redirect:/patients?lastName=" + query;
+			return "redirect:/patients?lastName=" + encodedQuery;
 		}
 		else if ("adult".equalsIgnoreCase(entityType) && isAuthorized(principal, "ListAdults")) {
-			return "redirect:/adults?lastName=" + query;
+			return "redirect:/adults?lastName=" + encodedQuery;
 		}
 		else if ("secretary".equalsIgnoreCase(entityType) && isAuthorized(principal, "ListEmployees")) {
-			return "redirect:/secretaries?lastName=" + query;
+			return "redirect:/secretaries?lastName=" + encodedQuery;
 		}
 		else if ("doctor".equalsIgnoreCase(entityType) && isAuthorized(principal, "ListEmployees")) {
-			return "redirect:/doctors?lastName=" + query;
+			return "redirect:/doctors?lastName=" + encodedQuery;
 		}
 		else {
 			return "redirect:/";

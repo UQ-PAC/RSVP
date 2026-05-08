@@ -11,16 +11,15 @@ import java.lang.reflect.Method;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -43,13 +42,18 @@ public class CedarAspect {
 
 	private static final String CONTEXT_PARAM_PREFIX = "cedar-context-";
 
+	private static final Set<String> ALLOWED_CONTEXT_KEYS = Set.of("authenticated");
+
 	private record ResourceMetadata(String sqlQuery, Function<Map<String, Object>, String> nameExtractor) {
 	}
 
-	private static final Map<String, ResourceMetadata> RESOURCE_REGISTRY = Map.of("Doctor", new ResourceMetadata(
-			"SELECT p.first_name, p.last_name FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE d.entity_id = ?",
-			rs -> rs.get("first_name") + " " + rs.get("last_name")), "Employee",
-			new ResourceMetadata("SELECT username FROM users WHERE entity_id = ?", rs -> rs.get("username").toString()),
+	private static final Map<String, ResourceMetadata> RESOURCE_REGISTRY = Map.of(
+			"Clinic",
+			new ResourceMetadata("SELECT name FROM clinics WHERE clinic_id = ?",
+					rs -> rs.get("name").toString().replaceFirst("^Clinic\\s+", "")),
+			"Employee",
+			new ResourceMetadata("SELECT username FROM users WHERE entity_id = ?",
+					rs -> rs.get("username").toString()),
 			"Patient",
 			new ResourceMetadata(
 					"SELECT p.first_name, p.last_name FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE pt.entity_id = ?",
@@ -58,11 +62,8 @@ public class CedarAspect {
 			new ResourceMetadata(
 					"SELECT p.first_name, p.last_name FROM adults a JOIN persons p ON a.entity_id = p.entity_id WHERE a.entity_id = ?",
 					rs -> rs.get("first_name") + " " + rs.get("last_name")),
-			"Secretary",
-			new ResourceMetadata(
-					"SELECT p.first_name, p.last_name FROM secretaries s JOIN persons p ON s.entity_id = p.entity_id WHERE s.entity_id = ?",
-					rs -> rs.get("first_name") + " " + rs.get("last_name")),
-			"Visit", new ResourceMetadata("SELECT description FROM visits WHERE entity_id = ?",
+			"Visit",
+			new ResourceMetadata("SELECT description FROM visits WHERE entity_id = ?",
 					rs -> rs.get("description").toString()));
 
 	private static final Logger logger = LoggerFactory.getLogger(CedarAspect.class);
@@ -212,10 +213,26 @@ public class CedarAspect {
 				if (resolvedName != null && !resolvedName.trim().isEmpty()) {
 					requestResourceIdentifier = resolvedName.trim();
 				}
+				else {
+					logger.warn("Resource name resolution returned null or blank for {} with identifier {}. "
+							+ "Falling back to numeric identifier.", authorizationResourceType,
+							requestResourceIdentifier);
+				}
 			}
-			catch (NumberFormatException | EmptyResultDataAccessException | NullPointerException exception) {
-				// Retains the default numeric identifier if parsing, resolution, or
-				// formatting fails.
+			catch (NumberFormatException exception) {
+				logger.debug("Resource identifier '{}' for type {} is not numeric; "
+						+ "skipping database resolution.", requestResourceIdentifier, authorizationResourceType);
+			}
+			catch (EmptyResultDataAccessException exception) {
+				logger.warn("No database record found for {} with identifier {}. "
+						+ "Cedar evaluation will proceed with the numeric identifier, "
+						+ "which is expected to result in an implicit denial.",
+						authorizationResourceType, requestResourceIdentifier);
+			}
+			catch (NullPointerException exception) {
+				logger.error("Null pointer encountered during resource name extraction for {} "
+						+ "with identifier {}. This may indicate a schema or data integrity issue.",
+						authorizationResourceType, requestResourceIdentifier, exception);
 			}
 
 		}
@@ -236,6 +253,11 @@ public class CedarAspect {
 			if (paramName.regionMatches(true, 0, CONTEXT_PARAM_PREFIX, 0, CONTEXT_PARAM_PREFIX.length())) {
 				String contextKey = paramName.substring(CONTEXT_PARAM_PREFIX.length()).toLowerCase();
 
+				if (!ALLOWED_CONTEXT_KEYS.contains(contextKey)) {
+					logger.warn("Rejected disallowed Cedar context parameter: {}", contextKey);
+					continue;
+				}
+
 				if ("authenticated".equals(contextKey)) {
 					boolean isAuthenticated = false;
 					if (!"Guest".equals(principalId)) {
@@ -245,13 +267,10 @@ public class CedarAspect {
 							isAuthenticated = (count != null && count > 0);
 						}
 						catch (Exception exception) {
+							logger.error("Failed to verify authentication for principal: {}", principalId, exception);
 						}
 					}
 					context.put(contextKey, new PrimString(String.valueOf(isAuthenticated)));
-				}
-				else {
-					String paramValue = request.getParameter(paramName);
-					context.put(contextKey, new PrimString(paramValue));
 				}
 			}
 		}

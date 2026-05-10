@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -36,6 +37,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
 import uq.pac.childrenclinic.cedar.CedarDeniedException;
+import uq.pac.childrenclinic.cedar.CedarEntitiesInvalidationEvent;
 import uq.pac.childrenclinic.cedar.CedarProgrammaticEvaluator;
 import uq.pac.childrenclinic.model.Gender;
 import uq.pac.childrenclinic.model.GenderRepository;
@@ -55,12 +57,15 @@ public class SecretaryController {
 
 	private final CedarProgrammaticEvaluator cedarEvaluator;
 
+	private final ApplicationEventPublisher eventPublisher;
+
 	public SecretaryController(SecretaryRepository secretaries, GenderRepository genders, ClinicRepository clinics,
-			CedarProgrammaticEvaluator cedarEvaluator) {
+			CedarProgrammaticEvaluator cedarEvaluator, ApplicationEventPublisher eventPublisher) {
 		this.secretaries = secretaries;
 		this.genders = genders;
 		this.clinics = clinics;
 		this.cedarEvaluator = cedarEvaluator;
+		this.eventPublisher = eventPublisher;
 	}
 
 	@ModelAttribute("genders")
@@ -278,6 +283,7 @@ public class SecretaryController {
 			return VIEWS_SECRETARY_CREATE_OR_UPDATE_FORM;
 		}
 
+		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
 		redirectAttributes.addFlashAttribute("message", "New Secretary has been added.");
 		return "redirect:/secretaries/" + secretary.getId();
 	}
@@ -384,6 +390,7 @@ public class SecretaryController {
 			return VIEWS_SECRETARY_CREATE_OR_UPDATE_FORM;
 		}
 
+		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
 		redirectAttributes.addFlashAttribute("message", "Secretary values updated.");
 		return "redirect:/secretaries/{secretaryId}";
 	}

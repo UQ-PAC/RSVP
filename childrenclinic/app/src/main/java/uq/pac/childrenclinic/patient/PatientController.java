@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -39,6 +40,7 @@ import uq.pac.childrenclinic.adult.Adult;
 import uq.pac.childrenclinic.adult.AdultRepository;
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
 import uq.pac.childrenclinic.cedar.CedarDeniedException;
+import uq.pac.childrenclinic.cedar.CedarEntitiesInvalidationEvent;
 import uq.pac.childrenclinic.cedar.CedarProgrammaticEvaluator;
 import uq.pac.childrenclinic.doctor.Doctor;
 import uq.pac.childrenclinic.doctor.DoctorRepository;
@@ -66,8 +68,11 @@ public class PatientController {
 
 	private final CedarProgrammaticEvaluator cedarEvaluator;
 
+	private final ApplicationEventPublisher eventPublisher;
+
 	public PatientController(PatientRepository patients, GenderRepository genders, ClinicRepository clinics,
 			AdultRepository adults, AdultAuthorityRepository authorities, DoctorRepository doctorRepository,
+			ApplicationEventPublisher eventPublisher,
 			CedarProgrammaticEvaluator cedarEvaluator) {
 		this.patients = patients;
 		this.genders = genders;
@@ -76,6 +81,7 @@ public class PatientController {
 		this.authorities = authorities;
 		this.doctorRepository = doctorRepository;
 		this.cedarEvaluator = cedarEvaluator;
+		this.eventPublisher = eventPublisher;
 	}
 
 	@ModelAttribute("genders")
@@ -359,6 +365,7 @@ public class PatientController {
 			return VIEWS_PATIENT_CREATE_OR_UPDATE_FORM;
 		}
 
+		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
 		redirectAttributes.addFlashAttribute("message", "New Patient has been added.");
 		return "redirect:/patients/" + patient.getId();
 	}
@@ -561,6 +568,7 @@ public class PatientController {
 			return VIEWS_PATIENT_CREATE_OR_UPDATE_FORM;
 		}
 
+		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
 		redirectAttributes.addFlashAttribute("message", "Patient values updated.");
 		return "redirect:/patients/{patientId}";
 	}

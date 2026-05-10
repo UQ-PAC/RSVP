@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -40,6 +41,7 @@ import uq.pac.childrenclinic.adult.Adult;
 import uq.pac.childrenclinic.adult.AdultRepository;
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
 import uq.pac.childrenclinic.cedar.CedarDeniedException;
+import uq.pac.childrenclinic.cedar.CedarEntitiesInvalidationEvent;
 import uq.pac.childrenclinic.cedar.CedarProgrammaticEvaluator;
 import uq.pac.childrenclinic.doctor.Doctor;
 import uq.pac.childrenclinic.doctor.DoctorRepository;
@@ -71,15 +73,18 @@ class VisitController {
 
 	private final CedarProgrammaticEvaluator cedarEvaluator;
 
+	private final ApplicationEventPublisher eventPublisher;
+
 	public VisitController(PatientRepository patients, ConfidentialityRepository confidentialities,
 			ClinicRepository clinics, AdultRepository adults, DoctorRepository doctors,
-			CedarProgrammaticEvaluator cedarEvaluator) {
+			CedarProgrammaticEvaluator cedarEvaluator, ApplicationEventPublisher eventPublisher) {
 		this.patients = patients;
 		this.confidentialities = confidentialities;
 		this.clinics = clinics;
 		this.adults = adults;
 		this.doctors = doctors;
 		this.cedarEvaluator = cedarEvaluator;
+		this.eventPublisher = eventPublisher;
 	}
 
 	@InitBinder("visit")
@@ -190,6 +195,7 @@ class VisitController {
 
 		patient.addVisit(visit);
 		this.patients.save(patient);
+		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
 		redirectAttributes.addFlashAttribute("message", "Visit has been booked.");
 		return "redirect:/patients/{patientId}";
 	}

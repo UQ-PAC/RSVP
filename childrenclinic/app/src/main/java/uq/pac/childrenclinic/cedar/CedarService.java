@@ -9,18 +9,17 @@ import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.policy.PolicySet;
 import com.cedarpolicy.model.schema.Schema;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,60 +29,67 @@ public class CedarService {
 
 	private final AuthorizationEngine engine;
 
-	private final PolicySet policySet;
+	private final Path policyPath;
 
-	private final Entities entities;
+    private final Path schemaPath;
 
-	private final Schema schema;
+	private final CedarEntityBuilder cedarEntityBuilder;
 
-	private Map<String, String> policyIdMap;
+    private final AtomicReference<Entities> entitiesCache = new AtomicReference<>();
+
+	private final CedarRequestScopedCache requestCache;
 
 	private static final Logger logger = LoggerFactory.getLogger(CedarService.class);
 
-	public CedarService(@Value("${policy.file:childrenclinic-rsvp-policy.cedar}") String policyFile) {
-		try {
-			this.policySet = PolicySet.parsePolicies(Path.of("src/main/resources/cedar/" + policyFile));
-			logger.info("Cedar Policy file loaded: {}", policyFile);
-		}
-		catch (Exception e) {
-			throw new RuntimeException("Failed to parse Cedar Policy.", e);
-		}
-		try {
-			this.entities = Entities.parse(Path.of("src/main/resources/cedar/childrenclinic-rsvp-entities.json"));
-		}
-		catch (Exception e) {
-			throw new RuntimeException("Failed to parse Cedar Entities.", e);
-		}
-		try {
-			String schemaText = Files
-				.readString(Path.of("src/main/resources/cedar/childrenclinic-rsvp-schema.cedarschema"));
-			this.schema = Schema.parse(Schema.JsonOrCedar.Cedar, schemaText);
-		}
-		catch (Exception e) {
-			throw new RuntimeException("Failed to parse Cedar Schema.", e);
-		}
+	public CedarService(@Value("${policy.file:childrenclinic-rsvp-policy.cedar}") String policyFile,
+			CedarEntityBuilder cedarEntityBuilder,
+			CedarRequestScopedCache requestCache) {
+		this.policyPath = Path.of("src/main/resources/cedar/" + policyFile);
+        this.schemaPath = Path.of("src/main/resources/cedar/childrenclinic-rsvp-schema.cedarschema");
+        this.cedarEntityBuilder = cedarEntityBuilder;
+        this.requestCache = requestCache;
+
 		try {
 			this.engine = new BasicAuthorizationEngine();
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Failed to initialize Cedar Engine.", e);
 		}
-		try {
-			String policyContent = Files.readString(Path.of("src/main/resources/cedar/" + policyFile));
-			this.policyIdMap = CedarPolicyMapper.mapEngineIdsToAnnotations(policyContent);
+	}
+
+	private Entities getEntities() {
+		Entities current = entitiesCache.get();
+		if (current == null) {
+			logger.info("Cedar entities cache is empty; rebuilding from the database.");
+			current = cedarEntityBuilder.buildEntities();
+			entitiesCache.set(current);
 		}
-		catch (IOException exception) {
-			throw new IllegalStateException("Failed to read Cedar policy file for annotations mapping.", exception);
-		}
+		return current;
+	}
+
+	public void invalidateEntities() {
+		logger.info("Cedar entities cache invalidated.");
+		entitiesCache.set(null);
+	}
+
+	@EventListener
+	public void onEntitiesInvalidation(CedarEntitiesInvalidationEvent event) {
+		invalidateEntities();
 	}
 
 	public ResponseEntity<String> checkAccess(@RequestBody CedarRequest parsedRequest) {
+		this.requestCache.ensureLoaded(this.policyPath, this.schemaPath);
+
+        PolicySet policySet = this.requestCache.getPolicySet();
+        Schema schema = this.requestCache.getSchema();
+        Map<String, String> policyIdMap = this.requestCache.getPolicyIdMap();
+
 		AuthorizationRequest request = new AuthorizationRequest(parsedRequest.getPrincipal(), parsedRequest.getAction(),
-				parsedRequest.getResource(), parsedRequest.getContext(), Optional.ofNullable(this.schema),
+				parsedRequest.getResource(), parsedRequest.getContext(), Optional.ofNullable(schema),
 				parsedRequest.isValidateRequest());
 
 		try {
-			AuthorizationResponse response = engine.isAuthorized(request, this.policySet, this.entities);
+			AuthorizationResponse response = engine.isAuthorized(request, policySet, getEntities());
 
 			logger.info("Cedar request: {principal = " + request.principalEUID + ", action = " + request.actionEUID
 					+ ", resource = " + request.resourceEUID + ", context = " + request.context + ", validateRequest = "
@@ -98,11 +104,12 @@ public class CedarService {
 					AuthorizationSuccessResponse successResponse = response.success.get();
 					isAllowed = successResponse.isAllowed();
 					Set<String> reasons = successResponse.getReason();
-					resolvedReasons = CedarPolicyMapper.resolveReasons(reasons, this.policyIdMap);
+					resolvedReasons = CedarPolicyMapper.resolveReasons(reasons, policyIdMap);
 				}
 
+				String joinedReasons = String.join("\n", resolvedReasons);
+
 				if (isAllowed) {
-					String joinedReasons = String.join("\n", resolvedReasons);
 					String body = """
 							Access Granted.
 							%s
@@ -112,7 +119,6 @@ public class CedarService {
 					return ResponseEntity.ok(body);
 				}
 				else {
-					String joinedReasons = String.join("\n", resolvedReasons);
 					String body = """
 							Access Denied.
 							%s
@@ -123,12 +129,16 @@ public class CedarService {
 				}
 			}
 			else {
-				throw new Exception(response.errors.toString());
+				String errorDetails = response.toString();
+				logger.error("Cedar policy evaluation failed: {}", errorDetails);
+				return ResponseEntity.internalServerError()
+						.body("Authorization check failed: " + errorDetails);
 			}
 		}
 		catch (Exception e) {
 			logger.error("Authorization check failed: {}", e.getMessage(), e);
-			return ResponseEntity.internalServerError().body("Authorization check failed: " + e.getMessage());
+			return ResponseEntity.internalServerError()
+					.body("Authorization check failed: " + e.getMessage());
 		}
 	}
 

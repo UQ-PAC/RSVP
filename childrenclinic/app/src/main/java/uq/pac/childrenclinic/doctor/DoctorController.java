@@ -30,6 +30,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -51,6 +52,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
 import uq.pac.childrenclinic.cedar.CedarDeniedException;
+import uq.pac.childrenclinic.cedar.CedarEntitiesInvalidationEvent;
 import uq.pac.childrenclinic.cedar.CedarProgrammaticEvaluator;
 import uq.pac.childrenclinic.model.Gender;
 import uq.pac.childrenclinic.model.GenderRepository;
@@ -78,13 +80,16 @@ class DoctorController {
 
 	private final CedarProgrammaticEvaluator cedarEvaluator;
 
+	private final ApplicationEventPublisher eventPublisher;
+
 	public DoctorController(DoctorRepository doctors, GenderRepository genders, SpecialtyRepository specialties,
-			ClinicRepository clinics, CedarProgrammaticEvaluator cedarEvaluator) {
+			ClinicRepository clinics, CedarProgrammaticEvaluator cedarEvaluator, ApplicationEventPublisher eventPublisher) {
 		this.doctors = doctors;
 		this.genders = genders;
 		this.specialties = specialties;
 		this.clinics = clinics;
 		this.cedarEvaluator = cedarEvaluator;
+		this.eventPublisher = eventPublisher;
 	}
 
 	@ModelAttribute("genders")
@@ -305,6 +310,7 @@ class DoctorController {
 			return VIEWS_DOCTOR_CREATE_OR_UPDATE_FORM;
 		}
 
+		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
 		redirectAttributes.addFlashAttribute("message", "New Doctor has been added.");
 		return "redirect:/doctors/" + doctor.getId();
 	}
@@ -411,6 +417,7 @@ class DoctorController {
 			return VIEWS_DOCTOR_CREATE_OR_UPDATE_FORM;
 		}
 
+		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
 		redirectAttributes.addFlashAttribute("message", "Doctor values updated.");
 		return "redirect:/doctors/{doctorId}";
 	}

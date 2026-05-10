@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -36,6 +37,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
 import uq.pac.childrenclinic.cedar.CedarDeniedException;
+import uq.pac.childrenclinic.cedar.CedarEntitiesInvalidationEvent;
 import uq.pac.childrenclinic.cedar.CedarProgrammaticEvaluator;
 import uq.pac.childrenclinic.model.Gender;
 import uq.pac.childrenclinic.model.GenderRepository;
@@ -55,12 +57,15 @@ public class AdultController {
 
 	private final CedarProgrammaticEvaluator cedarEvaluator;
 
+	private final ApplicationEventPublisher eventPublisher;
+
 	public AdultController(AdultRepository adults, GenderRepository genders, ClinicRepository clinics,
-			CedarProgrammaticEvaluator cedarEvaluator) {
+			CedarProgrammaticEvaluator cedarEvaluator, ApplicationEventPublisher eventPublisher) {
 		this.adults = adults;
 		this.genders = genders;
 		this.clinics = clinics;
 		this.cedarEvaluator = cedarEvaluator;
+		this.eventPublisher = eventPublisher;
 	}
 
 	@ModelAttribute("genders")
@@ -279,6 +284,7 @@ public class AdultController {
 			return VIEWS_ADULT_CREATE_OR_UPDATE_FORM;
 		}
 
+		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
 		redirectAttributes.addFlashAttribute("message", "New Adult has been added.");
 		return "redirect:/adults/" + adult.getId();
 	}
@@ -390,6 +396,7 @@ public class AdultController {
 			return VIEWS_ADULT_CREATE_OR_UPDATE_FORM;
 		}
 
+		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
 		redirectAttributes.addFlashAttribute("message", "Adult values updated.");
 		return "redirect:/adults/{adultId}";
 	}

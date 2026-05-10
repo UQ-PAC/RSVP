@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
@@ -31,23 +32,22 @@ public class CedarService {
 
 	private final Path policyPath;
 
-    private final Path schemaPath;
+	private final Path schemaPath;
 
 	private final CedarEntityBuilder cedarEntityBuilder;
 
-    private final AtomicReference<Entities> entitiesCache = new AtomicReference<>();
+	private final AtomicReference<Entities> entitiesCache = new AtomicReference<>();
 
 	private final CedarRequestScopedCache requestCache;
 
 	private static final Logger logger = LoggerFactory.getLogger(CedarService.class);
 
 	public CedarService(@Value("${policy.file:childrenclinic-rsvp-policy.cedar}") String policyFile,
-			CedarEntityBuilder cedarEntityBuilder,
-			CedarRequestScopedCache requestCache) {
+			CedarEntityBuilder cedarEntityBuilder, CedarRequestScopedCache requestCache) {
 		this.policyPath = Path.of("src/main/resources/cedar/" + policyFile);
-        this.schemaPath = Path.of("src/main/resources/cedar/childrenclinic-rsvp-schema.cedarschema");
-        this.cedarEntityBuilder = cedarEntityBuilder;
-        this.requestCache = requestCache;
+		this.schemaPath = Path.of("src/main/resources/cedar/childrenclinic-rsvp-schema.cedarschema");
+		this.cedarEntityBuilder = cedarEntityBuilder;
+		this.requestCache = requestCache;
 
 		try {
 			this.engine = new BasicAuthorizationEngine();
@@ -80,9 +80,9 @@ public class CedarService {
 	public ResponseEntity<String> checkAccess(@RequestBody CedarRequest parsedRequest) {
 		this.requestCache.ensureLoaded(this.policyPath, this.schemaPath);
 
-        PolicySet policySet = this.requestCache.getPolicySet();
-        Schema schema = this.requestCache.getSchema();
-        Map<String, String> policyIdMap = this.requestCache.getPolicyIdMap();
+		PolicySet policySet = this.requestCache.getPolicySet();
+		Schema schema = this.requestCache.getSchema();
+		Map<String, String> policyIdMap = this.requestCache.getPolicyIdMap();
 
 		AuthorizationRequest request = new AuthorizationRequest(parsedRequest.getPrincipal(), parsedRequest.getAction(),
 				parsedRequest.getResource(), parsedRequest.getContext(), Optional.ofNullable(schema),
@@ -131,14 +131,12 @@ public class CedarService {
 			else {
 				String errorDetails = response.toString();
 				logger.error("Cedar policy evaluation failed: {}", errorDetails);
-				return ResponseEntity.internalServerError()
-						.body("Authorization check failed: " + errorDetails);
+				return ResponseEntity.internalServerError().body("Authorization check failed: " + errorDetails);
 			}
 		}
 		catch (Exception e) {
 			logger.error("Authorization check failed: {}", e.getMessage(), e);
-			return ResponseEntity.internalServerError()
-					.body("Authorization check failed: " + e.getMessage());
+			return ResponseEntity.internalServerError().body("Authorization check failed: " + e.getMessage());
 		}
 	}
 

@@ -83,7 +83,8 @@ class DoctorController {
 	private final ApplicationEventPublisher eventPublisher;
 
 	public DoctorController(DoctorRepository doctors, GenderRepository genders, SpecialtyRepository specialties,
-			ClinicRepository clinics, CedarProgrammaticEvaluator cedarEvaluator, ApplicationEventPublisher eventPublisher) {
+			ClinicRepository clinics, CedarProgrammaticEvaluator cedarEvaluator,
+			ApplicationEventPublisher eventPublisher) {
 		this.doctors = doctors;
 		this.genders = genders;
 		this.specialties = specialties;
@@ -107,10 +108,12 @@ class DoctorController {
 		Collection<Clinic> allClinics = this.clinics.findClinics();
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
-		if (allClinics == null) return new ArrayList<>();
+		if (allClinics == null)
+			return new ArrayList<>();
 
 		return allClinics.stream().filter(clinic -> {
-			if (clinic == null || clinic.getClinicName() == null) return false;
+			if (clinic == null || clinic.getClinicName() == null)
+				return false;
 			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 			var result = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Item");
 			return result.isGranted();
@@ -198,7 +201,8 @@ class DoctorController {
 
 		if (allClinics != null) {
 			for (Clinic clinic : allClinics) {
-				if (clinic == null || clinic.getClinicName() == null) continue;
+				if (clinic == null || clinic.getClinicName() == null)
+					continue;
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 				var result = cedarEvaluator.evaluate(principal, "AddEmployee", "Clinic", cedarClinicId, "Page");
 
@@ -251,7 +255,8 @@ class DoctorController {
 		}
 		else {
 			for (Clinic clinic : submittedClinics) {
-				if (clinic == null || clinic.getClinicName() == null) continue;
+				if (clinic == null || clinic.getClinicName() == null)
+					continue;
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 				var evalResult = cedarEvaluator.evaluate(principal, "AddEmployee", "Clinic", cedarClinicId, "Page");
 
@@ -346,7 +351,8 @@ class DoctorController {
 
 		if (submittedClinics != null) {
 			for (Clinic clinic : submittedClinics) {
-				if (clinic == null || clinic.getClinicName() == null) continue;
+				if (clinic == null || clinic.getClinicName() == null)
+					continue;
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 				// Here we check for the "AddEmployee" action, instead of "EditEmployee",
 				// since the former applies to the "Clinic" resource.
@@ -373,7 +379,8 @@ class DoctorController {
 
 		if (existingDoctor.getClinics() != null) {
 			for (Clinic existingClinic : existingDoctor.getClinics()) {
-				if (existingClinic == null || existingClinic.getClinicName() == null) continue;
+				if (existingClinic == null || existingClinic.getClinicName() == null)
+					continue;
 				String cedarClinicId = existingClinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 				var viewEval = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Background");
 
@@ -391,8 +398,7 @@ class DoctorController {
 				.stream()
 				.anyMatch(d -> d.getFirstName().equalsIgnoreCase(doctor.getFirstName())
 						&& Objects.equals(d.getBirthDate(), doctor.getBirthDate())
-						&& Objects.equals(d.getGender(), doctor.getGender())
-						&& !Objects.equals(d.getId(), doctorId));
+						&& Objects.equals(d.getGender(), doctor.getGender()) && !Objects.equals(d.getId(), doctorId));
 
 			if (duplicateExists) {
 				result.rejectValue("firstName", "duplicate",

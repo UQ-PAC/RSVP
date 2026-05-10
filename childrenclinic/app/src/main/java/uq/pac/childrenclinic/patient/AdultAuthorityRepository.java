@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AdultAuthorityRepository extends JpaRepository<AdultAuthority, Integer> {
 
-    @Override
-    @Cacheable("authorities")
-    List<AdultAuthority> findAll();
+	@Override
+	@Cacheable("authorities")
+	List<AdultAuthority> findAll();
 
 }

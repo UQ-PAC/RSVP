@@ -18,8 +18,10 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -47,13 +49,11 @@ public class CedarAspect {
 	private record ResourceMetadata(String sqlQuery, Function<Map<String, Object>, String> nameExtractor) {
 	}
 
-	private static final Map<String, ResourceMetadata> RESOURCE_REGISTRY = Map.of(
-			"Clinic",
+	private static final Map<String, ResourceMetadata> RESOURCE_REGISTRY = Map.of("Clinic",
 			new ResourceMetadata("SELECT name FROM clinics WHERE clinic_id = ?",
 					rs -> rs.get("name").toString().replaceFirst("^Clinic\\s+", "")),
 			"Employee",
-			new ResourceMetadata("SELECT username FROM users WHERE entity_id = ?",
-					rs -> rs.get("username").toString()),
+			new ResourceMetadata("SELECT username FROM users WHERE entity_id = ?", rs -> rs.get("username").toString()),
 			"Patient",
 			new ResourceMetadata(
 					"SELECT p.first_name, p.last_name FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE pt.entity_id = ?",
@@ -62,8 +62,7 @@ public class CedarAspect {
 			new ResourceMetadata(
 					"SELECT p.first_name, p.last_name FROM adults a JOIN persons p ON a.entity_id = p.entity_id WHERE a.entity_id = ?",
 					rs -> rs.get("first_name") + " " + rs.get("last_name")),
-			"Visit",
-			new ResourceMetadata("SELECT description FROM visits WHERE entity_id = ?",
+			"Visit", new ResourceMetadata("SELECT description FROM visits WHERE entity_id = ?",
 					rs -> rs.get("description").toString()));
 
 	private static final Logger logger = LoggerFactory.getLogger(CedarAspect.class);
@@ -214,24 +213,27 @@ public class CedarAspect {
 					requestResourceIdentifier = resolvedName.trim();
 				}
 				else {
-					logger.warn("Resource name resolution returned null or blank for {} with identifier {}. "
-							+ "Falling back to numeric identifier.", authorizationResourceType,
-							requestResourceIdentifier);
+					logger.warn(
+							"Resource name resolution returned null or blank for {} with identifier {}. "
+									+ "Falling back to numeric identifier.",
+							authorizationResourceType, requestResourceIdentifier);
 				}
 			}
 			catch (NumberFormatException exception) {
-				logger.debug("Resource identifier '{}' for type {} is not numeric; "
-						+ "skipping database resolution.", requestResourceIdentifier, authorizationResourceType);
+				logger.debug("Resource identifier '{}' for type {} is not numeric; " + "skipping database resolution.",
+						requestResourceIdentifier, authorizationResourceType);
 			}
 			catch (EmptyResultDataAccessException exception) {
-				logger.warn("No database record found for {} with identifier {}. "
-						+ "Cedar evaluation will proceed with the numeric identifier, "
-						+ "which is expected to result in an implicit denial.",
+				logger.warn(
+						"No database record found for {} with identifier {}. "
+								+ "Cedar evaluation will proceed with the numeric identifier, "
+								+ "which is expected to result in an implicit denial.",
 						authorizationResourceType, requestResourceIdentifier);
 			}
 			catch (NullPointerException exception) {
-				logger.error("Null pointer encountered during resource name extraction for {} "
-						+ "with identifier {}. This may indicate a schema or data integrity issue.",
+				logger.error(
+						"Null pointer encountered during resource name extraction for {} "
+								+ "with identifier {}. This may indicate a schema or data integrity issue.",
 						authorizationResourceType, requestResourceIdentifier, exception);
 			}
 

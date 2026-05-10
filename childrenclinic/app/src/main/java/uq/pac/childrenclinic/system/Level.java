@@ -44,16 +44,18 @@ public class Level implements Serializable, Identifiable {
 	}
 
 	@Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Level level = (Level) o; 
-        return id != null && Objects.equals(this.id, level.getId());
-    }
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		Level level = (Level) o;
+		return id != null && Objects.equals(this.id, level.getId());
+	}
 
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();
+	}
 
 }

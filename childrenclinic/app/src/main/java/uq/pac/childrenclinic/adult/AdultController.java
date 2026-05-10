@@ -78,10 +78,12 @@ public class AdultController {
 		Collection<Clinic> allClinics = this.clinics.findClinics();
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
-		if (allClinics == null) return new ArrayList<>();
+		if (allClinics == null)
+			return new ArrayList<>();
 
 		return allClinics.stream().filter(clinic -> {
-			if (clinic == null || clinic.getClinicName() == null) return false;
+			if (clinic == null || clinic.getClinicName() == null)
+				return false;
 			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 			var result = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Item");
 			return result.isGranted();
@@ -172,7 +174,8 @@ public class AdultController {
 
 		if (allClinics != null) {
 			for (Clinic clinic : allClinics) {
-				if (clinic == null || clinic.getClinicName() == null) continue;
+				if (clinic == null || clinic.getClinicName() == null)
+					continue;
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 				var result = cedarEvaluator.evaluate(principal, "AddAdult", "Clinic", cedarClinicId, "Page");
 
@@ -225,7 +228,8 @@ public class AdultController {
 		}
 		else {
 			for (Clinic clinic : submittedClinics) {
-				if (clinic == null || clinic.getClinicName() == null) continue;
+				if (clinic == null || clinic.getClinicName() == null)
+					continue;
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 				var evalResult = cedarEvaluator.evaluate(principal, "AddAdult", "Clinic", cedarClinicId, "Page");
 
@@ -326,7 +330,8 @@ public class AdultController {
 
 		if (submittedClinics != null) {
 			for (Clinic clinic : submittedClinics) {
-				if (clinic == null || clinic.getClinicName() == null) continue;
+				if (clinic == null || clinic.getClinicName() == null)
+					continue;
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 				// Here we check for the "AddAdult" action, instead of "EditAdult", since
 				// the former applies to the "Clinic" resource.
@@ -353,7 +358,8 @@ public class AdultController {
 
 		if (existingAdult.getClinics() != null) {
 			for (Clinic existingClinic : existingAdult.getClinics()) {
-				if (existingClinic == null || existingClinic.getClinicName() == null) continue;
+				if (existingClinic == null || existingClinic.getClinicName() == null)
+					continue;
 				String cedarClinicId = existingClinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 				var viewEval = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Background");
 
@@ -370,8 +376,7 @@ public class AdultController {
 				.stream()
 				.anyMatch(a -> a.getFirstName().equalsIgnoreCase(adult.getFirstName())
 						&& Objects.equals(a.getBirthDate(), adult.getBirthDate())
-						&& Objects.equals(a.getGender(), adult.getGender())
-						&& !Objects.equals(a.getId(), adultId));
+						&& Objects.equals(a.getGender(), adult.getGender()) && !Objects.equals(a.getId(), adultId));
 
 			if (duplicateExists) {
 				result.rejectValue("firstName", "duplicate",

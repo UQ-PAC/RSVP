@@ -40,10 +40,9 @@ public class Patient extends Person {
 	private Set<PatientAdult> responsibleAdults = new LinkedHashSet<>();
 
 	@ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "patient_doctors",
-            joinColumns = @JoinColumn(name = "patient_id"),
-            inverseJoinColumns = @JoinColumn(name = "doctor_id"))
-    private Set<Doctor> doctors = new LinkedHashSet<>();
+	@JoinTable(name = "patient_doctors", joinColumns = @JoinColumn(name = "patient_id"),
+			inverseJoinColumns = @JoinColumn(name = "doctor_id"))
+	private Set<Doctor> doctors = new LinkedHashSet<>();
 
 	@OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@OrderBy("date ASC")
@@ -74,12 +73,12 @@ public class Patient extends Person {
 	}
 
 	public Set<Doctor> getDoctors() {
-        return doctors;
-    }
+		return doctors;
+	}
 
-    public void setDoctors(Set<Doctor> doctors) {
-        this.doctors = doctors;
-    }
+	public void setDoctors(Set<Doctor> doctors) {
+		this.doctors = doctors;
+	}
 
 	public Collection<Visit> getVisits() {
 		return this.visits;

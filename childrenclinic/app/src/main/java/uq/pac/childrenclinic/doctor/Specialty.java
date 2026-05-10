@@ -44,16 +44,18 @@ public class Specialty implements Serializable, Identifiable {
 	}
 
 	@Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Specialty specialty = (Specialty) o; 
-        return id != null && Objects.equals(this.id, specialty.getId());
-    }
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		Specialty specialty = (Specialty) o;
+		return id != null && Objects.equals(this.id, specialty.getId());
+	}
 
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();
+	}
 
 }

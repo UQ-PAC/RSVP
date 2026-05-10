@@ -72,8 +72,7 @@ public class PatientController {
 
 	public PatientController(PatientRepository patients, GenderRepository genders, ClinicRepository clinics,
 			AdultRepository adults, AdultAuthorityRepository authorities, DoctorRepository doctorRepository,
-			ApplicationEventPublisher eventPublisher,
-			CedarProgrammaticEvaluator cedarEvaluator) {
+			ApplicationEventPublisher eventPublisher, CedarProgrammaticEvaluator cedarEvaluator) {
 		this.patients = patients;
 		this.genders = genders;
 		this.clinics = clinics;
@@ -94,10 +93,12 @@ public class PatientController {
 		Collection<Clinic> allClinics = this.clinics.findClinics();
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
-		if (allClinics == null) return new ArrayList<>();
+		if (allClinics == null)
+			return new ArrayList<>();
 
 		return allClinics.stream().filter(clinic -> {
-			if (clinic == null || clinic.getClinicName() == null) return false;
+			if (clinic == null || clinic.getClinicName() == null)
+				return false;
 			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 			var result = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Item");
 			return result.isGranted();
@@ -110,9 +111,9 @@ public class PatientController {
 	}
 
 	@ModelAttribute("authorities")
-    public Collection<AdultAuthority> populateAuthorities() {
-        return this.authorities.findAll();
-    }
+	public Collection<AdultAuthority> populateAuthorities() {
+		return this.authorities.findAll();
+	}
 
 	@ModelAttribute("doctors")
 	public Collection<Doctor> populateDoctors() {
@@ -150,9 +151,10 @@ public class PatientController {
 		Map<Integer, String> cedarResourceMap = new HashMap<>();
 
 		List<Patient> authorized = allMatchingPatients.stream().filter(p -> {
-			if (p == null) return false;
-			String resourceName = (p.getFirstName() != null ? p.getFirstName() : "") + " " + 
-			                      (p.getLastName() != null ? p.getLastName() : "");
+			if (p == null)
+				return false;
+			String resourceName = (p.getFirstName() != null ? p.getFirstName() : "") + " "
+					+ (p.getLastName() != null ? p.getLastName() : "");
 			var evalResult = cedarEvaluator.evaluate(principal, "ViewPatient", "Patient", resourceName.trim(), "Item");
 			authorizationMap.put(p.getId(), evalResult.responseBody());
 			cedarResourceMap.put(p.getId(), "ChildrenClinic::Patient::\"" + resourceName.trim() + "\"");
@@ -208,7 +210,8 @@ public class PatientController {
 
 					if (result.isGranted()) {
 						isAuthorized = true;
-					} else if (result.responseBody() != null) {
+					}
+					else if (result.responseBody() != null) {
 						denialReasons.add(result.responseBody());
 					}
 				}
@@ -306,14 +309,14 @@ public class PatientController {
 		}
 
 		if (doctorIds != null && !doctorIds.isEmpty()) {
-            Set<Doctor> selectedDoctors = new LinkedHashSet<>();
-            for (Integer docId : doctorIds) {
-                if (docId != null) {
-                    doctorRepository.findById(docId).ifPresent(selectedDoctors::add);
-                }
-            }
-            patient.setDoctors(selectedDoctors);
-        }
+			Set<Doctor> selectedDoctors = new LinkedHashSet<>();
+			for (Integer docId : doctorIds) {
+				if (docId != null) {
+					doctorRepository.findById(docId).ifPresent(selectedDoctors::add);
+				}
+			}
+			patient.setDoctors(selectedDoctors);
+		}
 
 		// Deny Access if any checks failed.
 		if (!isAuthorized) {
@@ -344,13 +347,14 @@ public class PatientController {
 						&& Objects.equals(p.getGender(), patient.getGender()));
 
 			if (duplicateExists) {
-				result.rejectValue("firstName", "duplicate", "A patient with this first and last name, birth date, and gender already exists.");
+				result.rejectValue("firstName", "duplicate",
+						"A patient with this first and last name, birth date, and gender already exists.");
 			}
 		}
 
 		if (result.hasErrors()) {
 			model.addAttribute("selectedAdultIds", adultIds);
-            model.addAttribute("selectedAuthorityId", authorityId);
+			model.addAttribute("selectedAuthorityId", authorityId);
 			return VIEWS_PATIENT_CREATE_OR_UPDATE_FORM;
 		}
 
@@ -382,23 +386,25 @@ public class PatientController {
 	public String initUpdateForm(@PathVariable("patientId") int patientId, Model model) {
 		Patient patient = this.patients.findById(patientId)
 			.orElseThrow(() -> new IllegalArgumentException("Patient entity not found for identifier: " + patientId));
-		
-		if (patient.getResponsibleAdults() != null && !patient.getResponsibleAdults().isEmpty()) {
-            List<Integer> adultIds = patient.getResponsibleAdults().stream()
-                    .map(pa -> pa.getAdult().getId())
-                    .collect(Collectors.toList());
-            model.addAttribute("selectedAdultIds", adultIds);
 
-            Integer authId = patient.getResponsibleAdults().iterator().next().getAuthority().getId();
-            model.addAttribute("selectedAuthorityId", authId);
-        }
+		if (patient.getResponsibleAdults() != null && !patient.getResponsibleAdults().isEmpty()) {
+			List<Integer> adultIds = patient.getResponsibleAdults()
+				.stream()
+				.map(pa -> pa.getAdult().getId())
+				.collect(Collectors.toList());
+			model.addAttribute("selectedAdultIds", adultIds);
+
+			Integer authId = patient.getResponsibleAdults().iterator().next().getAuthority().getId();
+			model.addAttribute("selectedAuthorityId", authId);
+		}
 
 		if (patient.getDoctors() != null && !patient.getDoctors().isEmpty()) {
-            List<Integer> selectedDoctorIds = patient.getDoctors().stream()
-                    .map(Doctor::getId)
-                    .collect(Collectors.toList());
-            model.addAttribute("selectedDoctorIds", selectedDoctorIds);
-        }
+			List<Integer> selectedDoctorIds = patient.getDoctors()
+				.stream()
+				.map(Doctor::getId)
+				.collect(Collectors.toList());
+			model.addAttribute("selectedDoctorIds", selectedDoctorIds);
+		}
 
 		model.addAttribute("patient", patient);
 		return VIEWS_PATIENT_CREATE_OR_UPDATE_FORM;
@@ -425,8 +431,8 @@ public class PatientController {
 		Patient existingPatient = this.patients.findById(patientId)
 			.orElseThrow(() -> new IllegalArgumentException("Patient not found: " + patientId));
 
-		String resourceName = (existingPatient.getFirstName() != null ? existingPatient.getFirstName() : "") + " " + 
-		                      (existingPatient.getLastName() != null ? existingPatient.getLastName() : "");
+		String resourceName = (existingPatient.getFirstName() != null ? existingPatient.getFirstName() : "") + " "
+				+ (existingPatient.getLastName() != null ? existingPatient.getLastName() : "");
 		var patientEval = cedarEvaluator.evaluate(principal, "EditPatient", "Patient", resourceName, "Page");
 
 		if (!patientEval.isGranted()) {
@@ -442,7 +448,8 @@ public class PatientController {
 			for (Clinic clinic : submittedClinics) {
 				if (clinic != null && clinic.getClinicName() != null) {
 					String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-					// Here we check for the "AddPatient" action, instead of "EditPatient",
+					// Here we check for the "AddPatient" action, instead of
+					// "EditPatient",
 					// since the former applies to the "Clinic" resource.
 					var clinicEval = cedarEvaluator.evaluate(principal, "AddPatient", "Clinic", cedarClinicId, "Page");
 					if (!clinicEval.isGranted()) {
@@ -461,7 +468,8 @@ public class PatientController {
 			for (Clinic existingClinic : existingPatient.getClinics()) {
 				if (existingClinic != null && existingClinic.getClinicName() != null) {
 					String cedarClinicId = existingClinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-					var viewEval = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Background");
+					var viewEval = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId,
+							"Background");
 
 					if (!viewEval.isGranted()) {
 						finalClinics.add(existingClinic);
@@ -479,14 +487,15 @@ public class PatientController {
 		Set<PatientAdult> mergedAdults;
 		if (existingPatient.getResponsibleAdults() != null) {
 			mergedAdults = new LinkedHashSet<>(existingPatient.getResponsibleAdults());
-		} else {
+		}
+		else {
 			mergedAdults = new LinkedHashSet<>();
 		}
 
 		// Collect the adult IDs already present to prevent duplicates.
 		Set<Integer> existingAdultIds = mergedAdults.stream()
-				.map(pa -> pa.getAdult().getId())
-				.collect(Collectors.toSet());
+			.map(pa -> pa.getAdult().getId())
+			.collect(Collectors.toSet());
 
 		// Add only newly submitted adults that are not already in the set.
 		if (adultIds != null && authorityId != null) {
@@ -512,14 +521,14 @@ public class PatientController {
 		}
 
 		if (doctorIds != null && !doctorIds.isEmpty()) {
-            Set<Doctor> selectedDoctors = new LinkedHashSet<>();
-            for (Integer docId : doctorIds) {
-                if (docId != null) {
-                    doctorRepository.findById(docId).ifPresent(selectedDoctors::add);
-                }
-            }
-            patient.setDoctors(selectedDoctors);
-        }
+			Set<Doctor> selectedDoctors = new LinkedHashSet<>();
+			for (Integer docId : doctorIds) {
+				if (docId != null) {
+					doctorRepository.findById(docId).ifPresent(selectedDoctors::add);
+				}
+			}
+			patient.setDoctors(selectedDoctors);
+		}
 
 		// Deny Access if any checks failed.
 		if (!isAuthorized) {
@@ -536,14 +545,14 @@ public class PatientController {
 				.findByLastNameStartingWith(patient.getLastName(), PageRequest.of(0, 50))
 				.getContent()
 				.stream()
-				.anyMatch(p -> p != null && p.getFirstName() != null &&
-							p.getFirstName().equalsIgnoreCase(patient.getFirstName()) &&
-							Objects.equals(p.getBirthDate(), patient.getBirthDate()) && 
-							Objects.equals(p.getGender(), patient.getGender()) &&
-							!Objects.equals(p.getId(), patientId));
+				.anyMatch(p -> p != null && p.getFirstName() != null
+						&& p.getFirstName().equalsIgnoreCase(patient.getFirstName())
+						&& Objects.equals(p.getBirthDate(), patient.getBirthDate())
+						&& Objects.equals(p.getGender(), patient.getGender()) && !Objects.equals(p.getId(), patientId));
 
 			if (duplicateExists) {
-				result.rejectValue("firstName", "duplicate", "A patient with this first and last name, birth date, and gender already exists.");
+				result.rejectValue("firstName", "duplicate",
+						"A patient with this first and last name, birth date, and gender already exists.");
 			}
 		}
 

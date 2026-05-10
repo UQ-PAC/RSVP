@@ -2,8 +2,6 @@ package uq.pac.childrenclinic.user;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import uq.pac.childrenclinic.system.User;
-import uq.pac.childrenclinic.system.UserRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
+
+import uq.pac.childrenclinic.system.User;
+import uq.pac.childrenclinic.system.UserRepository;
 
 @ControllerAdvice
 public class GlobalModelAttributes {

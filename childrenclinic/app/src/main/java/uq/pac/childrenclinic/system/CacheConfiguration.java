@@ -34,14 +34,14 @@ class CacheConfiguration {
 
 	@Bean
 	public JCacheManagerCustomizer childrenclinicCacheConfigurationCustomizer() {
-        return cm -> {
-            cm.createCache("genders", cacheConfiguration());
-            cm.createCache("clinics", cacheConfiguration());
-            cm.createCache("specialties", cacheConfiguration());
-            cm.createCache("confidentialities", cacheConfiguration());
-            cm.createCache("authorities", cacheConfiguration());
-        };
-    }
+		return cm -> {
+			cm.createCache("genders", cacheConfiguration());
+			cm.createCache("clinics", cacheConfiguration());
+			cm.createCache("specialties", cacheConfiguration());
+			cm.createCache("confidentialities", cacheConfiguration());
+			cm.createCache("authorities", cacheConfiguration());
+		};
+	}
 
 	/**
 	 * Create a simple configuration that enable statistics via the JCache programmatic

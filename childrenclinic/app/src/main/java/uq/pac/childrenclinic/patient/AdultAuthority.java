@@ -17,14 +17,14 @@ import uq.pac.childrenclinic.model.Identifiable;
 @Table(name = "authorities")
 public class AdultAuthority implements Serializable, Identifiable {
 
-    @Id
+	@Id
 	@Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 
-    @Column(name = "name")
+	@Column(name = "name")
 	@NotBlank
-    private String name;
+	private String name;
 
 	public Integer getId() {
 		return id;
@@ -43,16 +43,18 @@ public class AdultAuthority implements Serializable, Identifiable {
 	}
 
 	@Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AdultAuthority authority = (AdultAuthority) o; 
-        return id != null && Objects.equals(this.id, authority.getId());
-    }
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		AdultAuthority authority = (AdultAuthority) o;
+		return id != null && Objects.equals(this.id, authority.getId());
+	}
 
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();
+	}
 
 }

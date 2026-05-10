@@ -102,10 +102,12 @@ class VisitController {
 		Collection<Clinic> allClinics = this.clinics.findClinics();
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
-		if (allClinics == null) return new ArrayList<>();
+		if (allClinics == null)
+			return new ArrayList<>();
 
 		return allClinics.stream().filter(clinic -> {
-			if (clinic == null || clinic.getClinicName() == null) return false;
+			if (clinic == null || clinic.getClinicName() == null)
+				return false;
 			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 			var result = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Item");
 			return result.isGranted();
@@ -138,8 +140,8 @@ class VisitController {
 	}
 
 	@PostMapping("/patients/{patientId}/visits/new")
-	public String processNewVisitForm(@PathVariable("patientId") int patientId, @Valid Visit visit, BindingResult result,
-			RedirectAttributes redirectAttributes, HttpSession session) {
+	public String processNewVisitForm(@PathVariable("patientId") int patientId, @Valid Visit visit,
+			BindingResult result, RedirectAttributes redirectAttributes, HttpSession session) {
 		Patient patient = this.patients.findById(patientId)
 			.orElseThrow(() -> new IllegalArgumentException("Patient not found for identifier: " + patientId));
 		visit.setPatient(patient);
@@ -160,7 +162,8 @@ class VisitController {
 		}
 
 		for (Clinic clinic : submittedClinics) {
-			if (clinic == null || clinic.getClinicName() == null) continue;
+			if (clinic == null || clinic.getClinicName() == null)
+				continue;
 			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 			// Here we check for the "AddPatient" action, instead of "EditPatient",
 			// since the former applies to the "Clinic" resource.

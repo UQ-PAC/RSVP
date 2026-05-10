@@ -48,16 +48,18 @@ public class Gender implements Serializable, Identifiable {
 	}
 
 	@Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Gender gender = (Gender) o;
-        return id != null && Objects.equals(this.id, gender.getId());
-    }
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		Gender gender = (Gender) o;
+		return id != null && Objects.equals(this.id, gender.getId());
+	}
 
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();
+	}
 
 }

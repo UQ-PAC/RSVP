@@ -44,16 +44,18 @@ public class Clinic implements Serializable, Identifiable {
 	}
 
 	@Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Clinic clinic = (Clinic) o;
-        return id != null && Objects.equals(this.id, clinic.getId());
-    }
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		Clinic clinic = (Clinic) o;
+		return id != null && Objects.equals(this.id, clinic.getId());
+	}
 
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();
+	}
 
 }

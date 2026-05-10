@@ -10,17 +10,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface PatientRepository extends JpaRepository<Patient, Integer> {
 
-	@EntityGraph(attributePaths = { "clinics", "gender", "doctors", "doctors.specialties",
-			"responsibleAdults", "responsibleAdults.adult", "responsibleAdults.authority",
-			"visits", "visits.confidentiality", "visits.clinics", "visits.doctors",
-			"visits.doctors.specialties", "visits.responsibleAdults" })
+	@EntityGraph(attributePaths = { "clinics", "gender", "doctors", "doctors.specialties", "responsibleAdults",
+			"responsibleAdults.adult", "responsibleAdults.authority", "visits", "visits.confidentiality",
+			"visits.clinics", "visits.doctors", "visits.doctors.specialties", "visits.responsibleAdults" })
 	@Transactional(readOnly = true)
 	Page<Patient> findByLastNameStartingWith(String lastName, Pageable pageable);
 
-	@EntityGraph(attributePaths = { "clinics", "gender", "doctors", "doctors.specialties",
-			"responsibleAdults", "responsibleAdults.adult", "responsibleAdults.authority",
-			"visits", "visits.confidentiality", "visits.clinics", "visits.doctors",
-			"visits.doctors.specialties", "visits.responsibleAdults" })
+	@EntityGraph(attributePaths = { "clinics", "gender", "doctors", "doctors.specialties", "responsibleAdults",
+			"responsibleAdults.adult", "responsibleAdults.authority", "visits", "visits.confidentiality",
+			"visits.clinics", "visits.doctors", "visits.doctors.specialties", "visits.responsibleAdults" })
 	@Transactional(readOnly = true)
 	Optional<Patient> findById(Integer id);
 

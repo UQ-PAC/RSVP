@@ -78,10 +78,12 @@ public class SecretaryController {
 		Collection<Clinic> allClinics = this.clinics.findClinics();
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
-		if (allClinics == null) return new ArrayList<>();
+		if (allClinics == null)
+			return new ArrayList<>();
 
 		return allClinics.stream().filter(clinic -> {
-			if (clinic == null || clinic.getClinicName() == null) return false;
+			if (clinic == null || clinic.getClinicName() == null)
+				return false;
 			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 			var result = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Item");
 			return result.isGranted();
@@ -170,7 +172,8 @@ public class SecretaryController {
 
 		if (allClinics != null) {
 			for (Clinic clinic : allClinics) {
-				if (clinic == null || clinic.getClinicName() == null) continue;
+				if (clinic == null || clinic.getClinicName() == null)
+					continue;
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 				var result = cedarEvaluator.evaluate(principal, "AddEmployee", "Clinic", cedarClinicId, "Page");
 
@@ -223,7 +226,8 @@ public class SecretaryController {
 		}
 		else {
 			for (Clinic clinic : submittedClinics) {
-				if (clinic == null || clinic.getClinicName() == null) continue;
+				if (clinic == null || clinic.getClinicName() == null)
+					continue;
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 				var evalResult = cedarEvaluator.evaluate(principal, "AddEmployee", "Clinic", cedarClinicId, "Page");
 
@@ -299,7 +303,8 @@ public class SecretaryController {
 
 	@PostMapping("/secretaries/{secretaryId}/edit")
 	public String processUpdateForm(@Valid Secretary secretary, BindingResult result,
-			@PathVariable("secretaryId") int secretaryId, RedirectAttributes redirectAttributes, HttpSession session, Model model) {
+			@PathVariable("secretaryId") int secretaryId, RedirectAttributes redirectAttributes, HttpSession session,
+			Model model) {
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
 		Secretary existingSecretary = this.secretaries.findById(secretaryId)
@@ -319,7 +324,8 @@ public class SecretaryController {
 
 		if (submittedClinics != null) {
 			for (Clinic clinic : submittedClinics) {
-				if (clinic == null || clinic.getClinicName() == null) continue;
+				if (clinic == null || clinic.getClinicName() == null)
+					continue;
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 				// Here we check for the "AddEmployee" action, instead of "EditEmployee",
 				// since the former applies to the "Clinic" resource.
@@ -346,7 +352,8 @@ public class SecretaryController {
 
 		if (existingSecretary.getClinics() != null) {
 			for (Clinic existingClinic : existingSecretary.getClinics()) {
-				if (existingClinic == null || existingClinic.getClinicName() == null) continue;
+				if (existingClinic == null || existingClinic.getClinicName() == null)
+					continue;
 				String cedarClinicId = existingClinic.getClinicName().replaceFirst("^Clinic\\s+", "");
 				var viewEval = cedarEvaluator.evaluate(principal, "ViewClinic", "Clinic", cedarClinicId, "Background");
 

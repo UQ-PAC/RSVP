@@ -1,5 +1,10 @@
 package uq.pac.childrenclinic.cedar;
 
+import com.cedarpolicy.model.entity.Entities;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -9,12 +14,9 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-
-import com.cedarpolicy.model.entity.Entities;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 // Dynamically constructs Cedar Entities from the database.
 @Component
@@ -58,8 +60,8 @@ public class CedarEntityBuilder {
 
 		try {
 			String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(allEntities);
-			logger.debug("Rebuilt Cedar entities JSON ({} entities, {} characters).",
-					allEntities.size(), json.length());
+			logger.debug("Rebuilt Cedar entities JSON ({} entities, {} characters).", allEntities.size(),
+					json.length());
 			return Entities.parse(json);
 		}
 		catch (JsonProcessingException exception) {
@@ -81,23 +83,23 @@ public class CedarEntityBuilder {
 	}
 
 	private List<Map<String, Object>> buildAdultAuthorityEntities() {
-		return jdbcTemplate.query("SELECT name FROM authorities", (rs, rowNum) ->
-				buildSimpleEntity("AdultAuthority", rs.getString("name")));
+		return jdbcTemplate.query("SELECT name FROM authorities",
+				(rs, rowNum) -> buildSimpleEntity("AdultAuthority", rs.getString("name")));
 	}
 
 	private List<Map<String, Object>> buildConfidentialityEntities() {
-		return jdbcTemplate.query("SELECT name FROM confidentialities", (rs, rowNum) ->
-				buildSimpleEntity("Confidentiality", rs.getString("name")));
+		return jdbcTemplate.query("SELECT name FROM confidentialities",
+				(rs, rowNum) -> buildSimpleEntity("Confidentiality", rs.getString("name")));
 	}
 
 	private List<Map<String, Object>> buildEmployeeRoleEntities() {
-		return jdbcTemplate.query("SELECT name FROM roles", (rs, rowNum) ->
-				buildSimpleEntity("EmployeeRole", rs.getString("name")));
+		return jdbcTemplate.query("SELECT name FROM roles",
+				(rs, rowNum) -> buildSimpleEntity("EmployeeRole", rs.getString("name")));
 	}
 
 	private List<Map<String, Object>> buildProfessionalLevelEntities() {
-		return jdbcTemplate.query("SELECT name FROM levels", (rs, rowNum) ->
-				buildSimpleEntity("ProfessionalLevel", rs.getString("name")));
+		return jdbcTemplate.query("SELECT name FROM levels",
+				(rs, rowNum) -> buildSimpleEntity("ProfessionalLevel", rs.getString("name")));
 	}
 
 	// Invariant singleton entity.
@@ -110,8 +112,7 @@ public class CedarEntityBuilder {
 
 	private List<Map<String, Object>> buildEmployeeEntities() {
 		// Retrieve all users (employees).
-		List<Map<String, Object>> users = jdbcTemplate.queryForList(
-				"SELECT entity_id, username FROM users");
+		List<Map<String, Object>> users = jdbcTemplate.queryForList("SELECT entity_id, username FROM users");
 
 		// Pre-fetch all relational data into maps keyed by entity_id.
 		Map<Integer, List<String>> clinicsByUser = fetchEntityClinics();
@@ -128,14 +129,10 @@ public class CedarEntityBuilder {
 			attrs.put("name", username);
 
 			List<String> userClinics = clinicsByUser.getOrDefault(entityId, List.of());
-			attrs.put("clinics", userClinics.stream()
-					.map(c -> entityRef("Clinic", c))
-					.collect(Collectors.toList()));
+			attrs.put("clinics", userClinics.stream().map(c -> entityRef("Clinic", c)).collect(Collectors.toList()));
 
 			List<String> userRoles = rolesByUser.getOrDefault(entityId, List.of());
-			attrs.put("roles", userRoles.stream()
-					.map(r -> entityRef("EmployeeRole", r))
-					.collect(Collectors.toList()));
+			attrs.put("roles", userRoles.stream().map(r -> entityRef("EmployeeRole", r)).collect(Collectors.toList()));
 
 			String level = levelByUser.get(entityId);
 			if (level != null) {
@@ -153,10 +150,8 @@ public class CedarEntityBuilder {
 	}
 
 	private List<Map<String, Object>> buildResponsibleAdultEntities() {
-		List<Map<String, Object>> adults = jdbcTemplate.queryForList(
-				"SELECT a.entity_id, p.first_name, p.last_name "
-						+ "FROM adults a "
-						+ "JOIN persons p ON a.entity_id = p.entity_id");
+		List<Map<String, Object>> adults = jdbcTemplate.queryForList("SELECT a.entity_id, p.first_name, p.last_name "
+				+ "FROM adults a " + "JOIN persons p ON a.entity_id = p.entity_id");
 
 		Map<Integer, List<String>> clinicsByEntity = fetchEntityClinics();
 
@@ -169,9 +164,7 @@ public class CedarEntityBuilder {
 			attrs.put("name", name);
 
 			List<String> adultClinics = clinicsByEntity.getOrDefault(entityId, List.of());
-			attrs.put("clinics", adultClinics.stream()
-					.map(c -> entityRef("Clinic", c))
-					.collect(Collectors.toList()));
+			attrs.put("clinics", adultClinics.stream().map(c -> entityRef("Clinic", c)).collect(Collectors.toList()));
 
 			result.add(buildEntity("ResponsibleAdult", name, attrs));
 		}
@@ -179,10 +172,8 @@ public class CedarEntityBuilder {
 	}
 
 	private List<Map<String, Object>> buildPatientEntities() {
-		List<Map<String, Object>> patients = jdbcTemplate.queryForList(
-				"SELECT pt.entity_id, p.first_name, p.last_name "
-						+ "FROM patients pt "
-						+ "JOIN persons p ON pt.entity_id = p.entity_id");
+		List<Map<String, Object>> patients = jdbcTemplate.queryForList("SELECT pt.entity_id, p.first_name, p.last_name "
+				+ "FROM patients pt " + "JOIN persons p ON pt.entity_id = p.entity_id");
 
 		Map<Integer, List<String>> clinicsByEntity = fetchEntityClinics();
 		Map<Integer, List<Map<String, Object>>> adultsByPatient = fetchPatientAdults();
@@ -208,14 +199,11 @@ public class CedarEntityBuilder {
 			attrs.put("adults", adultsAttr);
 
 			List<String> patientClinics = clinicsByEntity.getOrDefault(entityId, List.of());
-			attrs.put("clinics", patientClinics.stream()
-					.map(c -> entityRef("Clinic", c))
-					.collect(Collectors.toList()));
+			attrs.put("clinics", patientClinics.stream().map(c -> entityRef("Clinic", c)).collect(Collectors.toList()));
 
 			List<String> patientDoctorNames = doctorsByPatient.getOrDefault(entityId, List.of());
-			attrs.put("doctors", patientDoctorNames.stream()
-					.map(d -> entityRef("Employee", d))
-					.collect(Collectors.toList()));
+			attrs.put("doctors",
+					patientDoctorNames.stream().map(d -> entityRef("Employee", d)).collect(Collectors.toList()));
 
 			result.add(buildEntity("Patient", name, attrs));
 		}
@@ -223,15 +211,13 @@ public class CedarEntityBuilder {
 	}
 
 	private List<Map<String, Object>> buildVisitEntities() {
-		List<Map<String, Object>> visits = jdbcTemplate.queryForList(
-				"SELECT v.entity_id, v.patient_id, v.confidentiality_id, "
-						+ "p.first_name AS patient_first, p.last_name AS patient_last, "
-						+ "c.name AS confidentiality_name "
-						+ "FROM visits v "
-						+ "JOIN patients pt ON v.patient_id = pt.entity_id "
-						+ "JOIN persons p ON pt.entity_id = p.entity_id "
-						+ "JOIN confidentialities c ON v.confidentiality_id = c.id "
-						+ "ORDER BY v.patient_id, v.visit_date, v.entity_id");
+		List<Map<String, Object>> visits = jdbcTemplate
+			.queryForList("SELECT v.entity_id, v.patient_id, v.confidentiality_id, "
+					+ "p.first_name AS patient_first, p.last_name AS patient_last, " + "c.name AS confidentiality_name "
+					+ "FROM visits v " + "JOIN patients pt ON v.patient_id = pt.entity_id "
+					+ "JOIN persons p ON pt.entity_id = p.entity_id "
+					+ "JOIN confidentialities c ON v.confidentiality_id = c.id "
+					+ "ORDER BY v.patient_id, v.visit_date, v.entity_id");
 
 		Map<Integer, List<String>> clinicsByEntity = fetchEntityClinics();
 		Map<Integer, List<String>> adultsByVisit = fetchVisitAdults();
@@ -255,19 +241,15 @@ public class CedarEntityBuilder {
 			attrs.put("patient", entityRef("Patient", patientName));
 
 			List<String> visitAdultNames = adultsByVisit.getOrDefault(entityId, List.of());
-			attrs.put("adults", visitAdultNames.stream()
-					.map(a -> entityRef("ResponsibleAdult", a))
-					.collect(Collectors.toList()));
+			attrs.put("adults",
+					visitAdultNames.stream().map(a -> entityRef("ResponsibleAdult", a)).collect(Collectors.toList()));
 
 			List<String> visitClinics = clinicsByEntity.getOrDefault(entityId, List.of());
-			attrs.put("clinics", visitClinics.stream()
-					.map(c -> entityRef("Clinic", c))
-					.collect(Collectors.toList()));
+			attrs.put("clinics", visitClinics.stream().map(c -> entityRef("Clinic", c)).collect(Collectors.toList()));
 
 			List<String> visitDoctorNames = doctorsByVisit.getOrDefault(entityId, List.of());
-			attrs.put("doctors", visitDoctorNames.stream()
-					.map(d -> entityRef("Employee", d))
-					.collect(Collectors.toList()));
+			attrs.put("doctors",
+					visitDoctorNames.stream().map(d -> entityRef("Employee", d)).collect(Collectors.toList()));
 
 			attrs.put("confidentiality", entityRef("Confidentiality", confidentialityName));
 
@@ -315,34 +297,26 @@ public class CedarEntityBuilder {
 	// Batch-fetching helpers (relational join data).
 
 	private Map<Integer, List<String>> fetchEntityClinics() {
-		List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-				"SELECT ec.entity_id, c.name "
-						+ "FROM entity_clinics ec "
-						+ "JOIN clinics c ON ec.clinic_id = c.clinic_id");
+		List<Map<String, Object>> rows = jdbcTemplate.queryForList("SELECT ec.entity_id, c.name "
+				+ "FROM entity_clinics ec " + "JOIN clinics c ON ec.clinic_id = c.clinic_id");
 
-		return rows.stream().collect(Collectors.groupingBy(
-				row -> (Integer) row.get("entity_id"),
-				Collectors.mapping(
-						row -> ((String) row.get("name")).replaceFirst("^Clinic\\s+", ""),
-						Collectors.toList())));
+		return rows.stream()
+			.collect(Collectors.groupingBy(row -> (Integer) row.get("entity_id"), Collectors
+				.mapping(row -> ((String) row.get("name")).replaceFirst("^Clinic\\s+", ""), Collectors.toList())));
 	}
 
 	private Map<Integer, List<String>> fetchUserRoles() {
-		List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-				"SELECT ur.user_id, r.name "
-						+ "FROM user_roles ur "
-						+ "JOIN roles r ON ur.role_id = r.id");
+		List<Map<String, Object>> rows = jdbcTemplate
+			.queryForList("SELECT ur.user_id, r.name " + "FROM user_roles ur " + "JOIN roles r ON ur.role_id = r.id");
 
-		return rows.stream().collect(Collectors.groupingBy(
-				row -> (Integer) row.get("user_id"),
-				Collectors.mapping(row -> (String) row.get("name"), Collectors.toList())));
+		return rows.stream()
+			.collect(Collectors.groupingBy(row -> (Integer) row.get("user_id"),
+					Collectors.mapping(row -> (String) row.get("name"), Collectors.toList())));
 	}
 
 	private Map<Integer, String> fetchUserLevels() {
 		List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-				"SELECT ul.user_id, l.name "
-						+ "FROM user_levels ul "
-						+ "JOIN levels l ON ul.level_id = l.id");
+				"SELECT ul.user_id, l.name " + "FROM user_levels ul " + "JOIN levels l ON ul.level_id = l.id");
 
 		Map<Integer, String> result = new HashMap<>();
 		for (Map<String, Object> row : rows) {
@@ -352,10 +326,8 @@ public class CedarEntityBuilder {
 	}
 
 	private Map<Integer, String> fetchUserManagers() {
-		List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-				"SELECT um.user_id, u.username "
-						+ "FROM user_manager um "
-						+ "JOIN users u ON um.manager_id = u.entity_id");
+		List<Map<String, Object>> rows = jdbcTemplate.queryForList("SELECT um.user_id, u.username "
+				+ "FROM user_manager um " + "JOIN users u ON um.manager_id = u.entity_id");
 
 		Map<Integer, String> result = new HashMap<>();
 		for (Map<String, Object> row : rows) {
@@ -365,58 +337,47 @@ public class CedarEntityBuilder {
 	}
 
 	private Map<Integer, List<Map<String, Object>>> fetchPatientAdults() {
-		List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-				"SELECT pa.patient_id, "
-						+ "CONCAT(p.first_name, ' ', p.last_name) AS adult_name, "
-						+ "auth.name AS authority_name "
-						+ "FROM patient_adults pa "
-						+ "JOIN adults a ON pa.adult_id = a.entity_id "
-						+ "JOIN persons p ON a.entity_id = p.entity_id "
-						+ "JOIN authorities auth ON pa.authority_id = auth.id");
+		List<Map<String, Object>> rows = jdbcTemplate
+			.queryForList("SELECT pa.patient_id, " + "CONCAT(p.first_name, ' ', p.last_name) AS adult_name, "
+					+ "auth.name AS authority_name " + "FROM patient_adults pa "
+					+ "JOIN adults a ON pa.adult_id = a.entity_id " + "JOIN persons p ON a.entity_id = p.entity_id "
+					+ "JOIN authorities auth ON pa.authority_id = auth.id");
 
-		return rows.stream().collect(Collectors.groupingBy(
-				row -> (Integer) row.get("patient_id"),
-				Collectors.mapping(row -> {
-					Map<String, Object> entry = new HashMap<>();
-					entry.put("adult_name", row.get("adult_name"));
-					entry.put("authority_name", row.get("authority_name"));
-					return entry;
-				}, Collectors.toList())));
+		return rows.stream()
+			.collect(Collectors.groupingBy(row -> (Integer) row.get("patient_id"), Collectors.mapping(row -> {
+				Map<String, Object> entry = new HashMap<>();
+				entry.put("adult_name", row.get("adult_name"));
+				entry.put("authority_name", row.get("authority_name"));
+				return entry;
+			}, Collectors.toList())));
 	}
 
 	private Map<Integer, List<String>> fetchPatientDoctors() {
-		List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-				"SELECT pd.patient_id, u.username "
-						+ "FROM patient_doctors pd "
-						+ "JOIN users u ON pd.doctor_id = u.entity_id");
+		List<Map<String, Object>> rows = jdbcTemplate.queryForList("SELECT pd.patient_id, u.username "
+				+ "FROM patient_doctors pd " + "JOIN users u ON pd.doctor_id = u.entity_id");
 
-		return rows.stream().collect(Collectors.groupingBy(
-				row -> (Integer) row.get("patient_id"),
-				Collectors.mapping(row -> (String) row.get("username"), Collectors.toList())));
+		return rows.stream()
+			.collect(Collectors.groupingBy(row -> (Integer) row.get("patient_id"),
+					Collectors.mapping(row -> (String) row.get("username"), Collectors.toList())));
 	}
 
 	private Map<Integer, List<String>> fetchVisitAdults() {
-		List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-				"SELECT va.visit_id, "
-						+ "CONCAT(p.first_name, ' ', p.last_name) AS adult_name "
-						+ "FROM visit_adults va "
-						+ "JOIN adults a ON va.adult_id = a.entity_id "
-						+ "JOIN persons p ON a.entity_id = p.entity_id");
+		List<Map<String, Object>> rows = jdbcTemplate.queryForList("SELECT va.visit_id, "
+				+ "CONCAT(p.first_name, ' ', p.last_name) AS adult_name " + "FROM visit_adults va "
+				+ "JOIN adults a ON va.adult_id = a.entity_id " + "JOIN persons p ON a.entity_id = p.entity_id");
 
-		return rows.stream().collect(Collectors.groupingBy(
-				row -> (Integer) row.get("visit_id"),
-				Collectors.mapping(row -> (String) row.get("adult_name"), Collectors.toList())));
+		return rows.stream()
+			.collect(Collectors.groupingBy(row -> (Integer) row.get("visit_id"),
+					Collectors.mapping(row -> (String) row.get("adult_name"), Collectors.toList())));
 	}
 
 	private Map<Integer, List<String>> fetchVisitDoctors() {
-		List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-				"SELECT vd.visit_id, u.username "
-						+ "FROM visit_doctors vd "
-						+ "JOIN users u ON vd.doctor_id = u.entity_id");
+		List<Map<String, Object>> rows = jdbcTemplate.queryForList("SELECT vd.visit_id, u.username "
+				+ "FROM visit_doctors vd " + "JOIN users u ON vd.doctor_id = u.entity_id");
 
-		return rows.stream().collect(Collectors.groupingBy(
-				row -> (Integer) row.get("visit_id"),
-				Collectors.mapping(row -> (String) row.get("username"), Collectors.toList())));
+		return rows.stream()
+			.collect(Collectors.groupingBy(row -> (Integer) row.get("visit_id"),
+					Collectors.mapping(row -> (String) row.get("username"), Collectors.toList())));
 	}
 
 	// JSON structure helpers.
@@ -440,13 +401,13 @@ public class CedarEntityBuilder {
 		Map<String, Object> entity = new LinkedHashMap<>();
 		entity.put("uid", Map.of("type", NAMESPACE + "::Action", "id", actionId));
 		entity.put("attrs", Map.of());
-		entity.put("parents", parentActionIds.stream()
-				.map(parentId -> entityRef("Action", parentId))
-				.collect(Collectors.toList()));
+		entity.put("parents",
+				parentActionIds.stream().map(parentId -> entityRef("Action", parentId)).collect(Collectors.toList()));
 		return entity;
 	}
 
-	// Builds a Cedar entity reference using the "__entity" format required by the Cedar JSON entity specification.
+	// Builds a Cedar entity reference using the "__entity" format required by the Cedar
+	// JSON entity specification.
 	private Map<String, Object> entityRef(String type, String id) {
 		return Map.of("__entity", Map.of("type", NAMESPACE + "::" + type, "id", id));
 	}

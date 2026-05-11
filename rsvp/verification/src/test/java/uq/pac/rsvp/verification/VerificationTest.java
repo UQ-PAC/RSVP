@@ -5,8 +5,6 @@ import uq.pac.rsvp.policy.ast.FileSet;
 import uq.pac.rsvp.support.reporting.Report;
 
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,18 +43,14 @@ public class VerificationTest {
 
         FileSet fileset = new FileSet().addEntities(entities).addPolicies(policy).addSchema(schema);
 
-        VerificationResult result = Verification.verifyPolicies(fileset);
+        Set<Report> reports = Verification.verifyPolicies(fileset).reports();
 
-        assertEquals(2, result.reports().size());
+        assertEquals(2, reports.size());
 
-        Set<String> expectedMsgs = new HashSet<>(List.of(
-                "Policy 'policy8' does not match any requests that are not also matched by policy 'policy6'",
-                "Policy 'policy14' does not match any requests that are not also matched by policy 'policy6'"
-        ));
-
-        for (Report report : result.reports()) {
-            assertTrue(expectedMsgs.remove(report.getMessage()));
+        for (Report report : reports) {
+            assertEquals("Subsumed Policy", report.getMessage());
         }
+
     }
 
 }

@@ -96,7 +96,17 @@ public class Request {
     }
 
     public String toHumanReadableString() {
-        return "%s can perform %s on %s".formatted(principal, action.substring(8), resource);
+        // The "Action::" qualifier is an internal detail, so filter it out
+        int actionLoc = action.indexOf("Action::");
+        String prettyAction = action;
+
+        if (actionLoc == 0) {
+            prettyAction = action.substring(8);
+        } else if (actionLoc > 0) {
+            prettyAction = action.substring(0, actionLoc) + action.substring(actionLoc + 8);
+        }
+
+        return "%s can perform %s on %s".formatted(principal, prettyAction, resource);
     }
 
     @Override

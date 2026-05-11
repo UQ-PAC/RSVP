@@ -10,7 +10,7 @@
     "lint": "eslint"
   },
   "packageManager": "pnpm@10.30.3",
-  "proxy": "http://localhost:8080",
+  "proxy": "http://localhost:8090",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.2.0",
     "@fortawesome/free-regular-svg-icons": "^7.2.0",

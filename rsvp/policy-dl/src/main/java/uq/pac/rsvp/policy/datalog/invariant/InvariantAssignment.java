@@ -2,7 +2,12 @@ package uq.pac.rsvp.policy.datalog.invariant;
 
 import uq.pac.rsvp.policy.datalog.translation.Relation;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static uq.pac.rsvp.Assertion.require;
 
@@ -22,6 +27,28 @@ public class InvariantAssignment {
 
     public Set<String> getVariables() {
         return assignment.keySet();
+    }
+
+    public String toHumanReadableString() {
+        StringBuilder result = new StringBuilder("When ");
+        List<String> variables = new ArrayList<>(assignment.keySet());
+
+        for (int i = 0; i < assignment.size(); i++) {
+            String var = variables.get(i);
+            String val = assignment.get(var);
+
+            if (i > 0 && i == assignment.size() - 1) {
+                result.append(" and ");
+            } else if (i > 0) {
+                result.append(", ");
+            }
+
+            result.append(var);
+            result.append(" = ");
+            result.append(val);
+        }
+
+        return result.toString();
     }
 
     @Override

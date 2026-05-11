@@ -57,6 +57,21 @@ public class Report {
         public String toString() {
             return "%s: %s".formatted(location.toString(), message);
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            } else if (obj == this) {
+                return true;
+            }
+
+            if (!(obj instanceof LocationMessage other)) {
+                return false;
+            }
+
+            return message.equals(other.message) && !location.equals(other.location);
+        }
     }
 
     private final HashCode id;
@@ -78,6 +93,15 @@ public class Report {
 
     public Report(Severity severity, String message, LocationMessage... locations) {
         this(severity, message, "", locations);
+    }
+
+    public Report(Severity severity, String message, String detail, SourceLoc location) {
+        this(severity, message, detail, new LocationMessage(location, ""));
+    }
+
+    public Report(Severity severity, String message, SourceLoc location) {
+        this(severity, message, new LocationMessage(location, ""));
+
     }
 
     public String getId() {
@@ -108,5 +132,34 @@ public class Report {
     @Override
     public int hashCode() {
         return id.asInt();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        } else if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof Report other)) {
+            return false;
+        }
+
+        return severity.equals(other.severity) && message.equals(other.message) && detail.equals(other.detail) && equalsLocations(other.locations);
+    }
+
+    private boolean equalsLocations(List<LocationMessage> other) {
+        if (locations.size() != other.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < locations.size(); i++) {
+            if (!locations.get(i).equals(other.get(i))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

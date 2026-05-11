@@ -29,10 +29,8 @@ public class ImpactAnalysis {
             RequestResult prevResult = original.get(requestEntry.getKey());
             if ((prevResult == null && requestEntry.getValue().permitted) || (prevResult != null && requestEntry.getValue().permitted != prevResult.permitted)) {
                 Request request = requestEntry.getKey();
-                if (request.known()) {
-                    changeImpact.add(new RequestStatus(request.toHumanReadableString(),
-                            requestEntry.getValue().permitted));
-                }
+                changeImpact.add(new RequestStatus(request.toHumanReadableString(),
+                        requestEntry.getValue().permitted));
             }
         }
 
@@ -42,9 +40,7 @@ public class ImpactAnalysis {
                 RequestResult currentResult = updated.get(requestEntry.getKey());
                 if (currentResult == null) {
                     Request request = requestEntry.getKey();
-                    if (request.known()) {
-                        changeImpact.add(new RequestStatus(request.toHumanReadableString(), false));
-                    }
+                    changeImpact.add(new RequestStatus(request.toHumanReadableString(), false));
                 }
             }
         }

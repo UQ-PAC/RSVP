@@ -37,8 +37,8 @@
 .d2h-code-side-linenumber {
   width: 3rem;
   line-height: 1.3rem;
-  position: relative;
   display: block;
+  position: relative;
   padding-left: 0.2rem;
   padding-right: 0.5rem;
   z-index: 1;
@@ -47,6 +47,15 @@
 .d2h-code-side-line {
   margin-left: -3rem;
   border: 0;
+  width: fit-content;
+}
+
+.d2h-ins .d2h-code-side-line {
+  background-color: var(--d2h-ins-bg-color);
+}
+
+.d2h-del .d2h-code-side-line {
+  background-color: var(--d2h-del-bg-color);
 }
 
 .d2h-info {

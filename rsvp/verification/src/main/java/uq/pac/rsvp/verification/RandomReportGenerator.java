@@ -35,6 +35,7 @@ import uq.pac.rsvp.policy.ast.schema.type.TypeReference;
 import uq.pac.rsvp.policy.ast.schema.visitor.SchemaVisitorAdapter;
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.support.reporting.Report;
+import uq.pac.rsvp.verification.policy.PolicyReport;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -64,6 +65,15 @@ public class RandomReportGenerator {
         RandomReportGenerator.RandomPolicyReportGenerator policyReportGenerator = new RandomPolicyReportGenerator(randomGenerator);
         RandomReportGenerator.RandomSchemaReportGenerator schemaReportGenerator = new RandomSchemaReportGenerator(randomGenerator);
 
+        invariantAst.forEach(invariant -> {
+            int i = randomGenerator.nextRandomNumber();
+
+            if (i < 20) {
+                results.add(randomGenerator.generateRandomInvariantReport(invariant));
+            }
+        });
+
+
         schema.accept(schemaReportGenerator);
         policyAst.forEach(policy -> policy.accept(policyReportGenerator));
         invariantAst.forEach(invariant -> invariant.accept(policyReportGenerator));
@@ -72,7 +82,7 @@ public class RandomReportGenerator {
         results.add(randomGenerator.generateRandomReport(null, "Mystery"));
         results.add(randomGenerator.generateRandomReport(null, "Mystery"));
         results.add(randomGenerator.generateRandomReport(null, "Mystery"));
-        
+
         results.addAll(schemaReportGenerator.reports);
         results.addAll(policyReportGenerator.reports);
         results.addAll(entityReportGenerator.reports);
@@ -190,6 +200,8 @@ public class RandomReportGenerator {
         private final Set<Report> reports;
         private final RandomReportGenerator generator;
 
+        private Policy secondPolicy = null;
+
         private RandomPolicyReportGenerator(RandomReportGenerator generator) {
             reports = new HashSet<>();
             this.generator = generator;
@@ -197,7 +209,17 @@ public class RandomReportGenerator {
 
         @Override
         public void visitPolicy(Policy policy) {
-            maybeAddRandomReport(policy, 30);
+            int p = generator.nextRandomNumber();
+
+            if (p < 50) {
+//                maybeAddRandomReport(policy, 30);
+//            } else if (p < 80) {
+                reports.add(generator.generateRandomPolicyReport(policy, secondPolicy));
+            } else if (p < 75) {
+                secondPolicy = policy;
+            } else {
+                secondPolicy = null;
+            }
             super.visitPolicy(policy);
         }
 
@@ -325,6 +347,27 @@ public class RandomReportGenerator {
                 }
             }
         }
+    }
+
+    private Report generateRandomPolicyReport(Policy p1, Policy p2) {
+        int r = nextRandomNumber();
+        if (p2 != null) {
+            if (r < 50) {
+                return new PolicyReport.IdenticalPolicies(p1, p2);
+            } else {
+                return new PolicyReport.SubsumedPolicy(p1, p2);
+            }
+        } else {
+            if (r < 50) {
+                return new PolicyReport.UnusedPolicy(p1);
+            } else {
+                return new PolicyReport.SubsumedPolicy(p1);
+            }
+        }
+    }
+
+    private Report generateRandomInvariantReport(Invariant i) {
+        return new PolicyReport.InvariantNotHeld(i, "Counterexamples");
     }
 
     private Report generateRandomReport(SourceLoc loc, String entryType) {

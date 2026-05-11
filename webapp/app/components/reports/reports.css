@@ -127,6 +127,7 @@
     padding-left: 1.8rem;
     color: var(--color-gray-700);
     font-size: 0.8rem;
+    white-space: pre-wrap;
   }
 
   .report-item .report-item-source-location-list {

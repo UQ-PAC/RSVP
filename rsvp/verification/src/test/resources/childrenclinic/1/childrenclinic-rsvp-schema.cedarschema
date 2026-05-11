@@ -1,0 +1,173 @@
+namespace ChildrenClinic {
+    entity Clinic;
+
+    entity AdultAuthority enum ["Parent", "Legal Guardian", "Designated Representative", "Authorised Adult"];
+
+    entity Confidentiality enum ["Official", "Sensitive", "Protected"];
+
+    entity EmployeeRole enum ["Administrator", "Secretary", "Doctor"];
+
+    entity ProfessionalLevel enum ["Intern", "Resident", "Staff", "Senior", "Registrar", "Specialist"];
+
+    entity Employee = {
+        name: String,
+        clinics: Set<Clinic>,
+        roles: Set<EmployeeRole>,
+        level?: ProfessionalLevel,
+        manager?: Employee
+    };
+
+    entity Guest;
+
+    entity ResponsibleAdult = {
+        name: String,
+        clinics: Set<Clinic>
+    };
+
+    entity Patient = {
+        name: String,
+        adults: Set<{
+            adult: ResponsibleAdult,
+            authority: AdultAuthority
+        }>,
+        clinics: Set<Clinic>,
+        doctors: Set<Employee>
+    };
+
+    entity Visit = {
+        patient: Patient,
+        adults: Set<ResponsibleAdult>,
+        clinics: Set<Clinic>,
+        doctors: Set<Employee>,
+        confidentiality: Confidentiality
+    };
+
+    action EmployeeOperations;
+    action PatientOperations;
+
+    action ViewClinic in [EmployeeOperations, PatientOperations] appliesTo {
+        principal: [Employee, Guest],
+        resource: Clinic,
+        context: { }
+    };
+
+    action ListEmployees in EmployeeOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Clinic,
+        context: { }
+    };
+
+    action AddEmployee in EmployeeOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Clinic,
+        context: { }
+    };
+
+    action ViewEmployee in EmployeeOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Employee,
+        context: { }
+    };
+
+    action EditEmployee in EmployeeOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Employee,
+        context: { }
+    };
+
+    action DeleteEmployee in EmployeeOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Employee,
+        context: { }
+    };
+
+    action ListPatients in PatientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Clinic,
+        context: { }
+    };
+
+    action AddPatient in PatientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Clinic,
+        context: { }
+    };
+
+    action ViewPatient in PatientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Patient,
+        context: { }
+    };
+
+    action EditPatient in PatientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Patient,
+        context: { }
+    };
+
+    action DeletePatient in PatientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Patient,
+        context: { }
+    };
+
+    action ListAdults in PatientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Clinic,
+        context: { }
+    };
+
+    action AddAdult in PatientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Clinic,
+        context: { }
+    };
+
+    action ViewAdult in PatientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: ResponsibleAdult,
+        context: { }
+    };
+
+    action EditAdult in PatientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: ResponsibleAdult,
+        context: { }
+    };
+
+    action DeleteAdult in PatientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: ResponsibleAdult,
+        context: { }
+    };
+
+    action ListVisits in PatientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Clinic,
+        context: { }
+    };
+
+    action AddVisit in PatientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Clinic,
+        context: { }
+    };
+
+    action ViewVisit in PatientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Visit,
+        context: { }
+    };
+
+    action EditVisit in PatientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Visit,
+        context: { }
+    };
+
+    action DeleteVisit in PatientOperations appliesTo {
+        principal: [Employee, Guest],
+        resource: Visit,
+        context: { }
+    };
+}

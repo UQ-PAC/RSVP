@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Kathaleen Tramonte\"",
-  "resource": "ChildrenClinic::ResponsibleAdult::\"Carlos Estaban\"",
-  "action": "ChildrenClinic::Action::\"ViewAdult\"",
+  "principal": "ChildrenClinic::Guest::\"???\"",
+  "resource": "ChildrenClinic::Clinic::\"???\"",
+  "action": "ChildrenClinic::Action::\"AddVisit\"",
   "context": {}
 }

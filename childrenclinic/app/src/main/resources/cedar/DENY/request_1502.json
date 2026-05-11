@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Guest::\"???\"",
-  "resource": "ChildrenClinic::Clinic::\"B\"",
-  "action": "ChildrenClinic::Action::\"ListAdults\"",
+  "principal": "ChildrenClinic::Employee::\"Linda Douglas\"",
+  "resource": "ChildrenClinic::Employee::\"Bob Buchanan\"",
+  "action": "ChildrenClinic::Action::\"EditEmployee\"",
   "context": {}
 }

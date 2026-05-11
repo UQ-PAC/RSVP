@@ -1,4 +1,4 @@
-package uq.pac.childrenclinic.secretary;
+package uq.pac.childrenclinic.administrativeassistant;
 
 import com.cedarpolicy.value.EntityUID;
 
@@ -45,11 +45,11 @@ import uq.pac.childrenclinic.system.Clinic;
 import uq.pac.childrenclinic.system.ClinicRepository;
 
 @Controller
-public class SecretaryController {
+public class AdministrativeAssistantController {
 
-	private static final String VIEWS_SECRETARY_CREATE_OR_UPDATE_FORM = "secretaries/createOrUpdateSecretaryForm";
+	private static final String VIEWS_ADMINISTRATIVE_ASSISTANT_CREATE_OR_UPDATE_FORM = "administrative-assistants/createOrUpdateAdministrativeAssistantForm";
 
-	private final SecretaryRepository secretaries;
+	private final AdministrativeAssistantRepository administrativeAssistants;
 
 	private final GenderRepository genders;
 
@@ -59,9 +59,10 @@ public class SecretaryController {
 
 	private final ApplicationEventPublisher eventPublisher;
 
-	public SecretaryController(SecretaryRepository secretaries, GenderRepository genders, ClinicRepository clinics,
-			CedarProgrammaticEvaluator cedarEvaluator, ApplicationEventPublisher eventPublisher) {
-		this.secretaries = secretaries;
+	public AdministrativeAssistantController(AdministrativeAssistantRepository administrativeAssistants,
+			GenderRepository genders, ClinicRepository clinics, CedarProgrammaticEvaluator cedarEvaluator,
+			ApplicationEventPublisher eventPublisher) {
+		this.administrativeAssistants = administrativeAssistants;
 		this.genders = genders;
 		this.clinics = clinics;
 		this.cedarEvaluator = cedarEvaluator;
@@ -90,38 +91,38 @@ public class SecretaryController {
 		}).collect(Collectors.toList());
 	}
 
-	@InitBinder("secretary")
-	public void initSecretaryBinder(WebDataBinder dataBinder) {
+	@InitBinder("administrativeAssistant")
+	public void initAdministrativeAssistantBinder(WebDataBinder dataBinder) {
 		dataBinder.setDisallowedFields("id");
 	}
 
-	@GetMapping("/secretaries/find")
+	@GetMapping("/administrative-assistants/find")
 	@CedarAuthorization(action = "ListEmployees", resourceType = "Clinic", resourceId = "Any", validate = true)
 	public String initFindForm(Model model) {
-		model.addAttribute("secretary", new Secretary());
-		return "secretaries/findSecretaries";
+		model.addAttribute("administrativeAssistant", new AdministrativeAssistant());
+		return "administrative-assistants/findAdministrativeAssistants";
 	}
 
-	@GetMapping("/secretaries")
+	@GetMapping("/administrative-assistants")
 	@CedarAuthorization(action = "ListEmployees", resourceType = "Clinic", resourceId = "Any", validate = true)
-	public String processFindForm(@RequestParam(defaultValue = "1") int page, Secretary secretary, BindingResult result,
-			Model model, HttpSession session) {
-		String lastName = secretary.getLastName() == null ? "" : secretary.getLastName();
+	public String processFindForm(@RequestParam(defaultValue = "1") int page,
+			AdministrativeAssistant administrativeAssistant, BindingResult result, Model model, HttpSession session) {
+		String lastName = administrativeAssistant.getLastName() == null ? "" : administrativeAssistant.getLastName();
 
-		List<Secretary> allMatchingSecretaries = this.secretaries
+		List<AdministrativeAssistant> allMatchingAssistants = this.administrativeAssistants
 			.findByLastNameStartingWith(lastName, Pageable.unpaged())
 			.getContent();
 
-		if (allMatchingSecretaries.isEmpty()) {
-			result.rejectValue("lastName", "notFound", "No secretaries found.");
-			return "secretaries/findSecretaries";
+		if (allMatchingAssistants.isEmpty()) {
+			result.rejectValue("lastName", "notFound", "No administrative assistants found.");
+			return "administrative-assistants/findAdministrativeAssistants";
 		}
 
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 		Map<Integer, String> authorizationMap = new HashMap<>();
 		Map<Integer, String> cedarResourceMap = new HashMap<>();
 
-		List<Secretary> authorized = allMatchingSecretaries.stream().filter(s -> {
+		List<AdministrativeAssistant> authorized = allMatchingAssistants.stream().filter(s -> {
 			String resourceName = s.getFirstName() + " " + s.getLastName();
 			var evalResult = cedarEvaluator.evaluate(principal, "ViewEmployee", "Employee", resourceName, "Item");
 			authorizationMap.put(s.getId(), evalResult.responseBody());
@@ -129,17 +130,18 @@ public class SecretaryController {
 			return evalResult.isGranted();
 		}).collect(Collectors.toList());
 
-		if (authorized.size() == 1 && allMatchingSecretaries.size() == 1) {
-			return "redirect:/secretaries/" + authorized.iterator().next().getId();
+		if (authorized.size() == 1 && allMatchingAssistants.size() == 1) {
+			return "redirect:/administrative-assistants/" + authorized.iterator().next().getId();
 		}
 
 		Pageable pageable = PageRequest.of(page - 1, 5);
 		int start = (int) pageable.getOffset();
 		int end = Math.min((start + pageable.getPageSize()), authorized.size());
-		List<Secretary> pageContent = start > authorized.size() ? List.of() : authorized.subList(start, end);
-		Page<Secretary> paginated = new PageImpl<>(pageContent, pageable, authorized.size());
+		List<AdministrativeAssistant> pageContent = start > authorized.size() ? List.of()
+				: authorized.subList(start, end);
+		Page<AdministrativeAssistant> paginated = new PageImpl<>(pageContent, pageable, authorized.size());
 
-		model.addAttribute("listSecretaries", paginated.getContent());
+		model.addAttribute("listAdministrativeAssistants", paginated.getContent());
 		model.addAttribute("currentPage", page);
 		model.addAttribute("totalPages", paginated.getTotalPages());
 		model.addAttribute("totalItems", paginated.getTotalElements());
@@ -148,20 +150,21 @@ public class SecretaryController {
 		model.addAttribute("cedarAction", "ChildrenClinic::Action::\"ViewEmployee\"");
 		model.addAttribute("cedarResourceMap", cedarResourceMap);
 
-		return "secretaries/secretariesList";
+		return "administrative-assistants/administrativeAssistantsList";
 	}
 
-	@GetMapping("/secretaries/{secretaryId}")
+	@GetMapping("/administrative-assistants/{assistantId}")
 	@CedarAuthorization(action = "ViewEmployee", resourceType = "Employee", validate = true)
-	public ModelAndView showSecretary(@PathVariable("secretaryId") int secretaryId) {
-		ModelAndView mav = new ModelAndView("secretaries/secretaryDetails");
-		Secretary secretary = this.secretaries.findById(secretaryId)
-			.orElseThrow(() -> new IllegalArgumentException("Secretary not found for identifier: " + secretaryId));
-		mav.addObject("secretary", secretary);
+	public ModelAndView showAdministrativeAssistant(@PathVariable("assistantId") int assistantId) {
+		ModelAndView mav = new ModelAndView("administrative-assistants/administrativeAssistantDetails");
+		AdministrativeAssistant administrativeAssistant = this.administrativeAssistants.findById(assistantId)
+			.orElseThrow(() -> new IllegalArgumentException(
+					"Administrative Assistant not found for identifier: " + assistantId));
+		mav.addObject("administrativeAssistant", administrativeAssistant);
 		return mav;
 	}
 
-	@GetMapping("/secretaries/new")
+	@GetMapping("/administrative-assistants/new")
 	public String initCreationForm(Model model, HttpSession session) {
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 		Collection<Clinic> allClinics = this.clinics.findClinics();
@@ -199,18 +202,19 @@ public class SecretaryController {
 				}
 			}
 			else {
-				exceptionBody.append("You do not have permission to add secretaries to any assigned clinics.");
+				exceptionBody
+					.append("You do not have permission to add administrative assistants to any assigned clinics.");
 			}
 
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
-		model.addAttribute("secretary", new Secretary());
-		return VIEWS_SECRETARY_CREATE_OR_UPDATE_FORM;
+		model.addAttribute("administrativeAssistant", new AdministrativeAssistant());
+		return VIEWS_ADMINISTRATIVE_ASSISTANT_CREATE_OR_UPDATE_FORM;
 	}
 
-	@PostMapping("/secretaries/new")
-	public String processCreationForm(@Valid Secretary secretary, BindingResult result,
+	@PostMapping("/administrative-assistants/new")
+	public String processCreationForm(@Valid AdministrativeAssistant administrativeAssistant, BindingResult result,
 			RedirectAttributes redirectAttributes, HttpSession session) {
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
@@ -218,11 +222,12 @@ public class SecretaryController {
 		boolean isAuthorized = true;
 		List<String> denialReasons = new ArrayList<>();
 
-		Collection<Clinic> submittedClinics = secretary.getClinics();
+		Collection<Clinic> submittedClinics = administrativeAssistant.getClinics();
 
 		if (submittedClinics == null || submittedClinics.isEmpty()) {
 			isAuthorized = false;
-			denialReasons.add("You must assign the Secretary to at least one valid Clinic.");
+			denialReasons
+				.add("You must assign the Administrative Assistant to at least one valid Clinic.");
 		}
 		else {
 			for (Clinic clinic : submittedClinics) {
@@ -251,76 +256,79 @@ public class SecretaryController {
 				}
 			}
 			else {
-				exceptionBody
-					.append("You do not have permission to add secretaries to one or more of the selected clinics.");
+				exceptionBody.append(
+						"You do not have permission to add administrative assistants to one or more of the selected clinics.");
 			}
 
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
-		if (StringUtils.hasLength(secretary.getLastName()) && StringUtils.hasLength(secretary.getFirstName())
-				&& secretary.isNew()) {
-			boolean duplicateExists = secretaries
-				.findByLastNameStartingWith(secretary.getLastName(), PageRequest.of(0, 50))
+		if (StringUtils.hasLength(administrativeAssistant.getLastName())
+				&& StringUtils.hasLength(administrativeAssistant.getFirstName())
+				&& administrativeAssistant.isNew()) {
+			boolean duplicateExists = administrativeAssistants
+				.findByLastNameStartingWith(administrativeAssistant.getLastName(), PageRequest.of(0, 50))
 				.getContent()
 				.stream()
-				.anyMatch(s -> s.getFirstName().equalsIgnoreCase(secretary.getFirstName())
-						&& Objects.equals(s.getBirthDate(), secretary.getBirthDate())
-						&& Objects.equals(s.getGender(), secretary.getGender()));
+				.anyMatch(s -> s.getFirstName().equalsIgnoreCase(administrativeAssistant.getFirstName())
+						&& Objects.equals(s.getBirthDate(), administrativeAssistant.getBirthDate())
+						&& Objects.equals(s.getGender(), administrativeAssistant.getGender()));
 
 			if (duplicateExists) {
 				result.rejectValue("firstName", "duplicate",
-						"A secretary with this first and last name, birth date, and gender already exists.");
+						"An administrative assistant with this first and last name, birth date, and gender already exists.");
 			}
 		}
 
 		if (result.hasErrors()) {
-			return VIEWS_SECRETARY_CREATE_OR_UPDATE_FORM;
+			return VIEWS_ADMINISTRATIVE_ASSISTANT_CREATE_OR_UPDATE_FORM;
 		}
 
 		try {
-			this.secretaries.save(secretary);
+			this.administrativeAssistants.save(administrativeAssistant);
 		}
 		catch (DataIntegrityViolationException ex) {
 			result.rejectValue("firstName", "duplicate",
 					"A person with this first name, last name, birth date, and gender already exists.");
-			return VIEWS_SECRETARY_CREATE_OR_UPDATE_FORM;
+			return VIEWS_ADMINISTRATIVE_ASSISTANT_CREATE_OR_UPDATE_FORM;
 		}
 
 		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
-		redirectAttributes.addFlashAttribute("message", "New Secretary has been added.");
-		return "redirect:/secretaries/" + secretary.getId();
+		redirectAttributes.addFlashAttribute("message", "New Administrative Assistant has been added.");
+		return "redirect:/administrative-assistants/" + administrativeAssistant.getId();
 	}
 
-	@GetMapping("/secretaries/{secretaryId}/edit")
+	@GetMapping("/administrative-assistants/{assistantId}/edit")
 	@CedarAuthorization(action = "EditEmployee", resourceType = "Employee", validate = true)
-	public String initUpdateForm(@PathVariable("secretaryId") int secretaryId, Model model) {
-		Secretary secretary = this.secretaries.findById(secretaryId)
-			.orElseThrow(() -> new IllegalArgumentException("Secretary not found for identifier: " + secretaryId));
-		model.addAttribute("secretary", secretary);
-		return VIEWS_SECRETARY_CREATE_OR_UPDATE_FORM;
+	public String initUpdateForm(@PathVariable("assistantId") int assistantId, Model model) {
+		AdministrativeAssistant administrativeAssistant = this.administrativeAssistants.findById(assistantId)
+			.orElseThrow(
+					() -> new IllegalArgumentException("Administrative Assistant not found for identifier: " + assistantId));
+		model.addAttribute("administrativeAssistant", administrativeAssistant);
+		return VIEWS_ADMINISTRATIVE_ASSISTANT_CREATE_OR_UPDATE_FORM;
 	}
 
-	@PostMapping("/secretaries/{secretaryId}/edit")
-	public String processUpdateForm(@Valid Secretary secretary, BindingResult result,
-			@PathVariable("secretaryId") int secretaryId, RedirectAttributes redirectAttributes, HttpSession session,
+	@PostMapping("/administrative-assistants/{assistantId}/edit")
+	public String processUpdateForm(@Valid AdministrativeAssistant administrativeAssistant, BindingResult result,
+			@PathVariable("assistantId") int assistantId, RedirectAttributes redirectAttributes, HttpSession session,
 			Model model) {
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
-		Secretary existingSecretary = this.secretaries.findById(secretaryId)
-			.orElseThrow(() -> new IllegalArgumentException("Secretary not found: " + secretaryId));
+		AdministrativeAssistant existingAssistant = this.administrativeAssistants.findById(assistantId)
+			.orElseThrow(() -> new IllegalArgumentException("Administrative Assistant not found: " + assistantId));
 
-		String resourceName = existingSecretary.getFirstName() + " " + existingSecretary.getLastName();
-		var secretaryEval = cedarEvaluator.evaluate(principal, "EditEmployee", "Employee", resourceName, "Page");
+		String resourceName = existingAssistant.getFirstName() + " " + existingAssistant.getLastName();
+		var assistantEval = cedarEvaluator.evaluate(principal, "EditEmployee", "Employee", resourceName, "Page");
 
-		if (!secretaryEval.isGranted()) {
-			throw new CedarDeniedException("Access Denied: You do not have permission to edit this secretary.\n"
-					+ (secretaryEval.responseBody() != null ? secretaryEval.responseBody() : ""));
+		if (!assistantEval.isGranted()) {
+			throw new CedarDeniedException(
+					"Access Denied: You do not have permission to edit this administrative assistant.\n"
+							+ (assistantEval.responseBody() != null ? assistantEval.responseBody() : ""));
 		}
 
 		boolean isAuthorized = true;
 		List<String> denialReasons = new ArrayList<>();
-		Collection<Clinic> submittedClinics = secretary.getClinics();
+		Collection<Clinic> submittedClinics = administrativeAssistant.getClinics();
 
 		if (submittedClinics != null) {
 			for (Clinic clinic : submittedClinics) {
@@ -350,8 +358,8 @@ public class SecretaryController {
 
 		Set<Clinic> finalClinics = new HashSet<>(submittedClinics != null ? submittedClinics : new ArrayList<>());
 
-		if (existingSecretary.getClinics() != null) {
-			for (Clinic existingClinic : existingSecretary.getClinics()) {
+		if (existingAssistant.getClinics() != null) {
+			for (Clinic existingClinic : existingAssistant.getClinics()) {
 				if (existingClinic == null || existingClinic.getClinicName() == null)
 					continue;
 				String cedarClinicId = existingClinic.getClinicName().replaceFirst("^Clinic\\s+", "");
@@ -362,44 +370,45 @@ public class SecretaryController {
 				}
 			}
 		}
-		secretary.setClinics(finalClinics);
+		administrativeAssistant.setClinics(finalClinics);
 
-		if (StringUtils.hasLength(secretary.getLastName()) && StringUtils.hasLength(secretary.getFirstName())) {
-			boolean duplicateExists = this.secretaries
-				.findByLastNameStartingWith(secretary.getLastName(), PageRequest.of(0, 50))
+		if (StringUtils.hasLength(administrativeAssistant.getLastName())
+				&& StringUtils.hasLength(administrativeAssistant.getFirstName())) {
+			boolean duplicateExists = this.administrativeAssistants
+				.findByLastNameStartingWith(administrativeAssistant.getLastName(), PageRequest.of(0, 50))
 				.getContent()
 				.stream()
-				.anyMatch(s -> s.getFirstName().equalsIgnoreCase(secretary.getFirstName())
-						&& Objects.equals(s.getBirthDate(), secretary.getBirthDate())
-						&& Objects.equals(s.getGender(), secretary.getGender())
-						&& !Objects.equals(s.getId(), secretaryId));
+				.anyMatch(s -> s.getFirstName().equalsIgnoreCase(administrativeAssistant.getFirstName())
+						&& Objects.equals(s.getBirthDate(), administrativeAssistant.getBirthDate())
+						&& Objects.equals(s.getGender(), administrativeAssistant.getGender())
+						&& !Objects.equals(s.getId(), assistantId));
 
 			if (duplicateExists) {
 				result.rejectValue("firstName", "duplicate",
-						"A secretary with this first and last name, birth date, and gender already exists.");
+						"An administrative assistant with this first and last name, birth date, and gender already exists.");
 			}
 		}
 
 		if (result.hasErrors()) {
-			model.addAttribute("error", "There was an error in updating the secretary.");
-			return VIEWS_SECRETARY_CREATE_OR_UPDATE_FORM;
+			model.addAttribute("error", "There was an error in updating the administrative assistant.");
+			return VIEWS_ADMINISTRATIVE_ASSISTANT_CREATE_OR_UPDATE_FORM;
 		}
 
-		secretary.setId(secretaryId);
+		administrativeAssistant.setId(assistantId);
 
 		try {
-			this.secretaries.save(secretary);
+			this.administrativeAssistants.save(administrativeAssistant);
 		}
 		catch (DataIntegrityViolationException ex) {
 			result.rejectValue("firstName", "duplicate",
 					"A person with this first name, last name, birth date, and gender already exists.");
-			model.addAttribute("error", "There was an error in updating the secretary.");
-			return VIEWS_SECRETARY_CREATE_OR_UPDATE_FORM;
+			model.addAttribute("error", "There was an error in updating the administrative assistant.");
+			return VIEWS_ADMINISTRATIVE_ASSISTANT_CREATE_OR_UPDATE_FORM;
 		}
 
 		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
-		redirectAttributes.addFlashAttribute("message", "Secretary values updated.");
-		return "redirect:/secretaries/{secretaryId}";
+		redirectAttributes.addFlashAttribute("message", "Administrative Assistant values updated.");
+		return "redirect:/administrative-assistants/{assistantId}";
 	}
 
 }

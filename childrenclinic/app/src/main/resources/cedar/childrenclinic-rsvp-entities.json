@@ -53,7 +53,7 @@
         "parents": [ ]
     },
     {
-        "uid": { "type": "ChildrenClinic::EmployeeRole", "id": "Secretary" },
+        "uid": { "type": "ChildrenClinic::EmployeeRole", "id": "Administrative Assistant" },
         "attrs": { },
         "parents": [ ]
     },
@@ -193,7 +193,7 @@
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
             ],
             "roles": [
-                { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Secretary" } }
+                { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Administrative Assistant" } }
             ],
             "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Staff" } }
         },
@@ -207,7 +207,7 @@
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
             ],
             "roles": [
-                { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Secretary" } }
+                { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Administrative Assistant" } }
             ],
             "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Intern" } },
             "manager": { "__entity": { "type": "ChildrenClinic::Employee", "id": "Bob Buchanan" } }

@@ -89,7 +89,7 @@ class WelcomeController {
 			searchOptions.put("adult", "Adult");
 		}
 		if (isAuthorized(principal, "ListEmployees")) {
-			searchOptions.put("secretary", "Secretary");
+			searchOptions.put("administrativeAssistant", "Administrative Assistant");
 			searchOptions.put("doctor", "Doctor");
 		}
 
@@ -100,7 +100,7 @@ class WelcomeController {
 			addOptions.put("/adults/new", "Adult");
 		}
 		if (isAuthorized(principal, "AddEmployee")) {
-			addOptions.put("/secretaries/new", "Secretary");
+			addOptions.put("/administrative-assistants/new", "Administrative Assistant");
 			addOptions.put("/doctors/new", "Doctor");
 		}
 
@@ -124,8 +124,8 @@ class WelcomeController {
 		else if ("adult".equalsIgnoreCase(entityType) && isAuthorized(principal, "ListAdults")) {
 			return "redirect:/adults?lastName=" + encodedQuery;
 		}
-		else if ("secretary".equalsIgnoreCase(entityType) && isAuthorized(principal, "ListEmployees")) {
-			return "redirect:/secretaries?lastName=" + encodedQuery;
+		else if ("administrativeAssistant".equalsIgnoreCase(entityType) && isAuthorized(principal, "ListEmployees")) {
+			return "redirect:/administrative-assistants?lastName=" + encodedQuery;
 		}
 		else if ("doctor".equalsIgnoreCase(entityType) && isAuthorized(principal, "ListEmployees")) {
 			return "redirect:/doctors?lastName=" + encodedQuery;

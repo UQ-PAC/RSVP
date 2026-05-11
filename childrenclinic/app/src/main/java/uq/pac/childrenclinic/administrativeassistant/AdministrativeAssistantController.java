@@ -226,8 +226,7 @@ public class AdministrativeAssistantController {
 
 		if (submittedClinics == null || submittedClinics.isEmpty()) {
 			isAuthorized = false;
-			denialReasons
-				.add("You must assign the Administrative Assistant to at least one valid Clinic.");
+			denialReasons.add("You must assign the Administrative Assistant to at least one valid Clinic.");
 		}
 		else {
 			for (Clinic clinic : submittedClinics) {
@@ -264,8 +263,7 @@ public class AdministrativeAssistantController {
 		}
 
 		if (StringUtils.hasLength(administrativeAssistant.getLastName())
-				&& StringUtils.hasLength(administrativeAssistant.getFirstName())
-				&& administrativeAssistant.isNew()) {
+				&& StringUtils.hasLength(administrativeAssistant.getFirstName()) && administrativeAssistant.isNew()) {
 			boolean duplicateExists = administrativeAssistants
 				.findByLastNameStartingWith(administrativeAssistant.getLastName(), PageRequest.of(0, 50))
 				.getContent()
@@ -302,8 +300,8 @@ public class AdministrativeAssistantController {
 	@CedarAuthorization(action = "EditEmployee", resourceType = "Employee", validate = true)
 	public String initUpdateForm(@PathVariable("assistantId") int assistantId, Model model) {
 		AdministrativeAssistant administrativeAssistant = this.administrativeAssistants.findById(assistantId)
-			.orElseThrow(
-					() -> new IllegalArgumentException("Administrative Assistant not found for identifier: " + assistantId));
+			.orElseThrow(() -> new IllegalArgumentException(
+					"Administrative Assistant not found for identifier: " + assistantId));
 		model.addAttribute("administrativeAssistant", administrativeAssistant);
 		return VIEWS_ADMINISTRATIVE_ASSISTANT_CREATE_OR_UPDATE_FORM;
 	}

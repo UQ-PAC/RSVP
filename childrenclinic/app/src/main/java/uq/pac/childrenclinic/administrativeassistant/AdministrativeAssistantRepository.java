@@ -17,4 +17,5 @@ public interface AdministrativeAssistantRepository extends JpaRepository<Adminis
 	@EntityGraph(attributePaths = { "clinics", "gender" })
 	@Transactional(readOnly = true)
 	Optional<AdministrativeAssistant> findById(Integer id);
+
 }

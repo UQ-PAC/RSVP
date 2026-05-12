@@ -48,6 +48,8 @@ If you ever delete the `node_modules` directory or `pnpm-lock.yaml`, or if you e
 
   This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+  **Note**: The React client interacts with a Spring Boot web server to execute policy verification, the server code is located in a submodule of [../rsvp](https://github.com/UQ-PAC/RSVP/tree/main/rsvp) and can be executed from that directory by running `./gradlew :webserver:bootRun`.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

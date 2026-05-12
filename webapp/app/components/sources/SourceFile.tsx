@@ -14,7 +14,10 @@ import {
   useFocus,
   useFocusDispatch,
 } from "../../lib/context/FocusContext";
-import { useSelectionDispatch } from "../../lib/context/SelectionContext";
+import {
+  useSelection,
+  useSelectionDispatch,
+} from "../../lib/context/SelectionContext";
 import { Report, VerificationFile, VersionedFile } from "../../lib/types";
 import { CodeRender } from "./CodeRender";
 import { DiffRender } from "./DiffRender";
@@ -33,7 +36,10 @@ export function SourceFile({ source, reports, setFocus }: SourceFileParams) {
     "source-file": { expansions },
   } = useFocus();
   const focusDispatch = useFocusDispatch();
+  const { scroll, file: focusedFileId } = useSelection();
   const selectionDispatch = useSelectionDispatch();
+
+  const file = useRef<HTMLDivElement>(null);
 
   const [focusIds, setFocusIds] = useState<string[]>([]);
   const [versionIds, setVersionIds] = useState<string[]>([]);
@@ -179,6 +185,19 @@ export function SourceFile({ source, reports, setFocus }: SourceFileParams) {
         }) ?? null;
   }, [expansions, focusIds, files, focusDispatch]);
 
+  // Scroll selected policy into view if relevant
+  useEffect(() => {
+    focus.current?.then((id) => {
+      if (file.current && scroll === "source-file" && id === focusedFileId) {
+        file.current.scrollIntoView({
+          block: "start",
+          inline: "start",
+          behavior: "smooth",
+        });
+      }
+    });
+  }, [scroll, focusedFileId]);
+
   // Resolve reports
   useEffect(() => {
     reports.then((resolved) => setResolvedReports(resolved));
@@ -211,7 +230,10 @@ export function SourceFile({ source, reports, setFocus }: SourceFileParams) {
     );
 
   return (
-    <div className={cx("source-file", expanded ? "expanded" : "collapsed")}>
+    <div
+      ref={file}
+      className={cx("source-file", expanded ? "expanded" : "collapsed")}
+    >
       <div
         className="source-file-header"
         onClick={() => {

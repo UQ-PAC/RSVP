@@ -4,7 +4,8 @@ interface SelectionState {
   selected?: string;
   hovered?: string;
   loc?: string;
-  scroll?: "source" | "report" | "none";
+  file?: string;
+  scroll?: "source" | "report" | "source-file" | "none";
 }
 
 export const emptySelection = {};
@@ -12,7 +13,8 @@ export const emptySelection = {};
 interface SelectionAction {
   hovered?: string;
   selected?: string;
-  scroll: "source" | "report" | "none";
+  scroll: "source" | "report" | "source-file" | "none";
+  file?: string;
   loc?: string;
 }
 

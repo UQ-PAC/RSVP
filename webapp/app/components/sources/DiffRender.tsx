@@ -61,14 +61,22 @@ export function DiffRender({
   const diffRef = useRef<HTMLDivElement>(null);
   const impactRef = useRef<HTMLDivElement>(null);
 
+  const diffRequested = useRef(false);
   const impactRequested = useRef(false);
 
   const [diff, setDiff] = useState(diffs[originalId]?.[updatedId]);
   const [impact, setImpact] = useState(impacts?.[originalId]?.[updatedId]);
 
+  const [inProgress, setInProgress] = useState(verifyPending);
+
   useEffect(() => {
-    if (diff === undefined) {
+    const existing = diffs[originalId]?.[updatedId];
+
+    if (existing) {
+      setDiff(existing);
+    } else if (!diffRequested.current) {
       // Diff hasn't been requested yet
+      diffRequested.current = true;
       getDiff(
         { id: originalId, name: original.file.name },
         { id: updatedId, name: updated.file.name },
@@ -80,26 +88,34 @@ export function DiffRender({
           updatedId,
           diff,
         });
+        diffRequested.current = false;
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [originalId, original, updatedId, updated]);
 
   useEffect(() => {
-    if (!impactRequested.current && verifyCompleted) {
+    const existing = impacts?.[originalId]?.[updatedId];
+
+    if (existing) {
+      setImpact(existing);
+    } else if (!impactRequested.current && verifyCompleted) {
       impactRequested.current = true;
+      setInProgress(true);
 
       verifyCompleted.then((result) => {
-        if (result && !impact) {
+        if (result) {
           // Verification has been executed but no impact exists yet
           getImpact(originalId, updatedId).then((impact) => {
             setImpact(impact);
+            setInProgress(false);
             analysisGroupDispatch({
               type: "impact",
               originalId,
               updatedId,
               diff: impact,
             });
+            impactRequested.current = false;
           });
         }
       });
@@ -133,7 +149,7 @@ export function DiffRender({
     }
   }, [impact]);
 
-  const fallback = verifyPending ? (
+  const fallback = inProgress ? (
     <ProgressSpinner />
   ) : (
     <span className="diff-impact-information-message">

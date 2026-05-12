@@ -160,6 +160,7 @@
 
   .upload-container .uploaded-file .uploaded-file-name {
     flex-grow: 1;
+    cursor: pointer;
   }
 
   .uploaded-file-delete-icon,

@@ -17,6 +17,15 @@ jest.mock("@fortawesome/free-solid-svg-icons", () => ({
   faXmark: "faXmark",
 }));
 
+jest.mock("../../lib/context/SelectionContext", () => ({
+  useSelectionDispatch: jest.fn(() => jest.fn()),
+}));
+
+jest.mock("../../lib/context/FocusContext", () => ({
+  ...jest.requireActual("../../lib/context/FocusContext"),
+  useFocusDispatch: jest.fn(() => jest.fn()),
+}));
+
 const file = { filename: "test-file" } as any;
 
 test("renders", () => {

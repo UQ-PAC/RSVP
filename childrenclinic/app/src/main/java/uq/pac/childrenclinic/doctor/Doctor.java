@@ -82,7 +82,7 @@ public class Doctor extends Person {
 
 	public String getSpecialtyDescriptions() {
 		if (this.specialties == null || this.specialties.isEmpty()) {
-			return "Generalist";
+			return "General Practitioner";
 		}
 		return this.specialties.stream().map(Specialty::getName).sorted().collect(Collectors.joining(", "));
 	}

@@ -15,16 +15,16 @@
       <th th:text="#{name}">Name</th>
       <td><b th:text="*{firstName + ' ' + lastName}"></b></td>
     </tr>
+<!--    <tr>-->
+<!--      <th th:text="#{birthDate}">Birth Date</th>-->
+<!--      <td th:text="*{birthDate}"></td>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--      <th th:text="#{gender}">Gender</th>-->
+<!--      <td th:text="*{gender?.name}"></td>-->
+<!--    </tr>-->
     <tr>
-      <th th:text="#{birthDate}">Birth Date</th>
-      <td th:text="*{birthDate}"></td>
-    </tr>
-    <tr>
-      <th th:text="#{gender}">Gender</th>
-      <td th:text="*{gender?.name}"></td>
-    </tr>
-    <tr>
-      <th th:text="#{telephone}">Telephone</th>
+      <th th:text="#{telephone}">Phone</th>
       <td th:text="*{telephone}"></td>
     </tr>
     <tr>
@@ -33,7 +33,7 @@
     </tr>
   </table>
 
-  <a th:href="@{/administrative-assistants/__${administrativeAssistant.id}__/edit}" class="btn btn-primary" th:text="#{editAdministrativeAssistant}">Edit Administrative Assistant</a>
+  <a th:href="@{/administrative-assistants/__${administrativeAssistant.id}__/edit}" class="btn btn-primary" th:text="#{editAdministrativeAssistant}">Edit</a>
 
   <script>
     function hideMessages() {
@@ -42,7 +42,7 @@
         var errorMessage = document.getElementById("error-message");
         if (successMessage) successMessage.style.display = "none";
         if (errorMessage) errorMessage.style.display = "none";
-      }, 3000); 
+      }, 3000);
     }
     hideMessages();
   </script>

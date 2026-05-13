@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Employee::\"???\"",
-  "resource": "ChildrenClinic::ResponsibleAdult::\"Eduardo Rodriquez\"",
-  "action": "ChildrenClinic::Action::\"ViewAdult\"",
-  "context": {}
-}

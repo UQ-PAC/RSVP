@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Employee::\"Alice\"",
-  "resource": "ChildrenClinic::ResponsibleAdult::\"Clara Higgins\"",
-  "action": "ChildrenClinic::Action::\"EditAdult\"",
-  "context": {}
-}

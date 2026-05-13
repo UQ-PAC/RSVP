@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Employee::\"Linda Douglas\"",
-  "resource": "ChildrenClinic::Visit::\"Lucky Estaban 2\"",
-  "action": "ChildrenClinic::Action::\"ViewVisit\"",
-  "context": {}
-}

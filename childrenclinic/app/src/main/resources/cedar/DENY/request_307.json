@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
-  "resource": "ChildrenClinic::Visit::\"Lucky Estaban 2\"",
-  "action": "ChildrenClinic::Action::\"DeleteVisit\"",
-  "context": {}
-}

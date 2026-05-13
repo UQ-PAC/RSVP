@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Guest::\"Unknown\"",
-  "resource": "ChildrenClinic::Visit::\"Basil Davis 3\"",
-  "action": "ChildrenClinic::Action::\"EditVisit\"",
-  "context": {}
-}

@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Guest::\"???\"",
-  "resource": "ChildrenClinic::Visit::\"Basil Davis 2\"",
-  "action": "ChildrenClinic::Action::\"DeleteVisit\"",
-  "context": {}
-}

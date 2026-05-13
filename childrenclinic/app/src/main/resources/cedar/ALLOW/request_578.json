@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Employee::\"Bob Buchanan\"",
-  "resource": "ChildrenClinic::Clinic::\"B\"",
-  "action": "ChildrenClinic::Action::\"ViewClinic\"",
-  "context": {}
-}

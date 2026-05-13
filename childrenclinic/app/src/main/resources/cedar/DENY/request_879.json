@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Guest::\"???\"",
-  "resource": "ChildrenClinic::Visit::\"Samantha Coleman 3\"",
-  "action": "ChildrenClinic::Action::\"DeleteVisit\"",
-  "context": {}
-}

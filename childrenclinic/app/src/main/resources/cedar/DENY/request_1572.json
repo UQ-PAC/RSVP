@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Employee::\"Bob Buchanan\"",
-  "resource": "ChildrenClinic::Visit::\"Sly Estaban 2\"",
-  "action": "ChildrenClinic::Action::\"DeleteVisit\"",
-  "context": {}
-}

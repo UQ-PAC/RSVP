@@ -3,13 +3,42 @@ package uq.pac.rsvp.policy.ast.policy;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import uq.pac.rsvp.policy.ast.CedarParser;
-import uq.pac.rsvp.policy.ast.policy.expr.*;
+import uq.pac.rsvp.policy.ast.policy.expr.ActionExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.BooleanExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.CallExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.ConditionalExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.EntityExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.Expression;
+import uq.pac.rsvp.policy.ast.policy.expr.LongExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.PropertyAccessExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.RecordExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.SetExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.StringExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.TypeExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.VariableExpression;
 import uq.pac.rsvp.support.FileSource;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.*;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.Eq;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.Greater;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.GreaterEq;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.HasAttr;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.Is;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.Less;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.LessEq;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.Like;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.Neq;
+import static uq.pac.rsvp.policy.ast.schema.type.TypeReference.TYPE_REFERENCE_DELIMITER;
 
 public class ExpressionVisitor extends CedarSourceVisitor<Expression> {
 
@@ -21,7 +50,7 @@ public class ExpressionVisitor extends CedarSourceVisitor<Expression> {
     public Expression visitType(CedarParser.TypeContext ctx) {
         String type = ctx.ID().stream()
                 .map(ParseTree::getText)
-                .collect(Collectors.joining("::"));
+                .collect(Collectors.joining(TYPE_REFERENCE_DELIMITER));
         return new TypeExpression(type, location(ctx));
     }
 

@@ -1,14 +1,22 @@
 package uq.pac.rsvp.policy.ast.schema.parser;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
-import uq.pac.rsvp.policy.ast.*;
+import uq.pac.rsvp.policy.ast.CedarTypeReferenceBaseVisitor;
+import uq.pac.rsvp.policy.ast.CedarTypeReferenceLexer;
+import uq.pac.rsvp.policy.ast.CedarTypeReferenceParser;
 import uq.pac.rsvp.policy.ast.schema.type.TypeReference;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static uq.pac.rsvp.policy.ast.schema.type.TypeReference.TYPE_REFERENCE_DELIMITER;
 
 /**
  * Parse text into a type reference
@@ -44,7 +52,7 @@ public class TypeReferenceParser {
                 // If there is no string, it means an entity type with the last
                 // element being the name and the rest namespace
                 String name = path.removeLast();
-                String namespace ;
+                String namespace;
                 if (ctx.STRING() != null) {
                     // If there is a string, it means that's an action
                     // And if so the last element of teh path should be literal 'Action',
@@ -52,10 +60,10 @@ public class TypeReferenceParser {
                     if (!name.equals("Action")) {
                         throw new ParseCancellationException("Invalid reference: " + ctx.getText());
                     }
-                    name = name + "::" + ctx.STRING().getText();
+                    name = name + TYPE_REFERENCE_DELIMITER + ctx.STRING().getText();
 
                 }
-                namespace = String.join("::", path);
+                namespace = String.join(TYPE_REFERENCE_DELIMITER, path);
                 return new TypeReference(namespace, name);
             }
         }.visit(parser.reference());

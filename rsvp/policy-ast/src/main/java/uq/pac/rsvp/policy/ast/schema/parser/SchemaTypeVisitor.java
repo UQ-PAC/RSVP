@@ -4,13 +4,15 @@ import org.antlr.v4.runtime.RuleContext;
 import uq.pac.rsvp.policy.ast.CedarschemaParser;
 import uq.pac.rsvp.policy.ast.schema.type.BuiltinType;
 import uq.pac.rsvp.policy.ast.schema.type.RecordType;
-import uq.pac.rsvp.policy.ast.schema.type.TypeReference;
 import uq.pac.rsvp.policy.ast.schema.type.SetType;
+import uq.pac.rsvp.policy.ast.schema.type.TypeReference;
 import uq.pac.rsvp.support.FileSource;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static uq.pac.rsvp.policy.ast.schema.type.TypeReference.TYPE_REFERENCE_DELIMITER;
 
 class SchemaTypeVisitor extends CedarschemaSourceVisitor<BuiltinType> {
 
@@ -27,11 +29,11 @@ class SchemaTypeVisitor extends CedarschemaSourceVisitor<BuiltinType> {
         if (ctx.ident().size() == 1) {
             // At this point namespace cannot be determined
             // Ensure this method is not invoked for entity, cation and types definitions
-            namespace  = null;
+            namespace = null;
         } else {
             namespace = ctx.ident().subList(0, ctx.ident().size() - 1).stream()
                     .map(RuleContext::getText)
-                    .collect(Collectors.joining("::"));
+                    .collect(Collectors.joining(TYPE_REFERENCE_DELIMITER));
         }
         String name = ctx.ident(ctx.ident().size() - 1).getText();
         return new TypeReference(namespace, name, location(ctx));

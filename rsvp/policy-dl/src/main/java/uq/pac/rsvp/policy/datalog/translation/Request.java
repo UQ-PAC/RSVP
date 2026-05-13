@@ -6,7 +6,9 @@ import com.cedarpolicy.value.EntityUID;
 import java.util.Map;
 import java.util.Optional;
 
+import static uq.pac.rsvp.policy.ast.schema.type.TypeReference.TYPE_REFERENCE_DELIMITER;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.OUTPUT_DELIMITER;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.UndefinedEntityUIDName;
 
 /**
  * A class representing a cedar request as a triple {@code} (principal, resource action) {@code}.
@@ -23,15 +25,26 @@ public class Request {
     private final String resource;
     private final String action;
 
+    private final String principalType;
+    private final boolean principalKnown;
+    private final String resourceType;
+    private final boolean resourceKnown;
+
     public Request(String id) {
         this.id = id;
-        String[] components = id.split(OUTPUT_DELIMITER.toString());
+        String[] components = id.split(OUTPUT_DELIMITER);
         if (components.length != 3) {
             throw new TranslationError("Invalid request format: %s", id);
         }
         principal = components[0];
         resource = components[1];
         action = components[2];
+
+        principalType = principal.substring(0, principal.lastIndexOf(TYPE_REFERENCE_DELIMITER));
+        resourceType = resource.substring(0, resource.lastIndexOf(TYPE_REFERENCE_DELIMITER));
+        principalKnown = !principal.contains(UndefinedEntityUIDName);
+        resourceKnown = !resource.contains(UndefinedEntityUIDName);
+
     }
 
     public Request(String principal, String resource, String action) {
@@ -39,6 +52,11 @@ public class Request {
         this.principal = principal;
         this.resource = resource;
         this.action = action;
+
+        principalType = principal.substring(0, principal.lastIndexOf(TYPE_REFERENCE_DELIMITER));
+        resourceType = resource.substring(0, resource.lastIndexOf(TYPE_REFERENCE_DELIMITER));
+        principalKnown = !principal.contains(UndefinedEntityUIDName);
+        resourceKnown = !resource.contains(UndefinedEntityUIDName);
     }
 
     public static Request of(String request) {
@@ -92,10 +110,30 @@ public class Request {
     }
 
     public boolean known() {
-        return !principal.contains("???") && !resource.contains("???");
+        return principalKnown && resourceKnown;
+    }
+
+    public boolean subsumes(Request other) {
+        if (known() || !other.known()) {
+            return false;
+        }
+
+        if (!principalKnown && !principalType.equals(other.principalType)) {
+            return false;
+        }
+
+        if (!resourceKnown && !resourceType.equals(other.resourceType)) {
+            return false;
+        }
+
+        return true;
     }
 
     public String toHumanReadableString() {
+
+        String prettyPrincipal = principalKnown ? principal : "Any %s".formatted(principalType);
+        String prettyResource = resourceKnown ? resource : "any %s".formatted(resourceType);
+
         // The "Action::" qualifier is an internal detail, so filter it out
         int actionLoc = action.indexOf("Action::");
         String prettyAction = action;
@@ -106,7 +144,7 @@ public class Request {
             prettyAction = action.substring(0, actionLoc) + action.substring(actionLoc + 8);
         }
 
-        return "%s can perform %s on %s".formatted(principal, prettyAction, resource);
+        return "%s can perform %s on %s".formatted(prettyPrincipal, prettyAction, prettyResource);
     }
 
     @Override

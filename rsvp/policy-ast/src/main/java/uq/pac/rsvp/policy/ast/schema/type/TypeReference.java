@@ -1,14 +1,16 @@
 package uq.pac.rsvp.policy.ast.schema.type;
 
 import uq.pac.rsvp.policy.ast.schema.parser.TypeReferenceParser;
-import uq.pac.rsvp.policy.ast.schema.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.schema.visitor.SchemaComputationVisitor;
+import uq.pac.rsvp.policy.ast.schema.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.schema.visitor.SchemaVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
 import java.util.Objects;
 
 public class TypeReference extends BuiltinType {
+
+    public static String TYPE_REFERENCE_DELIMITER = "::";
 
     private final String name;
     private final String namespace;
@@ -30,9 +32,9 @@ public class TypeReference extends BuiltinType {
     public String getName() {
         String prefix = "";
         if (namespace == null) {
-            prefix = "???::";
+            prefix = "???" + TYPE_REFERENCE_DELIMITER;
         } else if (!namespace.isEmpty()) {
-            prefix = namespace + "::";
+            prefix = namespace + TYPE_REFERENCE_DELIMITER;
         }
         return prefix + name;
     }

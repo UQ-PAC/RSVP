@@ -4,8 +4,10 @@ import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.verification.RequestResult;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ImpactAnalysis {
 
@@ -25,12 +27,32 @@ public class ImpactAnalysis {
 
         // For now though, simply check which requests have changed status:
 
+        // Track unresolved requests (with ???) so results can be simplified
+        Set<Request> unknownPermitted = new HashSet<>();
+        Set<Request> unknownForbidden = new HashSet<>();
+
+        // Cache known requests for simplification
+        Set<Request> knownPermitted = new HashSet<>();
+        Set<Request> knownForbidden = new HashSet<>();
+
         for (Map.Entry<Request, RequestResult> requestEntry : updated.entrySet()) {
             RequestResult prevResult = original.get(requestEntry.getKey());
             if ((prevResult == null && requestEntry.getValue().permitted) || (prevResult != null && requestEntry.getValue().permitted != prevResult.permitted)) {
                 Request request = requestEntry.getKey();
-                changeImpact.add(new RequestStatus(request.toHumanReadableString(),
-                        requestEntry.getValue().permitted));
+
+                if (request.known()) {
+                    if (requestEntry.getValue().permitted) {
+                        knownPermitted.add(request);
+                    } else {
+                        knownForbidden.add(request);
+                    }
+                } else {
+                    if (requestEntry.getValue().permitted) {
+                        unknownPermitted.add(request);
+                    } else {
+                        unknownForbidden.add(request);
+                    }
+                }
             }
         }
 
@@ -40,10 +62,30 @@ public class ImpactAnalysis {
                 RequestResult currentResult = updated.get(requestEntry.getKey());
                 if (currentResult == null) {
                     Request request = requestEntry.getKey();
-                    changeImpact.add(new RequestStatus(request.toHumanReadableString(), false));
+
+                    if (request.known()) {
+                        knownForbidden.add(request);
+                    } else {
+                        unknownForbidden.add(request);
+                    }
                 }
             }
         }
+
+
+        // Don't return requests that are implied by other ??? requests
+        unknownPermitted.forEach(request -> changeImpact.add(new RequestStatus(request.toHumanReadableString(), true)));
+        unknownForbidden.forEach(request -> changeImpact.add(new RequestStatus(request.toHumanReadableString(), false)));
+        knownPermitted.forEach(request -> {
+            if (unknownPermitted.stream().noneMatch(unknown -> unknown.subsumes(request))) {
+                changeImpact.add(new RequestStatus(request.toHumanReadableString(), true));
+            }
+        });
+        knownForbidden.forEach(request -> {
+            if (unknownForbidden.stream().noneMatch(unknown -> unknown.subsumes(request))) {
+                changeImpact.add(new RequestStatus(request.toHumanReadableString(), false));
+            }
+        });
 
         return changeImpact;
     }

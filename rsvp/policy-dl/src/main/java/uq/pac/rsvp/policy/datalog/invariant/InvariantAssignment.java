@@ -44,7 +44,7 @@ public class InvariantAssignment {
             }
 
             result.append(var);
-            result.append(" = ");
+            result.append(" is ");
             result.append(val);
         }
 

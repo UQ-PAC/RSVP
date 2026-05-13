@@ -118,15 +118,15 @@ public class Request {
             return false;
         }
 
-        if (!principalKnown && !principalType.equals(other.principalType)) {
+        if ((!principalKnown && !principalType.equals(other.principalType)) || (principalKnown && !principal.equals(other.principal))) {
             return false;
         }
 
-        if (!resourceKnown && !resourceType.equals(other.resourceType)) {
+        if ((!resourceKnown && !resourceType.equals(other.resourceType)) || (resourceKnown && !resource.equals(other.resource))) {
             return false;
         }
 
-        return true;
+        return action.equals(other.action);
     }
 
     public String toHumanReadableString() {

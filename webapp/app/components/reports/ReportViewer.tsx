@@ -2,7 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useVerification } from "../../lib/context/VerificationContext";
-import { Report, ReportSeverity, VerificationFile } from "../../lib/types";
+import {
+  FileType,
+  Report,
+  ReportSeverity,
+  VerificationFile,
+} from "../../lib/types";
 import { ReportGroup, ReportsSection } from "./ReportsSection";
 
 import { ProgressSpinner } from "../shared/ProgressSpinner";
@@ -39,7 +44,6 @@ export function ReportViewer() {
         sortByFile("err", reports).then((sorted) => setErr(sorted));
       }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [verificationContext]);
 
   const count = info.length + warn.length + err.length;
@@ -81,21 +85,47 @@ export function ReportViewer() {
             return primaryFile.resolved.then((uploaded) => ({
               id: uploaded.serverId,
               filename: primaryFile.filename ?? primaryFile.file.name,
+              filetype: primaryFile.filetype,
               report,
             }));
           } else {
-            return Promise.resolve({ id: "other", filename: "Other", report });
+            return Promise.resolve({
+              id: "other",
+              filename: "Other",
+              report,
+            });
           }
         }),
     ).then((resolved) =>
       Object.entries(
         resolved.reduce(
           (
-            sorted: { [id: string]: { filename: string; reports: Report[] } },
-            current: { report: Report; id: string; filename: string },
-          ): { [id: string]: { filename: string; reports: Report[] } } => {
+            sorted: {
+              [id: string]: {
+                filename: string;
+                filetype?: FileType;
+                reports: Report[];
+              };
+            },
+            current: {
+              report: Report;
+              id: string;
+              filetype?: FileType;
+              filename: string;
+            },
+          ): {
+            [id: string]: {
+              filename: string;
+              filetype?: FileType;
+              reports: Report[];
+            };
+          } => {
             if (!sorted[current.id]) {
-              sorted[current.id] = { filename: current.filename, reports: [] };
+              sorted[current.id] = {
+                filename: current.filename,
+                filetype: current.filetype,
+                reports: [],
+              };
             }
 
             sorted[current.id].reports.push(current.report);

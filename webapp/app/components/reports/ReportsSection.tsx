@@ -4,12 +4,15 @@ import {
   ExpansionState,
   useFocusDispatch,
 } from "../../lib/context/FocusContext";
-import { Report, ReportSeverity } from "../../lib/types";
-import { getFileIcon, getFileType } from "../../lib/util";
+import { FileType, Report, ReportSeverity } from "../../lib/types";
+import { getFileIcon } from "../../lib/util";
 import { ToggleAll } from "../shared/ToggleAll";
 import { ReportsGroup } from "./ReportsGroup";
 
-export type ReportGroup = [string, { filename: string; reports: Report[] }];
+export type ReportGroup = [
+  string,
+  { filename: string; filetype?: FileType; reports: Report[] },
+];
 
 interface ReportsSectionProps {
   title: string;
@@ -44,16 +47,14 @@ export function ReportsSection({
         <ToggleAll name="reports-section" toggle={toggleAll} />
       </span>
 
-      {reports.map(([group, { filename, reports }]) => (
+      {reports.map(([group, { filename, filetype, reports }]) => (
         <ReportsGroup
           key={`${severity}-${group}`}
           section={severity}
           name={filename}
           id={group}
           reports={reports}
-          icon={
-            group === "other" ? undefined : getFileIcon(getFileType(filename))
-          }
+          icon={filetype ? getFileIcon(filetype) : undefined}
         />
       ))}
     </div>

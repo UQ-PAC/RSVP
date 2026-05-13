@@ -29,7 +29,6 @@ interface ReportsGroupProps {
   icon?: IconDefinition;
 }
 
-// TODO: organise by filename (collapsible)
 export function ReportsGroup({
   section,
   id,
@@ -53,6 +52,11 @@ export function ReportsGroup({
         data-testid={`reports-group-${id}-header`}
         onClick={() => {
           if (id !== "other") {
+            focusDispatch({
+              type: "focus",
+              target: "source-file",
+              focus: { key: id, value: ExpansionState.Expanded },
+            });
             selectionDispatch({
               scroll: "file",
               file: id,

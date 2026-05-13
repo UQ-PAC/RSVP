@@ -89,11 +89,11 @@ public class CedarAspect {
 
 		EntityUID principal;
 		if (principalId.equals("Guest")) {
-			principal = EntityUID.parse("ChildrenClinic::Guest::\"Unknown\"")
+			principal = EntityUID.parse("Guest::\"Unknown\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 		else {
-			principal = EntityUID.parse("ChildrenClinic::Employee::\"" + principalId + "\"")
+			principal = EntityUID.parse("Employee::\"" + principalId + "\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 
@@ -104,7 +104,7 @@ public class CedarAspect {
 		logger.info("Cedar context: {}", contextMap.toString());
 
 		for (CedarAuthorization requiresAuthorization : annotations) {
-			EntityUID action = EntityUID.parse("ChildrenClinic::Action::\"" + requiresAuthorization.action() + "\"")
+			EntityUID action = EntityUID.parse("Action::\"" + requiresAuthorization.action() + "\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
 			EntityUID resource = resolveResourceUid(request, requiresAuthorization);
 			String extractedResourceId = extractResourceId(request, requiresAuthorization.resourceType());
@@ -192,7 +192,7 @@ public class CedarAspect {
 		String authorizationResourceId = requiresAuthorization.resourceId();
 		if (!authorizationResourceId.isEmpty()) {
 			return EntityUID
-				.parse("ChildrenClinic::" + authorizationResourceType + "::\"" + authorizationResourceId + "\"")
+				.parse("" + authorizationResourceType + "::\"" + authorizationResourceId + "\"")
 				.orElseThrow(() -> new IllegalArgumentException(
 						"Invalid Resource UID format generated for: " + authorizationResourceId + "."));
 		}
@@ -241,7 +241,7 @@ public class CedarAspect {
 
 		final String finalResourceIdentifier = requestResourceIdentifier;
 
-		return EntityUID.parse("ChildrenClinic::" + authorizationResourceType + "::\"" + finalResourceIdentifier + "\"")
+		return EntityUID.parse("" + authorizationResourceType + "::\"" + finalResourceIdentifier + "\"")
 			.orElseThrow(() -> new IllegalArgumentException(
 					"Invalid Resource UID format generated for: " + finalResourceIdentifier + "."));
 	}

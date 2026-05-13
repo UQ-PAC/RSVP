@@ -126,7 +126,7 @@ public class AdministrativeAssistantController {
 			String resourceName = s.getFirstName() + " " + s.getLastName();
 			var evalResult = cedarEvaluator.evaluate(principal, "ViewEmployee", "Employee", resourceName, "Item");
 			authorizationMap.put(s.getId(), evalResult.responseBody());
-			cedarResourceMap.put(s.getId(), "ChildrenClinic::Employee::\"" + resourceName + "\"");
+			cedarResourceMap.put(s.getId(), "Employee::\"" + resourceName + "\"");
 			return evalResult.isGranted();
 		}).collect(Collectors.toList());
 
@@ -147,7 +147,7 @@ public class AdministrativeAssistantController {
 		model.addAttribute("totalItems", paginated.getTotalElements());
 		model.addAttribute("authorizationMap", authorizationMap);
 		model.addAttribute("cedarPrincipal", principal.toString());
-		model.addAttribute("cedarAction", "ChildrenClinic::Action::\"ViewEmployee\"");
+		model.addAttribute("cedarAction", "Action::\"ViewEmployee\"");
 		model.addAttribute("cedarResourceMap", cedarResourceMap);
 
 		return "administrative-assistants/administrativeAssistantsList";

@@ -69,14 +69,14 @@ class WelcomeController {
 			String resourceName = d.getFirstName() + " " + d.getLastName();
 			var evalResult = cedarEvaluator.evaluate(principal, "ViewEmployee", "Employee", resourceName, "Item");
 			authorizationMap.put(d.getId(), evalResult.responseBody());
-			cedarResourceMap.put(d.getId(), "ChildrenClinic::Employee::\"" + resourceName + "\"");
+			cedarResourceMap.put(d.getId(), "Employee::\"" + resourceName + "\"");
 			return evalResult.isGranted();
 		}).collect(Collectors.toList());
 
 		model.addAttribute("listDoctors", authorized);
 		model.addAttribute("authorizationMap", authorizationMap);
 		model.addAttribute("cedarPrincipal", principal.toString());
-		model.addAttribute("cedarAction", "ChildrenClinic::Action::\"ViewEmployee\"");
+		model.addAttribute("cedarAction", "Action::\"ViewEmployee\"");
 		model.addAttribute("cedarResourceMap", cedarResourceMap);
 
 		Map<String, String> searchOptions = new LinkedHashMap<>();

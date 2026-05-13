@@ -29,11 +29,11 @@ public class CedarProgrammaticEvaluator {
 		principalId = principalId == null ? "Guest" : principalId;
 
 		if ("Guest".equals(principalId)) {
-			return EntityUID.parse("ChildrenClinic::Guest::\"Unknown\"")
+			return EntityUID.parse("Guest::\"Unknown\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 		else {
-			return EntityUID.parse("ChildrenClinic::Employee::\"" + principalId + "\"")
+			return EntityUID.parse("Employee::\"" + principalId + "\"")
 				.orElseThrow(() -> new IllegalArgumentException("Invalid Principal UID format."));
 		}
 	}
@@ -43,10 +43,10 @@ public class CedarProgrammaticEvaluator {
 	 */
 	public EvaluationResult evaluate(EntityUID principal, String actionStr, String resourceType, String resourceId,
 			String logPrefix) {
-		EntityUID action = EntityUID.parse("ChildrenClinic::Action::\"" + actionStr + "\"")
+		EntityUID action = EntityUID.parse("Action::\"" + actionStr + "\"")
 			.orElseThrow(() -> new IllegalArgumentException("Invalid Action UID format."));
 
-		EntityUID resource = EntityUID.parse("ChildrenClinic::" + resourceType + "::\"" + resourceId + "\"")
+		EntityUID resource = EntityUID.parse("" + resourceType + "::\"" + resourceId + "\"")
 			.orElseThrow(() -> new IllegalArgumentException("Invalid Resource UID format."));
 
 		CedarRequest request = new CedarRequest(principal, action, resource, new HashMap<>(), true);

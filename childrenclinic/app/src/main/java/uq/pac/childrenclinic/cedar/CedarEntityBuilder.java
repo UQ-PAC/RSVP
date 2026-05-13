@@ -24,8 +24,6 @@ public class CedarEntityBuilder {
 
 	private static final Logger logger = LoggerFactory.getLogger(CedarEntityBuilder.class);
 
-	private static final String NAMESPACE = "ChildrenClinic";
-
 	private final JdbcTemplate jdbcTemplate;
 
 	private final ObjectMapper objectMapper;
@@ -390,7 +388,7 @@ public class CedarEntityBuilder {
 	// Builds a Cedar entity JSON structure with the given attributes and no parents.
 	private Map<String, Object> buildEntity(String type, String id, Map<String, Object> attrs) {
 		Map<String, Object> entity = new LinkedHashMap<>();
-		entity.put("uid", Map.of("type", NAMESPACE + "::" + type, "id", id));
+		entity.put("uid", Map.of("type", type, "id", id));
 		entity.put("attrs", attrs);
 		entity.put("parents", List.of());
 		return entity;
@@ -399,7 +397,7 @@ public class CedarEntityBuilder {
 	// Builds an Action entity with the specified parent action entities.
 	private Map<String, Object> buildActionWithParents(String actionId, List<String> parentActionIds) {
 		Map<String, Object> entity = new LinkedHashMap<>();
-		entity.put("uid", Map.of("type", NAMESPACE + "::Action", "id", actionId));
+		entity.put("uid", Map.of("type", "Action", "id", actionId));
 		entity.put("attrs", Map.of());
 		entity.put("parents",
 				parentActionIds.stream().map(parentId -> entityRef("Action", parentId)).collect(Collectors.toList()));
@@ -409,7 +407,7 @@ public class CedarEntityBuilder {
 	// Builds a Cedar entity reference using the "__entity" format required by the Cedar
 	// JSON entity specification.
 	private Map<String, Object> entityRef(String type, String id) {
-		return Map.of("__entity", Map.of("type", NAMESPACE + "::" + type, "id", id));
+		return Map.of("__entity", Map.of("type", type, "id", id));
 	}
 
 }

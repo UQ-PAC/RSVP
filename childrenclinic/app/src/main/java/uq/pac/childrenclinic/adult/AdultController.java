@@ -124,7 +124,7 @@ public class AdultController {
 			String resourceName = a.getFirstName() + " " + a.getLastName();
 			var evalResult = cedarEvaluator.evaluate(principal, "ViewAdult", "ResponsibleAdult", resourceName, "Item");
 			authorizationMap.put(a.getId(), evalResult.responseBody());
-			cedarResourceMap.put(a.getId(), "ChildrenClinic::ResponsibleAdult::\"" + resourceName + "\"");
+			cedarResourceMap.put(a.getId(), "ResponsibleAdult::\"" + resourceName + "\"");
 			return evalResult.isGranted();
 		}).collect(Collectors.toList());
 
@@ -144,7 +144,7 @@ public class AdultController {
 		model.addAttribute("totalItems", paginated.getTotalElements());
 		model.addAttribute("authorizationMap", authorizationMap);
 		model.addAttribute("cedarPrincipal", principal.toString());
-		model.addAttribute("cedarAction", "ChildrenClinic::Action::\"ViewAdult\"");
+		model.addAttribute("cedarAction", "Action::\"ViewAdult\"");
 		model.addAttribute("cedarResourceMap", cedarResourceMap);
 
 		return "adults/adultsList";

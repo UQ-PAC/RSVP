@@ -157,7 +157,7 @@ public class PatientController {
 					+ (p.getLastName() != null ? p.getLastName() : "");
 			var evalResult = cedarEvaluator.evaluate(principal, "ViewPatient", "Patient", resourceName.trim(), "Item");
 			authorizationMap.put(p.getId(), evalResult.responseBody());
-			cedarResourceMap.put(p.getId(), "ChildrenClinic::Patient::\"" + resourceName.trim() + "\"");
+			cedarResourceMap.put(p.getId(), "Patient::\"" + resourceName.trim() + "\"");
 			return evalResult.isGranted();
 		}).collect(Collectors.toList());
 
@@ -177,7 +177,7 @@ public class PatientController {
 		model.addAttribute("totalItems", paginated.getTotalElements());
 		model.addAttribute("authorizationMap", authorizationMap);
 		model.addAttribute("cedarPrincipal", principal.toString());
-		model.addAttribute("cedarAction", "ChildrenClinic::Action::\"ViewPatient\"");
+		model.addAttribute("cedarAction", "Action::\"ViewPatient\"");
 		model.addAttribute("cedarResourceMap", cedarResourceMap);
 
 		return "patients/patientsList";

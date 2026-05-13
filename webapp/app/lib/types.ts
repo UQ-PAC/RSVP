@@ -5,7 +5,6 @@ export type FileType =
   | "invariant"
   | "text";
 export type ReportSeverity = "info" | "warn" | "err";
-
 interface LineLoc {
   line: number;
   column: number;
@@ -71,3 +70,5 @@ export interface AnalysisGroup {
   verifyPending: boolean;
   verifyCompleted?: Promise<boolean>;
 }
+
+export type ScrollTarget = "source" | "report" | "file" | "group" | "none";

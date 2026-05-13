@@ -1,10 +1,10 @@
 "use client";
 
-import { faFileLines } from "@fortawesome/free-regular-svg-icons";
 import {
   faCodeCompare,
   faFileCircleMinus,
   faFileCirclePlus,
+  IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import cx from "classnames";
@@ -17,6 +17,7 @@ interface SourceVersionSelectParams {
   selectedUpdate?: string;
   expanded: boolean;
   set: (version: string, compare?: string) => void;
+  icon: IconDefinition;
   children?: JSX.Element | JSX.Element[];
 }
 
@@ -27,6 +28,7 @@ export function SourceVersionSelect({
   selectedUpdate,
   expanded,
   set,
+  icon,
   children,
 }: SourceVersionSelectParams) {
   const originalIndex = versions.indexOf(selectedOriginal);
@@ -52,10 +54,7 @@ export function SourceVersionSelect({
                 e.stopPropagation();
               }}
             >
-              <FontAwesomeIcon
-                className="source-file-icon"
-                icon={faFileLines}
-              />
+              <FontAwesomeIcon className="source-file-icon" icon={icon} />
               {versionNames[i]}
             </div>
           ))}
@@ -112,7 +111,7 @@ export function SourceVersionSelect({
                     >
                       <FontAwesomeIcon
                         className="source-file-icon"
-                        icon={faFileLines}
+                        icon={icon}
                       />
                       {versionNames[i]}
                     </div>
@@ -139,7 +138,7 @@ export function SourceVersionSelect({
                     >
                       <FontAwesomeIcon
                         className="source-file-icon"
-                        icon={faFileLines}
+                        icon={icon}
                       />
                       {versionNames[originalIndex + i + 1]}
                     </div>

@@ -14,9 +14,13 @@ exports[`renders 1`] = `
         test-file
       </span>
       <div
-        data-icon="faXmark"
-        data-testid="font-awesome-icon-faXmark"
-      />
+        class="action-icon uploaded-file-delete-icon"
+      >
+        <div
+          data-icon="faXmark"
+          data-testid="font-awesome-icon-faXmark"
+        />
+      </div>
     </span>
   </div>
 </DocumentFragment>
@@ -36,13 +40,21 @@ exports[`renders 2`] = `
         test-file
       </span>
       <div
-        data-icon="faCodeCompare"
-        data-testid="font-awesome-icon-faCodeCompare"
-      />
+        class="action-icon uploaded-file-version-icon"
+      >
+        <div
+          data-icon="faCodeCompare"
+          data-testid="font-awesome-icon-faCodeCompare"
+        />
+      </div>
       <div
-        data-icon="faXmark"
-        data-testid="font-awesome-icon-faXmark"
-      />
+        class="action-icon uploaded-file-delete-icon"
+      >
+        <div
+          data-icon="faXmark"
+          data-testid="font-awesome-icon-faXmark"
+        />
+      </div>
     </span>
   </div>
 </DocumentFragment>
@@ -62,13 +74,21 @@ exports[`renders 3`] = `
         test-file
       </span>
       <div
-        data-icon="faCodeCompare"
-        data-testid="font-awesome-icon-faCodeCompare"
-      />
+        class="action-icon uploaded-file-version-icon"
+      >
+        <div
+          data-icon="faCodeCompare"
+          data-testid="font-awesome-icon-faCodeCompare"
+        />
+      </div>
       <div
-        data-icon="faXmark"
-        data-testid="font-awesome-icon-faXmark"
-      />
+        class="action-icon uploaded-file-delete-icon"
+      >
+        <div
+          data-icon="faXmark"
+          data-testid="font-awesome-icon-faXmark"
+        />
+      </div>
     </span>
     <div
       class="uploaded-file-versions"
@@ -95,13 +115,21 @@ exports[`renders 4`] = `
         test-file
       </span>
       <div
-        data-icon="faCodeCompare"
-        data-testid="font-awesome-icon-faCodeCompare"
-      />
+        class="action-icon uploaded-file-version-icon"
+      >
+        <div
+          data-icon="faCodeCompare"
+          data-testid="font-awesome-icon-faCodeCompare"
+        />
+      </div>
       <div
-        data-icon="faXmark"
-        data-testid="font-awesome-icon-faXmark"
-      />
+        class="action-icon uploaded-file-delete-icon"
+      >
+        <div
+          data-icon="faXmark"
+          data-testid="font-awesome-icon-faXmark"
+        />
+      </div>
     </span>
     <div
       class="uploaded-file-versions"

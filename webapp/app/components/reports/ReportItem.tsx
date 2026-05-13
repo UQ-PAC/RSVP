@@ -66,31 +66,32 @@ export function ReportItem({ report }: ReportItemParams) {
 
   const clickLoc = (e, report: Report, loc?: SourceLoc) => {
     e.stopPropagation();
-    const target = loc ?? report.sourceLocations[0].location;
-    target.source?.resolved
-      .then((uploaded) => uploaded.serverId)
-      .then((id) =>
-        focusDispatch({
-          type: "focus",
-          target: "source-file",
-          focus: { key: id, value: ExpansionState.Expanded },
-        }),
-      );
-    selectionDispatch({
-      scroll: "source",
-      loc: `${report.id}:${getSourceIdentifier(target)}`,
-    });
-    console.log(JSON.stringify(loc));
+    const target = loc ?? report.sourceLocations[0]?.location;
+    if (target) {
+      target.source?.resolved
+        .then((uploaded) => uploaded.serverId)
+        .then((id) =>
+          focusDispatch({
+            type: "focus",
+            target: "source-file",
+            focus: { key: id, value: ExpansionState.Expanded },
+          }),
+        );
+      selectionDispatch({
+        scroll: "source",
+        loc: `${report.id}:${getSourceIdentifier(target)}`,
+      });
+    }
   };
 
   // TODO: refactor
   const enterLoc = (e, report: Report, loc?: SourceLoc) => {
     e.stopPropagation();
-    const target = loc ?? report.sourceLocations[0].location;
+    const target = loc ?? report.sourceLocations[0]?.location;
     selectionDispatch({
       scroll: "none",
       hovered: "",
-      loc: `${report.id}:${getSourceIdentifier(target)}`,
+      loc: target ? `${report.id}:${getSourceIdentifier(target)}` : undefined,
     });
   };
 
@@ -101,7 +102,8 @@ export function ReportItem({ report }: ReportItemParams) {
       className={className}
       onClick={() => {
         if (!isSelected) {
-          report.sourceLocations[0]?.location.source?.resolved
+          const target = report.sourceLocations[0];
+          target?.location.source?.resolved
             .then((uploaded) => uploaded.serverId)
             .then((id) =>
               focusDispatch({
@@ -112,7 +114,9 @@ export function ReportItem({ report }: ReportItemParams) {
             );
           selectionDispatch({
             selected: report.id,
-            loc: `${report.id}:${getSourceIdentifier(report.sourceLocations[0].location)}`,
+            loc: target
+              ? `${report.id}:${getSourceIdentifier(report.sourceLocations[0].location)}`
+              : undefined,
             scroll: "source",
           });
         } else {

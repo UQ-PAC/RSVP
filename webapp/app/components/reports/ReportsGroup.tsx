@@ -1,10 +1,17 @@
 "use client";
 
+import { IconDefinition } from "@fortawesome/free-regular-svg-icons";
+
 import {
-  faMinusSquare,
-  faPlusSquare,
+  faSquareMinus as regularMinus,
+  faSquarePlus as regularPlus,
 } from "@fortawesome/free-regular-svg-icons";
+import {
+  faSquareMinus as solidMinus,
+  faSquarePlus as solidPlus,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState } from "react";
 import {
   ExpansionState,
   useFocus,
@@ -19,6 +26,7 @@ interface ReportsGroupProps {
   id: string;
   name: string;
   reports: Report[];
+  icon?: IconDefinition;
 }
 
 // TODO: organise by filename (collapsible)
@@ -27,6 +35,7 @@ export function ReportsGroup({
   id,
   name,
   reports,
+  icon,
 }: ReportsGroupProps) {
   const { "report-group": groupFocus } = useFocus();
   const focusDispatch = useFocusDispatch();
@@ -35,29 +44,58 @@ export function ReportsGroup({
   const groupKey = `${section}-${id}`;
   const expanded = !groupFocus.expansions[groupKey];
 
+  const [hovered, setHovered] = useState(false);
+
   return (
     <div className="reports-group">
       <div
         className="reports-group-header"
         data-testid={`reports-group-${id}-header`}
         onClick={() => {
-          selectionDispatch({ scroll: "none" });
-          focusDispatch({
-            type: "focus",
-            target: "report-group",
-            focus: {
-              key: groupKey,
-              value: expanded
-                ? ExpansionState.Collapsed
-                : ExpansionState.Expanded,
-            },
-          });
+          if (id !== "other") {
+            selectionDispatch({
+              scroll: "file",
+              file: id,
+            });
+          }
         }}
       >
-        <FontAwesomeIcon
+        <div
           className="reports-group-toggle"
-          icon={expanded ? faMinusSquare : faPlusSquare}
-        />
+          onClick={(e) => {
+            e.stopPropagation();
+            selectionDispatch({ scroll: "none" });
+            focusDispatch({
+              type: "focus",
+              target: "report-group",
+              focus: {
+                key: groupKey,
+                value: expanded
+                  ? ExpansionState.Collapsed
+                  : ExpansionState.Expanded,
+              },
+            });
+          }}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+        >
+          <FontAwesomeIcon
+            icon={
+              expanded
+                ? hovered
+                  ? solidMinus
+                  : regularMinus
+                : hovered
+                  ? solidPlus
+                  : regularPlus
+            }
+          />
+        </div>
+        {icon && (
+          <div className="reports-group-filetype-icon">
+            <FontAwesomeIcon icon={icon} />
+          </div>
+        )}
         <span className="reports-group-title">{name}</span>
         <span className="reports-group-count">({reports.length})</span>
       </div>

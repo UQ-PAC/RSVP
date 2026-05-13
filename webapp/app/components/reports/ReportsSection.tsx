@@ -5,6 +5,7 @@ import {
   useFocusDispatch,
 } from "../../lib/context/FocusContext";
 import { Report, ReportSeverity } from "../../lib/types";
+import { getFileIcon, getFileType } from "../../lib/util";
 import { ToggleAll } from "../shared/ToggleAll";
 import { ReportsGroup } from "./ReportsGroup";
 
@@ -50,6 +51,9 @@ export function ReportsSection({
           name={filename}
           id={group}
           reports={reports}
+          icon={
+            group === "other" ? undefined : getFileIcon(getFileType(filename))
+          }
         />
       ))}
     </div>

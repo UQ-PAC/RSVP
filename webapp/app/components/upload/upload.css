@@ -9,10 +9,16 @@
   }
 
   .upload-container .analysis-group-header {
-    padding: 0.75rem 0.5rem 0;
+    padding: 0.75rem 0.34rem 0 0.5rem;
     border-bottom: 1px solid var(--color-gray-300);
     display: flex;
     align-items: center;
+    color: var(--color-gray-700);
+    cursor: pointer;
+  }
+
+  .upload-container .analysis-group-header:hover {
+    background-color: var(--color-gray-200);
   }
 
   .create-policy-context-button {
@@ -118,13 +124,20 @@
   }
 
   .upload-container .analysis-group-header .analysis-group-delete-icon {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     cursor: pointer;
     color: var(--color-gray-700);
   }
 
+  .upload-container
+    .analysis-group:has(
+      > .analysis-group-header > .analysis-group-delete-icon:hover
+    ) {
+    background-color: var(--color-gray-200);
+  }
+
   .upload-container .analysis-group-filelist {
-    padding: 0.5rem 0 0 0.5rem;
+    padding: 0.5rem 0 0 0;
     margin-bottom: 0.5rem;
   }
 
@@ -138,16 +151,37 @@
   }
 
   .upload-container .uploaded-file-versions {
-    padding: 0 0 0 0.5rem;
-    margin-left: 0.2rem;
-    border-left: 0.2rem solid var(--color-gray-300);
+    margin-left: 0.75rem;
+    border-left: 0.2rem dotted var(--color-gray-500);
   }
 
   .upload-container .uploaded-file {
     display: flex;
     align-items: center;
-    padding: 0.1rem 0.5rem;
-    margin-left: 0.2rem;
+    padding: 0.1rem 0.3rem 0.1rem 0.45rem;
+    color: var(--color-gray-800);
+  }
+
+  .upload-container .uploaded-file:hover {
+    background-color: var(--color-gray-200);
+  }
+
+  .upload-container
+    .uploaded-file-container:has(
+      > .uploaded-file > .uploaded-file-delete-icon:hover
+    ) {
+    background-color: var(--color-gray-200);
+  }
+
+  .upload-container .uploaded-file-versions .uploaded-file {
+    padding-left: 0.7rem;
+  }
+
+  .upload-container .uploaded-file .uploaded-filetype-icon {
+    font-size: 0.7rem;
+    color: var(--color-gray-600);
+    margin-right: 0.3rem;
+    margin-top: 0.1rem;
   }
 
   .upload-container .uploaded-file-draggable {
@@ -163,15 +197,20 @@
     cursor: pointer;
   }
 
-  .uploaded-file-delete-icon,
-  .uploaded-file-version-icon {
+  .upload-container .action-icon {
     font-size: 0.8rem;
     cursor: pointer;
-    color: var(--color-gray-700);
+    color: var(--color-gray-600);
+    padding: 0 0.15rem;
+    margin: 0.05rem 0;
+  }
+
+  .upload-container .action-icon:hover {
+    background-color: var(--color-gray-300);
   }
 
   .analysis-group {
-    margin-bottom: 0.2rem;
+    padding-bottom: 0.2rem;
   }
 
   .analysis-group .analysis-group-title {
@@ -206,15 +245,21 @@
   }
 
   .file-input .drop-zone {
-    border-radius: 1.5rem;
+    border-radius: 0.5rem;
     background-color: var(--color-gray-100);
     border: 1px solid var(--color-gray-300);
-    color: var(--color-gray-700);
+    color: var(--color-gray-500);
     cursor: pointer;
     min-height: 5rem;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 0.9rem;
+  }
+
+  .file-input .drop-zone:hover {
+    border-color: var(--color-gray-400);
+    color: var(--color-gray-600);
   }
 
   .file-input .drop-zone .drop-message {

@@ -1,10 +1,15 @@
 "use client";
 
 import {
-  faSquareMinus,
-  faSquarePlus,
+  faSquareMinus as regularMinus,
+  faSquarePlus as regularPlus,
 } from "@fortawesome/free-regular-svg-icons";
-import { faFileLines } from "@fortawesome/free-regular-svg-icons/faFileLines";
+
+import {
+  faSquareMinus as solidMinus,
+  faSquarePlus as solidPlus,
+} from "@fortawesome/free-solid-svg-icons";
+
 import { faCodeCompare } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import cx from "classnames";
@@ -19,6 +24,7 @@ import {
   useSelectionDispatch,
 } from "../../lib/context/SelectionContext";
 import { Report, VerificationFile, VersionedFile } from "../../lib/types";
+import { getFileIcon } from "../../lib/util";
 import { CodeRender } from "./CodeRender";
 import { DiffRender } from "./DiffRender";
 import { SourceVersionSelect } from "./SourceVersionSelect";
@@ -57,6 +63,23 @@ export function SourceFile({ source, reports, setFocus }: SourceFileParams) {
 
   const expanded = focusIds.some(
     (id) => expansions[id] === ExpansionState.Expanded,
+  );
+
+  const [toggleHover, setToggleHover] = useState(false);
+
+  const toggleIcon = (
+    <FontAwesomeIcon
+      className="source-file-toggle"
+      icon={
+        expanded
+          ? toggleHover
+            ? solidMinus
+            : regularMinus
+          : toggleHover
+            ? solidPlus
+            : regularPlus
+      }
+    />
   );
 
   // Focus initialisation
@@ -188,7 +211,7 @@ export function SourceFile({ source, reports, setFocus }: SourceFileParams) {
   // Scroll selected policy into view if relevant
   useEffect(() => {
     focus.current?.then((id) => {
-      if (file.current && scroll === "source-file" && id === focusedFileId) {
+      if (file.current && scroll === "file" && id === focusedFileId) {
         file.current.scrollIntoView({
           block: "start",
           inline: "start",
@@ -229,6 +252,8 @@ export function SourceFile({ source, reports, setFocus }: SourceFileParams) {
       />
     );
 
+  const fileIcon = getFileIcon(original?.file.filetype);
+
   return (
     <div
       ref={file}
@@ -251,11 +276,13 @@ export function SourceFile({ source, reports, setFocus }: SourceFileParams) {
             });
           });
         }}
+        onMouseEnter={() => setToggleHover(true)}
+        onMouseLeave={() => setToggleHover(false)}
       >
         {source.versions.length === 0 && (
           <FontAwesomeIcon
             className="source-file-icon"
-            icon={original && updated ? faCodeCompare : faFileLines}
+            icon={original && updated ? faCodeCompare : fileIcon}
           />
         )}
         {source.versions.length === 0 && (
@@ -270,6 +297,7 @@ export function SourceFile({ source, reports, setFocus }: SourceFileParams) {
             ]}
             selectedOriginal={original.id}
             selectedUpdate={updated?.id}
+            icon={fileIcon}
             set={(original, updated) => {
               const id = updated ? original + updated : original;
               focus.current = Promise.resolve(id);
@@ -285,19 +313,11 @@ export function SourceFile({ source, reports, setFocus }: SourceFileParams) {
             }}
             expanded={expanded}
           >
-            <FontAwesomeIcon
-              className="source-file-toggle"
-              icon={expanded ? faSquareMinus : faSquarePlus}
-            />
+            {toggleIcon}
           </SourceVersionSelect>
         )}
 
-        {source.versions.length === 0 && (
-          <FontAwesomeIcon
-            className="source-file-toggle"
-            icon={expanded ? faSquareMinus : faSquarePlus}
-          />
-        )}
+        {source.versions.length === 0 && toggleIcon}
       </div>
       <div className="source-file-content">{expanded && render}</div>
     </div>

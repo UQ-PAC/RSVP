@@ -10,7 +10,8 @@
 
   .reports-container .reports-instruction {
     color: #505050;
-    padding: 0.75rem 0.5rem 0;
+    padding: 1rem 0.5rem 0;
+    text-align: center;
   }
 
   .reports-container:has(.progress-spinner-icon) {
@@ -38,15 +39,28 @@
   }
 
   .reports-group-header {
-    cursor: pointer;
     display: flex;
     align-items: center;
     padding: 0.2rem 0.5rem 0.1rem 0.5rem;
     line-height: 1.5rem;
   }
 
+  .reports-group-header:has(.reports-group-filetype-icon) {
+    cursor: pointer;
+  }
+
+  .reports-group-header:not(:has(.reports-group-filetype-icon))
+    .reports-group-title {
+    margin-left: 1.25rem;
+  }
+
+  .reports-group:has(.reports-group-toggle:hover) {
+    background-color: var(--color-gray-200);
+  }
+
   .reports-group-content {
     margin-left: 0.5rem;
+    padding-bottom: 0.5rem;
   }
 
   .reports-group-header:hover {
@@ -55,8 +69,11 @@
 
   .reports-group-header .reports-group-toggle {
     font-size: 0.8rem;
-    margin-right: 0.4rem;
+    margin-right: 0.2rem;
     color: var(--color-gray-500);
+    cursor: pointer;
+    line-height: 0.9rem;
+    padding-top: 0.05rem;
   }
 
   .reports-group-header .reports-group-title {
@@ -70,6 +87,13 @@
     margin-left: 0.2rem;
     color: var(--color-gray-700);
     font-weight: 600;
+  }
+
+  .reports-group-header .reports-group-filetype-icon {
+    color: var(--color-gray-500);
+    font-size: 0.8rem;
+    margin-right: 0.25rem;
+    margin-top: 0.05rem;
   }
 
   .report-item {
@@ -143,10 +167,7 @@
     cursor: pointer;
     padding: 0.1rem 0 0.1rem 1.5rem;
     align-self: flex-start;
-
-    /* padding-left: 1.5rem; */
     text-indent: -0.9rem;
-    /* padding-right: 0; */
     margin-right: 0.9rem;
     display: block;
     width: 100%;

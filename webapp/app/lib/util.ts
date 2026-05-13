@@ -1,4 +1,12 @@
 import {
+  IconDefinition,
+  faBarsStaggered,
+  faCheckDouble,
+  faDatabase,
+  faFileLines,
+  faLock,
+} from "@fortawesome/free-solid-svg-icons";
+import {
   FileType,
   Report,
   SourceLoc,
@@ -36,14 +44,17 @@ export function sortReports(reports: Report[]): Report[] {
   return reports.sort(compareReports);
 }
 
-export function getFileType(file: File): FileType {
-  if (file.name.endsWith(".cedar")) {
+export function getFileType(file: File);
+export function getFileType(file: string);
+export function getFileType(file: File | string): FileType {
+  const filename = typeof file === "string" ? file : file.name;
+  if (filename.endsWith(".cedar")) {
     return "cedar";
-  } else if (file.name.endsWith(".cedarschema")) {
+  } else if (filename.endsWith(".cedarschema")) {
     return "cedarschema";
-  } else if (file.name.endsWith(".json")) {
+  } else if (filename.endsWith(".json")) {
     return "entities";
-  } else if (file.name.endsWith(".invariant")) {
+  } else if (filename.endsWith(".invariant")) {
     return "invariant";
   } else {
     return "text";
@@ -75,4 +86,19 @@ export function checkAnalysisGroup(files: VersionedFileList): {
   const error = !hasPolicy || !hasSchema || !hasEntities;
 
   return { hasPolicy, hasSchema, hasEntities, error };
+}
+
+export function getFileIcon(filetype: FileType | undefined): IconDefinition {
+  switch (filetype) {
+    case "cedar":
+      return faLock;
+    case "cedarschema":
+      return faBarsStaggered;
+    case "entities":
+      return faDatabase;
+    case "invariant":
+      return faCheckDouble;
+    default:
+      return faFileLines;
+  }
 }

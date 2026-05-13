@@ -15,6 +15,9 @@ exports[`handles no children 1`] = `
       />
     </div>
     <div
+      class="drawer-patch"
+    />
+    <div
       class="drawer-container"
     >
       <h3
@@ -44,6 +47,9 @@ exports[`renders left collapsed 1`] = `
         data-testid="font-awesome-icon"
       />
     </div>
+    <div
+      class="drawer-patch"
+    />
     <div
       class="drawer-container"
     >
@@ -78,6 +84,9 @@ exports[`renders left expanded 1`] = `
       />
     </div>
     <div
+      class="drawer-patch"
+    />
+    <div
       class="drawer-container"
     >
       <h3
@@ -110,6 +119,9 @@ exports[`renders right collapsed 1`] = `
         data-testid="font-awesome-icon"
       />
     </div>
+    <div
+      class="drawer-patch"
+    />
     <div
       class="drawer-container"
     >
@@ -144,6 +156,9 @@ exports[`renders right expanded 1`] = `
       />
     </div>
     <div
+      class="drawer-patch"
+    />
+    <div
       class="drawer-container"
     >
       <h3
@@ -177,6 +192,9 @@ exports[`triggers collapse 1`] = `
       />
     </div>
     <div
+      class="drawer-patch"
+    />
+    <div
       class="drawer-container"
     >
       <h3
@@ -209,6 +227,9 @@ exports[`triggers expansion 1`] = `
         data-testid="font-awesome-icon"
       />
     </div>
+    <div
+      class="drawer-patch"
+    />
     <div
       class="drawer-container"
     >

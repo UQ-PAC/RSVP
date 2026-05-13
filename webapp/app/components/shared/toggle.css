@@ -9,4 +9,9 @@
 .toggle-all > a {
   cursor: pointer;
   text-align: center;
+  text-wrap: nowrap;
+}
+
+.toggle-all > a:hover {
+  color: var(--color-gray-500);
 }

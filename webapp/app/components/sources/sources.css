@@ -30,6 +30,7 @@
     .source-files-analysis-group-title {
     flex-grow: 1;
     color: var(--color-gray-600);
+    text-wrap: nowrap;
   }
   .source-files-container .source-files-instruction {
     text-align: center;
@@ -47,7 +48,7 @@
     background-color: var(--color-gray-50);
     border: 1px solid var(--color-gray-300);
     border-radius: 0.5rem;
-    scroll-margin: 50px;
+    scroll-margin: 3rem;
   }
 
   .source-file .source-file-header {

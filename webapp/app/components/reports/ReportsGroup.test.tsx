@@ -18,8 +18,13 @@ jest.mock("@fortawesome/react-fontawesome", () => ({
 }));
 
 jest.mock("@fortawesome/free-regular-svg-icons", () => ({
-  faMinusSquare: "faMinusSquare",
-  faPlusSquare: "faPlusSquare",
+  faSquareMinus: "faSquareMinus",
+  faSquarePlus: "faSquarePlus",
+}));
+
+jest.mock("@fortawesome/free-solid-svg-icons", () => ({
+  faSquareMinus: "faSquareMinus",
+  faSquarePlus: "faSquarePlus",
 }));
 
 jest.mock("../../lib/context/FocusContext", () => ({
@@ -107,7 +112,12 @@ test("triggers expansion", () => {
   // Trigger expansion of group one
   const headerOne = screen.getByTestId(`reports-group-${fileOne}-header`);
   expect(headerOne).toBeInTheDocument();
-  fireEvent.click(headerOne);
+
+  const toggleOne = headerOne.querySelector(".reports-group-toggle");
+  expect(toggleOne).toBeTruthy();
+  expect(toggleOne).toBeInTheDocument();
+
+  fireEvent.click(toggleOne!);
   expect(selectionDispatch).toHaveBeenCalledTimes(1);
   expect(selectionDispatch).toHaveBeenCalledWith({
     scroll: "none",
@@ -121,8 +131,11 @@ test("triggers expansion", () => {
   // Trigger collapse of group two
   const headerTwo = screen.getByTestId(`reports-group-${fileTwo}-header`);
   expect(headerTwo).toBeInTheDocument();
+  const toggleTwo = headerTwo.querySelector(".reports-group-toggle");
+  expect(toggleTwo).toBeTruthy();
+  expect(toggleTwo).toBeInTheDocument();
 
-  fireEvent.click(headerTwo);
+  fireEvent.click(toggleTwo!);
   expect(selectionDispatch).toHaveBeenCalledTimes(2);
   expect(focusDispatch).toHaveBeenCalledTimes(2);
   expect(focusDispatch).toHaveBeenLastCalledWith({

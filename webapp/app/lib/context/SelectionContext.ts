@@ -1,11 +1,13 @@
 import { createContext, Dispatch, useContext } from "react";
+import { ScrollTarget } from "../types";
 
 interface SelectionState {
   selected?: string;
   hovered?: string;
   loc?: string;
   file?: string;
-  scroll?: "source" | "report" | "source-file" | "none";
+  group?: string;
+  scroll?: ScrollTarget;
 }
 
 export const emptySelection = {};
@@ -13,8 +15,9 @@ export const emptySelection = {};
 interface SelectionAction {
   hovered?: string;
   selected?: string;
-  scroll: "source" | "report" | "source-file" | "none";
+  scroll: ScrollTarget;
   file?: string;
+  group?: string;
   loc?: string;
 }
 

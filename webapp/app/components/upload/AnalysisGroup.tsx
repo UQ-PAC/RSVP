@@ -1,7 +1,6 @@
 "use client";
 
-import { faTrashCan } from "@fortawesome/free-regular-svg-icons";
-import { faExclamation } from "@fortawesome/free-solid-svg-icons";
+import { faExclamation, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import cx from "classnames";
 import { useRef } from "react";
@@ -13,6 +12,7 @@ import {
   ExpansionState,
   useFocusDispatch,
 } from "../../lib/context/FocusContext";
+import { useSelectionDispatch } from "../../lib/context/SelectionContext";
 import { remove, upload } from "../../lib/requests";
 import { VerificationFile } from "../../lib/types";
 import { checkAnalysisGroup, getFileType } from "../../lib/util";
@@ -32,6 +32,7 @@ export function AnalysisGroup({ removeGroup }: AnalysisGroupProps) {
   const dispatch = useAnalysisGroupDispatch();
 
   const focus = useFocusDispatch();
+  const selection = useSelectionDispatch();
 
   const addFiles = (toAdd: File[], original?: VerificationFile) =>
     toAdd.forEach((file) => {
@@ -100,7 +101,15 @@ export function AnalysisGroup({ removeGroup }: AnalysisGroupProps) {
 
   return (
     <div className="analysis-group">
-      <span className="analysis-group-header">
+      <span
+        className="analysis-group-header"
+        onClick={() =>
+          selection({
+            scroll: "group",
+            group: name,
+          })
+        }
+      >
         <h4
           className={cx(
             "analysis-group-title",
@@ -109,34 +118,41 @@ export function AnalysisGroup({ removeGroup }: AnalysisGroupProps) {
         >
           {name}
         </h4>
-        <FontAwesomeIcon
-          className="analysis-group-delete-icon"
-          icon={faTrashCan}
-          onClick={removeGroup}
-        />
+        <div
+          className="analysis-group-delete-icon action-icon"
+          onClick={(e) => {
+            e.stopPropagation();
+            removeGroup();
+          }}
+        >
+          <FontAwesomeIcon icon={faTrash} />
+        </div>
       </span>
-      <div className="analysis-group-filelist">
-        {files.map((file, i) => (
-          <UploadedFile
-            key={i}
-            file={file.original}
-            remove={removeFile}
-            addChild={
-              file.original.filetype === "cedar"
-                ? openCedarFileDialog
-                : undefined
-            }
-          >
-            {file.versions.map((version, j) => (
-              <UploadedFile
-                key={j}
-                file={version}
-                remove={(version) => removeFile(version, file.original)}
-              />
-            ))}
-          </UploadedFile>
-        ))}
-      </div>
+      {files.length > 0 && (
+        <div className="analysis-group-filelist">
+          {files.map((file, i) => (
+            <UploadedFile
+              key={i}
+              icon
+              file={file.original}
+              remove={removeFile}
+              addChild={
+                file.original.filetype === "cedar"
+                  ? openCedarFileDialog
+                  : undefined
+              }
+            >
+              {file.versions.map((version, j) => (
+                <UploadedFile
+                  key={j}
+                  file={version}
+                  remove={(version) => removeFile(version, file.original)}
+                />
+              ))}
+            </UploadedFile>
+          ))}
+        </div>
+      )}
       {verifyRequested && error && (
         <div className="analysis-group-errors">
           {!hasPolicy && (

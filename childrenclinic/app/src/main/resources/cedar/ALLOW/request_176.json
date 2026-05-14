@@ -1,6 +1,6 @@
 {
   "principal": "ChildrenClinic::Employee::\"Alice\"",
-  "resource": "ChildrenClinic::ResponsibleAdult::\"Betty Davis\"",
-  "action": "ChildrenClinic::Action::\"ViewAdult\"",
+  "resource": "ChildrenClinic::Patient::\"Rosy Rodriquez\"",
+  "action": "ChildrenClinic::Action::\"ViewPatient\"",
   "context": {}
 }

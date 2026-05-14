@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Guest::\"???\"",
-  "resource": "ChildrenClinic::ResponsibleAdult::\"Carlos Estaban\"",
-  "action": "ChildrenClinic::Action::\"ViewAdult\"",
+  "principal": "ChildrenClinic::Guest::\"Unknown\"",
+  "resource": "ChildrenClinic::Visit::\"???\"",
+  "action": "ChildrenClinic::Action::\"EditVisit\"",
   "context": {}
 }

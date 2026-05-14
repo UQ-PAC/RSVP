@@ -1,6 +1,6 @@
 {
   "principal": "ChildrenClinic::Employee::\"???\"",
-  "resource": "ChildrenClinic::Patient::\"Lucky Estaban\"",
-  "action": "ChildrenClinic::Action::\"EditPatient\"",
+  "resource": "ChildrenClinic::Visit::\"Leo Franklin 2\"",
+  "action": "ChildrenClinic::Action::\"DeleteVisit\"",
   "context": {}
 }

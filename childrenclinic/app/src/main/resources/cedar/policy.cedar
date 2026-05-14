@@ -199,10 +199,6 @@ when {
         resource is Patient ||
         resource is Visit
     )
-}
-unless {
-    resource has confidentiality &&
-    resource.confidentiality == Confidentiality::"Protected"
 };
 
 // 'policy13'

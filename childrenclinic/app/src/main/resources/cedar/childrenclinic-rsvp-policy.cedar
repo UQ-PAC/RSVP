@@ -25,7 +25,7 @@ when {
 };
 
 // 'policy2'
-// Anyone can view any Doctor or Administrative Assistant.
+// Anyone can view any "Doctor" or "Administrative Assistant".
 @id("Policy: Public Doctor and Administrative Assistant data.")
 permit (
     principal,
@@ -53,7 +53,7 @@ when {
 };
 
 // 'policy4'
-// Every Administrator can do anything, anywhere.
+// Every "Administrator" can do anything, anywhere.
 @id("Policy: Administrator.")
 permit (
     principal is ChildrenClinic::Employee,
@@ -65,7 +65,7 @@ when {
 };
 
 // 'policy5'
-// Every Administrative Assistant can view and edit their Clinics' data.
+// Every "Administrative Assistant" can view and edit their Clinics' data.
 @id("Policy: Administrative Assistant can view and edit in their Clinics.")
 permit (
     principal is ChildrenClinic::Employee,
@@ -98,7 +98,7 @@ unless {
 };
 
 // 'policy6'
-// Every Administrative Assistant can add Patients and Adults to their Clinics' data.
+// Every "Administrative Assistant" can add Patients and Adults to their Clinics' data.
 @id("Policy: Administrative Assistant can add Patients and Adults to their Clinics.")
 permit (
     principal is ChildrenClinic::Employee,
@@ -113,7 +113,7 @@ when {
 };
 
 // 'policy7'
-// Every Doctor can view and edit their Patients' data.
+// Every "Doctor" can view and edit their Patients' data.
 @id("Policy: Doctor can view and edit their Patients.")
 permit (
     principal is ChildrenClinic::Employee,
@@ -134,7 +134,7 @@ unless {
 };
 
 // 'policy8'
-// Every Doctor can add Adults and Patients to their Clinics' data.
+// Every "Doctor" can add Adults and Patients to their Clinics' data.
 @id("Policy: Doctor can add Adults and Patients to their Clinics.")
 permit (
     principal is ChildrenClinic::Employee,
@@ -153,17 +153,19 @@ unless {
 };
 
 // 'policy9'
-// No Intern Doctor can edit their Patients' data.
+// No "Intern" "Doctor" can edit their Patients' data.
 @id("Policy: Intern Doctor cannot edit their Patients.")
 forbid (
     principal is ChildrenClinic::Employee,
-    action == ChildrenClinic::Action::"EditPatient",
+    action,
     resource
 )
 when {
     principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
     principal has level &&
     principal.level == ChildrenClinic::ProfessionalLevel::"Intern" &&
+    action in [ChildrenClinic::Action::"EditPatient",
+               ChildrenClinic::Action::"EditVisit"] &&
     (
         resource is ChildrenClinic::Patient ||
         resource is ChildrenClinic::Visit
@@ -186,7 +188,7 @@ when {
 };
 
 // 'policy11'
-// Every Senior or Specialist Doctor can delete their Patients' data.
+// Every "Senior" or "Specialist" "Doctor" can delete their Patients' data.
 @id("Policy: Senior or Specialist Doctor can delete their Patients.")
 permit (
     principal is ChildrenClinic::Employee,
@@ -210,7 +212,7 @@ when {
 };
 
 // 'policy12'
-// Every Senior or Specialist Doctor can view all Patients' data.
+// Every "Senior" or "Specialist" "Doctor" can view all Patients' data.
 @id("Policy: Senior or Specialist Doctor can view all Patients.")
 permit (
     principal is ChildrenClinic::Employee,

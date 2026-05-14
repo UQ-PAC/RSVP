@@ -12,6 +12,13 @@
 
     <div class="col-md-6">
 
+      <div th:if="${param.error}" class="alert alert-warning">
+        <span th:if="${param.error[0] == 'noPatients'}" th:text="#{error.noPatients}">No patients found.</span>
+        <span th:if="${param.error[0] == 'noAdults'}" th:text="#{error.noAdults}">No adults found.</span>
+        <span th:if="${param.error[0] == 'noDoctors'}" th:text="#{error.noDoctors}">No doctors found.</span>
+        <span th:if="${param.error[0] == 'noAssistants'}" th:text="#{error.noAssistants}">No administrative assistants found.</span>
+      </div>
+
       <div th:if="${hasSearchAccess}" class="well">
         <form th:action="@{/search}" method="get" class="form-inline">
           <div class="form-group">
@@ -30,7 +37,6 @@
       <hr th:if="${not #maps.isEmpty(addOptions)}" />
 
       <div th:if="${not #maps.isEmpty(addOptions)}">
-         <h4 th:text="#{quickAdd}">Quick Add Entities</h4>
          <div class="btn-group" role="group" aria-label="Quick Add Actions">
            <a th:each="entry : ${addOptions}" th:href="@{${entry.key}}" class="btn btn-success">
              <i class="fa fa-plus" aria-hidden="true"></i> Add <span th:text="${entry.value}"></span>

@@ -5,6 +5,7 @@ import com.cedarpolicy.value.EntityUID;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriUtils;
 
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
 import uq.pac.childrenclinic.cedar.CedarDeniedException;
@@ -108,13 +110,6 @@ public class AdultController {
 		dataBinder.setDisallowedFields("id");
 	}
 
-	@GetMapping("/adults/find")
-	@CedarAuthorization(action = "ListAdults", resourceType = "Clinic", resourceId = "Any", validate = true)
-	public String initFindForm(Model model) {
-		model.addAttribute("adult", new Adult());
-		return "adults/findAdults";
-	}
-
 	@GetMapping("/adults")
 	@CedarAuthorization(action = "ListAdults", resourceType = "Clinic", resourceId = "Any", validate = true)
 	public String processFindForm(@RequestParam(defaultValue = "1") int page, Adult adult, BindingResult result,
@@ -126,7 +121,7 @@ public class AdultController {
 
 		if (allMatchingAdults.isEmpty()) {
 			result.rejectValue("lastName", "notFound", "No adults found.");
-			return "adults/findAdults";
+			return "redirect:/?error=noAdults&query=" + UriUtils.encode(lastName, StandardCharsets.UTF_8);
 		}
 
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);

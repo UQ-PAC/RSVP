@@ -45,34 +45,6 @@
             <span th:text="#{home}">Home</span>
           </li>
 
-          <th:block th:if="${navCanListPatients}">
-            <li th:replace="~{::menuItem ('/patients/find','patients','patients','th-list',#{patients})}">
-                <span class="fa fa-th-list" aria-hidden="true"></span>
-                <span th:text="#{patients}">Patients</span>
-            </li>
-          </th:block>
-
-          <th:block th:if="${navCanListAdults}">
-            <li th:replace="~{::menuItem ('/adults/find','adults','adults','th-list',#{adults})}">
-                <span class="fa fa-th-list" aria-hidden="true"></span>
-                <span th:text="#{adults}">Adults</span>
-            </li>
-          </th:block>
-
-          <th:block th:if="${navCanListEmployees}">
-            <li th:replace="~{::menuItem ('/administrative-assistants/find','administrative-assistants','administrative-assistants','th-list',#{administrativeAssistants})}">
-              <span class="fa fa-th-list" aria-hidden="true"></span>
-              <span th:text="#{administrativeAssistants}">Administrative Assistants</span>
-            </li>
-          </th:block>
-
-          <th:block th:if="${navCanListEmployees}">
-            <li th:replace="~{::menuItem ('/doctors/find','doctors','doctors','th-list',#{doctors})}">
-              <span class="fa fa-th-list" aria-hidden="true"></span>
-              <span th:text="#{doctors}">Doctors</span>
-            </li>
-          </th:block>
-
         </ul>
 
         <ul class="nav navbar-nav ms-auto align-items-right">

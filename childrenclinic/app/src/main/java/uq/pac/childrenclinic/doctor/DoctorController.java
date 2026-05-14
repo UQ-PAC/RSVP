@@ -20,6 +20,7 @@ import com.cedarpolicy.value.EntityUID;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -49,6 +50,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriUtils;
 
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
 import uq.pac.childrenclinic.cedar.CedarDeniedException;
@@ -125,13 +127,6 @@ class DoctorController {
 		dataBinder.setDisallowedFields("id");
 	}
 
-	@GetMapping("/doctors/find")
-	@CedarAuthorization(action = "ListEmployees", resourceType = "Clinic", resourceId = "Any", validate = true)
-	public String initFindForm(Model model) {
-		model.addAttribute("doctor", new Doctor());
-		return "doctors/findDoctors";
-	}
-
 	@GetMapping("/doctors")
 	@CedarAuthorization(action = "ListEmployees", resourceType = "Clinic", resourceId = "Any", validate = true)
 	public String showDoctorsList(@RequestParam(defaultValue = "1") int page, Doctor doctor, BindingResult result,
@@ -143,7 +138,7 @@ class DoctorController {
 
 		if (allMatchingDoctors.isEmpty()) {
 			result.rejectValue("lastName", "notFound", "No doctors found.");
-			return "doctors/findDoctors";
+			return "redirect:/?error=noDoctors&query=" + UriUtils.encode(lastName, StandardCharsets.UTF_8);
 		}
 
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);

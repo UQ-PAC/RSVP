@@ -5,6 +5,7 @@ import com.cedarpolicy.value.EntityUID;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriUtils;
 
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
 import uq.pac.childrenclinic.cedar.CedarDeniedException;
@@ -96,13 +98,6 @@ public class AdministrativeAssistantController {
 		dataBinder.setDisallowedFields("id");
 	}
 
-	@GetMapping("/administrative-assistants/find")
-	@CedarAuthorization(action = "ListEmployees", resourceType = "Clinic", resourceId = "Any", validate = true)
-	public String initFindForm(Model model) {
-		model.addAttribute("administrativeAssistant", new AdministrativeAssistant());
-		return "administrative-assistants/findAdministrativeAssistants";
-	}
-
 	@GetMapping("/administrative-assistants")
 	@CedarAuthorization(action = "ListEmployees", resourceType = "Clinic", resourceId = "Any", validate = true)
 	public String processFindForm(@RequestParam(defaultValue = "1") int page,
@@ -115,7 +110,7 @@ public class AdministrativeAssistantController {
 
 		if (allMatchingAssistants.isEmpty()) {
 			result.rejectValue("lastName", "notFound", "No administrative assistants found.");
-			return "administrative-assistants/findAdministrativeAssistants";
+			return "redirect:/?error=noAssistants&query=" + UriUtils.encode(lastName, StandardCharsets.UTF_8);
 		}
 
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);

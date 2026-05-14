@@ -1,9 +1,5 @@
-// ChildrenClinic RSVP Policy
-// Original version without introduced issues.
-
 // 'policy0'
 // Anyone can list the Employees they are allowed to view.
-@id("Policy: Anyone can list Employees.")
 permit (
     principal,
     action == Action::"ListEmployees",
@@ -12,21 +8,14 @@ permit (
 
 // 'policy1'
 // Every Employee can list the Adults, Patients, and Visits they are allowed to view.
-@id("Policy: Every Employee can list Adults, Patients, and Visits.")
 permit (
     principal is Employee,
-    action,
+    action in [Action::"ListAdults", Action::"ListPatients", Action::"ListVisits"],
     resource is Clinic
-)
-when {
-    action in [Action::"ListAdults",
-               Action::"ListPatients",
-               Action::"ListVisits"]
-};
+);
 
 // 'policy2'
 // Anyone can view any Doctor or Administrative Assistant.
-@id("Policy: Public Doctor and Administrative Assistant data.")
 permit (
     principal,
     action == Action::"ViewEmployee",
@@ -39,7 +28,6 @@ when {
 
 // 'policy3'
 // No Guest can access any Patient data.
-@id("Policy: Guest cannot access Patient data.")
 forbid (
     principal is Guest,
     action in Action::"PatientOperations",
@@ -54,7 +42,6 @@ when {
 
 // 'policy4'
 // Every Administrator can do anything, anywhere.
-@id("Policy: Administrator.")
 permit (
     principal is Employee,
     action,
@@ -66,7 +53,6 @@ when {
 
 // 'policy5'
 // Every Administrative Assistant can view and edit their Clinics' data.
-@id("Policy: Administrative Assistant can view and edit in their Clinics.")
 permit (
     principal is Employee,
     action,
@@ -80,21 +66,19 @@ when {
         resource is ResponsibleAdult ||
         resource is Visit
     ) &&
+    resource has clinics &&
     resource.clinics.containsAny(principal.clinics)
 };
 
 // 'policy6'
 // Every Administrative Assistant can add Patients and Adults to their Clinics' data.
-@id("Policy: Administrative Assistant can add Patients and Adults to their Clinics.")
 permit (
     principal is Employee,
-    action,
+    action in [Action::"AddAdult", Action::"AddPatient"],
     resource is Clinic
 )
 when {
-    action in [Action::"AddAdult",
-               Action::"AddPatient"] &&
-    principal.roles.contains(EmployeeRole::"Administrative Assistant") ||
+    principal.roles.contains(EmployeeRole::"Administrative Assistant") &&
     principal.clinics.contains(resource)
 };
 
@@ -115,8 +99,7 @@ when {
     principal in resource.doctors
 }
 unless {
-    action in [Action::"DeletePatient",
-               Action::"DeleteVisit"]
+    action in [Action::"DeletePatient", Action::"DeleteVisit"]
 };
 
 // 'policy8'
@@ -128,8 +111,7 @@ permit (
     resource is Clinic
 )
 when {
-    action in [Action::"AddAdult",
-               Action::"AddPatient"] &&
+    action in [Action::"AddAdult", Action::"AddPatient"] &&
     principal.roles.contains(EmployeeRole::"Doctor") &&
     principal.clinics.contains(resource)
 }
@@ -162,12 +144,11 @@ when {
 @id("Policy: Employee can view and edit their own data.")
 permit (
     principal is Employee,
-    action,
+    action in [Action::"ViewEmployee", Action::"EditEmployee"],
     resource is Employee
 )
 when {
-    action in [Action::"ViewEmployee",
-               Action::"EditEmployee"] &&
+
     principal == resource
 };
 

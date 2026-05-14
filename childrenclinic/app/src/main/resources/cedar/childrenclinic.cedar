@@ -272,3 +272,16 @@ permit (
 when {
     principal.clinics.contains(resource)
 };
+
+// 'policy15'
+// Every Doctor can view Adults in their Clinics.
+@id("Policy: Doctor can view Adults in their Clinics.")
+permit (
+    principal is ChildrenClinic::Employee,
+    action == ChildrenClinic::Action::"ViewAdult",
+    resource is ChildrenClinic::ResponsibleAdult
+)
+when {
+    principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
+    resource.clinics.containsAny(principal.clinics)
+};

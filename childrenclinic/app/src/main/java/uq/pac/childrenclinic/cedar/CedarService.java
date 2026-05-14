@@ -42,10 +42,10 @@ public class CedarService {
 
 	private static final Logger logger = LoggerFactory.getLogger(CedarService.class);
 
-	public CedarService(@Value("${policy.file:childrenclinic-rsvp-policy.cedar}") String policyFile,
+	public CedarService(@Value("${policy.file:childrenclinic.cedar}") String policyFile,
 			CedarEntityBuilder cedarEntityBuilder, CedarRequestScopedCache requestCache) {
 		this.policyPath = Path.of("src/main/resources/cedar/" + policyFile);
-		this.schemaPath = Path.of("src/main/resources/cedar/childrenclinic-rsvp-schema.cedarschema");
+		this.schemaPath = Path.of("src/main/resources/cedar/childrenclinic.cedarschema");
 		this.cedarEntityBuilder = cedarEntityBuilder;
 		this.requestCache = requestCache;
 

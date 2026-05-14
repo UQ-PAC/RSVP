@@ -2,15 +2,15 @@
 
 This folder contains the Cedar files for the RSVP version of PetClinic, ChildrenClinic, including request files for testing.
 
-To run all tests: `./childrenclinic-rsvp-requests.sh`.
+To run all tests: `./childrenclinic-requests.sh`.
 
 The commands above will load the default Cedar files:
-- Schema: `childrenclinic-rsvp-schema.cedarschema`
-- Entities: `childrenclinic-rsvp-entities.json`
-- Policy: `childrenclinic-rsvp-policy.cedar`
+- Schema: `childrenclinic.cedarschema`
+- Entities: `childrenclinic-entities.json`
+- Policy: `childrenclinic.cedar`
 
 You can change the default Cedar Policy by running, instead:
-- `./childrenclinic-rsvp-requests.sh -p <another-policy.cedar>`
+- `./childrenclinic-requests.sh -p <another-policy.cedar>`
 
 Available flags:
 - `-t`: to read requests from the `./ALLOW-TEST` and `./DENY-TEST` folders instead of from the `./ALLOW` and `./DENY` folders.
@@ -25,13 +25,13 @@ Request JSON files in the `./ALLOW-TEST` and `./DENY-TEST` folders are named fol
 On Debian, run: `sudo apt install xdot`.
 
 2. Update the Graphviz dot file.
-Run: `cedar visualize --entities childrenclinic-rsvp-entities.json > childrenclinic-rsvp-entities.dot`.
+Run: `cedar visualize --entities childrenclinic-entities.json > childrenclinic-entities.dot`.
 
-3. Run `xdot`, e.g.: `xdot childrenclinic-rsvp-entities.dot`.
+3. Run `xdot`, e.g.: `xdot childrenclinic-entities.dot`.
 
 ## Authorisation Model for the RSVP ChildrenClinic App
 
-Cedar [Schema](childrenclinic-rsvp-schema.cedarschema).
+Cedar [Schema](childrenclinic.cedarschema).
 
 ### Entities
 

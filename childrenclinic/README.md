@@ -20,9 +20,9 @@ You can start the application on the command-line as follows:
 You can then access the ChildrenClinic at <http://localhost:8080/>.
 
 The command above will load the default Cedar files:
-- Schema: `app/src/main/resources/cedar/childrenclinic-rsvp-schema.cedarschema`
-- Entities: `app/src/main/resources/cedar/childrenclinic-rsvp-entities.json`
-- Policy: `app/src/main/resources/cedar/childrenclinic-rsvp-policy.cedar`
+- Schema: `app/src/main/resources/cedar/childrenclinic.cedarschema`
+- Entities: `app/src/main/resources/cedar/childrenclinic-entities.json`
+- Policy: `app/src/main/resources/cedar/childrenclinic.cedar`
 
 You can change the default Cedar Policy by running, instead:
 

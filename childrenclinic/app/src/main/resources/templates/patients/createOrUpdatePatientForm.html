@@ -6,10 +6,11 @@
   <h2 th:with="text=${patient['new']} ? #{newPatient} : #{updatePatient}" th:text="${text}">Patient Form</h2>
   <form th:object="${patient}" class="form-horizontal" method="post">
     <div class="form-group has-feedback">
+      <input type="hidden" name="patientId" th:value="${patient.id}" th:if="${!patient['new']}" />
 
       <div class="control-group">
         <label class="col-sm-2 control-label" th:text="#{responsibleAdults}">Assign Adults</label>
-        <div class="col-sm-5">
+        <div class="col-sm-10">
           <select name="newAdultIds" class="form-control" multiple="multiple">
             <option th:each="adult : ${adults}" 
                     th:value="${adult.id}" 
@@ -18,7 +19,7 @@
           </select>
           <span class="help-inline text-muted" style="font-size: 0.85em;">Select one or more adults to assign.</span>
         </div>
-        <div class="col-sm-5">
+        <div class="col-sm-10">
           <select name="newAuthorityId" class="form-control">
             <option value="" disabled th:selected="${selectedAuthorityId == null}">Select Authority Role...</option>
             <option th:each="auth : ${authorities}" 
@@ -73,6 +74,8 @@
       <div class="col-sm-offset-2 col-sm-10">
         <button th:with="text=${patient['new']} ? #{addPatient} : #{updatePatient}" class="btn btn-primary" type="submit"
           th:text="${text}">Submit</button>
+        <button type="submit" class="btn btn-primary" th:formaction="@{/patients/stash-and-add-adult}" formnovalidate
+          th:text="#{addAdult}">Add Adult</button>
       </div>
     </div>
   </form>

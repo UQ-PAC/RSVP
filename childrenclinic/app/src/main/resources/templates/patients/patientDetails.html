@@ -69,6 +69,7 @@
   <a th:href="@{__${patient.id}__/edit}" class="btn btn-primary" th:text="#{editPatient}">Edit
     Patient</a>
   <a th:href="@{__${patient.id}__/visits/new}" class="btn btn-primary" th:text="#{addVisit}">Add Visit</a>
+  <a th:href="@{/adults/new(patientId=${patient.id})}" class="btn btn-primary">Add Adult</a>
 
   <br />
   <hr />

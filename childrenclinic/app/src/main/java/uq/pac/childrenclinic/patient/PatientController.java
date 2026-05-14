@@ -237,7 +237,43 @@ public class PatientController {
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
-		model.addAttribute("patient", new Patient());
+		PatientFormState state = (PatientFormState) session.getAttribute("patientFormState");
+
+		if (state != null) {
+			Patient patient = new Patient();
+			patient.setFirstName(state.getFirstName());
+			patient.setLastName(state.getLastName());
+			patient.setAddress(state.getAddress());
+			patient.setCity(state.getCity());
+			if (state.getBirthDate() != null && !state.getBirthDate().isBlank()) {
+				patient.setBirthDate(java.time.LocalDate.parse(state.getBirthDate()));
+			}
+			if (state.getGender() != null) {
+				this.genders.findGenders()
+					.stream()
+					.filter(g -> g.getName().equals(state.getGender()))
+					.findFirst()
+					.ifPresent(patient::setGender);
+			}
+			if (state.getClinics() != null) {
+				Set<Clinic> selectedClinics = new java.util.HashSet<>();
+				for (String clinicName : state.getClinics()) {
+					this.clinics.findByName(clinicName).ifPresent(selectedClinics::add);
+				}
+				patient.setClinics(selectedClinics);
+			}
+			model.addAttribute("patient", patient);
+			model.addAttribute("selectedAdultIds", state.getAdultIds());
+			model.addAttribute("selectedAuthorityId", state.getAuthorityId());
+			model.addAttribute("selectedDoctorIds", state.getDoctorIds());
+
+			// Clear the session state after restoration.
+			session.removeAttribute("patientFormState");
+		}
+		else {
+			model.addAttribute("patient", new Patient());
+		}
+
 		return VIEWS_PATIENT_CREATE_OR_UPDATE_FORM;
 	}
 
@@ -383,26 +419,57 @@ public class PatientController {
 	 */
 	@GetMapping("/patients/{patientId}/edit")
 	@CedarAuthorization(action = "EditPatient", resourceType = "Patient", validate = true)
-	public String initUpdateForm(@PathVariable("patientId") int patientId, Model model) {
+	public String initUpdateForm(@PathVariable("patientId") int patientId, Model model, HttpSession session) {
+		session.removeAttribute("patientFormState");
+
 		Patient patient = this.patients.findById(patientId)
 			.orElseThrow(() -> new IllegalArgumentException("Patient entity not found for identifier: " + patientId));
 
+		List<Integer> adultIds = new ArrayList<>();
+		Integer authId = null;
 		if (patient.getResponsibleAdults() != null && !patient.getResponsibleAdults().isEmpty()) {
-			List<Integer> adultIds = patient.getResponsibleAdults()
+			adultIds = patient.getResponsibleAdults()
 				.stream()
 				.map(pa -> pa.getAdult().getId())
 				.collect(Collectors.toList());
-			model.addAttribute("selectedAdultIds", adultIds);
-
-			Integer authId = patient.getResponsibleAdults().iterator().next().getAuthority().getId();
-			model.addAttribute("selectedAuthorityId", authId);
+			authId = patient.getResponsibleAdults().iterator().next().getAuthority().getId();
 		}
+
+		Map<String, ?> flashMap = model.asMap();
+		if (flashMap.containsKey("selectedAdultIds")) {
+			@SuppressWarnings("unchecked")
+			List<Integer> flashAdultIds = (List<Integer>) flashMap.get("selectedAdultIds");
+			if (flashAdultIds != null) {
+				for (Integer id : flashAdultIds) {
+					if (id != null && !adultIds.contains(id)) {
+						adultIds.add(id);
+					}
+				}
+			}
+		}
+		if (flashMap.containsKey("selectedAuthorityId")) {
+			authId = (Integer) flashMap.get("selectedAuthorityId");
+		}
+
+		model.addAttribute("selectedAdultIds", adultIds);
+		model.addAttribute("selectedAuthorityId", authId);
 
 		if (patient.getDoctors() != null && !patient.getDoctors().isEmpty()) {
 			List<Integer> selectedDoctorIds = patient.getDoctors()
 				.stream()
 				.map(Doctor::getId)
 				.collect(Collectors.toList());
+			if (flashMap.containsKey("selectedDoctorIds")) {
+				@SuppressWarnings("unchecked")
+				List<Integer> flashDoctorIds = (List<Integer>) flashMap.get("selectedDoctorIds");
+				if (flashDoctorIds != null) {
+					for (Integer id : flashDoctorIds) {
+						if (id != null && !selectedDoctorIds.contains(id)) {
+							selectedDoctorIds.add(id);
+						}
+					}
+				}
+			}
 			model.addAttribute("selectedDoctorIds", selectedDoctorIds);
 		}
 
@@ -580,6 +647,38 @@ public class PatientController {
 		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
 		redirectAttributes.addFlashAttribute("message", "Patient values updated.");
 		return "redirect:/patients/{patientId}";
+	}
+
+	@PostMapping("/patients/stash-and-add-adult")
+	public String stashPatientFormAndRedirectToAdultCreation(
+			@RequestParam(name = "patientId", required = false) Integer patientId,
+			@RequestParam(name = "firstName", required = false) String firstName,
+			@RequestParam(name = "lastName", required = false) String lastName,
+			@RequestParam(name = "address", required = false) String address,
+			@RequestParam(name = "city", required = false) String city,
+			@RequestParam(name = "birthDate", required = false) String birthDate,
+			@RequestParam(name = "gender", required = false) String gender,
+			@RequestParam(name = "clinics", required = false) List<String> clinicNames,
+			@RequestParam(name = "newAdultIds", required = false) List<Integer> adultIds,
+			@RequestParam(name = "newAuthorityId", required = false) Integer authorityId,
+			@RequestParam(name = "newDoctorIds", required = false) List<Integer> doctorIds, HttpSession session) {
+
+		PatientFormState state = new PatientFormState();
+		state.setPatientId(patientId);
+		state.setFirstName(firstName);
+		state.setLastName(lastName);
+		state.setAddress(address);
+		state.setCity(city);
+		state.setBirthDate(birthDate);
+		state.setGender(gender);
+		state.setClinics(clinicNames);
+		state.setAdultIds(adultIds);
+		state.setAuthorityId(authorityId);
+		state.setDoctorIds(doctorIds);
+
+		session.setAttribute("patientFormState", state);
+
+		return "redirect:/adults/new?fromPatientForm=true";
 	}
 
 }

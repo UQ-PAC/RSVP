@@ -34,6 +34,21 @@
       </div>
 
     </div>
+
+    <input type="hidden" name="patientId" th:value="${patientId}" th:if="${patientId != null}" />
+    <input type="hidden" name="fromPatientForm" th:value="${fromPatientForm}" th:if="${fromPatientForm != null and fromPatientForm}" />
+
+    <div class="control-group" th:if="${patientId != null or (fromPatientForm != null and fromPatientForm)}">
+      <label class="col-sm-2 control-label">Authority</label>
+      <div class="col-sm-10">
+        <select name="authorityId" class="form-control">
+          <option value="" disabled selected>Select Authority Role...</option>
+          <option th:each="auth : ${authorities}" th:value="${auth.id}"
+                  th:text="${auth.name}">Authority</option>
+        </select>
+      </div>
+    </div>
+
     <div class="form-group">
       <div class="col-sm-offset-2 col-sm-10">
         <button th:with="text=${adult['new']} ? #{addAdult} : #{updateAdult}" class="btn btn-primary" type="submit"

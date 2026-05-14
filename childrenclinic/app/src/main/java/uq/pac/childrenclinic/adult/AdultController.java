@@ -41,6 +41,12 @@ import uq.pac.childrenclinic.cedar.CedarEntitiesInvalidationEvent;
 import uq.pac.childrenclinic.cedar.CedarProgrammaticEvaluator;
 import uq.pac.childrenclinic.model.Gender;
 import uq.pac.childrenclinic.model.GenderRepository;
+import uq.pac.childrenclinic.patient.AdultAuthority;
+import uq.pac.childrenclinic.patient.AdultAuthorityRepository;
+import uq.pac.childrenclinic.patient.Patient;
+import uq.pac.childrenclinic.patient.PatientAdult;
+import uq.pac.childrenclinic.patient.PatientFormState;
+import uq.pac.childrenclinic.patient.PatientRepository;
 import uq.pac.childrenclinic.system.Clinic;
 import uq.pac.childrenclinic.system.ClinicRepository;
 
@@ -59,13 +65,20 @@ public class AdultController {
 
 	private final ApplicationEventPublisher eventPublisher;
 
+	private final PatientRepository patients;
+
+	private final AdultAuthorityRepository authorities;
+
 	public AdultController(AdultRepository adults, GenderRepository genders, ClinicRepository clinics,
-			CedarProgrammaticEvaluator cedarEvaluator, ApplicationEventPublisher eventPublisher) {
+			CedarProgrammaticEvaluator cedarEvaluator, ApplicationEventPublisher eventPublisher,
+			PatientRepository patients, AdultAuthorityRepository authorities) {
 		this.adults = adults;
 		this.genders = genders;
 		this.clinics = clinics;
 		this.cedarEvaluator = cedarEvaluator;
 		this.eventPublisher = eventPublisher;
+		this.patients = patients;
+		this.authorities = authorities;
 	}
 
 	@ModelAttribute("genders")
@@ -164,7 +177,13 @@ public class AdultController {
 	}
 
 	@GetMapping("/adults/new")
-	public String initCreationForm(Model model, HttpSession session) {
+	public String initCreationForm(@RequestParam(name = "patientId", required = false) Integer patientId,
+			@RequestParam(name = "fromPatientForm", required = false) Boolean fromPatientForm, Model model,
+			HttpSession session) {
+		if (!Boolean.TRUE.equals(fromPatientForm) && patientId == null) {
+			session.removeAttribute("patientFormState");
+		}
+
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 		Collection<Clinic> allClinics = this.clinics.findClinics();
 
@@ -208,12 +227,22 @@ public class AdultController {
 		}
 
 		model.addAttribute("adult", new Adult());
+		model.addAttribute("patientId", patientId);
+		model.addAttribute("fromPatientForm", fromPatientForm);
+
+		if (patientId != null || Boolean.TRUE.equals(fromPatientForm)) {
+			model.addAttribute("authorities", this.authorities.findAll());
+		}
+
 		return VIEWS_ADULT_CREATE_OR_UPDATE_FORM;
 	}
 
 	@PostMapping("/adults/new")
-	public String processCreationForm(@Valid Adult adult, BindingResult result, RedirectAttributes redirectAttributes,
-			HttpSession session) {
+	public String processCreationForm(@Valid Adult adult, BindingResult result,
+			@RequestParam(name = "patientId", required = false) Integer patientId,
+			@RequestParam(name = "authorityId", required = false) Integer authorityId,
+			@RequestParam(name = "fromPatientForm", required = false) Boolean fromPatientForm,
+			RedirectAttributes redirectAttributes, HttpSession session, Model model) {
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
 		// Evaluate Cedar for all the submitted Clinics.
@@ -276,6 +305,11 @@ public class AdultController {
 		}
 
 		if (result.hasErrors()) {
+			model.addAttribute("patientId", patientId);
+			model.addAttribute("fromPatientForm", fromPatientForm);
+			if (patientId != null || Boolean.TRUE.equals(fromPatientForm)) {
+				model.addAttribute("authorities", this.authorities.findAll());
+			}
 			return VIEWS_ADULT_CREATE_OR_UPDATE_FORM;
 		}
 
@@ -285,10 +319,66 @@ public class AdultController {
 		catch (DataIntegrityViolationException ex) {
 			result.rejectValue("firstName", "duplicate",
 					"A person with this first name, last name, birth date, and gender already exists.");
+			model.addAttribute("patientId", patientId);
+			model.addAttribute("fromPatientForm", fromPatientForm);
+			if (patientId != null || Boolean.TRUE.equals(fromPatientForm)) {
+				model.addAttribute("authorities", this.authorities.findAll());
+			}
 			return VIEWS_ADULT_CREATE_OR_UPDATE_FORM;
 		}
 
 		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
+
+		// Existing Patient (from patientDetails.html).
+		if (patientId != null && authorityId != null) {
+			Patient patient = this.patients.findById(patientId)
+				.orElseThrow(() -> new IllegalArgumentException("Patient not found: " + patientId));
+			AdultAuthority auth = this.authorities.findById(authorityId).orElse(null);
+			if (auth != null) {
+				PatientAdult pa = new PatientAdult(patient, adult, auth);
+				if (patient.getResponsibleAdults() == null) {
+					patient.setResponsibleAdults(new java.util.LinkedHashSet<>());
+				}
+				patient.getResponsibleAdults().add(pa);
+				this.patients.save(patient);
+			}
+			eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
+			redirectAttributes.addFlashAttribute("message", "New Adult has been created and assigned to the Patient.");
+			return "redirect:/patients/" + patientId;
+		}
+
+		// New Patient (from createOrUpdatePatientForm.html via session stash).
+		if (Boolean.TRUE.equals(fromPatientForm)) {
+			PatientFormState state = (PatientFormState) session.getAttribute("patientFormState");
+			if (state != null) {
+				List<Integer> adultIds = state.getAdultIds();
+				if (adultIds == null) {
+					adultIds = new java.util.ArrayList<>();
+				}
+				adultIds.add(adult.getId());
+				state.setAdultIds(adultIds);
+				if (authorityId != null) {
+					state.setAuthorityId(authorityId);
+				}
+				session.setAttribute("patientFormState", state);
+
+				redirectAttributes.addFlashAttribute("message",
+						"New Adult created. Complete the Patient form to finalise.");
+
+				if (state.getPatientId() != null) {
+					session.removeAttribute("patientFormState");
+					// Restore state via flash attributes for the edit path.
+					redirectAttributes.addFlashAttribute("selectedAdultIds", state.getAdultIds());
+					redirectAttributes.addFlashAttribute("selectedAuthorityId", state.getAuthorityId());
+					redirectAttributes.addFlashAttribute("selectedDoctorIds", state.getDoctorIds());
+					return "redirect:/patients/" + state.getPatientId() + "/edit";
+				}
+				return "redirect:/patients/new";
+			}
+		}
+
+		// Standalone Adult creation (default behaviour from
+		// createOrUpdateAdultForm.html).
 		redirectAttributes.addFlashAttribute("message", "New Adult has been added.");
 		return "redirect:/adults/" + adult.getId();
 	}

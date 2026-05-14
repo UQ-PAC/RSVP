@@ -6,6 +6,14 @@ permit (
     resource is Clinic
 );
 
+forbid (
+    principal,
+    action == Action::"ListEmployees",
+    resource is Clinic
+) when {
+    !(principal is Employee) && !(principal is Guest)
+};
+
 // 'policy1'
 // Every Employee can list the Adults, Patients, and Visits they are allowed to view.
 permit (
@@ -74,10 +82,11 @@ when {
 // Every Administrative Assistant can add Patients and Adults to their Clinics' data.
 permit (
     principal is Employee,
-    action in [Action::"AddAdult", Action::"AddPatient"],
+    action,
     resource is Clinic
 )
 when {
+    action in [Action::"AddAdult", Action::"AddPatient"] &&
     principal.roles.contains(EmployeeRole::"Administrative Assistant") &&
     principal.clinics.contains(resource)
 };
@@ -104,7 +113,6 @@ unless {
 
 // 'policy8'
 // Every Doctor can add Adults and Patients to their Clinics' data.
-@id("Policy: Doctor can add Adults and Patients to their Clinics.")
 permit (
     principal is Employee,
     action,
@@ -122,7 +130,6 @@ unless {
 
 // 'policy9'
 // No Intern Doctor can edit their Patients' data.
-@id("Policy: Intern Doctor cannot edit their Patients.")
 forbid (
     principal is Employee,
     action == Action::"EditPatient",
@@ -141,7 +148,6 @@ when {
 
 // 'policy10'
 // Every Employee can view and edit their own data.
-@id("Policy: Employee can view and edit their own data.")
 permit (
     principal is Employee,
     action in [Action::"ViewEmployee", Action::"EditEmployee"],
@@ -154,7 +160,6 @@ when {
 
 // 'policy11'
 // Every Senior or Specialist Doctor can delete their Patients' data.
-@id("Policy: Senior or Specialist Doctor can delete their Patients.")
 permit (
     principal is Employee,
     action,
@@ -177,8 +182,7 @@ when {
 };
 
 // 'policy12'
-// Every Senior or Specialist Doctor can view all Patients' data.
-@id("Policy: Senior or Specialist Doctor can view all Patients.")
+// Every Senior or Specialist Doctor can view all Patients' data
 permit (
     principal is Employee,
     action == Action::"ViewPatient",
@@ -203,7 +207,6 @@ unless {
 
 // 'policy13'
 // No Principal can view data from a Clinic they are not assigned to.
-@id("Policy: Principal cannot view data from another Clinic.")
 forbid (
     principal,
     action,
@@ -228,7 +231,6 @@ unless {
 
 // 'policy14'
 // Every Employee can view the Clinics they are assigned to.
-@id("Policy: Every Employee can view the Clinics they are assigned to.")
 permit (
     principal is Employee,
     action == Action::"ViewClinic",

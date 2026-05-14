@@ -1,5 +1,5 @@
 {
-  "principal": "ChildrenClinic::Employee::\"James Carter\"",
+  "principal": "ChildrenClinic::Guest::\"???\"",
   "resource": "ChildrenClinic::ResponsibleAdult::\"Jean Coleman\"",
   "action": "ChildrenClinic::Action::\"DeleteAdult\"",
   "context": {}

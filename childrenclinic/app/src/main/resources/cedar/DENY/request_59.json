@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Guest::\"???\"",
-  "resource": "ChildrenClinic::ResponsibleAdult::\"George Franklin\"",
-  "action": "ChildrenClinic::Action::\"EditAdult\"",
+  "principal": "ChildrenClinic::Employee::\"Linda Douglas\"",
+  "resource": "ChildrenClinic::Visit::\"Sly Estaban 1\"",
+  "action": "ChildrenClinic::Action::\"ViewVisit\"",
   "context": {}
 }

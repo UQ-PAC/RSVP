@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"James Carter\"",
-  "resource": "ChildrenClinic::Clinic::\"???\"",
-  "action": "ChildrenClinic::Action::\"ViewClinic\"",
+  "principal": "ChildrenClinic::Guest::\"???\"",
+  "resource": "ChildrenClinic::Clinic::\"A\"",
+  "action": "ChildrenClinic::Action::\"ListVisits\"",
   "context": {}
 }

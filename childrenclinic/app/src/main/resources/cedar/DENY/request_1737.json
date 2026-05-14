@@ -1,6 +1,6 @@
 {
   "principal": "ChildrenClinic::Employee::\"???\"",
-  "resource": "ChildrenClinic::ResponsibleAdult::\"Eduardo Rodriquez\"",
-  "action": "ChildrenClinic::Action::\"EditAdult\"",
+  "resource": "ChildrenClinic::Clinic::\"A\"",
+  "action": "ChildrenClinic::Action::\"AddPatient\"",
   "context": {}
 }

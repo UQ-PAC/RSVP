@@ -1,6 +1,6 @@
 {
   "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
-  "resource": "ChildrenClinic::ResponsibleAdult::\"Clara Higgins\"",
-  "action": "ChildrenClinic::Action::\"DeleteAdult\"",
+  "resource": "ChildrenClinic::Patient::\"Lucky Estaban\"",
+  "action": "ChildrenClinic::Action::\"EditPatient\"",
   "context": {}
 }

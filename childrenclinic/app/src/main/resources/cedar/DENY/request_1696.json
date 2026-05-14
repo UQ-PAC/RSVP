@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"James Carter\"",
-  "resource": "ChildrenClinic::Visit::\"Max Coleman 3\"",
+  "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
+  "resource": "ChildrenClinic::Visit::\"Leo Franklin 2\"",
   "action": "ChildrenClinic::Action::\"ViewVisit\"",
   "context": {}
 }

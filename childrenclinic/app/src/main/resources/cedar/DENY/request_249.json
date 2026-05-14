@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
-  "resource": "ChildrenClinic::ResponsibleAdult::\"Jean Coleman\"",
+  "principal": "ChildrenClinic::Employee::\"???\"",
+  "resource": "ChildrenClinic::ResponsibleAdult::\"George Franklin\"",
   "action": "ChildrenClinic::Action::\"EditAdult\"",
   "context": {}
 }

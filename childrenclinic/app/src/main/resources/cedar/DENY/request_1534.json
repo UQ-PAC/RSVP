@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Linda Douglas\"",
-  "resource": "ChildrenClinic::Patient::\"Rosy Rodriquez\"",
-  "action": "ChildrenClinic::Action::\"EditPatient\"",
+  "principal": "ChildrenClinic::Guest::\"???\"",
+  "resource": "ChildrenClinic::Clinic::\"A\"",
+  "action": "ChildrenClinic::Action::\"AddAdult\"",
   "context": {}
 }

@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Carl Bradford\"",
-  "resource": "ChildrenClinic::Patient::\"Jewel Rodriquez\"",
-  "action": "ChildrenClinic::Action::\"ViewPatient\"",
+  "principal": "ChildrenClinic::Employee::\"James Carter\"",
+  "resource": "ChildrenClinic::Visit::\"Leo Franklin 1\"",
+  "action": "ChildrenClinic::Action::\"EditVisit\"",
   "context": {}
 }

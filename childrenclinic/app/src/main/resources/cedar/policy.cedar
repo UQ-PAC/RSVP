@@ -81,20 +81,6 @@ when {
         resource is Visit
     ) &&
     resource.clinics.containsAny(principal.clinics)
-}
-unless {
-    action in [Action::"AddAdult",
-               Action::"AddEmployee",
-               Action::"AddPatient",
-               Action::"AddVisit",
-               Action::"DeleteAdult",
-               Action::"DeleteEmployee",
-               Action::"DeletePatient",
-               Action::"DeleteVisit"] ||
-    (
-        resource has roles &&
-        resource.roles.contains(EmployeeRole::"Administrator")
-    )
 };
 
 // 'policy6'
@@ -108,7 +94,7 @@ permit (
 when {
     action in [Action::"AddAdult",
                Action::"AddPatient"] &&
-    principal.roles.contains(EmployeeRole::"Administrative Assistant") &&
+    principal.roles.contains(EmployeeRole::"Administrative Assistant") ||
     principal.clinics.contains(resource)
 };
 

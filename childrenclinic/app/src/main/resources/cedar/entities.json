@@ -809,8 +809,8 @@
         "uid": { "type": "Action", "id": "ViewClinic" },
         "attrs": { },
         "parents": [
-            { "__entity": { "type": "Action", "id": "EmployeeOperations" } },
-            { "__entity": { "type": "Action", "id": "PatientOperations" } }
+            { "type": "Action", "id": "EmployeeOperations" },
+            { "type": "Action", "id": "PatientOperations" }
         ]
     },
 
@@ -818,35 +818,35 @@
         "uid": { "type": "Action", "id": "ListEmployees" },
         "attrs": { },
         "parents": [
-            { "__entity": { "type": "Action", "id": "EmployeeOperations" } }
+            { "type": "Action", "id": "EmployeeOperations" }
         ]
     },
     {
         "uid": { "type": "Action", "id": "AddEmployee" },
         "attrs": { },
         "parents": [
-            { "__entity": { "type": "Action", "id": "EmployeeOperations" } }
+            { "type": "Action", "id": "EmployeeOperations" }
         ]
     },
     {
         "uid": { "type": "Action", "id": "ViewEmployee" },
         "attrs": { },
         "parents": [
-            { "__entity": { "type": "Action", "id": "EmployeeOperations" } }
+            { "type": "Action", "id": "EmployeeOperations" }
         ]
     },
     {
         "uid": { "type": "Action", "id": "EditEmployee" },
         "attrs": { },
         "parents": [
-            { "__entity": { "type": "Action", "id": "EmployeeOperations" } }
+            { "type": "Action", "id": "EmployeeOperations" }
         ]
     },
     {
         "uid": { "type": "Action", "id": "DeleteEmployee" },
         "attrs": { },
         "parents": [
-            { "__entity": { "type": "Action", "id": "EmployeeOperations" } }
+            { "type": "Action", "id": "EmployeeOperations" }
         ]
     },
 
@@ -854,35 +854,35 @@
         "uid": { "type": "Action", "id": "ListPatients" },
         "attrs": { },
         "parents": [
-            { "__entity": { "type": "Action", "id": "PatientOperations" } }
+            { "type": "Action", "id": "PatientOperations" }
         ]
     },
     {
         "uid": { "type": "Action", "id": "AddPatient" },
         "attrs": { },
         "parents": [
-            { "__entity": { "type": "Action", "id": "PatientOperations" } }
+            { "type": "Action", "id": "PatientOperations" }
         ]
     },
     {
         "uid": { "type": "Action", "id": "ViewPatient" },
         "attrs": { },
         "parents": [
-            { "__entity": { "type": "Action", "id": "PatientOperations" } }
+            { "type": "Action", "id": "PatientOperations" }
         ]
     },
     {
         "uid": { "type": "Action", "id": "EditPatient" },
         "attrs": { },
         "parents": [
-            { "__entity": { "type": "Action", "id": "PatientOperations" } }
+            { "type": "Action", "id": "PatientOperations" }
         ]
     },
     {
         "uid": { "type": "Action", "id": "DeletePatient" },
         "attrs": { },
         "parents": [
-            { "__entity": { "type": "Action", "id": "PatientOperations" } }
+            { "type": "Action", "id": "PatientOperations" }
         ]
     },
 
@@ -890,35 +890,35 @@
         "uid": { "type": "Action", "id": "ListAdults" },
         "attrs": { },
         "parents": [
-            { "__entity": { "type": "Action", "id": "PatientOperations" } }
+            { "type": "Action", "id": "PatientOperations" }
         ]
     },
     {
         "uid": { "type": "Action", "id": "AddAdult" },
         "attrs": { },
         "parents": [
-            { "__entity": { "type": "Action", "id": "PatientOperations" } }
+            { "type": "Action", "id": "PatientOperations" }
         ]
     },
     {
         "uid": { "type": "Action", "id": "ViewAdult" },
         "attrs": { },
         "parents": [
-            { "__entity": { "type": "Action", "id": "PatientOperations" } }
+            { "type": "Action", "id": "PatientOperations" }
         ]
     },
     {
         "uid": { "type": "Action", "id": "EditAdult" },
         "attrs": { },
         "parents": [
-            { "__entity": { "type": "Action", "id": "PatientOperations" } }
+            { "type": "Action", "id": "PatientOperations" }
         ]
     },
     {
         "uid": { "type": "Action", "id": "DeleteAdult" },
         "attrs": { },
         "parents": [
-            { "__entity": { "type": "Action", "id": "PatientOperations" } }
+           { "type": "Action", "id": "PatientOperations" }
         ]
     },
 
@@ -926,35 +926,35 @@
         "uid": { "type": "Action", "id": "ListVisits" },
         "attrs": { },
         "parents": [
-            { "__entity": { "type": "Action", "id": "PatientOperations" } }
+            { "type": "Action", "id": "PatientOperations" }
         ]
     },
     {
         "uid": { "type": "Action", "id": "AddVisit" },
         "attrs": { },
         "parents": [
-            { "__entity": { "type": "Action", "id": "PatientOperations" } }
+            { "type": "Action", "id": "PatientOperations" }
         ]
     },
     {
         "uid": { "type": "Action", "id": "ViewVisit" },
         "attrs": { },
         "parents": [
-            { "__entity": { "type": "Action", "id": "PatientOperations" } }
+            { "type": "Action", "id": "PatientOperations" }
         ]
     },
     {
         "uid": { "type": "Action", "id": "EditVisit" },
         "attrs": { },
         "parents": [
-            { "__entity": { "type": "Action", "id": "PatientOperations" } }
+            { "type": "Action", "id": "PatientOperations" }
         ]
     },
     {
         "uid": { "type": "Action", "id": "DeleteVisit" },
         "attrs": { },
         "parents": [
-            { "__entity": { "type": "Action", "id": "PatientOperations" } }
+            { "type": "Action", "id": "PatientOperations" }
         ]
     }
 ]

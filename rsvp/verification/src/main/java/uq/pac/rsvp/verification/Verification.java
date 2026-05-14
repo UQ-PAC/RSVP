@@ -6,7 +6,9 @@ import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestSet;
 import uq.pac.rsvp.policy.datalog.translation.Translation;
+import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 import uq.pac.rsvp.support.reporting.Report;
+import uq.pac.rsvp.support.reporting.Report.Severity;
 import uq.pac.rsvp.verification.impact.ImpactAnalysis;
 import uq.pac.rsvp.verification.impact.RequestStatus;
 import uq.pac.rsvp.verification.policy.PolicyAnalysis;
@@ -50,15 +52,20 @@ public class Verification {
         Set<Report> reports = new HashSet<>();
         VerificationCache cache = new VerificationCache(fileset);
 
-        Translation translation = translate(fileset);
-        Map<Policy, RequestSet> policyResults = translation.getPolicyResult();
+        try {
+            Translation translation = translate(fileset);
+            Map<Policy, RequestSet> policyResults = translation.getPolicyResult();
 
-        // Generate the inverse map, request -> policy set:
-        Map<Request, RequestResult> requestPolicyMap = createReverseMapping(policyResults);
-        cache.cacheMapping(FileSet.LATEST, requestPolicyMap);
+            // Generate the inverse map, request -> policy set:
+            Map<Request, RequestResult> requestPolicyMap = createReverseMapping(policyResults);
+            cache.cacheMapping(FileSet.LATEST, requestPolicyMap);
 
-        reports.addAll(PolicyAnalysis.checkPolicies(policyResults, requestPolicyMap));
-        reports.addAll(PolicyAnalysis.checkInvariants(translation.getInvariantResult()));
+            reports.addAll(PolicyAnalysis.checkPolicies(policyResults, requestPolicyMap));
+            reports.addAll(PolicyAnalysis.checkInvariants(translation.getInvariantResult()));
+        }
+        catch (TranslationError translationError) {
+            reports.add(new Report(Severity.Error, "Translation error", translationError.getMessage()));
+        }
 
         return new VerificationResult(reports, cache);
     }

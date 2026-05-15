@@ -1,5 +1,6 @@
 package uq.pac.rsvp.verification.impact;
 
+import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.verification.RequestResult;
 
@@ -72,21 +73,42 @@ public class ImpactAnalysis {
             }
         }
 
+        // FIXME we append a single source policy to the request Id so it will display in the UI,
+        // this should be done properly (included as part of request status).
 
         // Don't return requests that are implied by other ??? requests
-        unknownPermitted.forEach(request -> changeImpact.add(new RequestStatus(request.toHumanReadableString(), true)));
-        unknownForbidden.forEach(request -> changeImpact.add(new RequestStatus(request.toHumanReadableString(), false)));
+        unknownPermitted.forEach(request -> {
+            String policyInfo = getPolicyInfoString(request, updated);
+            changeImpact.add(new RequestStatus(request.toHumanReadableString() + policyInfo, true));
+        });
+        unknownForbidden.forEach(request -> {
+            String policyInfo = getPolicyInfoString(request, updated);
+            changeImpact.add(new RequestStatus(request.toHumanReadableString() + policyInfo, false));
+        });
         knownPermitted.forEach(request -> {
             if (unknownPermitted.stream().noneMatch(unknown -> unknown.subsumes(request))) {
-                changeImpact.add(new RequestStatus(request.toHumanReadableString(), true));
+                String policyInfo = getPolicyInfoString(request, updated);
+                changeImpact.add(new RequestStatus(request.toHumanReadableString() + policyInfo, true));
             }
         });
         knownForbidden.forEach(request -> {
             if (unknownForbidden.stream().noneMatch(unknown -> unknown.subsumes(request))) {
-                changeImpact.add(new RequestStatus(request.toHumanReadableString(), false));
+                String policyInfo = getPolicyInfoString(request, updated);
+                changeImpact.add(new RequestStatus(request.toHumanReadableString() + policyInfo, false));
             }
         });
 
         return changeImpact;
+    }
+
+    private static String getPolicyInfoString(Request request, Map<Request, RequestResult> requestMap) {
+        String policyInfo = "";
+        RequestResult reqResult = requestMap.get(request);
+        if (reqResult != null && !reqResult.policies.isEmpty()) {
+            Policy firstPolicy = reqResult.policies.iterator().next();
+            policyInfo = " (from policy " + firstPolicy.getName() + " at "
+                    + firstPolicy.getSourceLoc().getStartLoc() + ")";
+        }
+        return policyInfo;
     }
 }

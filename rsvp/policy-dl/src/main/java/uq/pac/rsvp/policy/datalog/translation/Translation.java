@@ -59,7 +59,6 @@ import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.Permit
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.PermittedRequestsRuleDecl;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.ProgramName;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.TmpRecordType;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.UndefinedEntityUIDName;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.makeAtom;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.makeForbiddenRequestsRule;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.makeIODirectives;
@@ -175,9 +174,6 @@ public class Translation {
         for (String en : entityNames) {
             if (en.contains(OUTPUT_DELIMITER)) {
                 throw new TranslationError("Unsupported entity name: " + en);
-            }
-            if (en.equals(UndefinedEntityUIDName)) {
-                throw new TranslationError("Internal entity name in schema: " + en);
             }
         }
 

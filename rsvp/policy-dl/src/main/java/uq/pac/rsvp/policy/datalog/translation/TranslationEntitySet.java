@@ -23,14 +23,6 @@ public class TranslationEntitySet {
                 .map(e -> new TranslationEntity(e, schema, records))
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        // Generate undefined (UID-only) entities omitting Enum entities
-        // that have pre-defined names
-        for (TranslationEntityDefinition def : schema.getDefinitions()) {
-            if (def.getEntityType() instanceof RecordEntityTypeDefinition) {
-                entityList.add(new TranslationEntity(def, TranslationConstants.getUndefinedEUID(def)));
-            }
-        }
-
         this.entities = List.copyOf(entityList);
     }
 

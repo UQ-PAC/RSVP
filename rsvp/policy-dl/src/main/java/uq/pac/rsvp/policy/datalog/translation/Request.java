@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import static uq.pac.rsvp.policy.ast.schema.type.TypeReference.TYPE_REFERENCE_DELIMITER;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.OUTPUT_DELIMITER;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.UndefinedEntityUIDName;
 
 /**
  * A class representing a cedar request as a triple {@code} (principal, resource action) {@code}.
@@ -26,9 +25,9 @@ public class Request {
     private final String action;
 
     private final String principalType;
-    private final boolean principalKnown;
+    private final boolean principalKnown = true;
     private final String resourceType;
-    private final boolean resourceKnown;
+    private final boolean resourceKnown = true;
 
     public Request(String id) {
         this.id = id;
@@ -42,8 +41,6 @@ public class Request {
 
         principalType = principal.substring(0, principal.lastIndexOf(TYPE_REFERENCE_DELIMITER));
         resourceType = resource.substring(0, resource.lastIndexOf(TYPE_REFERENCE_DELIMITER));
-        principalKnown = !principal.contains(UndefinedEntityUIDName);
-        resourceKnown = !resource.contains(UndefinedEntityUIDName);
 
     }
 
@@ -55,8 +52,6 @@ public class Request {
 
         principalType = principal.substring(0, principal.lastIndexOf(TYPE_REFERENCE_DELIMITER));
         resourceType = resource.substring(0, resource.lastIndexOf(TYPE_REFERENCE_DELIMITER));
-        principalKnown = !principal.contains(UndefinedEntityUIDName);
-        resourceKnown = !resource.contains(UndefinedEntityUIDName);
     }
 
     public static Request of(String request) {

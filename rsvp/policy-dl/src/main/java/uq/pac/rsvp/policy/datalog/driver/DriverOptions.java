@@ -17,6 +17,13 @@ public class DriverOptions extends OptionsBase {
             defaultValue = "null")
     public String policyFile;
 
+    @Option(name = "invariants",
+            abbrev = 'i',
+            help = "Cedar invariants file.",
+            category = "input",
+            defaultValue = "null")
+    public String invariantsFile;
+
     @Option(name = "schema",
             abbrev = 's',
             help = "Cedar schema file.",

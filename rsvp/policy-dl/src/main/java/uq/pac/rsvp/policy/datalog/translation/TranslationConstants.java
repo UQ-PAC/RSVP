@@ -247,25 +247,4 @@ public class TranslationConstants {
         return EntityUID.parse("%s::\"%s\"".formatted(def.getName(), uid)).orElseThrow();
     }
 
-    /**
-     * UID name denoting an "unknown entity"
-     */
-    public static String UndefinedEntityUIDName = "???";
-
-    /**
-     * Get an unknown entity (UID) only. Abstraction over entities that can be given for
-     * authorisation but are not in the provided list of entities
-     */
-    public static EntityReference getUndefinedEUID(TranslationEntityDefinition def) {
-        return new EntityReference(def.getEntityType().getName(), UndefinedEntityUIDName);
-    }
-
-    /**
-     * Get an unknown entity (UID) only. Abstraction over entities that can be given for
-     * authorisation but are not in the provided list of entities
-     */
-    public static EntityUID getUndefinedEUID(EntityTypeDefinition def) {
-        return getEUID(def, UndefinedEntityUIDName);
-    }
-
 }

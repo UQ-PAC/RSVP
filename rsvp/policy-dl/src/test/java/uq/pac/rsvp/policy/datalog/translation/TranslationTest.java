@@ -21,21 +21,17 @@ import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import static com.cedarpolicy.model.schema.Schema.JsonOrCedar.Cedar;
 import static org.fusesource.jansi.Ansi.Color.BLUE;
 import static org.fusesource.jansi.Ansi.Color.CYAN;
 import static org.fusesource.jansi.Ansi.Color.GREEN;
 import static org.fusesource.jansi.Ansi.Color.MAGENTA;
 import static org.fusesource.jansi.Ansi.Color.YELLOW;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Souffle datalog translation testing
@@ -134,6 +130,30 @@ public class TranslationTest {
                 .toList();
     }
 
+    static class Timer {
+        private final Map<String, String> results = new HashMap<>();
+
+        <E> E timed(String key, Supplier<E> supplier) {
+            assertFalse(results.containsKey(key));
+            long current = System.currentTimeMillis();
+            E result = supplier.get();
+            long elapsed = System.currentTimeMillis() - current;
+            results.put(key, "%.3fs".formatted (elapsed / 1000.0));
+            return result;
+        }
+
+        void timed(String key, Runnable run) {
+            timed(key, () -> {
+                run.run();
+                return true;
+            });
+        }
+
+        String elapsed(String key) {
+            return results.get(key);
+        }
+    }
+
     /**
      * Differential test for Cedar and RSVP.
      * The test runs both, RSVP and Cedar authorisation engines and compares the results that should agree
@@ -160,7 +180,13 @@ public class TranslationTest {
                 .addInvariants(test.invariants)
                 .loadFiles();
 
-        Translation translation = new Translation(fileset, test.datalogDir);
+        Timer timer = new Timer();
+
+        Translation translation = timer.timed("translation", () ->
+                new Translation(fileset, test.datalogDir));
+
+        logger.attr(Ansi.Attribute.INTENSITY_BOLD)
+                .info(YELLOW, "Translation: %s", timer.elapsed("translation"));
 
         RequestAuth rsvpAuth = new RequestAuth(translation);
         assertTrue(Collections.disjoint(rsvpAuth.getForbiddenRequests().getRequests(),
@@ -178,7 +204,8 @@ public class TranslationTest {
         AuthorizationEngine cedarAuth = new BasicAuthorizationEngine();
         Entities cedarEntities = Entities.parse(test.entities);
 
-        com.cedarpolicy.model.schema.Schema cedarSchema = com.cedarpolicy.model.schema.Schema.parse(com.cedarpolicy.model.schema.Schema.JsonOrCedar.Cedar, Files.readString(test.schema));
+        com.cedarpolicy.model.schema.Schema cedarSchema =
+                com.cedarpolicy.model.schema.Schema.parse(Cedar, Files.readString(test.schema));
         PolicySet cedarPolicies = PolicySet.parsePolicies(test.policy);
 
         int[] rsvpRequestCounter = new int[2];

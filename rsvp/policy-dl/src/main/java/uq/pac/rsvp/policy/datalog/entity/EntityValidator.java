@@ -14,7 +14,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.UndefinedEntityUIDName;
 import static uq.pac.rsvp.Assertion.require;
 
 /**
@@ -88,11 +87,6 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
         // to have these characters in entity names in general
         if (ESCAPED.matcher(euid.getId()).find()) {
             throw new EntityException(euid.getSourceLoc(), "Unsupported entity id (escaped characters): " + euid.getId());
-        }
-
-        // Prevent entity names from having '???' internal names
-        if (euid.getId().equals(UndefinedEntityUIDName)) {
-            throw new EntityException(euid.getSourceLoc(), "Internal entity id: " + euid.getId());
         }
 
         // Here we parse only the type. Then, if this is an action reference then the type name is 'Action'

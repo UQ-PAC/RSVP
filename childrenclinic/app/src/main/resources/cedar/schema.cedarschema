@@ -4,7 +4,7 @@
 
     entity Confidentiality enum ["Official", "Sensitive", "Protected"];
 
-    entity EmployeeRole enum ["Administrator", "Administrative Assistant", "Doctor"];
+    entity EmployeeRole enum ["Administrator", "Assistant", "Doctor"];
 
     entity ProfessionalLevel enum ["Intern", "Resident", "Staff", "Senior", "Registrar", "Specialist"];
 

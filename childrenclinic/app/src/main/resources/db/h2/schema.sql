@@ -40,7 +40,7 @@ CREATE TABLE entities (
 
 CREATE TABLE entity_types (
   entity_id   INTEGER NOT NULL,
-  entity_type VARCHAR(40) NOT NULL, -- 'User', 'Administrator', 'Administrative Assistant', 'Doctor', 'Adult', 'Patient', 'Visit'.
+  entity_type VARCHAR(40) NOT NULL, -- 'User', 'Administrator', 'Assistant', 'Doctor', 'Adult', 'Patient', 'Visit'.
   PRIMARY KEY (entity_id, entity_type),
   FOREIGN KEY (entity_id) REFERENCES entities(entity_id) ON DELETE CASCADE
 );

@@ -62,7 +62,7 @@
           <th:block th:if="${navCanListEmployees}">
             <li th:replace="~{::menuItem ('/administrative-assistants/find','administrative-assistants','administrative-assistants','th-list',#{administrativeAssistants})}">
               <span class="fa fa-th-list" aria-hidden="true"></span>
-              <span th:text="#{administrativeAssistants}">Administrative Assistants</span>
+              <span th:text="#{administrativeAssistants}">Assistants</span>
             </li>
           </th:block>
 
@@ -94,7 +94,7 @@
 
                 <li><h6 class="dropdown-header">Database Users</h6></li>
                 <li th:each="user : ${dynamicUsers}">
-                    <a class="dropdown-item" 
+                    <a class="dropdown-item"
                       th:href="@{/switch-user(username=${user.username})}"
                       th:text="${user.username + ' : ' + user.getRoleDescriptions() + ' (' + user.getLevelDescriptions() + ')' + ' @ ' + user.getClinicDescriptions()}">Dynamic User</a>
                 </li>

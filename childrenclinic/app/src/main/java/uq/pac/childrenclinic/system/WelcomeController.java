@@ -89,7 +89,7 @@ class WelcomeController {
 			searchOptions.put("adult", "Adult");
 		}
 		if (isAuthorized(principal, "ListEmployees")) {
-			searchOptions.put("administrativeAssistant", "Administrative Assistant");
+			searchOptions.put("administrativeAssistant", "Assistant");
 			searchOptions.put("doctor", "Doctor");
 		}
 
@@ -100,7 +100,7 @@ class WelcomeController {
 			addOptions.put("/adults/new", "Adult");
 		}
 		if (isAuthorized(principal, "AddEmployee")) {
-			addOptions.put("/administrative-assistants/new", "Administrative Assistant");
+			addOptions.put("/administrative-assistants/new", "Assistant");
 			addOptions.put("/doctors/new", "Doctor");
 		}
 

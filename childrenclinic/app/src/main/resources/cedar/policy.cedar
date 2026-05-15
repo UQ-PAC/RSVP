@@ -23,14 +23,14 @@ permit (
 );
 
 // 'policy2'
-// Anyone can view any Doctor or Administrative Assistant.
+// Anyone can view any Doctor or Assistant.
 permit (
     principal,
     action == Action::"ViewEmployee",
     resource is Employee
 )
 when {
-    resource.roles.containsAny([EmployeeRole::"Administrative Assistant",
+    resource.roles.containsAny([EmployeeRole::"Assistant",
                                 EmployeeRole::"Doctor"])
 };
 
@@ -60,14 +60,14 @@ when {
 };
 
 // 'policy5'
-// Every Administrative Assistant can view and edit their Clinics' data.
+// Every Assistant can view and edit their Clinics' data.
 permit (
     principal is Employee,
     action,
     resource
 )
 when {
-    principal.roles.contains(EmployeeRole::"Administrative Assistant") &&
+    principal.roles.contains(EmployeeRole::"Assistant") &&
     (
         resource is Employee ||
         resource is Patient ||
@@ -79,7 +79,7 @@ when {
 };
 
 // 'policy6'
-// Every Administrative Assistant can add Patients and Adults to their Clinics' data.
+// Every Assistant can add Patients and Adults to their Clinics' data.
 permit (
     principal is Employee,
     action,
@@ -87,7 +87,7 @@ permit (
 )
 when {
     action in [Action::"AddAdult", Action::"AddPatient"] &&
-    principal.roles.contains(EmployeeRole::"Administrative Assistant") &&
+    principal.roles.contains(EmployeeRole::"Assistant") &&
     principal.clinics.contains(resource)
 };
 
@@ -220,7 +220,7 @@ unless {
     ) ||
     (
         action == Action::"ViewEmployee" &&
-        resource.roles.containsAny([EmployeeRole::"Administrative Assistant",
+        resource.roles.containsAny([EmployeeRole::"Assistant",
                                     EmployeeRole::"Doctor"])
     )
 };

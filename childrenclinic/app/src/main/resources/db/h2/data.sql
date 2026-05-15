@@ -6,7 +6,7 @@ INSERT INTO specialties VALUES (default, 'Surgery');   -- 2
 INSERT INTO specialties VALUES (default, 'Dentistry'); -- 3
 
 INSERT INTO roles VALUES (default, 'Administrator');                -- 1
-INSERT INTO roles VALUES (default, 'Administrative Assistant');     -- 2
+INSERT INTO roles VALUES (default, 'Assistant');     -- 2
 INSERT INTO roles VALUES (default, 'Doctor');                       -- 3
 
 INSERT INTO levels VALUES (default, 'Intern');     -- 1
@@ -40,7 +40,7 @@ INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Admin
 INSERT INTO user_roles (user_id, role_id) VALUES (@new_entity_id, 1);
 INSERT INTO user_levels (user_id, level_id) VALUES (@new_entity_id, 4);
 
--- Administrative Assistants (Users).
+-- Assistants (Users).
 
 -- Bob Buchanan
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
@@ -50,7 +50,7 @@ INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VALUES (@new_entity_id, 'Bob', 'Buchanan', '1980-05-15', 2);
 INSERT INTO administrative_assistants (entity_id, telephone) VALUES (@new_entity_id, '6085559001');
-INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Administrative Assistant');
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Assistant');
 INSERT INTO user_roles (user_id, role_id) VALUES (@new_entity_id, 2);
 INSERT INTO user_levels (user_id, level_id) VALUES (@new_entity_id, 3);
 
@@ -61,7 +61,7 @@ INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'User'
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VALUES (@new_entity_id, 'Carl', 'Bradford', '1985-08-22', 2);
 INSERT INTO administrative_assistants (entity_id, telephone) VALUES (@new_entity_id, '6085559002');
-INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Administrative Assistant');
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Assistant');
 INSERT INTO user_roles (user_id, role_id) VALUES (@new_entity_id, 2);
 INSERT INTO user_levels (user_id, level_id) VALUES (@new_entity_id, 1);
 SET @recovered_user_id = (SELECT entity_id FROM users WHERE username = 'Bob Buchanan');

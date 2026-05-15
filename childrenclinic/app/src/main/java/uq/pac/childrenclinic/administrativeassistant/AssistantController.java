@@ -45,11 +45,11 @@ import uq.pac.childrenclinic.system.Clinic;
 import uq.pac.childrenclinic.system.ClinicRepository;
 
 @Controller
-public class AdministrativeAssistantController {
+public class AssistantController {
 
 	private static final String VIEWS_ADMINISTRATIVE_ASSISTANT_CREATE_OR_UPDATE_FORM = "administrative-assistants/createOrUpdateAdministrativeAssistantForm";
 
-	private final AdministrativeAssistantRepository administrativeAssistants;
+	private final AssistantRepository administrativeAssistants;
 
 	private final GenderRepository genders;
 
@@ -59,9 +59,9 @@ public class AdministrativeAssistantController {
 
 	private final ApplicationEventPublisher eventPublisher;
 
-	public AdministrativeAssistantController(AdministrativeAssistantRepository administrativeAssistants,
-			GenderRepository genders, ClinicRepository clinics, CedarProgrammaticEvaluator cedarEvaluator,
-			ApplicationEventPublisher eventPublisher) {
+	public AssistantController(AssistantRepository administrativeAssistants,
+	                           GenderRepository genders, ClinicRepository clinics, CedarProgrammaticEvaluator cedarEvaluator,
+	                           ApplicationEventPublisher eventPublisher) {
 		this.administrativeAssistants = administrativeAssistants;
 		this.genders = genders;
 		this.clinics = clinics;
@@ -99,17 +99,17 @@ public class AdministrativeAssistantController {
 	@GetMapping("/administrative-assistants/find")
 	@CedarAuthorization(action = "ListEmployees", resourceType = "Clinic", resourceId = "Any", validate = true)
 	public String initFindForm(Model model) {
-		model.addAttribute("administrativeAssistant", new AdministrativeAssistant());
+		model.addAttribute("administrativeAssistant", new Assistant());
 		return "administrative-assistants/findAdministrativeAssistants";
 	}
 
 	@GetMapping("/administrative-assistants")
 	@CedarAuthorization(action = "ListEmployees", resourceType = "Clinic", resourceId = "Any", validate = true)
 	public String processFindForm(@RequestParam(defaultValue = "1") int page,
-			AdministrativeAssistant administrativeAssistant, BindingResult result, Model model, HttpSession session) {
+	                              Assistant administrativeAssistant, BindingResult result, Model model, HttpSession session) {
 		String lastName = administrativeAssistant.getLastName() == null ? "" : administrativeAssistant.getLastName();
 
-		List<AdministrativeAssistant> allMatchingAssistants = this.administrativeAssistants
+		List<Assistant> allMatchingAssistants = this.administrativeAssistants
 			.findByLastNameStartingWith(lastName, Pageable.unpaged())
 			.getContent();
 
@@ -122,7 +122,7 @@ public class AdministrativeAssistantController {
 		Map<Integer, String> authorizationMap = new HashMap<>();
 		Map<Integer, String> cedarResourceMap = new HashMap<>();
 
-		List<AdministrativeAssistant> authorized = allMatchingAssistants.stream().filter(s -> {
+		List<Assistant> authorized = allMatchingAssistants.stream().filter(s -> {
 			String resourceName = s.getFirstName() + " " + s.getLastName();
 			var evalResult = cedarEvaluator.evaluate(principal, "ViewEmployee", "Employee", resourceName, "Item");
 			authorizationMap.put(s.getId(), evalResult.responseBody());
@@ -137,9 +137,9 @@ public class AdministrativeAssistantController {
 		Pageable pageable = PageRequest.of(page - 1, 5);
 		int start = (int) pageable.getOffset();
 		int end = Math.min((start + pageable.getPageSize()), authorized.size());
-		List<AdministrativeAssistant> pageContent = start > authorized.size() ? List.of()
+		List<Assistant> pageContent = start > authorized.size() ? List.of()
 				: authorized.subList(start, end);
-		Page<AdministrativeAssistant> paginated = new PageImpl<>(pageContent, pageable, authorized.size());
+		Page<Assistant> paginated = new PageImpl<>(pageContent, pageable, authorized.size());
 
 		model.addAttribute("listAdministrativeAssistants", paginated.getContent());
 		model.addAttribute("currentPage", page);
@@ -157,9 +157,9 @@ public class AdministrativeAssistantController {
 	@CedarAuthorization(action = "ViewEmployee", resourceType = "Employee", validate = true)
 	public ModelAndView showAdministrativeAssistant(@PathVariable("assistantId") int assistantId) {
 		ModelAndView mav = new ModelAndView("administrative-assistants/administrativeAssistantDetails");
-		AdministrativeAssistant administrativeAssistant = this.administrativeAssistants.findById(assistantId)
+		Assistant administrativeAssistant = this.administrativeAssistants.findById(assistantId)
 			.orElseThrow(() -> new IllegalArgumentException(
-					"Administrative Assistant not found for identifier: " + assistantId));
+					"Assistant not found for identifier: " + assistantId));
 		mav.addObject("administrativeAssistant", administrativeAssistant);
 		return mav;
 	}
@@ -209,13 +209,13 @@ public class AdministrativeAssistantController {
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
-		model.addAttribute("administrativeAssistant", new AdministrativeAssistant());
+		model.addAttribute("administrativeAssistant", new Assistant());
 		return VIEWS_ADMINISTRATIVE_ASSISTANT_CREATE_OR_UPDATE_FORM;
 	}
 
 	@PostMapping("/administrative-assistants/new")
-	public String processCreationForm(@Valid AdministrativeAssistant administrativeAssistant, BindingResult result,
-			RedirectAttributes redirectAttributes, HttpSession session) {
+	public String processCreationForm(@Valid Assistant administrativeAssistant, BindingResult result,
+	                                  RedirectAttributes redirectAttributes, HttpSession session) {
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
 		// Evaluate Cedar for all the submitted Clinics.
@@ -226,7 +226,7 @@ public class AdministrativeAssistantController {
 
 		if (submittedClinics == null || submittedClinics.isEmpty()) {
 			isAuthorized = false;
-			denialReasons.add("You must assign the Administrative Assistant to at least one valid Clinic.");
+			denialReasons.add("You must assign the Assistant to at least one valid Clinic.");
 		}
 		else {
 			for (Clinic clinic : submittedClinics) {
@@ -292,28 +292,28 @@ public class AdministrativeAssistantController {
 		}
 
 		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
-		redirectAttributes.addFlashAttribute("message", "New Administrative Assistant has been added.");
+		redirectAttributes.addFlashAttribute("message", "New Assistant has been added.");
 		return "redirect:/administrative-assistants/" + administrativeAssistant.getId();
 	}
 
 	@GetMapping("/administrative-assistants/{assistantId}/edit")
 	@CedarAuthorization(action = "EditEmployee", resourceType = "Employee", validate = true)
 	public String initUpdateForm(@PathVariable("assistantId") int assistantId, Model model) {
-		AdministrativeAssistant administrativeAssistant = this.administrativeAssistants.findById(assistantId)
+		Assistant administrativeAssistant = this.administrativeAssistants.findById(assistantId)
 			.orElseThrow(() -> new IllegalArgumentException(
-					"Administrative Assistant not found for identifier: " + assistantId));
+					"Assistant not found for identifier: " + assistantId));
 		model.addAttribute("administrativeAssistant", administrativeAssistant);
 		return VIEWS_ADMINISTRATIVE_ASSISTANT_CREATE_OR_UPDATE_FORM;
 	}
 
 	@PostMapping("/administrative-assistants/{assistantId}/edit")
-	public String processUpdateForm(@Valid AdministrativeAssistant administrativeAssistant, BindingResult result,
-			@PathVariable("assistantId") int assistantId, RedirectAttributes redirectAttributes, HttpSession session,
-			Model model) {
+	public String processUpdateForm(@Valid Assistant administrativeAssistant, BindingResult result,
+	                                @PathVariable("assistantId") int assistantId, RedirectAttributes redirectAttributes, HttpSession session,
+	                                Model model) {
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
-		AdministrativeAssistant existingAssistant = this.administrativeAssistants.findById(assistantId)
-			.orElseThrow(() -> new IllegalArgumentException("Administrative Assistant not found: " + assistantId));
+		Assistant existingAssistant = this.administrativeAssistants.findById(assistantId)
+			.orElseThrow(() -> new IllegalArgumentException("Assistant not found: " + assistantId));
 
 		String resourceName = existingAssistant.getFirstName() + " " + existingAssistant.getLastName();
 		var assistantEval = cedarEvaluator.evaluate(principal, "EditEmployee", "Employee", resourceName, "Page");
@@ -405,7 +405,7 @@ public class AdministrativeAssistantController {
 		}
 
 		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
-		redirectAttributes.addFlashAttribute("message", "Administrative Assistant values updated.");
+		redirectAttributes.addFlashAttribute("message", "Assistant values updated.");
 		return "redirect:/administrative-assistants/{assistantId}";
 	}
 

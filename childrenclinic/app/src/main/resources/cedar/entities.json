@@ -53,7 +53,7 @@
         "parents": [ ]
     },
     {
-        "uid": { "type": "EmployeeRole", "id": "Administrative Assistant" },
+        "uid": { "type": "EmployeeRole", "id": "Assistant" },
         "attrs": { },
         "parents": [ ]
     },
@@ -193,7 +193,7 @@
                 { "__entity": { "type": "Clinic", "id": "B" } }
             ],
             "roles": [
-                { "__entity": { "type": "EmployeeRole", "id": "Administrative Assistant" } }
+                { "__entity": { "type": "EmployeeRole", "id": "Assistant" } }
             ],
             "level": { "__entity": { "type": "ProfessionalLevel", "id": "Staff" } }
         },
@@ -207,7 +207,7 @@
                 { "__entity": { "type": "Clinic", "id": "B" } }
             ],
             "roles": [
-                { "__entity": { "type": "EmployeeRole", "id": "Administrative Assistant" } }
+                { "__entity": { "type": "EmployeeRole", "id": "Assistant" } }
             ],
             "level": { "__entity": { "type": "ProfessionalLevel", "id": "Intern" } },
             "manager": { "__entity": { "type": "Employee", "id": "Bob Buchanan" } }

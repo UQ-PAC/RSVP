@@ -14,7 +14,7 @@ import uq.pac.childrenclinic.model.Person;
 @Entity
 @Table(name = "administrative_assistants")
 @PrimaryKeyJoinColumn(name = "entity_id")
-public class AdministrativeAssistant extends Person {
+public class Assistant extends Person {
 
 	@Column(name = "telephone")
 	@NotBlank

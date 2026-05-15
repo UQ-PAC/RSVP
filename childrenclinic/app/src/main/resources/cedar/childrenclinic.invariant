@@ -1,13 +1,15 @@
 // ChildrenClinic RSVP Invariants
 
+//***********************//
 // Structural Invariants
+//***********************//
 
-// S1. There is at least one "Administrator".
+// St1. There is at least one "Administrator".
 invariant
 entity.roles.contains(ChildrenClinic::EmployeeRole::"Administrator")
     for some entity: ChildrenClinic::Employee;
 
-// S2. Every Employee should have non-empty name, clinics, and roles.
+// St2. Every Employee should have non-empty name, clinics, and roles.
 invariant
 entity == ChildrenClinic::Employee::"???" ||
 entity has name && entity.name != "" &&
@@ -15,13 +17,13 @@ entity has clinics && entity.clinics != [] &&
 entity has roles && entity.roles != []
     for all entity: ChildrenClinic::Employee;
 
-// S3. Every "Doctor" should have non-empty level.
+// St3. Every "Doctor" should have non-empty level.
 invariant
 !entity.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") ||
 entity has level
     for all entity: ChildrenClinic::Employee;
 
-// S4. A "Doctor" may only hold the "Intern", "Resident", "Staff", "Senior", "Registrar",
+// St4. A "Doctor" may only hold the "Intern", "Resident", "Staff", "Senior", "Registrar",
 // or "Specialist" level.
 invariant
 !(entity.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
@@ -34,7 +36,7 @@ invariant
  entity.level == ChildrenClinic::ProfessionalLevel::"Specialist")
     for all entity: ChildrenClinic::Employee;
 
-// S5. An "Administrator" may only hold the "Intern", "Staff", or "Senior" level.
+// St5. An "Administrator" may only hold the "Intern", "Staff", or "Senior" level.
 invariant
 !(entity.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
   entity has level) ||
@@ -43,7 +45,7 @@ invariant
  entity.level == ChildrenClinic::ProfessionalLevel::"Senior")
     for all entity: ChildrenClinic::Employee;
 
-// S6. An "Administrative Assistant" may only hold the "Intern", "Staff", or "Senior" level.
+// St6. An "Administrative Assistant" may only hold the "Intern", "Staff", or "Senior" level.
 invariant
 !(entity.roles.contains(ChildrenClinic::EmployeeRole::"Administrative Assistant") &&
   entity has level) ||
@@ -52,7 +54,7 @@ invariant
  entity.level == ChildrenClinic::ProfessionalLevel::"Senior")
     for all entity: ChildrenClinic::Employee;
 
-// S7. Every "Intern" and "Registrar" must have a manager.
+// St7. Every "Intern" and "Registrar" must have a manager.
 invariant
 !(
     entity.level == ChildrenClinic::ProfessionalLevel::"Intern" ||
@@ -60,7 +62,7 @@ invariant
 ) || entity has manager
     for all entity: ChildrenClinic::Employee;
 
-// S8. An "Intern" must be managed by a "Resident", "Staff", "Senior", or "Specialist".
+// St8. An "Intern" must be managed by a "Resident", "Staff", "Senior", or "Specialist".
 invariant
 !(entity has manager &&
   entity has level &&
@@ -72,7 +74,7 @@ invariant
   entity.manager.level == ChildrenClinic::ProfessionalLevel::"Specialist"))
     for all entity: ChildrenClinic::Employee;
 
-// S9. A "Registrar" must be managed by a "Specialist".
+// St9. A "Registrar" must be managed by a "Specialist".
 invariant
 !(entity has manager &&
   entity has level &&
@@ -81,19 +83,19 @@ invariant
  entity.manager.level == ChildrenClinic::ProfessionalLevel::"Specialist")
     for all entity: ChildrenClinic::Employee;
 
-// S10. No Employee can be their own manager.
+// St10. No Employee can be their own manager.
 invariant
 !(entity has manager) || entity.manager != entity
     for all entity: ChildrenClinic::Employee;
 
-// S11. Every ResponsibleAdult should have non-empty name and clinics.
+// St11. Every ResponsibleAdult should have non-empty name and clinics.
 invariant
 entity == ChildrenClinic::ResponsibleAdult::"???" ||
 entity has name && entity.name != "" &&
 entity has clinics && entity.clinics != []
     for all entity: ChildrenClinic::ResponsibleAdult;
 
-// S12. Every Patient should have non-empty name, adults, clinics, and doctors.
+// St12. Every Patient should have non-empty name, adults, clinics, and doctors.
 invariant
 entity == ChildrenClinic::Patient::"???" ||
 entity has name && entity.name != "" &&
@@ -102,7 +104,7 @@ entity has clinics && entity.clinics != [] &&
 entity has doctors && entity.doctors != []
     for all entity: ChildrenClinic::Patient;
 
-// S13. Every Visit should have non-empty adults, clinics, and doctors.
+// St13. Every Visit should have non-empty adults, clinics, and doctors.
 invariant
 entity == ChildrenClinic::Visit::"???" ||
 entity has adults && entity.adults != [] &&
@@ -110,7 +112,7 @@ entity has clinics && entity.clinics != [] &&
 entity has doctors && entity.doctors != []
     for all entity: ChildrenClinic::Visit;
 
-// S14. An Employee who is an "Administrator" should not simultaneously
+// St14. An Employee who is an "Administrator" should not simultaneously
 // hold the "Doctor" or "Administrative Assistant" role.
 invariant
 !entity.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") ||
@@ -118,20 +120,22 @@ invariant
  !entity.roles.contains(ChildrenClinic::EmployeeRole::"Administrative Assistant"))
     for all entity: ChildrenClinic::Employee;
 
-// S15. A Patient's doctors must each hold the "Doctor" role.
+// St15. A Patient's doctors must each hold the "Doctor" role.
 invariant
 !patient.doctors.contains(employee) ||
 employee.roles.contains(ChildrenClinic::EmployeeRole::"Doctor")
     for all patient: ChildrenClinic::Patient, employee: ChildrenClinic::Employee;
 
-// S16. There exists at least one Clinic in the system.
+// St16. There exists at least one Clinic in the system.
 invariant 
 entity is ChildrenClinic::Clinic 
     for some entity: ChildrenClinic::Clinic;
 
-// Policy Invariants
+//*********************//
+// Semantic Invariants
+//*********************//
 
-// P1. An "Administrator" is never denied any action on any resource.
+// Se1. An "Administrator" is never denied any action on any resource.
 // ('policy4')
 invariant
 !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") ||
@@ -140,7 +144,7 @@ allow(principal, resource, action)
             resource,
             action;
 
-// P2. A Guest is always denied any action in "PatientOperations".
+// Se2. A Guest is always denied any action in "PatientOperations".
 // ('policy3')
 invariant
 !(resource is ChildrenClinic::Clinic ||
@@ -152,7 +156,7 @@ deny(principal, resource, action)
             resource,
             action in ChildrenClinic::Action::"PatientOperations";
 
-// P3. Any Employee can view a "Doctor" or an "Administrative Assistant".
+// Se3. Any Employee can view a "Doctor" or an "Administrative Assistant".
 // ('policy2')
 invariant
 !resource.roles.containsAny([ChildrenClinic::EmployeeRole::"Doctor",
@@ -161,7 +165,7 @@ allow(principal, resource, ChildrenClinic::Action::"ViewEmployee")
     for all principal: ChildrenClinic::Employee,
             resource: ChildrenClinic::Employee;
 
-// P4. Any Guest can view a "Doctor" or an "Administrative Assistant".
+// Se4. Any Guest can view a "Doctor" or an "Administrative Assistant".
 // ('policy2')
 invariant
 !resource.roles.containsAny([ChildrenClinic::EmployeeRole::"Doctor",
@@ -170,7 +174,7 @@ allow(principal, resource, ChildrenClinic::Action::"ViewEmployee")
     for all principal: ChildrenClinic::Guest,
             resource: ChildrenClinic::Employee;
 
-// P5. An "Intern" "Doctor" is always denied "EditPatient" on their patients.
+// Se5. An "Intern" "Doctor" is always denied "EditPatient" on their patients.
 // ('policy9')
 invariant
 !(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
@@ -181,7 +185,7 @@ deny(principal, resource, ChildrenClinic::Action::"EditPatient")
     for all principal: ChildrenClinic::Employee,
             resource: ChildrenClinic::Patient;
 
-// P6. An "Intern" "Doctor" is always denied "EditVisit" on their visits.
+// Se6. An "Intern" "Doctor" is always denied "EditVisit" on their visits.
 // ('policy9')
 invariant
 !(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
@@ -192,7 +196,7 @@ deny(principal, resource, ChildrenClinic::Action::"EditVisit")
     for all principal: ChildrenClinic::Employee,
             resource: ChildrenClinic::Visit;
 
-// P7. An "Intern" "Doctor" cannot add Adults to their clinics.
+// Se7. An "Intern" "Doctor" cannot add Adults to their clinics.
 // ('policy8')
 invariant
 !(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
@@ -203,7 +207,7 @@ deny(principal, resource, action)
             resource: ChildrenClinic::Clinic,
             action: ChildrenClinic::Action::"AddAdult";
 
-// P8. An "Intern" "Doctor" cannot add Patients to their clinics.
+// Se8. An "Intern" "Doctor" cannot add Patients to their clinics.
 // ('policy8')
 invariant
 !(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
@@ -214,7 +218,7 @@ deny(principal, resource, action)
             resource: ChildrenClinic::Clinic,
             action: ChildrenClinic::Action::"AddPatient";
 
-// P9. A non-"Administrator" Employee cannot access data from a Clinic they are not assigned to.
+// Se9. A non-"Administrator" Employee cannot access data from a Clinic they are not assigned to.
 // ('policy13')
 invariant
 !(principal has clinics && resource has clinics &&
@@ -229,7 +233,7 @@ deny(principal, resource, action)
             resource,
             action;
 
-// P10. Every Employee can view their own Employee record.
+// Se10. Every Employee can view their own Employee record.
 // ('policy10')
 invariant
 principal == ChildrenClinic::Employee::"???" ||
@@ -237,7 +241,7 @@ allow(principal, principal, action)
     for all principal: ChildrenClinic::Employee,
             action: ChildrenClinic::Action::"ViewEmployee";
 
-// P11. Every Employee can edit their own Employee record.
+// Se11. Every Employee can edit their own Employee record.
 // ('policy10')
 invariant
 principal == ChildrenClinic::Employee::"???" ||
@@ -245,7 +249,7 @@ allow(principal, principal, action)
     for all principal: ChildrenClinic::Employee,
             action: ChildrenClinic::Action::"EditEmployee";
 
-// P12. Only a "Senior" or "Specialist" "Doctor" may delete Patient records.
+// Se12. Only a "Senior" or "Specialist" "Doctor" may delete Patient records.
 // ('policy7', 'policy11')
 invariant
 !(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
@@ -258,7 +262,7 @@ deny(principal, resource, action)
             resource: ChildrenClinic::Patient,
             action: ChildrenClinic::Action::"DeletePatient";
 
-// P13. Only a "Senior" or "Specialist" "Doctor" may delete Visit records.
+// Se13. Only a "Senior" or "Specialist" "Doctor" may delete Visit records.
 // ('policy7', 'policy11')
 invariant
 !(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
@@ -271,7 +275,7 @@ deny(principal, resource, action)
             resource: ChildrenClinic::Visit,
             action: ChildrenClinic::Action::"DeleteVisit";
 
-// P14. A "Senior" or "Specialist" "Doctor" can view any Patient.
+// Se14. A "Senior" or "Specialist" "Doctor" can view any Patient.
 // ('policy12')
 invariant
 !(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
@@ -284,7 +288,7 @@ allow(principal, resource, ChildrenClinic::Action::"ViewPatient")
     for all principal: ChildrenClinic::Employee,
             resource: ChildrenClinic::Patient;
 
-// P15. A "Senior" or "Specialist" "Doctor" can view any Visit,
+// Se15. A "Senior" or "Specialist" "Doctor" can view any Visit,
 // unless the Visit has "Protected" confidentiality.
 // ('policy12')
 invariant
@@ -300,7 +304,7 @@ allow(principal, resource, ChildrenClinic::Action::"ViewVisit")
     for all principal: ChildrenClinic::Employee,
             resource: ChildrenClinic::Visit;
 
-// P16. An "Administrative Assistant" cannot add Employees.
+// Se16. An "Administrative Assistant" cannot add Employees.
 // ('policy5')
 invariant
 !(principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrative Assistant") &&
@@ -310,7 +314,7 @@ deny(principal, resource, action)
             resource: ChildrenClinic::Clinic,
             action: ChildrenClinic::Action::"AddEmployee";
 
-// P17. An "Administrative Assistant" cannot delete Employees.
+// Se17. An "Administrative Assistant" cannot delete Employees.
 // ('policy5')
 invariant
 !(principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrative Assistant") &&
@@ -320,7 +324,7 @@ deny(principal, resource, action)
             resource: ChildrenClinic::Clinic,
             action: ChildrenClinic::Action::"DeleteEmployee";
 
-// P18. An "Administrative Assistant" cannot view the record of an "Administrator".
+// Se18. An "Administrative Assistant" cannot view the record of an "Administrator".
 // ('policy5')
 invariant
 !(principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrative Assistant") &&
@@ -332,7 +336,7 @@ deny(principal, resource, action)
             resource: ChildrenClinic::Employee,
             action: ChildrenClinic::Action::"ViewEmployee";
 
-// P19. An "Administrative Assistant" cannot edit the record of an "Administrator".
+// Se19. An "Administrative Assistant" cannot edit the record of an "Administrator".
 // ('policy5')
 invariant
 !(principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrative Assistant") &&
@@ -344,16 +348,26 @@ deny(principal, resource, action)
             resource: ChildrenClinic::Employee,
             action: ChildrenClinic::Action::"EditEmployee";
 
-// P20. Every Employee can list Employees at any Clinic.
+// Se20. Every Employee can list Employees at any Clinic.
 // ('policy0')
 invariant
 allow(principal, resource, ChildrenClinic::Action::"ListEmployees")
     for all principal: ChildrenClinic::Employee,
             resource: ChildrenClinic::Clinic;
 
-// P21. Every Guest can list Employees at any Clinic.
+// Se21. Every Guest can list Employees at any Clinic.
 // ('policy0')
 invariant
 allow(principal, resource, ChildrenClinic::Action::"ListEmployees")
     for all principal: ChildrenClinic::Guest,
             resource: ChildrenClinic::Clinic;
+
+// Se22. A "Doctor" can view any ResponsibleAdult in their Clinics.
+// ('policy15')
+invariant
+!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
+  !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
+  resource.clinics.containsAny(principal.clinics)) ||
+allow(principal, resource, ChildrenClinic::Action::"ViewAdult")
+    for all principal: ChildrenClinic::Employee,
+            resource: ChildrenClinic::ResponsibleAdult;

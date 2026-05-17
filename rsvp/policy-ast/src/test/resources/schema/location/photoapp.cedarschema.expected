@@ -1,4 +1,4 @@
-   Schema at file:0:1009 [1:1-53:1]
+   Schema at <unknown>
       Enum Entity Photo::App::Visibility at file:27:96 [2:5-4:64]
          Reference Photo::App::Visibility at file:70:10 [4:12-4:21]
       Enum Entity Photo::App::Role at file:128:37 [5:5-5:41]

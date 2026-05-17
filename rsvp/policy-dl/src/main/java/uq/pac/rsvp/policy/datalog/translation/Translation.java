@@ -120,6 +120,7 @@ public class Translation {
         return validate(fileset, FileSet.LATEST);
     }
 
+    // FIXME: Fileset need to be moved to Verification
     static InputSet validate(FileSet fileset, String policyVersion)
             throws IOException, AuthException, IllegalAccessException {
         EntitySet entities = new EntitySet(fileset.getEntities());
@@ -201,6 +202,7 @@ public class Translation {
         return new InputSet(rsvpSchema, policies, entities, invariants);
     }
 
+    // FIXME: Translation over policy statements
     private DLProgram translate(Schema schema, Collection<Policy> policies, EntitySet entities, Collection<Invariant> invariants) {
         TranslationSchema translationSchema = new TranslationSchema(schema);
         TranslationEntitySet translationEntities = new TranslationEntitySet(entities, translationSchema);
@@ -375,6 +377,7 @@ public class Translation {
         return new Relation(headers, rows);
     }
 
+    // FIXME: Need to load through the DB
     Relation loadRelation(Invariant invariant) {
         return loadRelation(invariantDeclarations.get(invariant));
     }

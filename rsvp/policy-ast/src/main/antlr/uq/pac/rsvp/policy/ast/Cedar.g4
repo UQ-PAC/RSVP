@@ -147,4 +147,4 @@ policy:
     ';'
 ;
 
-program : (invariant | policy)*;
+program : (invariant | policy)* EOF;

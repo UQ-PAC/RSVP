@@ -2,6 +2,7 @@ package uq.pac.rsvp.verification;
 
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.FileSet;
+import uq.pac.rsvp.policy.ast.ParseError;
 import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestSet;
@@ -47,12 +48,12 @@ public class Verification {
             throw new ConfigurationException("No entities provided");
         }
 
-        fileset.loadFiles();
-
         Set<Report> reports = new HashSet<>();
-        VerificationCache cache = new VerificationCache(fileset);
+        VerificationCache cache = null;
 
         try {
+            fileset.loadFiles();
+            cache = new VerificationCache(fileset);
             Translation translation = translate(fileset);
             Map<Policy, RequestSet> policyResults = translation.getPolicyResult();
 
@@ -63,8 +64,14 @@ public class Verification {
             reports.addAll(PolicyAnalysis.checkPolicies(policyResults, requestPolicyMap));
             reports.addAll(PolicyAnalysis.checkInvariants(translation.getInvariantResult()));
         }
-        catch (TranslationError translationError) {
+        // FIXME: Need a better approach to exception handling in the translation
+        //        with thrown exception carrying context and locations
+        catch (ParseError e) {
+            reports.add(new Report(Severity.Error, "Parse Error", e.getMessage(), e.getLocation()));
+        } catch (TranslationError translationError) {
             reports.add(new Report(Severity.Error, "Translation error", translationError.getMessage()));
+        } catch (Throwable t) {
+            reports.add(new Report(Severity.Error, "Error", t.getMessage()));
         }
 
         return new VerificationResult(reports, cache);

@@ -2,14 +2,9 @@ package uq.pac.rsvp.policy.ast.schema;
 
 import com.cedarpolicy.model.exception.InternalException;
 import com.cedarpolicy.model.schema.Schema;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import uq.pac.rsvp.policy.ast.CedarschemaBaseVisitor;
-import uq.pac.rsvp.policy.ast.CedarschemaLexer;
-import uq.pac.rsvp.policy.ast.CedarschemaParser;
 import uq.pac.rsvp.policy.ast.schema.parser.SchemaParser;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -277,24 +272,8 @@ public class SchemaParseTest {
         }
     }
 
-    static String parse(String text) {
-        SchemaParser.ThrowingErrorListener errorListener = new SchemaParser.ThrowingErrorListener();
-
-        CedarschemaLexer lexer = new CedarschemaLexer(CharStreams.fromString(text));
-        lexer.removeErrorListeners();
-        lexer.addErrorListener(errorListener);
-
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        CedarschemaParser parser = new CedarschemaParser(tokens);
-        parser.removeErrorListeners();
-        parser.addErrorListener(errorListener);
-
-        return new CedarschemaBaseVisitor<String>() {
-            @Override
-            public String visitSchema(CedarschemaParser.SchemaContext ctx) {
-                return ctx.getText();
-            }
-        }.visit(parser.schema());
+    static void parse(String text) {
+        SchemaParser.parse("", text);
     }
 
 }

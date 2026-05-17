@@ -12,8 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SchemaLocationTest {
 
@@ -45,7 +44,11 @@ public class SchemaLocationTest {
             indent += 3;
             log("%s at %s".formatted(msg, node.getSourceLoc().toString()));
             consumer.run();
-            assertFalse(node.getSourceLoc().isEmpty());
+            if (node instanceof Schema) {
+                assertTrue(node.getSourceLoc().isEmpty());
+            } else {
+                assertFalse(node.getSourceLoc().isEmpty());
+            }
             indent -= 3;
         }
 

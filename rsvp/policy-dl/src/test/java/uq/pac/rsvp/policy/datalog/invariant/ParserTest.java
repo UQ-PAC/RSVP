@@ -49,7 +49,7 @@ public class ParserTest {
         resource in Resource::Picture::Kind::"Forest"
         // Has
         principal has "attr"
-        principal has attr;
+        principal has attr
         // Conjunction
         principal.album.photo && resource
         // Disjunction
@@ -63,8 +63,8 @@ public class ParserTest {
         a == "a" && c != "c"
         a == 1 && c != 2
         // Quantifiers
-        resource == Resource::Picture::Kind::"Forest" for some resource: Resource::Picture::Kind;
-        resource.foo == "foo" && principal.bar == "bar" for all resource:  Resource::Picture, principal: Album::Photo;
+        resource == Resource::Picture::Kind::"Forest" for some resource: Resource::Picture::Kind
+        resource.foo == "foo" && principal.bar == "bar" for all resource:  Resource::Picture, principal: Album::Photo
         // Arithmetic precedence
         -1 + 2 * 3 == 6 * 7 + 8
         // Conditional expressions

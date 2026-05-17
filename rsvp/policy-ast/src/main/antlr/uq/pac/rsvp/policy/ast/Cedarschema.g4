@@ -121,4 +121,4 @@ namespace:
     annotation* NAMESPACE path '{' statement* '}';
 
 schema:
-    (statement | namespace)*;
+    (statement | namespace)* EOF;

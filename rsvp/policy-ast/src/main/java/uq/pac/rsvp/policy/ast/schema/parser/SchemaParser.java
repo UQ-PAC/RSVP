@@ -1,9 +1,9 @@
 package uq.pac.rsvp.policy.ast.schema.parser;
 
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 import uq.pac.rsvp.policy.ast.CedarschemaLexer;
 import uq.pac.rsvp.policy.ast.CedarschemaParser;
+import uq.pac.rsvp.policy.ast.ThrowingErrorListener;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.statement.SchemaStatement;
 import uq.pac.rsvp.support.FileSource;
@@ -18,14 +18,6 @@ import java.util.*;
  * Parsing cedar policies and invariants as a collection of statements
  */
 public class SchemaParser {
-    public static class ThrowingErrorListener extends BaseErrorListener {
-        @Override
-        public void syntaxError(Recognizer<?, ?> recognizer, Object sym, int line, int pos,
-                                String msg, RecognitionException e) {
-            throw new ParseCancellationException("Parse error: " + line + ":" + pos + " " + msg);
-        }
-    }
-
     public static Schema parse(Path path) throws IOException {
         String file = path.getFileName().toString();
         String text = Files.readString(path);
@@ -33,7 +25,8 @@ public class SchemaParser {
     }
 
     public static Schema parse(String file, String text) {
-        ThrowingErrorListener errorListener = new ThrowingErrorListener();
+        FileSource fs = new FileSource(file, text);
+        ThrowingErrorListener errorListener = new ThrowingErrorListener(fs);
 
         CedarschemaLexer lexer = new CedarschemaLexer(CharStreams.fromString(text));
         lexer.removeErrorListeners();
@@ -44,13 +37,12 @@ public class SchemaParser {
         parser.removeErrorListeners();
         parser.addErrorListener(errorListener);
 
-        FileSource source = new FileSource(file, text);
         List<SchemaStatement> components = new ArrayList<>();
 
-        return new CedarschemaSourceVisitor<Schema>(source) {
+        return new CedarschemaSourceVisitor<Schema>(fs) {
             @Override
             public Schema visitSchema(CedarschemaParser.SchemaContext ctx) {
-                SchemaStatementVisitor statements = new SchemaStatementVisitor(source, "");
+                SchemaStatementVisitor statements = new SchemaStatementVisitor(fs, "");
 
                 for (CedarschemaParser.StatementContext s : ctx.statement()) {
                     components.addAll(statements.visit(s));
@@ -58,13 +50,12 @@ public class SchemaParser {
 
                 for (CedarschemaParser.NamespaceContext ns : ctx.namespace()) {
                     String namespace  = ns.path().getText();
-                    statements = new SchemaStatementVisitor(source, namespace);
+                    statements = new SchemaStatementVisitor(fs, namespace);
                     for (CedarschemaParser.StatementContext s : ns.statement()) {
                         components.addAll(statements.visit(s));
                     }
                 }
-                SourceLoc location = components.isEmpty() ? SourceLoc.MISSING : location(ctx);
-                return Schema.build(components, location);
+                return Schema.build(components, SourceLoc.MISSING);
             }
         }.visit(parser.schema());
     }

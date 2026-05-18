@@ -12,7 +12,8 @@ import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.policy.Invariant;
 import uq.pac.rsvp.policy.ast.policy.Quantifier;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
-import uq.pac.rsvp.policy.datalog.translation.TranslationError;
+import uq.pac.rsvp.support.error.TranslationError;
+import uq.pac.rsvp.support.error.ValidationError;
 
 import java.util.*;
 
@@ -63,24 +64,19 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
 
             // Check for duplicate variables
             if (variables.containsKey(varName)) {
-                throw new Error("duplicate variable name: %s in quantifier: %s", varName, invariant.getQuantifier());
+                throw new ValidationError(
+                        "duplicate variable name: %s in quantifier: %s".formatted(varName, invariant.getQuantifier()));
             }
 
             // Ensure types exist
             if (!types.contains(typeRef)) {
-                throw new Error("invalid type: %s in quantifier: %s. Available types: %s",
-                        var.type(), invariant.getQuantifier(), types);
+                throw new ValidationError("invalid type: %s in quantifier: %s. Available types: %s".formatted(
+                        var.type(), invariant.getQuantifier(), types));
             }
 
             variables.put(varName, typeRef);
         });
         return variables;
-    }
-
-    static class Error extends RuntimeException {
-        public Error(Object format, Object ...args) {
-            super("Invariant validation error: " + String.format(format.toString(), args));
-        }
     }
 
     private BuiltinType collect(Expression expr) {
@@ -154,7 +150,8 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
                 return attrType;
             }
         }
-        throw new Error("Invalid property access: %s [%s: %s]", expr, expr.getObject(), objectType.toString());
+        throw new ValidationError("Invalid property access: %s [%s: %s]"
+                .formatted(expr, expr.getObject(), objectType.toString()));
     }
 
     @Override
@@ -183,7 +180,7 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
         if (variables.containsKey(ref)) {
             return variables.get(ref);
         }
-        throw new Error("Ungrounded variable: %s", ref);
+        throw new ValidationError("Ungrounded variable: " + ref);
     }
 
     @Override
@@ -204,26 +201,26 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
         // We do not check specific entities, but since enum
         // entities are specified by the schema we check if they exist
         if (enumType != null && !enumType.getEnumNames().contains(expr.getName())) {
-            throw new Error("invalid enum entity reference: %s", expr.getQualifiedName());
+            throw new ValidationError("invalid enum entity reference: " + expr.getQualifiedName());
         }
 
         if (types.contains(ref)) {
             return ref;
         }
-        throw new Error("invalid type reference: %s", expr.getQualifiedName());
+        throw new ValidationError("invalid type reference: " + expr.getQualifiedName());
     }
 
     @Override
     public BuiltinType visitActionExpr(ActionExpression expr) {
         TypeReference action = TypeReference.parse(expr.getQualifiedName());
         if (schema.getAction(action) == null) {
-            throw new Error("invalid action: " + action);
+            throw new ValidationError("invalid action: " + action);
         }
         TypeReference ref = TypeReference.parse(expr.getType());
         if (types.contains(ref)) {
             return ref;
         }
-        throw new Error("invalid type reference: %s", ref);
+        throw new ValidationError("invalid type reference: " + ref);
     }
 
     @Override
@@ -232,8 +229,8 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
         if (types.contains(ref)) {
             return TypeOfEntityType;
         }
-        throw new Error("invalid type: %s in type expression: %s. Available types: %s",
-                expr.getValue(), expr, types);
+        throw new ValidationError("invalid type: %s in type expression: %s. Available types: %s"
+                .formatted(expr.getValue(), expr, types));
     }
 
     @Override
@@ -242,7 +239,7 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
         InvariantFunctionValidator.FunctionValidator validator =
                 InvariantFunctionValidator.getValidator(name);
         if (validator == null) {
-            throw new Error("Function: %s not registered", name);
+            throw new ValidationError("Function: " + name + " not registered");
         }
         BuiltinType self = expr.getSelf() == null ? null : collect(expr.getSelf());
         return validator.validate(self, collect(expr.getArgs()));

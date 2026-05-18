@@ -4,6 +4,7 @@ import uq.pac.rsvp.policy.ast.policy.expr.CallExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.Expression;
 import uq.pac.rsvp.policy.ast.policy.expr.PropertyAccessExpression;
 import uq.pac.rsvp.policy.datalog.ast.*;
+import uq.pac.rsvp.support.error.TranslationError;
 
 import java.util.HashMap;
 import java.util.List;

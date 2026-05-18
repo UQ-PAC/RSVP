@@ -7,6 +7,7 @@ import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.entity.*;
 import uq.pac.rsvp.policy.datalog.TestUtil;
 import uq.pac.rsvp.support.SourceLoc;
+import uq.pac.rsvp.support.error.LocationError;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -51,20 +52,18 @@ public class EntityValidationTest {
             EntitySet entities = EntitySet.parse(entityFile);
             EntityValidator.validate(SCHEMA, entities);
             fail("expected EntityException thrown");
-        } catch (EntityException error) {
-            String [] parts = error.getMessage().split("\\r?\\n");
+        } catch (LocationError error) {
             // Error message of entity validator is in two parts (NL-separated)
             // * Error message
             // * Location of the form 'at file:offset:length [line:column-line-column]'
 
-            assertEquals(2, parts.length);
-            String actualMessage = parts[0].trim();
+            String actualMessage = error.getMessage();
             assertEquals(expectedMessage, actualMessage);
 
-            String actualLocation = parts[1].trim();
+            String actualLocation = error.getLocation().toString();
 
             expectedLocations = expectedLocations.stream()
-                    .map(l -> "at %s:%s".formatted(entityFile.toString(), l))
+                    .map(l -> "%s:%s".formatted(entityFile.toString(), l))
                     .collect(Collectors.toSet());
 
             if (expectedLocations.size() == 1) {

@@ -1,6 +1,6 @@
 package uq.pac.rsvp.policy.datalog.ast;
 
-import uq.pac.rsvp.policy.datalog.translation.TranslationError;
+import uq.pac.rsvp.support.error.TranslationError;
 
 import java.io.BufferedReader;
 import java.io.IOException;

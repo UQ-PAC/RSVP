@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.ast.entity;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
+import uq.pac.rsvp.support.error.ParseError;
 import uq.pac.rsvp.support.FileSource;
 import uq.pac.rsvp.support.SourceLoc;
 
@@ -83,12 +84,12 @@ class EntityReader {
                 return null;
             }
             if (val == null) {
-                throw new EntityException(entityRecord.getSourceLoc(), "Missing " + name + " entity attribute");
+                throw new ParseError("Missing " + name + " entity attribute", entityRecord.getSourceLoc());
             }
             if (target.isInstance(val)) {
                 return target.cast(val);
             } else {
-                throw new EntityException(val.getSourceLoc(), "Expected " + LABELS.get(target));
+                throw new ParseError("Expected " + LABELS.get(target), val.getSourceLoc());
             }
         }
     }
@@ -174,7 +175,7 @@ class EntityReader {
                 int length = bool ? 4 : 5;
                 yield new BooleanValue(bool, loc(position() - length, length));
             }
-            case NULL -> throw new EntityException(loc(offset, 4), "Null value");
+            case NULL -> throw new ParseError("Null value", loc(offset, 4));
             default -> throw new RuntimeException();
         };
     }
@@ -183,7 +184,7 @@ class EntityReader {
         JsonToken token = reader.peek();
         int offset = position() - 1;
         if (token != JsonToken.BEGIN_OBJECT) {
-            throw new EntityException(loc(offset, 1), "Expected object start");
+            throw new ParseError("Expected object start", loc(offset, 1));
         }
         RecordValue entityRecord = (RecordValue) readEntityValue();
 
@@ -196,13 +197,13 @@ class EntityReader {
                     if (e instanceof EntityReference ref) {
                         return ref;
                     }
-                    throw new EntityException(e.getSourceLoc(), "Expected entity reference");
+                    throw new ParseError("Expected entity reference", e.getSourceLoc());
                 })
                 .collect(Collectors.toSet());
 
         entityRecord.forEach(((attr, value) -> {
             if (!EntityAttribute.contains(attr.getValue())) {
-                throw new EntityException(attr.getSourceLoc(), "Unexpected entity key: " + attr);
+                throw new ParseError("Unexpected entity key: " + attr, attr.getSourceLoc());
             }
         }));
 
@@ -212,7 +213,7 @@ class EntityReader {
     private EntitySet readEntitySet() throws IOException {
         JsonToken token = reader.peek();
         if (token != JsonToken.BEGIN_ARRAY) {
-            throw new EntityException(loc(position() - 1, 1), "Expected array start");
+            throw new ParseError("Expected array start", loc(position() - 1, 1));
         }
         reader.beginArray();
 

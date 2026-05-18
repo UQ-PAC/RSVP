@@ -5,7 +5,7 @@ import java.util.Set;
 import uq.pac.rsvp.policy.ast.policy.Quantifier;
 import uq.pac.rsvp.policy.ast.policy.Invariant;
 import uq.pac.rsvp.policy.datalog.translation.Relation;
-import uq.pac.rsvp.policy.datalog.translation.TranslationError;
+import uq.pac.rsvp.support.error.TranslationError;
 
 /**
  * Result of evaluating an invariant
@@ -23,7 +23,7 @@ public class InvariantResult {
         switch (scope) {
             case SOME -> this.holds = !relation.isEmpty();
             case NONE, ALL -> this.holds = relation.isEmpty();
-            default -> throw new TranslationError("Unreachable");
+            default -> throw new AssertionError("Unreachable");
         }
     }
 

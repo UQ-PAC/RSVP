@@ -1,7 +1,7 @@
 package uq.pac.rsvp.policy.datalog;
 
 import org.junit.jupiter.api.Test;
-import uq.pac.rsvp.policy.datalog.translation.TranslationError;
+import uq.pac.rsvp.support.error.TranslationError;
 
 import java.io.IOException;
 import java.nio.file.Files;

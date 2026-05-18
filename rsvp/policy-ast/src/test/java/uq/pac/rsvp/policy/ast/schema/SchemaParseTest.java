@@ -2,10 +2,10 @@ package uq.pac.rsvp.policy.ast.schema;
 
 import com.cedarpolicy.model.exception.InternalException;
 import com.cedarpolicy.model.schema.Schema;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import uq.pac.rsvp.policy.ast.schema.parser.SchemaParser;
+import uq.pac.rsvp.support.error.ParseError;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -265,7 +265,7 @@ public class SchemaParseTest {
             if (!rsvpPositive) {
                 fail("Unexpected success [rsvp]: " + text);
             }
-        } catch (ParseCancellationException c) {
+        } catch (ParseError c) {
             if (rsvpPositive) {
                 throw c;
             }

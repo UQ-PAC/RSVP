@@ -2,12 +2,11 @@ package uq.pac.rsvp.verification;
 
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.FileSet;
-import uq.pac.rsvp.policy.ast.ParseError;
+import uq.pac.rsvp.support.error.LocationError;
 import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestSet;
 import uq.pac.rsvp.policy.datalog.translation.Translation;
-import uq.pac.rsvp.policy.datalog.translation.TranslationError;
 import uq.pac.rsvp.support.reporting.Report;
 import uq.pac.rsvp.support.reporting.Report.Severity;
 import uq.pac.rsvp.verification.impact.ImpactAnalysis;
@@ -64,12 +63,8 @@ public class Verification {
             reports.addAll(PolicyAnalysis.checkPolicies(policyResults, requestPolicyMap));
             reports.addAll(PolicyAnalysis.checkInvariants(translation.getInvariantResult()));
         }
-        // FIXME: Need a better approach to exception handling in the translation
-        //        with thrown exception carrying context and locations
-        catch (ParseError e) {
-            reports.add(new Report(Severity.Error, "Parse Error", e.getMessage(), e.getLocation()));
-        } catch (TranslationError translationError) {
-            reports.add(new Report(Severity.Error, "Translation error", translationError.getMessage()));
+        catch (LocationError e) {
+            reports.add(new Report(Severity.Error, e.getTitle() + " Error", e.getMessage(), e.getLocation()));
         } catch (Throwable t) {
             reports.add(new Report(Severity.Error, "Error", t.getMessage()));
         }

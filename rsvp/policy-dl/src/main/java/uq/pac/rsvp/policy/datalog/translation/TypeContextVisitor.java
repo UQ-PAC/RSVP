@@ -3,6 +3,7 @@ package uq.pac.rsvp.policy.datalog.translation;
 import uq.pac.rsvp.policy.ast.policy.expr.*;
 import uq.pac.rsvp.policy.datalog.ast.*;
 import uq.pac.rsvp.policy.datalog.visitors.ValueVisitorAdapter;
+import uq.pac.rsvp.support.error.TranslationError;
 
 import java.util.HashMap;
 import java.util.Map;

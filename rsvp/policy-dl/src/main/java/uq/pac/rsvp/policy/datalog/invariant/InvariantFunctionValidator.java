@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.datalog.invariant;
 
 import uq.pac.rsvp.policy.ast.schema.type.BuiltinType;
 import uq.pac.rsvp.policy.ast.schema.type.SetType;
+import uq.pac.rsvp.support.error.ValidationError;
 
 import java.util.*;
 
@@ -49,16 +50,17 @@ public class InvariantFunctionValidator {
 
         BuiltinType validate(BuiltinType actualSelf, List<BuiltinType> actualArguments) {
             if (actualSelf != null && self.isEmpty()) {
-                throw new InvariantValidator.Error("Function %s requires no object application", getName());
+                throw new ValidationError("Function %s requires no object application".formatted(getName()));
             } else if (actualSelf == null && !self.isEmpty()) {
-                throw new InvariantValidator.Error("Function %s requires object application", getName());
+                throw new ValidationError("Function %s requires object application".formatted(getName()));
             } else if (actualSelf != null) {
                 InvariantTyping.expect(actualSelf, self);
             }
 
             require(arguments != null);
             if (arguments.size() != actualArguments.size()) {
-                throw new InvariantValidator.Error("Function %s expects %d arguments, got %d", getName(), arguments.size(), actualArguments.size());
+                throw new ValidationError("Function %s expects %d arguments, got %d"
+                        .formatted(getName(), arguments.size(), actualArguments.size()));
             }
 
             for (int i = 0; i < actualArguments.size(); i++) {

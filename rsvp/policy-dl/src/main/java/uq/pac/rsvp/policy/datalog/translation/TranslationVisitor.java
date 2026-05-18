@@ -4,6 +4,7 @@ import uq.pac.rsvp.policy.ast.policy.expr.*;
 import uq.pac.rsvp.policy.datalog.ast.*;
 import uq.pac.rsvp.policy.ast.policy.Quantifier;
 import uq.pac.rsvp.policy.datalog.visitors.VoidVisitorAdapter;
+import uq.pac.rsvp.support.error.TranslationError;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -151,7 +152,7 @@ public class TranslationVisitor extends VoidVisitorAdapter {
                     rhs = getOperand(expr.getRight());
                 expressions.add(new DLAtom(HasAttributeRuleDecl, negated, lhs, rhs));
             }
-            case And, Or -> throw new TranslationError("Unreachable");
+            case And, Or -> throw new AssertionError("Unreachable");
             default -> throw new TranslationError("Unsupported: " + expr.getOp());
         }
     }
@@ -187,7 +188,7 @@ public class TranslationVisitor extends VoidVisitorAdapter {
             List<DLRuleExpr> exprs = function.translate(expr, negated, operandVisitor);
             expressions.addAll(exprs);
         } else {
-            throw new TranslationError("Unsupported function: " + expr.getFunc());
+            throw new uq.pac.rsvp.support.error.TranslationError("Unsupported function: " + expr.getFunc());
         }
     }
 }

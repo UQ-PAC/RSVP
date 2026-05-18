@@ -1,4 +1,9 @@
-import { Report, UploadedFile, VerificationRequest } from "./types";
+import {
+  ChangeImpact,
+  Report,
+  UploadedFile,
+  VerificationRequest,
+} from "./types";
 import { sortReports } from "./util";
 
 export async function upload(file: File): Promise<UploadedFile> {
@@ -6,12 +11,12 @@ export async function upload(file: File): Promise<UploadedFile> {
   const formData = new FormData();
   formData.append("file", file);
 
-  return fetch("/api/upload", {
-    method: "POST",
-    body: formData,
-  })
-    .then((res) => res.text())
-    .then((text) => ({ serverId: text, content: download(text) }));
+  return wrapText(
+    fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    }),
+  ).then((text) => ({ serverId: text, content: download(text) }));
 }
 
 export async function remove(id: string): Promise<boolean> {
@@ -21,10 +26,9 @@ export async function remove(id: string): Promise<boolean> {
 }
 
 export async function download(id: string): Promise<string> {
-  return fetch(`/api/file/${id}`).then((res) => res.text());
+  return wrapText(fetch(`/api/file/${id}`));
 }
 
-// TODO: check if response is OK
 export async function verify(request: VerificationRequest): Promise<Report[]> {
   return fetch("/api/verify", {
     headers: {
@@ -58,14 +62,38 @@ export async function diff(
     `updatedName=${updated.name}`,
   ];
 
-  return fetch(`/api/diff?${params.join("&")}`).then((res) => res.text());
+  return wrapText(fetch(`/api/diff?${params.join("&")}`));
 }
 
 export async function impact(
   original: string,
   updated: string,
-): Promise<string> {
+): Promise<ChangeImpact> {
   const params = [`original=${original}`, `updated=${updated}`];
 
-  return fetch(`/api/impact?${params.join("&")}`).then((res) => res.text());
+  return fetch(`/api/impact?${params.join("&")}`)
+    .then((res) => {
+      if (!res.ok) {
+        throw res;
+      }
+      return res.json();
+    })
+    .catch((err) => {
+      console.error(err);
+      return { permitted: [], forbidden: [] };
+    });
+}
+
+function wrapText(res: Promise<Response>, def: string = ""): Promise<string> {
+  return res
+    .then((res) => {
+      if (!res.ok) {
+        throw res;
+      }
+      return res.text();
+    })
+    .catch((err) => {
+      console.error(err);
+      return def;
+    });
 }

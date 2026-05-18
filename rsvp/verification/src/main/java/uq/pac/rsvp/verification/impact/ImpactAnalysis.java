@@ -1,6 +1,6 @@
 package uq.pac.rsvp.verification.impact;
 
-import uq.pac.rsvp.policy.ast.policy.Policy;
+import uq.pac.rsvp.policy.ast.AstNode;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.verification.RequestResult;
 
@@ -12,9 +12,10 @@ import java.util.Set;
 
 public class ImpactAnalysis {
 
-    public static List<RequestStatus> computeImpact(Map<Request, RequestResult> original, Map<Request, RequestResult> updated) {
+    public static ChangeImpact computeImpact(Map<Request, RequestResult> original, Map<Request, RequestResult> updated) {
 
-        List<RequestStatus> changeImpact = new ArrayList<>();
+        List<RequestSummary> permitted = new ArrayList<>();
+        List<RequestSummary> forbidden = new ArrayList<>();
 
         // Determine which requests have changed from/to permit/forbid/uncovered;
         // Check overall numbers (newly permitted/forbidden/unmatched vs old)
@@ -73,42 +74,20 @@ public class ImpactAnalysis {
             }
         }
 
-        // FIXME we append a single source policy to the request Id so it will display in the UI,
-        // this should be done properly (included as part of request status).
-
         // Don't return requests that are implied by other ??? requests
-        unknownPermitted.forEach(request -> {
-            String policyInfo = getPolicyInfoString(request, updated);
-            changeImpact.add(new RequestStatus(request.toHumanReadableString() + policyInfo, true));
-        });
-        unknownForbidden.forEach(request -> {
-            String policyInfo = getPolicyInfoString(request, updated);
-            changeImpact.add(new RequestStatus(request.toHumanReadableString() + policyInfo, false));
-        });
-        knownPermitted.forEach(request -> {
-            if (unknownPermitted.stream().noneMatch(unknown -> unknown.subsumes(request))) {
-                String policyInfo = getPolicyInfoString(request, updated);
-                changeImpact.add(new RequestStatus(request.toHumanReadableString() + policyInfo, true));
-            }
-        });
-        knownForbidden.forEach(request -> {
-            if (unknownForbidden.stream().noneMatch(unknown -> unknown.subsumes(request))) {
-                String policyInfo = getPolicyInfoString(request, updated);
-                changeImpact.add(new RequestStatus(request.toHumanReadableString() + policyInfo, false));
-            }
-        });
+        unknownPermitted.forEach(request -> permitted.add(getSummary(request, updated)));
+        unknownForbidden.forEach(request -> forbidden.add(getSummary(request, original)));
+        knownPermitted.stream()
+                .filter(request -> unknownPermitted.stream().noneMatch(unknown -> unknown.subsumes(request)))
+                .forEach(request -> permitted.add(getSummary(request, updated)));
+        knownForbidden.stream()
+                .filter(request -> unknownForbidden.stream().noneMatch(unknown -> unknown.subsumes(request)))
+                .forEach(request -> forbidden.add(getSummary(request, original)));
 
-        return changeImpact;
+        return new ChangeImpact(permitted, forbidden);
     }
 
-    private static String getPolicyInfoString(Request request, Map<Request, RequestResult> requestMap) {
-        String policyInfo = "";
-        RequestResult reqResult = requestMap.get(request);
-        if (reqResult != null && !reqResult.policies.isEmpty()) {
-            Policy firstPolicy = reqResult.policies.iterator().next();
-            policyInfo = " (from policy " + firstPolicy.getName() + " at "
-                    + firstPolicy.getSourceLoc().getStartLoc() + ")";
-        }
-        return policyInfo;
+    private static RequestSummary getSummary(Request request, Map<Request, RequestResult> requestMap) {
+        return new RequestSummary(request.toHumanReadableString(), requestMap.get(request).policies.stream().map(AstNode::getSourceLoc).toList());
     }
 }

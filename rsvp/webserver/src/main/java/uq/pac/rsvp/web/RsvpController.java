@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import uq.pac.rsvp.support.reporting.Report;
 import uq.pac.rsvp.verification.VerificationResult;
+import uq.pac.rsvp.verification.impact.ChangeImpact;
 import uq.pac.rsvp.web.context.VerificationSession;
 import uq.pac.rsvp.web.service.DiffService;
 import uq.pac.rsvp.web.service.FileService;
@@ -87,11 +88,11 @@ public class RsvpController {
     }
 
     @GetMapping("/impact")
-    public CompletableFuture<String> impact(@RequestParam String original, @RequestParam String updated) {
+    public CompletableFuture<ChangeImpact> impact(@RequestParam String original, @RequestParam String updated) {
         logger.info("GET /impact ? {} & {}", original, updated);
 
         // Wait until verification has completed execution before querying impact
-        return session.getResult().thenApply(result -> diffService.getImpact(original, updated, result.cache()));
+        return session.getResult().thenApply(result -> verificationService.getImpact(original, updated, result.cache()));
     }
 
     public static void main(String[] args) {

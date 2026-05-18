@@ -6,7 +6,8 @@ import uq.pac.rsvp.support.util.Pair;
 import uq.pac.rsvp.verification.ConfigurationException;
 import uq.pac.rsvp.verification.Verification;
 import uq.pac.rsvp.verification.VerificationResult;
-import uq.pac.rsvp.verification.impact.RequestStatus;
+import uq.pac.rsvp.verification.impact.ChangeImpact;
+import uq.pac.rsvp.verification.impact.RequestSummary;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -74,14 +75,18 @@ public class Main {
             }
 
             for (Pair<String, String> pair : fileset.getVersionPairs()) {
-                List<RequestStatus> impact = Verification.getImpact(pair.getKey(), pair.getValue(), result.cache());
+                ChangeImpact impact = Verification.getImpact(pair.getKey(), pair.getValue(), result.cache());
 
                 System.out.println("\nChange impact: " + pair.getKey() + " -> " + pair.getValue());
                 System.out.println("-----------------------");
-                for (RequestStatus requestStatus : impact) {
-                    System.out.println(requestStatus.toString());
+
+                for (RequestSummary summary : impact.forbidden()) {
+                    System.out.printf(" - %s%n", summary.summary());
                 }
 
+                for (RequestSummary summary : impact.permitted()) {
+                    System.out.printf(" + %s%n", summary.summary());
+                }
             }
 
         } catch (IOException io) {

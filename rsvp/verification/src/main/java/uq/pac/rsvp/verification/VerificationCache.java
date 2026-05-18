@@ -2,15 +2,14 @@ package uq.pac.rsvp.verification;
 
 import uq.pac.rsvp.policy.ast.FileSet;
 import uq.pac.rsvp.policy.datalog.translation.Request;
-import uq.pac.rsvp.verification.impact.RequestStatus;
+import uq.pac.rsvp.verification.impact.ChangeImpact;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class VerificationCache {
     private final Map<String, Map<Request, RequestResult>> requestMappings;
-    private final Map<String, Map<String, List<RequestStatus>>> changeImpacts;
+    private final Map<String, Map<String, ChangeImpact>> changeImpacts;
     private final FileSet fileset;
 
     public VerificationCache(FileSet fileset) {
@@ -21,8 +20,8 @@ public class VerificationCache {
         this.fileset = fileset;
     }
 
-    public List<RequestStatus> getImpact(String original, String updated) {
-        Map<String, List<RequestStatus>> impacts = changeImpacts.get(original);
+    public ChangeImpact getImpact(String original, String updated) {
+        Map<String, ChangeImpact> impacts = changeImpacts.get(original);
 
         if (impacts == null) {
             return null;
@@ -39,7 +38,7 @@ public class VerificationCache {
         return fileset;
     }
 
-    public void cacheImpact(String original, String updated, List<RequestStatus> impacts) {
+    public void cacheImpact(String original, String updated, ChangeImpact impacts) {
         changeImpacts.computeIfAbsent(original, key -> new HashMap<>()).put(updated, impacts);
     }
 

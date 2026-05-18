@@ -294,10 +294,28 @@
   }
 
   .source-file .source-file-render .code > .source-file-line-content {
-    padding: 0.07rem 0 0 1.55rem;
-    line-height: 1.245rem;
-    height: 100%;
     font-size: 0.8rem;
+    line-height: 1.245rem;
+  }
+
+  .source-file
+    .source-file-render
+    .code
+    > .source-file-line-content
+    > .source-line-highlight,
+  .source-file .source-file-render .code > .source-line-no-report {
+    transition: background-color 0.5s ease-in-out;
+    display: block;
+    padding: 0.07rem 0 0 1.55rem;
+  }
+
+  .source-file
+    .source-file-render
+    .code
+    > .source-file-line-content
+    > .source-line-highlight.highlighted,
+  .source-file .source-file-render .code > .source-line-no-report.highlighted {
+    background-color: var(--color-neutral-200);
   }
 
   .source-report {

@@ -2,15 +2,15 @@ package uq.pac.rsvp.verification;
 
 import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.FileSet;
-import uq.pac.rsvp.support.error.LocationError;
 import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestSet;
 import uq.pac.rsvp.policy.datalog.translation.Translation;
+import uq.pac.rsvp.support.error.LocationError;
 import uq.pac.rsvp.support.reporting.Report;
 import uq.pac.rsvp.support.reporting.Report.Severity;
+import uq.pac.rsvp.verification.impact.ChangeImpact;
 import uq.pac.rsvp.verification.impact.ImpactAnalysis;
-import uq.pac.rsvp.verification.impact.RequestStatus;
 import uq.pac.rsvp.verification.policy.PolicyAnalysis;
 
 import java.io.IOException;
@@ -18,7 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -62,8 +61,7 @@ public class Verification {
 
             reports.addAll(PolicyAnalysis.checkPolicies(policyResults, requestPolicyMap));
             reports.addAll(PolicyAnalysis.checkInvariants(translation.getInvariantResult()));
-        }
-        catch (LocationError e) {
+        } catch (LocationError e) {
             // User-error, such as syntax or validation error
             reports.add(new Report(Severity.Error, e.getTitle() + " Error", e.getMessage(), e.getLocation()));
         }
@@ -71,8 +69,8 @@ public class Verification {
         return new VerificationResult(reports, cache);
     }
 
-    public static List<RequestStatus> getImpact(String original, String updated, VerificationCache cache) throws IOException, InterruptedException {
-        List<RequestStatus> changeImpact = cache.getImpact(original, updated);
+    public static ChangeImpact getImpact(String original, String updated, VerificationCache cache) throws IOException, InterruptedException {
+        ChangeImpact changeImpact = cache.getImpact(original, updated);
 
         if (changeImpact == null) {
 

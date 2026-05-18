@@ -5,7 +5,7 @@ import uq.pac.rsvp.policy.ast.policy.Invariant;
 import uq.pac.rsvp.policy.ast.policy.Quantifier;
 import uq.pac.rsvp.policy.ast.policy.expr.*;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
-import uq.pac.rsvp.policy.datalog.translation.TranslationError;
+import uq.pac.rsvp.support.error.TranslationError;
 
 public class ValueVisitorAdapter<T> implements PolicyComputationVisitor<T> {
 

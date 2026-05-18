@@ -2,7 +2,8 @@ package uq.pac.rsvp.policy.datalog.invariant;
 
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.type.*;
-import uq.pac.rsvp.policy.datalog.translation.TranslationError;
+import uq.pac.rsvp.support.error.TranslationError;
+import uq.pac.rsvp.support.error.ValidationError;
 
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,7 @@ public class InvariantTyping {
             }
         }
         String expected = Stream.of(tests).map(TypeTest::expected).toList().toString();
-        throw new InvariantValidator.Error("Expected one of %s, got %s", expected, actual.toString());
+        throw new ValidationError("Expected one of %s, got %s".formatted(expected, actual.toString()));
     }
 
 

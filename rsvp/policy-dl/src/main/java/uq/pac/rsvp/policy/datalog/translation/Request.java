@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import com.cedarpolicy.model.AuthorizationRequest;
 import com.cedarpolicy.value.EntityUID;
+import uq.pac.rsvp.support.error.TranslationError;
 
 import java.util.Map;
 import java.util.Optional;
@@ -33,7 +34,7 @@ public class Request {
         this.id = id;
         String[] components = id.split(OUTPUT_DELIMITER);
         if (components.length != 3) {
-            throw new TranslationError("Invalid request format: %s", id);
+            throw new TranslationError("Invalid request format: " + id);
         }
         principal = components[0];
         resource = components[1];

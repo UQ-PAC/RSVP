@@ -3,6 +3,7 @@ package uq.pac.rsvp.policy.datalog.translation;
 import org.junit.jupiter.api.Test;
 import uq.pac.rsvp.policy.ast.FileSet;
 import uq.pac.rsvp.policy.datalog.TestUtil;
+import uq.pac.rsvp.support.error.TranslationError;
 
 import java.io.IOException;
 import java.nio.file.Path;

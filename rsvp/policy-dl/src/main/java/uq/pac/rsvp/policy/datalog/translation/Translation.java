@@ -30,6 +30,7 @@ import uq.pac.rsvp.policy.datalog.ast.DLTerm;
 import uq.pac.rsvp.policy.datalog.entity.EntityValidator;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 import uq.pac.rsvp.policy.datalog.invariant.InvariantValidator;
+import uq.pac.rsvp.support.error.TranslationError;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -107,7 +108,7 @@ public class Translation {
             this.program = translate(schema, policies, entities, invariants);
             program.execute(datalogDir);
         } catch (Throwable e) {
-            throw new TranslationError(e);
+            throw new AssertionError(e);
         }
     }
 

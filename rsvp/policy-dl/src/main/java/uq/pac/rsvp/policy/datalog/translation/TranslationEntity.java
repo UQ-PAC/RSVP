@@ -3,6 +3,7 @@ package uq.pac.rsvp.policy.datalog.translation;
 import uq.pac.rsvp.policy.ast.schema.statement.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.entity.*;
 import uq.pac.rsvp.policy.datalog.ast.*;
+import uq.pac.rsvp.support.error.TranslationError;
 
 import java.util.ArrayList;
 import java.util.Collections;

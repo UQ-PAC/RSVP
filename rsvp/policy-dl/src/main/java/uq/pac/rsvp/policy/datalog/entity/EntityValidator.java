@@ -8,6 +8,7 @@ import uq.pac.rsvp.policy.ast.schema.statement.RecordEntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.type.*;
 import uq.pac.rsvp.policy.ast.schema.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.entity.*;
+import uq.pac.rsvp.support.error.TranslationError;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -67,7 +68,7 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
         // Check all references for existence
         for (EntityReference ref : references) {
             if (!uids.contains(ref)) {
-                throw new EntityException(ref.getSourceLoc(), "Undefined entity reference: " + ref);
+                throw new TranslationError("Undefined entity reference: " + ref, ref.getSourceLoc());
             }
         }
 
@@ -77,7 +78,7 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
     private void validate(Entity entity) {
         EntityReference euid = entity.getEuid();
         if (uids.contains(euid)) {
-            throw new EntityException(euid.getSourceLoc(), "Duplicate entity: " + entity.getEuid());
+            throw new TranslationError("Duplicate entity: " + entity.getEuid(), euid.getSourceLoc());
         }
         uids.add(euid);
 
@@ -86,7 +87,7 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
         // this can skew source locations and partly because there is no good reason
         // to have these characters in entity names in general
         if (ESCAPED.matcher(euid.getId()).find()) {
-            throw new EntityException(euid.getSourceLoc(), "Unsupported entity id (escaped characters): " + euid.getId());
+            throw new TranslationError("Unsupported entity id (escaped characters): " + euid.getId(), euid.getSourceLoc());
         }
 
         // Here we parse only the type. Then, if this is an action reference then the type name is 'Action'
@@ -94,9 +95,9 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
         EntityTypeDefinition def = schema.getEntityType(ref);
         if (def == null) {
             if (ref.getBaseName().equals("Action")) {
-                throw new EntityException(entity.getSourceLoc(), "Action entity: " + entity.getEuid());
+                throw new TranslationError( "Action entity: " + entity.getEuid(), entity.getSourceLoc());
             } else {
-                throw new EntityException(entity.getSourceLoc(), "Undefined entity type: " + euid.getType());
+                throw new TranslationError( "Undefined entity type: " + euid.getType(), entity.getSourceLoc());
             }
         }
         def.getShape().process(this, entity.getAttrs());
@@ -109,7 +110,7 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
                         .collect(Collectors.toSet());
                 memberOf.add(def.getName());
                 if (!memberOf.contains(parent.getType())) {
-                    throw new EntityException(value.getSourceLoc(), "Unexpected parent type: " + parent.getType() + " expected one of " + memberOf);
+                    throw new TranslationError( "Unexpected parent type: " + parent.getType() + " expected one of " + memberOf, value.getSourceLoc());
                 }
             }
         }
@@ -118,7 +119,7 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
     private static <T extends EntityValue> T expectedType(EntityValue payload, Class<T> cls, String kind) {
         require(payload != null);
         if (!cls.isInstance(payload)) {
-            throw new EntityException(payload.getSourceLoc(), "Expected " + kind);
+            throw new TranslationError( "Expected " + kind, payload.getSourceLoc());
         }
         return cls.cast(payload);
     }
@@ -132,13 +133,13 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
                 type.process(this, attrValue);
             }
             if (attrValue == null && attr.isRequired()) {
-                throw new EntityException(payload.getSourceLoc(), "Missing attribute: " + attr);
+                throw new TranslationError("Missing attribute: " + attr, payload.getSourceLoc());
             }
         });
 
         value.forEach((attr, val) -> {
             if (!rec.hasAttribute(attr.getValue())) {
-                throw new EntityException(attr.getSourceLoc(), "Unexpected attribute: " + attr);
+                throw new TranslationError("Unexpected attribute: " + attr, attr.getSourceLoc());
             }
         });
     }
@@ -154,8 +155,8 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
         EntityReference ref = expectedType(payload, EntityReference.class, "entity reference");
 
         if (!type.getName().equals(ref.getType())) {
-            throw new EntityException(payload.getSourceLoc(),
-                    "Unexpected type: expected" + type.getName() + ", got " + ref.getType());
+            throw new TranslationError("Unexpected type: expected" + type.getName() + ", got " + ref.getType(),
+                    payload.getSourceLoc());
         }
 
         // Track all references
@@ -167,12 +168,12 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
         EntityReference ref = expectedType(payload, EntityReference.class, "entity reference");
 
         if (!type.getName().equals(ref.getType())) {
-            throw new EntityException(payload.getSourceLoc(), "Unexpected type: expected" + type.getName() + ", got " + ref.getType());
+            throw new TranslationError("Unexpected type: expected" + type.getName() + ", got " + ref.getType(), payload.getSourceLoc());
         }
 
         if (!type.getEnumNames().contains(ref.getId())) {
-            throw new EntityException(payload.getSourceLoc(), "Unexpected ID " + ref.getId() +
-                    " for type " + type.getName() + ", expected one of " + type.getEnumNames());
+            throw new TranslationError("Unexpected ID " + ref.getId() +
+                    " for type " + type.getName() + ", expected one of " + type.getEnumNames(), payload.getSourceLoc());
         }
 
         // Track all references

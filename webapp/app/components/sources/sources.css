@@ -52,7 +52,6 @@
   }
 
   .source-file .source-file-header {
-    cursor: pointer;
     background-color: var(--color-gray-200);
     font-weight: 600;
     font-size: 0.8rem;
@@ -62,6 +61,11 @@
     display: flex;
     align-items: center;
     gap: 0.1rem;
+  }
+
+  .source-file .source-file-header:not(:has(.top-row)),
+  .source-file .source-file-header .top-row {
+    cursor: pointer;
   }
 
   .source-file.expanded .source-file-header {

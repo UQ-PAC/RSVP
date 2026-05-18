@@ -19,6 +19,9 @@ interface SourceVersionSelectParams {
   set: (version: string, compare?: string) => void;
   icon: IconDefinition;
   children?: JSX.Element | JSX.Element[];
+  mouseOver: () => void;
+  mouseOut: () => void;
+  click: () => void;
 }
 
 export function SourceVersionSelect({
@@ -30,6 +33,9 @@ export function SourceVersionSelect({
   set,
   icon,
   children,
+  click,
+  mouseOver,
+  mouseOut,
 }: SourceVersionSelectParams) {
   const originalIndex = versions.indexOf(selectedOriginal);
   const updateIndex = selectedUpdate
@@ -38,7 +44,12 @@ export function SourceVersionSelect({
 
   return (
     <div className="source-file-tabs">
-      <div className="top-row">
+      <div
+        className="top-row"
+        onClick={click}
+        onMouseOver={mouseOver}
+        onMouseOut={mouseOut}
+      >
         <div className="source-file-versions">
           {versions.map((version, i) => (
             <div
@@ -50,7 +61,10 @@ export function SourceVersionSelect({
                   "selected",
               )}
               onClick={(e) => {
+                e.stopPropagation();
                 set(version);
+              }}
+              onMouseOver={(e) => {
                 e.stopPropagation();
               }}
             >
@@ -66,7 +80,10 @@ export function SourceVersionSelect({
               selectedUpdate !== undefined && "selected",
             )}
             onClick={(e) => {
+              e.stopPropagation();
               set(versions[0], versions[1]);
+            }}
+            onMouseOver={(e) => {
               e.stopPropagation();
             }}
           >
@@ -99,6 +116,7 @@ export function SourceVersionSelect({
                           "selected",
                       )}
                       onClick={(e) => {
+                        e.stopPropagation();
                         const index = versions.indexOf(version);
                         set(
                           version,
@@ -106,7 +124,6 @@ export function SourceVersionSelect({
                             updateIndex > index ? updateIndex : index + 1
                           ],
                         );
-                        e.stopPropagation();
                       }}
                     >
                       <FontAwesomeIcon
@@ -132,8 +149,8 @@ export function SourceVersionSelect({
                         selectedUpdate === version && "selected",
                       )}
                       onClick={(e) => {
-                        set(selectedOriginal, version);
                         e.stopPropagation();
+                        set(selectedOriginal, version);
                       }}
                     >
                       <FontAwesomeIcon

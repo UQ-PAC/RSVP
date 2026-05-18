@@ -257,6 +257,22 @@ export function SourceFile({ source, reports, setFocus }: SourceFileParams) {
 
   const fileIcon = getFileIcon(original?.file.filetype);
 
+  const mouseOverHeader = () => setToggleHover(true);
+  const mouseOutHeader = () => setToggleHover(false);
+  const clickHeader = () => {
+    selectionDispatch({ scroll: "none" });
+    focus.current?.then((key) => {
+      focusDispatch({
+        type: "focus",
+        target: "source-file",
+        focus: {
+          key,
+          value: expanded ? ExpansionState.Collapsed : ExpansionState.Expanded,
+        },
+      });
+    });
+  };
+
   return (
     <div
       ref={file}
@@ -264,23 +280,9 @@ export function SourceFile({ source, reports, setFocus }: SourceFileParams) {
     >
       <div
         className="source-file-header"
-        onClick={() => {
-          selectionDispatch({ scroll: "none" });
-          focus.current?.then((key) => {
-            focusDispatch({
-              type: "focus",
-              target: "source-file",
-              focus: {
-                key,
-                value: expanded
-                  ? ExpansionState.Collapsed
-                  : ExpansionState.Expanded,
-              },
-            });
-          });
-        }}
-        onMouseEnter={() => setToggleHover(true)}
-        onMouseLeave={() => setToggleHover(false)}
+        onClick={source.versions.length === 0 ? clickHeader : undefined}
+        onMouseOver={source.versions.length === 0 ? mouseOverHeader : undefined}
+        onMouseOut={source.versions.length === 0 ? mouseOutHeader : undefined}
       >
         {source.versions.length === 0 && (
           <FontAwesomeIcon
@@ -315,6 +317,9 @@ export function SourceFile({ source, reports, setFocus }: SourceFileParams) {
               });
             }}
             expanded={expanded}
+            click={clickHeader}
+            mouseOver={mouseOverHeader}
+            mouseOut={mouseOutHeader}
           >
             {toggleIcon}
           </SourceVersionSelect>

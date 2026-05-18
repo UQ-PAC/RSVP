@@ -1,4 +1,4 @@
-package uq.pac.childrenclinic.adult;
+package uq.pac.childrenclinic.guardian;
 
 import com.cedarpolicy.value.EntityUID;
 
@@ -43,21 +43,21 @@ import uq.pac.childrenclinic.cedar.CedarEntitiesInvalidationEvent;
 import uq.pac.childrenclinic.cedar.CedarProgrammaticEvaluator;
 import uq.pac.childrenclinic.model.Gender;
 import uq.pac.childrenclinic.model.GenderRepository;
-import uq.pac.childrenclinic.patient.AdultAuthority;
-import uq.pac.childrenclinic.patient.AdultAuthorityRepository;
+import uq.pac.childrenclinic.patient.GuardianAuthority;
+import uq.pac.childrenclinic.patient.GuardianAuthorityRepository;
 import uq.pac.childrenclinic.patient.Patient;
-import uq.pac.childrenclinic.patient.PatientAdult;
+import uq.pac.childrenclinic.patient.PatientGuardian;
 import uq.pac.childrenclinic.patient.PatientFormState;
 import uq.pac.childrenclinic.patient.PatientRepository;
 import uq.pac.childrenclinic.system.Clinic;
 import uq.pac.childrenclinic.system.ClinicRepository;
 
 @Controller
-public class AdultController {
+public class GuardianController {
 
-	private static final String VIEWS_ADULT_CREATE_OR_UPDATE_FORM = "adults/createOrUpdateAdultForm";
+	private static final String VIEWS_GUARDIAN_CREATE_OR_UPDATE_FORM = "guardians/createOrUpdateGuardianForm";
 
-	private final AdultRepository adults;
+	private final GuardianRepository guardians;
 
 	private final GenderRepository genders;
 
@@ -69,12 +69,12 @@ public class AdultController {
 
 	private final PatientRepository patients;
 
-	private final AdultAuthorityRepository authorities;
+	private final GuardianAuthorityRepository authorities;
 
-	public AdultController(AdultRepository adults, GenderRepository genders, ClinicRepository clinics,
+	public GuardianController(GuardianRepository guardians, GenderRepository genders, ClinicRepository clinics,
 			CedarProgrammaticEvaluator cedarEvaluator, ApplicationEventPublisher eventPublisher,
-			PatientRepository patients, AdultAuthorityRepository authorities) {
-		this.adults = adults;
+			PatientRepository patients, GuardianAuthorityRepository authorities) {
+		this.guardians = guardians;
 		this.genders = genders;
 		this.clinics = clinics;
 		this.cedarEvaluator = cedarEvaluator;
@@ -105,73 +105,73 @@ public class AdultController {
 		}).collect(Collectors.toList());
 	}
 
-	@InitBinder("adult")
-	public void initAdultBinder(WebDataBinder dataBinder) {
+	@InitBinder("guardian")
+	public void initGuardianBinder(WebDataBinder dataBinder) {
 		dataBinder.setDisallowedFields("id");
 	}
 
-	@GetMapping("/adults")
-	@CedarAuthorization(action = "ListAdults", resourceType = "Clinic", resourceId = "Any", validate = true)
-	public String processFindForm(@RequestParam(defaultValue = "1") int page, Adult adult, BindingResult result,
+	@GetMapping("/guardians")
+	@CedarAuthorization(action = "ListGuardians", resourceType = "Clinic", resourceId = "Any", validate = true)
+	public String processFindForm(@RequestParam(defaultValue = "1") int page, Guardian guardian, BindingResult result,
 			Model model, HttpSession session) {
-		String lastName = adult.getLastName() == null ? "" : adult.getLastName();
+		String lastName = guardian.getLastName() == null ? "" : guardian.getLastName();
 
-		List<Adult> allMatchingAdults = this.adults.findByLastNameStartingWith(lastName, Pageable.unpaged())
+		List<Guardian> allMatchingGuardians = this.guardians.findByLastNameStartingWith(lastName, Pageable.unpaged())
 			.getContent();
 
-		if (allMatchingAdults.isEmpty()) {
-			result.rejectValue("lastName", "notFound", "No adults found.");
-			return "redirect:/?error=noAdults&query=" + UriUtils.encode(lastName, StandardCharsets.UTF_8);
+		if (allMatchingGuardians.isEmpty()) {
+			result.rejectValue("lastName", "notFound", "No guardians found.");
+			return "redirect:/?error=noGuardians&query=" + UriUtils.encode(lastName, StandardCharsets.UTF_8);
 		}
 
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 		Map<Integer, String> authorizationMap = new HashMap<>();
 		Map<Integer, String> cedarResourceMap = new HashMap<>();
 
-		List<Adult> authorized = allMatchingAdults.stream().filter(a -> {
+		List<Guardian> authorized = allMatchingGuardians.stream().filter(a -> {
 			String resourceName = a.getFirstName() + " " + a.getLastName();
-			var evalResult = cedarEvaluator.evaluate(principal, "ViewAdult", "ResponsibleAdult", resourceName, "Item");
+			var evalResult = cedarEvaluator.evaluate(principal, "ViewGuardian", "Guardian", resourceName, "Item");
 			authorizationMap.put(a.getId(), evalResult.responseBody());
-			cedarResourceMap.put(a.getId(), "ChildrenClinic::ResponsibleAdult::\"" + resourceName + "\"");
+			cedarResourceMap.put(a.getId(), "ChildrenClinic::Guardian::\"" + resourceName + "\"");
 			return evalResult.isGranted();
 		}).collect(Collectors.toList());
 
-		if (authorized.size() == 1 && allMatchingAdults.size() == 1) {
-			return "redirect:/adults/" + authorized.iterator().next().getId();
+		if (authorized.size() == 1 && allMatchingGuardians.size() == 1) {
+			return "redirect:/guardians/" + authorized.iterator().next().getId();
 		}
 
 		Pageable pageable = PageRequest.of(page - 1, 5);
 		int start = (int) pageable.getOffset();
 		int end = Math.min((start + pageable.getPageSize()), authorized.size());
-		List<Adult> pageContent = start > authorized.size() ? List.of() : authorized.subList(start, end);
-		Page<Adult> paginated = new PageImpl<>(pageContent, pageable, authorized.size());
+		List<Guardian> pageContent = start > authorized.size() ? List.of() : authorized.subList(start, end);
+		Page<Guardian> paginated = new PageImpl<>(pageContent, pageable, authorized.size());
 
-		model.addAttribute("listAdults", paginated.getContent());
+		model.addAttribute("listGuardians", paginated.getContent());
 		model.addAttribute("currentPage", page);
 		model.addAttribute("totalPages", paginated.getTotalPages());
 		model.addAttribute("totalItems", paginated.getTotalElements());
 		model.addAttribute("authorizationMap", authorizationMap);
 		model.addAttribute("cedarPrincipal", principal.toString());
-		model.addAttribute("cedarAction", "ChildrenClinic::Action::\"ViewAdult\"");
+		model.addAttribute("cedarAction", "ChildrenClinic::Action::\"ViewGuardian\"");
 		model.addAttribute("cedarResourceMap", cedarResourceMap);
 
-		return "adults/adultsList";
+		return "guardians/guardiansList";
 	}
 
 	/**
-	 * Retrieves and renders the details of a specific Adult entity.
+	 * Retrieves and renders the details of a specific Guardian entity.
 	 */
-	@GetMapping("/adults/{adultId}")
-	@CedarAuthorization(action = "ViewAdult", resourceType = "ResponsibleAdult", validate = true)
-	public ModelAndView showAdult(@PathVariable("adultId") int adultId) {
-		ModelAndView mav = new ModelAndView("adults/adultDetails");
-		Adult adult = this.adults.findById(adultId)
-			.orElseThrow(() -> new IllegalArgumentException("Adult not found with identifier: " + adultId));
-		mav.addObject("adult", adult);
+	@GetMapping("/guardians/{guardianId}")
+	@CedarAuthorization(action = "ViewGuardian", resourceType = "Guardian", validate = true)
+	public ModelAndView showGuardian(@PathVariable("guardianId") int guardianId) {
+		ModelAndView mav = new ModelAndView("guardians/guardianDetails");
+		Guardian guardian = this.guardians.findById(guardianId)
+			.orElseThrow(() -> new IllegalArgumentException("Guardian not found with identifier: " + guardianId));
+		mav.addObject("guardian", guardian);
 		return mav;
 	}
 
-	@GetMapping("/adults/new")
+	@GetMapping("/guardians/new")
 	public String initCreationForm(@RequestParam(name = "patientId", required = false) Integer patientId,
 			@RequestParam(name = "fromPatientForm", required = false) Boolean fromPatientForm, Model model,
 			HttpSession session) {
@@ -191,7 +191,7 @@ public class AdultController {
 				if (clinic == null || clinic.getClinicName() == null)
 					continue;
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-				var result = cedarEvaluator.evaluate(principal, "AddAdult", "Clinic", cedarClinicId, "Page");
+				var result = cedarEvaluator.evaluate(principal, "AddGuardian", "Clinic", cedarClinicId, "Page");
 
 				if (result.isGranted()) {
 					isAuthorized = true;
@@ -215,13 +215,13 @@ public class AdultController {
 				}
 			}
 			else {
-				exceptionBody.append("You do not have permission to add adults to any assigned clinics.");
+				exceptionBody.append("You do not have permission to add guardians to any assigned clinics.");
 			}
 
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
-		model.addAttribute("adult", new Adult());
+		model.addAttribute("guardian", new Guardian());
 		model.addAttribute("patientId", patientId);
 		model.addAttribute("fromPatientForm", fromPatientForm);
 
@@ -229,11 +229,11 @@ public class AdultController {
 			model.addAttribute("authorities", this.authorities.findAll());
 		}
 
-		return VIEWS_ADULT_CREATE_OR_UPDATE_FORM;
+		return VIEWS_GUARDIAN_CREATE_OR_UPDATE_FORM;
 	}
 
-	@PostMapping("/adults/new")
-	public String processCreationForm(@Valid Adult adult, BindingResult result,
+	@PostMapping("/guardians/new")
+	public String processCreationForm(@Valid Guardian guardian, BindingResult result,
 			@RequestParam(name = "patientId", required = false) Integer patientId,
 			@RequestParam(name = "authorityId", required = false) Integer authorityId,
 			@RequestParam(name = "fromPatientForm", required = false) Boolean fromPatientForm,
@@ -244,18 +244,18 @@ public class AdultController {
 		boolean isAuthorized = true;
 		List<String> denialReasons = new ArrayList<>();
 
-		Collection<Clinic> submittedClinics = adult.getClinics();
+		Collection<Clinic> submittedClinics = guardian.getClinics();
 
 		if (submittedClinics == null || submittedClinics.isEmpty()) {
 			isAuthorized = false;
-			denialReasons.add("You must assign the Adult to at least one valid Clinic.");
+			denialReasons.add("You must assign the Guardian to at least one valid Clinic.");
 		}
 		else {
 			for (Clinic clinic : submittedClinics) {
 				if (clinic == null || clinic.getClinicName() == null)
 					continue;
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-				var evalResult = cedarEvaluator.evaluate(principal, "AddAdult", "Clinic", cedarClinicId, "Page");
+				var evalResult = cedarEvaluator.evaluate(principal, "AddGuardian", "Clinic", cedarClinicId, "Page");
 
 				if (!evalResult.isGranted()) {
 					isAuthorized = false;
@@ -278,24 +278,24 @@ public class AdultController {
 			}
 			else {
 				exceptionBody
-					.append("You do not have permission to add adults to one or more of the selected clinics.");
+					.append("You do not have permission to add guardians to one or more of the selected clinics.");
 			}
 
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
-		if (StringUtils.hasLength(adult.getLastName()) && StringUtils.hasLength(adult.getFirstName())
-				&& adult.isNew()) {
-			boolean duplicateExists = adults.findByLastNameStartingWith(adult.getLastName(), PageRequest.of(0, 50))
+		if (StringUtils.hasLength(guardian.getLastName()) && StringUtils.hasLength(guardian.getFirstName())
+				&& guardian.isNew()) {
+			boolean duplicateExists = guardians.findByLastNameStartingWith(guardian.getLastName(), PageRequest.of(0, 50))
 				.getContent()
 				.stream()
-				.anyMatch(a -> a.getFirstName().equalsIgnoreCase(adult.getFirstName())
-						&& Objects.equals(a.getBirthDate(), adult.getBirthDate())
-						&& Objects.equals(a.getGender(), adult.getGender()));
+				.anyMatch(a -> a.getFirstName().equalsIgnoreCase(guardian.getFirstName())
+						&& Objects.equals(a.getBirthDate(), guardian.getBirthDate())
+						&& Objects.equals(a.getGender(), guardian.getGender()));
 
 			if (duplicateExists) {
 				result.rejectValue("firstName", "duplicate",
-						"An adult with this first and last name, birth date, and gender already exists.");
+						"A guardian with this first and last name, birth date, and gender already exists.");
 			}
 		}
 
@@ -305,11 +305,11 @@ public class AdultController {
 			if (patientId != null || Boolean.TRUE.equals(fromPatientForm)) {
 				model.addAttribute("authorities", this.authorities.findAll());
 			}
-			return VIEWS_ADULT_CREATE_OR_UPDATE_FORM;
+			return VIEWS_GUARDIAN_CREATE_OR_UPDATE_FORM;
 		}
 
 		try {
-			this.adults.save(adult);
+			this.guardians.save(guardian);
 		}
 		catch (DataIntegrityViolationException ex) {
 			result.rejectValue("firstName", "duplicate",
@@ -319,7 +319,7 @@ public class AdultController {
 			if (patientId != null || Boolean.TRUE.equals(fromPatientForm)) {
 				model.addAttribute("authorities", this.authorities.findAll());
 			}
-			return VIEWS_ADULT_CREATE_OR_UPDATE_FORM;
+			return VIEWS_GUARDIAN_CREATE_OR_UPDATE_FORM;
 		}
 
 		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
@@ -328,17 +328,17 @@ public class AdultController {
 		if (patientId != null && authorityId != null) {
 			Patient patient = this.patients.findById(patientId)
 				.orElseThrow(() -> new IllegalArgumentException("Patient not found: " + patientId));
-			AdultAuthority auth = this.authorities.findById(authorityId).orElse(null);
+			GuardianAuthority auth = this.authorities.findById(authorityId).orElse(null);
 			if (auth != null) {
-				PatientAdult pa = new PatientAdult(patient, adult, auth);
-				if (patient.getResponsibleAdults() == null) {
-					patient.setResponsibleAdults(new java.util.LinkedHashSet<>());
+				PatientGuardian pa = new PatientGuardian(patient, guardian, auth);
+				if (patient.getGuardians() == null) {
+					patient.setGuardians(new java.util.LinkedHashSet<>());
 				}
-				patient.getResponsibleAdults().add(pa);
+				patient.getGuardians().add(pa);
 				this.patients.save(patient);
 			}
 			eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
-			redirectAttributes.addFlashAttribute("message", "New Adult has been created and assigned to the Patient.");
+			redirectAttributes.addFlashAttribute("message", "New Guardian has been created and assigned to the Patient.");
 			return "redirect:/patients/" + patientId;
 		}
 
@@ -346,24 +346,24 @@ public class AdultController {
 		if (Boolean.TRUE.equals(fromPatientForm)) {
 			PatientFormState state = (PatientFormState) session.getAttribute("patientFormState");
 			if (state != null) {
-				List<Integer> adultIds = state.getAdultIds();
-				if (adultIds == null) {
-					adultIds = new java.util.ArrayList<>();
+				List<Integer> guardianIds = state.getGuardianIds();
+				if (guardianIds == null) {
+					guardianIds = new java.util.ArrayList<>();
 				}
-				adultIds.add(adult.getId());
-				state.setAdultIds(adultIds);
+				guardianIds.add(guardian.getId());
+				state.setGuardianIds(guardianIds);
 				if (authorityId != null) {
 					state.setAuthorityId(authorityId);
 				}
 				session.setAttribute("patientFormState", state);
 
 				redirectAttributes.addFlashAttribute("message",
-						"New Adult created. Complete the Patient form to finalise.");
+						"New Guardian created. Complete the Patient form to finalise.");
 
 				if (state.getPatientId() != null) {
 					session.removeAttribute("patientFormState");
 					// Restore state via flash attributes for the edit path.
-					redirectAttributes.addFlashAttribute("selectedAdultIds", state.getAdultIds());
+					redirectAttributes.addFlashAttribute("selectedGuardianIds", state.getGuardianIds());
 					redirectAttributes.addFlashAttribute("selectedAuthorityId", state.getAuthorityId());
 					redirectAttributes.addFlashAttribute("selectedDoctorIds", state.getDoctorIds());
 					return "redirect:/patients/" + state.getPatientId() + "/edit";
@@ -372,55 +372,55 @@ public class AdultController {
 			}
 		}
 
-		// Standalone Adult creation (default behaviour from
-		// createOrUpdateAdultForm.html).
-		redirectAttributes.addFlashAttribute("message", "New Adult has been added.");
-		return "redirect:/adults/" + adult.getId();
+		// Standalone Guardian creation (default behaviour from
+		// createOrUpdateGuardianForm.html).
+		redirectAttributes.addFlashAttribute("message", "New Guardian has been added.");
+		return "redirect:/guardians/" + guardian.getId();
 	}
 
 	/**
-	 * Initializes the form for updating an existing Adult entity.
+	 * Initializes the form for updating an existing Guardian entity.
 	 */
-	@GetMapping("/adults/{adultId}/edit")
-	@CedarAuthorization(action = "EditAdult", resourceType = "ResponsibleAdult", validate = true)
-	public String initUpdateForm(@PathVariable("adultId") int adultId, Model model) {
-		Adult adult = this.adults.findById(adultId)
-			.orElseThrow(() -> new IllegalArgumentException("Adult not found with identifier: " + adultId));
-		model.addAttribute("adult", adult);
-		return VIEWS_ADULT_CREATE_OR_UPDATE_FORM;
+	@GetMapping("/guardians/{guardianId}/edit")
+	@CedarAuthorization(action = "EditGuardian", resourceType = "Guardian", validate = true)
+	public String initUpdateForm(@PathVariable("guardianId") int guardianId, Model model) {
+		Guardian guardian = this.guardians.findById(guardianId)
+			.orElseThrow(() -> new IllegalArgumentException("Guardian not found with identifier: " + guardianId));
+		model.addAttribute("guardian", guardian);
+		return VIEWS_GUARDIAN_CREATE_OR_UPDATE_FORM;
 	}
 
 	/**
-	 * Processes the submission of the Adult update form.
+	 * Processes the submission of the Guardian update form.
 	 */
-	@PostMapping("/adults/{adultId}/edit")
-	public String processUpdateForm(@Valid Adult adult, BindingResult result, @PathVariable("adultId") int adultId,
+	@PostMapping("/guardians/{guardianId}/edit")
+	public String processUpdateForm(@Valid Guardian guardian, BindingResult result, @PathVariable("guardianId") int guardianId,
 			RedirectAttributes redirectAttributes, HttpSession session, Model model) {
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
-		Adult existingAdult = this.adults.findById(adultId)
-			.orElseThrow(() -> new IllegalArgumentException("Adult not found: " + adultId));
+		Guardian existingGuardian = this.guardians.findById(guardianId)
+			.orElseThrow(() -> new IllegalArgumentException("Guardian not found: " + guardianId));
 
-		String resourceName = existingAdult.getFirstName() + " " + existingAdult.getLastName();
-		var adultEval = cedarEvaluator.evaluate(principal, "EditAdult", "ResponsibleAdult", resourceName, "Page");
+		String resourceName = existingGuardian.getFirstName() + " " + existingGuardian.getLastName();
+		var guardianEval = cedarEvaluator.evaluate(principal, "EditGuardian", "Guardian", resourceName, "Page");
 
-		if (!adultEval.isGranted()) {
-			throw new CedarDeniedException("Access Denied: You do not have permission to edit this adult.\n"
-					+ (adultEval.responseBody() != null ? adultEval.responseBody() : ""));
+		if (!guardianEval.isGranted()) {
+			throw new CedarDeniedException("Access Denied: You do not have permission to edit this guardian.\n"
+					+ (guardianEval.responseBody() != null ? guardianEval.responseBody() : ""));
 		}
 
 		boolean isAuthorized = true;
 		List<String> denialReasons = new ArrayList<>();
-		Collection<Clinic> submittedClinics = adult.getClinics();
+		Collection<Clinic> submittedClinics = guardian.getClinics();
 
 		if (submittedClinics != null) {
 			for (Clinic clinic : submittedClinics) {
 				if (clinic == null || clinic.getClinicName() == null)
 					continue;
 				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-				// Here we check for the "AddAdult" action, instead of "EditAdult", since
+				// Here we check for the "AddGuardian" action, instead of "EditGuardian", since
 				// the former applies to the "Clinic" resource.
-				var clinicEval = cedarEvaluator.evaluate(principal, "AddAdult", "Clinic", cedarClinicId, "Page");
+				var clinicEval = cedarEvaluator.evaluate(principal, "AddGuardian", "Clinic", cedarClinicId, "Page");
 				if (!clinicEval.isGranted()) {
 					isAuthorized = false;
 					if (clinicEval.responseBody() != null) {
@@ -441,8 +441,8 @@ public class AdultController {
 
 		Set<Clinic> finalClinics = new HashSet<>(submittedClinics != null ? submittedClinics : new ArrayList<>());
 
-		if (existingAdult.getClinics() != null) {
-			for (Clinic existingClinic : existingAdult.getClinics()) {
+		if (existingGuardian.getClinics() != null) {
+			for (Clinic existingClinic : existingGuardian.getClinics()) {
 				if (existingClinic == null || existingClinic.getClinicName() == null)
 					continue;
 				String cedarClinicId = existingClinic.getClinicName().replaceFirst("^Clinic\\s+", "");
@@ -453,42 +453,42 @@ public class AdultController {
 				}
 			}
 		}
-		adult.setClinics(finalClinics);
+		guardian.setClinics(finalClinics);
 
-		if (StringUtils.hasLength(adult.getLastName()) && StringUtils.hasLength(adult.getFirstName())) {
-			boolean duplicateExists = this.adults.findByLastNameStartingWith(adult.getLastName(), PageRequest.of(0, 50))
+		if (StringUtils.hasLength(guardian.getLastName()) && StringUtils.hasLength(guardian.getFirstName())) {
+			boolean duplicateExists = this.guardians.findByLastNameStartingWith(guardian.getLastName(), PageRequest.of(0, 50))
 				.getContent()
 				.stream()
-				.anyMatch(a -> a.getFirstName().equalsIgnoreCase(adult.getFirstName())
-						&& Objects.equals(a.getBirthDate(), adult.getBirthDate())
-						&& Objects.equals(a.getGender(), adult.getGender()) && !Objects.equals(a.getId(), adultId));
+				.anyMatch(a -> a.getFirstName().equalsIgnoreCase(guardian.getFirstName())
+						&& Objects.equals(a.getBirthDate(), guardian.getBirthDate())
+						&& Objects.equals(a.getGender(), guardian.getGender()) && !Objects.equals(a.getId(), guardianId));
 
 			if (duplicateExists) {
 				result.rejectValue("firstName", "duplicate",
-						"An adult with this first and last name, birth date, and gender already exists.");
+						"A guardian with this first and last name, birth date, and gender already exists.");
 			}
 		}
 
 		if (result.hasErrors()) {
-			model.addAttribute("error", "There was an error in updating the adult.");
-			return VIEWS_ADULT_CREATE_OR_UPDATE_FORM;
+			model.addAttribute("error", "There was an error in updating the guardian.");
+			return VIEWS_GUARDIAN_CREATE_OR_UPDATE_FORM;
 		}
 
-		adult.setId(adultId);
+		guardian.setId(guardianId);
 
 		try {
-			this.adults.save(adult);
+			this.guardians.save(guardian);
 		}
 		catch (DataIntegrityViolationException ex) {
 			result.rejectValue("firstName", "duplicate",
 					"A person with this first name, last name, birth date, and gender already exists.");
-			model.addAttribute("error", "There was an error in updating the adult.");
-			return VIEWS_ADULT_CREATE_OR_UPDATE_FORM;
+			model.addAttribute("error", "There was an error in updating the guardian.");
+			return VIEWS_GUARDIAN_CREATE_OR_UPDATE_FORM;
 		}
 
 		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
-		redirectAttributes.addFlashAttribute("message", "Adult values updated.");
-		return "redirect:/adults/{adultId}";
+		redirectAttributes.addFlashAttribute("message", "Guardian values updated.");
+		return "redirect:/guardians/{guardianId}";
 	}
 
 }

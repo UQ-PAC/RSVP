@@ -11,22 +11,22 @@
     },
 
     {
-        "uid": { "type": "ChildrenClinic::AdultAuthority", "id": "Parent" },
+        "uid": { "type": "ChildrenClinic::GuardianAuthority", "id": "Parent" },
         "attrs": { },
         "parents": [ ]
     },
     {
-        "uid": { "type": "ChildrenClinic::AdultAuthority", "id": "Legal Guardian" },
+        "uid": { "type": "ChildrenClinic::GuardianAuthority", "id": "Legal Guardian" },
         "attrs": { },
         "parents": [ ]
     },
     {
-        "uid": { "type": "ChildrenClinic::AdultAuthority", "id": "Designated Representative" },
+        "uid": { "type": "ChildrenClinic::GuardianAuthority", "id": "Designated Representative" },
         "attrs": { },
         "parents": [ ]
     },
     {
-        "uid": { "type": "ChildrenClinic::AdultAuthority", "id": "Authorised Adult" },
+        "uid": { "type": "ChildrenClinic::GuardianAuthority", "id": "Authorised Adult" },
         "attrs": { },
         "parents": [ ]
     },
@@ -222,7 +222,7 @@
     },
 
     {
-        "uid": { "type": "ChildrenClinic::ResponsibleAdult", "id": "George Franklin" },
+        "uid": { "type": "ChildrenClinic::Guardian", "id": "George Franklin" },
         "attrs": {
             "name": "George Franklin",
             "clinics": [
@@ -233,7 +233,7 @@
         "parents": [ ]
     },
     {
-        "uid": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Betty Davis" },
+        "uid": { "type": "ChildrenClinic::Guardian", "id": "Betty Davis" },
         "attrs": {
             "name": "Betty Davis",
             "clinics": [
@@ -243,7 +243,7 @@
         "parents": [ ]
     },
     {
-        "uid": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Eduardo Rodriquez" },
+        "uid": { "type": "ChildrenClinic::Guardian", "id": "Eduardo Rodriquez" },
         "attrs": {
             "name": "Eduardo Rodriquez",
             "clinics": [
@@ -253,7 +253,7 @@
         "parents": [ ]
     },
     {
-        "uid": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Jean Coleman" },
+        "uid": { "type": "ChildrenClinic::Guardian", "id": "Jean Coleman" },
         "attrs": {
             "name": "Jean Coleman",
             "clinics": [
@@ -263,7 +263,7 @@
         "parents": [ ]
     },
     {
-        "uid": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Carlos Estaban" },
+        "uid": { "type": "ChildrenClinic::Guardian", "id": "Carlos Estaban" },
         "attrs": {
             "name": "Carlos Estaban",
             "clinics": [
@@ -273,7 +273,7 @@
         "parents": [ ]
     },
     {
-        "uid": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Clara Higgins" },
+        "uid": { "type": "ChildrenClinic::Guardian", "id": "Clara Higgins" },
         "attrs": {
             "name": "Clara Higgins",
             "clinics": [
@@ -287,14 +287,14 @@
         "uid": { "type": "ChildrenClinic::Patient", "id": "Leo Franklin" },
         "attrs": {
             "name": "Leo Franklin",
-            "adults": [
+            "guardians": [
                 {
-                    "adult": { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "George Franklin" } },
-                    "authority": { "__entity": { "type": "ChildrenClinic::AdultAuthority", "id": "Parent" } }
+                    "guardian": { "__entity": { "type": "ChildrenClinic::Guardian", "id": "George Franklin" } },
+                    "authority": { "__entity": { "type": "ChildrenClinic::GuardianAuthority", "id": "Parent" } }
                 },
                 {
-                    "adult": { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Clara Higgins" } },
-                    "authority": { "__entity": { "type": "ChildrenClinic::AdultAuthority", "id": "Authorised Adult" } }
+                    "guardian": { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Clara Higgins" } },
+                    "authority": { "__entity": { "type": "ChildrenClinic::GuardianAuthority", "id": "Authorised Adult" } }
                 }
             ],
             "clinics": [
@@ -311,10 +311,10 @@
         "uid": { "type": "ChildrenClinic::Patient", "id": "Basil Davis" },
         "attrs": {
             "name": "Basil Davis",
-            "adults": [
+            "guardians": [
                 {
-                    "adult": { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Betty Davis" } },
-                    "authority": { "__entity": { "type": "ChildrenClinic::AdultAuthority", "id": "Parent" } }
+                    "guardian": { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Betty Davis" } },
+                    "authority": { "__entity": { "type": "ChildrenClinic::GuardianAuthority", "id": "Parent" } }
                 }
             ],
             "clinics": [
@@ -330,10 +330,10 @@
         "uid": { "type": "ChildrenClinic::Patient", "id": "Rosy Rodriquez" },
         "attrs": {
             "name": "Rosy Rodriquez",
-            "adults": [
+            "guardians": [
                 {
-                    "adult": { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Eduardo Rodriquez" } },
-                    "authority": { "__entity": { "type": "ChildrenClinic::AdultAuthority", "id": "Parent" } }
+                    "guardian": { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Eduardo Rodriquez" } },
+                    "authority": { "__entity": { "type": "ChildrenClinic::GuardianAuthority", "id": "Parent" } }
                 }
             ],
             "clinics": [
@@ -350,10 +350,10 @@
         "uid": { "type": "ChildrenClinic::Patient", "id": "Jewel Rodriquez" },
         "attrs": {
             "name": "Jewel Rodriquez",
-            "adults": [
+            "guardians": [
                 {
-                    "adult": { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Eduardo Rodriquez" } },
-                    "authority": { "__entity": { "type": "ChildrenClinic::AdultAuthority", "id": "Parent" } }
+                    "guardian": { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Eduardo Rodriquez" } },
+                    "authority": { "__entity": { "type": "ChildrenClinic::GuardianAuthority", "id": "Parent" } }
                 }
             ],
             "clinics": [
@@ -370,10 +370,10 @@
         "uid": { "type": "ChildrenClinic::Patient", "id": "Samantha Coleman" },
         "attrs": {
             "name": "Samantha Coleman",
-            "adults": [
+            "guardians": [
                 {
-                    "adult": { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Jean Coleman" } },
-                    "authority": { "__entity": { "type": "ChildrenClinic::AdultAuthority", "id": "Parent" } }
+                    "guardian": { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Jean Coleman" } },
+                    "authority": { "__entity": { "type": "ChildrenClinic::GuardianAuthority", "id": "Parent" } }
                 }
             ],
             "clinics": [
@@ -391,10 +391,10 @@
         "uid": { "type": "ChildrenClinic::Patient", "id": "Max Coleman" },
         "attrs": {
             "name": "Max Coleman",
-            "adults": [
+            "guardians": [
                 {
-                    "adult": { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Jean Coleman" } },
-                    "authority": { "__entity": { "type": "ChildrenClinic::AdultAuthority", "id": "Parent" } }
+                    "guardian": { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Jean Coleman" } },
+                    "authority": { "__entity": { "type": "ChildrenClinic::GuardianAuthority", "id": "Parent" } }
                 }
             ],
             "clinics": [
@@ -412,10 +412,10 @@
         "uid": { "type": "ChildrenClinic::Patient", "id": "Lucky Estaban" },
         "attrs": {
             "name": "Lucky Estaban",
-            "adults": [
+            "guardians": [
                 {
-                    "adult": { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Carlos Estaban" } },
-                    "authority": { "__entity": { "type": "ChildrenClinic::AdultAuthority", "id": "Parent" } }
+                    "guardian": { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Carlos Estaban" } },
+                    "authority": { "__entity": { "type": "ChildrenClinic::GuardianAuthority", "id": "Parent" } }
                 }
             ],
             "clinics": [
@@ -431,10 +431,10 @@
         "uid": { "type": "ChildrenClinic::Patient", "id": "Sly Estaban" },
         "attrs": {
             "name": "Sly Estaban",
-            "adults": [
+            "guardians": [
                 {
-                    "adult": { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Carlos Estaban" } },
-                    "authority": { "__entity": { "type": "ChildrenClinic::AdultAuthority", "id": "Parent" } }
+                    "guardian": { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Carlos Estaban" } },
+                    "authority": { "__entity": { "type": "ChildrenClinic::GuardianAuthority", "id": "Parent" } }
                 }
             ],
             "clinics": [
@@ -451,8 +451,8 @@
         "uid": { "type": "ChildrenClinic::Visit", "id": "Samantha Coleman 1" },
         "attrs": {
             "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Samantha Coleman" } },
-            "adults": [
-                { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Jean Coleman" } }
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Jean Coleman" } }
             ],
             "clinics": [
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
@@ -468,8 +468,8 @@
         "uid": { "type": "ChildrenClinic::Visit", "id": "Max Coleman 1" },
         "attrs": {
             "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Max Coleman" } },
-            "adults": [
-                { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Jean Coleman" } }
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Jean Coleman" } }
             ],
             "clinics": [
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
@@ -485,8 +485,8 @@
         "uid": { "type": "ChildrenClinic::Visit", "id": "Max Coleman 2" },
         "attrs": {
             "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Max Coleman" } },
-            "adults": [
-                { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Jean Coleman" } }
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Jean Coleman" } }
             ],
             "clinics": [
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
@@ -504,8 +504,8 @@
         "uid": { "type": "ChildrenClinic::Visit", "id": "Samantha Coleman 2" },
         "attrs": {
             "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Samantha Coleman" } },
-            "adults": [
-                { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Jean Coleman" } }
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Jean Coleman" } }
             ],
             "clinics": [
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
@@ -523,8 +523,8 @@
         "uid": { "type": "ChildrenClinic::Visit", "id": "Rosy Rodriquez 1" },
         "attrs": {
             "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Rosy Rodriquez" } },
-            "adults": [
-                { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Eduardo Rodriquez" } }
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Eduardo Rodriquez" } }
             ],
             "clinics": [
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
@@ -541,8 +541,8 @@
         "uid": { "type": "ChildrenClinic::Visit", "id": "Jewel Rodriquez 1" },
         "attrs": {
             "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Jewel Rodriquez" } },
-            "adults": [
-                { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Eduardo Rodriquez" } }
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Eduardo Rodriquez" } }
             ],
             "clinics": [
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
@@ -559,8 +559,8 @@
         "uid": { "type": "ChildrenClinic::Visit", "id": "Lucky Estaban 1" },
         "attrs": {
             "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Lucky Estaban" } },
-            "adults": [
-                { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Carlos Estaban" } }
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Carlos Estaban" } }
             ],
             "clinics": [
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
@@ -576,8 +576,8 @@
         "uid": { "type": "ChildrenClinic::Visit", "id": "Sly Estaban 1" },
         "attrs": {
             "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Sly Estaban" } },
-            "adults": [
-                { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Carlos Estaban" } }
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Carlos Estaban" } }
             ],
             "clinics": [
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
@@ -593,8 +593,8 @@
         "uid": { "type": "ChildrenClinic::Visit", "id": "Basil Davis 1" },
         "attrs": {
             "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Basil Davis" } },
-            "adults": [
-                { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Betty Davis" } }
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Betty Davis" } }
             ],
             "clinics": [
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
@@ -610,8 +610,8 @@
         "uid": { "type": "ChildrenClinic::Visit", "id": "Leo Franklin 1" },
         "attrs": {
             "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Leo Franklin" } },
-            "adults": [
-                { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Clara Higgins" } }
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Clara Higgins" } }
             ],
             "clinics": [
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
@@ -627,8 +627,8 @@
         "uid": { "type": "ChildrenClinic::Visit", "id": "Leo Franklin 2" },
         "attrs": {
             "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Leo Franklin" } },
-            "adults": [
-                { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "George Franklin" } }
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "George Franklin" } }
             ],
             "clinics": [
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
@@ -644,8 +644,8 @@
         "uid": { "type": "ChildrenClinic::Visit", "id": "Basil Davis 2" },
         "attrs": {
             "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Basil Davis" } },
-            "adults": [
-                { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Betty Davis" } }
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Betty Davis" } }
             ],
             "clinics": [
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
@@ -661,8 +661,8 @@
         "uid": { "type": "ChildrenClinic::Visit", "id": "Rosy Rodriquez 2" },
         "attrs": {
             "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Rosy Rodriquez" } },
-            "adults": [
-                { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Eduardo Rodriquez" } }
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Eduardo Rodriquez" } }
             ],
             "clinics": [
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
@@ -678,8 +678,8 @@
         "uid": { "type": "ChildrenClinic::Visit", "id": "Jewel Rodriquez 2" },
         "attrs": {
             "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Jewel Rodriquez" } },
-            "adults": [
-                { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Eduardo Rodriquez" } }
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Eduardo Rodriquez" } }
             ],
             "clinics": [
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
@@ -695,8 +695,8 @@
         "uid": { "type": "ChildrenClinic::Visit", "id": "Samantha Coleman 3" },
         "attrs": {
             "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Samantha Coleman" } },
-            "adults": [
-                { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Jean Coleman" } }
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Jean Coleman" } }
             ],
             "clinics": [
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
@@ -712,8 +712,8 @@
         "uid": { "type": "ChildrenClinic::Visit", "id": "Max Coleman 3" },
         "attrs": {
             "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Max Coleman" } },
-            "adults": [
-                { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Jean Coleman" } }
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Jean Coleman" } }
             ],
             "clinics": [
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
@@ -729,8 +729,8 @@
         "uid": { "type": "ChildrenClinic::Visit", "id": "Lucky Estaban 2" },
         "attrs": {
             "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Lucky Estaban" } },
-            "adults": [
-                { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Carlos Estaban" } }
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Carlos Estaban" } }
             ],
             "clinics": [
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
@@ -746,8 +746,8 @@
         "uid": { "type": "ChildrenClinic::Visit", "id": "Sly Estaban 2" },
         "attrs": {
             "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Sly Estaban" } },
-            "adults": [
-                { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Carlos Estaban" } }
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Carlos Estaban" } }
             ],
             "clinics": [
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
@@ -763,8 +763,8 @@
         "uid": { "type": "ChildrenClinic::Visit", "id": "Leo Franklin 3" },
         "attrs": {
             "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Leo Franklin" } },
-            "adults": [
-                { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Clara Higgins" } }
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Clara Higgins" } }
             ],
             "clinics": [
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
@@ -780,8 +780,8 @@
         "uid": { "type": "ChildrenClinic::Visit", "id": "Basil Davis 3" },
         "attrs": {
             "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Basil Davis" } },
-            "adults": [
-                { "__entity": { "type": "ChildrenClinic::ResponsibleAdult", "id": "Betty Davis" } }
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Betty Davis" } }
             ],
             "clinics": [
                 { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
@@ -887,35 +887,35 @@
     },
 
     {
-        "uid": { "type": "ChildrenClinic::Action", "id": "ListAdults" },
+        "uid": { "type": "ChildrenClinic::Action", "id": "ListGuardians" },
         "attrs": { },
         "parents": [
             { "__entity": { "type": "ChildrenClinic::Action", "id": "PatientOperations" } }
         ]
     },
     {
-        "uid": { "type": "ChildrenClinic::Action", "id": "AddAdult" },
+        "uid": { "type": "ChildrenClinic::Action", "id": "AddGuardian" },
         "attrs": { },
         "parents": [
             { "__entity": { "type": "ChildrenClinic::Action", "id": "PatientOperations" } }
         ]
     },
     {
-        "uid": { "type": "ChildrenClinic::Action", "id": "ViewAdult" },
+        "uid": { "type": "ChildrenClinic::Action", "id": "ViewGuardian" },
         "attrs": { },
         "parents": [
             { "__entity": { "type": "ChildrenClinic::Action", "id": "PatientOperations" } }
         ]
     },
     {
-        "uid": { "type": "ChildrenClinic::Action", "id": "EditAdult" },
+        "uid": { "type": "ChildrenClinic::Action", "id": "EditGuardian" },
         "attrs": { },
         "parents": [
             { "__entity": { "type": "ChildrenClinic::Action", "id": "PatientOperations" } }
         ]
     },
     {
-        "uid": { "type": "ChildrenClinic::Action", "id": "DeleteAdult" },
+        "uid": { "type": "ChildrenClinic::Action", "id": "DeleteGuardian" },
         "attrs": { },
         "parents": [
             { "__entity": { "type": "ChildrenClinic::Action", "id": "PatientOperations" } }

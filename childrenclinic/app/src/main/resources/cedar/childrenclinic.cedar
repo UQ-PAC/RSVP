@@ -11,15 +11,15 @@ permit (
 );
 
 // 'policy1'
-// Every Employee can list the Adults, Patients, and Visits they are allowed to view.
-@id("Policy: Every Employee can list Adults, Patients, and Visits.")
+// Every Employee can list the Guardians, Patients, and Visits they are allowed to view.
+@id("Policy: Every Employee can list Guardians, Patients, and Visits.")
 permit (
     principal is ChildrenClinic::Employee,
     action,
     resource is ChildrenClinic::Clinic
 )
 when {
-    action in [ChildrenClinic::Action::"ListAdults",
+    action in [ChildrenClinic::Action::"ListGuardians",
                ChildrenClinic::Action::"ListPatients",
                ChildrenClinic::Action::"ListVisits"]
 };
@@ -48,7 +48,7 @@ forbid (
 when {
     resource is ChildrenClinic::Clinic ||
     resource is ChildrenClinic::Patient ||
-    resource is ChildrenClinic::ResponsibleAdult ||
+    resource is ChildrenClinic::Guardian ||
     resource is ChildrenClinic::Visit
 };
 
@@ -77,17 +77,17 @@ when {
     (
         resource is ChildrenClinic::Employee ||
         resource is ChildrenClinic::Patient ||
-        resource is ChildrenClinic::ResponsibleAdult ||
+        resource is ChildrenClinic::Guardian ||
         resource is ChildrenClinic::Visit
     ) &&
     resource.clinics.containsAny(principal.clinics)
 }
 unless {
-    action in [ChildrenClinic::Action::"AddAdult",
+    action in [ChildrenClinic::Action::"AddGuardian",
                ChildrenClinic::Action::"AddEmployee",
                ChildrenClinic::Action::"AddPatient",
                ChildrenClinic::Action::"AddVisit",
-               ChildrenClinic::Action::"DeleteAdult",
+               ChildrenClinic::Action::"DeleteGuardian",
                ChildrenClinic::Action::"DeleteEmployee",
                ChildrenClinic::Action::"DeletePatient",
                ChildrenClinic::Action::"DeleteVisit"] ||
@@ -98,15 +98,15 @@ unless {
 };
 
 // 'policy6'
-// Every "Administrative Assistant" can add Patients and Adults to their Clinics' data.
-@id("Policy: Administrative Assistant can add Patients and Adults to their Clinics.")
+// Every "Administrative Assistant" can add Patients and Guardians to their Clinics' data.
+@id("Policy: Administrative Assistant can add Patients and Guardians to their Clinics.")
 permit (
     principal is ChildrenClinic::Employee,
     action,
     resource is ChildrenClinic::Clinic
 )
 when {
-    action in [ChildrenClinic::Action::"AddAdult",
+    action in [ChildrenClinic::Action::"AddGuardian",
                ChildrenClinic::Action::"AddPatient"] &&
     principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrative Assistant") &&
     principal.clinics.contains(resource)
@@ -134,15 +134,15 @@ unless {
 };
 
 // 'policy8'
-// Every "Doctor" can add Adults and Patients to their Clinics' data.
-@id("Policy: Doctor can add Adults and Patients to their Clinics.")
+// Every "Doctor" can add Guardians and Patients to their Clinics' data.
+@id("Policy: Doctor can add Guardians and Patients to their Clinics.")
 permit (
     principal is ChildrenClinic::Employee,
     action,
     resource is ChildrenClinic::Clinic
 )
 when {
-    action in [ChildrenClinic::Action::"AddAdult",
+    action in [ChildrenClinic::Action::"AddGuardian",
                ChildrenClinic::Action::"AddPatient"] &&
     principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
     principal.clinics.contains(resource)
@@ -274,12 +274,12 @@ when {
 };
 
 // 'policy15'
-// Every Doctor can view Adults in their Clinics.
-@id("Policy: Doctor can view Adults in their Clinics.")
+// Every Doctor can view Guardians in their Clinics.
+@id("Policy: Doctor can view Guardians in their Clinics.")
 permit (
     principal is ChildrenClinic::Employee,
-    action == ChildrenClinic::Action::"ViewAdult",
-    resource is ChildrenClinic::ResponsibleAdult
+    action == ChildrenClinic::Action::"ViewGuardian",
+    resource is ChildrenClinic::Guardian
 )
 when {
     principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&

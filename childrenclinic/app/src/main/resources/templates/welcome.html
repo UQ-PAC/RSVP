@@ -14,7 +14,7 @@
 
       <div th:if="${param.error}" class="alert alert-warning">
         <span th:if="${param.error[0] == 'noPatients'}" th:text="#{error.noPatients}">No patients found.</span>
-        <span th:if="${param.error[0] == 'noAdults'}" th:text="#{error.noAdults}">No adults found.</span>
+        <span th:if="${param.error[0] == 'noGuardians'}" th:text="#{error.noGuardians}">No guardians found.</span>
         <span th:if="${param.error[0] == 'noDoctors'}" th:text="#{error.noDoctors}">No doctors found.</span>
         <span th:if="${param.error[0] == 'noAssistants'}" th:text="#{error.noAssistants}">No administrative assistants found.</span>
       </div>

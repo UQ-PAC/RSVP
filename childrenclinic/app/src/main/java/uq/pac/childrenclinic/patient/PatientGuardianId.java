@@ -7,20 +7,20 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
-public class PatientAdultId implements Serializable {
+public class PatientGuardianId implements Serializable {
 
 	@Column(name = "patient_id")
 	private Integer patientId;
 
-	@Column(name = "adult_id")
-	private Integer adultId;
+	@Column(name = "guardian_id")
+	private Integer guardianId;
 
-	public PatientAdultId() {
+	public PatientGuardianId() {
 	}
 
-	public PatientAdultId(Integer patientId, Integer adultId) {
+	public PatientGuardianId(Integer patientId, Integer guardianId) {
 		this.patientId = patientId;
-		this.adultId = adultId;
+		this.guardianId = guardianId;
 	}
 
 	public Integer getPatientId() {
@@ -31,12 +31,12 @@ public class PatientAdultId implements Serializable {
 		this.patientId = patientId;
 	}
 
-	public Integer getAdultId() {
-		return adultId;
+	public Integer getGuardianId() {
+		return guardianId;
 	}
 
-	public void setAdultId(Integer adultId) {
-		this.adultId = adultId;
+	public void setGuardianId(Integer guardianId) {
+		this.guardianId = guardianId;
 	}
 
 	@Override
@@ -45,9 +45,9 @@ public class PatientAdultId implements Serializable {
 			return true;
 		if (o == null || getClass() != o.getClass())
 			return false;
-		PatientAdultId that = (PatientAdultId) o;
-		return patientId != null && adultId != null && Objects.equals(patientId, that.patientId)
-				&& Objects.equals(adultId, that.adultId);
+		PatientGuardianId that = (PatientGuardianId) o;
+		return patientId != null && guardianId != null && Objects.equals(patientId, that.patientId)
+				&& Objects.equals(guardianId, that.guardianId);
 	}
 
 	@Override

@@ -15,7 +15,7 @@ import uq.pac.childrenclinic.model.Identifiable;
 
 @Entity
 @Table(name = "authorities")
-public class AdultAuthority implements Serializable, Identifiable {
+public class GuardianAuthority implements Serializable, Identifiable {
 
 	@Id
 	@Column(name = "id")
@@ -48,7 +48,7 @@ public class AdultAuthority implements Serializable, Identifiable {
 			return true;
 		if (o == null || getClass() != o.getClass())
 			return false;
-		AdultAuthority authority = (AdultAuthority) o;
+		GuardianAuthority authority = (GuardianAuthority) o;
 		return id != null && Objects.equals(this.id, authority.getId());
 	}
 

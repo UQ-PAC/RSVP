@@ -9,15 +9,15 @@
       <input type="hidden" name="patientId" th:value="${patient.id}" th:if="${!patient['new']}" />
 
       <div class="control-group">
-        <label class="col-sm-2 control-label" th:text="#{responsibleAdults}">Assign Adults</label>
+        <label class="col-sm-2 control-label" th:text="#{guardians}">Assign Guardians</label>
         <div class="col-sm-10">
-          <select name="newAdultIds" class="form-control" multiple="multiple">
-            <option th:each="adult : ${adults}" 
-                    th:value="${adult.id}" 
-                    th:selected="${selectedAdultIds != null and #lists.contains(selectedAdultIds, adult.id)}"
-                    th:text="${adult.firstName + ' ' + adult.lastName}">Adult</option>
+          <select name="newGuardianIds" class="form-control" multiple="multiple">
+            <option th:each="guardian : ${guardians}" 
+                    th:value="${guardian.id}" 
+                    th:selected="${selectedGuardianIds != null and #lists.contains(selectedGuardianIds, guardian.id)}"
+                    th:text="${guardian.firstName + ' ' + guardian.lastName}">Guardian</option>
           </select>
-          <span class="help-inline text-muted" style="font-size: 0.85em;">Select one or more adults to assign.</span>
+          <span class="help-inline text-muted" style="font-size: 0.85em;">Select one or more guardians to assign.</span>
         </div>
         <div class="col-sm-10">
           <select name="newAuthorityId" class="form-control">
@@ -74,8 +74,8 @@
       <div class="col-sm-offset-2 col-sm-10">
         <button th:with="text=${patient['new']} ? #{addPatient} : #{updatePatient}" class="btn btn-primary" type="submit"
           th:text="${text}">Submit</button>
-        <button type="submit" class="btn btn-primary" th:formaction="@{/patients/stash-and-add-adult}" formnovalidate
-          th:text="#{addAdult}">Add Adult</button>
+        <button type="submit" class="btn btn-primary" th:formaction="@{/patients/stash-and-add-guardian}" formnovalidate
+          th:text="#{addGuardian}">Add Guardian</button>
       </div>
     </div>
   </form>

@@ -14,13 +14,13 @@ DROP TABLE user_roles IF EXISTS;
 DROP TABLE levels IF EXISTS;
 DROP TABLE user_levels IF EXISTS;
 DROP TABLE user_manager IF EXISTS;
-DROP TABLE adults IF EXISTS;
+DROP TABLE guardians IF EXISTS;
 DROP TABLE patients IF EXISTS;
 DROP TABLE authorities IF EXISTS;
-DROP TABLE patient_adults IF EXISTS;
+DROP TABLE patient_guardians IF EXISTS;
 DROP TABLE confidentialities IF EXISTS;
 DROP TABLE visits IF EXISTS;
-DROP TABLE visit_adults IF EXISTS;
+DROP TABLE visit_guardians IF EXISTS;
 DROP TABLE patient_doctors IF EXISTS;
 DROP TABLE visit_doctors IF EXISTS;
 
@@ -40,7 +40,7 @@ CREATE TABLE entities (
 
 CREATE TABLE entity_types (
   entity_id   INTEGER NOT NULL,
-  entity_type VARCHAR(40) NOT NULL, -- 'User', 'Administrator', 'Administrative Assistant', 'Doctor', 'Adult', 'Patient', 'Visit'.
+  entity_type VARCHAR(40) NOT NULL, -- 'User', 'Administrator', 'Administrative Assistant', 'Doctor', 'Guardian', 'Patient', 'Visit'.
   PRIMARY KEY (entity_id, entity_type),
   FOREIGN KEY (entity_id) REFERENCES entities(entity_id) ON DELETE CASCADE
 );
@@ -145,7 +145,7 @@ CREATE TABLE user_manager (
   CONSTRAINT distinct_users CHECK (user_id != manager_id)
 );
 
-CREATE TABLE adults (
+CREATE TABLE guardians (
   entity_id  INTEGER PRIMARY KEY,
   telephone  VARCHAR(20) UNIQUE NOT NULL,
   FOREIGN KEY (entity_id) REFERENCES persons(entity_id) ON DELETE CASCADE
@@ -164,13 +164,13 @@ CREATE TABLE authorities (
 );
 CREATE INDEX authorities_name ON authorities (name);
 
-CREATE TABLE patient_adults (
+CREATE TABLE patient_guardians (
   patient_id   INTEGER NOT NULL,
-  adult_id     INTEGER NOT NULL,
+  guardian_id     INTEGER NOT NULL,
   authority_id INTEGER NOT NULL,
-  PRIMARY KEY (patient_id, adult_id),
+  PRIMARY KEY (patient_id, guardian_id),
   FOREIGN KEY (patient_id) REFERENCES patients(entity_id) ON DELETE CASCADE,
-  FOREIGN KEY (adult_id) REFERENCES adults(entity_id) ON DELETE CASCADE,
+  FOREIGN KEY (guardian_id) REFERENCES guardians(entity_id) ON DELETE CASCADE,
   FOREIGN KEY (authority_id) REFERENCES authorities(id) ON DELETE CASCADE
 );
 
@@ -193,12 +193,12 @@ CREATE TABLE visits (
 );
 CREATE INDEX visits_patient_id ON visits (patient_id);
 
-CREATE TABLE visit_adults (
+CREATE TABLE visit_guardians (
   visit_id   INTEGER NOT NULL,
-  adult_id   INTEGER NOT NULL,
-  PRIMARY KEY (visit_id, adult_id),
+  guardian_id   INTEGER NOT NULL,
+  PRIMARY KEY (visit_id, guardian_id),
   FOREIGN KEY (visit_id) REFERENCES visits(entity_id) ON DELETE CASCADE,
-  FOREIGN KEY (adult_id) REFERENCES adults(entity_id) ON DELETE CASCADE
+  FOREIGN KEY (guardian_id) REFERENCES guardians(entity_id) ON DELETE CASCADE
 );
 
 CREATE TABLE patient_doctors (

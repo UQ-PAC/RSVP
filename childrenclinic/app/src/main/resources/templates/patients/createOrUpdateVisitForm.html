@@ -57,14 +57,14 @@
         </div>
       </div>
       <div class="control-group">
-        <label class="col-sm-2 control-label" th:text="#{responsibleAdults}">Responsible Adults</label>
+        <label class="col-sm-2 control-label" th:text="#{guardians}">Guardians</label>
         <div class="col-sm-10">
-          <select th:field="*{responsibleAdults}" class="form-control" multiple="multiple">
-            <option th:each="adult : ${adults}" 
-                    th:value="${adult.id}" 
-                    th:text="${adult.firstName + ' ' + adult.lastName}">Adult</option>
+          <select th:field="*{guardians}" class="form-control" multiple="multiple">
+            <option th:each="guardian : ${guardians}" 
+                    th:value="${guardian.id}" 
+                    th:text="${guardian.firstName + ' ' + guardian.lastName}">Guardian</option>
           </select>
-          <span class="help-inline" th:errors="*{responsibleAdults}">[error]</span>
+          <span class="help-inline" th:errors="*{guardians}">[error]</span>
         </div>
       </div>
       <div class="control-group">
@@ -97,7 +97,7 @@
       <th th:text="#{description}">Description</th>
       <th th:text="#{confidentiality}">Confidentiality</th>
       <th th:text="#{doctors}">Doctors</th>
-      <th th:text="#{responsibleAdults}">Responsible Adults</th>
+      <th th:text="#{guardians}">Guardians</th>
       <th th:text="#{clinics}">Clinics</th>
     </tr>
     <tr th:if="${!visit['new']}" th:each="visit : ${patient.visits}">
@@ -114,9 +114,9 @@
       </td>
       <td>
         <ul class="list-unstyled mb-0">
-          <li th:each="adult : ${visit.responsibleAdults}"
-              th:text="${adult.firstName + ' ' + adult.lastName}"></li>
-          <li th:if="${visit.responsibleAdults == null or visit.responsibleAdults.isEmpty()}"
+          <li th:each="guardian : ${visit.guardians}"
+              th:text="${guardian.firstName + ' ' + guardian.lastName}"></li>
+          <li th:if="${visit.guardians == null or visit.guardians.isEmpty()}"
               class="text-muted">None</li>
         </ul>
       </td>

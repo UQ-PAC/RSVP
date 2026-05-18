@@ -131,49 +131,49 @@ INSERT INTO user_levels (user_id, level_id) VALUES (@new_entity_id, 5);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'Linda' AND p.last_name = 'Douglas');
 INSERT INTO user_manager (user_id, manager_id) VALUES (@new_entity_id, @recovered_doctor_id);
 
--- Adults.
+-- Guardians.
 
 -- George Franklin (Parent)
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VALUES (@new_entity_id, 'George', 'Franklin', '1970-03-12', 2);
-INSERT INTO adults (entity_id, telephone) VALUES (@new_entity_id, '6085551023');
-INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Adult');
+INSERT INTO guardians (entity_id, telephone) VALUES (@new_entity_id, '6085551023');
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Guardian');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 
 -- Betty Davis (Parent)
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VALUES (@new_entity_id, 'Betty', 'Davis', '1975-06-25', 1);
-INSERT INTO adults (entity_id, telephone) VALUES (@new_entity_id, '6085551749');
-INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Adult');
+INSERT INTO guardians (entity_id, telephone) VALUES (@new_entity_id, '6085551749');
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Guardian');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 
 -- Eduardo Rodriquez (Parent)
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VALUES (@new_entity_id, 'Eduardo', 'Rodriquez', '1978-09-08', 2);
-INSERT INTO adults (entity_id, telephone) VALUES (@new_entity_id, '6085558763');
-INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Adult');
+INSERT INTO guardians (entity_id, telephone) VALUES (@new_entity_id, '6085558763');
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Guardian');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 
 -- Jean Coleman (Parent)
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VALUES (@new_entity_id, 'Jean', 'Coleman', '1980-01-30', 1);
-INSERT INTO adults (entity_id, telephone) VALUES (@new_entity_id, '6085552654');
-INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Adult');
+INSERT INTO guardians (entity_id, telephone) VALUES (@new_entity_id, '6085552654');
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Guardian');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 
 -- Carlos Estaban (Parent)
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VALUES (@new_entity_id, 'Carlos', 'Estaban', '1976-11-14', 2);
-INSERT INTO adults (entity_id, telephone) VALUES (@new_entity_id, '6085555487');
-INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Adult');
+INSERT INTO guardians (entity_id, telephone) VALUES (@new_entity_id, '6085555487');
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Guardian');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 
 -- Clara Higgins (School Teacher)
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VALUES (@new_entity_id, 'Clara', 'Higgins', '1982-04-10', 1);
-INSERT INTO adults (entity_id, telephone) VALUES (@new_entity_id, '6085559999');
-INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Adult');
+INSERT INTO guardians (entity_id, telephone) VALUES (@new_entity_id, '6085559999');
+INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Guardian');
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 
 -- Patients.
@@ -183,8 +183,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VALUES (@new_entity_id, 'Leo', 'Franklin', '2010-09-07', 2);
 INSERT INTO patients (entity_id, address, city) VALUES (@new_entity_id, '110 W. Liberty St.', 'Madison');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Patient');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085551023');
-INSERT INTO patient_adults (patient_id, adult_id, authority_id) VALUES (@new_entity_id, @recovered_adult_id, 1);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085551023');
+INSERT INTO patient_guardians (patient_id, guardian_id, authority_id) VALUES (@new_entity_id, @recovered_guardian_id, 1);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'James' AND p.last_name = 'Carter');
@@ -195,8 +195,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VALUES (@new_entity_id, 'Basil', 'Davis', '2012-08-06', 2);
 INSERT INTO patients (entity_id, address, city) VALUES (@new_entity_id, '638 Cardinal Ave.', 'Sun Prairie');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Patient');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085551749');
-INSERT INTO patient_adults (patient_id, adult_id, authority_id) VALUES (@new_entity_id, @recovered_adult_id, 1);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085551749');
+INSERT INTO patient_guardians (patient_id, guardian_id, authority_id) VALUES (@new_entity_id, @recovered_guardian_id, 1);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'James' AND p.last_name = 'Carter');
 INSERT INTO patient_doctors (patient_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -206,8 +206,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VALUES (@new_entity_id, 'Rosy', 'Rodriquez', '2011-04-17', 1);
 INSERT INTO patients (entity_id, address, city) VALUES (@new_entity_id, '2693 Commerce St.', 'McFarland');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Patient');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085558763');
-INSERT INTO patient_adults (patient_id, adult_id, authority_id) VALUES (@new_entity_id, @recovered_adult_id, 1);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085558763');
+INSERT INTO patient_guardians (patient_id, guardian_id, authority_id) VALUES (@new_entity_id, @recovered_guardian_id, 1);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'James' AND p.last_name = 'Carter');
 INSERT INTO patient_doctors (patient_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -219,8 +219,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VALUES (@new_entity_id, 'Jewel', 'Rodriquez', '2010-03-07', 1);
 INSERT INTO patients (entity_id, address, city) VALUES (@new_entity_id, '2693 Commerce St.', 'McFarland');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Patient');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085558763');
-INSERT INTO patient_adults (patient_id, adult_id, authority_id) VALUES (@new_entity_id, @recovered_adult_id, 1);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085558763');
+INSERT INTO patient_guardians (patient_id, guardian_id, authority_id) VALUES (@new_entity_id, @recovered_guardian_id, 1);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'James' AND p.last_name = 'Carter');
 INSERT INTO patient_doctors (patient_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -232,8 +232,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VALUES (@new_entity_id, 'Samantha', 'Coleman', '2012-09-04', 1);
 INSERT INTO patients (entity_id, address, city) VALUES (@new_entity_id, '105 N. Lake St.', 'Monona');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Patient');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085552654');
-INSERT INTO patient_adults (patient_id, adult_id, authority_id) VALUES (@new_entity_id, @recovered_adult_id, 1);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085552654');
+INSERT INTO patient_guardians (patient_id, guardian_id, authority_id) VALUES (@new_entity_id, @recovered_guardian_id, 1);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'Sharon' AND p.last_name = 'Jenkins');
 INSERT INTO patient_doctors (patient_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -247,8 +247,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VALUES (@new_entity_id, 'Max', 'Coleman', '2012-09-04', 2);
 INSERT INTO patients (entity_id, address, city) VALUES (@new_entity_id, '105 N. Lake St.', 'Monona');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Patient');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085552654');
-INSERT INTO patient_adults (patient_id, adult_id, authority_id) VALUES (@new_entity_id, @recovered_adult_id, 1);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085552654');
+INSERT INTO patient_guardians (patient_id, guardian_id, authority_id) VALUES (@new_entity_id, @recovered_guardian_id, 1);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'Sharon' AND p.last_name = 'Jenkins');
 INSERT INTO patient_doctors (patient_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -262,8 +262,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VALUES (@new_entity_id, 'Lucky', 'Estaban', '2011-08-06', 1);
 INSERT INTO patients (entity_id, address, city) VALUES (@new_entity_id, '2335 Independence La.', 'Waunakee');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Patient');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085555487');
-INSERT INTO patient_adults (patient_id, adult_id, authority_id) VALUES (@new_entity_id, @recovered_adult_id, 1);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085555487');
+INSERT INTO patient_guardians (patient_id, guardian_id, authority_id) VALUES (@new_entity_id, @recovered_guardian_id, 1);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'James' AND p.last_name = 'Carter');
 INSERT INTO patient_doctors (patient_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -273,8 +273,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VALUES (@new_entity_id, 'Sly', 'Estaban', '2012-06-08', 2);
 INSERT INTO patients (entity_id, address, city) VALUES (@new_entity_id, '2335 Independence La.', 'Waunakee');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Patient');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085555487');
-INSERT INTO patient_adults (patient_id, adult_id, authority_id) VALUES (@new_entity_id, @recovered_adult_id, 1);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085555487');
+INSERT INTO patient_guardians (patient_id, guardian_id, authority_id) VALUES (@new_entity_id, @recovered_guardian_id, 1);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'James' AND p.last_name = 'Carter');
 INSERT INTO patient_doctors (patient_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -286,8 +286,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 SET @recovered_patient_id = (SELECT pt.entity_id FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE p.first_name = 'Samantha' AND p.last_name = 'Coleman' AND p.gender_id = 1);
 INSERT INTO visits (entity_id, patient_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_patient_id, '2013-01-01', 1, 'Routine pediatric wellness checkup.');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085552654');
-INSERT INTO visit_adults (visit_id, adult_id) VALUES (@new_entity_id, @recovered_adult_id);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085552654');
+INSERT INTO visit_guardians (visit_id, guardian_id) VALUES (@new_entity_id, @recovered_guardian_id);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'Sharon' AND p.last_name = 'Jenkins');
 INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -297,8 +297,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 SET @recovered_patient_id = (SELECT pt.entity_id FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE p.first_name = 'Max' AND p.last_name = 'Coleman' AND p.gender_id = 2);
 INSERT INTO visits (entity_id, patient_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_patient_id, '2013-01-02', 1, 'Routine pediatric wellness checkup.');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085552654');
-INSERT INTO visit_adults (visit_id, adult_id) VALUES (@new_entity_id, @recovered_adult_id);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085552654');
+INSERT INTO visit_guardians (visit_id, guardian_id) VALUES (@new_entity_id, @recovered_guardian_id);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'Sharon' AND p.last_name = 'Jenkins');
 INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -308,8 +308,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 SET @recovered_patient_id = (SELECT pt.entity_id FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE p.first_name = 'Max' AND p.last_name = 'Coleman' AND p.gender_id = 2);
 INSERT INTO visits (entity_id, patient_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_patient_id, '2013-01-03', 2, 'Minor dental surgery and cavity extraction.');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085552654');
-INSERT INTO visit_adults (visit_id, adult_id) VALUES (@new_entity_id, @recovered_adult_id);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085552654');
+INSERT INTO visit_guardians (visit_id, guardian_id) VALUES (@new_entity_id, @recovered_guardian_id);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'Sharon' AND p.last_name = 'Jenkins');
 INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -323,8 +323,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 SET @recovered_patient_id = (SELECT pt.entity_id FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE p.first_name = 'Samantha' AND p.last_name = 'Coleman' AND p.gender_id = 1);
 INSERT INTO visits (entity_id, patient_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_patient_id, '2013-01-04', 2, 'Tonsillectomy procedure.');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085552654');
-INSERT INTO visit_adults (visit_id, adult_id) VALUES (@new_entity_id, @recovered_adult_id);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085552654');
+INSERT INTO visit_guardians (visit_id, guardian_id) VALUES (@new_entity_id, @recovered_guardian_id);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'Sharon' AND p.last_name = 'Jenkins');
 INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -338,8 +338,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 SET @recovered_patient_id = (SELECT pt.entity_id FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE p.first_name = 'Rosy' AND p.last_name = 'Rodriquez' AND p.gender_id = 1);
 INSERT INTO visits (entity_id, patient_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_patient_id, '2013-01-04', 1, 'Evaluation for persistent fever and cough.');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085558763');
-INSERT INTO visit_adults (visit_id, adult_id) VALUES (@new_entity_id, @recovered_adult_id);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085558763');
+INSERT INTO visit_guardians (visit_id, guardian_id) VALUES (@new_entity_id, @recovered_guardian_id);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'James' AND p.last_name = 'Carter');
 INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -351,8 +351,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 SET @recovered_patient_id = (SELECT pt.entity_id FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE p.first_name = 'Jewel' AND p.last_name = 'Rodriquez' AND p.gender_id = 1);
 INSERT INTO visits (entity_id, patient_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_patient_id, '2013-01-04', 1, 'Treatment for acute otitis media (ear infection).');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085558763');
-INSERT INTO visit_adults (visit_id, adult_id) VALUES (@new_entity_id, @recovered_adult_id);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085558763');
+INSERT INTO visit_guardians (visit_id, guardian_id) VALUES (@new_entity_id, @recovered_guardian_id);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'James' AND p.last_name = 'Carter');
 INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -364,8 +364,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 SET @recovered_patient_id = (SELECT pt.entity_id FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE p.first_name = 'Lucky' AND p.last_name = 'Estaban' AND p.gender_id = 1);
 INSERT INTO visits (entity_id, patient_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_patient_id, '2013-01-05', 1, 'School sports physical examination.');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085555487');
-INSERT INTO visit_adults (visit_id, adult_id) VALUES (@new_entity_id, @recovered_adult_id);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085555487');
+INSERT INTO visit_guardians (visit_id, guardian_id) VALUES (@new_entity_id, @recovered_guardian_id);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'James' AND p.last_name = 'Carter');
 INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -375,8 +375,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 SET @recovered_patient_id = (SELECT pt.entity_id FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE p.first_name = 'Sly' AND p.last_name = 'Estaban' AND p.gender_id = 2);
 INSERT INTO visits (entity_id, patient_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_patient_id, '2013-01-05', 1, 'Standard childhood immunizations schedule update.');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085555487');
-INSERT INTO visit_adults (visit_id, adult_id) VALUES (@new_entity_id, @recovered_adult_id);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085555487');
+INSERT INTO visit_guardians (visit_id, guardian_id) VALUES (@new_entity_id, @recovered_guardian_id);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'James' AND p.last_name = 'Carter');
 INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -386,21 +386,21 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 SET @recovered_patient_id = (SELECT pt.entity_id FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE p.first_name = 'Basil' AND p.last_name = 'Davis' AND p.gender_id = 2);
 INSERT INTO visits (entity_id, patient_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_patient_id, '2013-01-06', 3, 'Pediatric behavioral health and developmental evaluation.');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085551749');
-INSERT INTO visit_adults (visit_id, adult_id) VALUES (@new_entity_id, @recovered_adult_id);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085551749');
+INSERT INTO visit_guardians (visit_id, guardian_id) VALUES (@new_entity_id, @recovered_guardian_id);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'James' AND p.last_name = 'Carter');
 INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
 
 -- Visit 10: Leo Franklin
 SET @recovered_patient_id = (SELECT pt.entity_id FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE p.first_name = 'Leo' AND p.last_name = 'Franklin' AND p.gender_id = 2);
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085559999');
-INSERT INTO patient_adults (patient_id, adult_id, authority_id) VALUES (@recovered_patient_id, @recovered_adult_id, 4);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085559999');
+INSERT INTO patient_guardians (patient_id, guardian_id, authority_id) VALUES (@recovered_patient_id, @recovered_guardian_id, 4);
 
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
 INSERT INTO visits (entity_id, patient_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_patient_id, '2013-01-10', 1, 'School-mandated asthma evaluation after recess incident.');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
-INSERT INTO visit_adults (visit_id, adult_id) VALUES (@new_entity_id, @recovered_adult_id);
+INSERT INTO visit_guardians (visit_id, guardian_id) VALUES (@new_entity_id, @recovered_guardian_id);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'James' AND p.last_name = 'Carter');
 INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -410,8 +410,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 SET @recovered_patient_id = (SELECT pt.entity_id FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE p.first_name = 'Leo' AND p.last_name = 'Franklin' AND p.gender_id = 2);
 INSERT INTO visits (entity_id, patient_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_patient_id, '2013-01-15', 1, 'Asthma follow-up and inhaler prescription.');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085551023');
-INSERT INTO visit_adults (visit_id, adult_id) VALUES (@new_entity_id, @recovered_adult_id);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085551023');
+INSERT INTO visit_guardians (visit_id, guardian_id) VALUES (@new_entity_id, @recovered_guardian_id);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'James' AND p.last_name = 'Carter');
 INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -421,8 +421,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 SET @recovered_patient_id = (SELECT pt.entity_id FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE p.first_name = 'Basil' AND p.last_name = 'Davis' AND p.gender_id = 2);
 INSERT INTO visits (entity_id, patient_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_patient_id, '2013-01-12', 1, 'Strep throat test and antibiotic prescription.');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085551749');
-INSERT INTO visit_adults (visit_id, adult_id) VALUES (@new_entity_id, @recovered_adult_id);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085551749');
+INSERT INTO visit_guardians (visit_id, guardian_id) VALUES (@new_entity_id, @recovered_guardian_id);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'Sharon' AND p.last_name = 'Jenkins');
 INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -432,8 +432,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 SET @recovered_patient_id = (SELECT pt.entity_id FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE p.first_name = 'Rosy' AND p.last_name = 'Rodriquez' AND p.gender_id = 1);
 INSERT INTO visits (entity_id, patient_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_patient_id, '2013-01-14', 1, 'Allergy testing for seasonal pollen.');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085558763');
-INSERT INTO visit_adults (visit_id, adult_id) VALUES (@new_entity_id, @recovered_adult_id);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085558763');
+INSERT INTO visit_guardians (visit_id, guardian_id) VALUES (@new_entity_id, @recovered_guardian_id);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'Jestine' AND p.last_name = 'Teixeira');
 INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -443,8 +443,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 SET @recovered_patient_id = (SELECT pt.entity_id FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE p.first_name = 'Jewel' AND p.last_name = 'Rodriquez' AND p.gender_id = 1);
 INSERT INTO visits (entity_id, patient_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_patient_id, '2013-01-14', 1, 'Treatment for minor abrasion from playground fall.');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085558763');
-INSERT INTO visit_adults (visit_id, adult_id) VALUES (@new_entity_id, @recovered_adult_id);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085558763');
+INSERT INTO visit_guardians (visit_id, guardian_id) VALUES (@new_entity_id, @recovered_guardian_id);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'Jestine' AND p.last_name = 'Teixeira');
 INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -454,8 +454,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 SET @recovered_patient_id = (SELECT pt.entity_id FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE p.first_name = 'Samantha' AND p.last_name = 'Coleman' AND p.gender_id = 1);
 INSERT INTO visits (entity_id, patient_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_patient_id, '2013-01-18', 2, 'Post-tonsillectomy recovery follow-up.');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085552654');
-INSERT INTO visit_adults (visit_id, adult_id) VALUES (@new_entity_id, @recovered_adult_id);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085552654');
+INSERT INTO visit_guardians (visit_id, guardian_id) VALUES (@new_entity_id, @recovered_guardian_id);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'Linda' AND p.last_name = 'Douglas');
 INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -465,8 +465,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 SET @recovered_patient_id = (SELECT pt.entity_id FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE p.first_name = 'Max' AND p.last_name = 'Coleman' AND p.gender_id = 2);
 INSERT INTO visits (entity_id, patient_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_patient_id, '2013-01-18', 2, 'Post-dental surgery healing checkup.');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085552654');
-INSERT INTO visit_adults (visit_id, adult_id) VALUES (@new_entity_id, @recovered_adult_id);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085552654');
+INSERT INTO visit_guardians (visit_id, guardian_id) VALUES (@new_entity_id, @recovered_guardian_id);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'Linda' AND p.last_name = 'Douglas');
 INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -476,8 +476,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 SET @recovered_patient_id = (SELECT pt.entity_id FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE p.first_name = 'Lucky' AND p.last_name = 'Estaban' AND p.gender_id = 1);
 INSERT INTO visits (entity_id, patient_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_patient_id, '2013-01-20', 1, 'X-ray and splinting for suspected sprained wrist.');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085555487');
-INSERT INTO visit_adults (visit_id, adult_id) VALUES (@new_entity_id, @recovered_adult_id);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085555487');
+INSERT INTO visit_guardians (visit_id, guardian_id) VALUES (@new_entity_id, @recovered_guardian_id);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'James' AND p.last_name = 'Carter');
 INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -487,8 +487,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 SET @recovered_patient_id = (SELECT pt.entity_id FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE p.first_name = 'Sly' AND p.last_name = 'Estaban' AND p.gender_id = 2);
 INSERT INTO visits (entity_id, patient_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_patient_id, '2013-01-22', 1, 'Consultation for persistent stomach ache.');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085555487');
-INSERT INTO visit_adults (visit_id, adult_id) VALUES (@new_entity_id, @recovered_adult_id);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085555487');
+INSERT INTO visit_guardians (visit_id, guardian_id) VALUES (@new_entity_id, @recovered_guardian_id);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'James' AND p.last_name = 'Carter');
 INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -498,8 +498,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 SET @recovered_patient_id = (SELECT pt.entity_id FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE p.first_name = 'Leo' AND p.last_name = 'Franklin' AND p.gender_id = 2);
 INSERT INTO visits (entity_id, patient_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_patient_id, '2013-01-25', 1, 'Vision screening due to reading difficulties in class.');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085559999');
-INSERT INTO visit_adults (visit_id, adult_id) VALUES (@new_entity_id, @recovered_adult_id);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085559999');
+INSERT INTO visit_guardians (visit_id, guardian_id) VALUES (@new_entity_id, @recovered_guardian_id);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'Sharon' AND p.last_name = 'Jenkins');
 INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);
@@ -509,8 +509,8 @@ SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DE
 SET @recovered_patient_id = (SELECT pt.entity_id FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE p.first_name = 'Basil' AND p.last_name = 'Davis' AND p.gender_id = 2);
 INSERT INTO visits (entity_id, patient_id, visit_date, confidentiality_id, description) VALUES (@new_entity_id, @recovered_patient_id, '2013-01-28', 3, 'Follow-up developmental evaluation.');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Visit');
-SET @recovered_adult_id = (SELECT entity_id FROM adults WHERE telephone = '6085551749');
-INSERT INTO visit_adults (visit_id, adult_id) VALUES (@new_entity_id, @recovered_adult_id);
+SET @recovered_guardian_id = (SELECT entity_id FROM guardians WHERE telephone = '6085551749');
+INSERT INTO visit_guardians (visit_id, guardian_id) VALUES (@new_entity_id, @recovered_guardian_id);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'Sharon' AND p.last_name = 'Jenkins');
 INSERT INTO visit_doctors (visit_id, doctor_id) VALUES (@new_entity_id, @recovered_doctor_id);

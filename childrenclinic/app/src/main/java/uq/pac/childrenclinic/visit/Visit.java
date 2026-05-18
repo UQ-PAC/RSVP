@@ -33,8 +33,8 @@ import java.util.Set;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import uq.pac.childrenclinic.adult.Adult;
 import uq.pac.childrenclinic.doctor.Doctor;
+import uq.pac.childrenclinic.guardian.Guardian;
 import uq.pac.childrenclinic.model.BaseEntity;
 import uq.pac.childrenclinic.patient.Patient;
 
@@ -67,9 +67,9 @@ public class Visit extends BaseEntity {
 	private Patient patient;
 
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "visit_adults", joinColumns = @JoinColumn(name = "visit_id"),
-			inverseJoinColumns = @JoinColumn(name = "adult_id"))
-	private Set<Adult> responsibleAdults = new LinkedHashSet<>();
+	@JoinTable(name = "visit_guardians", joinColumns = @JoinColumn(name = "visit_id"),
+			inverseJoinColumns = @JoinColumn(name = "guardian_id"))
+	private Set<Guardian> guardians = new LinkedHashSet<>();
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "visit_doctors", joinColumns = @JoinColumn(name = "visit_id"),
@@ -115,12 +115,12 @@ public class Visit extends BaseEntity {
 		this.patient = patient;
 	}
 
-	public Set<Adult> getResponsibleAdults() {
-		return responsibleAdults;
+	public Set<Guardian> getGuardians() {
+		return guardians;
 	}
 
-	public void setResponsibleAdults(Set<Adult> responsibleAdults) {
-		this.responsibleAdults = responsibleAdults;
+	public void setGuardians(Set<Guardian> guardians) {
+		this.guardians = guardians;
 	}
 
 	public Set<Doctor> getDoctors() {

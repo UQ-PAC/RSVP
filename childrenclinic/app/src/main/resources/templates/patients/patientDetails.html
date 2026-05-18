@@ -36,14 +36,14 @@
       <td th:text="*{city}"></td>
     </tr>
     <tr>
-      <th th:text="#{responsibleAdults}">Responsible Adults</th>
+      <th th:text="#{guardians}">Guardians</th>
       <td>
         <ul class="list-unstyled mb-0">
-          <li th:each="pa : *{responsibleAdults}">
-            <b th:text="${pa.adult.firstName + ' ' + pa.adult.lastName}"></b>
+          <li th:each="pa : *{guardians}">
+            <b th:text="${pa.guardian.firstName + ' ' + pa.guardian.lastName}"></b>
             <span class="text-muted" th:text="${' - ' + pa.authority.name}"></span>
           </li>
-          <li th:if="${#lists.isEmpty(patient.responsibleAdults)}" class="text-muted">None assigned.</li>
+          <li th:if="${#lists.isEmpty(patient.guardians)}" class="text-muted">None assigned.</li>
         </ul>
       </td>
     </tr>
@@ -69,7 +69,7 @@
   <a th:href="@{__${patient.id}__/edit}" class="btn btn-primary" th:text="#{editPatient}">Edit
     Patient</a>
   <a th:href="@{__${patient.id}__/visits/new}" class="btn btn-primary" th:text="#{addVisit}">Add Visit</a>
-  <a th:href="@{/adults/new(patientId=${patient.id})}" class="btn btn-primary">Add Adult</a>
+  <a th:href="@{/guardians/new(patientId=${patient.id})}" class="btn btn-primary">Add Guardian</a>
 
   <br />
   <hr />
@@ -82,7 +82,7 @@
         <th th:text="#{description}">Description</th>
         <th th:text="#{confidentiality}">Confidentiality</th>
         <th th:text="#{doctors}">Doctors</th>
-        <th th:text="#{responsibleAdults}">Responsible Adults</th>
+        <th th:text="#{guardians}">Guardians</th>
         <th th:text="#{clinics}">Clinics</th>
       </tr>
     </thead>
@@ -101,9 +101,9 @@
         </td>
         <td>
           <ul class="list-unstyled mb-0">
-            <li th:each="adult : ${visit.responsibleAdults}"
-                th:text="${adult.firstName + ' ' + adult.lastName}"></li>
-            <li th:if="${visit.responsibleAdults == null or visit.responsibleAdults.isEmpty()}"
+            <li th:each="guardian : ${visit.guardians}"
+                th:text="${guardian.firstName + ' ' + guardian.lastName}"></li>
+            <li th:if="${visit.guardians == null or visit.guardians.isEmpty()}"
                 class="text-muted">None</li>
           </ul>
         </td>

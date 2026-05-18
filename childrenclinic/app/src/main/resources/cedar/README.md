@@ -45,14 +45,14 @@ For `Level`, the values `Resident`, `Registrar`, and `Specialist` are only used 
 
 `Guest` has no attributes.
 
-Non-_actors_ are entities `ResponsibleAdult`, `Patient`, and `Visit`.
+Non-_actors_ are entities `Guardian`, `Patient`, and `Visit`.
 
-Every `ResponsibleAdult` must have a `name` and at least one entity `Clinic` in their set `clinics`.
+Every `Guardian` must have a `name` and at least one entity `Clinic` in their set `clinics`.
 
-Every `Patient` must have a `name`, at least one record in their set `adults` composed of an entity `ResponsibleAdult` as `adult` and of an entity `AdultAuthority` as `authority`, at least one entity `Clinic` in their set `clinics`, and at least one entity `Doctor` in their set `doctors`.
-`AdultAuthority` is either `Parent`, `Legal Guardian`, `Designated Representative`, or `Authorised Adult`.
+Every `Patient` must have a `name`, at least one record in their set `guardians` composed of an entity `Guardian` as `guardian` and of an entity `GuardianAuthority` as `authority`, at least one entity `Clinic` in their set `clinics`, and at least one entity `Doctor` in their set `doctors`.
+`GuardianAuthority` is either `Parent`, `Legal Guardian`, `Designated Representative`, or `Authorised Adult`.
 
-Every `Visit` must have one entity `Patient` as their `patient`, at least one entity `ResponsibleAdult` in their set `adults`, at least one entity `Clinic` in their set `clinics`, at least one entity `Doctor` in their set `doctors`, and one entity `Confidentiality` as their `confidentiality`.
+Every `Visit` must have one entity `Patient` as their `patient`, at least one entity `Guardian` in their set `guardians`, at least one entity `Clinic` in their set `clinics`, at least one entity `Doctor` in their set `doctors`, and one entity `Confidentiality` as their `confidentiality`.
 `Confidentiality` is either `Official`, `Sensitive`, or `Protected`.
 
 ### Actions
@@ -73,8 +73,8 @@ Actions `ViewEmployee`, `EditEmployee`, and `DeleteEmployee` apply to a resource
 Actions `ListPatients` and `AddPatient` apply to a resource whose entity is `Clinic`.
 Actions `ViewPatient`, `EditPatient`, and `DeletePatient` apply to a resource whose entity is `Patient`.
 
-Actions `ListAdults` and `AddAdult` apply to a resource whose entity is `Clinic`.
-Actions `ViewAdult`, `EditAdult`, and `DeleteAdult` apply to a resource whose entity is `ResponsibleAdult`.
+Actions `ListGuardians` and `AddGuardian` apply to a resource whose entity is `Clinic`.
+Actions `ViewGuardian`, `EditGuardian`, and `DeleteGuardian` apply to a resource whose entity is `Guardian`.
 
 Actions `ListVisits` and `AddVisit` apply to a resource whose entity is `Clinic`.
 Actions `ViewVisit`, `EditVisit`, and `DeleteVisit` apply to a resource whose entity is `Visit`.

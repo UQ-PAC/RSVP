@@ -24,7 +24,7 @@ public class EntityTypeListener {
 	// Maps each concrete entity class name to the entity_type label used in the
 	// entity_types table.
 	private static final Map<String, String> TYPE_LABELS = Map.of("User", "User", "Administrative Assistant",
-			"Administrative Assistant", "Doctor", "Doctor", "Adult", "Adult", "Patient", "Patient", "Visit", "Visit");
+			"Administrative Assistant", "Doctor", "Doctor", "Guardian", "Guardian", "Patient", "Patient", "Visit", "Visit");
 
 	private static final String ADMINISTRATOR_ROLE_NAME = "Administrator";
 

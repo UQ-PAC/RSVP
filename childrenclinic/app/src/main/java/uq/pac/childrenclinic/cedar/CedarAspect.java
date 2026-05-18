@@ -58,9 +58,9 @@ public class CedarAspect {
 			new ResourceMetadata(
 					"SELECT p.first_name, p.last_name FROM patients pt JOIN persons p ON pt.entity_id = p.entity_id WHERE pt.entity_id = ?",
 					rs -> rs.get("first_name") + " " + rs.get("last_name")),
-			"ResponsibleAdult",
+			"Guardian",
 			new ResourceMetadata(
-					"SELECT p.first_name, p.last_name FROM adults a JOIN persons p ON a.entity_id = p.entity_id WHERE a.entity_id = ?",
+					"SELECT p.first_name, p.last_name FROM guardians a JOIN persons p ON a.entity_id = p.entity_id WHERE a.entity_id = ?",
 					rs -> rs.get("first_name") + " " + rs.get("last_name")),
 			"Visit", new ResourceMetadata("SELECT description FROM visits WHERE entity_id = ?",
 					rs -> rs.get("description").toString()));

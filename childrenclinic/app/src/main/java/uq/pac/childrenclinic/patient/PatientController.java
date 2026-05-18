@@ -38,14 +38,14 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriUtils;
 
-import uq.pac.childrenclinic.adult.Adult;
-import uq.pac.childrenclinic.adult.AdultRepository;
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
 import uq.pac.childrenclinic.cedar.CedarDeniedException;
 import uq.pac.childrenclinic.cedar.CedarEntitiesInvalidationEvent;
 import uq.pac.childrenclinic.cedar.CedarProgrammaticEvaluator;
 import uq.pac.childrenclinic.doctor.Doctor;
 import uq.pac.childrenclinic.doctor.DoctorRepository;
+import uq.pac.childrenclinic.guardian.Guardian;
+import uq.pac.childrenclinic.guardian.GuardianRepository;
 import uq.pac.childrenclinic.model.Gender;
 import uq.pac.childrenclinic.model.GenderRepository;
 import uq.pac.childrenclinic.system.Clinic;
@@ -62,9 +62,9 @@ public class PatientController {
 
 	private final ClinicRepository clinics;
 
-	private final AdultRepository adults;
+	private final GuardianRepository guardians;
 
-	private final AdultAuthorityRepository authorities;
+	private final GuardianAuthorityRepository authorities;
 
 	private final DoctorRepository doctorRepository;
 
@@ -73,12 +73,12 @@ public class PatientController {
 	private final ApplicationEventPublisher eventPublisher;
 
 	public PatientController(PatientRepository patients, GenderRepository genders, ClinicRepository clinics,
-			AdultRepository adults, AdultAuthorityRepository authorities, DoctorRepository doctorRepository,
+			GuardianRepository guardians, GuardianAuthorityRepository authorities, DoctorRepository doctorRepository,
 			ApplicationEventPublisher eventPublisher, CedarProgrammaticEvaluator cedarEvaluator) {
 		this.patients = patients;
 		this.genders = genders;
 		this.clinics = clinics;
-		this.adults = adults;
+		this.guardians = guardians;
 		this.authorities = authorities;
 		this.doctorRepository = doctorRepository;
 		this.cedarEvaluator = cedarEvaluator;
@@ -107,13 +107,13 @@ public class PatientController {
 		}).collect(Collectors.toList());
 	}
 
-	@ModelAttribute("adults")
-	public Collection<Adult> populateAdults() {
-		return this.adults.findAll();
+	@ModelAttribute("guardians")
+	public Collection<Guardian> populateGuardians() {
+		return this.guardians.findAll();
 	}
 
 	@ModelAttribute("authorities")
-	public Collection<AdultAuthority> populateAuthorities() {
+	public Collection<GuardianAuthority> populateAuthorities() {
 		return this.authorities.findAll();
 	}
 
@@ -258,7 +258,7 @@ public class PatientController {
 				patient.setClinics(selectedClinics);
 			}
 			model.addAttribute("patient", patient);
-			model.addAttribute("selectedAdultIds", state.getAdultIds());
+			model.addAttribute("selectedGuardianIds", state.getGuardianIds());
 			model.addAttribute("selectedAuthorityId", state.getAuthorityId());
 			model.addAttribute("selectedDoctorIds", state.getDoctorIds());
 
@@ -275,7 +275,7 @@ public class PatientController {
 	@PostMapping("/patients/new")
 	public String processCreationForm(@Valid Patient patient, BindingResult result,
 			@RequestParam(name = "clinics", required = false) Collection<Clinic> submittedClinics,
-			@RequestParam(name = "newAdultIds", required = false) List<Integer> adultIds,
+			@RequestParam(name = "newGuardianIds", required = false) List<Integer> guardianIds,
 			@RequestParam(name = "newAuthorityId", required = false) Integer authorityId,
 			@RequestParam(name = "newDoctorIds", required = false) List<Integer> doctorIds,
 			RedirectAttributes redirectAttributes, HttpSession session, Model model) {
@@ -305,8 +305,8 @@ public class PatientController {
 			}
 		}
 
-		if (patient.getResponsibleAdults() == null) {
-			patient.setResponsibleAdults(new LinkedHashSet<>());
+		if (patient.getGuardians() == null) {
+			patient.setGuardians(new LinkedHashSet<>());
 		}
 		if (patient.getClinics() == null) {
 			patient.setClinics(new HashSet<>());
@@ -316,27 +316,27 @@ public class PatientController {
 			patient.getClinics().addAll(submittedClinics);
 		}
 
-		if (adultIds != null && authorityId != null) {
-			AdultAuthority auth = authorities.findById(authorityId).orElse(null);
+		if (guardianIds != null && authorityId != null) {
+			GuardianAuthority auth = authorities.findById(authorityId).orElse(null);
 			if (auth != null) {
-				for (Integer adId : adultIds) {
+				for (Integer adId : guardianIds) {
 					if (adId != null) {
-						Adult adult = adults.findById(adId).orElse(null);
-						if (adult != null) {
-							PatientAdult pa = new PatientAdult();
+						Guardian guardian = guardians.findById(adId).orElse(null);
+						if (guardian != null) {
+							PatientGuardian pa = new PatientGuardian();
 							pa.setPatient(patient);
-							pa.setAdult(adult);
+							pa.setGuardian(guardian);
 							pa.setAuthority(auth);
-							patient.getResponsibleAdults().add(pa);
+							patient.getGuardians().add(pa);
 						}
 					}
 				}
 			}
 		}
 
-		if (patient.getResponsibleAdults() == null || patient.getResponsibleAdults().isEmpty()) {
+		if (patient.getGuardians() == null || patient.getGuardians().isEmpty()) {
 			isAuthorized = false;
-			denialReasons.add("You must assign the Patient to at least one Responsible Adult.");
+			denialReasons.add("You must assign the Patient to at least one Guardian.");
 		}
 
 		if (doctorIds != null && !doctorIds.isEmpty()) {
@@ -384,7 +384,7 @@ public class PatientController {
 		}
 
 		if (result.hasErrors()) {
-			model.addAttribute("selectedAdultIds", adultIds);
+			model.addAttribute("selectedGuardianIds", guardianIds);
 			model.addAttribute("selectedAuthorityId", authorityId);
 			return VIEWS_PATIENT_CREATE_OR_UPDATE_FORM;
 		}
@@ -395,7 +395,7 @@ public class PatientController {
 		catch (DataIntegrityViolationException ex) {
 			result.rejectValue("firstName", "duplicate",
 					"A person with this first name, last name, birth date, and gender already exists.");
-			model.addAttribute("selectedAdultIds", adultIds);
+			model.addAttribute("selectedGuardianIds", guardianIds);
 			model.addAttribute("selectedAuthorityId", authorityId);
 			return VIEWS_PATIENT_CREATE_OR_UPDATE_FORM;
 		}
@@ -420,24 +420,24 @@ public class PatientController {
 		Patient patient = this.patients.findById(patientId)
 			.orElseThrow(() -> new IllegalArgumentException("Patient entity not found for identifier: " + patientId));
 
-		List<Integer> adultIds = new ArrayList<>();
+		List<Integer> guardianIds = new ArrayList<>();
 		Integer authId = null;
-		if (patient.getResponsibleAdults() != null && !patient.getResponsibleAdults().isEmpty()) {
-			adultIds = patient.getResponsibleAdults()
+		if (patient.getGuardians() != null && !patient.getGuardians().isEmpty()) {
+			guardianIds = patient.getGuardians()
 				.stream()
-				.map(pa -> pa.getAdult().getId())
+				.map(pa -> pa.getGuardian().getId())
 				.collect(Collectors.toList());
-			authId = patient.getResponsibleAdults().iterator().next().getAuthority().getId();
+			authId = patient.getGuardians().iterator().next().getAuthority().getId();
 		}
 
 		Map<String, ?> flashMap = model.asMap();
-		if (flashMap.containsKey("selectedAdultIds")) {
+		if (flashMap.containsKey("selectedGuardianIds")) {
 			@SuppressWarnings("unchecked")
-			List<Integer> flashAdultIds = (List<Integer>) flashMap.get("selectedAdultIds");
-			if (flashAdultIds != null) {
-				for (Integer id : flashAdultIds) {
-					if (id != null && !adultIds.contains(id)) {
-						adultIds.add(id);
+			List<Integer> flashGuardianIds = (List<Integer>) flashMap.get("selectedGuardianIds");
+			if (flashGuardianIds != null) {
+				for (Integer id : flashGuardianIds) {
+					if (id != null && !guardianIds.contains(id)) {
+						guardianIds.add(id);
 					}
 				}
 			}
@@ -446,7 +446,7 @@ public class PatientController {
 			authId = (Integer) flashMap.get("selectedAuthorityId");
 		}
 
-		model.addAttribute("selectedAdultIds", adultIds);
+		model.addAttribute("selectedGuardianIds", guardianIds);
 		model.addAttribute("selectedAuthorityId", authId);
 
 		if (patient.getDoctors() != null && !patient.getDoctors().isEmpty()) {
@@ -484,7 +484,7 @@ public class PatientController {
 	public String processUpdateForm(@Valid Patient patient, BindingResult result,
 			@PathVariable("patientId") int patientId,
 			@RequestParam(name = "clinics", required = false) Collection<Clinic> submittedClinics,
-			@RequestParam(name = "newAdultIds", required = false) List<Integer> adultIds,
+			@RequestParam(name = "newGuardianIds", required = false) List<Integer> guardianIds,
 			@RequestParam(name = "newAuthorityId", required = false) Integer authorityId,
 			@RequestParam(name = "newDoctorIds", required = false) List<Integer> doctorIds,
 			RedirectAttributes redirectAttributes, HttpSession session, Model model) {
@@ -545,41 +545,41 @@ public class PatientController {
 			result.rejectValue("clinics", "NotEmpty", "At least one clinic must be assigned.");
 		}
 
-		// Carry over the existing responsible adults.
-		Set<PatientAdult> mergedAdults;
-		if (existingPatient.getResponsibleAdults() != null) {
-			mergedAdults = new LinkedHashSet<>(existingPatient.getResponsibleAdults());
+		// Carry over the existing guardians.
+		Set<PatientGuardian> mergedGuardians;
+		if (existingPatient.getGuardians() != null) {
+			mergedGuardians = new LinkedHashSet<>(existingPatient.getGuardians());
 		}
 		else {
-			mergedAdults = new LinkedHashSet<>();
+			mergedGuardians = new LinkedHashSet<>();
 		}
 
-		// Collect the adult IDs already present to prevent duplicates.
-		Set<Integer> existingAdultIds = mergedAdults.stream()
-			.map(pa -> pa.getAdult().getId())
+		// Collect the guardian IDs already present to prevent duplicates.
+		Set<Integer> existingGuardianIds = mergedGuardians.stream()
+			.map(pa -> pa.getGuardian().getId())
 			.collect(Collectors.toSet());
 
-		// Add only newly submitted adults that are not already in the set.
-		if (adultIds != null && authorityId != null) {
-			AdultAuthority auth = authorities.findById(authorityId).orElse(null);
+		// Add only newly submitted guardians that are not already in the set.
+		if (guardianIds != null && authorityId != null) {
+			GuardianAuthority auth = authorities.findById(authorityId).orElse(null);
 			if (auth != null) {
-				for (Integer adId : adultIds) {
-					if (adId != null && !existingAdultIds.contains(adId)) {
-						Adult adult = adults.findById(adId).orElse(null);
-						if (adult != null) {
-							PatientAdult pa = new PatientAdult(existingPatient, adult, auth);
-							mergedAdults.add(pa);
+				for (Integer adId : guardianIds) {
+					if (adId != null && !existingGuardianIds.contains(adId)) {
+						Guardian guardian = guardians.findById(adId).orElse(null);
+						if (guardian != null) {
+							PatientGuardian pa = new PatientGuardian(existingPatient, guardian, auth);
+							mergedGuardians.add(pa);
 						}
 					}
 				}
 			}
 		}
 
-		patient.setResponsibleAdults(mergedAdults);
+		patient.setGuardians(mergedGuardians);
 
-		if (patient.getResponsibleAdults() == null || patient.getResponsibleAdults().isEmpty()) {
+		if (patient.getGuardians() == null || patient.getGuardians().isEmpty()) {
 			isAuthorized = false;
-			denialReasons.add("You must assign the Patient to at least one Responsible Adult.");
+			denialReasons.add("You must assign the Patient to at least one Guardian.");
 		}
 
 		if (doctorIds != null && !doctorIds.isEmpty()) {
@@ -619,7 +619,7 @@ public class PatientController {
 		}
 
 		if (result.hasErrors()) {
-			model.addAttribute("selectedAdultIds", adultIds);
+			model.addAttribute("selectedGuardianIds", guardianIds);
 			model.addAttribute("selectedAuthorityId", authorityId);
 			model.addAttribute("error", "There was an error in updating the patient.");
 			return VIEWS_PATIENT_CREATE_OR_UPDATE_FORM;
@@ -633,7 +633,7 @@ public class PatientController {
 		catch (DataIntegrityViolationException ex) {
 			result.rejectValue("firstName", "duplicate",
 					"A person with this first name, last name, birth date, and gender already exists.");
-			model.addAttribute("selectedAdultIds", adultIds);
+			model.addAttribute("selectedGuardianIds", guardianIds);
 			model.addAttribute("selectedAuthorityId", authorityId);
 			model.addAttribute("error", "There was an error in updating the patient.");
 			return VIEWS_PATIENT_CREATE_OR_UPDATE_FORM;
@@ -644,8 +644,8 @@ public class PatientController {
 		return "redirect:/patients/{patientId}";
 	}
 
-	@PostMapping("/patients/stash-and-add-adult")
-	public String stashPatientFormAndRedirectToAdultCreation(
+	@PostMapping("/patients/stash-and-add-guardian")
+	public String stashPatientFormAndRedirectToGuardianCreation(
 			@RequestParam(name = "patientId", required = false) Integer patientId,
 			@RequestParam(name = "firstName", required = false) String firstName,
 			@RequestParam(name = "lastName", required = false) String lastName,
@@ -654,7 +654,7 @@ public class PatientController {
 			@RequestParam(name = "birthDate", required = false) String birthDate,
 			@RequestParam(name = "gender", required = false) String gender,
 			@RequestParam(name = "clinics", required = false) List<String> clinicNames,
-			@RequestParam(name = "newAdultIds", required = false) List<Integer> adultIds,
+			@RequestParam(name = "newGuardianIds", required = false) List<Integer> guardianIds,
 			@RequestParam(name = "newAuthorityId", required = false) Integer authorityId,
 			@RequestParam(name = "newDoctorIds", required = false) List<Integer> doctorIds, HttpSession session) {
 
@@ -667,13 +667,13 @@ public class PatientController {
 		state.setBirthDate(birthDate);
 		state.setGender(gender);
 		state.setClinics(clinicNames);
-		state.setAdultIds(adultIds);
+		state.setGuardianIds(guardianIds);
 		state.setAuthorityId(authorityId);
 		state.setDoctorIds(doctorIds);
 
 		session.setAttribute("patientFormState", state);
 
-		return "redirect:/adults/new?fromPatientForm=true";
+		return "redirect:/guardians/new?fromPatientForm=true";
 	}
 
 }

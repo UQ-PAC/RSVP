@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'adults')}">
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'guardians')}">
 <body>
 
-  <h2 th:text="#{adult}">Adult</h2>
-  <form th:object="${adult}" class="form-horizontal" id="add-adult-form" method="post">
+  <h2 th:text="#{guardian}">Guardian</h2>
+  <form th:object="${guardian}" class="form-horizontal" id="add-guardian-form" method="post">
     <div class="form-group has-feedback">
 
       <input th:replace="~{fragments/inputField :: input (#{firstName}, 'firstName', 'text')}" />
@@ -51,7 +51,7 @@
 
     <div class="form-group">
       <div class="col-sm-offset-2 col-sm-10">
-        <button th:with="text=${adult['new']} ? #{addAdult} : #{updateAdult}" class="btn btn-primary" type="submit"
+        <button th:with="text=${guardian['new']} ? #{addGuardian} : #{updateGuardian}" class="btn btn-primary" type="submit"
           th:text="${text}">Submit</button>
       </div>
     </div>

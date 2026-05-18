@@ -1,7 +1,7 @@
 namespace ChildrenClinic {
     entity Clinic;
 
-    entity AdultAuthority enum ["Parent", "Legal Guardian", "Designated Representative", "Authorised Adult"];
+    entity GuardianAuthority enum ["Parent", "Legal Guardian", "Designated Representative", "Authorised Adult"];
 
     entity Confidentiality enum ["Official", "Sensitive", "Protected"];
 
@@ -19,16 +19,16 @@ namespace ChildrenClinic {
 
     entity Guest;
 
-    entity ResponsibleAdult = {
+    entity Guardian = {
         name: String,
         clinics: Set<Clinic>
     };
 
     entity Patient = {
         name: String,
-        adults: Set<{
-            adult: ResponsibleAdult,
-            authority: AdultAuthority
+        guardians: Set<{
+            guardian: Guardian,
+            authority: GuardianAuthority
         }>,
         clinics: Set<Clinic>,
         doctors: Set<Employee>
@@ -36,7 +36,7 @@ namespace ChildrenClinic {
 
     entity Visit = {
         patient: Patient,
-        adults: Set<ResponsibleAdult>,
+        guardians: Set<Guardian>,
         clinics: Set<Clinic>,
         doctors: Set<Employee>,
         confidentiality: Confidentiality
@@ -111,33 +111,33 @@ namespace ChildrenClinic {
         context: { }
     };
 
-    action ListAdults in PatientOperations appliesTo {
+    action ListGuardians in PatientOperations appliesTo {
         principal: [Employee, Guest],
         resource: Clinic,
         context: { }
     };
 
-    action AddAdult in PatientOperations appliesTo {
+    action AddGuardian in PatientOperations appliesTo {
         principal: [Employee, Guest],
         resource: Clinic,
         context: { }
     };
 
-    action ViewAdult in PatientOperations appliesTo {
+    action ViewGuardian in PatientOperations appliesTo {
         principal: [Employee, Guest],
-        resource: ResponsibleAdult,
+        resource: Guardian,
         context: { }
     };
 
-    action EditAdult in PatientOperations appliesTo {
+    action EditGuardian in PatientOperations appliesTo {
         principal: [Employee, Guest],
-        resource: ResponsibleAdult,
+        resource: Guardian,
         context: { }
     };
 
-    action DeleteAdult in PatientOperations appliesTo {
+    action DeleteGuardian in PatientOperations appliesTo {
         principal: [Employee, Guest],
-        resource: ResponsibleAdult,
+        resource: Guardian,
         context: { }
     };
 

@@ -23,7 +23,7 @@ public class PatientFormState implements Serializable {
 
 	private List<String> clinics;
 
-	private List<Integer> adultIds;
+	private List<Integer> guardianIds;
 
 	private Integer authorityId;
 
@@ -93,12 +93,12 @@ public class PatientFormState implements Serializable {
 		this.clinics = clinics;
 	}
 
-	public List<Integer> getAdultIds() {
-		return adultIds;
+	public List<Integer> getGuardianIds() {
+		return guardianIds;
 	}
 
-	public void setAdultIds(List<Integer> adultIds) {
-		this.adultIds = adultIds;
+	public void setGuardianIds(List<Integer> guardianIds) {
+		this.guardianIds = guardianIds;
 	}
 
 	public Integer getAuthorityId() {

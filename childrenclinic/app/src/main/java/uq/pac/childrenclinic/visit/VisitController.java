@@ -37,14 +37,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import uq.pac.childrenclinic.adult.Adult;
-import uq.pac.childrenclinic.adult.AdultRepository;
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
 import uq.pac.childrenclinic.cedar.CedarDeniedException;
 import uq.pac.childrenclinic.cedar.CedarEntitiesInvalidationEvent;
 import uq.pac.childrenclinic.cedar.CedarProgrammaticEvaluator;
 import uq.pac.childrenclinic.doctor.Doctor;
 import uq.pac.childrenclinic.doctor.DoctorRepository;
+import uq.pac.childrenclinic.guardian.Guardian;
+import uq.pac.childrenclinic.guardian.GuardianRepository;
 import uq.pac.childrenclinic.patient.Patient;
 import uq.pac.childrenclinic.patient.PatientRepository;
 import uq.pac.childrenclinic.system.Clinic;
@@ -67,7 +67,7 @@ class VisitController {
 
 	private final ClinicRepository clinics;
 
-	private final AdultRepository adults;
+	private final GuardianRepository guardians;
 
 	private final DoctorRepository doctors;
 
@@ -76,12 +76,12 @@ class VisitController {
 	private final ApplicationEventPublisher eventPublisher;
 
 	public VisitController(PatientRepository patients, ConfidentialityRepository confidentialities,
-			ClinicRepository clinics, AdultRepository adults, DoctorRepository doctors,
+			ClinicRepository clinics, GuardianRepository guardians, DoctorRepository doctors,
 			CedarProgrammaticEvaluator cedarEvaluator, ApplicationEventPublisher eventPublisher) {
 		this.patients = patients;
 		this.confidentialities = confidentialities;
 		this.clinics = clinics;
-		this.adults = adults;
+		this.guardians = guardians;
 		this.doctors = doctors;
 		this.cedarEvaluator = cedarEvaluator;
 		this.eventPublisher = eventPublisher;
@@ -119,9 +119,9 @@ class VisitController {
 		return this.patients.findById(patientId).orElseThrow(() -> new IllegalArgumentException("Patient not found"));
 	}
 
-	@ModelAttribute("adults")
-	public Collection<Adult> populateAdults() {
-		return this.adults.findAll();
+	@ModelAttribute("guardians")
+	public Collection<Guardian> populateGuardians() {
+		return this.guardians.findAll();
 	}
 
 	@ModelAttribute("doctors")
@@ -184,8 +184,8 @@ class VisitController {
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
-		if (visit.getResponsibleAdults() == null || visit.getResponsibleAdults().isEmpty()) {
-			result.rejectValue("responsibleAdults", "NotEmpty", "At least one responsible adult must be assigned.");
+		if (visit.getGuardians() == null || visit.getGuardians().isEmpty()) {
+			result.rejectValue("guardians", "NotEmpty", "At least one guardian must be assigned.");
 		}
 
 		if (visit.getDoctors() == null || visit.getDoctors().isEmpty()) {

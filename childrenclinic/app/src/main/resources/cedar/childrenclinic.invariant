@@ -88,26 +88,26 @@ invariant
 !(entity has manager) || entity.manager != entity
     for all entity: ChildrenClinic::Employee;
 
-// St11. Every ResponsibleAdult should have non-empty name and clinics.
+// St11. Every Guardian should have non-empty name and clinics.
 invariant
-entity == ChildrenClinic::ResponsibleAdult::"???" ||
+entity == ChildrenClinic::Guardian::"???" ||
 entity has name && entity.name != "" &&
 entity has clinics && entity.clinics != []
-    for all entity: ChildrenClinic::ResponsibleAdult;
+    for all entity: ChildrenClinic::Guardian;
 
-// St12. Every Patient should have non-empty name, adults, clinics, and doctors.
+// St12. Every Patient should have non-empty name, guardians, clinics, and doctors.
 invariant
 entity == ChildrenClinic::Patient::"???" ||
 entity has name && entity.name != "" &&
-entity has adults && entity.adults != [] &&
+entity has guardians && entity.guardians != [] &&
 entity has clinics && entity.clinics != [] &&
 entity has doctors && entity.doctors != []
     for all entity: ChildrenClinic::Patient;
 
-// St13. Every Visit should have non-empty adults, clinics, and doctors.
+// St13. Every Visit should have non-empty guardians, clinics, and doctors.
 invariant
 entity == ChildrenClinic::Visit::"???" ||
-entity has adults && entity.adults != [] &&
+entity has guardians && entity.guardians != [] &&
 entity has clinics && entity.clinics != [] &&
 entity has doctors && entity.doctors != []
     for all entity: ChildrenClinic::Visit;
@@ -149,7 +149,7 @@ allow(principal, resource, action)
 invariant
 !(resource is ChildrenClinic::Clinic ||
   resource is ChildrenClinic::Patient ||
-  resource is ChildrenClinic::ResponsibleAdult ||
+  resource is ChildrenClinic::Guardian ||
   resource is ChildrenClinic::Visit) ||
 deny(principal, resource, action)
     for all principal: ChildrenClinic::Guest,
@@ -196,7 +196,7 @@ deny(principal, resource, ChildrenClinic::Action::"EditVisit")
     for all principal: ChildrenClinic::Employee,
             resource: ChildrenClinic::Visit;
 
-// Se7. An "Intern" "Doctor" cannot add Adults to their clinics.
+// Se7. An "Intern" "Doctor" cannot add Guardians to their clinics.
 // ('policy8')
 invariant
 !(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
@@ -205,7 +205,7 @@ invariant
 deny(principal, resource, action)
     for all principal: ChildrenClinic::Employee,
             resource: ChildrenClinic::Clinic,
-            action: ChildrenClinic::Action::"AddAdult";
+            action: ChildrenClinic::Action::"AddGuardian";
 
 // Se8. An "Intern" "Doctor" cannot add Patients to their clinics.
 // ('policy8')
@@ -226,7 +226,7 @@ invariant
   !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
   action != ChildrenClinic::Action::"ViewEmployee" &&
   (resource is ChildrenClinic::Patient ||
-   resource is ChildrenClinic::ResponsibleAdult ||
+   resource is ChildrenClinic::Guardian ||
    resource is ChildrenClinic::Visit)) ||
 deny(principal, resource, action)
     for all principal: ChildrenClinic::Employee,
@@ -362,12 +362,12 @@ allow(principal, resource, ChildrenClinic::Action::"ListEmployees")
     for all principal: ChildrenClinic::Guest,
             resource: ChildrenClinic::Clinic;
 
-// Se22. A "Doctor" can view any ResponsibleAdult in their Clinics.
+// Se22. A "Doctor" can view any Guardian in their Clinics.
 // ('policy15')
 invariant
 !(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
   !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
   resource.clinics.containsAny(principal.clinics)) ||
-allow(principal, resource, ChildrenClinic::Action::"ViewAdult")
+allow(principal, resource, ChildrenClinic::Action::"ViewGuardian")
     for all principal: ChildrenClinic::Employee,
-            resource: ChildrenClinic::ResponsibleAdult;
+            resource: ChildrenClinic::Guardian;

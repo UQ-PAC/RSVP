@@ -37,7 +37,7 @@ public class Patient extends Person {
 	private String city;
 
 	@OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-	private Set<PatientAdult> responsibleAdults = new LinkedHashSet<>();
+	private Set<PatientGuardian> guardians = new LinkedHashSet<>();
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "patient_doctors", joinColumns = @JoinColumn(name = "patient_id"),
@@ -64,12 +64,12 @@ public class Patient extends Person {
 		this.city = city;
 	}
 
-	public Set<PatientAdult> getResponsibleAdults() {
-		return responsibleAdults;
+	public Set<PatientGuardian> getGuardians() {
+		return guardians;
 	}
 
-	public void setResponsibleAdults(Set<PatientAdult> responsibleAdults) {
-		this.responsibleAdults = responsibleAdults;
+	public void setGuardians(Set<PatientGuardian> guardians) {
+		this.guardians = guardians;
 	}
 
 	public Set<Doctor> getDoctors() {
@@ -100,7 +100,7 @@ public class Patient extends Person {
 			.append("address", this.getAddress())
 			.append("city", this.getCity())
 			.append("visits", this.getVisits())
-			.append("responsibleAdults", this.getResponsibleAdults())
+			.append("guardians", this.getGuardians())
 			.toString();
 	}
 

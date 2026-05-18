@@ -85,8 +85,8 @@ class WelcomeController {
 		if (isAuthorized(principal, "ListPatients")) {
 			searchOptions.put("patient", "Patient");
 		}
-		if (isAuthorized(principal, "ListAdults")) {
-			searchOptions.put("adult", "Adult");
+		if (isAuthorized(principal, "ListGuardians")) {
+			searchOptions.put("guardian", "Guardian");
 		}
 		if (isAuthorized(principal, "ListEmployees")) {
 			searchOptions.put("administrativeAssistant", "Administrative Assistant");
@@ -96,8 +96,8 @@ class WelcomeController {
 		if (isAuthorized(principal, "AddPatient")) {
 			addOptions.put("/patients/new", "Patient");
 		}
-		if (isAuthorized(principal, "AddAdult")) {
-			addOptions.put("/adults/new", "Adult");
+		if (isAuthorized(principal, "AddGuardian")) {
+			addOptions.put("/guardians/new", "Guardian");
 		}
 		if (isAuthorized(principal, "AddEmployee")) {
 			addOptions.put("/administrative-assistants/new", "Administrative Assistant");
@@ -121,8 +121,8 @@ class WelcomeController {
 		if ("patient".equalsIgnoreCase(entityType) && isAuthorized(principal, "ListPatients")) {
 			return "redirect:/patients?lastName=" + encodedQuery;
 		}
-		else if ("adult".equalsIgnoreCase(entityType) && isAuthorized(principal, "ListAdults")) {
-			return "redirect:/adults?lastName=" + encodedQuery;
+		else if ("guardian".equalsIgnoreCase(entityType) && isAuthorized(principal, "ListGuardians")) {
+			return "redirect:/guardians?lastName=" + encodedQuery;
 		}
 		else if ("administrativeAssistant".equalsIgnoreCase(entityType) && isAuthorized(principal, "ListEmployees")) {
 			return "redirect:/administrative-assistants?lastName=" + encodedQuery;

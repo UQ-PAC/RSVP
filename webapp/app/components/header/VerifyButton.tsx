@@ -48,8 +48,10 @@ export function VerifyButton() {
       });
     }
 
-    verificationDispatch({ type: "pre-verify" });
-    verificationDispatch({ type: "verify" });
+    if (!error) {
+      verificationDispatch({ type: "pre-verify" });
+      verificationDispatch({ type: "verify" });
+    }
   };
 
   return (

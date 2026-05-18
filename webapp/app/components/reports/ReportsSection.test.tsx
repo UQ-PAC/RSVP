@@ -12,6 +12,10 @@ jest.mock("../../lib/context/FocusContext", () => ({
   useFocusDispatch: () => focusDispatch,
 }));
 
+jest.mock("../../lib/util", () => ({
+  getFileIcon: jest.fn((filetype) => `${filetype}-icon`),
+}));
+
 jest.mock("../shared/ToggleAll", () => ({
   ToggleAll: jest.fn(({ name, toggle }) => {
     toggleAll = toggle;
@@ -20,12 +24,14 @@ jest.mock("../shared/ToggleAll", () => ({
 }));
 
 jest.mock("./ReportsGroup", () => ({
-  ReportsGroup: jest.fn(({ name, section, reports }) => (
+  ReportsGroup: jest.fn(({ name, id, section, reports, icon }) => (
     <div
-      data-testid={`reports-section-${name.replaceAll(" ", "-")}`}
+      data-testid={`reports-group-${name.replaceAll(" ", "-")}`}
       data-name={name}
+      data-id={id}
       data-section={section}
       data-reportcount={reports.length}
+      data-icon={icon}
     />
   )),
 }));
@@ -55,8 +61,18 @@ test("renders", () => {
       severity="warn"
       reports={
         [
-          ["group five", { filename: "group five", reports: [] }],
-          ["group two", { filename: "group two", reports: [{}, {}, {}] }],
+          [
+            "group five",
+            { filename: "group five", filetype: "cedar", reports: [] },
+          ],
+          [
+            "group two",
+            {
+              filename: "group two",
+              filetype: "cedarschema",
+              reports: [{}, {}, {}],
+            },
+          ],
         ] as ReportGroup[]
       }
     />,

@@ -24,16 +24,18 @@ exports[`renders 1`] = `
       />
     </span>
     <div
+      data-id="group one"
       data-name="group one"
       data-reportcount="2"
       data-section="warn"
-      data-testid="reports-section-group-one"
+      data-testid="reports-group-group-one"
     />
     <div
+      data-id="group two"
       data-name="group two"
       data-reportcount="3"
       data-section="warn"
-      data-testid="reports-section-group-two"
+      data-testid="reports-group-group-two"
     />
   </div>
 </DocumentFragment>
@@ -63,16 +65,20 @@ exports[`renders 2`] = `
       />
     </span>
     <div
+      data-icon="cedar-icon"
+      data-id="group five"
       data-name="group five"
       data-reportcount="0"
       data-section="warn"
-      data-testid="reports-section-group-five"
+      data-testid="reports-group-group-five"
     />
     <div
+      data-icon="cedarschema-icon"
+      data-id="group two"
       data-name="group two"
       data-reportcount="3"
       data-section="warn"
-      data-testid="reports-section-group-two"
+      data-testid="reports-group-group-two"
     />
   </div>
 </DocumentFragment>
@@ -102,22 +108,25 @@ exports[`toggles group expansions 1`] = `
       />
     </span>
     <div
+      data-id="group one"
       data-name="group one"
       data-reportcount="2"
       data-section="err"
-      data-testid="reports-section-group-one"
+      data-testid="reports-group-group-one"
     />
     <div
+      data-id="group two"
       data-name="group two"
       data-reportcount="3"
       data-section="err"
-      data-testid="reports-section-group-two"
+      data-testid="reports-group-group-two"
     />
     <div
+      data-id="group three"
       data-name="group three"
       data-reportcount="1"
       data-section="err"
-      data-testid="reports-section-group-three"
+      data-testid="reports-group-group-three"
     />
   </div>
 </DocumentFragment>

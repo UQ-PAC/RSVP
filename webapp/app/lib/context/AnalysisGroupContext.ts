@@ -4,8 +4,8 @@ import {
   VerificationFile,
   VerificationFileDict,
   VersionDict,
-} from "../../lib/types";
-import { sortSources } from "../../lib/util";
+} from "../types";
+import { sortSources } from "../util";
 
 export const emptyAnalysisGroup: AnalysisGroup = {
   name: "",

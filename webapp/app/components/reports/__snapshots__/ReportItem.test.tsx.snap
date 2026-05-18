@@ -1,0 +1,253 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`handles no source location 1`] = `
+<DocumentFragment>
+  <div
+    class="report-item report-item-info"
+    data-testid="report-item"
+    id="report-123"
+  >
+    <div
+      class="report-item-header"
+    >
+      <div
+        data-icon="faCircleInfo"
+        data-testid="font-awesome-icon"
+      />
+      <span
+        class="report-item-message report-item-message-info"
+      >
+        Test Report
+      </span>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`multiple source locations renders 1`] = `
+<DocumentFragment>
+  <div
+    class="report-item report-item-info"
+    data-testid="report-item"
+    id="report-123"
+  >
+    <div
+      class="report-item-header"
+    >
+      <div
+        data-icon="faCircleInfo"
+        data-testid="font-awesome-icon"
+      />
+      <span
+        class="report-item-message report-item-message-info"
+      >
+        <span
+          class="report-item-line-info"
+        >
+          Multiple locations: 
+        </span>
+        Test Report
+      </span>
+      <div
+        data-icon="faCaretDown"
+        data-testid="font-awesome-icon"
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`multiple source locations renders 2`] = `
+<DocumentFragment>
+  <div
+    class="report-item report-item-info selected"
+    data-testid="report-item"
+    id="report-123"
+  >
+    <div
+      class="report-item-header"
+    >
+      <div
+        data-icon="faCircleInfo"
+        data-testid="font-awesome-icon"
+      />
+      <span
+        class="report-item-message report-item-message-info"
+      >
+        <span
+          class="report-item-line-info"
+        >
+          Multiple locations: 
+        </span>
+        Test Report
+      </span>
+      <div
+        data-icon="faCaretUp"
+        data-testid="font-awesome-icon"
+      />
+    </div>
+    <div
+      class="report-item-source-location-list"
+    >
+      <span
+        class="report-item-source-location"
+        data-testid="report-item-source-location-test-file.txt:100:10-ident"
+      >
+        <span
+          class="location"
+        >
+          100:10
+        </span>
+      </span>
+      <span
+        class="report-item-source-location"
+        data-testid="report-item-source-location-another-file.txt:10:50-ident"
+      >
+        <span
+          class="location"
+        >
+          another-file.txt: 10:50
+        </span>
+      </span>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <div
+    class="report-item report-item-err"
+    data-testid="report-item"
+    id="report-123"
+  >
+    <div
+      class="report-item-header"
+    >
+      <div
+        data-icon="faCircleXmark"
+        data-testid="font-awesome-icon"
+      />
+      <span
+        class="report-item-message report-item-message-err"
+      >
+        <span
+          class="report-item-line-info"
+        >
+          100:10: 
+        </span>
+        Test Report
+      </span>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders 2`] = `
+<DocumentFragment>
+  <div
+    class="report-item report-item-warn"
+    data-testid="report-item"
+    id="report-123"
+  >
+    <div
+      class="report-item-header"
+    >
+      <div
+        data-icon="faCircleExclamation"
+        data-testid="font-awesome-icon"
+      />
+      <span
+        class="report-item-message report-item-message-warn"
+      >
+        <span
+          class="report-item-line-info"
+        >
+          100:10: 
+        </span>
+        Test Report
+      </span>
+      <div
+        data-icon="faCaretDown"
+        data-testid="font-awesome-icon"
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders 3`] = `
+<DocumentFragment>
+  <div
+    class="report-item report-item-warn selected"
+    data-testid="report-item"
+    id="report-123"
+  >
+    <div
+      class="report-item-header"
+    >
+      <div
+        data-icon="faCircleExclamation"
+        data-testid="font-awesome-icon"
+      />
+      <span
+        class="report-item-message report-item-message-warn"
+      >
+        <span
+          class="report-item-line-info"
+        >
+          100:10: 
+        </span>
+        Test Report
+      </span>
+      <div
+        data-icon="faCaretUp"
+        data-testid="font-awesome-icon"
+      />
+    </div>
+    <div
+      class="report-item-message-detail"
+    >
+      Details about the report
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders 4`] = `
+<DocumentFragment>
+  <div
+    class="report-item report-item-warn hovered"
+    data-testid="report-item"
+    id="report-123"
+  >
+    <div
+      class="report-item-header"
+    >
+      <div
+        data-icon="faCircleExclamation"
+        data-testid="font-awesome-icon"
+      />
+      <span
+        class="report-item-message report-item-message-warn"
+      >
+        <span
+          class="report-item-line-info"
+        >
+          100:10: 
+        </span>
+        Test Report
+      </span>
+      <div
+        data-icon="faCaretUp"
+        data-testid="font-awesome-icon"
+      />
+    </div>
+    <div
+      class="report-item-message-detail"
+    >
+      Details about the report
+    </div>
+  </div>
+</DocumentFragment>
+`;

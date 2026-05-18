@@ -38,7 +38,7 @@ export function ReportViewer() {
       const reports = resolved?.flat();
       setProgress(false);
 
-      if (reports && reports.length) {
+      if (reports) {
         sortByFile("info", reports).then((sorted) => setInfo(sorted));
         sortByFile("warn", reports).then((sorted) => setWarn(sorted));
         sortByFile("err", reports).then((sorted) => setErr(sorted));

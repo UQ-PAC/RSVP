@@ -78,6 +78,7 @@
     flex-grow: 1;
     font-family: var(--font-sans);
     color: var(--color-gray-600);
+    white-space: pre;
   }
 
   .source-file-header .source-file-tabs {

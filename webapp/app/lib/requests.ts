@@ -34,7 +34,12 @@ export async function verify(request: VerificationRequest): Promise<Report[]> {
     method: "POST",
     body: JSON.stringify(request),
   })
-    .then((res) => res.json())
+    .then((res) => {
+      if (!res.ok) {
+        throw res;
+      }
+      return res.json();
+    })
     .then(sortReports)
     .catch((err) => {
       console.error(err);

@@ -64,34 +64,30 @@ export function ReportItem({ report }: ReportItemParams) {
         ? "Multiple locations"
         : getSourceStr(report.sourceLocations[0].location);
 
-  const clickLoc = (e, report: Report, loc?: SourceLoc) => {
+  const clickLoc = (e, report: Report, loc: SourceLoc) => {
     e.stopPropagation();
-    const target = loc ?? report.sourceLocations[0]?.location;
-    if (target) {
-      target.source?.resolved
-        .then((uploaded) => uploaded.serverId)
-        .then((id) =>
-          focusDispatch({
-            type: "focus",
-            target: "source-file",
-            focus: { key: id, value: ExpansionState.Expanded },
-          }),
-        );
-      selectionDispatch({
-        scroll: "source",
-        loc: `${report.id}:${getSourceIdentifier(target)}`,
-      });
-    }
+    loc.source?.resolved
+      .then((uploaded) => uploaded.serverId)
+      .then((id) =>
+        focusDispatch({
+          type: "focus",
+          target: "source-file",
+          focus: { key: id, value: ExpansionState.Expanded },
+        }),
+      );
+    selectionDispatch({
+      scroll: "source",
+      loc: `${report.id}:${getSourceIdentifier(loc)}`,
+    });
   };
 
   // TODO: refactor
-  const enterLoc = (e, report: Report, loc?: SourceLoc) => {
+  const enterLoc = (e, report: Report, loc: SourceLoc) => {
     e.stopPropagation();
-    const target = loc ?? report.sourceLocations[0]?.location;
     selectionDispatch({
       scroll: "none",
       hovered: "",
-      loc: target ? `${report.id}:${getSourceIdentifier(target)}` : undefined,
+      loc: `${report.id}:${getSourceIdentifier(loc)}`,
     });
   };
 
@@ -100,6 +96,7 @@ export function ReportItem({ report }: ReportItemParams) {
       id={`report-${report.id}`}
       ref={element}
       className={className}
+      data-testid="report-item"
       onClick={() => {
         if (!isSelected) {
           const target = report.sourceLocations[0];
@@ -179,15 +176,18 @@ export function ReportItem({ report }: ReportItemParams) {
             return (
               <span
                 key={id}
+                data-testid={`report-item-source-location-${id}`}
                 className={className}
                 onClick={(e) => clickLoc(e, report, location)}
                 onMouseOver={(e) => enterLoc(e, report, location)}
-                onMouseOut={() =>
+                onMouseOut={(e) => {
+                  e.stopPropagation();
                   selectionDispatch({
                     scroll: "none",
                     hovered: "",
-                  })
-                }
+                    loc: undefined,
+                  });
+                }}
               >
                 <span className="location">
                   {(location.file !== report.sourceLocations[0].location.file

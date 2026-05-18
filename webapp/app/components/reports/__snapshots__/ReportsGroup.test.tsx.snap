@@ -61,6 +61,14 @@ exports[`renders 2`] = `
           data-testid="font-awesome-icon"
         />
       </div>
+      <div
+        class="reports-group-filetype-icon"
+      >
+        <div
+          data-icon="faFileLines"
+          data-testid="font-awesome-icon"
+        />
+      </div>
       <span
         class="reports-group-title"
       >
@@ -71,6 +79,234 @@ exports[`renders 2`] = `
       >
         (2)
       </span>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders solid icon on hover 1`] = `
+<DocumentFragment>
+  <div
+    class="reports-group"
+  >
+    <div
+      class="reports-group-header"
+      data-testid="reports-group-test-file-one.txt-header"
+    >
+      <div
+        class="reports-group-toggle"
+      >
+        <div
+          data-icon="faSquarePlus"
+          data-testid="font-awesome-icon"
+        />
+      </div>
+      <span
+        class="reports-group-title"
+      >
+        test-file-one.txt
+      </span>
+      <span
+        class="reports-group-count"
+      >
+        (2)
+      </span>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders solid icon on hover 2`] = `
+<DocumentFragment>
+  <div
+    class="reports-group"
+  >
+    <div
+      class="reports-group-header"
+      data-testid="reports-group-test-file-one.txt-header"
+    >
+      <div
+        class="reports-group-toggle"
+      >
+        <div
+          data-icon="faSquarePlus-solid"
+          data-testid="font-awesome-icon"
+        />
+      </div>
+      <span
+        class="reports-group-title"
+      >
+        test-file-one.txt
+      </span>
+      <span
+        class="reports-group-count"
+      >
+        (2)
+      </span>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders solid icon on hover 3`] = `
+<DocumentFragment>
+  <div
+    class="reports-group"
+  >
+    <div
+      class="reports-group-header"
+      data-testid="reports-group-test-file-one.txt-header"
+    >
+      <div
+        class="reports-group-toggle"
+      >
+        <div
+          data-icon="faSquarePlus"
+          data-testid="font-awesome-icon"
+        />
+      </div>
+      <span
+        class="reports-group-title"
+      >
+        test-file-one.txt
+      </span>
+      <span
+        class="reports-group-count"
+      >
+        (2)
+      </span>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders solid icon on hover 4`] = `
+<DocumentFragment>
+  <div
+    class="reports-group"
+  >
+    <div
+      class="reports-group-header"
+      data-testid="reports-group-test-file-one.txt-header"
+    >
+      <div
+        class="reports-group-toggle"
+      >
+        <div
+          data-icon="faSquareMinus"
+          data-testid="font-awesome-icon"
+        />
+      </div>
+      <span
+        class="reports-group-title"
+      >
+        test-file-one.txt
+      </span>
+      <span
+        class="reports-group-count"
+      >
+        (2)
+      </span>
+    </div>
+    <div
+      class="reports-group-content"
+    >
+      <div
+        data-reportid="one"
+        data-testid="report-item"
+      />
+      <div
+        data-reportid="two"
+        data-testid="report-item"
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders solid icon on hover 5`] = `
+<DocumentFragment>
+  <div
+    class="reports-group"
+  >
+    <div
+      class="reports-group-header"
+      data-testid="reports-group-test-file-one.txt-header"
+    >
+      <div
+        class="reports-group-toggle"
+      >
+        <div
+          data-icon="faSquareMinus-solid"
+          data-testid="font-awesome-icon"
+        />
+      </div>
+      <span
+        class="reports-group-title"
+      >
+        test-file-one.txt
+      </span>
+      <span
+        class="reports-group-count"
+      >
+        (2)
+      </span>
+    </div>
+    <div
+      class="reports-group-content"
+    >
+      <div
+        data-reportid="one"
+        data-testid="report-item"
+      />
+      <div
+        data-reportid="two"
+        data-testid="report-item"
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders solid icon on hover 6`] = `
+<DocumentFragment>
+  <div
+    class="reports-group"
+  >
+    <div
+      class="reports-group-header"
+      data-testid="reports-group-test-file-one.txt-header"
+    >
+      <div
+        class="reports-group-toggle"
+      >
+        <div
+          data-icon="faSquareMinus"
+          data-testid="font-awesome-icon"
+        />
+      </div>
+      <span
+        class="reports-group-title"
+      >
+        test-file-one.txt
+      </span>
+      <span
+        class="reports-group-count"
+      >
+        (2)
+      </span>
+    </div>
+    <div
+      class="reports-group-content"
+    >
+      <div
+        data-reportid="one"
+        data-testid="report-item"
+      />
+      <div
+        data-reportid="two"
+        data-testid="report-item"
+      />
     </div>
   </div>
 </DocumentFragment>

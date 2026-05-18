@@ -2,6 +2,7 @@
 /* eslint-disable no-var */
 import { fireEvent, render, screen } from "@testing-library/react";
 
+import { faFileLines } from "@fortawesome/free-solid-svg-icons";
 import { ExpansionState } from "../../lib/context/FocusContext";
 import { ReportsGroup } from "./ReportsGroup";
 
@@ -23,8 +24,9 @@ jest.mock("@fortawesome/free-regular-svg-icons", () => ({
 }));
 
 jest.mock("@fortawesome/free-solid-svg-icons", () => ({
-  faSquareMinus: "faSquareMinus",
-  faSquarePlus: "faSquarePlus",
+  faSquareMinus: "faSquareMinus-solid",
+  faSquarePlus: "faSquarePlus-solid",
+  faFileLines: "faFileLines",
 }));
 
 jest.mock("../../lib/context/FocusContext", () => ({
@@ -74,9 +76,96 @@ test("renders", () => {
   testFileOne = ExpansionState.Collapsed;
 
   rerender(
+    <ReportsGroup
+      section="section"
+      id={file}
+      name={file}
+      reports={reports}
+      icon={faFileLines}
+    />,
+  );
+  expect(asFragment()).toMatchSnapshot();
+});
+
+test("renders solid icon on hover", () => {
+  // Group collapsed
+  testFileOne = ExpansionState.Collapsed;
+
+  const file = "test-file-one.txt";
+  const reports = [{ id: "one" }, { id: "two" }] as any[];
+
+  const { asFragment, rerender } = render(
     <ReportsGroup section="section" id={file} name={file} reports={reports} />,
   );
   expect(asFragment()).toMatchSnapshot();
+
+  const header = screen.getByTestId(`reports-group-${file}-header`);
+  expect(header).toBeInTheDocument();
+
+  const toggle = header.querySelector(".reports-group-toggle") as Element;
+  expect(toggle).toBeTruthy();
+  expect(toggle).toBeInTheDocument();
+
+  // Hover
+  fireEvent.mouseEnter(toggle);
+
+  rerender(
+    <ReportsGroup section="section" id={file} name={file} reports={reports} />,
+  );
+  expect(asFragment()).toMatchSnapshot();
+
+  fireEvent.mouseLeave(toggle);
+
+  rerender(
+    <ReportsGroup section="section" id={file} name={file} reports={reports} />,
+  );
+  expect(asFragment()).toMatchSnapshot();
+
+  // Group expanded
+  testFileOne = ExpansionState.Expanded;
+
+  rerender(
+    <ReportsGroup section="section" id={file} name={file} reports={reports} />,
+  );
+  expect(asFragment()).toMatchSnapshot();
+
+  // Hover
+  fireEvent.mouseEnter(toggle);
+
+  rerender(
+    <ReportsGroup section="section" id={file} name={file} reports={reports} />,
+  );
+  expect(asFragment()).toMatchSnapshot();
+
+  fireEvent.mouseLeave(toggle);
+
+  rerender(
+    <ReportsGroup section="section" id={file} name={file} reports={reports} />,
+  );
+  expect(asFragment()).toMatchSnapshot();
+});
+
+test("triggers scroll to source file", () => {
+  const file = "test-file-one.txt";
+  const reports = [{ id: "one" }, { id: "two" }] as any[];
+
+  render(
+    <ReportsGroup section="section" id={file} name={file} reports={reports} />,
+  );
+
+  const header = screen.getByTestId(`reports-group-${file}-header`);
+  expect(header).toBeInTheDocument();
+
+  fireEvent.click(header);
+
+  expect(focusDispatch).toHaveBeenCalledTimes(1);
+  expect(focusDispatch).toHaveBeenCalledWith({
+    type: "focus",
+    target: "source-file",
+    focus: { key: file, value: ExpansionState.Expanded },
+  });
+  expect(selectionDispatch).toHaveBeenCalledTimes(1);
+  expect(selectionDispatch).toHaveBeenCalledWith({ scroll: "file", file });
 });
 
 test("triggers expansion", () => {
@@ -113,11 +202,11 @@ test("triggers expansion", () => {
   const headerOne = screen.getByTestId(`reports-group-${fileOne}-header`);
   expect(headerOne).toBeInTheDocument();
 
-  const toggleOne = headerOne.querySelector(".reports-group-toggle");
+  const toggleOne = headerOne.querySelector(".reports-group-toggle") as Element;
   expect(toggleOne).toBeTruthy();
   expect(toggleOne).toBeInTheDocument();
 
-  fireEvent.click(toggleOne!);
+  fireEvent.click(toggleOne);
   expect(selectionDispatch).toHaveBeenCalledTimes(1);
   expect(selectionDispatch).toHaveBeenCalledWith({
     scroll: "none",

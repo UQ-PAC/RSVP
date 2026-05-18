@@ -64,9 +64,8 @@ public class Verification {
             reports.addAll(PolicyAnalysis.checkInvariants(translation.getInvariantResult()));
         }
         catch (LocationError e) {
+            // User-error, such as syntax or validation error
             reports.add(new Report(Severity.Error, e.getTitle() + " Error", e.getMessage(), e.getLocation()));
-        } catch (Throwable t) {
-            reports.add(new Report(Severity.Error, "Error", t.getMessage()));
         }
 
         return new VerificationResult(reports, cache);

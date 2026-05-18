@@ -5,7 +5,7 @@ import com.cedarpolicy.model.schema.Schema;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import uq.pac.rsvp.policy.ast.schema.parser.SchemaParser;
-import uq.pac.rsvp.support.error.ParseError;
+import uq.pac.rsvp.support.error.SyntaxError;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -265,7 +265,7 @@ public class SchemaParseTest {
             if (!rsvpPositive) {
                 fail("Unexpected success [rsvp]: " + text);
             }
-        } catch (ParseError c) {
+        } catch (SyntaxError c) {
             if (rsvpPositive) {
                 throw c;
             }

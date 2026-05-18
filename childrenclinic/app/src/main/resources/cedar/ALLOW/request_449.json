@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Employee::\"Bob Buchanan\"",
-  "resource": "ChildrenClinic::ResponsibleAdult::\"Carlos Estaban\"",
-  "action": "ChildrenClinic::Action::\"ViewAdult\"",
-  "context": {}
-}

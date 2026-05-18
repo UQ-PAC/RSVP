@@ -1,6 +1,6 @@
 {
   "principal": "ChildrenClinic::Employee::\"Carl Bradford\"",
-  "resource": "ChildrenClinic::ResponsibleAdult::\"???\"",
-  "action": "ChildrenClinic::Action::\"EditAdult\"",
+  "resource": "ChildrenClinic::Visit::\"Leo Franklin 1\"",
+  "action": "ChildrenClinic::Action::\"EditVisit\"",
   "context": {}
 }

@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Employee::\"Carl Bradford\"",
-  "resource": "ChildrenClinic::Clinic::\"???\"",
-  "action": "ChildrenClinic::Action::\"AddEmployee\"",
-  "context": {}
-}

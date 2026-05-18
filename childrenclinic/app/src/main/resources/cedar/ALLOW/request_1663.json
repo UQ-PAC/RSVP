@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Employee::\"Linda Douglas\"",
-  "resource": "ChildrenClinic::Visit::\"Samantha Coleman 2\"",
-  "action": "ChildrenClinic::Action::\"EditVisit\"",
-  "context": {}
-}

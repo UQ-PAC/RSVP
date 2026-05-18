@@ -1,6 +1,6 @@
 {
   "principal": "ChildrenClinic::Employee::\"Linda Douglas\"",
-  "resource": "ChildrenClinic::ResponsibleAdult::\"Jean Coleman\"",
-  "action": "ChildrenClinic::Action::\"EditAdult\"",
+  "resource": "ChildrenClinic::Clinic::\"???\"",
+  "action": "ChildrenClinic::Action::\"AddGuardian\"",
   "context": {}
 }

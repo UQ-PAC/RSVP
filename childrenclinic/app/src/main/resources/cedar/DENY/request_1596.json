@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Guest::\"???\"",
-  "resource": "ChildrenClinic::ResponsibleAdult::\"Clara Higgins\"",
-  "action": "ChildrenClinic::Action::\"EditAdult\"",
-  "context": {}
-}

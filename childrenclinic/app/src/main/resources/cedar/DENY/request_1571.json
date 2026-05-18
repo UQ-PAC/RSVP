@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Employee::\"???\"",
-  "resource": "ChildrenClinic::ResponsibleAdult::\"???\"",
-  "action": "ChildrenClinic::Action::\"EditAdult\"",
-  "context": {}
-}

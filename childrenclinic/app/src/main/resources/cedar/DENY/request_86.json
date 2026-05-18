@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Guest::\"Unknown\"",
-  "resource": "ChildrenClinic::Visit::\"Jewel Rodriquez 1\"",
+  "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
+  "resource": "ChildrenClinic::Visit::\"Samantha Coleman 2\"",
   "action": "ChildrenClinic::Action::\"ViewVisit\"",
   "context": {}
 }

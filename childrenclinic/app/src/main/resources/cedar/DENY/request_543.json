@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Guest::\"???\"",
-  "resource": "ChildrenClinic::Patient::\"Leo Franklin\"",
+  "principal": "ChildrenClinic::Employee::\"???\"",
+  "resource": "ChildrenClinic::Patient::\"Jewel Rodriquez\"",
   "action": "ChildrenClinic::Action::\"EditPatient\"",
   "context": {}
 }

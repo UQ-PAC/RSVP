@@ -1,0 +1,6 @@
+{
+  "principal": "ChildrenClinic::Employee::\"James Carter\"",
+  "resource": "ChildrenClinic::Guardian::\"Carlos Estaban\"",
+  "action": "ChildrenClinic::Action::\"EditGuardian\"",
+  "context": {}
+}

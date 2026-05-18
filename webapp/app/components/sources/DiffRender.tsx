@@ -13,8 +13,13 @@ import {
   useAnalysisGroup,
   useAnalysisGroupDispatch,
 } from "../../lib/context/AnalysisGroupContext";
+import {
+  ExpansionState,
+  useFocusDispatch,
+} from "../../lib/context/FocusContext";
+import { useSelectionDispatch } from "../../lib/context/SelectionContext";
 import { diff as getDiff, impact as getImpact } from "../../lib/requests";
-import { VerificationFile } from "../../lib/types";
+import { ChangeImpact, SourceLoc, VerificationFile } from "../../lib/types";
 import { ProgressSpinner } from "../shared/ProgressSpinner";
 import "./diff.css";
 
@@ -37,14 +42,6 @@ const diffConfig: Diff2HtmlUIConfig = {
   highlightLanguages,
 };
 
-const impactConfig: Diff2HtmlUIConfig = {
-  drawFileList: false,
-  outputFormat: "side-by-side",
-  fileContentToggle: false,
-  stickyFileHeaders: false,
-  highlight: false,
-};
-
 const robotoMono = Roboto_Mono({
   subsets: ["latin"],
 });
@@ -57,15 +54,13 @@ export function DiffRender({
 }: DiffRenderProps) {
   const { diffs, impacts, verifyPending, verifyCompleted } = useAnalysisGroup();
   const analysisGroupDispatch = useAnalysisGroupDispatch();
+  const selectionDispatch = useSelectionDispatch();
+  const focusDispatch = useFocusDispatch();
 
   const diffRef = useRef<HTMLDivElement>(null);
-  const impactRef = useRef<HTMLDivElement>(null);
 
-  const diffRequested = useRef(false);
-  const impactRequested = useRef(false);
-
-  const [diff, setDiff] = useState(diffs[originalId]?.[updatedId]);
-  const [impact, setImpact] = useState(impacts?.[originalId]?.[updatedId]);
+  const [diff, setDiff] = useState<string>();
+  const [impact, setImpact] = useState<ChangeImpact>();
 
   const [inProgress, setInProgress] = useState(verifyPending);
 
@@ -73,23 +68,22 @@ export function DiffRender({
     const existing = diffs[originalId]?.[updatedId];
 
     if (existing) {
-      setDiff(existing);
-    } else if (!diffRequested.current) {
+      existing.then((existingDiff) => setDiff(existingDiff));
+    } else {
       // Diff hasn't been requested yet
-      diffRequested.current = true;
-      getDiff(
+      const result = getDiff(
         { id: originalId, name: original.file.name },
         { id: updatedId, name: updated.file.name },
-      ).then((diff) => {
-        setDiff(diff);
-        analysisGroupDispatch({
-          type: "diff",
-          originalId,
-          updatedId,
-          diff,
-        });
-        diffRequested.current = false;
+      );
+
+      analysisGroupDispatch({
+        type: "diff",
+        originalId,
+        updatedId,
+        diff: result,
       });
+
+      result.then((newDiff) => setDiff(newDiff));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [originalId, original, updatedId, updated]);
@@ -98,24 +92,25 @@ export function DiffRender({
     const existing = impacts?.[originalId]?.[updatedId];
 
     if (existing) {
-      setImpact(existing);
-    } else if (!impactRequested.current && verifyCompleted) {
-      impactRequested.current = true;
-      setInProgress(true);
-
+      existing.then((existingImpact) => setImpact(existingImpact));
+    } else if (verifyCompleted) {
+      // Verification has been executed but no impact exists yet
       verifyCompleted.then((result) => {
         if (result) {
-          // Verification has been executed but no impact exists yet
-          getImpact(originalId, updatedId).then((impact) => {
-            setImpact(impact);
+          setInProgress(true);
+
+          const result = getImpact(originalId, updatedId);
+
+          analysisGroupDispatch({
+            type: "impact",
+            originalId,
+            updatedId,
+            impact: result,
+          });
+
+          result.then((newImpact) => {
+            setImpact(newImpact);
             setInProgress(false);
-            analysisGroupDispatch({
-              type: "impact",
-              originalId,
-              updatedId,
-              diff: impact,
-            });
-            impactRequested.current = false;
           });
         }
       });
@@ -136,26 +131,22 @@ export function DiffRender({
     }
   }, [diff]);
 
-  // Re-render when impact is updated
-  useEffect(() => {
-    if (impact !== undefined && impactRef.current) {
-      if (impact.length === 0) {
-        impactRef.current.innerText = "No impact";
-      } else {
-        const diffUi = new Diff2HtmlUI(impactRef.current, impact, impactConfig);
-        impactRef.current.className = `${impactRef.current.className} ${robotoMono.className}`;
-        diffUi.draw();
-      }
-    }
-  }, [impact]);
-
-  const fallback = inProgress ? (
-    <ProgressSpinner />
-  ) : (
-    <span className="diff-impact-information-message">
-      Run verification to see the impact of these changes.
-    </span>
-  );
+  const clickRequest = (loc: SourceLoc) => {
+    focusDispatch({
+      type: "focus",
+      target: "source-file",
+      focus: { key: loc.file, value: ExpansionState.Expanded },
+    });
+    selectionDispatch({
+      scroll: "source",
+      loc: loc.file + ":" + loc.startLoc?.line,
+      highlighted: {
+        file: loc.file,
+        start: loc.startLoc?.line ?? 0,
+        end: loc.endLoc?.line ?? 0,
+      },
+    });
+  };
 
   return (
     <>
@@ -167,21 +158,59 @@ export function DiffRender({
         )}
         data-testid={diff?.length ? "diff-render" : "empty-diff-render"}
       />
-      {diff && (
+      {diff && impact && (
         <div className="diff-impact">
-          {impact !== undefined ? (
+          {!impact.permitted.length && !impact.forbidden.length && (
             <div
-              ref={impactRef}
-              data-testid={
-                impact.length ? "impact-render" : "empty-impact-render"
-              }
-              className={cx(
-                "source-file-impact",
-                !impact.length && "source-file-empty-impact",
-              )}
-            />
+              data-testid="empty-impact-render"
+              className="source-file-impact source-file-empty-impact"
+            >
+              No impact
+            </div>
+          )}
+          {(impact.permitted.length || impact.forbidden.length) && (
+            <div
+              data-testid="impact-render"
+              className={`source-file-impact ${robotoMono.className}`}
+            >
+              <div className="impact-render-changes impact-render-changes-forbidden">
+                {impact.forbidden.map((forbid, i) => (
+                  <div
+                    key={i}
+                    className="impact-render-change impact-render-change-forbidden"
+                    onClick={() => clickRequest(forbid.locations[0])}
+                  >
+                    <span className="impact-render-summary impact-render-forbidden-summary">
+                      {forbid.summary}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className="impact-render-changes impact-render-changes-permitted">
+                {impact.permitted.map((permit, i) => (
+                  <div
+                    key={i}
+                    className="impact-render-change impact-render-change-permitted"
+                    onClick={() => clickRequest(permit.locations[0])}
+                  >
+                    <span className="impact-render-summary impact-render-permitted-summary">
+                      {permit.summary}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      {diff && !impact && (
+        <div className="diff-impact">
+          {verifyPending || inProgress ? (
+            <ProgressSpinner />
           ) : (
-            fallback
+            <span className="diff-impact-information-message">
+              Run verification to see the impact of these changes.
+            </span>
           )}
         </div>
       )}

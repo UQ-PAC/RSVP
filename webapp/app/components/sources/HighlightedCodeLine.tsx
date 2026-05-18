@@ -24,6 +24,7 @@ interface HighlightedCodeLineProps {
   n: number;
   syntax: FileType;
   reports: ReportLine[];
+  temporaryHighlight: boolean;
 }
 
 export function HighlightedCodeLine({
@@ -31,8 +32,15 @@ export function HighlightedCodeLine({
   n,
   syntax,
   reports,
+  temporaryHighlight,
 }: HighlightedCodeLineProps) {
-  const { selected, hovered, scroll, loc: selectedLoc } = useSelection();
+  const {
+    selected,
+    hovered,
+    scroll,
+    loc: selectedLoc,
+    highlighted,
+  } = useSelection();
   const selectionDispatch = useSelectionDispatch();
 
   const { drawer: drawerFocus } = useFocus();
@@ -169,7 +177,10 @@ export function HighlightedCodeLine({
     }
 
     // Scroll to this line
-    if (selected === id && loc.startLoc?.line === n && targetLoc) {
+    if (
+      (selected === id && loc.startLoc?.line === n && targetLoc) ||
+      selectedLoc === `${loc.file}:${n}`
+    ) {
       ref = focus;
     }
 
@@ -291,7 +302,7 @@ export function HighlightedCodeLine({
             : undefined
         }
         onMouseOver={
-          mostRelevant
+          mostRelevant && !temporaryHighlight
             ? (e) => enter(e, mostRelevant?.report, mostRelevant?.loc)
             : undefined
         }
@@ -306,7 +317,14 @@ export function HighlightedCodeLine({
             : undefined
         }
       >
-        {child}
+        <span
+          className={cx(
+            "source-line-highlight",
+            temporaryHighlight && "highlighted",
+          )}
+        >
+          {child}
+        </span>
       </span>
     </>
   );

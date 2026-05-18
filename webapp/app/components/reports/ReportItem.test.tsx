@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-var */
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { ExpansionState } from "../../lib/context/FocusContext";
 import { Report, SourceLoc } from "../../lib/types";
 import { ReportItem } from "./ReportItem";
@@ -208,9 +208,7 @@ test("triggers selection", async () => {
   selectedReport = "";
   report.sourceLocations.push({
     location: {
-      source: {
-        resolved: Promise.resolve({ serverId: "9876" }),
-      },
+      file: "some-file.txt",
     },
   } as any);
 
@@ -218,15 +216,11 @@ test("triggers selection", async () => {
   fireEvent.click(element);
 
   expect(selectionDispatch).toHaveBeenCalledTimes(3);
-  await waitFor(() => {
-    expect(focusDispatch).toHaveBeenCalled();
-  });
-
   expect(focusDispatch).toHaveBeenCalledTimes(1);
   expect(focusDispatch).toHaveBeenCalledWith({
     type: "focus",
     target: "source-file",
-    focus: { key: "9876", value: ExpansionState.Expanded },
+    focus: { key: "some-file.txt", value: ExpansionState.Expanded },
   });
 });
 
@@ -276,9 +270,6 @@ describe("multiple source locations", () => {
           file: "test-file.txt",
           offset: 100,
           len: 10,
-          source: {
-            resolved: Promise.resolve({ serverId: "9876" }),
-          },
         },
       },
       {
@@ -288,7 +279,6 @@ describe("multiple source locations", () => {
           len: 50,
           source: {
             filename: "another-file.txt",
-            resolved: Promise.resolve({ serverId: "5432" }),
           },
         },
       },
@@ -326,15 +316,11 @@ describe("multiple source locations", () => {
       loc: "123:test-file.txt:100:10-ident",
     });
 
-    await waitFor(() => {
-      expect(focusDispatch).toHaveBeenCalled();
-    });
-
     expect(focusDispatch).toHaveBeenCalledTimes(1);
     expect(focusDispatch).toHaveBeenCalledWith({
       type: "focus",
       target: "source-file",
-      focus: { key: "9876", value: ExpansionState.Expanded },
+      focus: { key: "test-file.txt", value: ExpansionState.Expanded },
     });
 
     // Select second source location
@@ -349,14 +335,12 @@ describe("multiple source locations", () => {
       scroll: "source",
       loc: "123:another-file.txt:10:50-ident",
     });
-    await waitFor(() => {
-      expect(focusDispatch).toHaveBeenCalledTimes(2);
-    });
 
+    expect(focusDispatch).toHaveBeenCalledTimes(2);
     expect(focusDispatch).toHaveBeenNthCalledWith(2, {
       type: "focus",
       target: "source-file",
-      focus: { key: "5432", value: ExpansionState.Expanded },
+      focus: { key: "another-file.txt", value: ExpansionState.Expanded },
     });
   });
 

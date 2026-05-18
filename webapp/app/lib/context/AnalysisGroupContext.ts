@@ -1,6 +1,7 @@
 import { createContext, Dispatch, useContext } from "react";
 import {
   AnalysisGroup,
+  ChangeImpact,
   VerificationFile,
   VerificationFileDict,
   VersionDict,
@@ -20,7 +21,8 @@ interface AnalysisGroupAction {
   file?: VerificationFile;
   index?: number;
   original?: VerificationFile;
-  diff?: string;
+  diff?: Promise<string>;
+  impact?: Promise<ChangeImpact>;
   originalId?: string;
   updatedId?: string;
   update?: AnalysisGroup;
@@ -53,8 +55,9 @@ export function reducer(
     case "remove":
       return doRemove(context, action);
     case "diff":
-    case "impact":
       return addDiff(context, action);
+    case "impact":
+      return addImpact(context, action);
     case "update":
       return doUpdate(context, action);
   }
@@ -270,10 +273,7 @@ function addDiff(
 
   const newContext = { ...context };
 
-  const newDiffs =
-    action.type === "diff"
-      ? { ...newContext.diffs }
-      : { ...newContext.impacts };
+  const newDiffs = { ...newContext.diffs };
 
   if (!newDiffs) {
     return context;
@@ -284,11 +284,34 @@ function addDiff(
   newDiffsForFile[action.updatedId] = action.diff;
   newDiffs[action.originalId] = newDiffsForFile;
 
-  if (action.type === "diff") {
-    newContext.diffs = newDiffs;
-  } else {
-    newContext.impacts = newDiffs;
+  newContext.diffs = newDiffs;
+
+  return newContext;
+}
+
+function addImpact(
+  context: AnalysisGroup,
+  action: AnalysisGroupAction,
+): AnalysisGroup {
+  if (action.impact === undefined || !action.originalId || !action.updatedId) {
+    console.error(`Invalid action: ${JSON.stringify(action)}`);
+    return context;
   }
+
+  const newContext = { ...context };
+
+  const newImpacts = { ...newContext.impacts };
+
+  if (!newImpacts) {
+    return context;
+  }
+
+  const newImpactsForFile = { ...newImpacts[action.originalId] };
+
+  newImpactsForFile[action.updatedId] = action.impact;
+  newImpacts[action.originalId] = newImpactsForFile;
+
+  newContext.impacts = newImpacts;
 
   return newContext;
 }

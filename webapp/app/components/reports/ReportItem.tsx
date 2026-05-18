@@ -66,15 +66,11 @@ export function ReportItem({ report }: ReportItemParams) {
 
   const clickLoc = (e, report: Report, loc: SourceLoc) => {
     e.stopPropagation();
-    loc.source?.resolved
-      .then((uploaded) => uploaded.serverId)
-      .then((id) =>
-        focusDispatch({
-          type: "focus",
-          target: "source-file",
-          focus: { key: id, value: ExpansionState.Expanded },
-        }),
-      );
+    focusDispatch({
+      type: "focus",
+      target: "source-file",
+      focus: { key: loc.file, value: ExpansionState.Expanded },
+    });
     selectionDispatch({
       scroll: "source",
       loc: `${report.id}:${getSourceIdentifier(loc)}`,
@@ -100,15 +96,16 @@ export function ReportItem({ report }: ReportItemParams) {
       onClick={() => {
         if (!isSelected) {
           const target = report.sourceLocations[0];
-          target?.location.source?.resolved
-            .then((uploaded) => uploaded.serverId)
-            .then((id) =>
-              focusDispatch({
-                type: "focus",
-                target: "source-file",
-                focus: { key: id, value: ExpansionState.Expanded },
-              }),
-            );
+          if (target?.location) {
+            focusDispatch({
+              type: "focus",
+              target: "source-file",
+              focus: {
+                key: target.location.file,
+                value: ExpansionState.Expanded,
+              },
+            });
+          }
           selectionDispatch({
             selected: report.id,
             loc: target

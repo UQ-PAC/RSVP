@@ -5,6 +5,11 @@ import { Roboto_Mono } from "next/font/google";
 
 import { Report, VerificationFile } from "../../lib/types";
 
+import { useEffect, useState } from "react";
+import {
+  useSelection,
+  useSelectionDispatch,
+} from "../../lib/context/SelectionContext";
 import { sortReportsBySourceLine } from "../../lib/sources/util";
 import "./CodeHighlight";
 import { CodeLine } from "./CodeLine";
@@ -26,6 +31,35 @@ export function CodeRender({ file, content, reports }: CodeRenderParams) {
     reports,
   );
 
+  const { scroll, highlighted } = useSelection();
+  const selectionDispatch = useSelectionDispatch();
+
+  const [temporaryHighlight, setTemporaryHighlight] = useState(false);
+
+  useEffect(() => {
+    if (scroll === "source") {
+      if (highlighted) {
+        file.resolved
+          .then(({ serverId }) => serverId)
+          .then((id) => {
+            if (id === highlighted.file) {
+              setTemporaryHighlight(true);
+              setTimeout(() => {
+                setTemporaryHighlight(false);
+                selectionDispatch({
+                  scroll: "none",
+                  highlighted: undefined,
+                });
+              }, 500);
+            }
+          });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [file, highlighted, scroll]);
+
+  const id = file.resolved.then(({ serverId }) => serverId);
+
   return (
     <div className={cx("source-file-render", robotoMono.className)}>
       <pre className="code">
@@ -44,9 +78,27 @@ export function CodeRender({ file, content, reports }: CodeRenderParams) {
                 line={line}
                 syntax={file.filetype}
                 reports={reports}
+                temporaryHighlight={
+                  temporaryHighlight &&
+                  !!highlighted &&
+                  n >= highlighted.start &&
+                  n <= highlighted.end
+                }
               />
             ) : (
-              <CodeLine key={n} line={line} syntax={file.filetype} />
+              <CodeLine
+                key={n}
+                n={n}
+                file={id}
+                line={line}
+                syntax={file.filetype}
+                temporaryHighlight={
+                  temporaryHighlight &&
+                  !!highlighted &&
+                  n >= highlighted.start &&
+                  n <= highlighted.end
+                }
+              />
             ),
           )}
       </pre>

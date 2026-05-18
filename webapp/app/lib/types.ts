@@ -29,6 +29,16 @@ export interface Report {
   messageDetail?: string;
 }
 
+interface ImpactedRequest {
+  summary: string;
+  locations: SourceLoc[];
+}
+
+export interface ChangeImpact {
+  permitted: ImpactedRequest[];
+  forbidden: ImpactedRequest[];
+}
+
 export type VersionedPolicy = string[];
 
 export interface VerificationRequest {
@@ -58,14 +68,17 @@ export interface VersionedFile {
 export type VerificationFileDict = { [id: string]: VerificationFile };
 export type VersionedFileList = VersionedFile[];
 export type VersionDict = { [id: string]: string[] };
-export type DiffDict = { [id: string]: { [id: string]: string } };
+export type DiffDict = { [id: string]: { [id: string]: Promise<string> } };
+export type ImpactDict = {
+  [id: string]: { [id: string]: Promise<ChangeImpact> };
+};
 export interface AnalysisGroup {
   name: string;
   files: VersionedFileList;
   byId?: Promise<VerificationFileDict>;
   reports?: Promise<Report[]>;
   diffs: DiffDict;
-  impacts?: DiffDict;
+  impacts?: ImpactDict;
   verifyRequested: boolean;
   verifyPending: boolean;
   verifyCompleted?: Promise<boolean>;

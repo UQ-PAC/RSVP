@@ -48,6 +48,7 @@ export function SourceFile({ source, reports, setFocus }: SourceFileParams) {
   const file = useRef<HTMLDivElement>(null);
 
   const [focusIds, setFocusIds] = useState<string[]>([]);
+
   const [versionIds, setVersionIds] = useState<string[]>([]);
   const [files, setFiles] = useState<IdentifiedFile[]>([]);
 
@@ -169,6 +170,7 @@ export function SourceFile({ source, reports, setFocus }: SourceFileParams) {
               id: single.id,
             });
             setUpdated(undefined);
+            setFocus(single.id);
 
             single.file.resolved
               .then((uploaded) => uploaded.content)
@@ -202,6 +204,7 @@ export function SourceFile({ source, reports, setFocus }: SourceFileParams) {
 
             setOriginal(comparison?.original);
             setUpdated(comparison?.updated);
+            setFocus(`${comparison?.original?.id}${comparison?.updated?.id}`);
           }
 
           return focusId;

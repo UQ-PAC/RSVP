@@ -8,18 +8,12 @@ interface SelectionState {
   file?: string;
   group?: string;
   scroll?: ScrollTarget;
+  highlighted?: { file: string; start: number; end: number };
 }
 
 export const emptySelection = {};
 
-interface SelectionAction {
-  hovered?: string;
-  selected?: string;
-  scroll: ScrollTarget;
-  file?: string;
-  group?: string;
-  loc?: string;
-}
+type SelectionAction = SelectionState;
 
 export function selectionReducer(
   context: SelectionState,

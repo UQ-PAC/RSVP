@@ -51,7 +51,7 @@ export function SourceFile({ source, reports, setFocus }: SourceFileParams) {
   const [versionIds, setVersionIds] = useState<string[]>([]);
   const [files, setFiles] = useState<IdentifiedFile[]>([]);
 
-  const [filename, setFilename] = useState("");
+  const [filename, setFilename] = useState(source.original.file.name);
   const [code, setCode] = useState("");
 
   const [resolvedReports, setResolvedReports] = useState<Report[]>([]);

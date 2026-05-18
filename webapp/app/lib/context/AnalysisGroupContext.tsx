@@ -12,6 +12,7 @@ export const emptyAnalysisGroup: AnalysisGroup = {
   files: [],
   diffs: {},
   verifyPending: false,
+  verifyRequested: false,
 };
 
 interface AnalysisGroupAction {
@@ -230,26 +231,15 @@ function doRemove(
 
   if (action.original) {
     // Remove version
-    const existing = newContext.files.find(
-      (file) => file.original === action.original,
-    );
-
-    if (!existing) {
-      console.error(
-        "Removing version of nonexistent file: " + action.file.filename,
-      );
-      return context;
-    } else {
-      newContext.files = [
-        ...context.files.filter((file) => file !== existing),
-        {
-          original: existing.original,
-          versions: [
-            ...existing.versions.filter((version) => version !== action.file),
-          ],
-        },
-      ];
-    }
+    newContext.files = context.files.map(({ original, versions }) => {
+      if (original === action.original) {
+        return {
+          original,
+          versions: versions.filter((version) => version !== action.file),
+        };
+      }
+      return { original, versions: [...versions] };
+    });
   } else {
     // Remove standalone file (and all versions)
     newContext.files = [

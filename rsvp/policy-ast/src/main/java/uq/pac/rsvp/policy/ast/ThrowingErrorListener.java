@@ -4,7 +4,7 @@ import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
-import uq.pac.rsvp.support.error.ParseError;
+import uq.pac.rsvp.support.error.SyntaxError;
 import uq.pac.rsvp.support.FileSource;
 import uq.pac.rsvp.support.LineLoc;
 import uq.pac.rsvp.support.SourceLoc;
@@ -40,6 +40,6 @@ public class ThrowingErrorListener extends BaseErrorListener {
             int offset = fs.getPosition(line, pos == 0 ? 1 : pos) - 1;
             loc = fs.getSourceLoc(offset, 1);
         }
-        throw new ParseError("Parse Error: " + msg, loc);
+        throw new SyntaxError("Parse Error: " + msg, loc);
     }
 }

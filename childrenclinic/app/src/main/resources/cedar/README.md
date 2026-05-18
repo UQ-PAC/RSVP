@@ -38,7 +38,7 @@ Cedar [Schema](childrenclinic.cedarschema).
 All _actors_ are either an entity `Employee` or an entity `Guest`.
 
 Every `Employee` must have a `name`, at least one entity `Clinic` in their set `clinics`, and at least one entity `Role` in their set `roles`.
-`Role` is either `Administrator`, `Administrative Assistant`, or `Doctor`.
+`Role` is either `Administrator`, `Receptionist`, or `Doctor`.
 
 Optional `Employee` attributes are `level`, where entity `Level` is either `Intern`, `Resident`, `Staff`, `Senior`, `Registrar`, or `Specialist`, and `manager`, which is an entity `Employee`.
 For `Level`, the values `Resident`, `Registrar`, and `Specialist` are only used in conjunction with `Role` `Doctor`.

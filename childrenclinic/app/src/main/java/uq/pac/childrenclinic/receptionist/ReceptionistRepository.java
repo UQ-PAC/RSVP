@@ -1,4 +1,4 @@
-package uq.pac.childrenclinic.administrativeassistant;
+package uq.pac.childrenclinic.receptionist;
 
 import java.util.Optional;
 
@@ -8,14 +8,14 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface AdministrativeAssistantRepository extends JpaRepository<AdministrativeAssistant, Integer> {
+public interface ReceptionistRepository extends JpaRepository<Receptionist, Integer> {
 
 	@EntityGraph(attributePaths = { "clinics", "gender" })
 	@Transactional(readOnly = true)
-	Page<AdministrativeAssistant> findByLastNameStartingWith(String lastName, Pageable pageable);
+	Page<Receptionist> findByLastNameStartingWith(String lastName, Pageable pageable);
 
 	@EntityGraph(attributePaths = { "clinics", "gender" })
 	@Transactional(readOnly = true)
-	Optional<AdministrativeAssistant> findById(Integer id);
+	Optional<Receptionist> findById(Integer id);
 
 }

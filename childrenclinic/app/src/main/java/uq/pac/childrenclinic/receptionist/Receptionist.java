@@ -1,4 +1,4 @@
-package uq.pac.childrenclinic.administrativeassistant;
+package uq.pac.childrenclinic.receptionist;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,9 +12,9 @@ import org.springframework.core.style.ToStringCreator;
 import uq.pac.childrenclinic.model.Person;
 
 @Entity
-@Table(name = "administrative_assistants")
+@Table(name = "receptionists")
 @PrimaryKeyJoinColumn(name = "entity_id")
-public class AdministrativeAssistant extends Person {
+public class Receptionist extends Person {
 
 	@Column(name = "telephone")
 	@NotBlank

@@ -25,15 +25,15 @@ when {
 };
 
 // 'policy2'
-// Anyone can view any "Doctor" or "Administrative Assistant".
-@id("Policy: Public Doctor and Administrative Assistant data.")
+// Anyone can view any "Doctor" or "Receptionist".
+@id("Policy: Public Doctor and Receptionist data.")
 permit (
     principal,
     action == ChildrenClinic::Action::"ViewEmployee",
     resource is ChildrenClinic::Employee
 )
 when {
-    resource.roles.containsAny([ChildrenClinic::EmployeeRole::"Administrative Assistant",
+    resource.roles.containsAny([ChildrenClinic::EmployeeRole::"Receptionist",
                                 ChildrenClinic::EmployeeRole::"Doctor"])
 };
 
@@ -65,15 +65,15 @@ when {
 };
 
 // 'policy5'
-// Every "Administrative Assistant" can view and edit their Clinics' data.
-@id("Policy: Administrative Assistant can view and edit in their Clinics.")
+// Every "Receptionist" can view and edit their Clinics' data.
+@id("Policy: Receptionist can view and edit in their Clinics.")
 permit (
     principal is ChildrenClinic::Employee,
     action,
     resource
 )
 when {
-    principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrative Assistant") &&
+    principal.roles.contains(ChildrenClinic::EmployeeRole::"Receptionist") &&
     (
         resource is ChildrenClinic::Employee ||
         resource is ChildrenClinic::Patient ||
@@ -98,8 +98,8 @@ unless {
 };
 
 // 'policy6'
-// Every "Administrative Assistant" can add Patients and Guardians to their Clinics' data.
-@id("Policy: Administrative Assistant can add Patients and Guardians to their Clinics.")
+// Every "Receptionist" can add Patients and Guardians to their Clinics' data.
+@id("Policy: Receptionist can add Patients and Guardians to their Clinics.")
 permit (
     principal is ChildrenClinic::Employee,
     action,
@@ -108,7 +108,7 @@ permit (
 when {
     action in [ChildrenClinic::Action::"AddGuardian",
                ChildrenClinic::Action::"AddPatient"] &&
-    principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrative Assistant") &&
+    principal.roles.contains(ChildrenClinic::EmployeeRole::"Receptionist") &&
     principal.clinics.contains(resource)
 };
 
@@ -256,7 +256,7 @@ unless {
     ) ||
     (
         action == ChildrenClinic::Action::"ViewEmployee" &&
-        resource.roles.containsAny([ChildrenClinic::EmployeeRole::"Administrative Assistant",
+        resource.roles.containsAny([ChildrenClinic::EmployeeRole::"Receptionist",
                                     ChildrenClinic::EmployeeRole::"Doctor"])
     )
 };

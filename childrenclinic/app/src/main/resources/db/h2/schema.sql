@@ -5,7 +5,7 @@ DROP TABLE entity_clinics IF EXISTS;
 DROP TABLE users IF EXISTS;
 DROP TABLE genders IF EXISTS;
 DROP TABLE persons IF EXISTS;
-DROP TABLE administrative_assistants IF EXISTS;
+DROP TABLE receptionists IF EXISTS;
 DROP TABLE doctors IF EXISTS;
 DROP TABLE specialties IF EXISTS;
 DROP TABLE doctor_specialties IF EXISTS;
@@ -40,7 +40,7 @@ CREATE TABLE entities (
 
 CREATE TABLE entity_types (
   entity_id   INTEGER NOT NULL,
-  entity_type VARCHAR(40) NOT NULL, -- 'User', 'Administrator', 'Administrative Assistant', 'Doctor', 'Guardian', 'Patient', 'Visit'.
+  entity_type VARCHAR(40) NOT NULL, -- 'User', 'Administrator', 'Receptionist', 'Doctor', 'Guardian', 'Patient', 'Visit'.
   PRIMARY KEY (entity_id, entity_type),
   FOREIGN KEY (entity_id) REFERENCES entities(entity_id) ON DELETE CASCADE
 );
@@ -79,7 +79,7 @@ CREATE TABLE persons (
 );
 CREATE INDEX persons_last_name ON persons (last_name);
 
-CREATE TABLE administrative_assistants (
+CREATE TABLE receptionists (
   entity_id  INTEGER PRIMARY KEY,
   telephone  VARCHAR(20) UNIQUE NOT NULL,
   FOREIGN KEY (entity_id) REFERENCES persons(entity_id) ON DELETE CASCADE

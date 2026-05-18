@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'administrative-assistants')}">
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'receptionists')}">
 <body>
-  <h2 th:text="#{administrativeAssistantInformation}">Administrative Assistant Information</h2>
+  <h2 th:text="#{receptionistInformation}">Receptionist Information</h2>
 
   <div th:if="${message}" class="alert alert-success" id="success-message">
     <span th:text="${message}"></span>
@@ -10,7 +10,7 @@
     <span th:text="${error}"></span>
   </div>
 
-  <table class="table table-striped" th:object="${administrativeAssistant}">
+  <table class="table table-striped" th:object="${receptionist}">
     <tr>
       <th th:text="#{name}">Name</th>
       <td><b th:text="*{firstName + ' ' + lastName}"></b></td>
@@ -33,7 +33,7 @@
     </tr>
   </table>
 
-  <a th:href="@{/administrative-assistants/__${administrativeAssistant.id}__/edit}" class="btn btn-primary" th:text="#{editAdministrativeAssistant}">Edit Administrative Assistant</a>
+  <a th:href="@{/receptionists/__${receptionist.id}__/edit}" class="btn btn-primary" th:text="#{editReceptionist}">Edit Receptionist</a>
 
   <script>
     function hideMessages() {

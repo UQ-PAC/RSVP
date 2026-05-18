@@ -45,9 +45,9 @@ invariant
  entity.level == ChildrenClinic::ProfessionalLevel::"Senior")
     for all entity: ChildrenClinic::Employee;
 
-// St6. An "Administrative Assistant" may only hold the "Intern", "Staff", or "Senior" level.
+// St6. A "Receptionist" may only hold the "Intern", "Staff", or "Senior" level.
 invariant
-!(entity.roles.contains(ChildrenClinic::EmployeeRole::"Administrative Assistant") &&
+!(entity.roles.contains(ChildrenClinic::EmployeeRole::"Receptionist") &&
   entity has level) ||
 (entity.level == ChildrenClinic::ProfessionalLevel::"Intern" ||
  entity.level == ChildrenClinic::ProfessionalLevel::"Staff" ||
@@ -113,11 +113,11 @@ entity has doctors && entity.doctors != []
     for all entity: ChildrenClinic::Visit;
 
 // St14. An Employee who is an "Administrator" should not simultaneously
-// hold the "Doctor" or "Administrative Assistant" role.
+// hold the "Doctor" or "Receptionist" role.
 invariant
 !entity.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") ||
 (!entity.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
- !entity.roles.contains(ChildrenClinic::EmployeeRole::"Administrative Assistant"))
+ !entity.roles.contains(ChildrenClinic::EmployeeRole::"Receptionist"))
     for all entity: ChildrenClinic::Employee;
 
 // St15. A Patient's doctors must each hold the "Doctor" role.
@@ -156,20 +156,20 @@ deny(principal, resource, action)
             resource,
             action in ChildrenClinic::Action::"PatientOperations";
 
-// Se3. Any Employee can view a "Doctor" or an "Administrative Assistant".
+// Se3. Any Employee can view a "Doctor" or a "Receptionist".
 // ('policy2')
 invariant
 !resource.roles.containsAny([ChildrenClinic::EmployeeRole::"Doctor",
-                             ChildrenClinic::EmployeeRole::"Administrative Assistant"]) ||
+                             ChildrenClinic::EmployeeRole::"Receptionist"]) ||
 allow(principal, resource, ChildrenClinic::Action::"ViewEmployee")
     for all principal: ChildrenClinic::Employee,
             resource: ChildrenClinic::Employee;
 
-// Se4. Any Guest can view a "Doctor" or an "Administrative Assistant".
+// Se4. Any Guest can view a "Doctor" or a "Receptionist".
 // ('policy2')
 invariant
 !resource.roles.containsAny([ChildrenClinic::EmployeeRole::"Doctor",
-                             ChildrenClinic::EmployeeRole::"Administrative Assistant"]) ||
+                             ChildrenClinic::EmployeeRole::"Receptionist"]) ||
 allow(principal, resource, ChildrenClinic::Action::"ViewEmployee")
     for all principal: ChildrenClinic::Guest,
             resource: ChildrenClinic::Employee;
@@ -304,30 +304,30 @@ allow(principal, resource, ChildrenClinic::Action::"ViewVisit")
     for all principal: ChildrenClinic::Employee,
             resource: ChildrenClinic::Visit;
 
-// Se16. An "Administrative Assistant" cannot add Employees.
+// Se16. A "Receptionist" cannot add Employees.
 // ('policy5')
 invariant
-!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrative Assistant") &&
+!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Receptionist") &&
   !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator")) ||
 deny(principal, resource, action)
     for all principal: ChildrenClinic::Employee,
             resource: ChildrenClinic::Clinic,
             action: ChildrenClinic::Action::"AddEmployee";
 
-// Se17. An "Administrative Assistant" cannot delete Employees.
+// Se17. A "Receptionist" cannot delete Employees.
 // ('policy5')
 invariant
-!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrative Assistant") &&
+!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Receptionist") &&
   !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator")) ||
 deny(principal, resource, action)
     for all principal: ChildrenClinic::Employee,
             resource: ChildrenClinic::Clinic,
             action: ChildrenClinic::Action::"DeleteEmployee";
 
-// Se18. An "Administrative Assistant" cannot view the record of an "Administrator".
+// Se18. A "Receptionist" cannot view the record of an "Administrator".
 // ('policy5')
 invariant
-!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrative Assistant") &&
+!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Receptionist") &&
   !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
   resource.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
   principal != resource) ||
@@ -336,10 +336,10 @@ deny(principal, resource, action)
             resource: ChildrenClinic::Employee,
             action: ChildrenClinic::Action::"ViewEmployee";
 
-// Se19. An "Administrative Assistant" cannot edit the record of an "Administrator".
+// Se19. A "Receptionist" cannot edit the record of an "Administrator".
 // ('policy5')
 invariant
-!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrative Assistant") &&
+!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Receptionist") &&
   !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
   resource.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
   principal != resource) ||

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'administrative-assistants')}">
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'receptionists')}">
 <body>
 
-  <h2 th:text="#{administrativeAssistant}">Administrative Assistant</h2>
-  <form th:object="${administrativeAssistant}" class="form-horizontal" id="add-administrative-assistant-form" method="post">
+  <h2 th:text="#{receptionist}">Receptionist</h2>
+  <form th:object="${receptionist}" class="form-horizontal" id="add-receptionist-form" method="post">
     <div class="form-group has-feedback">
       <input th:replace="~{fragments/inputField :: input (#{firstName}, 'firstName', 'text')}" />
       <input th:replace="~{fragments/inputField :: input (#{lastName}, 'lastName', 'text')}" />
@@ -35,7 +35,7 @@
     </div>
     <div class="form-group">
       <div class="col-sm-offset-2 col-sm-10">
-        <button th:with="text=${administrativeAssistant['new']} ? #{addAdministrativeAssistant} : #{updateAdministrativeAssistant}" class="btn btn-primary" type="submit"
+        <button th:with="text=${receptionist['new']} ? #{addReceptionist} : #{updateReceptionist}" class="btn btn-primary" type="submit"
           th:text="${text}">Submit</button>
       </div>
     </div>

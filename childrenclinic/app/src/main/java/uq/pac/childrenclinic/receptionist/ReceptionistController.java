@@ -1,10 +1,5 @@
 package uq.pac.childrenclinic.receptionist;
 
-import com.cedarpolicy.value.EntityUID;
-
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -37,6 +33,10 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriUtils;
 
+import com.cedarpolicy.value.EntityUID;
+
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
 import uq.pac.childrenclinic.cedar.CedarDeniedException;
 import uq.pac.childrenclinic.cedar.CedarEntitiesInvalidationEvent;
@@ -51,6 +51,10 @@ public class ReceptionistController {
 
 	private static final String VIEWS_RECEPTIONIST_CREATE_OR_UPDATE_FORM = "receptionists/createOrUpdateReceptionistForm";
 
+	private static final String RECEPTIONIST_ROLE_NAME = "Receptionist";
+
+	private static final String DEFAULT_LEVEL_NAME = "Intern";
+
 	private final ReceptionistRepository receptionists;
 
 	private final GenderRepository genders;
@@ -61,14 +65,17 @@ public class ReceptionistController {
 
 	private final ApplicationEventPublisher eventPublisher;
 
+	private final JdbcTemplate jdbcTemplate;
+
 	public ReceptionistController(ReceptionistRepository receptionists,
 			GenderRepository genders, ClinicRepository clinics, CedarProgrammaticEvaluator cedarEvaluator,
-			ApplicationEventPublisher eventPublisher) {
+			ApplicationEventPublisher eventPublisher, JdbcTemplate jdbcTemplate) {
 		this.receptionists = receptionists;
 		this.genders = genders;
 		this.clinics = clinics;
 		this.cedarEvaluator = cedarEvaluator;
 		this.eventPublisher = eventPublisher;
+		this.jdbcTemplate = jdbcTemplate;
 	}
 
 	@ModelAttribute("genders")
@@ -286,6 +293,8 @@ public class ReceptionistController {
 			return VIEWS_RECEPTIONIST_CREATE_OR_UPDATE_FORM;
 		}
 
+		createUserForReceptionist(receptionist);
+
 		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
 		redirectAttributes.addFlashAttribute("message", "New Receptionist has been added.");
 		return "redirect:/receptionists/" + receptionist.getId();
@@ -399,9 +408,28 @@ public class ReceptionistController {
 			return VIEWS_RECEPTIONIST_CREATE_OR_UPDATE_FORM;
 		}
 
+		String updatedUsername = receptionist.getFirstName() + " " + receptionist.getLastName();
+		jdbcTemplate.update("UPDATE users SET username = ? WHERE entity_id = ?", updatedUsername, receptionistId);
+
 		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
 		redirectAttributes.addFlashAttribute("message", "Receptionist values updated.");
 		return "redirect:/receptionists/{receptionistId}";
 	}
+
+	private void createUserForReceptionist(Receptionist receptionist) {
+		Integer entityId = receptionist.getId();
+		String username = receptionist.getFirstName() + " " + receptionist.getLastName();
+ 
+		jdbcTemplate.update("INSERT INTO users (entity_id, username) VALUES (?, ?)", entityId, username);
+ 
+		Integer roleId = jdbcTemplate.queryForObject("SELECT id FROM roles WHERE name = ?", Integer.class,
+				RECEPTIONIST_ROLE_NAME);
+		jdbcTemplate.update("INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)", entityId, roleId);
+ 
+		Integer levelId = jdbcTemplate.queryForObject("SELECT id FROM levels WHERE name = ?", Integer.class,
+				DEFAULT_LEVEL_NAME);
+		jdbcTemplate.update("INSERT INTO user_levels (user_id, level_id) VALUES (?, ?)", entityId, levelId);
+	}
+
 
 }

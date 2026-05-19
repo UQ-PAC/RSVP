@@ -15,11 +15,6 @@
  */
 package uq.pac.childrenclinic.doctor;
 
-import com.cedarpolicy.value.EntityUID;
-
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,6 +32,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -52,6 +48,10 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriUtils;
 
+import com.cedarpolicy.value.EntityUID;
+
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
 import uq.pac.childrenclinic.cedar.CedarDeniedException;
 import uq.pac.childrenclinic.cedar.CedarEntitiesInvalidationEvent;
@@ -72,6 +72,10 @@ class DoctorController {
 
 	private static final String VIEWS_DOCTOR_CREATE_OR_UPDATE_FORM = "doctors/createOrUpdateDoctorForm";
 
+	private static final String DOCTOR_ROLE_NAME = "Doctor";
+
+	private static final String DEFAULT_LEVEL_NAME = "Intern";
+
 	private final DoctorRepository doctors;
 
 	private final GenderRepository genders;
@@ -84,15 +88,18 @@ class DoctorController {
 
 	private final ApplicationEventPublisher eventPublisher;
 
+	private final JdbcTemplate jdbcTemplate;
+
 	public DoctorController(DoctorRepository doctors, GenderRepository genders, SpecialtyRepository specialties,
 			ClinicRepository clinics, CedarProgrammaticEvaluator cedarEvaluator,
-			ApplicationEventPublisher eventPublisher) {
+			ApplicationEventPublisher eventPublisher, JdbcTemplate jdbcTemplate) {
 		this.doctors = doctors;
 		this.genders = genders;
 		this.specialties = specialties;
 		this.clinics = clinics;
 		this.cedarEvaluator = cedarEvaluator;
 		this.eventPublisher = eventPublisher;
+		this.jdbcTemplate = jdbcTemplate;
 	}
 
 	@ModelAttribute("genders")
@@ -310,6 +317,8 @@ class DoctorController {
 			return VIEWS_DOCTOR_CREATE_OR_UPDATE_FORM;
 		}
 
+		createUserForDoctor(doctor);
+
 		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
 		redirectAttributes.addFlashAttribute("message", "New Doctor has been added.");
 		return "redirect:/doctors/" + doctor.getId();
@@ -418,9 +427,28 @@ class DoctorController {
 			return VIEWS_DOCTOR_CREATE_OR_UPDATE_FORM;
 		}
 
+		String updatedUsername = doctor.getFirstName() + " " + doctor.getLastName();
+		jdbcTemplate.update("UPDATE users SET username = ? WHERE entity_id = ?", updatedUsername, doctorId);
+
 		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
 		redirectAttributes.addFlashAttribute("message", "Doctor values updated.");
 		return "redirect:/doctors/{doctorId}";
 	}
+
+	private void createUserForDoctor(Doctor doctor) {
+		Integer entityId = doctor.getId();
+		String username = doctor.getFirstName() + " " + doctor.getLastName();
+ 
+		jdbcTemplate.update("INSERT INTO users (entity_id, username) VALUES (?, ?)", entityId, username);
+ 
+		Integer roleId = jdbcTemplate.queryForObject("SELECT id FROM roles WHERE name = ?", Integer.class,
+				DOCTOR_ROLE_NAME);
+		jdbcTemplate.update("INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)", entityId, roleId);
+ 
+		Integer levelId = jdbcTemplate.queryForObject("SELECT id FROM levels WHERE name = ?", Integer.class,
+				DEFAULT_LEVEL_NAME);
+		jdbcTemplate.update("INSERT INTO user_levels (user_id, level_id) VALUES (?, ?)", entityId, levelId);
+	}
+
 
 }

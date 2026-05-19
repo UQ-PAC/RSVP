@@ -105,12 +105,18 @@ public class PolicyAnalysis {
                 // (It is ok for a "forbid" policy to be "subsumed" by a "permit" policy - in that
                 // case the forbid acts as a filter over the permit).
                 if (!p.isForbid() || p2.isForbid()) {
-                    String action = p.isPermit() ? "permitted" : "forbidden";
                     if (analysisResults.get(p2).subsumers.contains(p)) {
                         // If two policies subsume each other, they match an identical set of
-                        // requests (this will be reported twice: once for each of the policies).
+                        // requests.
                         if (!analysisResults.get(p2).subsumptionReported) {
-                            reports.add(new PolicyReport.IdenticalPolicies(p, p2));
+                            // If one policy is forbid and the other permit, we have contradictory
+                            // rather than identical policies. The check above ("if (!p.isForbid()...")
+                            // ensures that if this is the case, p2 is forbid and p is permit:
+                            if (p2.isForbid() && p.isPermit()) {
+                                reports.add(new PolicyReport.ContradictoryPolicies(p, p2));
+                            } else {
+                                reports.add(new PolicyReport.IdenticalPolicies(p, p2));
+                            }
                         }
                     } else {
                         reports.add(new PolicyReport.SubsumedPolicy(p, p2));

@@ -11,7 +11,7 @@ forbid (
     action == Action::"ListEmployees",
     resource is Clinic
 ) when {
-    !(principal is Employee) && !(principal is Guest)
+    !(principal is Employee || principal is Guest)
 };
 
 // 'policy1'

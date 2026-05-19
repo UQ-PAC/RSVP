@@ -9,6 +9,7 @@ invariant
      deny(employee, clinic, Action::"AddEmployee")
         for all employee: Employee, clinic: Clinic;
 
+// Semantic: Assistants can add patients to a clinic only if they are assigned to that clinic
 invariant
     !(
         employee.roles.contains(EmployeeRole::"Assistant") &&

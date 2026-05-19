@@ -123,12 +123,19 @@
     margin-bottom: -1px;
   }
 
-  .source-file-header .source-file-version.source-file-compare.selected {
-    background-color: var(--color-gray-300);
-  }
-
+  .source-file-header .source-file-version.source-file-compare.selected,
   .source-file-header .source-file-version.source-file-compare:hover {
     background-color: var(--color-gray-300);
+    color: var(--color-gray-600);
+  }
+
+  .source-file-header
+    .source-file-version.source-file-compare:hover
+    .source-file-icon,
+  .source-file-header
+    .source-file-version.source-file-compare.selected
+    .source-file-icon {
+    color: var(--color-gray-600);
   }
 
   .source-file-header .source-comparison-tabs {
@@ -143,7 +150,7 @@
   }
 
   .source-file-header .source-compare-icon {
-    color: var(--color-gray-400);
+    color: var(--color-gray-500);
     align-self: center;
     justify-self: center;
     font-size: 1rem;
@@ -198,6 +205,10 @@
   .source-file-header .source-file-version.selected {
     background-color: var(--color-gray-100);
     color: var(--color-gray-700);
+  }
+
+  .source-file-header .source-file-version:not(.selected) {
+    cursor: pointer;
   }
 
   .source-file.expanded .source-file-header .source-file-version.selected {
@@ -361,6 +372,56 @@
     color: var(--color-gray-500);
     flex-grow: 1;
     text-align: center;
+  }
+
+  .diff-impact .source-file-impact:not(.source-file-empty-impact) {
+    display: flex;
+    justify-items: stretch;
+    flex-direction: row;
+    width: 100%;
+    font-size: 0.8rem;
+    line-height: 1.2rem;
+    background-color: var(--color-gray-50);
+  }
+
+  .source-file-impact .impact-render-changes {
+    overflow-x: scroll;
+    padding: 0.1rem 0 0.75rem 0;
+    width: 50%;
+    border-left: 1px solid var(--d2h-line-border-color);
+  }
+
+  .source-file-impact .impact-render-change {
+    white-space: pre;
+    padding: 0 0.75rem;
+    color: var(--color-gray-700);
+    width: fit-content;
+    cursor: pointer;
+  }
+
+  .source-file-impact .impact-render-change-permitted {
+    background-color: var(--d2h-ins-bg-color);
+  }
+  .source-file-impact .impact-render-change-forbidden {
+    background-color: var(--d2h-del-bg-color);
+  }
+
+  .source-file-impact .impact-render-change-permitted:hover {
+    background-color: var(--d2h-ins-highlight-bg-color);
+  }
+  .source-file-impact .impact-render-change-forbidden:hover {
+    background-color: var(--d2h-del-highlight-bg-color);
+  }
+
+  .source-file-impact .impact-render-summary::before {
+    margin-right: 0.75rem;
+  }
+  .source-file-impact .impact-render-permitted-summary::before {
+    content: "+";
+  }
+
+  .source-file-impact .impact-render-forbidden-summary::before {
+    content: "-";
   }
 
   /********  report highlighting  ********/

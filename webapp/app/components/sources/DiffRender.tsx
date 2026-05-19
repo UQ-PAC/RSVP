@@ -168,7 +168,7 @@ export function DiffRender({
               No impact
             </div>
           )}
-          {(impact.permitted.length || impact.forbidden.length) && (
+          {(!!impact.permitted.length || !!impact.forbidden.length) && (
             <div
               data-testid="impact-render"
               className={`source-file-impact ${robotoMono.className}`}

@@ -24,7 +24,7 @@ interface HighlightedCodeLineProps {
   n: number;
   syntax: FileType;
   reports: ReportLine[];
-  temporaryHighlight: boolean;
+  temporaryHighlight: (line: number) => boolean;
 }
 
 export function HighlightedCodeLine({
@@ -34,13 +34,7 @@ export function HighlightedCodeLine({
   reports,
   temporaryHighlight,
 }: HighlightedCodeLineProps) {
-  const {
-    selected,
-    hovered,
-    scroll,
-    loc: selectedLoc,
-    highlighted,
-  } = useSelection();
+  const { selected, hovered, scroll, loc: selectedLoc } = useSelection();
   const selectionDispatch = useSelectionDispatch();
 
   const { drawer: drawerFocus } = useFocus();
@@ -320,7 +314,7 @@ export function HighlightedCodeLine({
         <span
           className={cx(
             "source-line-highlight",
-            temporaryHighlight && "highlighted",
+            temporaryHighlight(n) && "highlighted",
           )}
         >
           {child}

@@ -24,6 +24,8 @@ interface CodeRenderParams {
   reports?: Report[];
 }
 
+type HighlightFunc = (line: number) => boolean;
+
 export function CodeRender({ file, content, reports }: CodeRenderParams) {
   const { lines, reportsByLine } = sortReportsBySourceLine(
     file,
@@ -34,7 +36,9 @@ export function CodeRender({ file, content, reports }: CodeRenderParams) {
   const { scroll, highlighted } = useSelection();
   const selectionDispatch = useSelectionDispatch();
 
-  const [temporaryHighlight, setTemporaryHighlight] = useState(false);
+  const [temporaryHighlight, setTemporaryHighlight] = useState<HighlightFunc>(
+    () => () => false,
+  );
 
   useEffect(() => {
     if (scroll === "source") {
@@ -43,9 +47,12 @@ export function CodeRender({ file, content, reports }: CodeRenderParams) {
           .then(({ serverId }) => serverId)
           .then((id) => {
             if (id === highlighted.file) {
-              setTemporaryHighlight(true);
+              setTemporaryHighlight(
+                () => (n: number) =>
+                  n >= highlighted.start && n <= highlighted.end,
+              );
               setTimeout(() => {
-                setTemporaryHighlight(false);
+                setTemporaryHighlight(() => () => false);
                 selectionDispatch({
                   scroll: "none",
                   highlighted: undefined,
@@ -78,12 +85,7 @@ export function CodeRender({ file, content, reports }: CodeRenderParams) {
                 line={line}
                 syntax={file.filetype}
                 reports={reports}
-                temporaryHighlight={
-                  temporaryHighlight &&
-                  !!highlighted &&
-                  n >= highlighted.start &&
-                  n <= highlighted.end
-                }
+                temporaryHighlight={temporaryHighlight}
               />
             ) : (
               <CodeLine
@@ -92,12 +94,7 @@ export function CodeRender({ file, content, reports }: CodeRenderParams) {
                 file={id}
                 line={line}
                 syntax={file.filetype}
-                temporaryHighlight={
-                  temporaryHighlight &&
-                  !!highlighted &&
-                  n >= highlighted.start &&
-                  n <= highlighted.end
-                }
+                temporaryHighlight={temporaryHighlight}
               />
             ),
           )}

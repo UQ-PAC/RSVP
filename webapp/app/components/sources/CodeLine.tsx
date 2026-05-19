@@ -11,7 +11,7 @@ interface CodeLineProps {
   n: number;
   line: string;
   syntax: FileType;
-  temporaryHighlight: boolean;
+  temporaryHighlight: (line: number) => boolean;
 }
 
 export function CodeLine({
@@ -23,19 +23,21 @@ export function CodeLine({
 }: CodeLineProps) {
   const highlight = getHighlightFunction(syntax);
 
-  const { scroll, loc, highlighted } = useSelection();
+  const { scroll, loc } = useSelection();
 
   // Scroll selected policy into view
   const focus = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     if (focus.current && scroll === "source") {
-      if (loc === `${file}:${n}`) {
-        focus.current.scrollIntoView({
-          block: "center",
-          inline: "center",
-          behavior: "smooth",
-        });
-      }
+      file.then((id) => {
+        if (loc === `${id}:${n}`) {
+          focus.current?.scrollIntoView({
+            block: "center",
+            inline: "center",
+            behavior: "smooth",
+          });
+        }
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scroll, loc]);
@@ -48,7 +50,7 @@ export function CodeLine({
         className={cx(
           "source-file-line-content",
           "source-line-no-report",
-          temporaryHighlight && "highlighted",
+          temporaryHighlight(n) && "highlighted",
         )}
         dangerouslySetInnerHTML={{ __html: highlight(line) }}
       />

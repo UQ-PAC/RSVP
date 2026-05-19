@@ -59,7 +59,7 @@
                   <small class="text-white-50 mt-1 text-wrap lh-sm" th:unless="${currentUser != null and currentUser.username != 'Guest'}" th:text="Unknown"></small>
                 </div>
             </a>
-            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarDropdown">
+            <ul class="dropdown-menu dropdown-menu-end shadow overflow-auto" style="max-height: 80vh;" aria-labelledby="navbarDropdown">
                 <li><a class="dropdown-item" href="/switch-user?username=Guest">Guest</a></li>
 
                 <li><hr class="dropdown-divider"></li>

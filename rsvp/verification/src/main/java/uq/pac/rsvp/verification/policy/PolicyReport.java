@@ -42,6 +42,17 @@ public abstract class PolicyReport {
         }
     }
 
+    public static class ContradictoryPolicies extends Report {
+        public ContradictoryPolicies(Policy permitPolicy, Policy forbidPolicy) {
+            super(Report.Severity.Warning,
+                    "Contradicted Policy",
+                    "The first of these policies forbids exactly what is permitted by the second",
+                    new Report.LocationMessage(forbidPolicy.getSourceLoc(), ""),
+                    new Report.LocationMessage(permitPolicy.getSourceLoc(), "")
+            );
+        }
+    }
+
     public static class UnusedPolicy extends Report {
         public UnusedPolicy(Policy policy) {
             super(Report.Severity.Warning,

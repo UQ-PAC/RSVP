@@ -8,7 +8,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import cx from "classnames";
-import { JSX } from "react";
+import { JSX, useRef } from "react";
 
 interface SourceVersionSelectParams {
   versions: string[];
@@ -42,6 +42,19 @@ export function SourceVersionSelect({
     ? versions.indexOf(selectedUpdate)
     : originalIndex + 1;
 
+  const topRow = useRef<HTMLDivElement>(null);
+  const comparisonOriginal = useRef<HTMLDivElement>(null);
+  const comparisonUpdated = useRef<HTMLDivElement>(null);
+
+  const horizontalScroll = (e, elem: HTMLDivElement | null) => {
+    e.preventDefault();
+    e.stopPropagation();
+    elem?.scrollTo({
+      left: elem.scrollLeft + e.deltaY * 3,
+      behavior: "smooth",
+    });
+  };
+
   return (
     <div className="source-file-tabs">
       <div
@@ -50,7 +63,11 @@ export function SourceVersionSelect({
         onMouseOver={mouseOver}
         onMouseOut={mouseOut}
       >
-        <div className="source-file-versions">
+        <div
+          className="source-file-versions"
+          ref={topRow}
+          onWheel={(e) => horizontalScroll(e, topRow.current)}
+        >
           {versions.map((version, i) => (
             <div
               key={version}
@@ -107,7 +124,11 @@ export function SourceVersionSelect({
                 className="source-compare-icon"
                 icon={faFileCircleMinus}
               />
-              <div className="source-comparison-original">
+              <div
+                className="source-comparison-original"
+                ref={comparisonOriginal}
+                onWheel={(e) => horizontalScroll(e, comparisonOriginal.current)}
+              >
                 {versions.slice(0, -1).map((version, i) => {
                   return (
                     <div
@@ -145,7 +166,11 @@ export function SourceVersionSelect({
                 className="source-compare-icon"
                 icon={faFileCirclePlus}
               />
-              <div className="source-comparison-updated">
+              <div
+                className="source-comparison-updated"
+                ref={comparisonUpdated}
+                onWheel={(e) => horizontalScroll(e, comparisonUpdated.current)}
+              >
                 {versions.slice(originalIndex + 1).map((version, i) => {
                   return (
                     <div

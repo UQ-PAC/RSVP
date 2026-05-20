@@ -15,20 +15,6 @@ exports[`cancels group creation 1`] = `
       class="create-analysis-group-buttons"
     >
       <button
-        class="cancel-create-analysis-group-button"
-        data-testid="cancel-create-analysis-group-button"
-      >
-        <div
-          data-icon="faCircleXmark"
-          data-testid="font-awesome-icon"
-        />
-        <span
-          class="button-text"
-        >
-          Cancel
-        </span>
-      </button>
-      <button
         class="create-analysis-group-button"
         data-testid="create-analysis-group-button"
       >
@@ -40,6 +26,20 @@ exports[`cancels group creation 1`] = `
           class="button-text"
         >
           Create
+        </span>
+      </button>
+      <button
+        class="cancel-create-analysis-group-button"
+        data-testid="cancel-create-analysis-group-button"
+      >
+        <div
+          data-icon="faCircleXmark"
+          data-testid="font-awesome-icon"
+        />
+        <span
+          class="button-text"
+        >
+          Cancel
         </span>
       </button>
     </span>
@@ -62,20 +62,6 @@ exports[`creates group 1`] = `
       class="create-analysis-group-buttons"
     >
       <button
-        class="cancel-create-analysis-group-button"
-        data-testid="cancel-create-analysis-group-button"
-      >
-        <div
-          data-icon="faCircleXmark"
-          data-testid="font-awesome-icon"
-        />
-        <span
-          class="button-text"
-        >
-          Cancel
-        </span>
-      </button>
-      <button
         class="create-analysis-group-button"
         data-testid="create-analysis-group-button"
       >
@@ -87,6 +73,20 @@ exports[`creates group 1`] = `
           class="button-text"
         >
           Create
+        </span>
+      </button>
+      <button
+        class="cancel-create-analysis-group-button"
+        data-testid="cancel-create-analysis-group-button"
+      >
+        <div
+          data-icon="faCircleXmark"
+          data-testid="font-awesome-icon"
+        />
+        <span
+          class="button-text"
+        >
+          Cancel
         </span>
       </button>
     </span>
@@ -109,20 +109,6 @@ exports[`renders 1`] = `
       class="create-analysis-group-buttons"
     >
       <button
-        class="cancel-create-analysis-group-button"
-        data-testid="cancel-create-analysis-group-button"
-      >
-        <div
-          data-icon="faCircleXmark"
-          data-testid="font-awesome-icon"
-        />
-        <span
-          class="button-text"
-        >
-          Cancel
-        </span>
-      </button>
-      <button
         class="create-analysis-group-button"
         data-testid="create-analysis-group-button"
       >
@@ -134,6 +120,20 @@ exports[`renders 1`] = `
           class="button-text"
         >
           Create
+        </span>
+      </button>
+      <button
+        class="cancel-create-analysis-group-button"
+        data-testid="cancel-create-analysis-group-button"
+      >
+        <div
+          data-icon="faCircleXmark"
+          data-testid="font-awesome-icon"
+        />
+        <span
+          class="button-text"
+        >
+          Cancel
         </span>
       </button>
     </span>
@@ -165,20 +165,6 @@ exports[`validates group name 1`] = `
       class="create-analysis-group-buttons"
     >
       <button
-        class="cancel-create-analysis-group-button"
-        data-testid="cancel-create-analysis-group-button"
-      >
-        <div
-          data-icon="faCircleXmark"
-          data-testid="font-awesome-icon"
-        />
-        <span
-          class="button-text"
-        >
-          Cancel
-        </span>
-      </button>
-      <button
         class="create-analysis-group-button"
         data-testid="create-analysis-group-button"
         disabled=""
@@ -191,6 +177,20 @@ exports[`validates group name 1`] = `
           class="button-text"
         >
           Create
+        </span>
+      </button>
+      <button
+        class="cancel-create-analysis-group-button"
+        data-testid="cancel-create-analysis-group-button"
+      >
+        <div
+          data-icon="faCircleXmark"
+          data-testid="font-awesome-icon"
+        />
+        <span
+          class="button-text"
+        >
+          Cancel
         </span>
       </button>
     </span>
@@ -213,20 +213,6 @@ exports[`validates group name 2`] = `
       class="create-analysis-group-buttons"
     >
       <button
-        class="cancel-create-analysis-group-button"
-        data-testid="cancel-create-analysis-group-button"
-      >
-        <div
-          data-icon="faCircleXmark"
-          data-testid="font-awesome-icon"
-        />
-        <span
-          class="button-text"
-        >
-          Cancel
-        </span>
-      </button>
-      <button
         class="create-analysis-group-button"
         data-testid="create-analysis-group-button"
       >
@@ -238,6 +224,20 @@ exports[`validates group name 2`] = `
           class="button-text"
         >
           Create
+        </span>
+      </button>
+      <button
+        class="cancel-create-analysis-group-button"
+        data-testid="cancel-create-analysis-group-button"
+      >
+        <div
+          data-icon="faCircleXmark"
+          data-testid="font-awesome-icon"
+        />
+        <span
+          class="button-text"
+        >
+          Cancel
         </span>
       </button>
     </span>
@@ -269,20 +269,6 @@ exports[`validates group name 3`] = `
       class="create-analysis-group-buttons"
     >
       <button
-        class="cancel-create-analysis-group-button"
-        data-testid="cancel-create-analysis-group-button"
-      >
-        <div
-          data-icon="faCircleXmark"
-          data-testid="font-awesome-icon"
-        />
-        <span
-          class="button-text"
-        >
-          Cancel
-        </span>
-      </button>
-      <button
         class="create-analysis-group-button"
         data-testid="create-analysis-group-button"
         disabled=""
@@ -295,6 +281,20 @@ exports[`validates group name 3`] = `
           class="button-text"
         >
           Create
+        </span>
+      </button>
+      <button
+        class="cancel-create-analysis-group-button"
+        data-testid="cancel-create-analysis-group-button"
+      >
+        <div
+          data-icon="faCircleXmark"
+          data-testid="font-awesome-icon"
+        />
+        <span
+          class="button-text"
+        >
+          Cancel
         </span>
       </button>
     </span>

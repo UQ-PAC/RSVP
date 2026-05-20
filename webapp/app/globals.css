@@ -89,6 +89,6 @@
     align-items: stretch;
     flex-grow: 1;
     background-color: var(--color-gray-100);
-    overflow-y: scroll;
+    overflow-y: auto;
   }
 }

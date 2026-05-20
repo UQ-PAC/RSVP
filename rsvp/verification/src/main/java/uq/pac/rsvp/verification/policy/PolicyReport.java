@@ -13,7 +13,7 @@ public abstract class PolicyReport {
 
             super(Report.Severity.Warning,
                     "Subsumed Policy",
-                    "Every request " + getActionAsVerb(subsumed, true) + " by this policy is already " + getActionAsVerb(subsumed, true) + " by a second policy.",
+                    "Every request " + getActionAsVerb(subsumed, true) + " by this policy is already " + getActionAsVerb(subsumer, true) + " by a second policy.",
                     new Report.LocationMessage(subsumed.getSourceLoc(), "Subsumed policy"),
                     new Report.LocationMessage(subsumer.getSourceLoc(), "Is subsumed by this policy")
             );
@@ -43,10 +43,11 @@ public abstract class PolicyReport {
     }
 
     public static class ContradictoryPolicies extends Report {
-        public ContradictoryPolicies(Policy permitPolicy, Policy forbidPolicy) {
+        public ContradictoryPolicies(Policy permitPolicy, Policy forbidPolicy, boolean exact) {
             super(Report.Severity.Warning,
                     "Contradicted Policy",
-                    "The first of these policies forbids exactly what is permitted by the second",
+                    "The first of these policies forbids " + (exact ? "exactly what" : "everything that")
+                            +  " is permitted by the second",
                     new Report.LocationMessage(forbidPolicy.getSourceLoc(), ""),
                     new Report.LocationMessage(permitPolicy.getSourceLoc(), "")
             );

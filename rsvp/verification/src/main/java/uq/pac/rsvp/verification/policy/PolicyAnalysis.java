@@ -113,13 +113,19 @@ public class PolicyAnalysis {
                             // rather than identical policies. The check above ("if (!p.isForbid()...")
                             // ensures that if this is the case, p2 is forbid and p is permit:
                             if (p2.isForbid() && p.isPermit()) {
-                                reports.add(new PolicyReport.ContradictoryPolicies(p, p2));
+                                reports.add(new PolicyReport.ContradictoryPolicies(p, p2, true));
                             } else {
                                 reports.add(new PolicyReport.IdenticalPolicies(p, p2));
                             }
                         }
                     } else {
-                        reports.add(new PolicyReport.SubsumedPolicy(p, p2));
+                        // As above, if the permission status mismatches, report as contradictory
+                        // rather than subsumed.
+                        if (p2.isForbid() && p.isPermit()) {
+                            reports.add(new PolicyReport.ContradictoryPolicies(p, p2, false));
+                        } else {
+                            reports.add(new PolicyReport.SubsumedPolicy(p, p2));
+                        }
                     }
                     analysisResults.get(p).subsumptionReported = true;
                 }
@@ -166,7 +172,7 @@ public class PolicyAnalysis {
                         if (i.hasNext()) {
                             counterExamples.append("\nAnd ");
                             counterExamples.append(assignments.size() - MAX_COUNTEREXAMPLES);
-                            counterExamples.append(" more counter-example...");
+                            counterExamples.append(" more counter-example(s)...");
                         }
                     }
                 }

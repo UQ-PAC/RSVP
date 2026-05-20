@@ -3,7 +3,7 @@
 import { faCirclePlus, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import cx from "classnames";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface NewGroupFormParams {
   index: number;
@@ -20,15 +20,25 @@ export function NewGroupForm({
 }: NewGroupFormParams) {
   const placeholder = `Policy Set ${index}`;
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const [name, setName] = useState(placeholder);
 
   const invalid = existing.some(
     (existing) => existing.toLowerCase() === name.toLowerCase(),
   );
 
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
   return (
-    <form className="create-analysis-group-form">
+    <form
+      className="create-analysis-group-form"
+      onSubmit={(e) => e.preventDefault()}
+    >
       <input
+        ref={inputRef}
         className={cx("create-analysis-group-text-input", invalid && "invalid")}
         data-testid="create-analysis-group-text-input"
         type="text"
@@ -49,17 +59,6 @@ export function NewGroupForm({
       )}
       <span className="create-analysis-group-buttons">
         <button
-          className="cancel-create-analysis-group-button"
-          data-testid="cancel-create-analysis-group-button"
-          onClick={(e) => {
-            e.preventDefault();
-            cancel();
-          }}
-        >
-          <FontAwesomeIcon className="button-icon" icon={faCircleXmark} />
-          <span className="button-text">Cancel</span>
-        </button>
-        <button
           className="create-analysis-group-button"
           data-testid="create-analysis-group-button"
           disabled={invalid}
@@ -70,6 +69,17 @@ export function NewGroupForm({
         >
           <FontAwesomeIcon className="button-icon" icon={faCirclePlus} />
           <span className="button-text">Create</span>
+        </button>
+        <button
+          className="cancel-create-analysis-group-button"
+          data-testid="cancel-create-analysis-group-button"
+          onClick={(e) => {
+            e.preventDefault();
+            cancel();
+          }}
+        >
+          <FontAwesomeIcon className="button-icon" icon={faCircleXmark} />
+          <span className="button-text">Cancel</span>
         </button>
       </span>
     </form>

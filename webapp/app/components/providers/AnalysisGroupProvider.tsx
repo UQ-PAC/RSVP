@@ -33,16 +33,22 @@ export function AnalysisGroupProvider({
 
   // Update global context when group is updated
   useEffect(() => {
-    verificationDispatch({
-      type: "update",
-      group,
-      update: analysisGroupContext,
-    });
-  }, [analysisGroupContext, group, verificationDispatch]);
+    if (analysisGroupContext !== globalGroupContext) {
+      verificationDispatch({
+        type: "update",
+        group,
+        update: analysisGroupContext,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [analysisGroupContext]);
 
   // Update group when global context is updated
   useEffect(() => {
-    analysisGroupDispatch({ type: "update", update: globalGroupContext });
+    if (analysisGroupContext !== globalGroupContext) {
+      analysisGroupDispatch({ type: "update", update: globalGroupContext });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalGroupContext]);
 
   return (

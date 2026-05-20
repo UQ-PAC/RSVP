@@ -15,6 +15,7 @@ interface UploadedFileProps {
   children?: JSX.Element | JSX.Element[];
   addChild?: (file: VerificationFile) => void;
   icon?: boolean;
+  version?: number;
 }
 
 export function UploadedFile({
@@ -23,6 +24,7 @@ export function UploadedFile({
   remove,
   addChild,
   icon = false,
+  version,
 }: UploadedFileProps) {
   const focusDispatch = useFocusDispatch();
   const selectionDispatch = useSelectionDispatch();
@@ -51,6 +53,9 @@ export function UploadedFile({
               className="uploaded-filetype-icon"
               icon={getFileIcon(file.filetype)}
             />
+          )}
+          {version !== undefined && (
+            <span className="uploaded-file-version-indicator">{`Version ${version}`}</span>
           )}
           {file.filename}
         </span>

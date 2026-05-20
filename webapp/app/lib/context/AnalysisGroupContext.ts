@@ -81,24 +81,11 @@ function doAdd(
 
   let filename = action.file.file.name;
 
-  // Make sure file name is unique in UI
-  if (doesFileExist(filename, context)) {
-    let i = 1;
-
-    while (doesFileExist(`${filename} (${i})`, context)) {
-      i++;
-    }
-
-    filename = `${filename} (${i})`;
-  }
-
-  const toAdd = { ...action.file, filename };
-
   // Add file as a version of another file
   if (action.original) {
-    if (toAdd.filetype !== action.original.filetype) {
+    if (action.file.filetype !== action.original.filetype) {
       console.error(
-        `Incompatible file types. Original: ${action.original.filetype}, Version: ${toAdd.filetype}}`,
+        `Incompatible file types. Original: ${action.original.filetype}, Version: ${action.file.filetype}}`,
       );
       return context;
     }
@@ -116,15 +103,26 @@ function doAdd(
         ...context.files.filter((file) => file !== existing),
         {
           original: existing.original,
-          versions: [...existing.versions, toAdd],
+          versions: [...existing.versions, { ...action.file, filename }],
         },
       ]);
     }
   } else {
+    // Make sure file name is unique in UI
+    if (doesFileExist(filename, context)) {
+      let i = 1;
+
+      while (doesFileExist(`${filename} (${i})`, context)) {
+        i++;
+      }
+
+      filename = `${filename} (${i})`;
+    }
+
     // Add new standalone file
     newContext.files = sortSources([
       ...context.files,
-      { original: toAdd, versions: [] },
+      { original: { ...action.file, filename }, versions: [] },
     ]);
   }
 

@@ -141,10 +141,12 @@ export function AnalysisGroup({ removeGroup }: AnalysisGroupProps) {
                   ? openCedarFileDialog
                   : undefined
               }
+              version={file.versions.length ? 1 : undefined}
             >
               {file.versions.map((version, j) => (
                 <UploadedFile
                   key={j}
+                  version={j + 2}
                   file={version}
                   remove={(version) => removeFile(version, file.original)}
                 />

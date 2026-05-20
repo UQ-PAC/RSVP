@@ -231,6 +231,18 @@
     color: var(--color-gray-400);
   }
 
+  .source-file-version-indicator {
+    font-size: 0.5rem;
+    line-height: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 0.1rem 0.3rem;
+    margin-right: 0.4rem;
+    color: var(--color-gray-50);
+    background-color: var(--color-gray-400);
+    border-radius: 0.25rem;
+  }
+
   .source-file-toggle {
     margin-right: 1rem;
     color: var(--color-gray-400);

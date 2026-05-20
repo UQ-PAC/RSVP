@@ -165,16 +165,15 @@ export function SourceFile({ source, reports, setFocus }: SourceFileParams) {
           const single = files.find(({ id }) => id === focusId);
 
           if (single) {
-            setOriginal({
-              file: single.file,
-              id: single.id,
-            });
-            setUpdated(undefined);
-            setFocus(single.id);
-
             single.file.resolved
               .then((uploaded) => uploaded.content)
               .then((content) => {
+                setOriginal({
+                  file: single.file,
+                  id: single.id,
+                });
+                setUpdated(undefined);
+                setFocus(single.id);
                 setFilename(single?.file.filename);
                 setCode(content);
               });

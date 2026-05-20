@@ -69,6 +69,9 @@ export function SourceVersionSelect({
               }}
             >
               <FontAwesomeIcon className="source-file-icon" icon={icon} />
+              <span className="source-file-version-indicator">
+                {`Version ${i + 1}`}
+              </span>
               {versionNames[i]}
             </div>
           ))}
@@ -130,6 +133,9 @@ export function SourceVersionSelect({
                         className="source-file-icon"
                         icon={icon}
                       />
+                      <span className="source-file-version-indicator">
+                        {`Version ${i + 1}`}
+                      </span>
                       {versionNames[i]}
                     </div>
                   );
@@ -157,6 +163,9 @@ export function SourceVersionSelect({
                         className="source-file-icon"
                         icon={icon}
                       />
+                      <span className="source-file-version-indicator">
+                        {`Version ${originalIndex + i + 2}`}
+                      </span>
                       {versionNames[originalIndex + i + 1]}
                     </div>
                   );

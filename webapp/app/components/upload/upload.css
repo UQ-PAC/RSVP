@@ -192,6 +192,22 @@
     cursor: grabbing;
   }
 
+  .upload-container
+    .uploaded-file
+    .uploaded-file-name
+    .uploaded-file-version-indicator {
+    font-size: 0.5rem;
+    line-height: 1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 0.15rem 0.25rem;
+    margin-right: 0.5rem;
+    color: var(--color-gray-50);
+    background-color: var(--color-gray-500);
+    border-radius: 0.25rem;
+    vertical-align: middle;
+  }
+
   .upload-container .uploaded-file .uploaded-file-name {
     flex-grow: 1;
     cursor: pointer;

@@ -17,7 +17,7 @@ import java.util.Map;
  * <p>
  * FIXME: This is closely related to type-checking that is being done for invariants.
  *        Tor the moment we cannot combine the two together because invariant type checking
- *        does not support type inference, but it needs to be reworks to be able to do so.
+ *        does not support type inference, but it needs to be reworked to be able to do so.
  */
 public class TypeContextVisitor extends ValueVisitorAdapter<TypeContextVisitor.Context> {
 

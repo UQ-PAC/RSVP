@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.ast.policy;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.text.StringEscapeUtils;
 import uq.pac.rsvp.policy.ast.CedarParser;
 import uq.pac.rsvp.policy.ast.policy.expr.ActionExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression;
@@ -87,7 +88,7 @@ public class ExpressionVisitor extends CedarSourceVisitor<Expression> {
     @Override
     public Expression visitStringExpr(CedarParser.StringExprContext ctx) {
         String value = ctx.STRING().getText();
-        return new StringExpression(StringExpression.unescape(value.substring(1, value.length() - 1)), location(ctx));
+        return new StringExpression(StringEscapeUtils.unescapeJava(value.substring(1, value.length() - 1)), location(ctx));
     }
 
     @Override

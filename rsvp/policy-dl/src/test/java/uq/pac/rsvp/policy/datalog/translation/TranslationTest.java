@@ -105,7 +105,7 @@ public class TranslationTest {
         }
     }
 
-    private final static String ONE_OFF = "github";
+    private final static String ONE_OFF = "strings";
 
     // Running tests for one directory separately for no particular
     // reason apart from being able to launch it separately

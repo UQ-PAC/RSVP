@@ -35,7 +35,12 @@ interface FocusAction {
     key: string;
     value: ExpansionState;
   };
-  register?: [ExpansionId, ExpansionId[]];
+  unfocus?: string;
+  register?: {
+    key: ExpansionId;
+    options: ExpansionId[];
+    default?: ExpansionId;
+  };
   deregister?: ExpansionId;
 }
 
@@ -70,7 +75,7 @@ function doFocus(context: FocusState, action: FocusAction): FocusState {
   if (action.focus.value === ExpansionState.Expanded) {
     // Collapse all conflicting focus entries
     Object.values(updatedTarget.groups ?? {})
-      .find((group) => group.some((item) => item === action.focus?.key))
+      .find((group) => group?.some((item) => item === action.focus?.key))
       ?.forEach((item) => {
         updatedTarget.expansions[item] = ExpansionState.Collapsed;
       });
@@ -91,13 +96,27 @@ function doRegister(context: FocusState, action: FocusAction): FocusState {
 
   const updatedContext: FocusState = { ...context };
 
+  const expansions = context[action.target].expansions;
   const groups = context[action.target].groups;
+
+  // If a default focus target was provided and no other target in the group
+  // is already expanded, then expand the default
+  if (
+    action.register.default &&
+    !action.register.options.some(
+      (key) => expansions[key] === ExpansionState.Expanded,
+    )
+  ) {
+    expansions[action.register.default] = ExpansionState.Expanded;
+  }
+
   const updatedTarget = {
-    expansions: { ...context[action.target].expansions },
+    expansions: { ...expansions },
     groups: groups ? { ...groups } : {},
   };
 
-  updatedTarget.groups[action.register[0]] = action.register[1];
+  updatedTarget.groups[action.register.key] = action.register.options;
+
   updatedContext[action.target] = updatedTarget;
 
   return updatedContext;

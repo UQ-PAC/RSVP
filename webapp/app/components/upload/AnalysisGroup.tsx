@@ -84,18 +84,19 @@ export function AnalysisGroup({ removeGroup }: AnalysisGroupProps) {
     checkAnalysisGroup(files);
 
   const removeFile = (file: VerificationFile, original?: VerificationFile) => {
-    file.resolved.then((uploaded) => {
-      remove(uploaded.serverId);
+    file.resolved
+      .then(({ serverId }) => serverId)
+      .then((id) => {
+        remove(id);
 
-      if (!original) {
-        // File is original, de-register focus group
-        focus({
-          type: "deregister",
-          target: "source-file",
-          deregister: uploaded.serverId,
-        });
-      }
-    });
+        if (!original) {
+          focus({
+            type: "deregister",
+            target: "source-file",
+            deregister: id,
+          });
+        }
+      });
     dispatch({ type: "remove", file, original });
   };
 

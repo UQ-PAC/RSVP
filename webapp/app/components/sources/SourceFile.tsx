@@ -108,8 +108,14 @@ export function SourceFile({ source, reports, setFocus }: SourceFileParams) {
           })),
         ),
       ).then((versions) => {
+        const originalId = uploaded.serverId;
+        const firstComparisonId =
+          updated && versions.length
+            ? `${uploaded.serverId}${versions[0].resolved.serverId}`
+            : undefined;
+
         const files: IdentifiedFile[] = [
-          { file: source.original, id: uploaded.serverId },
+          { file: source.original, id: originalId },
           ...versions.map((version) => ({
             file: version.unresolved,
             id: version.resolved.serverId,
@@ -140,11 +146,15 @@ export function SourceFile({ source, reports, setFocus }: SourceFileParams) {
         focusDispatch({
           type: "register",
           target: "source-file",
-          register: [uploaded.serverId, allIds],
+          register: {
+            key: uploaded.serverId,
+            options: allIds,
+            default: expanded ? (firstComparisonId ?? originalId) : undefined,
+          },
         });
       });
     });
-  }, [source.original, source.versions, focusDispatch, setFocus]);
+  }, [source.original, source.versions]);
 
   // Set focused files based on current focus state
   useEffect(() => {
@@ -208,7 +218,7 @@ export function SourceFile({ source, reports, setFocus }: SourceFileParams) {
 
           return focusId;
         }) ?? null;
-  }, [expansions, focusIds, files, focusDispatch]);
+  }, [expansions, focusIds, files]);
 
   // Scroll selected policy into view if relevant
   useEffect(() => {

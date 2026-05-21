@@ -71,7 +71,9 @@ export function CodeRender({ file, content, reports }: CodeRenderParams) {
     <div className={cx("source-file-render", robotoMono.className)}>
       <pre className="code">
         <span className="source-file-empty-line-number"> </span>
-        <span className="source-file-line-content source-file-empty-line" />
+        <span className="source-file-line-content source-file-empty-line">
+          {" "}
+        </span>
         {lines
           .map((line, i) => {
             const n = i + 1;

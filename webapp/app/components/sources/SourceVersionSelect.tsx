@@ -8,7 +8,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import cx from "classnames";
-import { JSX, useRef } from "react";
+import { JSX, useEffect, useRef } from "react";
 
 interface SourceVersionSelectParams {
   versions: string[];
@@ -46,6 +46,10 @@ export function SourceVersionSelect({
   const comparisonOriginal = useRef<HTMLDivElement>(null);
   const comparisonUpdated = useRef<HTMLDivElement>(null);
 
+  const selectedTopTab = useRef<HTMLDivElement>(null);
+  const selectedOriginalTab = useRef<HTMLDivElement>(null);
+  const selectedUpdateTab = useRef<HTMLDivElement>(null);
+
   const horizontalScroll = (e, elem: HTMLDivElement | null) => {
     e.preventDefault();
     e.stopPropagation();
@@ -54,6 +58,20 @@ export function SourceVersionSelect({
       behavior: "smooth",
     });
   };
+
+  useEffect(() => {
+    // On selection, if selected tabs are hidden then scroll them into view
+    if (selectedUpdate) {
+      scrollTabIfNeeded(selectedTopTab.current, topRow.current);
+      scrollTabIfNeeded(
+        selectedOriginalTab.current,
+        comparisonOriginal.current,
+      );
+      scrollTabIfNeeded(selectedUpdateTab.current, comparisonUpdated.current);
+    } else {
+      scrollTabIfNeeded(selectedTopTab.current, topRow.current);
+    }
+  }, [selectedOriginal, selectedUpdate]);
 
   return (
     <div className="source-file-tabs">
@@ -68,32 +86,33 @@ export function SourceVersionSelect({
           ref={topRow}
           onWheel={(e) => horizontalScroll(e, topRow.current)}
         >
-          {versions.map((version, i) => (
-            <div
-              key={version}
-              className={cx(
-                "source-file-version",
-                version === selectedOriginal &&
-                  selectedUpdate === undefined &&
-                  "selected",
-              )}
-              onClick={(e) => {
-                e.stopPropagation();
-                set(version);
-              }}
-              onMouseOver={(e) => {
-                e.stopPropagation();
-              }}
-            >
-              <FontAwesomeIcon className="source-file-icon" icon={icon} />
-              <span className="source-file-version-indicator">
-                {`Version ${i + 1}`}
-              </span>
-              {versionNames[i]}
-            </div>
-          ))}
+          {versions.map((version, i) => {
+            const isSelected =
+              version === selectedOriginal && selectedUpdate === undefined;
+            return (
+              <div
+                key={version}
+                ref={isSelected ? selectedTopTab : undefined}
+                className={cx("source-file-version", isSelected && "selected")}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  set(version);
+                }}
+                onMouseOver={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <FontAwesomeIcon className="source-file-icon" icon={icon} />
+                <span className="source-file-version-indicator">
+                  {`Version ${i + 1}`}
+                </span>
+                {versionNames[i]}
+              </div>
+            );
+          })}
           <div
             key="compare"
+            ref={selectedUpdate !== undefined ? selectedTopTab : undefined}
             className={cx(
               "source-file-version",
               "source-file-compare",
@@ -125,19 +144,21 @@ export function SourceVersionSelect({
                 icon={faFileCircleMinus}
               />
               <div
-                className="source-comparison-original"
+                className="source-file-versions source-comparison-original"
                 ref={comparisonOriginal}
                 onWheel={(e) => horizontalScroll(e, comparisonOriginal.current)}
               >
                 {versions.slice(0, -1).map((version, i) => {
+                  const isSelected =
+                    version === selectedOriginal &&
+                    selectedUpdate !== undefined;
                   return (
                     <div
                       key={version}
+                      ref={isSelected ? selectedOriginalTab : undefined}
                       className={cx(
                         "source-file-version",
-                        version === selectedOriginal &&
-                          selectedUpdate !== undefined &&
-                          "selected",
+                        isSelected && "selected",
                       )}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -167,17 +188,19 @@ export function SourceVersionSelect({
                 icon={faFileCirclePlus}
               />
               <div
-                className="source-comparison-updated"
+                className="source-file-versions source-comparison-updated"
                 ref={comparisonUpdated}
                 onWheel={(e) => horizontalScroll(e, comparisonUpdated.current)}
               >
                 {versions.slice(originalIndex + 1).map((version, i) => {
+                  const isSelected = selectedUpdate === version;
                   return (
                     <div
                       key={version}
+                      ref={isSelected ? selectedUpdateTab : undefined}
                       className={cx(
                         "source-file-version",
-                        selectedUpdate === version && "selected",
+                        isSelected && "selected",
                       )}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -202,4 +225,27 @@ export function SourceVersionSelect({
       )}
     </div>
   );
+}
+
+function scrollTabIfNeeded(
+  tab: HTMLDivElement | null,
+  container: HTMLDivElement | null,
+): void {
+  if (tab && container) {
+    const tabOffset = tab.offsetLeft - container.offsetLeft;
+    if (tabOffset + tab.offsetWidth * 0.95 < container.scrollLeft) {
+      tab.scrollIntoView({
+        block: "center",
+        behavior: "instant",
+      });
+    } else if (
+      tabOffset >
+      container.scrollLeft + container.offsetWidth * 0.98
+    ) {
+      tab.scrollIntoView({
+        block: "center",
+        behavior: "instant",
+      });
+    }
+  }
 }

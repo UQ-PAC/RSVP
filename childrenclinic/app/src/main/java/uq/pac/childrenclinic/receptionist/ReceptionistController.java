@@ -171,12 +171,18 @@ public class ReceptionistController {
 
 	@GetMapping("/receptionists/{receptionistId}")
 	@CedarAuthorization(action = "ViewEmployee", resourceType = "Employee", validate = true)
-	public ModelAndView showReceptionist(@PathVariable("receptionistId") int receptionistId) {
+	public ModelAndView showReceptionist(@PathVariable("receptionistId") int receptionistId, HttpSession session) {
 		ModelAndView mav = new ModelAndView("receptionists/receptionistDetails");
 		Receptionist receptionist = this.receptionists.findById(receptionistId)
 			.orElseThrow(() -> new IllegalArgumentException(
 					"Receptionist not found for identifier: " + receptionistId));
 		mav.addObject("receptionist", receptionist);
+ 
+		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
+		String resourceName = receptionist.getFirstName() + " " + receptionist.getLastName();
+		var editEval = cedarEvaluator.evaluate(principal, "EditEmployee", "Employee", resourceName, "Background");
+		mav.addObject("canEdit", editEval.isGranted());
+ 
 		return mav;
 	}
 
@@ -185,7 +191,6 @@ public class ReceptionistController {
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 		Collection<Clinic> allClinics = this.clinics.findClinics();
 
-		// Evaluate Cedar for each Clinic and log the result.
 		boolean isAuthorized = false;
 		List<String> denialReasons = new ArrayList<>();
 
@@ -205,14 +210,11 @@ public class ReceptionistController {
 			}
 		}
 
-		// Deny Access if no clinics passed the check.
 		if (!isAuthorized) {
 			String prefix = "Access Denied.\n";
 			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
 
 			if (!denialReasons.isEmpty()) {
-				// Combine all denial reasons and strip out the redundant prefix from
-				// each.
 				for (String reason : denialReasons) {
 					exceptionBody.append(reason.replaceAll("(?m)^" + prefix, "")).append("\n");
 				}
@@ -240,35 +242,49 @@ public class ReceptionistController {
 			@RequestParam(name = "levelId", required = false) Integer levelId,
 			@RequestParam(name = "managerId", required = false) Integer managerId,
 			RedirectAttributes redirectAttributes, HttpSession session, Model model) {
-		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
-		// Evaluate Cedar for all the submitted Clinics.
+		// Check binding/validation errors.
+		if (result.hasErrors()) {
+			model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));
+			model.addAttribute("potentialManagers", userRepository.findByRoleName(RECEPTIONIST_ROLE_NAME));
+			model.addAttribute("managerLevelMap", buildManagerLevelMap(RECEPTIONIST_ROLE_NAME));
+			model.addAttribute("selectedLevelId", levelId);
+			model.addAttribute("selectedManagerId", managerId);
+
+			return VIEWS_RECEPTIONIST_CREATE_OR_UPDATE_FORM;
+		}
+
+		// Check for empty clinics.
+		Collection<Clinic> submittedClinics = receptionist.getClinics();
+		if (submittedClinics == null || submittedClinics.isEmpty()) {
+			result.reject("clinicsRequired", "You must assign the Receptionist to at least one valid Clinic.");
+			model.addAttribute("levels", levelRepository.findLevels());
+			model.addAttribute("potentialManagers", userRepository.findByRoleName(RECEPTIONIST_ROLE_NAME));
+			model.addAttribute("managerLevelMap", buildManagerLevelMap(RECEPTIONIST_ROLE_NAME));
+			model.addAttribute("selectedLevelId", levelId);
+			model.addAttribute("selectedManagerId", managerId);
+			return VIEWS_RECEPTIONIST_CREATE_OR_UPDATE_FORM;
+		}
+
+		// Cedar authorization on submitted clinics.
+		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 		boolean isAuthorized = true;
 		List<String> denialReasons = new ArrayList<>();
 
-		Collection<Clinic> submittedClinics = receptionist.getClinics();
+		for (Clinic clinic : submittedClinics) {
+			if (clinic == null || clinic.getClinicName() == null)
+				continue;
+			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
+			var evalResult = cedarEvaluator.evaluate(principal, "AddEmployee", "Clinic", cedarClinicId, "Page");
 
-		if (submittedClinics == null || submittedClinics.isEmpty()) {
-			isAuthorized = false;
-			denialReasons.add("You must assign the Receptionist to at least one valid Clinic.");
-		}
-		else {
-			for (Clinic clinic : submittedClinics) {
-				if (clinic == null || clinic.getClinicName() == null)
-					continue;
-				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-				var evalResult = cedarEvaluator.evaluate(principal, "AddEmployee", "Clinic", cedarClinicId, "Page");
-
-				if (!evalResult.isGranted()) {
-					isAuthorized = false;
-					if (evalResult.responseBody() != null) {
-						denialReasons.add(evalResult.responseBody());
-					}
+			if (!evalResult.isGranted()) {
+				isAuthorized = false;
+				if (evalResult.responseBody() != null) {
+					denialReasons.add(evalResult.responseBody());
 				}
 			}
 		}
 
-		// Deny Access if any checks failed.
 		if (!isAuthorized) {
 			String prefix = "Access Denied.\n";
 			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
@@ -286,6 +302,7 @@ public class ReceptionistController {
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
+		// Duplicate check.
 		if (StringUtils.hasLength(receptionist.getLastName())
 				&& StringUtils.hasLength(receptionist.getFirstName()) && receptionist.isNew()) {
 			boolean duplicateExists = receptionists
@@ -334,6 +351,7 @@ public class ReceptionistController {
 			}
 		}
 
+		// Final error check.
 		if (result.hasErrors()) {
 			model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));
 			model.addAttribute("potentialManagers", userRepository.findByRoleName(RECEPTIONIST_ROLE_NAME));
@@ -399,6 +417,19 @@ public class ReceptionistController {
 			@RequestParam(name = "levelId", required = false) Integer levelId,
 			@RequestParam(name = "managerId", required = false) Integer managerId,
 			RedirectAttributes redirectAttributes, HttpSession session, Model model) {
+
+		if (result.hasErrors()) {
+			model.addAttribute("error", "There was an error in updating the receptionist.");
+			model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));
+			model.addAttribute("potentialManagers", userRepository.findByRoleName(RECEPTIONIST_ROLE_NAME));
+			model.addAttribute("managerLevelMap", buildManagerLevelMap(RECEPTIONIST_ROLE_NAME));
+			model.addAttribute("selectedLevelId", levelId);
+			model.addAttribute("selectedManagerId", managerId);
+
+			return VIEWS_RECEPTIONIST_CREATE_OR_UPDATE_FORM;
+		}
+
+		// Cedar authorization: can the principal edit this specific receptionist?
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
 		Receptionist existingReceptionist = this.receptionists.findById(receptionistId)
@@ -413,6 +444,7 @@ public class ReceptionistController {
 							+ (receptionistEval.responseBody() != null ? receptionistEval.responseBody() : ""));
 		}
 
+		// Cedar authorization on submitted clinics.
 		boolean isAuthorized = true;
 		List<String> denialReasons = new ArrayList<>();
 		Collection<Clinic> submittedClinics = receptionist.getClinics();
@@ -459,6 +491,7 @@ public class ReceptionistController {
 		}
 		receptionist.setClinics(finalClinics);
 
+		// Duplicate check.
 		if (StringUtils.hasLength(receptionist.getLastName())
 				&& StringUtils.hasLength(receptionist.getFirstName())) {
 			boolean duplicateExists = this.receptionists
@@ -508,6 +541,7 @@ public class ReceptionistController {
 			}
 		}
 
+		// Final error check.
 		if (result.hasErrors()) {
 			model.addAttribute("error", "There was an error in updating the receptionist.");
 			model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));

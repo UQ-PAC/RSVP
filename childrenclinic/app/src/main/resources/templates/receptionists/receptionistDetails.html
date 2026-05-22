@@ -33,7 +33,7 @@
     </tr>
   </table>
 
-  <a th:href="@{/receptionists/__${receptionist.id}__/edit}" class="btn btn-primary" th:text="#{editReceptionist}">Edit Receptionist</a>
+  <a th:if="${canEdit}" th:href="@{/receptionists/__${receptionist.id}__/edit}" class="btn btn-primary" th:text="#{editReceptionist}">Edit Receptionist</a>
 
   <script>
     function hideMessages() {

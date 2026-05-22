@@ -1,10 +1,5 @@
 package uq.pac.childrenclinic.patient;
 
-import com.cedarpolicy.value.EntityUID;
-
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,6 +33,10 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriUtils;
 
+import com.cedarpolicy.value.EntityUID;
+
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
 import uq.pac.childrenclinic.cedar.CedarDeniedException;
 import uq.pac.childrenclinic.cedar.CedarEntitiesInvalidationEvent;
@@ -180,11 +179,21 @@ public class PatientController {
 
 	@GetMapping("/patients/{patientId}")
 	@CedarAuthorization(action = "ViewPatient", resourceType = "Patient", validate = true)
-	public ModelAndView showPatient(@PathVariable("patientId") int patientId) {
+	public ModelAndView showPatient(@PathVariable("patientId") int patientId, HttpSession session) {
 		ModelAndView mav = new ModelAndView("patients/patientDetails");
 		Patient patient = this.patients.findById(patientId)
 			.orElseThrow(() -> new IllegalArgumentException("Patient not found for identifier: " + patientId));
 		mav.addObject("patient", patient);
+ 
+		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
+		String resourceName = (patient.getFirstName() != null ? patient.getFirstName() : "") + " "
+				+ (patient.getLastName() != null ? patient.getLastName() : "");
+		var editEval = cedarEvaluator.evaluate(principal, "EditPatient", "Patient", resourceName.trim(), "Background");
+		mav.addObject("canEdit", editEval.isGranted());
+ 
+		var addVisitEval = cedarEvaluator.evaluate(principal, "EditPatient", "Patient", resourceName.trim(), "Background");
+		mav.addObject("canAddVisit", addVisitEval.isGranted());
+ 
 		return mav;
 	}
 
@@ -193,7 +202,6 @@ public class PatientController {
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 		Collection<Clinic> allClinics = this.clinics.findClinics();
 
-		// Evaluate Cedar for each Clinic and log the result.
 		boolean isAuthorized = false;
 		List<String> denialReasons = new ArrayList<>();
 
@@ -213,14 +221,11 @@ public class PatientController {
 			}
 		}
 
-		// Deny Access if no clinics passed the check.
 		if (!isAuthorized) {
 			String prefix = "Access Denied.\n";
 			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
 
 			if (!denialReasons.isEmpty()) {
-				// Combine all denial reasons and strip out the redundant prefix from
-				// each.
 				for (String reason : denialReasons) {
 					exceptionBody.append(reason.replaceAll("(?m)^" + prefix, "")).append("\n");
 				}
@@ -279,41 +284,31 @@ public class PatientController {
 			@RequestParam(name = "newAuthorityId", required = false) Integer authorityId,
 			@RequestParam(name = "newDoctorIds", required = false) List<Integer> doctorIds,
 			RedirectAttributes redirectAttributes, HttpSession session, Model model) {
-		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
-		// Evaluate Cedar for all the submitted Clinics.
-		boolean isAuthorized = true;
-		List<String> denialReasons = new ArrayList<>();
+		// Check binding/validation errors.
+		if (result.hasErrors()) {
+			model.addAttribute("selectedGuardianIds", guardianIds);
+			model.addAttribute("selectedAuthorityId", authorityId);
+			return VIEWS_PATIENT_CREATE_OR_UPDATE_FORM;
+		}
 
+		// Check for empty clinics.
 		if (submittedClinics == null || submittedClinics.isEmpty()) {
-			isAuthorized = false;
-			denialReasons.add("You must assign the Patient to at least one valid Clinic.");
-		}
-		else {
-			for (Clinic clinic : submittedClinics) {
-				if (clinic != null && clinic.getClinicName() != null) {
-					String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-					var evalResult = cedarEvaluator.evaluate(principal, "AddPatient", "Clinic", cedarClinicId, "Page");
-
-					if (!evalResult.isGranted()) {
-						isAuthorized = false;
-						if (evalResult.responseBody() != null) {
-							denialReasons.add(evalResult.responseBody());
-						}
-					}
-				}
-			}
+			result.reject("clinicsRequired", "You must assign the Patient to at least one valid Clinic.");
 		}
 
-		if (patient.getGuardians() == null) {
-			patient.setGuardians(new LinkedHashSet<>());
-		}
+		// Build clinics.
 		if (patient.getClinics() == null) {
 			patient.setClinics(new HashSet<>());
 		}
 
 		if (submittedClinics != null) {
 			patient.getClinics().addAll(submittedClinics);
+		}
+
+		// Build guardians.
+		if (patient.getGuardians() == null) {
+			patient.setGuardians(new LinkedHashSet<>());
 		}
 
 		if (guardianIds != null && authorityId != null) {
@@ -335,10 +330,10 @@ public class PatientController {
 		}
 
 		if (patient.getGuardians() == null || patient.getGuardians().isEmpty()) {
-			isAuthorized = false;
-			denialReasons.add("You must assign the Patient to at least one Guardian.");
+			result.reject("guardiansRequired", "You must assign the Patient to at least one Guardian.");
 		}
 
+		// Build doctors.
 		if (doctorIds != null && !doctorIds.isEmpty()) {
 			Set<Doctor> selectedDoctors = new LinkedHashSet<>();
 			for (Integer docId : doctorIds) {
@@ -349,7 +344,36 @@ public class PatientController {
 			patient.setDoctors(selectedDoctors);
 		}
 
-		// Deny Access if any checks failed.
+		if (patient.getDoctors() == null || patient.getDoctors().isEmpty()) {
+			result.reject("doctorsRequired", "You must assign the Patient to at least one Doctor.");
+		}
+
+		// Return the form if any validation errors accumulated so far.
+		if (result.hasErrors()) {
+			model.addAttribute("selectedGuardianIds", guardianIds);
+			model.addAttribute("selectedAuthorityId", authorityId);
+			return VIEWS_PATIENT_CREATE_OR_UPDATE_FORM;
+		}
+
+		// Cedar authorization on submitted clinics.
+		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
+		boolean isAuthorized = true;
+		List<String> denialReasons = new ArrayList<>();
+
+		for (Clinic clinic : submittedClinics) {
+			if (clinic != null && clinic.getClinicName() != null) {
+				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
+				var evalResult = cedarEvaluator.evaluate(principal, "AddPatient", "Clinic", cedarClinicId, "Page");
+
+				if (!evalResult.isGranted()) {
+					isAuthorized = false;
+					if (evalResult.responseBody() != null) {
+						denialReasons.add(evalResult.responseBody());
+					}
+				}
+			}
+		}
+
 		if (!isAuthorized) {
 			String prefix = "Access Denied.\n";
 			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
@@ -367,6 +391,7 @@ public class PatientController {
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
+		// Duplicate check.
 		if (StringUtils.hasLength(patient.getLastName()) && StringUtils.hasLength(patient.getFirstName())
 				&& patient.isNew()) {
 			boolean duplicateExists = patients.findByLastNameStartingWith(patient.getLastName(), PageRequest.of(0, 50))
@@ -383,6 +408,7 @@ public class PatientController {
 			}
 		}
 
+		// Final error check.
 		if (result.hasErrors()) {
 			model.addAttribute("selectedGuardianIds", guardianIds);
 			model.addAttribute("selectedAuthorityId", authorityId);
@@ -488,6 +514,16 @@ public class PatientController {
 			@RequestParam(name = "newAuthorityId", required = false) Integer authorityId,
 			@RequestParam(name = "newDoctorIds", required = false) List<Integer> doctorIds,
 			RedirectAttributes redirectAttributes, HttpSession session, Model model) {
+
+		// Check binding/validation errors.
+		if (result.hasErrors()) {
+			model.addAttribute("selectedGuardianIds", guardianIds);
+			model.addAttribute("selectedAuthorityId", authorityId);
+			model.addAttribute("error", "There was an error in updating the patient.");
+			return VIEWS_PATIENT_CREATE_OR_UPDATE_FORM;
+		}
+
+		// Cedar authorization: can the principal edit this specific patient?
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
 		Patient existingPatient = this.patients.findById(patientId)
@@ -502,7 +538,7 @@ public class PatientController {
 					+ (patientEval.responseBody() != null ? patientEval.responseBody() : ""));
 		}
 
-		// Evaluate Cedar for all the submitted Clinics.
+		// Cedar authorization on submitted clinics.
 		boolean isAuthorized = true;
 		List<String> denialReasons = new ArrayList<>();
 
@@ -522,6 +558,15 @@ public class PatientController {
 					}
 				}
 			}
+		}
+
+		if (!isAuthorized) {
+			String prefix = "Access Denied.\n";
+			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
+			for (String reason : denialReasons) {
+				exceptionBody.append(reason.replaceAll("(?m)^" + prefix, "")).append("\n");
+			}
+			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
 		Set<Clinic> finalClinics = new HashSet<>(submittedClinics != null ? submittedClinics : new ArrayList<>());
@@ -592,16 +637,11 @@ public class PatientController {
 			patient.setDoctors(selectedDoctors);
 		}
 
-		// Deny Access if any checks failed.
-		if (!isAuthorized) {
-			String prefix = "Access Denied.\n";
-			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
-			for (String reason : denialReasons) {
-				exceptionBody.append(reason.replaceAll("(?m)^" + prefix, "")).append("\n");
-			}
-			throw new CedarDeniedException(exceptionBody.toString().trim());
+		if (patient.getDoctors() == null || patient.getDoctors().isEmpty()) {
+			result.reject("doctorsRequired", "You must assign the Patient to at least one Doctor.");
 		}
 
+		// Duplicate check.
 		if (StringUtils.hasLength(patient.getLastName()) && StringUtils.hasLength(patient.getFirstName())) {
 			boolean duplicateExists = this.patients
 				.findByLastNameStartingWith(patient.getLastName(), PageRequest.of(0, 50))
@@ -618,6 +658,7 @@ public class PatientController {
 			}
 		}
 
+		// Final error check.
 		if (result.hasErrors()) {
 			model.addAttribute("selectedGuardianIds", guardianIds);
 			model.addAttribute("selectedAuthorityId", authorityId);

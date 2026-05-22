@@ -66,10 +66,9 @@
     </tr>
   </table>
 
-  <a th:href="@{__${patient.id}__/edit}" class="btn btn-primary" th:text="#{editPatient}">Edit
-    Patient</a>
-  <a th:href="@{__${patient.id}__/visits/new}" class="btn btn-primary" th:text="#{addVisit}">Add Visit</a>
-  <a th:href="@{/guardians/new(patientId=${patient.id})}" class="btn btn-primary">Add Guardian</a>
+  <a th:if="${canEdit}" th:href="@{__${patient.id}__/edit}" class="btn btn-primary" th:text="#{editPatient}">Edit Patient</a>
+  <a th:if="${canAddVisit}" th:href="@{__${patient.id}__/visits/new}" class="btn btn-primary" th:text="#{addVisit}">Add Visit</a>
+  <a th:if="${canEdit}" th:href="@{/guardians/new(patientId=${patient.id})}" class="btn btn-primary">Add Guardian</a>
 
   <br />
   <hr />

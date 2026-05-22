@@ -198,11 +198,17 @@ class DoctorController {
 
 	@GetMapping("/doctors/{doctorId}")
 	@CedarAuthorization(action = "ViewEmployee", resourceType = "Employee", validate = true)
-	public ModelAndView showDoctor(@PathVariable("doctorId") int doctorId) {
+	public ModelAndView showDoctor(@PathVariable("doctorId") int doctorId, HttpSession session) {
 		ModelAndView mav = new ModelAndView("doctors/doctorDetails");
 		Doctor doctor = this.doctors.findById(doctorId)
 			.orElseThrow(() -> new IllegalArgumentException("Doctor not found for identifier: " + doctorId));
 		mav.addObject("doctor", doctor);
+ 
+		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
+		String resourceName = doctor.getFirstName() + " " + doctor.getLastName();
+		var editEval = cedarEvaluator.evaluate(principal, "EditEmployee", "Employee", resourceName, "Background");
+		mav.addObject("canEdit", editEval.isGranted());
+ 
 		return mav;
 	}
 
@@ -211,7 +217,6 @@ class DoctorController {
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 		Collection<Clinic> allClinics = this.clinics.findClinics();
 
-		// Evaluate Cedar for each Clinic and log the result.
 		boolean isAuthorized = false;
 		List<String> denialReasons = new ArrayList<>();
 
@@ -231,14 +236,11 @@ class DoctorController {
 			}
 		}
 
-		// Deny Access if no clinics passed the check.
 		if (!isAuthorized) {
 			String prefix = "Access Denied.\n";
 			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
 
 			if (!denialReasons.isEmpty()) {
-				// Combine all denial reasons and strip out the redundant prefix from
-				// each.
 				for (String reason : denialReasons) {
 					exceptionBody.append(reason.replaceAll("(?m)^" + prefix, "")).append("\n");
 				}
@@ -265,35 +267,49 @@ class DoctorController {
 			@RequestParam(name = "levelId", required = false) Integer levelId,
 			@RequestParam(name = "managerId", required = false) Integer managerId,
 			RedirectAttributes redirectAttributes, HttpSession session, Model model) {
-		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
-		// Evaluate Cedar for all the submitted Clinics.
+		// Check binding/validation errors.
+		if (result.hasErrors()) {
+			model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));
+			model.addAttribute("potentialManagers", userRepository.findByRoleName(DOCTOR_ROLE_NAME));
+			model.addAttribute("managerLevelMap", buildManagerLevelMap(DOCTOR_ROLE_NAME));
+			model.addAttribute("selectedLevelId", levelId);
+			model.addAttribute("selectedManagerId", managerId);
+
+			return VIEWS_DOCTOR_CREATE_OR_UPDATE_FORM;
+		}
+
+		// Check for empty clinics.
+		Collection<Clinic> submittedClinics = doctor.getClinics();
+		if (submittedClinics == null || submittedClinics.isEmpty()) {
+			result.reject("clinicsRequired", "You must assign the Doctor to at least one valid Clinic.");
+			model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));
+			model.addAttribute("potentialManagers", userRepository.findByRoleName(DOCTOR_ROLE_NAME));
+			model.addAttribute("managerLevelMap", buildManagerLevelMap(DOCTOR_ROLE_NAME));
+			model.addAttribute("selectedLevelId", levelId);
+			model.addAttribute("selectedManagerId", managerId);
+			return VIEWS_DOCTOR_CREATE_OR_UPDATE_FORM;
+		}
+
+		// Cedar authorization on submitted clinics.
+		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 		boolean isAuthorized = true;
 		List<String> denialReasons = new ArrayList<>();
 
-		Collection<Clinic> submittedClinics = doctor.getClinics();
+		for (Clinic clinic : submittedClinics) {
+			if (clinic == null || clinic.getClinicName() == null)
+				continue;
+			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
+			var evalResult = cedarEvaluator.evaluate(principal, "AddEmployee", "Clinic", cedarClinicId, "Page");
 
-		if (submittedClinics == null || submittedClinics.isEmpty()) {
-			isAuthorized = false;
-			denialReasons.add("You must assign the Doctor to at least one valid Clinic.");
-		}
-		else {
-			for (Clinic clinic : submittedClinics) {
-				if (clinic == null || clinic.getClinicName() == null)
-					continue;
-				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-				var evalResult = cedarEvaluator.evaluate(principal, "AddEmployee", "Clinic", cedarClinicId, "Page");
-
-				if (!evalResult.isGranted()) {
-					isAuthorized = false;
-					if (evalResult.responseBody() != null) {
-						denialReasons.add(evalResult.responseBody());
-					}
+			if (!evalResult.isGranted()) {
+				isAuthorized = false;
+				if (evalResult.responseBody() != null) {
+					denialReasons.add(evalResult.responseBody());
 				}
 			}
 		}
 
-		// Deny Access if any checks failed.
 		if (!isAuthorized) {
 			String prefix = "Access Denied.\n";
 			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
@@ -311,6 +327,7 @@ class DoctorController {
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
+		// Duplicate check.
 		if (StringUtils.hasLength(doctor.getLastName()) && StringUtils.hasLength(doctor.getFirstName())
 				&& doctor.isNew()) {
 			boolean duplicateExists = doctors.findByLastNameStartingWith(doctor.getLastName(), PageRequest.of(0, 50))
@@ -378,6 +395,7 @@ class DoctorController {
 			}
 		}
 
+		// Final error check.
 		if (result.hasErrors()) {
 			model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));
 			model.addAttribute("potentialManagers", userRepository.findByRoleName(DOCTOR_ROLE_NAME));
@@ -442,6 +460,20 @@ class DoctorController {
 			@RequestParam(name = "levelId", required = false) Integer levelId,
 			@RequestParam(name = "managerId", required = false) Integer managerId,
 			RedirectAttributes redirectAttributes, HttpSession session, Model model) {
+
+		// Check binding/validation errors.
+		if (result.hasErrors()) {
+			model.addAttribute("error", "There was an error in updating the doctor.");
+			model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));
+			model.addAttribute("potentialManagers", userRepository.findByRoleName(DOCTOR_ROLE_NAME));
+			model.addAttribute("managerLevelMap", buildManagerLevelMap(DOCTOR_ROLE_NAME));
+			model.addAttribute("selectedLevelId", levelId);
+			model.addAttribute("selectedManagerId", managerId);
+
+			return VIEWS_DOCTOR_CREATE_OR_UPDATE_FORM;
+		}
+
+		// Cedar authorization: can the principal edit this specific doctor?
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
 		Doctor existingDoctor = this.doctors.findById(doctorId)
@@ -455,6 +487,7 @@ class DoctorController {
 					+ (doctorEval.responseBody() != null ? doctorEval.responseBody() : ""));
 		}
 
+		// Cedar authorization on submitted clinics.
 		boolean isAuthorized = true;
 		List<String> denialReasons = new ArrayList<>();
 		Collection<Clinic> submittedClinics = doctor.getClinics();
@@ -501,6 +534,7 @@ class DoctorController {
 		}
 		doctor.setClinics(finalClinics);
 
+		// Duplicate check.
 		if (StringUtils.hasLength(doctor.getLastName()) && StringUtils.hasLength(doctor.getFirstName())) {
 			boolean duplicateExists = this.doctors
 				.findByLastNameStartingWith(doctor.getLastName(), PageRequest.of(0, 50))
@@ -568,6 +602,7 @@ class DoctorController {
 			}
 		}
 
+		// Final error check.
 		if (result.hasErrors()) {
 			model.addAttribute("error", "There was an error in updating the doctor.");
 			model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));

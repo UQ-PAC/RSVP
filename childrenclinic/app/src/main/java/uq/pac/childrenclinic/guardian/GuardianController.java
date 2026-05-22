@@ -1,10 +1,5 @@
 package uq.pac.childrenclinic.guardian;
 
-import com.cedarpolicy.value.EntityUID;
-
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,6 +32,10 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriUtils;
 
+import com.cedarpolicy.value.EntityUID;
+
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import uq.pac.childrenclinic.cedar.CedarAuthorization;
 import uq.pac.childrenclinic.cedar.CedarDeniedException;
 import uq.pac.childrenclinic.cedar.CedarEntitiesInvalidationEvent;
@@ -46,8 +45,8 @@ import uq.pac.childrenclinic.model.GenderRepository;
 import uq.pac.childrenclinic.patient.GuardianAuthority;
 import uq.pac.childrenclinic.patient.GuardianAuthorityRepository;
 import uq.pac.childrenclinic.patient.Patient;
-import uq.pac.childrenclinic.patient.PatientGuardian;
 import uq.pac.childrenclinic.patient.PatientFormState;
+import uq.pac.childrenclinic.patient.PatientGuardian;
 import uq.pac.childrenclinic.patient.PatientRepository;
 import uq.pac.childrenclinic.system.Clinic;
 import uq.pac.childrenclinic.system.ClinicRepository;
@@ -163,11 +162,17 @@ public class GuardianController {
 	 */
 	@GetMapping("/guardians/{guardianId}")
 	@CedarAuthorization(action = "ViewGuardian", resourceType = "Guardian", validate = true)
-	public ModelAndView showGuardian(@PathVariable("guardianId") int guardianId) {
+	public ModelAndView showGuardian(@PathVariable("guardianId") int guardianId, HttpSession session) {
 		ModelAndView mav = new ModelAndView("guardians/guardianDetails");
 		Guardian guardian = this.guardians.findById(guardianId)
 			.orElseThrow(() -> new IllegalArgumentException("Guardian not found with identifier: " + guardianId));
 		mav.addObject("guardian", guardian);
+ 
+		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
+		String resourceName = guardian.getFirstName() + " " + guardian.getLastName();
+		var editEval = cedarEvaluator.evaluate(principal, "EditGuardian", "Guardian", resourceName, "Background");
+		mav.addObject("canEdit", editEval.isGranted());
+ 
 		return mav;
 	}
 
@@ -182,7 +187,6 @@ public class GuardianController {
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 		Collection<Clinic> allClinics = this.clinics.findClinics();
 
-		// Evaluate Cedar for each Clinic and log the result.
 		boolean isAuthorized = false;
 		List<String> denialReasons = new ArrayList<>();
 
@@ -202,14 +206,11 @@ public class GuardianController {
 			}
 		}
 
-		// Deny Access if no clinics passed the check.
 		if (!isAuthorized) {
 			String prefix = "Access Denied.\n";
 			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
 
 			if (!denialReasons.isEmpty()) {
-				// Combine all denial reasons and strip out the redundant prefix from
-				// each.
 				for (String reason : denialReasons) {
 					exceptionBody.append(reason.replaceAll("(?m)^" + prefix, "")).append("\n");
 				}
@@ -238,35 +239,48 @@ public class GuardianController {
 			@RequestParam(name = "authorityId", required = false) Integer authorityId,
 			@RequestParam(name = "fromPatientForm", required = false) Boolean fromPatientForm,
 			RedirectAttributes redirectAttributes, HttpSession session, Model model) {
-		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
-		// Evaluate Cedar for all the submitted Clinics.
+		// Check binding/validation errors.
+		if (result.hasErrors()) {
+			model.addAttribute("patientId", patientId);
+			model.addAttribute("fromPatientForm", fromPatientForm);
+			if (patientId != null || Boolean.TRUE.equals(fromPatientForm)) {
+				model.addAttribute("authorities", this.authorities.findAll());
+			}
+			return VIEWS_GUARDIAN_CREATE_OR_UPDATE_FORM;
+		}
+
+		// Check for empty clinics.
+		Collection<Clinic> submittedClinics = guardian.getClinics();
+		if (submittedClinics == null || submittedClinics.isEmpty()) {
+			result.reject("clinicsRequired", "You must assign the Guardian to at least one valid Clinic.");
+			model.addAttribute("patientId", patientId);
+			model.addAttribute("fromPatientForm", fromPatientForm);
+			if (patientId != null || Boolean.TRUE.equals(fromPatientForm)) {
+				model.addAttribute("authorities", this.authorities.findAll());
+			}
+			return VIEWS_GUARDIAN_CREATE_OR_UPDATE_FORM;
+		}
+
+		// Cedar authorization on submitted clinics.
+		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 		boolean isAuthorized = true;
 		List<String> denialReasons = new ArrayList<>();
 
-		Collection<Clinic> submittedClinics = guardian.getClinics();
+		for (Clinic clinic : submittedClinics) {
+			if (clinic == null || clinic.getClinicName() == null)
+				continue;
+			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
+			var evalResult = cedarEvaluator.evaluate(principal, "AddGuardian", "Clinic", cedarClinicId, "Page");
 
-		if (submittedClinics == null || submittedClinics.isEmpty()) {
-			isAuthorized = false;
-			denialReasons.add("You must assign the Guardian to at least one valid Clinic.");
-		}
-		else {
-			for (Clinic clinic : submittedClinics) {
-				if (clinic == null || clinic.getClinicName() == null)
-					continue;
-				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-				var evalResult = cedarEvaluator.evaluate(principal, "AddGuardian", "Clinic", cedarClinicId, "Page");
-
-				if (!evalResult.isGranted()) {
-					isAuthorized = false;
-					if (evalResult.responseBody() != null) {
-						denialReasons.add(evalResult.responseBody());
-					}
+			if (!evalResult.isGranted()) {
+				isAuthorized = false;
+				if (evalResult.responseBody() != null) {
+					denialReasons.add(evalResult.responseBody());
 				}
 			}
 		}
 
-		// Deny Access if any checks failed.
 		if (!isAuthorized) {
 			String prefix = "Access Denied.\n";
 			StringBuilder exceptionBody = new StringBuilder("Access Denied by the Cedar Policy Engine.\n\n");
@@ -284,6 +298,7 @@ public class GuardianController {
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
+		// Duplicate check.
 		if (StringUtils.hasLength(guardian.getLastName()) && StringUtils.hasLength(guardian.getFirstName())
 				&& guardian.isNew()) {
 			boolean duplicateExists = guardians.findByLastNameStartingWith(guardian.getLastName(), PageRequest.of(0, 50))
@@ -299,6 +314,7 @@ public class GuardianController {
 			}
 		}
 
+		// Final error check.
 		if (result.hasErrors()) {
 			model.addAttribute("patientId", patientId);
 			model.addAttribute("fromPatientForm", fromPatientForm);
@@ -396,6 +412,14 @@ public class GuardianController {
 	@PostMapping("/guardians/{guardianId}/edit")
 	public String processUpdateForm(@Valid Guardian guardian, BindingResult result, @PathVariable("guardianId") int guardianId,
 			RedirectAttributes redirectAttributes, HttpSession session, Model model) {
+
+		// Check binding/validation errors.
+		if (result.hasErrors()) {
+			model.addAttribute("error", "There was an error in updating the guardian.");
+			return VIEWS_GUARDIAN_CREATE_OR_UPDATE_FORM;
+		}
+
+		// Cedar authorization: can the principal edit this specific guardian?
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
 		Guardian existingGuardian = this.guardians.findById(guardianId)
@@ -409,23 +433,29 @@ public class GuardianController {
 					+ (guardianEval.responseBody() != null ? guardianEval.responseBody() : ""));
 		}
 
+		// Check for empty clinics.
+		Collection<Clinic> submittedClinics = guardian.getClinics();
+		if (submittedClinics == null || submittedClinics.isEmpty()) {
+			result.reject("clinicsRequired", "You must assign the Guardian to at least one valid Clinic.");
+			model.addAttribute("error", "There was an error in updating the guardian.");
+			return VIEWS_GUARDIAN_CREATE_OR_UPDATE_FORM;
+		}
+
+		// Cedar authorization on submitted clinics.
 		boolean isAuthorized = true;
 		List<String> denialReasons = new ArrayList<>();
-		Collection<Clinic> submittedClinics = guardian.getClinics();
 
-		if (submittedClinics != null) {
-			for (Clinic clinic : submittedClinics) {
-				if (clinic == null || clinic.getClinicName() == null)
-					continue;
-				String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-				// Here we check for the "AddGuardian" action, instead of "EditGuardian", since
-				// the former applies to the "Clinic" resource.
-				var clinicEval = cedarEvaluator.evaluate(principal, "AddGuardian", "Clinic", cedarClinicId, "Page");
-				if (!clinicEval.isGranted()) {
-					isAuthorized = false;
-					if (clinicEval.responseBody() != null) {
-						denialReasons.add(clinicEval.responseBody());
-					}
+		for (Clinic clinic : submittedClinics) {
+			if (clinic == null || clinic.getClinicName() == null)
+				continue;
+			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
+			// Here we check for the "AddGuardian" action, instead of "EditGuardian", since
+			// the former applies to the "Clinic" resource.
+			var clinicEval = cedarEvaluator.evaluate(principal, "AddGuardian", "Clinic", cedarClinicId, "Page");
+			if (!clinicEval.isGranted()) {
+				isAuthorized = false;
+				if (clinicEval.responseBody() != null) {
+					denialReasons.add(clinicEval.responseBody());
 				}
 			}
 		}
@@ -455,6 +485,7 @@ public class GuardianController {
 		}
 		guardian.setClinics(finalClinics);
 
+		// Duplicate check.
 		if (StringUtils.hasLength(guardian.getLastName()) && StringUtils.hasLength(guardian.getFirstName())) {
 			boolean duplicateExists = this.guardians.findByLastNameStartingWith(guardian.getLastName(), PageRequest.of(0, 50))
 				.getContent()
@@ -469,6 +500,7 @@ public class GuardianController {
 			}
 		}
 
+		// Final error check.
 		if (result.hasErrors()) {
 			model.addAttribute("error", "There was an error in updating the guardian.");
 			return VIEWS_GUARDIAN_CREATE_OR_UPDATE_FORM;

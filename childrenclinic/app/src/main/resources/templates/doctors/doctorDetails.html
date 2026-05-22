@@ -37,7 +37,7 @@
     </tr>
   </table>
 
-  <a th:href="@{/doctors/__${doctor.id}__/edit}" class="btn btn-primary" th:text="#{editDoctor}">Edit Doctor</a>
+  <a th:if="${canEdit}" th:href="@{/doctors/__${doctor.id}__/edit}" class="btn btn-primary" th:text="#{editDoctor}">Edit Doctor</a>
 
   <script>
     function hideMessages() {

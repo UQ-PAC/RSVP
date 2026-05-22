@@ -142,10 +142,17 @@ class VisitController {
 	@PostMapping("/patients/{patientId}/visits/new")
 	public String processNewVisitForm(@PathVariable("patientId") int patientId, @Valid Visit visit,
 			BindingResult result, RedirectAttributes redirectAttributes, HttpSession session) {
+
 		Patient patient = this.patients.findById(patientId)
 			.orElseThrow(() -> new IllegalArgumentException("Patient not found for identifier: " + patientId));
 		visit.setPatient(patient);
 
+		// Check binding/validation errors.
+		if (result.hasErrors()) {
+			return "patients/createOrUpdateVisitForm";
+		}
+
+		// Cedar authorization: can the principal edit this specific patient?
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
 		String resourceName = patient.getFirstName() + " " + patient.getLastName();
@@ -153,13 +160,31 @@ class VisitController {
 		if (!patientEval.isGranted())
 			throw new CedarDeniedException("Access Denied.\n" + patientEval.responseBody());
 
-		boolean isAuthorized = true;
-		List<String> denialReasons = new ArrayList<>();
-
+		// Check for empty clinics.
 		Collection<Clinic> submittedClinics = visit.getClinics();
 		if (submittedClinics == null || submittedClinics.isEmpty()) {
 			throw new CedarDeniedException("You must assign the visit to at least one valid clinic.");
 		}
+
+		if (visit.getGuardians() == null || visit.getGuardians().isEmpty()) {
+			result.rejectValue("guardians", "NotEmpty", "At least one guardian must be assigned.");
+		}
+
+		if (visit.getDoctors() == null || visit.getDoctors().isEmpty()) {
+			result.rejectValue("doctors", "NotEmpty", "At least one doctor must be assigned.");
+		}
+		if (result.hasErrors()) {
+			return "patients/createOrUpdateVisitForm";
+		}
+
+		// Return the form if any validation errors accumulated so far.
+		if (result.hasErrors()) {
+			return "patients/createOrUpdateVisitForm";
+		}
+
+		// Cedar authorization on submitted clinics.
+		boolean isAuthorized = true;
+		List<String> denialReasons = new ArrayList<>();
 
 		for (Clinic clinic : submittedClinics) {
 			if (clinic == null || clinic.getClinicName() == null)
@@ -184,14 +209,7 @@ class VisitController {
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
-		if (visit.getGuardians() == null || visit.getGuardians().isEmpty()) {
-			result.rejectValue("guardians", "NotEmpty", "At least one guardian must be assigned.");
-		}
-
-		if (visit.getDoctors() == null || visit.getDoctors().isEmpty()) {
-			result.rejectValue("doctors", "NotEmpty", "At least one doctor must be assigned.");
-		}
-
+		// Final error check.
 		if (result.hasErrors()) {
 			return "patients/createOrUpdateVisitForm";
 		}

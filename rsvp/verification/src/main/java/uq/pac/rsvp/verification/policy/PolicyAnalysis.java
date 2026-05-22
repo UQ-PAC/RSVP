@@ -129,8 +129,6 @@ public class PolicyAnalysis {
                     }
                     analysisResults.get(p).subsumptionReported = true;
                 }
-                // TODO if a permit policy is subsumed by a forbid policy, make that clear in the
-                //      report
             });
         });
 

@@ -1,10 +1,5 @@
 package uq.pac.childrenclinic.cedar;
 
-import com.cedarpolicy.model.entity.Entities;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -14,9 +9,12 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+
+import com.cedarpolicy.model.entity.Entities;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 // Dynamically constructs Cedar Entities from the database.
 @Component
@@ -45,6 +43,7 @@ public class CedarEntityBuilder {
 		allEntities.addAll(buildConfidentialityEntities());
 		allEntities.addAll(buildEmployeeRoleEntities());
 		allEntities.addAll(buildProfessionalLevelEntities());
+		allEntities.addAll(buildSpecialtyEntities());
 
 		// Invariant singleton entity.
 		allEntities.add(buildGuestEntity());
@@ -102,6 +101,11 @@ public class CedarEntityBuilder {
 				(rs, rowNum) -> buildSimpleEntity("ProfessionalLevel", rs.getString("name")));
 	}
 
+	private List<Map<String, Object>> buildSpecialtyEntities() {
+		return jdbcTemplate.query("SELECT name FROM specialties",
+				(rs, rowNum) -> buildSimpleEntity("Specialty", rs.getString("name")));
+	}
+
 	// Invariant singleton entity.
 
 	private Map<String, Object> buildGuestEntity() {
@@ -117,8 +121,9 @@ public class CedarEntityBuilder {
 		// Pre-fetch all relational data into maps keyed by entity_id.
 		Map<Integer, List<String>> clinicsByUser = fetchEntityClinics();
 		Map<Integer, List<String>> rolesByUser = fetchUserRoles();
-		Map<Integer, String> levelByUser = fetchUserLevels();
+		Map<Integer, List<Map<String, String>>> roleLevelsByUser = fetchUserRoleLevels();
 		Map<Integer, String> managerByUser = fetchUserManagers();
+		Map<Integer, List<String>> specialtiesByDoctor = fetchDoctorSpecialties();
 
 		List<Map<String, Object>> result = new ArrayList<>();
 		for (Map<String, Object> user : users) {
@@ -134,9 +139,22 @@ public class CedarEntityBuilder {
 			List<String> userRoles = rolesByUser.getOrDefault(entityId, List.of());
 			attrs.put("roles", userRoles.stream().map(r -> entityRef("EmployeeRole", r)).collect(Collectors.toList()));
 
-			String level = levelByUser.get(entityId);
-			if (level != null) {
-				attrs.put("level", entityRef("ProfessionalLevel", level));
+			List<Map<String, String>> userRoleLevels = roleLevelsByUser.getOrDefault(entityId, List.of());
+			if (!userRoleLevels.isEmpty()) {
+				List<Map<String, Object>> roleLevelRecords = new ArrayList<>();
+				for (Map<String, String> rl : userRoleLevels) {
+					Map<String, Object> record = new LinkedHashMap<>();
+					record.put("role", entityRef("EmployeeRole", rl.get("role")));
+					record.put("level", entityRef("ProfessionalLevel", rl.get("level")));
+					roleLevelRecords.add(record);
+				}
+				attrs.put("levels", roleLevelRecords);
+			}
+ 
+			List<String> doctorSpecialties = specialtiesByDoctor.getOrDefault(entityId, List.of());
+			if (!doctorSpecialties.isEmpty()) {
+				attrs.put("specialties",
+						doctorSpecialties.stream().map(s -> entityRef("Specialty", s)).collect(Collectors.toList()));
 			}
 
 			String managerUsername = managerByUser.get(entityId);
@@ -314,13 +332,20 @@ public class CedarEntityBuilder {
 					Collectors.mapping(row -> (String) row.get("name"), Collectors.toList())));
 	}
 
-	private Map<Integer, String> fetchUserLevels() {
+	private Map<Integer, List<Map<String, String>>> fetchUserRoleLevels() {
 		List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-				"SELECT ul.user_id, l.name " + "FROM user_levels ul " + "JOIN levels l ON ul.level_id = l.id");
+			"SELECT url.user_id, r.name AS role_name, l.name AS level_name "
+			+ "FROM user_role_levels url "
+			+ "JOIN roles r ON url.role_id = r.id "
+			+ "JOIN levels l ON url.level_id = l.id");
 
-		Map<Integer, String> result = new HashMap<>();
+		Map<Integer, List<Map<String, String>>> result = new HashMap<>();
 		for (Map<String, Object> row : rows) {
-			result.putIfAbsent((Integer) row.get("user_id"), (String) row.get("name"));
+			Integer userId = (Integer) row.get("user_id");
+			String roleName  = (String) row.get("role_name");
+			String levelName = (String) row.get("level_name");
+			result.computeIfAbsent(userId, k -> new ArrayList<>())
+				.add(Map.of("role", roleName, "level", levelName));
 		}
 		return result;
 	}
@@ -332,6 +357,21 @@ public class CedarEntityBuilder {
 		Map<Integer, String> result = new HashMap<>();
 		for (Map<String, Object> row : rows) {
 			result.putIfAbsent((Integer) row.get("user_id"), (String) row.get("username"));
+		}
+		return result;
+	}
+
+	private Map<Integer, List<String>> fetchDoctorSpecialties() {
+		List<Map<String, Object>> rows = jdbcTemplate.queryForList(
+			"SELECT ds.doctor_id, s.name AS specialty_name "
+			+ "FROM doctor_specialties ds "
+			+ "JOIN specialties s ON ds.specialty_id = s.id");
+
+		Map<Integer, List<String>> result = new HashMap<>();
+		for (Map<String, Object> row : rows) {
+			Integer doctorId = (Integer) row.get("doctor_id");
+			String specialtyName = (String) row.get("specialty_name");
+			result.computeIfAbsent(doctorId, k -> new ArrayList<>()).add(specialtyName);
 		}
 		return result;
 	}

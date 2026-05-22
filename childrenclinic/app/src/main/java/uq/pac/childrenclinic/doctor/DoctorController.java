@@ -60,6 +60,9 @@ import uq.pac.childrenclinic.model.Gender;
 import uq.pac.childrenclinic.model.GenderRepository;
 import uq.pac.childrenclinic.system.Clinic;
 import uq.pac.childrenclinic.system.ClinicRepository;
+import uq.pac.childrenclinic.system.Level;
+import uq.pac.childrenclinic.system.LevelRepository;
+import uq.pac.childrenclinic.system.UserRepository;
 
 /**
  * @author Juergen Hoeller
@@ -76,6 +79,10 @@ class DoctorController {
 
 	private static final String DEFAULT_LEVEL_NAME = "Intern";
 
+	private static final List<String> LEVEL_HIERARCHY = List.of("Intern", "Resident", "Staff", "Senior", "Registrar", "Specialist");
+
+	private static final Set<String> NON_MANAGER_LEVELS = Set.of("Intern", "Registrar");
+
 	private final DoctorRepository doctors;
 
 	private final GenderRepository genders;
@@ -84,6 +91,10 @@ class DoctorController {
 
 	private final ClinicRepository clinics;
 
+	private final LevelRepository levelRepository;
+
+	private final UserRepository userRepository;
+
 	private final CedarProgrammaticEvaluator cedarEvaluator;
 
 	private final ApplicationEventPublisher eventPublisher;
@@ -91,12 +102,15 @@ class DoctorController {
 	private final JdbcTemplate jdbcTemplate;
 
 	public DoctorController(DoctorRepository doctors, GenderRepository genders, SpecialtyRepository specialties,
-			ClinicRepository clinics, CedarProgrammaticEvaluator cedarEvaluator,
-			ApplicationEventPublisher eventPublisher, JdbcTemplate jdbcTemplate) {
+			ClinicRepository clinics, LevelRepository levelRepository, UserRepository userRepository,
+			CedarProgrammaticEvaluator cedarEvaluator, ApplicationEventPublisher eventPublisher,
+			JdbcTemplate jdbcTemplate) {
 		this.doctors = doctors;
 		this.genders = genders;
 		this.specialties = specialties;
 		this.clinics = clinics;
+		this.levelRepository = levelRepository;
+		this.userRepository = userRepository;
 		this.cedarEvaluator = cedarEvaluator;
 		this.eventPublisher = eventPublisher;
 		this.jdbcTemplate = jdbcTemplate;
@@ -237,12 +251,20 @@ class DoctorController {
 		}
 
 		model.addAttribute("doctor", new Doctor());
+		model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));
+		model.addAttribute("potentialManagers", userRepository.findByRoleName(DOCTOR_ROLE_NAME));
+		model.addAttribute("managerLevelMap", buildManagerLevelMap(DOCTOR_ROLE_NAME));
+		model.addAttribute("selectedLevelId", levelRepository.findByName(DEFAULT_LEVEL_NAME).map(Level::getId).orElse(null));
+		model.addAttribute("selectedManagerId", null);
+
 		return VIEWS_DOCTOR_CREATE_OR_UPDATE_FORM;
 	}
 
 	@PostMapping("/doctors/new")
-	public String processCreationForm(@Valid Doctor doctor, BindingResult result, RedirectAttributes redirectAttributes,
-			HttpSession session) {
+	public String processCreationForm(@Valid Doctor doctor, BindingResult result,
+			@RequestParam(name = "levelId", required = false) Integer levelId,
+			@RequestParam(name = "managerId", required = false) Integer managerId,
+			RedirectAttributes redirectAttributes, HttpSession session, Model model) {
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
 		// Evaluate Cedar for all the submitted Clinics.
@@ -304,7 +326,65 @@ class DoctorController {
 			}
 		}
 
+		// Validate manager-level constraints.
+		if (levelId != null) {
+			String levelName = jdbcTemplate.queryForObject(
+					"SELECT name FROM levels WHERE id = ?", String.class, levelId);
+
+			boolean requiresManager = "Intern".equals(levelName) || "Registrar".equals(levelName);
+
+			if (requiresManager && managerId == null) {
+				result.reject("managerRequired",
+						"An Intern or Registrar Doctor must have a manager.");
+			}
+			else if (managerId != null) {
+				Integer managerLevelId = jdbcTemplate.query(
+						"SELECT level_id FROM user_role_levels WHERE user_id = ? AND role_id = "
+						+ "(SELECT id FROM roles WHERE name = ?)",
+						rs -> rs.next() ? rs.getInt("level_id") : null,
+						managerId, DOCTOR_ROLE_NAME);
+
+				String managerLevelName = null;
+				if (managerLevelId != null) {
+					managerLevelName = jdbcTemplate.queryForObject(
+							"SELECT name FROM levels WHERE id = ?", String.class, managerLevelId);
+				}
+
+				if (!isValidManager(levelName, managerLevelName)) {
+					result.reject("invalidManager",
+							"The selected manager's level is not high enough for a " + levelName + " Doctor.");
+				}
+			}
+		}
+
+		// Validate specialties constraints.
+		if (levelId != null) {
+			String levelName = jdbcTemplate.queryForObject(
+					"SELECT name FROM levels WHERE id = ?", String.class, levelId);
+
+			Collection<Specialty> submittedSpecialties = doctor.getSpecialties();
+			boolean hasSpecialties = submittedSpecialties != null && !submittedSpecialties.isEmpty();
+
+			// Only a Specialist may have specialties.
+			if (hasSpecialties && !"Specialist".equals(levelName)) {
+				result.reject("invalidLevel",
+						"Only a Specialist Doctor may have specialties.");
+			}
+
+			// A Specialist must have at least one specialty.
+			if ("Specialist".equals(levelName) && !hasSpecialties) {
+				result.reject("specialtiesRequired",
+						"A Specialist Doctor must have at least one specialty.");
+			}
+		}
+
 		if (result.hasErrors()) {
+			model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));
+			model.addAttribute("potentialManagers", userRepository.findByRoleName(DOCTOR_ROLE_NAME));
+			model.addAttribute("managerLevelMap", buildManagerLevelMap(DOCTOR_ROLE_NAME));
+			model.addAttribute("selectedLevelId", levelId);
+			model.addAttribute("selectedManagerId", managerId);
+
 			return VIEWS_DOCTOR_CREATE_OR_UPDATE_FORM;
 		}
 
@@ -314,10 +394,17 @@ class DoctorController {
 		catch (DataIntegrityViolationException ex) {
 			result.rejectValue("firstName", "duplicate",
 					"A person with this first name, last name, birth date, and gender already exists.");
+
+			model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));
+			model.addAttribute("potentialManagers", userRepository.findByRoleName(DOCTOR_ROLE_NAME));
+			model.addAttribute("managerLevelMap", buildManagerLevelMap(DOCTOR_ROLE_NAME));
+			model.addAttribute("selectedLevelId", levelId);
+			model.addAttribute("selectedManagerId", managerId);
+
 			return VIEWS_DOCTOR_CREATE_OR_UPDATE_FORM;
 		}
 
-		createUserForDoctor(doctor);
+		createUserForDoctor(doctor, levelId, managerId);
 
 		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
 		redirectAttributes.addFlashAttribute("message", "New Doctor has been added.");
@@ -329,12 +416,31 @@ class DoctorController {
 	public String initUpdateForm(@PathVariable("doctorId") int doctorId, Model model) {
 		Doctor doctor = this.doctors.findById(doctorId)
 			.orElseThrow(() -> new IllegalArgumentException("Doctor not found for identifier: " + doctorId));
+
 		model.addAttribute("doctor", doctor);
+		model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));
+		model.addAttribute("potentialManagers", userRepository.findByRoleName(DOCTOR_ROLE_NAME));
+		model.addAttribute("managerLevelMap", buildManagerLevelMap(DOCTOR_ROLE_NAME));
+
+		Integer currentLevelId = jdbcTemplate.query(
+				"SELECT level_id FROM user_role_levels WHERE user_id = ?",
+				rs -> rs.next() ? rs.getInt("level_id") : null,
+				doctorId);
+		Integer currentManagerId = jdbcTemplate.query(
+				"SELECT manager_id FROM user_manager WHERE user_id = ?",
+				rs -> rs.next() ? rs.getInt("manager_id") : null,
+				doctorId);
+
+		model.addAttribute("selectedLevelId", currentLevelId);
+		model.addAttribute("selectedManagerId", currentManagerId);
+
 		return VIEWS_DOCTOR_CREATE_OR_UPDATE_FORM;
 	}
 
 	@PostMapping("/doctors/{doctorId}/edit")
 	public String processUpdateForm(@Valid Doctor doctor, BindingResult result, @PathVariable("doctorId") int doctorId,
+			@RequestParam(name = "levelId", required = false) Integer levelId,
+			@RequestParam(name = "managerId", required = false) Integer managerId,
 			RedirectAttributes redirectAttributes, HttpSession session, Model model) {
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
@@ -410,8 +516,66 @@ class DoctorController {
 			}
 		}
 
+		// Validate manager-level constraints.
+		if (levelId != null) {
+			String levelName = jdbcTemplate.queryForObject(
+					"SELECT name FROM levels WHERE id = ?", String.class, levelId);
+
+			boolean requiresManager = "Intern".equals(levelName) || "Registrar".equals(levelName);
+
+			if (requiresManager && managerId == null) {
+				result.reject("managerRequired",
+						"An Intern or Registrar Doctor must have a manager.");
+			}
+			else if (managerId != null) {
+				Integer managerLevelId = jdbcTemplate.query(
+						"SELECT level_id FROM user_role_levels WHERE user_id = ? AND role_id = "
+						+ "(SELECT id FROM roles WHERE name = ?)",
+						rs -> rs.next() ? rs.getInt("level_id") : null,
+						managerId, DOCTOR_ROLE_NAME);
+
+				String managerLevelName = null;
+				if (managerLevelId != null) {
+					managerLevelName = jdbcTemplate.queryForObject(
+							"SELECT name FROM levels WHERE id = ?", String.class, managerLevelId);
+				}
+
+				if (!isValidManager(levelName, managerLevelName)) {
+					result.reject("invalidManager",
+							"The selected manager's level is not high enough for a " + levelName + " Doctor.");
+				}
+			}
+		}
+
+		// Validate specialties constraints.
+		if (levelId != null) {
+			String levelName = jdbcTemplate.queryForObject(
+					"SELECT name FROM levels WHERE id = ?", String.class, levelId);
+
+			Collection<Specialty> submittedSpecialties = doctor.getSpecialties();
+			boolean hasSpecialties = submittedSpecialties != null && !submittedSpecialties.isEmpty();
+
+			// Only a Specialist may have specialties.
+			if (hasSpecialties && !"Specialist".equals(levelName)) {
+				result.reject("invalidLevel",
+						"Only a Specialist Doctor may have specialties.");
+			}
+
+			// A Specialist must have at least one specialty.
+			if ("Specialist".equals(levelName) && !hasSpecialties) {
+				result.reject("specialtiesRequired",
+						"A Specialist Doctor must have at least one specialty.");
+			}
+		}
+
 		if (result.hasErrors()) {
 			model.addAttribute("error", "There was an error in updating the doctor.");
+			model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));
+			model.addAttribute("potentialManagers", userRepository.findByRoleName(DOCTOR_ROLE_NAME));
+			model.addAttribute("managerLevelMap", buildManagerLevelMap(DOCTOR_ROLE_NAME));
+			model.addAttribute("selectedLevelId", levelId);
+			model.addAttribute("selectedManagerId", managerId);
+
 			return VIEWS_DOCTOR_CREATE_OR_UPDATE_FORM;
 		}
 
@@ -424,18 +588,37 @@ class DoctorController {
 			result.rejectValue("firstName", "duplicate",
 					"A person with this first name, last name, birth date, and gender already exists.");
 			model.addAttribute("error", "There was an error in updating the doctor.");
+			model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));
+			model.addAttribute("potentialManagers", userRepository.findByRoleName(DOCTOR_ROLE_NAME));
+			model.addAttribute("managerLevelMap", buildManagerLevelMap(DOCTOR_ROLE_NAME));
+			model.addAttribute("selectedLevelId", levelId);
+			model.addAttribute("selectedManagerId", managerId);
+
 			return VIEWS_DOCTOR_CREATE_OR_UPDATE_FORM;
 		}
 
 		String updatedUsername = doctor.getFirstName() + " " + doctor.getLastName();
 		jdbcTemplate.update("UPDATE users SET username = ? WHERE entity_id = ?", updatedUsername, doctorId);
 
+		Integer roleId = jdbcTemplate.queryForObject("SELECT id FROM roles WHERE name = ?", Integer.class,
+				DOCTOR_ROLE_NAME);
+		jdbcTemplate.update("DELETE FROM user_role_levels WHERE user_id = ?", doctorId);
+		if (levelId != null) {
+			jdbcTemplate.update("INSERT INTO user_role_levels (user_id, role_id, level_id) VALUES (?, ?, ?)",
+					doctorId, roleId, levelId);
+		}
+		jdbcTemplate.update("DELETE FROM user_manager WHERE user_id = ?", doctorId);
+		if (managerId != null) {
+			jdbcTemplate.update("INSERT INTO user_manager (user_id, manager_id) VALUES (?, ?)",
+					doctorId, managerId);
+		}
+
 		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
 		redirectAttributes.addFlashAttribute("message", "Doctor values updated.");
 		return "redirect:/doctors/{doctorId}";
 	}
 
-	private void createUserForDoctor(Doctor doctor) {
+	private void createUserForDoctor(Doctor doctor, Integer levelId, Integer managerId) {
 		Integer entityId = doctor.getId();
 		String username = doctor.getFirstName() + " " + doctor.getLastName();
  
@@ -445,10 +628,47 @@ class DoctorController {
 				DOCTOR_ROLE_NAME);
 		jdbcTemplate.update("INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)", entityId, roleId);
  
-		Integer levelId = jdbcTemplate.queryForObject("SELECT id FROM levels WHERE name = ?", Integer.class,
-				DEFAULT_LEVEL_NAME);
-		jdbcTemplate.update("INSERT INTO user_levels (user_id, level_id) VALUES (?, ?)", entityId, levelId);
+		if (levelId != null) {
+			jdbcTemplate.update("INSERT INTO user_role_levels (user_id, role_id, level_id) VALUES (?, ?, ?)",
+					entityId, roleId, levelId);
+		}
+		else {
+			Integer defaultLevelId = jdbcTemplate.queryForObject("SELECT id FROM levels WHERE name = ?",
+					Integer.class, DEFAULT_LEVEL_NAME);
+			jdbcTemplate.update("INSERT INTO user_role_levels (user_id, role_id, level_id) VALUES (?, ?, ?)",
+					entityId, roleId, defaultLevelId);
+		}
+
+		if (managerId != null) {
+			jdbcTemplate.update("INSERT INTO user_manager (user_id, manager_id) VALUES (?, ?)",
+					entityId, managerId);
+		}
 	}
 
+	private Map<Integer, String> buildManagerLevelMap(String roleName) {
+		List<Map<String, Object>> rows = jdbcTemplate.queryForList(
+			"SELECT url.user_id, l.name AS level_name "
+			+ "FROM user_role_levels url "
+			+ "JOIN levels l ON url.level_id = l.id "
+			+ "JOIN roles r ON url.role_id = r.id "
+			+ "WHERE r.name = ?", roleName);
 
+		Map<Integer, String> result = new HashMap<>();
+		for (Map<String, Object> row : rows) {
+			result.put((Integer) row.get("user_id"), (String) row.get("level_name"));
+		}
+		return result;
+	}
+
+	private boolean isValidManager(String entityLevelName, String managerLevelName) {
+		if (managerLevelName == null) {
+			return false;
+		}
+		if (NON_MANAGER_LEVELS.contains(managerLevelName)) {
+			return false;
+		}
+		int entityRank = LEVEL_HIERARCHY.indexOf(entityLevelName);
+		int managerRank = LEVEL_HIERARCHY.indexOf(managerLevelName);
+		return entityRank >= 0 && managerRank >= 0 && managerRank > entityRank;
+	}
 }

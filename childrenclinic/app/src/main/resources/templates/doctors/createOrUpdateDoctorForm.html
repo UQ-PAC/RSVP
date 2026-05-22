@@ -4,6 +4,10 @@
 
   <h2 th:text="#{doctor}">Doctor</h2>
   <form th:object="${doctor}" class="form-horizontal" id="add-doctor-form" method="post">
+    <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
+        <span th:each="err : ${#fields.globalErrors()}" th:text="${err}"></span>
+    </div>
+
     <div class="form-group has-feedback">
 
       <input th:replace="~{fragments/inputField :: input (#{firstName}, 'firstName', 'text')}" />
@@ -19,19 +23,10 @@
           </select>
           <span class="help-inline" th:errors="*{gender}">[error]</span>
         </div>
+        <br />
       </div>
 
       <input th:replace="~{fragments/inputField :: input (#{telephone}, 'telephone', 'text')}" />
-
-      <div class="control-group">
-        <label class="col-sm-2 control-label" th:text="#{specialties}">Specialties</label>
-        <div class="col-sm-10">
-          <select th:field="*{specialties}" class="form-control" multiple="multiple">
-            <option th:each="specialty : ${specialties}" th:value="${specialty.name}" th:text="${specialty.name}">Specialty</option>
-          </select>
-          <span class="help-inline" th:errors="*{specialties}">[error]</span>
-        </div>
-      </div>
 
       <div class="control-group">
         <label class="col-sm-2 control-label" th:text="#{clinics}">Clinics</label>
@@ -41,6 +36,57 @@
           </select>
           <span class="help-inline" th:errors="*{clinics}">[error]</span>
         </div>
+        <br />
+      </div>
+
+      <div class="control-group">
+        <label class="col-sm-2 control-label">Level</label>
+        <div class="col-sm-10">
+          <select name="levelId" class="form-control"
+                  data-level-hierarchy='["Intern","Resident","Staff","Senior","Registrar","Specialist"]'
+                  data-non-manager-levels='["Intern","Registrar"]'>
+            <option th:each="level : ${levels}"
+                    th:value="${level.id}"
+                    th:selected="${selectedLevelId != null and selectedLevelId == level.id}"
+                    th:text="${level.name}">Level</option>
+          </select>
+          <span class="help-inline text-muted" style="font-size: 0.85em;">
+            Select a professional level for this doctor.
+          </span>
+        </div>
+        <br />
+      </div>
+
+      <div class="control-group">
+        <label class="col-sm-2 control-label">Manager</label>
+        <div class="col-sm-10">
+          <select name="managerId" id="managerSelect" class="form-control">
+            <option value="" th:selected="${selectedManagerId == null}">None</option>
+            <option th:each="user : ${potentialManagers}"
+                    th:value="${user.id}"
+                    th:attr="data-level=${managerLevelMap[user.id]}"
+                    th:selected="${selectedManagerId != null and selectedManagerId == user.id}"
+                    th:text="${user.username + ' (' + (managerLevelMap[user.id] ?: 'N/A') + ')'}">Manager</option>
+          </select>
+          <span class="help-inline text-muted" style="font-size: 0.85em;">
+            Required for Intern and Registrar levels.
+          </span>
+        </div>
+        <br />
+      </div>
+
+      <div class="control-group">
+        <label class="col-sm-2 control-label" th:text="#{specialties}">Specialties</label>
+        <div class="col-sm-10">
+          <select th:field="*{specialties}" class="form-control" multiple="multiple">
+            <option th:each="specialty : ${specialties}" th:value="${specialty.name}" th:text="${specialty.name}">Specialty</option>
+          </select>
+          <span class="help-inline text-muted" style="font-size: 0.85em;">
+            Required for Specialist level.
+          </span>
+          <span class="help-inline" th:errors="*{specialties}">[error]</span>
+        </div>
+        <br />
       </div>
 
     </div>

@@ -9,12 +9,20 @@ namespace ChildrenClinic {
 
     entity ProfessionalLevel enum ["Intern", "Resident", "Staff", "Senior", "Registrar", "Specialist"];
 
+    entity Specialty;
+
+    type RoleLevel = {
+        role: EmployeeRole,
+        level: ProfessionalLevel
+    };
+
     entity Employee = {
         name: String,
         clinics: Set<Clinic>,
         roles: Set<EmployeeRole>,
-        level?: ProfessionalLevel,
-        manager?: Employee
+        levels?: Set<RoleLevel>,
+        manager?: Employee,
+        specialties?: Set<Specialty>
     };
 
     entity Guest;

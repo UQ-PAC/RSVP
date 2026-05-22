@@ -12,7 +12,7 @@ DROP TABLE doctor_specialties IF EXISTS;
 DROP TABLE roles IF EXISTS;
 DROP TABLE user_roles IF EXISTS;
 DROP TABLE levels IF EXISTS;
-DROP TABLE user_levels IF EXISTS;
+DROP TABLE user_role_levels IF EXISTS;
 DROP TABLE user_manager IF EXISTS;
 DROP TABLE guardians IF EXISTS;
 DROP TABLE patients IF EXISTS;
@@ -128,11 +128,13 @@ CREATE TABLE levels (
 );
 CREATE INDEX levels_name ON levels (name);
 
-CREATE TABLE user_levels (
+CREATE TABLE user_role_levels (
   user_id    INTEGER NOT NULL,
+  role_id    INTEGER NOT NULL,
   level_id   INTEGER NOT NULL,
-  PRIMARY KEY (user_id, level_id),
+  PRIMARY KEY (user_id, role_id),
   FOREIGN KEY (user_id) REFERENCES users(entity_id) ON DELETE CASCADE,
+  FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,
   FOREIGN KEY (level_id) REFERENCES levels(id) ON DELETE CASCADE
 );
 

@@ -1,17 +1,20 @@
 package uq.pac.childrenclinic.system;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,10 +35,9 @@ public class User extends BaseEntity {
 	@NotEmpty
 	private Set<Role> roles;
 
-	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "user_levels", joinColumns = @JoinColumn(name = "user_id"),
-			inverseJoinColumns = @JoinColumn(name = "level_id"))
-	private Set<Level> levels;
+	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER,
+			cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<UserRoleLevel> roleLevels = new HashSet<>();
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "user_manager", joinColumns = @JoinColumn(name = "user_id"),
@@ -76,27 +78,37 @@ public class User extends BaseEntity {
 		return this.roles.stream().map(Role::getName).sorted().collect(Collectors.joining(", "));
 	}
 
-	public Set<Level> getLevels() {
-		return levels;
+	public Set<UserRoleLevel> getRoleLevels() {
+		return roleLevels;
 	}
 
-	public void setLevels(Set<Level> levels) {
-		this.levels = levels;
+	public void setRoleLevels(Set<UserRoleLevel> roleLevels) {
+		this.roleLevels = roleLevels;
 	}
 
-	public void addLevel(Level level) {
-		this.levels.add(level);
+	public void addRoleLevel(UserRoleLevel roleLevel) {
+		this.roleLevels.add(roleLevel);
+		roleLevel.setUser(this);
 	}
 
-	public void removeLevel(Level level) {
-		this.levels.remove(level);
+	public void removeRoleLevel(UserRoleLevel roleLevel) {
+		this.roleLevels.remove(roleLevel);
+		roleLevel.setUser(null);
+	}
+
+	public Map<Role, Level> getRoleLevelMap() {
+		return roleLevels.stream()
+			.collect(Collectors.toMap(UserRoleLevel::getRole, UserRoleLevel::getLevel));
 	}
 
 	public String getLevelDescriptions() {
-		if (this.levels == null || this.levels.isEmpty()) {
+		if (this.roleLevels == null || this.roleLevels.isEmpty()) {
 			return "No additional details.";
 		}
-		return this.levels.stream().map(Level::getName).sorted().collect(Collectors.joining(", "));
+		return this.roleLevels.stream()
+			.sorted((a, b) -> a.getRole().getName().compareTo(b.getRole().getName()))
+			.map(rl -> rl.getRole().getName() + " (" + rl.getLevel().getName() + ")")
+			.collect(Collectors.joining(", "));
 	}
 
 	public Set<User> getManagers() {

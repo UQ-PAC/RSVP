@@ -95,6 +95,22 @@
     },
 
     {
+        "uid": { "type": "ChildrenClinic::Specialty", "id": "Radiology" },
+        "attrs": {},
+        "parents": []
+    },
+    {
+        "uid": { "type": "ChildrenClinic::Specialty", "id": "Surgery" },
+        "attrs": {},
+        "parents": []
+    },
+    {
+        "uid": { "type": "ChildrenClinic::Specialty", "id": "Dentistry" },
+        "attrs": {},
+        "parents": []
+    },
+
+    {
         "uid": { "type": "ChildrenClinic::Employee", "id": "James Carter" },
         "attrs": {
             "name": "James Carter",
@@ -105,7 +121,12 @@
             "roles": [
                 { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Doctor" } }
             ],
-            "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Senior" } }
+            "levels": [
+                {
+                    "role": { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Doctor" } },
+                    "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Senior" } }
+                }
+            ]
         },
         "parents": [ ]
     },
@@ -119,7 +140,16 @@
             "roles": [
                 { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Doctor" } }
             ],
-            "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Specialist" } }
+            "levels": [
+                {
+                    "role": { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Doctor" } },
+                    "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Specialist" } }
+                }
+            ],
+            "specialties": [
+                { "__entity": { "type": "ChildrenClinic::Specialty", "id": "Radiology" } },
+                { "__entity": { "type": "ChildrenClinic::Specialty", "id": "Surgery" } }
+            ]
         },
         "parents": [ ]
     },
@@ -133,7 +163,12 @@
             "roles": [
                 { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Doctor" } }
             ],
-            "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Resident" } }
+            "levels": [
+                {
+                    "role": { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Doctor" } },
+                    "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Resident" } }
+                }
+            ]
         },
         "parents": [ ]
     },
@@ -147,7 +182,12 @@
             "roles": [
                 { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Doctor" } }
             ],
-            "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Intern" } },
+            "levels": [
+                {
+                    "role": { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Doctor" } },
+                    "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Intern" } }
+                }
+            ],
             "manager": { "__entity": { "type": "ChildrenClinic::Employee", "id": "James Carter" } }
         },
         "parents": [ ]
@@ -162,7 +202,12 @@
             "roles": [
                 { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Doctor" } }
             ],
-            "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Registrar" } },
+            "levels": [
+                {
+                    "role": { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Doctor" } },
+                    "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Registrar" } }
+                }
+            ],
             "manager": { "__entity": { "type": "ChildrenClinic::Employee", "id": "Linda Douglas" } }
         },
         "parents": [ ]
@@ -179,7 +224,12 @@
             "roles": [
                 { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Administrator" } }
             ],
-            "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Senior" } }
+            "levels": [
+                {
+                    "role": { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Administrator" } },
+                    "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Senior" } }
+                }
+            ]
         },
         "parents": [ ]
     },
@@ -195,7 +245,12 @@
             "roles": [
                 { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Receptionist" } }
             ],
-            "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Staff" } }
+            "levels": [
+                {
+                    "role": { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Receptionist" } },
+                    "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Staff" } }
+                }
+            ]
         },
         "parents": [ ]
     },
@@ -209,7 +264,12 @@
             "roles": [
                 { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Receptionist" } }
             ],
-            "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Intern" } },
+            "levels": [
+                {
+                    "role": { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Receptionist" } },
+                    "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Intern" } }
+                }
+            ],
             "manager": { "__entity": { "type": "ChildrenClinic::Employee", "id": "Bob Buchanan" } }
         },
         "parents": [ ]

@@ -40,6 +40,7 @@ class CacheConfiguration {
 			cm.createCache("specialties", cacheConfiguration());
 			cm.createCache("confidentialities", cacheConfiguration());
 			cm.createCache("authorities", cacheConfiguration());
+			cm.createCache("levels", cacheConfiguration());
 		};
 	}
 

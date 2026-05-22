@@ -1,8 +1,9 @@
-entity Role enum [ "Important User", "Powerful Admin" ];
+entity Role enum [ "Important\tUser", "Powerful Admin" ];
 entity User enum [ "Carl", "Tim" ];
 
 entity Account = {
-    role: Role
+    role: Role,
+    alias: String
 };
 
 action auth appliesTo {

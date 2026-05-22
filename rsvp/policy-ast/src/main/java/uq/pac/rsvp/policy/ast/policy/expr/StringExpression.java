@@ -34,7 +34,6 @@ public class StringExpression extends Expression {
 
     @Override
     public String toString() {
-        return "\"" + StringEscapeUtils.escapeJava(value) + "\"";
+        return "\"" + value + "\"";
     }
-
 }

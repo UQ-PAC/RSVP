@@ -1,15 +1,17 @@
 [
     {
-        "uid": { "type": "Account", "id": "Alice" },
+        "uid": { "type": "Account", "id": "Alice\tand\tBob" },
         "attrs": {
-            "role": { "__entity": { "type": "Role", "id": "Powerful Admin" }}
+            "role": { "__entity": { "type": "Role", "id": "Powerful Admin" }},
+            "alias": "alicebob"
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Account", "id": "Bob" },
+        "uid": { "type": "Account", "id": "Carl" },
         "attrs": {
-            "role": { "__entity": { "type": "Role", "id": "Important User" }}
+            "role": { "__entity": { "type": "Role", "id": "Important\tUser" }},
+            "alias": "carl"
         },
         "parents": [ ]
     }

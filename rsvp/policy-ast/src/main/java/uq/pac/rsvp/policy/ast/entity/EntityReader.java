@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.ast.entity;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
+import org.apache.commons.text.StringEscapeUtils;
 import uq.pac.rsvp.support.error.SyntaxError;
 import uq.pac.rsvp.support.FileSource;
 import uq.pac.rsvp.support.SourceLoc;
@@ -143,7 +144,8 @@ class EntityReader {
 
                 while (reader.peek() != JsonToken.END_OBJECT) {
                     int attrPosition = position() - 1;
-                    String name = reader.nextName();
+                    // Internally, all strings except string values are escaped
+                    String name = StringEscapeUtils.escapeJava(reader.nextName());
                     SourceLoc loc = loc(attrPosition,name.length() + 2);
                     AttributeName attrName = new AttributeName(name, loc);
                     EntityValue value = readEntityValue();
@@ -159,8 +161,7 @@ class EntityReader {
             }
             case STRING -> {
                 // For strings the offset is at the start, but we also need to take the account quotes
-                // FIXME: if there are escaped characters, the location will likely be off
-                String value = reader.nextString();
+                String value = StringEscapeUtils.escapeJava(reader.nextString());
                 yield new StringValue(value, loc(offset, value.length() + 2));
             }
             case NUMBER -> {

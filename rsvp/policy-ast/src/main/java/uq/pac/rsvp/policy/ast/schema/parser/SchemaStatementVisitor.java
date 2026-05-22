@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static uq.pac.rsvp.policy.ast.schema.parser.SchemaTypeVisitor.unquote;
+import static uq.pac.rsvp.policy.ast.Util.unquote;
 
 /**
  * A top-level visitor generating schema statements from the parser
@@ -27,7 +27,7 @@ class SchemaStatementVisitor extends CedarschemaSourceVisitor<List<SchemaStateme
     public SchemaStatementVisitor(FileSource fs, String namespace) {
         super(fs);
         this.namespace = namespace;
-        this.types = new SchemaTypeVisitor(fs, namespace);
+        this.types = new SchemaTypeVisitor(fs);
     }
 
     private static Annotations getAnnotations(List<CedarschemaParser.AnnotationContext> ctx) {

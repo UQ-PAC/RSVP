@@ -3,5 +3,5 @@ permit (
     action,
     resource
 ) when {
-    principal.role == Role::"Important User"
+    principal.role == Role::"Important\tUser"
 };

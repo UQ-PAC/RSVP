@@ -88,7 +88,7 @@ expression :
     | LONG                                                             # longExpr
     | expression IN expression                                         # inExpr
     | expression IS type                                               # isExpr
-    | expression HAS attr=(ID | STRING)                                # hasExpr
+    | expression HAS attributeName                                     # hasExpr
     | '(' expression ')'                                               # groupingExpr
     | '[' expressionList? ']'                                          # setExpr
     | '{' attributes? '}'                                              # recordExpr

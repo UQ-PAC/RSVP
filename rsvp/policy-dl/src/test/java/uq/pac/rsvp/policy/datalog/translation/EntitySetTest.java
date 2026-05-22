@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.value.*;
+import org.apache.commons.text.StringEscapeUtils;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.policy.ast.entity.*;
@@ -63,8 +64,10 @@ public class EntitySetTest {
         return switch (value) {
             case PrimBool b -> new BooleanValue(b.getValue());
             case PrimLong l -> new LongValue(l.getValue());
-            case PrimString s -> new StringValue(s.toString());
-            case EntityUID ref -> new EntityReference(ref.getType().toString(), ref.getId().toString());
+            case PrimString s -> new StringValue(StringEscapeUtils.escapeJava(s.toString()));
+            case EntityUID ref -> new EntityReference(
+                    StringEscapeUtils.escapeJava(ref.getType().toString()),
+                    StringEscapeUtils.escapeJava(ref.getId().toString()));
             case CedarList lst -> new SetValue(lst.stream().map(this::cedarToRsvp).collect(Collectors.toSet()));
             case CedarMap map ->
                 new RecordValue(map.entrySet().stream()

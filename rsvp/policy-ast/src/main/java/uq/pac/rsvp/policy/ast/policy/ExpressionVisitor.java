@@ -2,7 +2,6 @@ package uq.pac.rsvp.policy.ast.policy;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.apache.commons.text.StringEscapeUtils;
 import uq.pac.rsvp.policy.ast.CedarParser;
 import uq.pac.rsvp.policy.ast.policy.expr.ActionExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression;
@@ -30,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static uq.pac.rsvp.policy.ast.Util.unquote;
 import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.Eq;
 import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.Greater;
 import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.GreaterEq;
@@ -88,7 +88,7 @@ public class ExpressionVisitor extends CedarSourceVisitor<Expression> {
     @Override
     public Expression visitStringExpr(CedarParser.StringExprContext ctx) {
         String value = ctx.STRING().getText();
-        return new StringExpression(StringEscapeUtils.unescapeJava(value.substring(1, value.length() - 1)), location(ctx));
+        return new StringExpression(unquote(value), location(ctx));
     }
 
     @Override
@@ -142,12 +142,12 @@ public class ExpressionVisitor extends CedarSourceVisitor<Expression> {
 
     @Override
     public Expression visitHasExpr(CedarParser.HasExprContext ctx) {
-        String attr = ctx.attr.getText();
-        if (attr.startsWith("\"")) {
-            attr = attr.substring(1, attr.length() - 1);
+        String attr = ctx.attributeName().getText();
+        if (ctx.attributeName().STRING() != null) {
+            attr = unquote(ctx.attributeName().STRING().getText());
         }
         return new BinaryExpression(ctx.expression().accept(this),
-                HasAttr, new StringExpression(attr, location(ctx.attr)), location(ctx));
+                HasAttr, new StringExpression(attr, location(ctx.attributeName())), location(ctx));
     }
 
     @Override
@@ -203,7 +203,7 @@ public class ExpressionVisitor extends CedarSourceVisitor<Expression> {
             for (CedarParser.AttributeContext ac : ctx.attributes().attribute()) {
                 String name = ac.attributeName().getText();
                 if (ac.attributeName().STRING() != null) {
-                    name = name.substring(1, name.length() - 1);
+                    name = unquote(name);
                 }
                 Expression expr = ac.expression().accept(this);
                 attributes.put(name, expr);

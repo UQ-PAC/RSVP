@@ -12,15 +12,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static uq.pac.rsvp.policy.ast.Util.unquote;
 import static uq.pac.rsvp.policy.ast.schema.type.TypeReference.TYPE_REFERENCE_DELIMITER;
 
 class SchemaTypeVisitor extends CedarschemaSourceVisitor<BuiltinType> {
 
-    private final String namespace;
-
-    public SchemaTypeVisitor(FileSource fs, String namespace) {
+    public SchemaTypeVisitor(FileSource fs) {
         super(fs);
-        this.namespace = namespace;
     }
 
     @Override
@@ -39,19 +37,15 @@ class SchemaTypeVisitor extends CedarschemaSourceVisitor<BuiltinType> {
         return new TypeReference(namespace, name, location(ctx));
     }
 
-    public static String unquote(String s) {
-        if (s != null && s.length() > 1 && s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"') {
-            return s.substring(1, s.length() - 1);
-        }
-        return s;
-    }
-
     @Override
     public BuiltinType visitRecord(CedarschemaParser.RecordContext ctx) {
         Map<RecordType.Attribute, BuiltinType> attributes = new HashMap<>();
         ctx.attribute().forEach(a -> {
             BuiltinType type = a.type().accept(this);
-            String attrName = unquote(a.name().getText());
+            String attrName = a.name().getText();
+            if (a.name().STRING() != null) {
+                attrName = unquote(attrName);
+            }
             boolean required = a.OPTIONAL() == null;
             attributes.put(new RecordType.Attribute(attrName, required), type);
         });

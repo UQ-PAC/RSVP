@@ -167,12 +167,12 @@ public class GuardianController {
 		Guardian guardian = this.guardians.findById(guardianId)
 			.orElseThrow(() -> new IllegalArgumentException("Guardian not found with identifier: " + guardianId));
 		mav.addObject("guardian", guardian);
- 
+
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 		String resourceName = guardian.getFirstName() + " " + guardian.getLastName();
 		var editEval = cedarEvaluator.evaluate(principal, "EditGuardian", "Guardian", resourceName, "Background");
 		mav.addObject("canEdit", editEval.isGranted());
- 
+
 		return mav;
 	}
 
@@ -301,7 +301,8 @@ public class GuardianController {
 		// Duplicate check.
 		if (StringUtils.hasLength(guardian.getLastName()) && StringUtils.hasLength(guardian.getFirstName())
 				&& guardian.isNew()) {
-			boolean duplicateExists = guardians.findByLastNameStartingWith(guardian.getLastName(), PageRequest.of(0, 50))
+			boolean duplicateExists = guardians
+				.findByLastNameStartingWith(guardian.getLastName(), PageRequest.of(0, 50))
 				.getContent()
 				.stream()
 				.anyMatch(a -> a.getFirstName().equalsIgnoreCase(guardian.getFirstName())
@@ -354,7 +355,8 @@ public class GuardianController {
 				this.patients.save(patient);
 			}
 			eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
-			redirectAttributes.addFlashAttribute("message", "New Guardian has been created and assigned to the Patient.");
+			redirectAttributes.addFlashAttribute("message",
+					"New Guardian has been created and assigned to the Patient.");
 			return "redirect:/patients/" + patientId;
 		}
 
@@ -410,8 +412,9 @@ public class GuardianController {
 	 * Processes the submission of the Guardian update form.
 	 */
 	@PostMapping("/guardians/{guardianId}/edit")
-	public String processUpdateForm(@Valid Guardian guardian, BindingResult result, @PathVariable("guardianId") int guardianId,
-			RedirectAttributes redirectAttributes, HttpSession session, Model model) {
+	public String processUpdateForm(@Valid Guardian guardian, BindingResult result,
+			@PathVariable("guardianId") int guardianId, RedirectAttributes redirectAttributes, HttpSession session,
+			Model model) {
 
 		// Check binding/validation errors.
 		if (result.hasErrors()) {
@@ -449,7 +452,8 @@ public class GuardianController {
 			if (clinic == null || clinic.getClinicName() == null)
 				continue;
 			String cedarClinicId = clinic.getClinicName().replaceFirst("^Clinic\\s+", "");
-			// Here we check for the "AddGuardian" action, instead of "EditGuardian", since
+			// Here we check for the "AddGuardian" action, instead of "EditGuardian",
+			// since
 			// the former applies to the "Clinic" resource.
 			var clinicEval = cedarEvaluator.evaluate(principal, "AddGuardian", "Clinic", cedarClinicId, "Page");
 			if (!clinicEval.isGranted()) {
@@ -487,12 +491,14 @@ public class GuardianController {
 
 		// Duplicate check.
 		if (StringUtils.hasLength(guardian.getLastName()) && StringUtils.hasLength(guardian.getFirstName())) {
-			boolean duplicateExists = this.guardians.findByLastNameStartingWith(guardian.getLastName(), PageRequest.of(0, 50))
+			boolean duplicateExists = this.guardians
+				.findByLastNameStartingWith(guardian.getLastName(), PageRequest.of(0, 50))
 				.getContent()
 				.stream()
 				.anyMatch(a -> a.getFirstName().equalsIgnoreCase(guardian.getFirstName())
 						&& Objects.equals(a.getBirthDate(), guardian.getBirthDate())
-						&& Objects.equals(a.getGender(), guardian.getGender()) && !Objects.equals(a.getId(), guardianId));
+						&& Objects.equals(a.getGender(), guardian.getGender())
+						&& !Objects.equals(a.getId(), guardianId));
 
 			if (duplicateExists) {
 				result.rejectValue("firstName", "duplicate",

@@ -35,8 +35,7 @@ public class User extends BaseEntity {
 	@NotEmpty
 	private Set<Role> roles;
 
-	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER,
-			cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<UserRoleLevel> roleLevels = new HashSet<>();
 
 	@ManyToMany(fetch = FetchType.LAZY)
@@ -97,8 +96,7 @@ public class User extends BaseEntity {
 	}
 
 	public Map<Role, Level> getRoleLevelMap() {
-		return roleLevels.stream()
-			.collect(Collectors.toMap(UserRoleLevel::getRole, UserRoleLevel::getLevel));
+		return roleLevels.stream().collect(Collectors.toMap(UserRoleLevel::getRole, UserRoleLevel::getLevel));
 	}
 
 	public String getLevelDescriptions() {

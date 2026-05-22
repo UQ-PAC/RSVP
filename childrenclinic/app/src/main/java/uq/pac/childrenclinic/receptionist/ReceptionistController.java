@@ -121,8 +121,8 @@ public class ReceptionistController {
 
 	@GetMapping("/receptionists")
 	@CedarAuthorization(action = "ListEmployees", resourceType = "Clinic", resourceId = "Any", validate = true)
-	public String processFindForm(@RequestParam(defaultValue = "1") int page,
-			Receptionist receptionist, BindingResult result, Model model, HttpSession session) {
+	public String processFindForm(@RequestParam(defaultValue = "1") int page, Receptionist receptionist,
+			BindingResult result, Model model, HttpSession session) {
 		String lastName = receptionist.getLastName() == null ? "" : receptionist.getLastName();
 
 		List<Receptionist> allMatchingReceptionists = this.receptionists
@@ -153,8 +153,7 @@ public class ReceptionistController {
 		Pageable pageable = PageRequest.of(page - 1, 5);
 		int start = (int) pageable.getOffset();
 		int end = Math.min((start + pageable.getPageSize()), authorized.size());
-		List<Receptionist> pageContent = start > authorized.size() ? List.of()
-				: authorized.subList(start, end);
+		List<Receptionist> pageContent = start > authorized.size() ? List.of() : authorized.subList(start, end);
 		Page<Receptionist> paginated = new PageImpl<>(pageContent, pageable, authorized.size());
 
 		model.addAttribute("listReceptionists", paginated.getContent());
@@ -174,15 +173,15 @@ public class ReceptionistController {
 	public ModelAndView showReceptionist(@PathVariable("receptionistId") int receptionistId, HttpSession session) {
 		ModelAndView mav = new ModelAndView("receptionists/receptionistDetails");
 		Receptionist receptionist = this.receptionists.findById(receptionistId)
-			.orElseThrow(() -> new IllegalArgumentException(
-					"Receptionist not found for identifier: " + receptionistId));
+			.orElseThrow(
+					() -> new IllegalArgumentException("Receptionist not found for identifier: " + receptionistId));
 		mav.addObject("receptionist", receptionist);
- 
+
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 		String resourceName = receptionist.getFirstName() + " " + receptionist.getLastName();
 		var editEval = cedarEvaluator.evaluate(principal, "EditEmployee", "Employee", resourceName, "Background");
 		mav.addObject("canEdit", editEval.isGranted());
- 
+
 		return mav;
 	}
 
@@ -220,18 +219,22 @@ public class ReceptionistController {
 				}
 			}
 			else {
-				exceptionBody
-					.append("You do not have permission to add receptionists to any assigned clinics.");
+				exceptionBody.append("You do not have permission to add receptionists to any assigned clinics.");
 			}
 
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
 		model.addAttribute("receptionist", new Receptionist());
-		model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));
+		model.addAttribute("levels",
+				levelRepository.findLevels()
+					.stream()
+					.filter(l -> LEVEL_HIERARCHY.contains(l.getName()))
+					.collect(Collectors.toList()));
 		model.addAttribute("potentialManagers", userRepository.findByRoleName(RECEPTIONIST_ROLE_NAME));
 		model.addAttribute("managerLevelMap", buildManagerLevelMap(RECEPTIONIST_ROLE_NAME));
-		model.addAttribute("selectedLevelId", levelRepository.findByName(DEFAULT_LEVEL_NAME).map(Level::getId).orElse(null));
+		model.addAttribute("selectedLevelId",
+				levelRepository.findByName(DEFAULT_LEVEL_NAME).map(Level::getId).orElse(null));
 		model.addAttribute("selectedManagerId", null);
 
 		return VIEWS_RECEPTIONIST_CREATE_OR_UPDATE_FORM;
@@ -245,7 +248,11 @@ public class ReceptionistController {
 
 		// Check binding/validation errors.
 		if (result.hasErrors()) {
-			model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));
+			model.addAttribute("levels",
+					levelRepository.findLevels()
+						.stream()
+						.filter(l -> LEVEL_HIERARCHY.contains(l.getName()))
+						.collect(Collectors.toList()));
 			model.addAttribute("potentialManagers", userRepository.findByRoleName(RECEPTIONIST_ROLE_NAME));
 			model.addAttribute("managerLevelMap", buildManagerLevelMap(RECEPTIONIST_ROLE_NAME));
 			model.addAttribute("selectedLevelId", levelId);
@@ -295,16 +302,16 @@ public class ReceptionistController {
 				}
 			}
 			else {
-				exceptionBody.append(
-						"You do not have permission to add receptionists to one or more of the selected clinics.");
+				exceptionBody
+					.append("You do not have permission to add receptionists to one or more of the selected clinics.");
 			}
 
 			throw new CedarDeniedException(exceptionBody.toString().trim());
 		}
 
 		// Duplicate check.
-		if (StringUtils.hasLength(receptionist.getLastName())
-				&& StringUtils.hasLength(receptionist.getFirstName()) && receptionist.isNew()) {
+		if (StringUtils.hasLength(receptionist.getLastName()) && StringUtils.hasLength(receptionist.getFirstName())
+				&& receptionist.isNew()) {
 			boolean duplicateExists = receptionists
 				.findByLastNameStartingWith(receptionist.getLastName(), PageRequest.of(0, 50))
 				.getContent()
@@ -321,39 +328,40 @@ public class ReceptionistController {
 
 		// Validate manager-level constraints.
 		if (levelId != null) {
-			String levelName = jdbcTemplate.queryForObject(
-					"SELECT name FROM levels WHERE id = ?", String.class, levelId);
+			String levelName = jdbcTemplate.queryForObject("SELECT name FROM levels WHERE id = ?", String.class,
+					levelId);
 
 			boolean requiresManager = "Intern".equals(levelName);
 
 			if (requiresManager && managerId == null) {
-				result.reject("managerRequired",
-						"An Intern Receptionist must have a manager.");
+				result.reject("managerRequired", "An Intern Receptionist must have a manager.");
 			}
 			else if (managerId != null) {
 				Integer managerLevelId = jdbcTemplate.query(
 						"SELECT level_id FROM user_role_levels WHERE user_id = ? AND role_id = "
-					+ "(SELECT id FROM roles WHERE name = ?)",
-						rs -> rs.next() ? rs.getInt("level_id") : null,
-						managerId, RECEPTIONIST_ROLE_NAME);
+								+ "(SELECT id FROM roles WHERE name = ?)",
+						rs -> rs.next() ? rs.getInt("level_id") : null, managerId, RECEPTIONIST_ROLE_NAME);
 
 				String managerLevelName = null;
 				if (managerLevelId != null) {
-					managerLevelName = jdbcTemplate.queryForObject(
-							"SELECT name FROM levels WHERE id = ?", String.class, managerLevelId);
+					managerLevelName = jdbcTemplate.queryForObject("SELECT name FROM levels WHERE id = ?", String.class,
+							managerLevelId);
 				}
 
 				if (!isValidManager(levelName, managerLevelName)) {
 					result.reject("invalidManager",
-							"The selected manager's level is not high enough for a "
-							+ levelName + " Receptionist.");
+							"The selected manager's level is not high enough for a " + levelName + " Receptionist.");
 				}
 			}
 		}
 
 		// Final error check.
 		if (result.hasErrors()) {
-			model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));
+			model.addAttribute("levels",
+					levelRepository.findLevels()
+						.stream()
+						.filter(l -> LEVEL_HIERARCHY.contains(l.getName()))
+						.collect(Collectors.toList()));
 			model.addAttribute("potentialManagers", userRepository.findByRoleName(RECEPTIONIST_ROLE_NAME));
 			model.addAttribute("managerLevelMap", buildManagerLevelMap(RECEPTIONIST_ROLE_NAME));
 			model.addAttribute("selectedLevelId", levelId);
@@ -369,7 +377,11 @@ public class ReceptionistController {
 			result.rejectValue("firstName", "duplicate",
 					"A person with this first name, last name, birth date, and gender already exists.");
 
-			model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));
+			model.addAttribute("levels",
+					levelRepository.findLevels()
+						.stream()
+						.filter(l -> LEVEL_HIERARCHY.contains(l.getName()))
+						.collect(Collectors.toList()));
 			model.addAttribute("potentialManagers", userRepository.findByRoleName(RECEPTIONIST_ROLE_NAME));
 			model.addAttribute("managerLevelMap", buildManagerLevelMap(RECEPTIONIST_ROLE_NAME));
 			model.addAttribute("selectedLevelId", levelId);
@@ -389,22 +401,22 @@ public class ReceptionistController {
 	@CedarAuthorization(action = "EditEmployee", resourceType = "Employee", validate = true)
 	public String initUpdateForm(@PathVariable("receptionistId") int receptionistId, Model model) {
 		Receptionist receptionist = this.receptionists.findById(receptionistId)
-			.orElseThrow(() -> new IllegalArgumentException(
-					"Receptionist not found for identifier: " + receptionistId));
+			.orElseThrow(
+					() -> new IllegalArgumentException("Receptionist not found for identifier: " + receptionistId));
 
 		model.addAttribute("receptionist", receptionist);
-		model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));
+		model.addAttribute("levels",
+				levelRepository.findLevels()
+					.stream()
+					.filter(l -> LEVEL_HIERARCHY.contains(l.getName()))
+					.collect(Collectors.toList()));
 		model.addAttribute("potentialManagers", userRepository.findByRoleName(RECEPTIONIST_ROLE_NAME));
 		model.addAttribute("managerLevelMap", buildManagerLevelMap(RECEPTIONIST_ROLE_NAME));
 
-		Integer currentLevelId = jdbcTemplate.query(
-				"SELECT level_id FROM user_role_levels WHERE user_id = ?",
-				rs -> rs.next() ? rs.getInt("level_id") : null,
-				receptionistId);
-		Integer currentManagerId = jdbcTemplate.query(
-				"SELECT manager_id FROM user_manager WHERE user_id = ?",
-				rs -> rs.next() ? rs.getInt("manager_id") : null,
-				receptionistId);
+		Integer currentLevelId = jdbcTemplate.query("SELECT level_id FROM user_role_levels WHERE user_id = ?",
+				rs -> rs.next() ? rs.getInt("level_id") : null, receptionistId);
+		Integer currentManagerId = jdbcTemplate.query("SELECT manager_id FROM user_manager WHERE user_id = ?",
+				rs -> rs.next() ? rs.getInt("manager_id") : null, receptionistId);
 
 		model.addAttribute("selectedLevelId", currentLevelId);
 		model.addAttribute("selectedManagerId", currentManagerId);
@@ -413,14 +425,19 @@ public class ReceptionistController {
 	}
 
 	@PostMapping("/receptionists/{receptionistId}/edit")
-	public String processUpdateForm(@Valid Receptionist receptionist, BindingResult result, @PathVariable("receptionistId") int receptionistId,
+	public String processUpdateForm(@Valid Receptionist receptionist, BindingResult result,
+			@PathVariable("receptionistId") int receptionistId,
 			@RequestParam(name = "levelId", required = false) Integer levelId,
 			@RequestParam(name = "managerId", required = false) Integer managerId,
 			RedirectAttributes redirectAttributes, HttpSession session, Model model) {
 
 		if (result.hasErrors()) {
 			model.addAttribute("error", "There was an error in updating the receptionist.");
-			model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));
+			model.addAttribute("levels",
+					levelRepository.findLevels()
+						.stream()
+						.filter(l -> LEVEL_HIERARCHY.contains(l.getName()))
+						.collect(Collectors.toList()));
 			model.addAttribute("potentialManagers", userRepository.findByRoleName(RECEPTIONIST_ROLE_NAME));
 			model.addAttribute("managerLevelMap", buildManagerLevelMap(RECEPTIONIST_ROLE_NAME));
 			model.addAttribute("selectedLevelId", levelId);
@@ -439,9 +456,8 @@ public class ReceptionistController {
 		var receptionistEval = cedarEvaluator.evaluate(principal, "EditEmployee", "Employee", resourceName, "Page");
 
 		if (!receptionistEval.isGranted()) {
-			throw new CedarDeniedException(
-					"Access Denied: You do not have permission to edit this receptionist.\n"
-							+ (receptionistEval.responseBody() != null ? receptionistEval.responseBody() : ""));
+			throw new CedarDeniedException("Access Denied: You do not have permission to edit this receptionist.\n"
+					+ (receptionistEval.responseBody() != null ? receptionistEval.responseBody() : ""));
 		}
 
 		// Cedar authorization on submitted clinics.
@@ -492,8 +508,7 @@ public class ReceptionistController {
 		receptionist.setClinics(finalClinics);
 
 		// Duplicate check.
-		if (StringUtils.hasLength(receptionist.getLastName())
-				&& StringUtils.hasLength(receptionist.getFirstName())) {
+		if (StringUtils.hasLength(receptionist.getLastName()) && StringUtils.hasLength(receptionist.getFirstName())) {
 			boolean duplicateExists = this.receptionists
 				.findByLastNameStartingWith(receptionist.getLastName(), PageRequest.of(0, 50))
 				.getContent()
@@ -511,32 +526,29 @@ public class ReceptionistController {
 
 		// Validate manager-level constraints.
 		if (levelId != null) {
-			String levelName = jdbcTemplate.queryForObject(
-					"SELECT name FROM levels WHERE id = ?", String.class, levelId);
+			String levelName = jdbcTemplate.queryForObject("SELECT name FROM levels WHERE id = ?", String.class,
+					levelId);
 
 			boolean requiresManager = "Intern".equals(levelName);
 
 			if (requiresManager && managerId == null) {
-				result.reject("managerRequired",
-						"An Intern Receptionist must have a manager.");
+				result.reject("managerRequired", "An Intern Receptionist must have a manager.");
 			}
 			else if (managerId != null) {
 				Integer managerLevelId = jdbcTemplate.query(
 						"SELECT level_id FROM user_role_levels WHERE user_id = ? AND role_id = "
-					+ "(SELECT id FROM roles WHERE name = ?)",
-						rs -> rs.next() ? rs.getInt("level_id") : null,
-						managerId, RECEPTIONIST_ROLE_NAME);
+								+ "(SELECT id FROM roles WHERE name = ?)",
+						rs -> rs.next() ? rs.getInt("level_id") : null, managerId, RECEPTIONIST_ROLE_NAME);
 
 				String managerLevelName = null;
 				if (managerLevelId != null) {
-					managerLevelName = jdbcTemplate.queryForObject(
-							"SELECT name FROM levels WHERE id = ?", String.class, managerLevelId);
+					managerLevelName = jdbcTemplate.queryForObject("SELECT name FROM levels WHERE id = ?", String.class,
+							managerLevelId);
 				}
 
 				if (!isValidManager(levelName, managerLevelName)) {
 					result.reject("invalidManager",
-							"The selected manager's level is not high enough for a "
-							+ levelName + " Receptionist.");
+							"The selected manager's level is not high enough for a " + levelName + " Receptionist.");
 				}
 			}
 		}
@@ -544,7 +556,11 @@ public class ReceptionistController {
 		// Final error check.
 		if (result.hasErrors()) {
 			model.addAttribute("error", "There was an error in updating the receptionist.");
-			model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));
+			model.addAttribute("levels",
+					levelRepository.findLevels()
+						.stream()
+						.filter(l -> LEVEL_HIERARCHY.contains(l.getName()))
+						.collect(Collectors.toList()));
 			model.addAttribute("potentialManagers", userRepository.findByRoleName(RECEPTIONIST_ROLE_NAME));
 			model.addAttribute("managerLevelMap", buildManagerLevelMap(RECEPTIONIST_ROLE_NAME));
 			model.addAttribute("selectedLevelId", levelId);
@@ -562,7 +578,11 @@ public class ReceptionistController {
 			result.rejectValue("firstName", "duplicate",
 					"A person with this first name, last name, birth date, and gender already exists.");
 			model.addAttribute("error", "There was an error in updating the receptionist.");
-			model.addAttribute("levels", levelRepository.findLevels().stream().filter(l -> LEVEL_HIERARCHY.contains(l.getName())).collect(Collectors.toList()));
+			model.addAttribute("levels",
+					levelRepository.findLevels()
+						.stream()
+						.filter(l -> LEVEL_HIERARCHY.contains(l.getName()))
+						.collect(Collectors.toList()));
 			model.addAttribute("potentialManagers", userRepository.findByRoleName(RECEPTIONIST_ROLE_NAME));
 			model.addAttribute("managerLevelMap", buildManagerLevelMap(RECEPTIONIST_ROLE_NAME));
 			model.addAttribute("selectedLevelId", levelId);
@@ -583,8 +603,8 @@ public class ReceptionistController {
 		}
 		jdbcTemplate.update("DELETE FROM user_manager WHERE user_id = ?", receptionistId);
 		if (managerId != null) {
-			jdbcTemplate.update("INSERT INTO user_manager (user_id, manager_id) VALUES (?, ?)",
-					receptionistId, managerId);
+			jdbcTemplate.update("INSERT INTO user_manager (user_id, manager_id) VALUES (?, ?)", receptionistId,
+					managerId);
 		}
 
 		eventPublisher.publishEvent(new CedarEntitiesInvalidationEvent(this));
@@ -595,37 +615,33 @@ public class ReceptionistController {
 	private void createUserForReceptionist(Receptionist receptionist, Integer levelId, Integer managerId) {
 		Integer entityId = receptionist.getId();
 		String username = receptionist.getFirstName() + " " + receptionist.getLastName();
- 
+
 		jdbcTemplate.update("INSERT INTO users (entity_id, username) VALUES (?, ?)", entityId, username);
- 
+
 		Integer roleId = jdbcTemplate.queryForObject("SELECT id FROM roles WHERE name = ?", Integer.class,
 				RECEPTIONIST_ROLE_NAME);
 		jdbcTemplate.update("INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)", entityId, roleId);
- 
+
 		if (levelId != null) {
-			jdbcTemplate.update("INSERT INTO user_role_levels (user_id, role_id, level_id) VALUES (?, ?, ?)",
-					entityId, roleId, levelId);
+			jdbcTemplate.update("INSERT INTO user_role_levels (user_id, role_id, level_id) VALUES (?, ?, ?)", entityId,
+					roleId, levelId);
 		}
 		else {
-			Integer defaultLevelId = jdbcTemplate.queryForObject("SELECT id FROM levels WHERE name = ?",
-					Integer.class, DEFAULT_LEVEL_NAME);
-			jdbcTemplate.update("INSERT INTO user_role_levels (user_id, role_id, level_id) VALUES (?, ?, ?)",
-					entityId, roleId, defaultLevelId);
+			Integer defaultLevelId = jdbcTemplate.queryForObject("SELECT id FROM levels WHERE name = ?", Integer.class,
+					DEFAULT_LEVEL_NAME);
+			jdbcTemplate.update("INSERT INTO user_role_levels (user_id, role_id, level_id) VALUES (?, ?, ?)", entityId,
+					roleId, defaultLevelId);
 		}
 
 		if (managerId != null) {
-			jdbcTemplate.update("INSERT INTO user_manager (user_id, manager_id) VALUES (?, ?)",
-					entityId, managerId);
+			jdbcTemplate.update("INSERT INTO user_manager (user_id, manager_id) VALUES (?, ?)", entityId, managerId);
 		}
 	}
 
 	private Map<Integer, String> buildManagerLevelMap(String roleName) {
-		List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-			"SELECT url.user_id, l.name AS level_name "
-			+ "FROM user_role_levels url "
-			+ "JOIN levels l ON url.level_id = l.id "
-			+ "JOIN roles r ON url.role_id = r.id "
-			+ "WHERE r.name = ?", roleName);
+		List<Map<String, Object>> rows = jdbcTemplate.queryForList("SELECT url.user_id, l.name AS level_name "
+				+ "FROM user_role_levels url " + "JOIN levels l ON url.level_id = l.id "
+				+ "JOIN roles r ON url.role_id = r.id " + "WHERE r.name = ?", roleName);
 
 		Map<Integer, String> result = new HashMap<>();
 		for (Map<String, Object> row : rows) {
@@ -645,4 +661,5 @@ public class ReceptionistController {
 		int managerRank = LEVEL_HIERARCHY.indexOf(managerLevelName);
 		return entityRank >= 0 && managerRank >= 0 && managerRank > entityRank;
 	}
+
 }

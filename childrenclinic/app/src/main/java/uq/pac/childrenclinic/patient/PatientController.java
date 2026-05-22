@@ -184,16 +184,17 @@ public class PatientController {
 		Patient patient = this.patients.findById(patientId)
 			.orElseThrow(() -> new IllegalArgumentException("Patient not found for identifier: " + patientId));
 		mav.addObject("patient", patient);
- 
+
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 		String resourceName = (patient.getFirstName() != null ? patient.getFirstName() : "") + " "
 				+ (patient.getLastName() != null ? patient.getLastName() : "");
 		var editEval = cedarEvaluator.evaluate(principal, "EditPatient", "Patient", resourceName.trim(), "Background");
 		mav.addObject("canEdit", editEval.isGranted());
- 
-		var addVisitEval = cedarEvaluator.evaluate(principal, "EditPatient", "Patient", resourceName.trim(), "Background");
+
+		var addVisitEval = cedarEvaluator.evaluate(principal, "EditPatient", "Patient", resourceName.trim(),
+				"Background");
 		mav.addObject("canAddVisit", addVisitEval.isGranted());
- 
+
 		return mav;
 	}
 

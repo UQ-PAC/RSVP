@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 public interface GuardianRepository extends JpaRepository<Guardian, Integer> {
 
 	/**
-	 * Retrieves paginated Guardian entities matching a specified last name prefix. * @param
-	 * lastName The prefix of the last name to query.
+	 * Retrieves paginated Guardian entities matching a specified last name prefix.
+	 * * @param lastName The prefix of the last name to query.
 	 * @param pageable The pagination execution parameters.
 	 * @return A paginated subset of matching Guardian entities.
 	 */

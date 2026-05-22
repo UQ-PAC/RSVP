@@ -150,7 +150,7 @@ public class CedarEntityBuilder {
 				}
 				attrs.put("levels", roleLevelRecords);
 			}
- 
+
 			List<String> doctorSpecialties = specialtiesByDoctor.getOrDefault(entityId, List.of());
 			if (!doctorSpecialties.isEmpty()) {
 				attrs.put("specialties",
@@ -182,7 +182,8 @@ public class CedarEntityBuilder {
 			attrs.put("name", name);
 
 			List<String> guardianClinics = clinicsByEntity.getOrDefault(entityId, List.of());
-			attrs.put("clinics", guardianClinics.stream().map(c -> entityRef("Clinic", c)).collect(Collectors.toList()));
+			attrs.put("clinics",
+					guardianClinics.stream().map(c -> entityRef("Clinic", c)).collect(Collectors.toList()));
 
 			result.add(buildEntity("Guardian", name, attrs));
 		}
@@ -334,18 +335,15 @@ public class CedarEntityBuilder {
 
 	private Map<Integer, List<Map<String, String>>> fetchUserRoleLevels() {
 		List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-			"SELECT url.user_id, r.name AS role_name, l.name AS level_name "
-			+ "FROM user_role_levels url "
-			+ "JOIN roles r ON url.role_id = r.id "
-			+ "JOIN levels l ON url.level_id = l.id");
+				"SELECT url.user_id, r.name AS role_name, l.name AS level_name " + "FROM user_role_levels url "
+						+ "JOIN roles r ON url.role_id = r.id " + "JOIN levels l ON url.level_id = l.id");
 
 		Map<Integer, List<Map<String, String>>> result = new HashMap<>();
 		for (Map<String, Object> row : rows) {
 			Integer userId = (Integer) row.get("user_id");
-			String roleName  = (String) row.get("role_name");
+			String roleName = (String) row.get("role_name");
 			String levelName = (String) row.get("level_name");
-			result.computeIfAbsent(userId, k -> new ArrayList<>())
-				.add(Map.of("role", roleName, "level", levelName));
+			result.computeIfAbsent(userId, k -> new ArrayList<>()).add(Map.of("role", roleName, "level", levelName));
 		}
 		return result;
 	}
@@ -362,10 +360,8 @@ public class CedarEntityBuilder {
 	}
 
 	private Map<Integer, List<String>> fetchDoctorSpecialties() {
-		List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-			"SELECT ds.doctor_id, s.name AS specialty_name "
-			+ "FROM doctor_specialties ds "
-			+ "JOIN specialties s ON ds.specialty_id = s.id");
+		List<Map<String, Object>> rows = jdbcTemplate.queryForList("SELECT ds.doctor_id, s.name AS specialty_name "
+				+ "FROM doctor_specialties ds " + "JOIN specialties s ON ds.specialty_id = s.id");
 
 		Map<Integer, List<String>> result = new HashMap<>();
 		for (Map<String, Object> row : rows) {
@@ -377,11 +373,11 @@ public class CedarEntityBuilder {
 	}
 
 	private Map<Integer, List<Map<String, Object>>> fetchPatientGuardians() {
-		List<Map<String, Object>> rows = jdbcTemplate
-			.queryForList("SELECT pa.patient_id, " + "CONCAT(p.first_name, ' ', p.last_name) AS guardian_name, "
-					+ "auth.name AS authority_name " + "FROM patient_guardians pa "
-					+ "JOIN guardians a ON pa.guardian_id = a.entity_id " + "JOIN persons p ON a.entity_id = p.entity_id "
-					+ "JOIN authorities auth ON pa.authority_id = auth.id");
+		List<Map<String, Object>> rows = jdbcTemplate.queryForList("SELECT pa.patient_id, "
+				+ "CONCAT(p.first_name, ' ', p.last_name) AS guardian_name, " + "auth.name AS authority_name "
+				+ "FROM patient_guardians pa " + "JOIN guardians a ON pa.guardian_id = a.entity_id "
+				+ "JOIN persons p ON a.entity_id = p.entity_id "
+				+ "JOIN authorities auth ON pa.authority_id = auth.id");
 
 		return rows.stream()
 			.collect(Collectors.groupingBy(row -> (Integer) row.get("patient_id"), Collectors.mapping(row -> {

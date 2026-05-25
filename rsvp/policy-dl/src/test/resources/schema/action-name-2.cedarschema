@@ -1,6 +1,0 @@
-entity Partition enum [ "SDA1", "SDB2" ];
-
-action "" appliesTo {
-    principal: Partition,
-    resource: Partition
-};

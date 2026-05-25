@@ -3,23 +3,19 @@ package uq.pac.rsvp.policy.datalog.translation;
 import com.cedarpolicy.AuthorizationEngine;
 import com.cedarpolicy.BasicAuthorizationEngine;
 import com.cedarpolicy.model.DetailedError;
-import com.cedarpolicy.model.EntityValidationRequest;
 import com.cedarpolicy.model.ValidationRequest;
 import com.cedarpolicy.model.ValidationResponse;
-import com.cedarpolicy.model.entity.Entities;
 import com.cedarpolicy.model.exception.AuthException;
 import com.cedarpolicy.model.policy.PolicySet;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Multimap;
 import uq.pac.rsvp.policy.ast.FileSet;
-import uq.pac.rsvp.policy.ast.entity.Entity;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.ast.policy.Invariant;
 import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
 import uq.pac.rsvp.policy.ast.schema.Schema;
-import uq.pac.rsvp.policy.ast.schema.type.TypeReference;
 import uq.pac.rsvp.policy.datalog.ast.DLAtom;
 import uq.pac.rsvp.policy.datalog.ast.DLDeclTerm;
 import uq.pac.rsvp.policy.datalog.ast.DLFact;
@@ -53,14 +49,11 @@ import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.Attrib
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.ForbidRuleDecl;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.HasAttributeRuleDecl;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.NullifiedRequestsRuleDecl;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.OUTPUT_DELIMITER;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.OUTPUT_EXT;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.ParentOfRuleDecl;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.PermitRuleDecl;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.PermittedRequestsRuleDecl;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.ProgramName;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.TmpRecordType;
-import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.UndefinedEntityUIDName;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.makeAtom;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.makeForbiddenRequestsRule;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.makeIODirectives;
@@ -116,20 +109,15 @@ public class Translation {
     record InputSet(Schema schema, Collection<Policy> policies, EntitySet entities, Collection<Invariant> invariants) {
     }
 
-    static InputSet validate(FileSet fileset)
-            throws IOException, AuthException, IllegalAccessException {
+    static InputSet validate(FileSet fileset) throws AuthException {
         return validate(fileset, FileSet.LATEST);
     }
 
     // FIXME: Fileset need to be moved to Verification
-    static InputSet validate(FileSet fileset, String policyVersion)
-            throws IOException, AuthException, IllegalAccessException {
-        EntitySet entities = new EntitySet(fileset.getEntities());
-
-        Set<Entity> filteredEntities = entities.stream().filter(e -> {
-            return !TypeReference.parse(e.getEuid().getType()).getBaseName().equals("Action");
-        }).collect(Collectors.toSet());
-        entities = new EntitySet(filteredEntities);
+    static InputSet validate(FileSet fileset, String policyVersion) throws AuthException{
+        Schema rsvpSchema = Schema.of(fileset.getSchemaStatements());
+        EntitySet entities = EntityValidator.validate(rsvpSchema, new EntitySet(fileset.getEntities()));
+        PolicyProgram program = fileset.getPolicyProgram(policyVersion);
 
         com.cedarpolicy.model.schema.Schema cedarSchema =
                 new com.cedarpolicy.model.schema.Schema(fileset.getSchemaString());
@@ -148,52 +136,6 @@ public class Translation {
             throw new TranslationError("Schema/Policy validation failed: \n" + err);
         }
 
-        List<com.cedarpolicy.model.entity.Entity> cedarEntities = new ArrayList<>();
-        for (String entityFile : fileset.getEntitiesStrings()) {
-            cedarEntities.addAll(Entities.parse(entityFile).getEntities());
-        }
-
-        EntityValidationRequest eReq = new EntityValidationRequest(cedarSchema, cedarEntities);
-        engine.validateEntities(eReq);
-
-        // For the moment we do not support arbitrary action names as Cedar does,
-        // just standard non-empty identifiers
-        Schema rsvpSchema = Schema.of(fileset.getSchemaStatements());
-        Pattern actionPattern = Pattern.compile("^Action::\"[A-Za-z_][A-Za-z_0-9]*\"$");
-        rsvpSchema.actions().forEach(a -> {
-            if (!actionPattern.matcher(a.getBaseName()).matches()) {
-                throw new TranslationError("Unsupported action name: " + a.getName());
-            }
-        });
-
-        // FIXME: This needs to be moved to entity validation
-        // For the moment we also do not support entity names that have the same
-        // delimiter that is used for Datalog output (\t)
-        List<String> entityNames = entities.getEntities().stream()
-                .map(e -> e.getEuid().getId())
-                .collect(Collectors.toCollection(ArrayList::new));
-        rsvpSchema.enumEntityTypes()
-                .forEach(et -> entityNames.addAll(et.getEnumNames()));
-        for (String en : entityNames) {
-            if (en.contains(OUTPUT_DELIMITER)) {
-                throw new TranslationError("Unsupported entity name: " + en);
-            }
-            if (en.equals(UndefinedEntityUIDName)) {
-                throw new TranslationError("Internal entity name in schema: " + en);
-            }
-        }
-
-        // Make sure that the name of the internal record type used for processing
-        // records is not used in the schema
-        rsvpSchema.entityTypes().forEach(et -> {
-            if (et.getName().equals(TmpRecordType)) {
-                throw new TranslationError("Internal record type: " + et.getName() + "in schema");
-            }
-        });
-
-        entities = EntityValidator.validate(rsvpSchema, entities);
-
-        PolicyProgram program = fileset.getPolicyProgram(policyVersion);
         Collection<Policy> policies = program.getPolicies();
         Collection<Invariant> invariants = program.getInvariants();
 

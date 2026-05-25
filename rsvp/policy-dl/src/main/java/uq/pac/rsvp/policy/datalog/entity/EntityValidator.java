@@ -12,7 +12,6 @@ import uq.pac.rsvp.support.error.TranslationError;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.UndefinedEntityUIDName;
@@ -35,7 +34,6 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
     private Set<EntityReference> uids;
     // UIDs of all entity references
     private final Set<EntityReference> references;
-    private final static Pattern ESCAPED = Pattern.compile("[\b\t\n\r\"\\\\]");
 
     private EntityValidator(Schema schema, EntitySet entities) {
         this.schema = schema;
@@ -48,13 +46,26 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
         return new EntityValidator(schema, entities).validate();
     }
 
+    /**
+     * Validate a set of entities and return an updated set of entities ready for analysis.
+     * In addition to checking fields and values, this function makes two transformations
+     * to the input set of entities
+     * <ul>
+     *     <li> Generate entities for enum-style entities </li>
+     *     <li> Remove action-based entities </li>
+     * </ul>
+     */
     public synchronized EntitySet validate() {
         this.uids = new HashSet<>();
+        // Validate all entities first ensuring they are well-formed
         entities.stream().forEach(this::validate);
 
-        Set<Entity> updated = new HashSet<>(entities.getEntities());
+        // De-facto Cedar allows actions to be present in the set of entities,
+        // because they sort-of are. For the purposes of the analysis we remove them.
+        Set<Entity> updated = entities.getEntities().stream().filter(e -> {
+            return !TypeReference.parse(e.getEuid().getType()).getBaseName().equals("Action");
+        }).collect(Collectors.toSet());
 
-        // At this point euids contain all references
         // Add references from enums
         schema.enumEntityTypes().forEach(e -> {
             for (String name : e.getEnumNames()) {
@@ -72,7 +83,6 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
                 throw new TranslationError("Undefined entity reference: " + ref, ref.getSourceLoc());
             }
         }
-
         return new EntitySet(updated);
     }
 
@@ -82,14 +92,6 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
             throw new TranslationError("Duplicate entity: " + entity.getEuid(), euid.getSourceLoc());
         }
         uids.add(euid);
-
-        // Prevent entity names (IDs) from having escaped characters
-        // Partly because we use \t for processing Datalog, partly because
-        // this can skew source locations and partly because there is no good reason
-        // to have these characters in entity names in general
-        if (ESCAPED.matcher(euid.getId()).find()) {
-            throw new TranslationError("Unsupported entity id (escaped characters): " + euid.getId(), euid.getSourceLoc());
-        }
 
         // Prevent entity names from having '???' internal names
         if (euid.getId().equals(UndefinedEntityUIDName)) {

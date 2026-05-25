@@ -23,9 +23,8 @@ import uq.pac.rsvp.policy.datalog.ast.DLProgram;
 import uq.pac.rsvp.policy.datalog.ast.DLRule;
 import uq.pac.rsvp.policy.datalog.ast.DLRuleDecl;
 import uq.pac.rsvp.policy.datalog.ast.DLTerm;
-import uq.pac.rsvp.policy.datalog.entity.EntityValidator;
-import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
-import uq.pac.rsvp.policy.datalog.invariant.InvariantValidator;
+import uq.pac.rsvp.policy.datalog.validation.EntityValidator;
+import uq.pac.rsvp.policy.datalog.validation.InvariantValidator;
 import uq.pac.rsvp.support.error.TranslationError;
 
 import java.io.BufferedReader;

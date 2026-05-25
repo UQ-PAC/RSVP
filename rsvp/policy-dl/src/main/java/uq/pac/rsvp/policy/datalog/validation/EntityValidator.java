@@ -1,4 +1,4 @@
-package uq.pac.rsvp.policy.datalog.entity;
+package uq.pac.rsvp.policy.datalog.validation;
 
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.statement.CommonTypeDefinition;

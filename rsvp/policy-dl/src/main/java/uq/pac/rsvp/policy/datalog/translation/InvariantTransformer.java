@@ -1,4 +1,4 @@
-package uq.pac.rsvp.policy.datalog.invariant;
+package uq.pac.rsvp.policy.datalog.translation;
 
 import uq.pac.rsvp.policy.ast.policy.expr.Expression;
 import uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression;

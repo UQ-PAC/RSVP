@@ -6,6 +6,7 @@ import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.entity.*;
 import uq.pac.rsvp.policy.datalog.TestUtil;
+import uq.pac.rsvp.policy.datalog.validation.EntityValidator;
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.support.error.LocationError;
 

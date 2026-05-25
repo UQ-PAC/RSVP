@@ -6,6 +6,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
 import uq.pac.rsvp.policy.datalog.TestUtil;
+import uq.pac.rsvp.policy.datalog.validation.InvariantValidator;
 import uq.pac.rsvp.support.error.TranslationError;
 import uq.pac.rsvp.StdLogger;
 import uq.pac.rsvp.support.error.ValidationError;

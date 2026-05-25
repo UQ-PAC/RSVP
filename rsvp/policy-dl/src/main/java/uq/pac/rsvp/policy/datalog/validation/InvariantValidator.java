@@ -1,13 +1,11 @@
-package uq.pac.rsvp.policy.datalog.invariant;
+package uq.pac.rsvp.policy.datalog.validation;
 
 import uq.pac.rsvp.policy.ast.policy.expr.*;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.statement.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.statement.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityTypeDefinition;
-import uq.pac.rsvp.policy.ast.schema.type.BuiltinType;
-import uq.pac.rsvp.policy.ast.schema.type.RecordType;
-import uq.pac.rsvp.policy.ast.schema.type.TypeReference;
+import uq.pac.rsvp.policy.ast.schema.type.*;
 import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.policy.Invariant;
 import uq.pac.rsvp.policy.ast.policy.Quantifier;
@@ -16,8 +14,9 @@ import uq.pac.rsvp.support.error.TranslationError;
 import uq.pac.rsvp.support.error.ValidationError;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
-import static uq.pac.rsvp.policy.datalog.invariant.InvariantTyping.*;
 import static uq.pac.rsvp.Assertion.require;
 
 public class InvariantValidator implements PolicyComputationVisitor<BuiltinType> {
@@ -27,12 +26,60 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
     private final Map<String, TypeReference> variables;
     // Types of entities
     private final Schema schema;
-    private final InvariantTyping typing;
+
+    final static BooleanType BooleanType = new BooleanType();
+    final static StringType StringType = new StringType();
+    final static LongType LongType = new LongType();
+    final static BooleanType TypeOfEntityType = new BooleanType();
+
+    public record TypeTest(Function<BuiltinType, Boolean> test, String expected) { }
+
+    final static TypeTest TBoolean = new TypeTest(t -> t.equals(BooleanType), "__cedar::Boolean");
+    final static TypeTest TLong = new TypeTest(t -> t.equals(LongType), "__cedar::Long");
+    final static TypeTest TString = new TypeTest(t -> t.equals(StringType), "__cedar::String");
+    final static TypeTest TTypeOfEntity = new TypeTest(t -> t == TypeOfEntityType, "Entity");
+    final static TypeTest TSet = new TypeTest(t -> t instanceof SetType, "Set<?>");
+    final static TypeTest TRecord = new TypeTest(
+            t -> t instanceof RecordType, "Record, Entity, Action");
+    final static TypeTest TEntityOrAction = new TypeTest(
+            t -> isEntity(t) || isAction(t), "Entity, Action");
+    final static TypeTest TEntity = new TypeTest(InvariantValidator::isEntity, "Entity");
+    final static TypeTest TAction = new TypeTest(InvariantValidator::isAction, "Action");
+
+    private static boolean isAction(BuiltinType type) {
+        return type instanceof TypeReference ref && ref.getName().equals("Action");
+    }
+
+    private static boolean isEntity(BuiltinType type) {
+        return type instanceof TypeReference ref && !ref.getName().equals("Action");
+    }
+
+    static TypeTest expect(BuiltinType actual, TypeTest ...tests) {
+        for (TypeTest test : tests) {
+            if (test.test().apply(actual)) {
+                return test;
+            }
+        }
+        String expected = Stream.of(tests).map(TypeTest::expected).toList().toString();
+        throw new ValidationError("Expected one of %s, got %s".formatted(expected, actual.toString()));
+    }
+
+
+    static TypeTest expect(BuiltinType actual, List<TypeTest> tests) {
+        return expect(actual, tests.toArray(new TypeTest[0]));
+    }
+
+    static TypeTest expectCompatible(BuiltinType one, BuiltinType another, TypeTest ...tests) {
+        return expect(another,  expect(one, tests));
+    }
+
+    static TypeTest expectCompatible(BuiltinType one, BuiltinType another, List<TypeTest> tests) {
+        return expectCompatible(one, another, tests.toArray(new TypeTest[0]));
+    }
 
     private InvariantValidator(InvariantValidator factory, Invariant invariant) {
         this.types = Set.copyOf(factory.types);
         this.variables = getVariables(invariant, types);
-        this.typing = factory.typing;
         this.schema = factory.schema;
     }
 
@@ -46,7 +93,6 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
     public InvariantValidator(Schema schema) {
         this.types = new HashSet<>();
         this.variables = null;
-        this.typing = new InvariantTyping(schema);
         this.schema = schema;
 
         // Build types from entities
@@ -138,7 +184,7 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
     public BuiltinType visitPropertyAccessExpr(PropertyAccessExpression expr) {
         BuiltinType objectType = collect(expr.getObject());
         if (objectType instanceof TypeReference ref) {
-            objectType = switch (typing.getSchema().get(ref)) {
+            objectType = switch (schema.get(ref)) {
                 case EntityTypeDefinition t -> t.getShape();
                 case CommonTypeDefinition t -> t.getDefinition();
                 default -> null;

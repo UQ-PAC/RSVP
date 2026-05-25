@@ -1,6 +1,4 @@
-package uq.pac.rsvp.policy.datalog.invariant;
-
-import uq.pac.rsvp.policy.datalog.translation.Relation;
+package uq.pac.rsvp.policy.datalog.translation;
 
 import java.util.ArrayList;
 import java.util.HashMap;

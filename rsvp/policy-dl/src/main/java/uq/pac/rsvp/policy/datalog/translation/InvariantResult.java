@@ -1,11 +1,9 @@
-package uq.pac.rsvp.policy.datalog.invariant;
+package uq.pac.rsvp.policy.datalog.translation;
 
 import java.util.Set;
 
 import uq.pac.rsvp.policy.ast.policy.Quantifier;
 import uq.pac.rsvp.policy.ast.policy.Invariant;
-import uq.pac.rsvp.policy.datalog.translation.Relation;
-import uq.pac.rsvp.support.error.TranslationError;
 
 /**
  * Result of evaluating an invariant

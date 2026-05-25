@@ -16,7 +16,6 @@ import uq.pac.rsvp.StdLogger;
 import uq.pac.rsvp.policy.ast.FileSet;
 import uq.pac.rsvp.policy.ast.policy.Invariant;
 import uq.pac.rsvp.policy.datalog.TestUtil;
-import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
 
 import java.io.IOException;
 import java.nio.file.Files;

@@ -1,4 +1,4 @@
-package uq.pac.rsvp.policy.datalog.invariant;
+package uq.pac.rsvp.policy.datalog.validation;
 
 import uq.pac.rsvp.policy.ast.schema.type.BuiltinType;
 import uq.pac.rsvp.policy.ast.schema.type.SetType;
@@ -6,8 +6,8 @@ import uq.pac.rsvp.support.error.ValidationError;
 
 import java.util.*;
 
-import static uq.pac.rsvp.policy.datalog.invariant.InvariantTyping.*;
 import static uq.pac.rsvp.Assertion.require;
+import static uq.pac.rsvp.policy.datalog.validation.InvariantValidator.*;
 
 /**
  * Validation of function calls within invariant expressions
@@ -31,11 +31,11 @@ public class InvariantFunctionValidator {
 
     public abstract static class FunctionValidator {
         protected final String name;
-        protected final List<InvariantTyping.TypeTest> self;
-        protected final List<List<InvariantTyping.TypeTest>> arguments;
+        protected final List<TypeTest> self;
+        protected final List<List<TypeTest>> arguments;
         protected final BuiltinType returnType;
 
-        FunctionValidator(String name, List<InvariantTyping.TypeTest> self, List<List<InvariantTyping.TypeTest>> arguments, BuiltinType returnType) {
+        FunctionValidator(String name, List<TypeTest> self, List<List<TypeTest>> arguments, BuiltinType returnType) {
             this.name = name;
             this.self = self == null ? List.of() : self;
             this.arguments = List.copyOf(arguments);
@@ -54,7 +54,7 @@ public class InvariantFunctionValidator {
             } else if (actualSelf == null && !self.isEmpty()) {
                 throw new ValidationError("Function %s requires object application".formatted(getName()));
             } else if (actualSelf != null) {
-                InvariantTyping.expect(actualSelf, self);
+                InvariantValidator.expect(actualSelf, self);
             }
 
             require(arguments != null);
@@ -64,7 +64,7 @@ public class InvariantFunctionValidator {
             }
 
             for (int i = 0; i < actualArguments.size(); i++) {
-                expect(actualArguments.get(i), arguments.get(i));
+                InvariantValidator.expect(actualArguments.get(i), arguments.get(i));
             }
             post(actualSelf, actualArguments);
             return returnType;
@@ -96,7 +96,7 @@ public class InvariantFunctionValidator {
             require(arguments.size() == 1);
 
             BuiltinType element = ((SetType) actualSelf).getElementType();
-            InvariantTyping.expectCompatible(element, actualArguments.getFirst(), this.arguments.getFirst());
+            InvariantValidator.expectCompatible(element, actualArguments.getFirst(), this.arguments.getFirst());
         }
     }
 
@@ -115,7 +115,7 @@ public class InvariantFunctionValidator {
             BuiltinType selfElement = ((SetType) actualSelf).getElementType();
             BuiltinType argElement = ((SetType) actualArguments.getFirst()).getElementType();
 
-            InvariantTyping.expectCompatible(selfElement, argElement,
+            InvariantValidator.expectCompatible(selfElement, argElement,
                     getValidator("contains").arguments.getFirst());
         }
     }

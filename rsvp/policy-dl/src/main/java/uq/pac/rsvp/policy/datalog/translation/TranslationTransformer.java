@@ -6,7 +6,7 @@ import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.policy.Invariant;
 import uq.pac.rsvp.policy.ast.policy.Quantifier;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
-import uq.pac.rsvp.policy.datalog.invariant.InvariantFunctionValidator;
+import uq.pac.rsvp.policy.datalog.validation.InvariantFunctionValidator;
 import uq.pac.rsvp.support.error.TranslationError;
 
 import java.util.*;

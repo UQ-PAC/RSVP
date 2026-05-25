@@ -2,8 +2,8 @@ package uq.pac.rsvp.verification.policy;
 
 import uq.pac.rsvp.policy.ast.policy.Invariant;
 import uq.pac.rsvp.policy.ast.policy.Policy;
-import uq.pac.rsvp.policy.datalog.invariant.InvariantAssignment;
-import uq.pac.rsvp.policy.datalog.invariant.InvariantResult;
+import uq.pac.rsvp.policy.datalog.translation.InvariantAssignment;
+import uq.pac.rsvp.policy.datalog.translation.InvariantResult;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestSet;
 import uq.pac.rsvp.support.reporting.Report;

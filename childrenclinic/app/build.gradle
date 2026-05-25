@@ -1,3 +1,23 @@
+/*
+ * Copyright 2012-2025 the original author or authors.
+ * Copyright 2026 Gabriel Henrique Lopes Gomes Alves Nunes.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * This file has been modified from the original Spring PetClinic project
+ * (https://github.com/spring-projects/spring-petclinic).
+ */
+
 plugins {
   id 'java'
   id 'checkstyle'
@@ -7,6 +27,7 @@ plugins {
   id 'org.cyclonedx.bom' version '3.0.2'
   id 'io.spring.javaformat' version '0.0.47'
   id "io.spring.nohttp" version "0.0.11"
+  id 'com.diffplug.spotless' version '8.5.1'
 }
 
 gradle.startParameter.excludedTaskNames += [ "checkFormatAot", "checkFormatAotTest" ]
@@ -95,3 +116,166 @@ checkFormatAotTest.enabled = false
 
 formatAot.enabled = false
 formatAotTest.enabled = false
+
+// License header management
+// Plugin: com.diffplug.spotless v8.5.1
+// Usage:
+//   ./gradlew spotlessApply    — Apply all license headers
+//   ./gradlew spotlessCheck    — Verify compliance (runs during ./gradlew check)
+
+def headerDir = "${project.projectDir}/src/main/resources/license"
+def copyrightYear = '2026'
+def copyrightOwner = 'Gabriel Henrique Lopes Gomes Alves Nunes'
+
+// Read raw headers and substitute placeholders.
+def rawModified = file("${headerDir}/header-modified.txt").text
+    .replace('${year}', copyrightYear)
+    .replace('${owner}', copyrightOwner)
+def rawNew = file("${headerDir}/header-new.txt").text
+    .replace('${year}', copyrightYear)
+    .replace('${owner}', copyrightOwner)
+
+// Wrap raw text in the appropriate comment syntax.
+def toJavaBlock = { raw ->
+    '/*\n' + raw.trim().split('\n').collect { it.trim() ? " * $it" : ' *' }.join('\n') + '\n */\n\n'
+}
+def toXmlBlock = { raw ->
+    '<!--\n' + raw.trim().split('\n').collect { "  $it" }.join('\n') + '\n-->\n\n'
+}
+def toHashBlock = { raw ->
+    raw.trim().split('\n').collect { it.trim() ? "# $it" : '#' }.join('\n') + '\n\n'
+}
+def toHashBlockNoTrail = { raw ->
+    raw.trim().split('\n').collect { it.trim() ? "# $it" : '#' }.join('\n') + '\n'
+}
+def toShBlock = { raw, shebang ->
+    shebang + '\n#\n' + raw.trim().split('\n').collect { it.trim() ? "# $it" : '#' }.join('\n') + '\n\n'
+}
+def toDashBlock = { raw ->
+    raw.trim().split('\n').collect { it.trim() ? "-- $it" : '--' }.join('\n') + '\n\n'
+}
+def toSlashBlock = { raw ->
+    raw.trim().split('\n').collect { it.trim() ? "// $it" : '//' }.join('\n') + '\n\n'
+}
+def toSlashBlockNoTrail = { raw ->
+    raw.trim().split('\n').collect { it.trim() ? "// $it" : '//' }.join('\n') + '\n'
+}
+
+// Files derived from the upstream Spring PetClinic (modified or renamed).
+
+def modifiedJavaFiles = [
+    '**/BaseEntity.java', '**/CacheConfiguration.java', '**/CrashController.java',
+    '**/Person.java', '**/Specialty.java', '**/Visit.java',
+    '**/VisitController.java', '**/WebConfiguration.java', '**/WelcomeController.java',
+    '**/ChildrenClinicApplication.java', '**/ChildrenClinicRuntimeHints.java',
+    '**/Doctor.java', '**/DoctorController.java', '**/DoctorRepository.java',
+    '**/Gender.java', '**/GenderFormatter.java', '**/GenderRepository.java',
+    '**/Guardian.java', '**/GuardianController.java', '**/GuardianRepository.java',
+    '**/Patient.java', '**/PatientController.java',
+]
+
+def modifiedHtmlFiles = [
+    '**/createOrUpdateVisitForm.html', '**/error.html', '**/inputField.html',
+    '**/layout.html', '**/selectField.html', '**/welcome.html',
+    '**/guardianDetails.html', '**/guardiansList.html',
+    '**/createOrUpdateGuardianForm.html', '**/createOrUpdatePatientForm.html',
+    '**/doctorsList.html', '**/patientDetails.html', '**/patientsList.html',
+]
+
+def modifiedSqlFiles = ['**/schema.sql', '**/data.sql']
+
+def modifiedPropertiesFiles = [
+    '**/messages.properties',
+]
+def modifiedPropertiesFilesWithSeparator = [
+    '**/application.properties', '**/messages_en.properties',
+]
+
+// Delimiters: regex matching the first line of actual content after the header.
+def JAVA_DELIM = '(package |import |public |class |@)'
+def HTML_DELIM = '(<!DOCTYPE|<html)'
+def SQL_DELIM  = '(DROP |CREATE |INSERT |ALTER |SET |SELECT )'
+def PROP_DELIM = '[a-zA-Z]'
+def CEDAR_DELIM = '\\s*$'
+
+spotless {
+    // Java: new files (sole-copyright header).
+    java {
+        targetExclude(*modifiedJavaFiles, '**/build/**')
+        licenseHeader toJavaBlock(rawNew)
+    }
+    // Java: upstream-derived files (dual-copyright header).
+    format 'javaModified', {
+        target modifiedJavaFiles
+        licenseHeader toJavaBlock(rawModified), JAVA_DELIM
+    }
+
+    // JavaScript: all new.
+    format 'js', {
+        target 'src/**/*.js'
+        licenseHeader toJavaBlock(rawNew), '(var |let |const |function |document|\\(|\'use)'
+    }
+
+    // HTML: new files.
+    format 'html', {
+        target 'src/**/*.html'
+        targetExclude modifiedHtmlFiles
+        licenseHeader toXmlBlock(rawNew), HTML_DELIM
+    }
+    // HTML: upstream-derived files.
+    format 'htmlModified', {
+        target modifiedHtmlFiles
+        licenseHeader toXmlBlock(rawModified), HTML_DELIM
+    }
+
+    // SQL: new files.
+    format 'sql', {
+        target 'src/**/*.sql'
+        targetExclude modifiedSqlFiles
+        licenseHeader toDashBlock(rawNew), SQL_DELIM
+    }
+    // SQL: upstream-derived files.
+    format 'sqlModified', {
+        target modifiedSqlFiles
+        licenseHeader toDashBlock(rawModified), SQL_DELIM
+    }
+
+    // Gradle: upstream-derived files.
+    format 'gradle', {
+        target '**/*.gradle'
+        targetExclude '**/build/**'
+        licenseHeader toJavaBlock(rawModified), '(plugins |buildscript |apply )'
+    }
+
+    // Shell: new files.
+    // '#!/usr/bin/env bash' only.
+    format 'sh', {
+        target 'src/**/*.sh'
+        licenseHeader toShBlock(rawNew, '#!/usr/bin/env bash'), '(set |[A-Z_]+=|function |source |\\.|if |for |while |echo )'
+    }
+
+    // The following (Properties and Cedar) may need initial manual addition of header for new files.
+
+    // Properties: new files.
+    format 'properties', {
+        target 'src/**/*.properties'
+        targetExclude modifiedPropertiesFiles + modifiedPropertiesFilesWithSeparator
+        licenseHeader toHashBlock(rawNew), PROP_DELIM
+    }
+    // Properties: upstream-derived files.
+    format 'propertiesModified', {
+        target modifiedPropertiesFiles
+        licenseHeader toHashBlock(rawModified), PROP_DELIM
+    }
+    // Properties: upstream-derived files.
+    format 'propertiesSeparated', {
+        target modifiedPropertiesFilesWithSeparator
+        licenseHeader toHashBlockNoTrail(rawModified), '(\\s*$|[a-zA-Z])'
+    }
+
+    // Cedar: all new.
+    format 'cedar', {
+        target 'src/**/*.cedar', 'src/**/*.cedarschema', 'src/**/*.invariant'
+        licenseHeader toSlashBlockNoTrail(rawNew), CEDAR_DELIM
+    }
+}

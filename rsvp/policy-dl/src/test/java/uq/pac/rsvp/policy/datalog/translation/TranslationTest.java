@@ -104,7 +104,7 @@ public class TranslationTest {
         }
     }
 
-    private final static String ONE_OFF = "strings";
+    private final static String ONE_OFF = "equals";
 
     // Running tests for one directory separately for no particular
     // reason apart from being able to launch it separately

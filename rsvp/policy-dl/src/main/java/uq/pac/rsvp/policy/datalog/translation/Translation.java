@@ -1,12 +1,6 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import com.cedarpolicy.AuthorizationEngine;
-import com.cedarpolicy.BasicAuthorizationEngine;
-import com.cedarpolicy.model.DetailedError;
-import com.cedarpolicy.model.ValidationRequest;
-import com.cedarpolicy.model.ValidationResponse;
 import com.cedarpolicy.model.exception.AuthException;
-import com.cedarpolicy.model.policy.PolicySet;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Multimap;
@@ -24,7 +18,7 @@ import uq.pac.rsvp.policy.datalog.ast.DLRule;
 import uq.pac.rsvp.policy.datalog.ast.DLRuleDecl;
 import uq.pac.rsvp.policy.datalog.ast.DLTerm;
 import uq.pac.rsvp.policy.datalog.validation.EntityValidator;
-import uq.pac.rsvp.policy.datalog.validation.InvariantValidator;
+import uq.pac.rsvp.policy.datalog.validation.PolicyProgramValidator;
 import uq.pac.rsvp.support.error.TranslationError;
 
 import java.io.BufferedReader;
@@ -34,14 +28,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static uq.pac.rsvp.Assertion.require;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.AttributeRuleDecl;
@@ -114,34 +106,13 @@ public class Translation {
 
     // FIXME: Fileset need to be moved to Verification
     static InputSet validate(FileSet fileset, String policyVersion) throws AuthException{
-        Schema rsvpSchema = Schema.of(fileset.getSchemaStatements());
-        EntitySet entities = EntityValidator.validate(rsvpSchema, new EntitySet(fileset.getEntities()));
+        Schema schema = Schema.of(fileset.getSchemaStatements());
+        EntitySet entities = EntityValidator.validate(schema, new EntitySet(fileset.getEntities()));
         PolicyProgram program = fileset.getPolicyProgram(policyVersion);
-
-        com.cedarpolicy.model.schema.Schema cedarSchema =
-                new com.cedarpolicy.model.schema.Schema(fileset.getSchemaString());
-        PolicySet cedarPolicies = PolicySet.parsePolicies(fileset.getPolicyString(policyVersion));
-
-        ValidationRequest vReq = new ValidationRequest(cedarSchema, cedarPolicies);
-        AuthorizationEngine engine = new BasicAuthorizationEngine();
-        ValidationResponse vResp = engine.validate(vReq);
-
-        if (!vResp.validationPassed()) {
-            List<DetailedError> errors = vResp.errors.isPresent() ?
-                    vResp.errors.get() : Collections.emptyList();
-            String err = errors.stream()
-                    .map(e -> e.message)
-                    .collect(Collectors.joining("\n"));
-            throw new TranslationError("Schema/Policy validation failed: \n" + err);
-        }
-
+        PolicyProgramValidator.validate(schema, program);
         Collection<Policy> policies = program.getPolicies();
         Collection<Invariant> invariants = program.getInvariants();
-
-        InvariantValidator invariantValidator = new InvariantValidator(rsvpSchema);
-        invariants.forEach(invariantValidator::validate);
-
-        return new InputSet(rsvpSchema, policies, entities, invariants);
+        return new InputSet(schema, policies, entities, invariants);
     }
 
     // FIXME: Translation over policy statements

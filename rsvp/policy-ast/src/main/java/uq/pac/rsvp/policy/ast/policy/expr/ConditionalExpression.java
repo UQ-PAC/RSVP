@@ -50,10 +50,10 @@ public class ConditionalExpression extends Expression {
         StringBuilder sb = new StringBuilder();
         sb.append("(if ");
         sb.append(condition.toString());
-        sb.append("; then ");
+        sb.append(" then ");
         sb.append(then.toString());
         if (els != null) {
-            sb.append("; else ");
+            sb.append(" else ");
             sb.append(els);
         }
         sb.append(')');

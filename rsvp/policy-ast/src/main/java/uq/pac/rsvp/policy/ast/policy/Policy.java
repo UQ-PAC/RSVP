@@ -2,8 +2,6 @@ package uq.pac.rsvp.policy.ast.policy;
 
 import java.util.*;
 
-import com.google.gson.annotations.SerializedName;
-
 import uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.BooleanExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression;
@@ -21,10 +19,7 @@ import static uq.pac.rsvp.support.SourceLoc.MISSING;
 public class Policy extends PolicyStatement {
 
     public enum Effect {
-        @SerializedName("permit")
         Permit,
-
-        @SerializedName("forbid")
         Forbid
     }
 
@@ -39,22 +34,6 @@ public class Policy extends PolicyStatement {
         this.effect = effect;
         this.condition = condition;
         this.annotations = annotations != null ? Map.copyOf(annotations) : Collections.emptyMap();
-    }
-
-    public Policy(Effect effect, Expression condition, Map<String, String> annotations) {
-        this(null, effect, condition, annotations, MISSING);
-    }
-
-    public Policy(String name, Effect effect, Expression condition) {
-        this(name, effect, condition, null, MISSING);
-    }
-
-    public Policy(Effect effect, Expression condition) {
-        this(null, effect, condition, null, MISSING);
-    }
-
-    public Policy() {
-        this(null, Effect.Forbid, null, null, MISSING);
     }
 
     public boolean isPermit() {
@@ -100,7 +79,8 @@ public class Policy extends PolicyStatement {
 
     @Override
     public String toString() {
-        return (effect == Permit ? "permit" : "forbid") + " on: " + condition.toString();
+        return "%s (principal, action, resource) when { %s };"
+                .formatted(effect.toString().toLowerCase(), condition.toString());
     }
 
     public static class Builder {
@@ -120,13 +100,9 @@ public class Policy extends PolicyStatement {
 
         public Builder and(Expression e, SourceLoc loc) {
             if (e != null) {
-                this.condition = condition == null ? e : new BinaryExpression(e, And, condition, loc);
+                this.condition = condition == null ? e : new BinaryExpression(condition, And, e, loc);
             }
             return this;
-        }
-
-        public Builder and(Expression e) {
-            return and(e, MISSING);
         }
 
         public Builder andNot(Expression e, SourceLoc loc) {
@@ -134,10 +110,6 @@ public class Policy extends PolicyStatement {
                 return and(new UnaryExpression(Not, e, loc), loc);
             }
             return this;
-        }
-
-        public Builder andNot(Expression e) {
-            return andNot(e, MISSING);
         }
 
         public Builder name(String name) {

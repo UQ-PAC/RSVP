@@ -3,27 +3,23 @@
    Policy at location.cedar:83:53 [4:1-4:53]
       Bool: true at location.cedar:129:4 [4:47-4:50]
    Policy at location.cedar:138:99 [6:1-10:2]
-      Bin: ((action == Action::"view") && ((resource is App::Photo) && (principal is App::Account))) at <omitted>
-         Bin: ((resource is App::Photo) && (principal is App::Account)) at <omitted>
-            Bin: (principal is App::Account) at location.cedar:151:25 [7:5-7:29]
-               Type: App::Account at location.cedar:164:12 [7:18-7:29]
-               Var: principal at location.cedar:151:9 [7:5-7:13]
-            Bin: (resource is App::Photo) at location.cedar:212:22 [9:5-9:26]
-               Type: App::Photo at location.cedar:224:10 [9:17-9:26]
-               Var: resource at location.cedar:212:8 [9:5-9:12]
+      Bin: (((principal is App::Account) && (resource is App::Photo)) && (action == Action::"view")) at <omitted>
          Bin: (action == Action::"view") at location.cedar:182:24 [8:5-8:28]
             Action: Action::"view" at location.cedar:192:14 [8:15-8:28]
             Var: action at location.cedar:182:6 [8:5-8:10]
+         Bin: ((principal is App::Account) && (resource is App::Photo)) at <omitted>
+            Bin: (resource is App::Photo) at location.cedar:212:22 [9:5-9:26]
+               Type: App::Photo at location.cedar:224:10 [9:17-9:26]
+               Var: resource at location.cedar:212:8 [9:5-9:12]
+            Bin: (principal is App::Account) at location.cedar:151:25 [7:5-7:29]
+               Type: App::Account at location.cedar:164:12 [7:18-7:29]
+               Var: principal at location.cedar:151:9 [7:5-7:13]
    Policy at location.cedar:239:148 [12:1-16:2]
-      Bin: ((action == Action::"view") && (((resource in App::Photo::"Meadow") && (resource is App::Photo)) && ((principal in App::Account::"Alice") && (principal is App::Account)))) at <omitted>
-         Bin: (((resource in App::Photo::"Meadow") && (resource is App::Photo)) && ((principal in App::Account::"Alice") && (principal is App::Account))) at <omitted>
-            Bin: ((principal in App::Account::"Alice") && (principal is App::Account)) at location.cedar:252:50 [13:5-13:54]
-               Bin: (principal is App::Account) at <omitted>
-                  Type: App::Account at location.cedar:265:12 [13:18-13:29]
-                  Var: principal at location.cedar:252:9 [13:5-13:13]
-               Bin: (principal in App::Account::"Alice") at <omitted>
-                  Entity: App::Account::"Alice" at location.cedar:281:21 [13:34-13:54]
-                  Var: principal at location.cedar:252:9 [13:5-13:13]
+      Bin: ((((principal in App::Account::"Alice") && (principal is App::Account)) && ((resource in App::Photo::"Meadow") && (resource is App::Photo))) && (action == Action::"view")) at <omitted>
+         Bin: (action == Action::"view") at location.cedar:308:24 [14:5-14:28]
+            Action: Action::"view" at location.cedar:318:14 [14:15-14:28]
+            Var: action at location.cedar:308:6 [14:5-14:10]
+         Bin: (((principal in App::Account::"Alice") && (principal is App::Account)) && ((resource in App::Photo::"Meadow") && (resource is App::Photo))) at <omitted>
             Bin: ((resource in App::Photo::"Meadow") && (resource is App::Photo)) at location.cedar:338:46 [15:5-15:50]
                Bin: (resource is App::Photo) at <omitted>
                   Type: App::Photo at location.cedar:350:10 [15:17-15:26]
@@ -31,9 +27,13 @@
                Bin: (resource in App::Photo::"Meadow") at <omitted>
                   Entity: App::Photo::"Meadow" at location.cedar:364:20 [15:31-15:50]
                   Var: resource at location.cedar:338:8 [15:5-15:12]
-         Bin: (action == Action::"view") at location.cedar:308:24 [14:5-14:28]
-            Action: Action::"view" at location.cedar:318:14 [14:15-14:28]
-            Var: action at location.cedar:308:6 [14:5-14:10]
+            Bin: ((principal in App::Account::"Alice") && (principal is App::Account)) at location.cedar:252:50 [13:5-13:54]
+               Bin: (principal is App::Account) at <omitted>
+                  Type: App::Account at location.cedar:265:12 [13:18-13:29]
+                  Var: principal at location.cedar:252:9 [13:5-13:13]
+               Bin: (principal in App::Account::"Alice") at <omitted>
+                  Entity: App::Account::"Alice" at location.cedar:281:21 [13:34-13:54]
+                  Var: principal at location.cedar:252:9 [13:5-13:13]
    Policy at location.cedar:442:79 [20:1-23:2]
       Bin: ((true && false) && (12 == "bar")) at location.cedar:490:28 [22:5-22:32]
          Bin: (12 == "bar") at location.cedar:507:11 [22:22-22:32]
@@ -82,7 +82,7 @@
          Record: { attr: 2 } at location.cedar:983:13 [49:5-49:17]
             Long: 2 at location.cedar:993:1 [49:15-49:15]
    Policy at location.cedar:1035:80 [54:1-57:2]
-      If: (if true; then false; else false) at location.cedar:1083:29 [56:5-56:33]
+      If: (if true then false else false) at location.cedar:1083:29 [56:5-56:33]
          Bool: true at location.cedar:1086:4 [56:8-56:11]
          Bool: false at location.cedar:1107:5 [56:29-56:33]
          Bool: false at location.cedar:1096:5 [56:18-56:22]

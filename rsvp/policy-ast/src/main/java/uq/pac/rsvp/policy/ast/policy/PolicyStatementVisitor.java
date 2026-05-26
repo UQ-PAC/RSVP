@@ -183,7 +183,7 @@ class PolicyStatementVisitor extends CedarSourceVisitor<PolicyStatement> {
         // Unless specified, the policy condition it true
         // Set it here so the omitted location can be used
         if (builder.condition() == null) {
-            builder.and(new BooleanExpression(true, OMITTED));
+            builder.and(new BooleanExpression(true, OMITTED), OMITTED);
         }
 
         return builder.build();

@@ -1,5 +1,7 @@
 package uq.pac.rsvp.policy.ast.entity;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import uq.pac.rsvp.support.SourceLoc;
 
 import java.util.Objects;
@@ -46,5 +48,12 @@ public class SetValue extends EntityValue {
     @Override
     public String toString() {
         return values.toString();
+    }
+
+    @Override
+    public JsonElement toJson() {
+        JsonArray array = new JsonArray();
+        values.forEach(v -> array.add(v.toJson()));
+        return array;
     }
 }

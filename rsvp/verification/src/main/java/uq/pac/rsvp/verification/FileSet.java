@@ -1,4 +1,4 @@
-package uq.pac.rsvp.policy.ast;
+package uq.pac.rsvp.verification;
 
 import uq.pac.rsvp.policy.ast.entity.Entity;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;

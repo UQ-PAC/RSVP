@@ -1,7 +1,6 @@
 package uq.pac.rsvp.verification;
 
 import org.junit.jupiter.api.Test;
-import uq.pac.rsvp.policy.ast.FileSet;
 import uq.pac.rsvp.support.reporting.Report;
 
 import java.nio.file.Path;

@@ -1,5 +1,7 @@
 package uq.pac.rsvp.policy.ast.entity;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import uq.pac.rsvp.policy.ast.AstNode;
 import uq.pac.rsvp.support.SourceLoc;
 
@@ -51,5 +53,18 @@ public class Entity extends AstNode {
     @Override
     public String toString() {
         return "{\n\tuid: " + euid + "\n\tattrs: " + attrs + "\n\tparents: " + parents + "\n}";
+    }
+
+    public JsonObject toJson() {
+        JsonObject object = new JsonObject();
+        object.add("uid", euid.toMinimalJson());
+        object.add("attrs", attrs.toJson());
+        if (context != null) {
+            object.add("context", context.toJson());
+        }
+        JsonArray jParents = new JsonArray();
+        parents.forEach(p -> jParents.add(p.toMinimalJson()));
+        object.add("parents", jParents);
+        return object;
     }
 }

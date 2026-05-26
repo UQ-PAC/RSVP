@@ -1,6 +1,5 @@
 package uq.pac.rsvp.verification;
 
-import uq.pac.rsvp.policy.ast.FileSet;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.verification.impact.ChangeImpact;
 

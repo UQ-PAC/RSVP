@@ -1,8 +1,10 @@
 package uq.pac.rsvp.verification;
 
 import uq.pac.rsvp.RsvpException;
-import uq.pac.rsvp.policy.ast.FileSet;
+import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.ast.policy.Policy;
+import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
+import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestSet;
 import uq.pac.rsvp.policy.datalog.translation.Translation;
@@ -109,16 +111,17 @@ public class Verification {
 
     private static Translation translate(FileSet fileset, String policyVersion) throws IOException {
         Path dlPath = Files.createTempDirectory("rsvp-");
-        return new Translation(fileset, dlPath, policyVersion);
+        Schema schema = Schema.of(fileset.getSchemaStatements());
+        PolicyProgram program = fileset.getPolicyProgram(policyVersion);
+        EntitySet entities = new EntitySet(fileset.getEntities());
+        return new Translation(schema, program, entities, dlPath);
     }
 
     private static Map<Request, RequestResult> createReverseMapping(Map<Policy, RequestSet> policyResults) {
         Map<Request, RequestResult> requestPolicyMap = new HashMap<>();
         policyResults.forEach((k, v) -> {
             v.forEach(r -> {
-                RequestResult rr = requestPolicyMap.computeIfAbsent(r, y -> {
-                    return new RequestResult();
-                });
+                RequestResult rr = requestPolicyMap.computeIfAbsent(r, y -> new RequestResult());
                 if (k.isPermit() && rr.policies.isEmpty()) {
                     rr.permitted = true;
                 }

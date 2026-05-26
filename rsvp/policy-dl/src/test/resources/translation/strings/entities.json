@@ -2,8 +2,8 @@
     {
         "uid": { "type": "Account", "id": "Alice\tand\tBob" },
         "attrs": {
-            "role": { "__entity": { "type": "Role", "id": "Powerful Admin" }},
-            "alias": "alicebob"
+            "role": { "__entity": { "type": "Role", "id": "Powerful\nAdmin" }},
+            "alias": "alice\tand\tbob"
         },
         "parents": [ ]
     },

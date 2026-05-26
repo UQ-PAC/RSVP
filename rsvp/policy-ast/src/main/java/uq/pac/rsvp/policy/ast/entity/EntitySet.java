@@ -1,5 +1,7 @@
 package uq.pac.rsvp.policy.ast.entity;
 
+import com.google.gson.JsonArray;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Set;
@@ -31,5 +33,11 @@ public class EntitySet {
     @Override
     public String toString() {
         return entities.toString();
+    }
+
+    public JsonArray toJson() {
+        JsonArray array = new JsonArray();
+        entities.forEach(v -> array.add(v.toJson()));
+        return array;
     }
 }

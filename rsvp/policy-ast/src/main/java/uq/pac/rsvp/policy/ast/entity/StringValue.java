@@ -1,5 +1,8 @@
 package uq.pac.rsvp.policy.ast.entity;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
+import org.apache.commons.text.StringEscapeUtils;
 import uq.pac.rsvp.support.SourceLoc;
 
 import java.util.Objects;
@@ -40,5 +43,13 @@ public class StringValue extends EntityValue {
     @Override
     public String toString() {
         return value;
+    }
+
+    @Override
+    public JsonElement toJson() {
+        // We keep all String values unescaped,
+        // so to properly convert back we need to unescape as converting to Json string
+        // will keep things escaped
+        return new JsonPrimitive(StringEscapeUtils.unescapeJava(value));
     }
 }

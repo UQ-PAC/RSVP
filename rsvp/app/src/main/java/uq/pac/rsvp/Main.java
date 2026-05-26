@@ -1,6 +1,6 @@
 package uq.pac.rsvp;
 
-import uq.pac.rsvp.policy.ast.FileSet;
+import uq.pac.rsvp.verification.FileSet;
 import uq.pac.rsvp.support.reporting.Report;
 import uq.pac.rsvp.support.util.Pair;
 import uq.pac.rsvp.verification.ConfigurationException;

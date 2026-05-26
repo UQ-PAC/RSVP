@@ -1,10 +1,8 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
-import com.cedarpolicy.model.exception.AuthException;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Multimap;
-import uq.pac.rsvp.policy.ast.FileSet;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.ast.policy.Invariant;
 import uq.pac.rsvp.policy.ast.policy.Policy;
@@ -57,26 +55,22 @@ public class Translation {
 
     private final Schema schema;
     private final Collection<Policy> policies;
-    private final EntitySet entities;
     private final Collection<Invariant> invariants;
+    private final EntitySet entities;
     private final Path datalogDir;
-    private final DLProgram program;
+    private final DLProgram datalogProgram;
 
     private final BiMap<Policy, DLRuleDecl> policyDeclarations;
     private final BiMap<Invariant, DLRuleDecl> invariantDeclarations;
 
-    public Translation(FileSet fileset, Path datalogDir) {
-        this(fileset, datalogDir, FileSet.LATEST);
-    }
-
-    public Translation(FileSet fileset, Path datalogDir, String policyVersion) {
+    public Translation(Schema schema, PolicyProgram program, EntitySet entities, Path datalogDir) {
         this.datalogDir = datalogDir;
         try {
-            InputSet validated = validate(fileset, policyVersion);
-            this.schema = validated.schema;
-            this.entities = validated.entities;
-            this.policies = validated.policies;
-            this.invariants = validated.invariants;
+            this.schema = schema;
+            this.entities = EntityValidator.validate(schema, entities);
+            PolicyProgramValidator.validate(schema, program);
+            this.policies = program.getPolicies();
+            this.invariants = program.getInvariants();
 
             this.policyDeclarations = HashBiMap.create();
             int index = 1;
@@ -90,29 +84,11 @@ public class Translation {
                 invariantDeclarations.put(i, TranslationConstants.makeInvariantRuleDecl(i, index++));
             }
 
-            this.program = translate(schema, policies, entities, invariants);
-            program.execute(datalogDir);
+            this.datalogProgram = translate(schema, policies, entities, invariants);
+            datalogProgram.execute(datalogDir);
         } catch (Throwable e) {
             throw new AssertionError(e);
         }
-    }
-
-    record InputSet(Schema schema, Collection<Policy> policies, EntitySet entities, Collection<Invariant> invariants) {
-    }
-
-    static InputSet validate(FileSet fileset) throws AuthException {
-        return validate(fileset, FileSet.LATEST);
-    }
-
-    // FIXME: Fileset need to be moved to Verification
-    static InputSet validate(FileSet fileset, String policyVersion) throws AuthException{
-        Schema schema = Schema.of(fileset.getSchemaStatements());
-        EntitySet entities = EntityValidator.validate(schema, new EntitySet(fileset.getEntities()));
-        PolicyProgram program = fileset.getPolicyProgram(policyVersion);
-        PolicyProgramValidator.validate(schema, program);
-        Collection<Policy> policies = program.getPolicies();
-        Collection<Invariant> invariants = program.getInvariants();
-        return new InputSet(schema, policies, entities, invariants);
     }
 
     // FIXME: Translation over policy statements
@@ -332,7 +308,7 @@ public class Translation {
     }
 
     public DLProgram getDatalogProgram() {
-        return program;
+        return datalogProgram;
     }
 
     public Path getDatalogDir() {

@@ -1,5 +1,7 @@
 package uq.pac.rsvp.policy.ast.entity;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import uq.pac.rsvp.support.SourceLoc;
 
 import java.util.Objects;
@@ -40,5 +42,10 @@ public class LongValue extends EntityValue {
     @Override
     public String toString() {
         return Long.toString(value);
+    }
+
+    @Override
+    public JsonElement toJson() {
+        return new JsonPrimitive(value);
     }
 }

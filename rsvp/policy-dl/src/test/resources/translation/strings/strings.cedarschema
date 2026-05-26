@@ -1,4 +1,4 @@
-entity Role enum [ "Important\tUser", "Powerful Admin" ];
+entity Role enum [ "Important\tUser", "Powerful\nAdmin" ];
 entity User enum [ "Carl", "Tim" ];
 
 entity Account = {
@@ -7,6 +7,11 @@ entity Account = {
 };
 
 action auth appliesTo {
+    principal: [ Account ],
+    resource: Account
+};
+
+action "auth\tauth" appliesTo {
     principal: [ Account ],
     resource: Account
 };

@@ -1,6 +1,6 @@
 package uq.pac.rsvp.web;
 
-import uq.pac.rsvp.policy.ast.FileSet;
+import uq.pac.rsvp.verification.FileSet;
 import uq.pac.rsvp.support.util.Pair;
 import uq.pac.rsvp.web.service.FileService;
 

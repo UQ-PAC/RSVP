@@ -1,7 +1,6 @@
 package uq.pac.rsvp.verification;
 
 import uq.pac.rsvp.policy.ast.AstNode;
-import uq.pac.rsvp.policy.ast.FileSet;
 import uq.pac.rsvp.policy.ast.entity.Entity;
 import uq.pac.rsvp.policy.ast.entity.EntityReference;
 import uq.pac.rsvp.policy.ast.entity.EntityValue;

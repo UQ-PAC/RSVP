@@ -18,16 +18,18 @@ import java.util.stream.Collectors;
 
 import static com.cedarpolicy.model.schema.Schema.JsonOrCedar.*;
 
+/**
+ * Validation of the entire program against the schema.
+ * FIXME: For the moment validation of policies is delegated to Cedar itself
+ */
 public class PolicyProgramValidator {
 
-    public static void validate(Schema schema, PolicyProgram program) throws AuthException {
+    public static PolicyProgram validate(Schema schema, PolicyProgram program) throws AuthException {
         com.cedarpolicy.model.schema.Schema cedarSchema =
                 com.cedarpolicy.model.schema.Schema.parse(Cedar, schema.toString());
         String policies = program.policies()
                 .map(Policy::toString)
                 .collect(Collectors.joining("\n"));
-
-        System.out.println(policies);
 
         PolicySet cedarPolicies = PolicySet.parsePolicies(policies);
 
@@ -46,5 +48,6 @@ public class PolicyProgramValidator {
 
         InvariantValidator invariantValidator = new InvariantValidator(schema);
         program.invariants().forEach(invariantValidator::validate);
+        return program;
     }
 }

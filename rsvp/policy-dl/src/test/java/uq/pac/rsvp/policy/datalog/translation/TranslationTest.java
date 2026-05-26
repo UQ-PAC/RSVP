@@ -13,8 +13,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.StdLogger;
-import uq.pac.rsvp.policy.ast.FileSet;
+import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.ast.policy.Invariant;
+import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
+import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.datalog.TestUtil;
 
 import java.io.IOException;
@@ -152,14 +154,14 @@ public class TranslationTest {
             logger.warning("Empty policy: " + test.policy);
         }
 
-        FileSet fileset = new FileSet()
-                .addSchema(test.schema)
-                .addPolicies(test.policy)
-                .addEntities(test.entities)
-                .addInvariants(test.invariants)
-                .loadFiles();
+        Schema schema = Schema.parse(test.schema);
+        PolicyProgram policies = PolicyProgram.parse(test.policy);
+        PolicyProgram invariants = PolicyProgram.parse(test.invariants);
+        PolicyProgram program =
+                PolicyProgram.of(Stream.concat(policies.stream(), invariants.stream()).toList());
+        EntitySet entities = EntitySet.parse(test.entities);
 
-        Translation translation = new Translation(fileset, test.datalogDir);
+        Translation translation = new Translation(schema, program, entities, test.datalogDir);
 
         RequestAuth rsvpAuth = new RequestAuth(translation);
         assertTrue(Collections.disjoint(rsvpAuth.getForbiddenRequests().getRequests(),

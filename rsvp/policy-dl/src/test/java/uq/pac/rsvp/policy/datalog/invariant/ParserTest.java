@@ -106,7 +106,7 @@ public class ParserTest {
         invariant ((resource.foo == "foo") && (principal.bar == "bar"))
             for all resource: Resource::Picture, principal: Album::Photo;
         invariant ((-1 + (2 * 3)) == ((6 * 7) + 8));
-        invariant (if true; then false; else true);
+        invariant (if true then false else true);
         invariant "a\\nb\\t\\"";
         """;
 

@@ -2,12 +2,12 @@ package uq.pac.rsvp.policy.ast.entity;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import uq.pac.rsvp.policy.ast.JsonBaseVisitor;
+import uq.pac.rsvp.policy.ast.EntityBaseVisitor;
 import uq.pac.rsvp.support.FileSource;
 import uq.pac.rsvp.support.LineLoc;
 import uq.pac.rsvp.support.SourceLoc;
 
-class JsonSourceVisitor<T> extends JsonBaseVisitor<T> {
+class JsonSourceVisitor<T> extends EntityBaseVisitor<T> {
     private final FileSource fs;
 
     public JsonSourceVisitor(FileSource fs) {

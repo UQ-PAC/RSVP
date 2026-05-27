@@ -2,8 +2,8 @@ package uq.pac.rsvp.policy.ast.entity;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import uq.pac.rsvp.policy.ast.JsonLexer;
-import uq.pac.rsvp.policy.ast.JsonParser;
+import uq.pac.rsvp.policy.ast.EntityLexer;
+import uq.pac.rsvp.policy.ast.EntityParser;
 import uq.pac.rsvp.policy.ast.ThrowingErrorListener;
 import uq.pac.rsvp.support.FileSource;
 import uq.pac.rsvp.support.error.SyntaxError;
@@ -19,7 +19,7 @@ import static uq.pac.rsvp.policy.ast.Util.unquote;
 /**
  * Parse a JSON specification describing a set of Cedar entities and output then as an {@link EntitySet}
  */
-class EntityParser {
+class EntitySetParser {
 
     public static EntitySet parse(Path path) throws IOException {
         String file = path.getFileName().toString();
@@ -31,12 +31,12 @@ class EntityParser {
         FileSource fs = new FileSource(file, text);
         ThrowingErrorListener errorListener = new ThrowingErrorListener(fs);
 
-        JsonLexer lexer = new JsonLexer(CharStreams.fromString(text));
+        EntityLexer lexer = new EntityLexer(CharStreams.fromString(text));
         lexer.removeErrorListeners();
         lexer.addErrorListener(errorListener);
 
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-        JsonParser parser = new JsonParser(tokens);
+        EntityParser parser = new EntityParser(tokens);
         parser.removeErrorListeners();
         parser.addErrorListener(errorListener);
 
@@ -58,7 +58,7 @@ class EntityParser {
         }
 
         @Override
-        public Entity visitEntity(JsonParser.EntityContext ctx) {
+        public Entity visitEntity(EntityParser.EntityContext ctx) {
             RecordValue entityRecord = (RecordValue) ctx.object().accept(values);
 
             EntityReference uid = EntityAttribute.UID.get(entityRecord, EntityReference.class);
@@ -105,7 +105,7 @@ class EntityParser {
         }
 
         @Override
-        public EntityValue visitObject(JsonParser.ObjectContext ctx) {
+        public EntityValue visitObject(EntityParser.ObjectContext ctx) {
             Map<AttributeName, EntityValue> values = new HashMap<>();
             ctx.mapping().forEach(mapping -> {
                 String key = unquote(mapping.STRING().getText());
@@ -122,17 +122,17 @@ class EntityParser {
         }
 
         @Override
-        public EntityValue visitObjectExpr(JsonParser.ObjectExprContext ctx) {
+        public EntityValue visitObjectExpr(EntityParser.ObjectExprContext ctx) {
             return ctx.object().accept(this);
         }
 
         @Override
-        public EntityValue visitArrayExpr(JsonParser.ArrayExprContext ctx) {
+        public EntityValue visitArrayExpr(EntityParser.ArrayExprContext ctx) {
             return ctx.array().accept(this);
         }
 
         @Override
-        public EntityValue visitArray(JsonParser.ArrayContext ctx) {
+        public EntityValue visitArray(EntityParser.ArrayContext ctx) {
             Set<EntityValue> values = ctx.value().stream()
                     .map(v -> v.accept(this))
                     .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -140,19 +140,19 @@ class EntityParser {
         }
 
         @Override
-        public EntityValue visitNumberExpr(JsonParser.NumberExprContext ctx) {
+        public EntityValue visitNumberExpr(EntityParser.NumberExprContext ctx) {
             long value = Long.parseLong(ctx.getText());
             return new LongValue(value, location(ctx));
         }
 
         @Override
-        public EntityValue visitBooleanExpr(JsonParser.BooleanExprContext ctx) {
+        public EntityValue visitBooleanExpr(EntityParser.BooleanExprContext ctx) {
             boolean value = Boolean.parseBoolean(ctx.getText().toLowerCase());
             return new BooleanValue(value, location(ctx));
         }
 
         @Override
-        public EntityValue visitStringExpr(JsonParser.StringExprContext ctx) {
+        public EntityValue visitStringExpr(EntityParser.StringExprContext ctx) {
             String value = unquote(ctx.STRING().getText());
             return new StringValue(value, location(ctx));
         }

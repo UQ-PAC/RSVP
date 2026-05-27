@@ -1,4 +1,4 @@
-grammar Json;
+grammar Entity;
 
 fragment ESCAPE: '\\' [tbnr"\\];
 

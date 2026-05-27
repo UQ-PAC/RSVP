@@ -84,15 +84,14 @@ public class Translation {
                 invariantDeclarations.put(i, TranslationConstants.makeInvariantRuleDecl(i, index++));
             }
 
-            this.datalogProgram = translate(schema, policies, entities, invariants);
+            this.datalogProgram = translate();
             datalogProgram.execute(datalogDir);
         } catch (Throwable e) {
             throw new AssertionError(e);
         }
     }
 
-    // FIXME: Translation over policy statements
-    private DLProgram translate(Schema schema, Collection<Policy> policies, EntitySet entities, Collection<Invariant> invariants) {
+    private DLProgram translate() {
         TranslationSchema translationSchema = new TranslationSchema(schema);
         TranslationEntitySet translationEntities = new TranslationEntitySet(entities, translationSchema);
         Collection<TranslationPolicy> translationPermitPolicies = policies.stream()

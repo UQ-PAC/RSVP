@@ -1,9 +1,7 @@
 package uq.pac.rsvp.policy.ast.entity;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import org.apache.commons.text.StringEscapeUtils;
 import uq.pac.rsvp.support.SourceLoc;
 
@@ -51,7 +49,6 @@ public class EntityReference extends EntityValue {
         return false;
     }
 
-    // FIXME: There will be a problem with escaped characters
     public String getReference() {
         return type + "::\"" + id + "\"";
     }
@@ -64,8 +61,8 @@ public class EntityReference extends EntityValue {
     @Override
     public JsonElement toJson() {
         JsonObject contents = new JsonObject();
-        // By default we keep all strings unescaped, so to keep things consistent we
-        // need to unescaped before converting to Json to get the same representation
+        // We keep all strings unescaped, so to keep things consistent we
+        // need to unescaped before converting to JSON to get the same representation
         contents.addProperty("type", StringEscapeUtils.unescapeJava(type));
         contents.addProperty("id", StringEscapeUtils.unescapeJava(id));
         JsonObject entity = new JsonObject();
@@ -73,6 +70,9 @@ public class EntityReference extends EntityValue {
         return entity;
     }
 
+    /**
+     * Return Json representation of the form { "id": <ID>,  "type": <TYPE> }
+     */
     public JsonElement toMinimalJson() {
         return toJson().getAsJsonObject().get("__entity");
     }

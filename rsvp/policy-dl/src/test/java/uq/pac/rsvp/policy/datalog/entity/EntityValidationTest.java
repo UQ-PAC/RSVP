@@ -64,7 +64,7 @@ public class EntityValidationTest {
             String actualLocation = error.getLocation().toString();
 
             expectedLocations = expectedLocations.stream()
-                    .map(l -> "%s:%s".formatted(entityFile.toString(), l))
+                    .map(l -> "%s:%s".formatted(entityFile.getFileName().toString(), l))
                     .collect(Collectors.toSet());
 
             if (expectedLocations.size() == 1) {

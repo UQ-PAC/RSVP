@@ -2,5 +2,5 @@
     "foobar": true
 }
 
-// @MESSAGE: Expected array start
+// @MESSAGE: Parse Error: mismatched input '{' expecting '['
 // @LOCATION: 0:1 [1:1-1:1]

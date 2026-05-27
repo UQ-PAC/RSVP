@@ -2,5 +2,5 @@
     "foobar"
 ]
 
-// @MESSAGE: Expected object start
-// @LOCATION: 6:1 [2:5-2:5]
+// @MESSAGE: Parse Error: no viable alternative at input '["foobar"'
+// @LOCATION: 6:8 [2:5-2:12]

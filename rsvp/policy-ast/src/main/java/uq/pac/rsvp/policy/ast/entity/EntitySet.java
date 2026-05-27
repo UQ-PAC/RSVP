@@ -15,11 +15,11 @@ public class EntitySet {
     }
 
     public static EntitySet parse(Path json) throws IOException, IllegalAccessException {
-        return new EntityReader(json).parse();
+        return EntityParser.parse(json);
     }
 
     public static EntitySet parse(String filename, String json) throws IOException, IllegalAccessException {
-        return new EntityReader(filename, json).parse();
+        return EntityParser.parse(filename, json);
     }
 
     public Stream<Entity> stream() {

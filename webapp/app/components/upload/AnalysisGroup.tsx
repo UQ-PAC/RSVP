@@ -2,19 +2,19 @@
 
 import { faExclamation, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import cx from "classnames";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   useAnalysisGroup,
   useAnalysisGroupDispatch,
 } from "../../lib/context/AnalysisGroupContext";
 import {
-  ExpansionState,
-  useFocusDispatch,
-} from "../../lib/context/FocusContext";
+  ExpansionStatus,
+  useExpansionDispatch,
+} from "../../lib/context/ExpansionContext";
 import { useSelectionDispatch } from "../../lib/context/SelectionContext";
+import { useEventListener } from "../../lib/events";
 import { remove, upload } from "../../lib/requests";
-import { VerificationFile } from "../../lib/types";
+import { VerificationFile, VersionedFile } from "../../lib/types";
 import { checkAnalysisGroup, getFileType } from "../../lib/util";
 import { FileInput } from "./FileInput";
 import { HiddenFileInput } from "./HiddenFileInput";
@@ -25,49 +25,115 @@ interface AnalysisGroupProps {
 }
 
 export function AnalysisGroup({ removeGroup }: AnalysisGroupProps) {
-  const versionOriginFile = useRef<VerificationFile>(null);
+  const versionOriginFile = useRef<VersionedFile>(null);
   const versionInputRef = useRef<HTMLInputElement>(null);
 
-  const { name, files, verifyRequested } = useAnalysisGroup();
+  const { name, files } = useAnalysisGroup();
   const dispatch = useAnalysisGroupDispatch();
 
-  const focus = useFocusDispatch();
+  const expansion = useExpansionDispatch();
   const selection = useSelectionDispatch();
 
-  const addFiles = (toAdd: File[], original?: VerificationFile) =>
-    toAdd.forEach((file) => {
-      dispatch({
-        type: "add",
-        file: {
-          file,
-          filename: file.name,
-          filetype: getFileType(file),
-          resolved: upload(file).then((uploaded) => {
-            if (!original) {
-              // Expand added file if completely new file (not a version)
-              focus({
-                type: "focus",
-                target: "source-file",
-                focus: {
-                  key: uploaded.serverId,
-                  value: ExpansionState.Expanded,
-                },
-              });
-            }
-            return uploaded;
-          }),
-        },
-        original,
-      });
+  const registerComparisonFocus = (
+    group: string,
+    original: string,
+    updated: string,
+  ) =>
+    expansion({
+      type: "register",
+      group: "source-file",
+      id: `${original}${updated}`,
+      conflict: group,
+      kind: "c", // File comparison
+      status: ExpansionStatus.Collapsed,
     });
 
-  // Handle regular file input selection
+  const deregisterComparisonFocus = (original: string, updated: string) =>
+    expansion({
+      type: "deregister",
+      group: "source-file",
+      id: `${original}${updated}`,
+      kind: "c",
+    });
+
+  // Track whether verify was requested, to display error messages if relevant
+  const [verifyRequested, setVerifyRequested] = useState(false);
+  useEventListener("verificationRequested", () => setVerifyRequested(true));
+  useEventListener("verificationComplete", () => setVerifyRequested(false));
+
+  const addFiles = (toAdd: File[], existing?: VersionedFile) => {
+    const uploaded = toAdd.map((file) => ({
+      file,
+      filename: file.name,
+      filetype: getFileType(file),
+      resolved: upload(file),
+    }));
+
+    // Add new files to group
+    uploaded.forEach((file) =>
+      dispatch({ type: "add", file, original: existing?.original }),
+    );
+
+    // Register source files as focus targets based on server ID,
+    // and set focus to latest file
+    Promise.all(uploaded.map((file) => file.resolved)).then((resolved) => {
+      const ids = resolved.map((file) => file.serverId);
+
+      ids.forEach((id, i) => {
+        // New files are file versions, so need to add comparisons as focus targets
+        if (existing) {
+          existing.original.resolved
+            .then(({ serverId }) => serverId)
+            .then((originalId) => {
+              // Add comparison to original
+              registerComparisonFocus(originalId, originalId, id);
+
+              // Add comparisons to existing versions
+              existing.versions.forEach((version) =>
+                version.resolved.then((uploadedVersion) =>
+                  registerComparisonFocus(
+                    originalId,
+                    uploadedVersion.serverId,
+                    id,
+                  ),
+                ),
+              );
+
+              // Add comparisons between other files added at the same time
+              ids.slice(0, i).forEach((olderId) => {
+                registerComparisonFocus(originalId, olderId, id);
+              });
+
+              // Register file as grouped focus target, if this is the latest version,
+              // then focus on the file
+              expansion({
+                type: "register",
+                group: "source-file",
+                id,
+                conflict: originalId,
+                status:
+                  i === ids.length - 1
+                    ? ExpansionStatus.Expanded
+                    : ExpansionStatus.Collapsed,
+              });
+            });
+        } else {
+          // Register file as standalone focus target
+          expansion({
+            type: "register",
+            group: "source-file",
+            id,
+            conflict: id,
+            status: ExpansionStatus.Expanded,
+          });
+        }
+      });
+    });
+  };
+
+  // Handle file version input selection
   const handleVersionFileInput = (e) => {
-    if (
-      e.target.files &&
-      e.target.files.length > 0 &&
-      versionOriginFile.current
-    ) {
+    if (!!e.target.files?.length && versionOriginFile.current) {
       const selectedFiles = Array.from<File>(e.target.files);
       addFiles(selectedFiles, versionOriginFile.current);
     }
@@ -75,7 +141,7 @@ export function AnalysisGroup({ removeGroup }: AnalysisGroupProps) {
   };
 
   // Programmatically open file selection dialog
-  const openCedarFileDialog = (file: VerificationFile) => {
+  const openCedarFileDialog = (file: VersionedFile) => {
     versionOriginFile.current = file;
     versionInputRef.current?.click();
   };
@@ -83,21 +149,49 @@ export function AnalysisGroup({ removeGroup }: AnalysisGroupProps) {
   const { hasPolicy, hasSchema, hasEntities, error } =
     checkAnalysisGroup(files);
 
-  const removeFile = (file: VerificationFile, original?: VerificationFile) => {
+  const removeFile = (file: VerificationFile, original?: VersionedFile) => {
     file.resolved
       .then(({ serverId }) => serverId)
       .then((id) => {
         remove(id);
 
-        if (!original) {
-          focus({
-            type: "deregister",
-            target: "source-file",
-            deregister: id,
+        expansion({
+          type: "deregister",
+          group: "source-file",
+          id,
+        });
+
+        if (original) {
+          // Delete comparison with original
+          original.original.resolved.then(({ serverId }) =>
+            deregisterComparisonFocus(serverId, id),
+          );
+
+          Promise.all(
+            original.versions.map((version) => version.resolved),
+          ).then((versions) => {
+            const deleteIdx = versions.findIndex(
+              ({ serverId }) => serverId === id,
+            );
+
+            // Delete comparisons with earlier versions
+            versions
+              .slice(0, deleteIdx)
+              .forEach(({ serverId }) =>
+                deregisterComparisonFocus(serverId, id),
+              );
+
+            // Delete comparisons with later versions
+            versions
+              .slice(deleteIdx + 1)
+              .forEach(({ serverId }) =>
+                deregisterComparisonFocus(id, serverId),
+              );
           });
         }
       });
-    dispatch({ type: "remove", file, original });
+
+    dispatch({ type: "remove", file, original: original?.original });
   };
 
   return (
@@ -111,18 +205,22 @@ export function AnalysisGroup({ removeGroup }: AnalysisGroupProps) {
           })
         }
       >
-        <h4
-          className={cx(
-            "analysis-group-title",
-            error && verifyRequested && "error",
-          )}
-        >
-          {name}
-        </h4>
+        <h4 className="analysis-group-title">{name}</h4>
         <div
           className="analysis-group-delete-icon action-icon"
           onClick={(e) => {
             e.stopPropagation();
+            files.forEach((file) => {
+              file.original.resolved
+                .then(({ serverId }) => serverId)
+                .then((id) => {
+                  expansion({
+                    type: "deregister",
+                    group: "source-file",
+                    id,
+                  });
+                });
+            });
             removeGroup();
           }}
         >
@@ -142,6 +240,7 @@ export function AnalysisGroup({ removeGroup }: AnalysisGroupProps) {
                   ? openCedarFileDialog
                   : undefined
               }
+              original={file}
               version={file.versions.length ? 1 : undefined}
             >
               {file.versions.map((version, j) => (
@@ -149,13 +248,14 @@ export function AnalysisGroup({ removeGroup }: AnalysisGroupProps) {
                   key={j}
                   version={j + 2}
                   file={version}
-                  remove={(version) => removeFile(version, file.original)}
+                  remove={(version) => removeFile(version, file)}
                 />
               ))}
             </UploadedFile>
           ))}
         </div>
       )}
+      <FileInput addFiles={addFiles} error={verifyRequested && error} />
       {verifyRequested && error && (
         <div className="analysis-group-errors">
           {!hasPolicy && (
@@ -187,7 +287,6 @@ export function AnalysisGroup({ removeGroup }: AnalysisGroupProps) {
           )}
         </div>
       )}
-      <FileInput addFiles={addFiles} />
       <HiddenFileInput
         ref={versionInputRef}
         accept=".cedar"

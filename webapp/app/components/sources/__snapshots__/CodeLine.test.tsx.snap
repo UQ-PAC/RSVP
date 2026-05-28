@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <span
+    class="source-file-line-number"
+  />
+  <span
+    class="source-file-line-content source-line-no-report"
+    data-testid="code-line"
+  >
+    Highlighted code!!
+  </span>
+</DocumentFragment>
+`;
+
+exports[`renders 2`] = `
+<DocumentFragment>
+  <span
+    class="source-file-line-number"
+  />
+  <span
+    class="source-file-line-content source-line-no-report highlighted"
+    data-testid="code-line"
+  >
+    Highlighted code!!
+  </span>
+</DocumentFragment>
+`;

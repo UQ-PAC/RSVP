@@ -100,35 +100,13 @@
     justify-content: space-between;
   }
 
-  .source-file-header .top-row .source-file-versions {
+  .source-file-header .top-row .tabs {
     align-self: stretch;
     flex-grow: 1;
   }
 
-  .source-file-header .source-file-versions {
-    display: inline-flex;
-    gap: 0;
-    overflow-x: scroll;
-    overflow-y: clip;
-    /* Hide scrollbar for IE, Edge and Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
-    overscroll-behavior: none;
-    margin-bottom: -1px;
-  }
-
-  .source-file-header .source-file-version.source-file-compare.selected,
-  .source-file-header .source-file-version.source-file-compare:hover {
-    background-color: var(--color-gray-300);
-    color: var(--color-gray-600);
-  }
-
-  .source-file-header
-    .source-file-version.source-file-compare:hover
-    .source-file-icon,
-  .source-file-header
-    .source-file-version.source-file-compare.selected
-    .source-file-icon {
+  .source-file-header .source-file-icon,
+  .source-file-header .source-file-icon {
     color: var(--color-gray-600);
   }
 
@@ -138,9 +116,8 @@
     background-color: var(--color-gray-300);
   }
 
-  .source-file-header .source-comparison-tabs .source-comparison-original,
-  .source-file-header .source-comparison-tabs .source-comparison-updated {
-    padding-top: 0.1rem;
+  .source-file-header .source-comparison-tabs .tabs {
+    padding-top: 0.15rem;
   }
 
   .source-file-header .source-compare-icon {
@@ -150,67 +127,16 @@
     font-size: 1rem;
   }
 
-  /* Hide scrollbar for Chrome, Safari and Opera */
-  .source-file-header .source-file-versions::-webkit-scrollbar {
-    display: none;
+  .source-file:not(.expanded) .source-file-header {
+    overflow: clip;
   }
 
-  .source-file-header .source-file-version {
-    line-height: 2rem;
-    padding: 0.2rem 1.2rem 0 0;
-    background-color: var(--color-gray-200);
-    border-right: 1px solid var(--color-gray-300);
-    display: flex;
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--color-gray-600);
-    text-wrap: nowrap;
-    align-items: center;
-    width: fit-content;
-  }
-
-  .source-file.expanded .source-file-header .source-file-version {
-    border-bottom: 1px solid var(--color-gray-300);
-  }
-  .source-comparison-original .source-file-version,
-  .source-comparison-updated .source-file-version {
-    border-top: 1px solid var(--color-gray-300);
-  }
-
-  .source-comparison-updated .source-file-version:first-child {
-    border-left: 1px solid var(--color-gray-300);
-  }
-
-  .source-file.expanded .source-file-header .top-row .source-file-versions {
+  .source-file.expanded .source-file-header .top-row .tabs {
     border-radius: 0.5rem 0 0 0;
   }
 
-  .source-file.collapsed .source-file-header .top-row .source-file-versions {
+  .source-file.collapsed .source-file-header .top-row .tabs {
     border-radius: 0.5rem 0 0 0.5rem;
-  }
-
-  .source-file-header .source-file-version.selected {
-    background-color: var(--color-gray-100);
-    color: var(--color-gray-700);
-  }
-
-  .source-file-header .source-file-version:not(.selected) {
-    cursor: pointer;
-  }
-
-  .source-file.expanded .source-file-header .source-file-version.selected {
-    cursor: default;
-  }
-
-  .source-file.expanded
-    .source-file-header
-    .source-file-versions
-    .source-file-version.selected {
-    border-bottom: 1px solid var(--color-gray-100);
-  }
-
-  .source-file-header .source-file-version:hover {
-    background-color: var(--color-gray-100);
   }
 
   .source-file-header .source-file-icon {

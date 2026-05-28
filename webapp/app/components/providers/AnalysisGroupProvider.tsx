@@ -4,16 +4,13 @@ import { JSX, useEffect, useReducer } from "react";
 import {
   AnalysisGroupContext,
   AnalysisGroupDispatchContext,
-  emptyAnalysisGroup,
   reducer,
 } from "../../lib/context/AnalysisGroupContext";
-import {
-  useVerification,
-  useVerificationDispatch,
-} from "../../lib/context/VerificationContext";
+import { useVerificationDispatch } from "../../lib/context/VerificationContext";
+import { AnalysisGroup } from "../../lib/types";
 
 interface AnalysisGroupProviderProps {
-  group: string;
+  group: AnalysisGroup;
   children?: JSX.Element | JSX.Element[];
 }
 
@@ -21,22 +18,18 @@ export function AnalysisGroupProvider({
   group,
   children,
 }: AnalysisGroupProviderProps) {
-  const verificationContext = useVerification();
   const verificationDispatch = useVerificationDispatch();
-
-  const globalGroupContext = verificationContext[group];
 
   const [analysisGroupContext, analysisGroupDispatch] = useReducer(
     reducer,
-    globalGroupContext ?? emptyAnalysisGroup,
+    group,
   );
 
   // Update global context when group is updated
   useEffect(() => {
-    if (analysisGroupContext !== globalGroupContext) {
+    if (analysisGroupContext !== group) {
       verificationDispatch({
         type: "update",
-        group,
         update: analysisGroupContext,
       });
     }
@@ -45,11 +38,11 @@ export function AnalysisGroupProvider({
 
   // Update group when global context is updated
   useEffect(() => {
-    if (analysisGroupContext !== globalGroupContext) {
-      analysisGroupDispatch({ type: "update", update: globalGroupContext });
+    if (analysisGroupContext !== group) {
+      analysisGroupDispatch({ type: "update", update: group });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalGroupContext]);
+  }, [group]);
 
   return (
     <AnalysisGroupContext value={analysisGroupContext}>

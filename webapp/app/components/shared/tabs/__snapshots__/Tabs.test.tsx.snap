@@ -1,0 +1,285 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`handles selection 1`] = `
+<DocumentFragment>
+  <div
+    class="tabs"
+    data-testid="tabs"
+  >
+    <div
+      data-selected="true"
+      data-testid="tab"
+    >
+      <span>
+        Tab 0
+      </span>
+    </div>
+    <div
+      data-selected="false"
+      data-testid="tab"
+    >
+      <span>
+        Tab 1
+      </span>
+    </div>
+    <div
+      data-selected="false"
+      data-testid="tab"
+    >
+      <span>
+        Tab 2
+      </span>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`handles selection 2`] = `
+<DocumentFragment>
+  <div
+    class="tabs"
+    data-testid="tabs"
+  >
+    <div
+      data-selected="false"
+      data-testid="tab"
+    >
+      <span>
+        Tab 0
+      </span>
+    </div>
+    <div
+      data-selected="true"
+      data-testid="tab"
+    >
+      <span>
+        Tab 1
+      </span>
+    </div>
+    <div
+      data-selected="false"
+      data-testid="tab"
+    >
+      <span>
+        Tab 2
+      </span>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`handles selection 3`] = `
+<DocumentFragment>
+  <div
+    class="tabs"
+    data-testid="tabs"
+  >
+    <div
+      data-selected="false"
+      data-testid="tab"
+    >
+      <span>
+        Tab 0
+      </span>
+    </div>
+    <div
+      data-selected="false"
+      data-testid="tab"
+    >
+      <span>
+        Tab 1
+      </span>
+    </div>
+    <div
+      data-selected="true"
+      data-testid="tab"
+    >
+      <span>
+        Tab 2
+      </span>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders default option 1`] = `
+<DocumentFragment>
+  <div
+    class="tabs"
+    data-testid="tabs"
+  >
+    <div
+      data-selected="false"
+      data-testid="tab"
+    >
+      <span>
+        Tab 0
+      </span>
+    </div>
+    <div
+      data-selected="false"
+      data-testid="tab"
+    >
+      <span>
+        Tab 1
+      </span>
+    </div>
+    <div
+      data-selected="true"
+      data-testid="tab"
+    >
+      <span>
+        Tab 2
+      </span>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders default option 2`] = `
+<DocumentFragment>
+  <div
+    class="tabs"
+    data-testid="tabs"
+  >
+    <div
+      data-selected="false"
+      data-testid="tab"
+    >
+      <span>
+        Tab 0
+      </span>
+    </div>
+    <div
+      data-selected="true"
+      data-testid="tab"
+    >
+      <span>
+        Tab 1
+      </span>
+    </div>
+    <div
+      data-selected="false"
+      data-testid="tab"
+    >
+      <span>
+        Tab 2
+      </span>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders empty 1`] = `
+<DocumentFragment>
+  <div
+    class="tabs"
+    data-testid="tabs"
+  />
+</DocumentFragment>
+`;
+
+exports[`renders tabs 1`] = `
+<DocumentFragment>
+  <div
+    class="tabs"
+    data-testid="tabs"
+  >
+    <div
+      data-selected="true"
+      data-testid="tab"
+    >
+      <span>
+        Tab 0
+      </span>
+    </div>
+    <div
+      data-selected="false"
+      data-testid="tab"
+    >
+      <span>
+        Tab 1
+      </span>
+    </div>
+    <div
+      data-selected="false"
+      data-testid="tab"
+    >
+      <span>
+        Tab 2
+      </span>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders tabs 2`] = `
+<DocumentFragment>
+  <div
+    class="tabs"
+    data-testid="tabs"
+  >
+    <div
+      data-selected="true"
+      data-testid="tab"
+      data-theme="light"
+    >
+      <span>
+        Tab 0
+      </span>
+    </div>
+    <div
+      data-selected="false"
+      data-testid="tab"
+      data-theme="dark"
+    >
+      <span>
+        Tab 1
+      </span>
+    </div>
+    <div
+      data-selected="false"
+      data-testid="tab"
+      data-theme="light"
+    >
+      <span>
+        Tab 2
+      </span>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders tabs 3`] = `
+<DocumentFragment>
+  <div
+    class="tabs"
+    data-testid="tabs"
+  >
+    <div
+      data-selected="false"
+      data-testid="tab"
+    >
+      <span>
+        Tab 0
+      </span>
+    </div>
+    <div
+      data-selected="true"
+      data-testid="tab"
+    >
+      <span>
+        Tab 1
+      </span>
+    </div>
+    <div
+      data-selected="false"
+      data-testid="tab"
+    >
+      <span>
+        Tab 2
+      </span>
+    </div>
+  </div>
+</DocumentFragment>
+`;

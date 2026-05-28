@@ -1,18 +1,17 @@
-/* eslint-disable no-var */
 import { render, screen } from "@testing-library/react";
 
-import { ExpansionState } from "../../lib/context/FocusContext";
-import { ReportGroup, ReportsSection } from "./ReportsSection";
+import { ExpansionStatus } from "../../lib/context/ExpansionContext";
+import { ReportGroupListing, ReportSection } from "./ReportSection";
 
-var focusDispatch = jest.fn();
+var expansionDispatch = jest.fn();
 var toggleAll;
 
-jest.mock("../../lib/context/FocusContext", () => ({
-  ...jest.requireActual("../../lib/context/FocusContext"),
-  useFocusDispatch: () => focusDispatch,
+jest.mock("../../lib/context/ExpansionContext", () => ({
+  ...jest.requireActual("../../lib/context/ExpansionContext"),
+  useExpansionDispatch: () => expansionDispatch,
 }));
 
-jest.mock("../../lib/util", () => ({
+jest.mock("../../lib/fa-util", () => ({
   getFileIcon: jest.fn((filetype) => `${filetype}-icon`),
 }));
 
@@ -23,8 +22,8 @@ jest.mock("../shared/ToggleAll", () => ({
   }),
 }));
 
-jest.mock("./ReportsGroup", () => ({
-  ReportsGroup: jest.fn(({ name, id, section, reports, icon }) => (
+jest.mock("./ReportGroup", () => ({
+  ReportGroup: jest.fn(({ name, id, section, reports, icon }) => (
     <div
       data-testid={`reports-group-${name.replaceAll(" ", "-")}`}
       data-name={name}
@@ -37,26 +36,26 @@ jest.mock("./ReportsGroup", () => ({
 }));
 
 beforeEach(() => {
-  focusDispatch.mockClear();
+  expansionDispatch.mockClear();
 });
 
 test("renders", () => {
   const { asFragment, rerender } = render(
-    <ReportsSection
+    <ReportSection
       title="Silly Mistakes"
       severity="warn"
       reports={
         [
           ["group one", { filename: "group one", reports: [{}, {}] }],
           ["group two", { filename: "group two", reports: [{}, {}, {}] }],
-        ] as ReportGroup[]
+        ] as ReportGroupListing[]
       }
     />,
   );
   expect(asFragment()).toMatchSnapshot();
 
   rerender(
-    <ReportsSection
+    <ReportSection
       title="Silly Mistakes"
       severity="warn"
       reports={
@@ -73,7 +72,7 @@ test("renders", () => {
               reports: [{}, {}, {}],
             },
           ],
-        ] as ReportGroup[]
+        ] as ReportGroupListing[]
       }
     />,
   );
@@ -82,12 +81,12 @@ test("renders", () => {
 
 test("toggles group expansions", () => {
   const focusAction = {
-    type: "focus",
-    target: "report-group",
+    type: "toggle",
+    group: "report-group",
   };
 
   const { asFragment } = render(
-    <ReportsSection
+    <ReportSection
       title="Expanded Section"
       severity="err"
       reports={
@@ -95,7 +94,7 @@ test("toggles group expansions", () => {
           ["group one", { filename: "group one", reports: [{}, {}] }],
           ["group two", { filename: "group two", reports: [{}, {}, {}] }],
           ["group three", { filename: "group three", reports: [{}] }],
-        ] as ReportGroup[]
+        ] as ReportGroupListing[]
       }
     />,
   );
@@ -106,35 +105,41 @@ test("toggles group expansions", () => {
 
   expect(toggleAll).toBeDefined();
 
-  toggleAll(ExpansionState.Collapsed);
+  toggleAll(ExpansionStatus.Collapsed);
 
-  expect(focusDispatch).toHaveBeenCalledTimes(3);
-  expect(focusDispatch).toHaveBeenNthCalledWith(1, {
+  expect(expansionDispatch).toHaveBeenCalledTimes(3);
+  expect(expansionDispatch).toHaveBeenNthCalledWith(1, {
     ...focusAction,
-    focus: { key: "err-group one", value: ExpansionState.Collapsed },
+    id: "err-group one",
+    status: ExpansionStatus.Collapsed,
   });
-  expect(focusDispatch).toHaveBeenNthCalledWith(2, {
+  expect(expansionDispatch).toHaveBeenNthCalledWith(2, {
     ...focusAction,
-    focus: { key: "err-group two", value: ExpansionState.Collapsed },
+    id: "err-group two",
+    status: ExpansionStatus.Collapsed,
   });
-  expect(focusDispatch).toHaveBeenNthCalledWith(3, {
+  expect(expansionDispatch).toHaveBeenNthCalledWith(3, {
     ...focusAction,
-    focus: { key: "err-group three", value: ExpansionState.Collapsed },
+    id: "err-group three",
+    status: ExpansionStatus.Collapsed,
   });
 
-  toggleAll(ExpansionState.Expanded);
-  expect(focusDispatch).toHaveBeenCalledTimes(6);
+  toggleAll(ExpansionStatus.Expanded);
+  expect(expansionDispatch).toHaveBeenCalledTimes(6);
 
-  expect(focusDispatch).toHaveBeenNthCalledWith(4, {
+  expect(expansionDispatch).toHaveBeenNthCalledWith(4, {
     ...focusAction,
-    focus: { key: "err-group one", value: ExpansionState.Expanded },
+    id: "err-group one",
+    status: ExpansionStatus.Expanded,
   });
-  expect(focusDispatch).toHaveBeenNthCalledWith(5, {
+  expect(expansionDispatch).toHaveBeenNthCalledWith(5, {
     ...focusAction,
-    focus: { key: "err-group two", value: ExpansionState.Expanded },
+    id: "err-group two",
+    status: ExpansionStatus.Expanded,
   });
-  expect(focusDispatch).toHaveBeenNthCalledWith(6, {
+  expect(expansionDispatch).toHaveBeenNthCalledWith(6, {
     ...focusAction,
-    focus: { key: "err-group three", value: ExpansionState.Expanded },
+    id: "err-group three",
+    status: ExpansionStatus.Expanded,
   });
 });

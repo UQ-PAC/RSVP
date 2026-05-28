@@ -83,10 +83,6 @@ public class Verification {
             cache.cacheImpact(original, updated, changeImpact);
         }
 
-        if (TESTING) {
-            Thread.sleep(1000);
-        }
-
         return changeImpact;
     }
 

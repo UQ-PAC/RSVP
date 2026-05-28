@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <div
+    data-testid="verification-context"
+  >
+    <div
+      data-testid="verification-dispatch-context"
+    >
+      <div
+        data-testid="expansion-context"
+      >
+        <div
+          data-testid="expansion-dispatch-context"
+        >
+          <div
+            data-testid="selection-context"
+          >
+            <div
+              data-testid="selection-dispatch-context"
+            >
+              <div
+                data-testid="child"
+              >
+                I'm a child
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;

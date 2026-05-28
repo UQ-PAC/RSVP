@@ -2,11 +2,11 @@
 
 import { useReducer } from "react";
 import {
-  emptyFocus,
-  FocusContext,
-  FocusDispatchContext,
-  focusReducer,
-} from "../../lib/context/FocusContext";
+  emptyExpansionState,
+  ExpansionContext,
+  ExpansionDispatchContext,
+  expansionReducer,
+} from "../../lib/context/ExpansionContext";
 import {
   emptySelection,
   SelectionContext,
@@ -19,30 +19,38 @@ import {
   VerificationDispatchContext,
   verificationReducer,
 } from "../../lib/context/VerificationContext";
+import { useEventListener } from "../../lib/events";
 
-export function ContextProvider({ children }) {
+export function ApplicationStateProvider({ children }) {
   const [verificationContext, verificationDispatch] = useReducer(
     verificationReducer,
     emptyVerification,
   );
-  const [focusContext, focusDispatch] = useReducer(focusReducer, emptyFocus);
+  const [expansionContext, expansionDispatch] = useReducer(
+    expansionReducer,
+    emptyExpansionState,
+  );
   const [selectionContext, selectionDispatch] = useReducer(
     selectionReducer,
     emptySelection,
   );
 
+  useEventListener("verificationComplete", () => {
+    verificationDispatch({ type: "complete" });
+  });
+
   return (
     <VerificationContext value={verificationContext}>
       <VerificationDispatchContext value={verificationDispatch}>
-        <FocusContext value={focusContext}>
-          <FocusDispatchContext value={focusDispatch}>
+        <ExpansionContext value={expansionContext}>
+          <ExpansionDispatchContext value={expansionDispatch}>
             <SelectionContext value={selectionContext}>
               <SelectionDispatchContext value={selectionDispatch}>
                 {children}
               </SelectionDispatchContext>
             </SelectionContext>
-          </FocusDispatchContext>
-        </FocusContext>
+          </ExpansionDispatchContext>
+        </ExpansionContext>
       </VerificationDispatchContext>
     </VerificationContext>
   );

@@ -13,15 +13,15 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import {
-  ExpansionState,
-  useFocus,
-  useFocusDispatch,
-} from "../../lib/context/FocusContext";
+  ExpansionStatus,
+  useExpansion,
+  useExpansionDispatch,
+} from "../../lib/context/ExpansionContext";
 import { useSelectionDispatch } from "../../lib/context/SelectionContext";
 import { Report } from "../../lib/types";
 import { ReportItem } from "./ReportItem";
 
-interface ReportsGroupProps {
+interface ReportGroupProps {
   section: string;
   id: string;
   name: string;
@@ -29,15 +29,15 @@ interface ReportsGroupProps {
   icon?: IconDefinition;
 }
 
-export function ReportsGroup({
+export function ReportGroup({
   section,
   id,
   name,
   reports,
   icon,
-}: ReportsGroupProps) {
-  const { "report-group": groupFocus } = useFocus();
-  const focusDispatch = useFocusDispatch();
+}: ReportGroupProps) {
+  const { "report-group": groupFocus } = useExpansion();
+  const expansionDispatch = useExpansionDispatch();
   const selectionDispatch = useSelectionDispatch();
 
   const groupKey = `${section}-${id}`;
@@ -52,10 +52,11 @@ export function ReportsGroup({
         data-testid={`reports-group-${id}-header`}
         onClick={() => {
           if (id !== "other") {
-            focusDispatch({
-              type: "focus",
-              target: "source-file",
-              focus: { key: id, value: ExpansionState.Expanded },
+            expansionDispatch({
+              type: "toggle",
+              group: "source-file",
+              id,
+              status: ExpansionStatus.Expanded,
             });
             selectionDispatch({
               scroll: "file",
@@ -69,15 +70,13 @@ export function ReportsGroup({
           onClick={(e) => {
             e.stopPropagation();
             selectionDispatch({ scroll: "none" });
-            focusDispatch({
-              type: "focus",
-              target: "report-group",
-              focus: {
-                key: groupKey,
-                value: expanded
-                  ? ExpansionState.Collapsed
-                  : ExpansionState.Expanded,
-              },
+            expansionDispatch({
+              type: "toggle",
+              group: "report-group",
+              id: groupKey,
+              status: expanded
+                ? ExpansionStatus.Collapsed
+                : ExpansionStatus.Expanded,
             });
           }}
           onMouseEnter={() => setHovered(true)}

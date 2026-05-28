@@ -1,0 +1,92 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <div
+    data-testid="one-context"
+  >
+    <div
+      data-testid="dispatch-context"
+    >
+      <div
+        data-testid="child"
+      >
+        I'm a child
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`updates local context 1`] = `
+<DocumentFragment>
+  <div
+    data-testid="one-context"
+  >
+    <div
+      data-testid="dispatch-context"
+    >
+      <div
+        data-testid="child-one"
+      >
+        I'm a child
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`updates local context 2`] = `
+<DocumentFragment>
+  <div
+    data-testid="two-context"
+  >
+    <div
+      data-testid="dispatch-context"
+    >
+      <div
+        data-testid="child-one"
+      >
+        I'm a child
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`updates local context 3`] = `
+<DocumentFragment>
+  <div
+    data-testid="two-context"
+  >
+    <div
+      data-testid="dispatch-context"
+    >
+      <div
+        data-testid="child-two"
+      >
+        I'm an adult
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`updates local context 4`] = `
+<DocumentFragment>
+  <div
+    data-diffs="["I'm a diff!"]"
+    data-testid="two-context"
+  >
+    <div
+      data-testid="dispatch-context"
+    >
+      <div
+        data-testid="child-two"
+      >
+        I'm an adult
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;

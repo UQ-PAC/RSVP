@@ -1,11 +1,10 @@
-/* eslint-disable no-var */
 import { fireEvent, render, screen } from "@testing-library/react";
 
-import { ExpansionState } from "../../lib/context/FocusContext";
+import { ExpansionStatus } from "../../lib/context/ExpansionContext";
 import { Fallback } from "./Fallback";
 
-var uploadsDrawer = ExpansionState.Expanded;
-var focusDispatch = jest.fn();
+var uploadsDrawer = ExpansionStatus.Expanded;
+var expansionDispatch = jest.fn();
 
 jest.mock("next/font/google", () => ({
   Lexend_Deca: jest.fn().mockReturnValue({ className: "lexend-deca" }),
@@ -21,20 +20,20 @@ jest.mock("@fortawesome/free-solid-svg-icons", () => ({
   faFileShield: "faFileShield",
 }));
 
-jest.mock("../../lib/context/FocusContext", () => ({
-  ...jest.requireActual("../../lib/context/FocusContext"),
-  useFocus: () => ({
+jest.mock("../../lib/context/ExpansionContext", () => ({
+  ...jest.requireActual("../../lib/context/ExpansionContext"),
+  useExpansion: () => ({
     drawer: {
       expansions: {
         left: uploadsDrawer,
       },
     },
   }),
-  useFocusDispatch: () => focusDispatch,
+  useExpansionDispatch: () => expansionDispatch,
 }));
 
 beforeEach(() => {
-  focusDispatch.mockClear();
+  expansionDispatch.mockClear();
 });
 
 test("renders", () => {
@@ -48,28 +47,30 @@ test("renders", () => {
 });
 
 test("expands uploads drawer", () => {
-  uploadsDrawer = ExpansionState.Expanded;
+  uploadsDrawer = ExpansionStatus.Expanded;
   const { rerender } = render(<Fallback instruction="Have a cry" />);
 
   const link = screen.getByTestId("source-files-upload-link");
   expect(link).toBeInTheDocument();
 
   fireEvent.click(link);
-  expect(focusDispatch).toHaveBeenCalledTimes(0);
+  expect(expansionDispatch).toHaveBeenCalledTimes(0);
 
-  uploadsDrawer = ExpansionState.Collapsed;
+  uploadsDrawer = ExpansionStatus.Collapsed;
   rerender(<Fallback instruction="Have a cry" />);
 
   fireEvent.click(link);
-  expect(focusDispatch).toHaveBeenCalledTimes(2);
-  expect(focusDispatch).toHaveBeenNthCalledWith(1, {
-    type: "focus",
-    target: "drawer",
-    focus: { key: "left", value: ExpansionState.Expanded },
+  expect(expansionDispatch).toHaveBeenCalledTimes(2);
+  expect(expansionDispatch).toHaveBeenNthCalledWith(1, {
+    type: "toggle",
+    group: "drawer",
+    id: "left",
+    status: ExpansionStatus.Expanded,
   });
-  expect(focusDispatch).toHaveBeenNthCalledWith(2, {
-    type: "focus",
-    target: "drawer",
-    focus: { key: "right", value: ExpansionState.Collapsed },
+  expect(expansionDispatch).toHaveBeenNthCalledWith(2, {
+    type: "toggle",
+    group: "drawer",
+    id: "right",
+    status: ExpansionStatus.Collapsed,
   });
 });

@@ -1,0 +1,361 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <div
+    class="source-file-tabs"
+  >
+    <div
+      class="top-row"
+    >
+      <div
+        data-testid="tabs-1"
+      >
+        <div
+          data-selected="true"
+          data-testid="tab-1"
+          data-theme="light"
+        >
+          <div
+            data-icon="tabIcon"
+            data-testid="font-awesome-icon"
+          />
+          <span
+            class="source-file-version-indicator"
+          >
+            Version 1
+          </span>
+          One
+        </div>
+        <div
+          data-testid="tab-2"
+          data-theme="light"
+        >
+          <div
+            data-icon="tabIcon"
+            data-testid="font-awesome-icon"
+          />
+          <span
+            class="source-file-version-indicator"
+          >
+            Version 2
+          </span>
+          Two
+        </div>
+        <div
+          data-testid="tab-3"
+          data-theme="light"
+        >
+          <div
+            data-icon="tabIcon"
+            data-testid="font-awesome-icon"
+          />
+          <span
+            class="source-file-version-indicator"
+          >
+            Version 3
+          </span>
+          Three
+        </div>
+        <div
+          data-testid="tab-4"
+          data-theme="dark"
+        >
+          <div
+            data-icon="faCodeCompare"
+            data-testid="font-awesome-icon"
+          />
+          Compare
+        </div>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders 2`] = `
+<DocumentFragment>
+  <div
+    class="source-file-tabs"
+  >
+    <div
+      class="top-row"
+    >
+      <div
+        data-testid="tabs-2"
+      >
+        <div
+          data-testid="tab-1"
+          data-theme="light"
+        >
+          <div
+            data-icon="tabIcon"
+            data-testid="font-awesome-icon"
+          />
+          <span
+            class="source-file-version-indicator"
+          >
+            Version 1
+          </span>
+          One
+        </div>
+        <div
+          data-testid="tab-2"
+          data-theme="light"
+        >
+          <div
+            data-icon="tabIcon"
+            data-testid="font-awesome-icon"
+          />
+          <span
+            class="source-file-version-indicator"
+          >
+            Version 2
+          </span>
+          Two
+        </div>
+        <div
+          data-selected="true"
+          data-testid="tab-3"
+          data-theme="light"
+        >
+          <div
+            data-icon="tabIcon"
+            data-testid="font-awesome-icon"
+          />
+          <span
+            class="source-file-version-indicator"
+          >
+            Version 3
+          </span>
+          Three
+        </div>
+        <div
+          data-testid="tab-4"
+          data-theme="dark"
+        >
+          <div
+            data-icon="faCodeCompare"
+            data-testid="font-awesome-icon"
+          />
+          Compare
+        </div>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders 3`] = `
+<DocumentFragment>
+  <div
+    class="source-file-tabs"
+  >
+    <div
+      class="top-row"
+    >
+      <div
+        data-testid="tabs-3"
+      >
+        <div
+          data-testid="tab-1"
+          data-theme="light"
+        >
+          <div
+            data-icon="tabIcon"
+            data-testid="font-awesome-icon"
+          />
+          <span
+            class="source-file-version-indicator"
+          >
+            Version 1
+          </span>
+          One
+        </div>
+        <div
+          data-testid="tab-2"
+          data-theme="light"
+        >
+          <div
+            data-icon="tabIcon"
+            data-testid="font-awesome-icon"
+          />
+          <span
+            class="source-file-version-indicator"
+          >
+            Version 2
+          </span>
+          Two
+        </div>
+        <div
+          data-testid="tab-3"
+          data-theme="light"
+        >
+          <div
+            data-icon="tabIcon"
+            data-testid="font-awesome-icon"
+          />
+          <span
+            class="source-file-version-indicator"
+          >
+            Version 3
+          </span>
+          Three
+        </div>
+        <div
+          data-selected="true"
+          data-testid="tab-4"
+          data-theme="dark"
+        >
+          <div
+            data-icon="faCodeCompare"
+            data-testid="font-awesome-icon"
+          />
+          Compare
+        </div>
+      </div>
+    </div>
+    <div
+      class="bottom-row"
+    >
+      <div
+        class="source-comparison-tabs"
+      >
+        <div
+          data-icon="faFileCircleMinus"
+          data-testid="font-awesome-icon"
+        />
+        <div
+          data-testid="tabs-4"
+        >
+          <div
+            data-testid="tab-1"
+          >
+            <div
+              data-icon="tabIcon"
+              data-testid="font-awesome-icon"
+            />
+            <span
+              class="source-file-version-indicator"
+            >
+              Version 1
+            </span>
+            One
+          </div>
+          <div
+            data-selected="true"
+            data-testid="tab-2"
+          >
+            <div
+              data-icon="tabIcon"
+              data-testid="font-awesome-icon"
+            />
+            <span
+              class="source-file-version-indicator"
+            >
+              Version 2
+            </span>
+            Two
+          </div>
+        </div>
+        <div
+          data-icon="faFileCirclePlus"
+          data-testid="font-awesome-icon"
+        />
+        <div
+          data-testid="tabs-5"
+        >
+          <div
+            data-selected="true"
+            data-testid="tab-1"
+          >
+            <div
+              data-icon="tabIcon"
+              data-testid="font-awesome-icon"
+            />
+            <span
+              class="source-file-version-indicator"
+            >
+              Version 3
+            </span>
+            Three
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders 4`] = `
+<DocumentFragment>
+  <div
+    class="source-file-tabs"
+  >
+    <div
+      class="top-row"
+    >
+      <div
+        data-testid="tabs-6"
+      >
+        <div
+          data-testid="tab-1"
+          data-theme="light"
+        >
+          <div
+            data-icon="tabIcon"
+            data-testid="font-awesome-icon"
+          />
+          <span
+            class="source-file-version-indicator"
+          >
+            Version 1
+          </span>
+          One
+        </div>
+        <div
+          data-testid="tab-2"
+          data-theme="light"
+        >
+          <div
+            data-icon="tabIcon"
+            data-testid="font-awesome-icon"
+          />
+          <span
+            class="source-file-version-indicator"
+          >
+            Version 2
+          </span>
+          Two
+        </div>
+        <div
+          data-testid="tab-3"
+          data-theme="light"
+        >
+          <div
+            data-icon="tabIcon"
+            data-testid="font-awesome-icon"
+          />
+          <span
+            class="source-file-version-indicator"
+          >
+            Version 3
+          </span>
+          Three
+        </div>
+        <div
+          data-selected="true"
+          data-testid="tab-4"
+          data-theme="dark"
+        >
+          <div
+            data-icon="faCodeCompare"
+            data-testid="font-awesome-icon"
+          />
+          Compare
+        </div>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;

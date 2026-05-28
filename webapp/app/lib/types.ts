@@ -79,9 +79,8 @@ export interface AnalysisGroup {
   reports?: Promise<Report[]>;
   diffs: DiffDict;
   impacts?: ImpactDict;
-  verifyRequested: boolean;
   verifyPending: boolean;
-  verifyCompleted?: Promise<boolean>;
+  verifyComplete: boolean;
 }
 
 export type ScrollTarget = "source" | "report" | "file" | "group" | "none";

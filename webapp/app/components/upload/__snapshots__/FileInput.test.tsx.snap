@@ -1,0 +1,126 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`handles drag and drop 1`] = `
+<DocumentFragment>
+  <div
+    class="file-input"
+  >
+    <div
+      class="drop-zone"
+      data-testid="drop-zone"
+    >
+      <div
+        data-accept=".cedar, .cedarschema, .json, .invariant"
+        data-testid="hidden-file-input"
+      />
+      <div
+        class="drop-message"
+      >
+        <p>
+          Drag and drop files or click to browse
+        </p>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`handles drag and drop 2`] = `
+<DocumentFragment>
+  <div
+    class="file-input"
+  >
+    <div
+      class="drop-zone dragging"
+      data-testid="drop-zone"
+    >
+      <div
+        data-accept=".cedar, .cedarschema, .json, .invariant"
+        data-testid="hidden-file-input"
+      />
+      <div
+        class="drop-message"
+      >
+        <p>
+          Drop files here
+        </p>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`handles drag and drop 3`] = `
+<DocumentFragment>
+  <div
+    class="file-input"
+  >
+    <div
+      class="drop-zone"
+      data-testid="drop-zone"
+    >
+      <div
+        data-accept=".cedar, .cedarschema, .json, .invariant"
+        data-testid="hidden-file-input"
+      />
+      <div
+        class="drop-message"
+      >
+        <p>
+          Drag and drop files or click to browse
+        </p>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`handles drag and drop 4`] = `
+<DocumentFragment>
+  <div
+    class="file-input"
+  >
+    <div
+      class="drop-zone"
+      data-testid="drop-zone"
+    >
+      <div
+        data-accept=".cedar, .cedarschema, .json, .invariant"
+        data-testid="hidden-file-input"
+      />
+      <div
+        class="drop-message"
+      >
+        <p>
+          Drag and drop files or click to browse
+        </p>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <div
+    class="file-input"
+  >
+    <div
+      class="drop-zone"
+      data-testid="drop-zone"
+    >
+      <div
+        data-accept=".cedar, .cedarschema, .json, .invariant"
+        data-testid="hidden-file-input"
+      />
+      <div
+        class="drop-message"
+      >
+        <p>
+          Drag and drop files or click to browse
+        </p>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;

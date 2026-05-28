@@ -1,10 +1,10 @@
-import { ExpansionState } from "../../lib/context/FocusContext";
+import { ExpansionStatus } from "../../lib/context/ExpansionContext";
 
 import "./toggle.css";
 
 interface ToggleAllProps {
   name: string;
-  toggle: (expand: ExpansionState) => void;
+  toggle: (expand: ExpansionStatus) => void;
 }
 
 export function ToggleAll({ name, toggle }: ToggleAllProps) {
@@ -13,7 +13,7 @@ export function ToggleAll({ name, toggle }: ToggleAllProps) {
       <a
         className={`expand-all ${name}-expand-all`}
         data-testid="expand-all"
-        onClick={() => toggle(ExpansionState.Expanded)}
+        onClick={() => toggle(ExpansionStatus.Expanded)}
       >
         EXPAND ALL
       </a>
@@ -21,7 +21,7 @@ export function ToggleAll({ name, toggle }: ToggleAllProps) {
       <a
         className={`collapse-all ${name}-collapse-all`}
         data-testid="collapse-all"
-        onClick={() => toggle(ExpansionState.Collapsed)}
+        onClick={() => toggle(ExpansionStatus.Collapsed)}
       >
         COLLAPSE ALL
       </a>

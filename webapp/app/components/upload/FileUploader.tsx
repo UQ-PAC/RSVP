@@ -16,16 +16,16 @@ export function FileUploader() {
   const context = useVerification();
   const dispatch = useVerificationDispatch();
 
-  const policySets = Object.keys(context);
+  const policySets = Object.entries(context);
 
   const [creating, setCreating] = useState(false);
 
   return (
     <div className="upload-container">
-      {policySets.map((policySet, i) => (
-        <AnalysisGroupProvider key={i} group={policySet}>
+      {policySets.map(([name, group]) => (
+        <AnalysisGroupProvider key={name} group={group}>
           <AnalysisGroup
-            removeGroup={() => dispatch({ type: "remove", group: policySet })}
+            removeGroup={() => dispatch({ type: "remove", group: name })}
           />
         </AnalysisGroupProvider>
       ))}
@@ -37,7 +37,7 @@ export function FileUploader() {
             setCreating(false);
           }}
           cancel={() => setCreating(false)}
-          existing={[...policySets]}
+          existing={policySets.map(([name]) => name)}
         />
       )}
       {!creating && <CreateContextButton onclick={() => setCreating(true)} />}

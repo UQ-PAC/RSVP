@@ -1,38 +1,42 @@
 "use client";
 
 import {
-  ExpansionState,
-  useFocusDispatch,
-} from "../../lib/context/FocusContext";
+  ExpansionStatus,
+  useExpansionDispatch,
+} from "../../lib/context/ExpansionContext";
+import { getFileIcon } from "../../lib/fa-util";
 import { FileType, Report, ReportSeverity } from "../../lib/types";
-import { getFileIcon } from "../../lib/util";
 import { ToggleAll } from "../shared/ToggleAll";
-import { ReportsGroup } from "./ReportsGroup";
+import { ReportGroup } from "./ReportGroup";
 
-export type ReportGroup = [
-  string,
-  { filename: string; filetype?: FileType; reports: Report[] },
-];
+export type ReportGroupData = {
+  filename: string;
+  filetype?: FileType;
+  reports: Report[];
+};
 
-interface ReportsSectionProps {
+export type ReportGroupListing = [string, ReportGroupData];
+
+interface ReportSectionProps {
   title: string;
   severity: ReportSeverity;
-  reports: ReportGroup[];
+  reports: ReportGroupListing[];
 }
 
-export function ReportsSection({
+export function ReportSection({
   title,
   severity,
   reports,
-}: ReportsSectionProps) {
-  const focusDispatch = useFocusDispatch();
+}: ReportSectionProps) {
+  const expansionDispatch = useExpansionDispatch();
 
-  const toggleAll = (expand: ExpansionState) => {
+  const toggleAll = (expand: ExpansionStatus) => {
     reports.forEach(([group]) => {
-      focusDispatch({
-        type: "focus",
-        target: "report-group",
-        focus: { key: `${severity}-${group}`, value: expand },
+      expansionDispatch({
+        type: "toggle",
+        group: "report-group",
+        id: `${severity}-${group}`,
+        status: expand,
       });
     });
   };
@@ -48,7 +52,7 @@ export function ReportsSection({
       </span>
 
       {reports.map(([group, { filename, filetype, reports }]) => (
-        <ReportsGroup
+        <ReportGroup
           key={`${severity}-${group}`}
           section={severity}
           name={filename}

@@ -9,16 +9,16 @@ import { FileType } from "../../lib/types";
 interface CodeLineProps {
   file: Promise<string>;
   n: number;
-  line: string;
   syntax: FileType;
+  children: string;
   temporaryHighlight: (line: number) => boolean;
 }
 
 export function CodeLine({
   file,
   n,
-  line,
   syntax,
+  children: line,
   temporaryHighlight,
 }: CodeLineProps) {
   const highlight = getHighlightFunction(syntax);
@@ -52,6 +52,7 @@ export function CodeLine({
           "source-line-no-report",
           temporaryHighlight(n) && "highlighted",
         )}
+        data-testid="code-line"
         dangerouslySetInnerHTML={{ __html: highlight(line) }}
       />
     </>

@@ -1,0 +1,3 @@
+// Admin accounts should not have albums
+invariant album.owner.role == Role::"Admin"
+    for none album : Album;

@@ -13,11 +13,11 @@ export const emptyAnalysisGroup: AnalysisGroup = {
   files: [],
   diffs: {},
   verifyPending: false,
-  verifyRequested: false,
+  verifyComplete: false,
 };
 
 interface AnalysisGroupAction {
-  type: "add" | "move" | "remove" | "diff" | "impact" | "update";
+  type: "add" | "remove" | "diff" | "impact" | "update";
   file?: VerificationFile;
   index?: number;
   original?: VerificationFile;
@@ -35,10 +35,12 @@ export const AnalysisGroupDispatchContext = createContext<
   Dispatch<AnalysisGroupAction>
 >(() => {});
 
+/* istanbul ignore next */
 export function useAnalysisGroup() {
   return useContext(AnalysisGroupContext);
 }
 
+/* istanbul ignore next */
 export function useAnalysisGroupDispatch() {
   return useContext(AnalysisGroupDispatchContext);
 }
@@ -50,8 +52,6 @@ export function reducer(
   switch (action.type) {
     case "add":
       return doAdd(context, action);
-    case "move":
-      return doMove(context, action);
     case "remove":
       return doRemove(context, action);
     case "diff":
@@ -68,15 +68,13 @@ function doAdd(
   action: AnalysisGroupAction,
 ): AnalysisGroup {
   if (!action.file) {
-    console.error(`invalid action: ${JSON.stringify(action)}`);
+    console.error(`Invalid action: ${JSON.stringify(action)}`);
     return context;
   }
 
   // Copy current context
   const newContext: AnalysisGroup = {
     ...context,
-    verifyPending: false,
-    verifyCompleted: undefined,
   };
 
   let filename = action.file.file.name;
@@ -132,102 +130,17 @@ function doAdd(
   return newContext;
 }
 
-function doMove(
-  context: AnalysisGroup,
-  action: AnalysisGroupAction,
-): AnalysisGroup {
-  if (!action.file || action.index === undefined) {
-    console.error(
-      `Invalid action: { file: ${action.file}, index: ${action.index} }`,
-    );
-    return context;
-  }
-
-  return context;
-
-  // TODO:
-  // 1. Move out of version (+ sort sources)
-  // 2. Move into version
-  // 3. Move between versions
-
-  // const newContext = { ...context };
-  // const newGroup = { ...group };
-
-  // // Add file to new position
-  // if (action.original) {
-  //   // Move to version
-  //   const target = newGroup.files.find(
-  //     (file) => file.original === action.original,
-  //   );
-
-  //   if (!target) {
-  //     console.error(
-  //       "Moving version to nonexistent file: " + action.file.file.name,
-  //     );
-  //     return context;
-  //   } else {
-  //     newGroup.files = [
-  //       ...group.files.filter((file) => file !== existing),
-  //       {
-  //         original: existing.original,
-  //         versions: [
-  //           ...existing.versions.filter((version) => version !== action.file),
-  //         ],
-  //       },
-  //     ];
-  //   }
-  // } else {
-  //   newGroup.files = [...newGroup.files];
-  // }
-
-  // const isVersion = !newGroup.files.some(
-  //   (file) => file.original === action.file,
-  // );
-
-  // // Remove file from current position
-  // if (isVersion) {
-  //   // Locate current original file
-  //   const original = newGroup.files.find((file) =>
-  //     file.versions.some((version) => version === action.file),
-  //   );
-
-  //   if (!original) {
-  //     console.error("Moving nonexistent version: " + action.file.file.name);
-  //     return context;
-  //   } else {
-  //     newGroup.files = [
-  //       ...group.files.filter((file) => file !== original),
-  //       {
-  //         original: original.original,
-  //         versions: [
-  //           ...original.versions.filter((version) => version !== action.file),
-  //         ],
-  //       },
-  //     ];
-  //   }
-  // } else {
-  //   newGroup.files = [
-  //     ...newGroup.files.filter((file) => file.original !== action.file),
-  //   ];
-  // }
-
-  // newContext[action.group] = newGroup;
-  // return newContext;
-}
-
 function doRemove(
   context: AnalysisGroup,
   action: AnalysisGroupAction,
 ): AnalysisGroup {
   if (!action.file) {
-    console.error(`invalid action: ${JSON.stringify(action)}`);
+    console.error(`Invalid action: ${JSON.stringify(action)}`);
     return context;
   }
 
   const newContext: AnalysisGroup = {
     ...context,
-    verifyPending: false,
-    verifyCompleted: undefined,
   };
 
   if (action.original) {
@@ -241,16 +154,29 @@ function doRemove(
       }
       return { original, versions: [...versions] };
     });
-  } else {
-    // Remove standalone file (and all versions)
-    newContext.files = [
-      ...context.files.filter((file) => file.original !== action.file),
-    ];
+
     // Delete any associated reports
     newContext.reports = context.reports?.then((reports) =>
       reports.filter(
         (report) => report.sourceLocations[0]?.location.source !== action.file,
       ),
+    );
+  } else {
+    // Remove standalone file (and all versions)
+    const toRemove = context.files.find(
+      (file) => file.original === action.file,
+    );
+    newContext.files = [...context.files.filter((file) => file !== toRemove)];
+
+    // Delete any associated reports
+    newContext.reports = context.reports?.then((reports) =>
+      reports.filter((report) => {
+        const source = report.sourceLocations[0]?.location.source;
+        return (
+          source !== toRemove?.original &&
+          !toRemove?.versions.some((version) => source === version)
+        );
+      }),
     );
   }
 
@@ -264,7 +190,7 @@ function addDiff(
   context: AnalysisGroup,
   action: AnalysisGroupAction,
 ): AnalysisGroup {
-  if (action.diff === undefined || !action.originalId || !action.updatedId) {
+  if (!action.diff || !action.originalId || !action.updatedId) {
     console.error(`Invalid action: ${JSON.stringify(action)}`);
     return context;
   }
@@ -272,10 +198,6 @@ function addDiff(
   const newContext = { ...context };
 
   const newDiffs = { ...newContext.diffs };
-
-  if (!newDiffs) {
-    return context;
-  }
 
   const newDiffsForFile = { ...newDiffs[action.originalId] };
 
@@ -291,18 +213,14 @@ function addImpact(
   context: AnalysisGroup,
   action: AnalysisGroupAction,
 ): AnalysisGroup {
-  if (action.impact === undefined || !action.originalId || !action.updatedId) {
+  if (!action.impact || !action.originalId || !action.updatedId) {
     console.error(`Invalid action: ${JSON.stringify(action)}`);
     return context;
   }
 
   const newContext = { ...context };
 
-  const newImpacts = { ...newContext.impacts };
-
-  if (!newImpacts) {
-    return context;
-  }
+  const newImpacts = newContext.impacts ? { ...newContext.impacts } : {};
 
   const newImpactsForFile = { ...newImpacts[action.originalId] };
 
@@ -319,7 +237,7 @@ function doUpdate(
   action: AnalysisGroupAction,
 ): AnalysisGroup {
   if (!action.update) {
-    console.error(`bad update: ${JSON.stringify(action)}`);
+    console.error(`Invalid action: ${JSON.stringify(action)}`);
     return context;
   }
 
@@ -394,11 +312,7 @@ export async function sortFilesById(group: AnalysisGroup): Promise<{
 }
 
 function doesFileExist(filename: string, context: AnalysisGroup): boolean {
-  return context.files.some(
-    (file) =>
-      file.original.filename === filename ||
-      file.versions.some((version) => version.filename === filename),
-  );
+  return context.files.some((file) => file.original.filename === filename);
 }
 
 async function getServerId(file: VerificationFile): Promise<string> {

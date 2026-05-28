@@ -1,0 +1,90 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <div
+    class="source-file-render roboto-mono"
+  >
+    <pre
+      class="code"
+    >
+      <span
+        class="source-file-empty-line-number"
+      >
+         
+      </span>
+      <span
+        class="source-file-line-content source-file-empty-line"
+      >
+         
+      </span>
+      <div
+        data-syntax="cedar"
+        data-temp-highlight="false"
+        data-testid="code-line-1"
+      >
+        Some lines of code here
+      </div>
+      <div
+        data-syntax="cedar"
+        data-temp-highlight="false"
+        data-testid="code-line-2"
+      >
+        such brilliant code
+      </div>
+      <div
+        data-syntax="cedar"
+        data-temp-highlight="false"
+        data-testid="code-line-3"
+      >
+        wowee
+      </div>
+    </pre>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders 2`] = `
+<DocumentFragment>
+  <div
+    class="source-file-render roboto-mono"
+  >
+    <pre
+      class="code"
+    >
+      <span
+        class="source-file-empty-line-number"
+      >
+         
+      </span>
+      <span
+        class="source-file-line-content source-file-empty-line"
+      >
+         
+      </span>
+      <div
+        data-reports="1"
+        data-syntax="cedar"
+        data-temp-highlight="false"
+        data-testid="highlighted-code-line-1"
+      >
+        Some lines of code here
+      </div>
+      <div
+        data-syntax="cedar"
+        data-temp-highlight="false"
+        data-testid="code-line-2"
+      >
+        such brilliant code
+      </div>
+      <div
+        data-syntax="cedar"
+        data-temp-highlight="false"
+        data-testid="code-line-3"
+      >
+        wowee
+      </div>
+    </pre>
+  </div>
+</DocumentFragment>
+`;

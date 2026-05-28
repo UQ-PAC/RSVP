@@ -1,15 +1,13 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-var */
 import { fireEvent, render, screen } from "@testing-library/react";
 
 import { faFileLines } from "@fortawesome/free-solid-svg-icons";
-import { ExpansionState } from "../../lib/context/FocusContext";
-import { ReportsGroup } from "./ReportsGroup";
+import { ExpansionStatus } from "../../lib/context/ExpansionContext";
+import { ReportGroup } from "./ReportGroup";
 
-var testFileOne = ExpansionState.Expanded;
-var testFileTwo = ExpansionState.Expanded;
+var testFileOne = ExpansionStatus.Expanded;
+var testFileTwo = ExpansionStatus.Expanded;
 
-var focusDispatch = jest.fn();
+var expansionDispatch = jest.fn();
 var selectionDispatch = jest.fn();
 
 jest.mock("@fortawesome/react-fontawesome", () => ({
@@ -29,9 +27,9 @@ jest.mock("@fortawesome/free-solid-svg-icons", () => ({
   faFileLines: "faFileLines",
 }));
 
-jest.mock("../../lib/context/FocusContext", () => ({
-  ...jest.requireActual("../../lib/context/FocusContext"),
-  useFocus: () => ({
+jest.mock("../../lib/context/ExpansionContext", () => ({
+  ...jest.requireActual("../../lib/context/ExpansionContext"),
+  useExpansion: () => ({
     "report-group": {
       expansions: {
         "section-test-file-one.txt": testFileOne,
@@ -39,7 +37,7 @@ jest.mock("../../lib/context/FocusContext", () => ({
       },
     },
   }),
-  useFocusDispatch: () => focusDispatch,
+  useExpansionDispatch: () => expansionDispatch,
 }));
 
 jest.mock("../../lib/context/SelectionContext", () => ({
@@ -53,18 +51,18 @@ jest.mock("./ReportItem", () => ({
 }));
 
 beforeEach(() => {
-  focusDispatch.mockClear();
+  expansionDispatch.mockClear();
   selectionDispatch.mockClear();
 });
 
 test("renders", () => {
-  testFileOne = ExpansionState.Expanded;
+  testFileOne = ExpansionStatus.Expanded;
 
   const file = "test-file-one.txt";
   const reports = [{ id: "one" }, { id: "two" }] as any[];
 
   const { asFragment, rerender } = render(
-    <ReportsGroup
+    <ReportGroup
       section="section"
       id={file}
       name={file + " (2)"}
@@ -73,10 +71,10 @@ test("renders", () => {
   );
   expect(asFragment()).toMatchSnapshot();
 
-  testFileOne = ExpansionState.Collapsed;
+  testFileOne = ExpansionStatus.Collapsed;
 
   rerender(
-    <ReportsGroup
+    <ReportGroup
       section="section"
       id={file}
       name={file}
@@ -89,13 +87,13 @@ test("renders", () => {
 
 test("renders solid icon on hover", () => {
   // Group collapsed
-  testFileOne = ExpansionState.Collapsed;
+  testFileOne = ExpansionStatus.Collapsed;
 
   const file = "test-file-one.txt";
   const reports = [{ id: "one" }, { id: "two" }] as any[];
 
   const { asFragment, rerender } = render(
-    <ReportsGroup section="section" id={file} name={file} reports={reports} />,
+    <ReportGroup section="section" id={file} name={file} reports={reports} />,
   );
   expect(asFragment()).toMatchSnapshot();
 
@@ -110,22 +108,22 @@ test("renders solid icon on hover", () => {
   fireEvent.mouseEnter(toggle);
 
   rerender(
-    <ReportsGroup section="section" id={file} name={file} reports={reports} />,
+    <ReportGroup section="section" id={file} name={file} reports={reports} />,
   );
   expect(asFragment()).toMatchSnapshot();
 
   fireEvent.mouseLeave(toggle);
 
   rerender(
-    <ReportsGroup section="section" id={file} name={file} reports={reports} />,
+    <ReportGroup section="section" id={file} name={file} reports={reports} />,
   );
   expect(asFragment()).toMatchSnapshot();
 
   // Group expanded
-  testFileOne = ExpansionState.Expanded;
+  testFileOne = ExpansionStatus.Expanded;
 
   rerender(
-    <ReportsGroup section="section" id={file} name={file} reports={reports} />,
+    <ReportGroup section="section" id={file} name={file} reports={reports} />,
   );
   expect(asFragment()).toMatchSnapshot();
 
@@ -133,14 +131,14 @@ test("renders solid icon on hover", () => {
   fireEvent.mouseEnter(toggle);
 
   rerender(
-    <ReportsGroup section="section" id={file} name={file} reports={reports} />,
+    <ReportGroup section="section" id={file} name={file} reports={reports} />,
   );
   expect(asFragment()).toMatchSnapshot();
 
   fireEvent.mouseLeave(toggle);
 
   rerender(
-    <ReportsGroup section="section" id={file} name={file} reports={reports} />,
+    <ReportGroup section="section" id={file} name={file} reports={reports} />,
   );
   expect(asFragment()).toMatchSnapshot();
 });
@@ -150,7 +148,7 @@ test("triggers scroll to source file", () => {
   const reports = [{ id: "one" }, { id: "two" }] as any[];
 
   render(
-    <ReportsGroup section="section" id={file} name={file} reports={reports} />,
+    <ReportGroup section="section" id={file} name={file} reports={reports} />,
   );
 
   const header = screen.getByTestId(`reports-group-${file}-header`);
@@ -158,37 +156,54 @@ test("triggers scroll to source file", () => {
 
   fireEvent.click(header);
 
-  expect(focusDispatch).toHaveBeenCalledTimes(1);
-  expect(focusDispatch).toHaveBeenCalledWith({
-    type: "focus",
-    target: "source-file",
-    focus: { key: file, value: ExpansionState.Expanded },
+  expect(expansionDispatch).toHaveBeenCalledTimes(1);
+  expect(expansionDispatch).toHaveBeenCalledWith({
+    type: "toggle",
+    group: "source-file",
+    id: file,
+    status: ExpansionStatus.Expanded,
   });
   expect(selectionDispatch).toHaveBeenCalledTimes(1);
   expect(selectionDispatch).toHaveBeenCalledWith({ scroll: "file", file });
 });
 
+test("doesn't trigger scroll when no source file", () => {
+  const file = "other";
+  const reports = [{ id: "one" }, { id: "two" }] as any[];
+
+  render(
+    <ReportGroup section="section" id={file} name={file} reports={reports} />,
+  );
+
+  const header = screen.getByTestId(`reports-group-${file}-header`);
+  expect(header).toBeInTheDocument();
+
+  fireEvent.click(header);
+  expect(expansionDispatch).not.toHaveBeenCalled();
+  expect(selectionDispatch).not.toHaveBeenCalled();
+});
+
 test("triggers expansion", () => {
-  testFileOne = ExpansionState.Collapsed;
-  testFileTwo = ExpansionState.Expanded;
+  testFileOne = ExpansionStatus.Collapsed;
+  testFileTwo = ExpansionStatus.Expanded;
 
   const fileOne = "test-file-one.txt";
   const fileTwo = "test-file-two.txt";
 
   const focusAction = {
-    type: "focus",
-    target: "report-group",
+    type: "toggle",
+    group: "report-group",
   };
 
   const { asFragment } = render(
     <>
-      <ReportsGroup
+      <ReportGroup
         section="section"
         id={fileOne}
         name={fileOne}
         reports={[{ id: "one" }, { id: "two" }] as any[]}
       />
-      <ReportsGroup
+      <ReportGroup
         section="section"
         id={fileTwo}
         name={fileTwo}
@@ -211,10 +226,11 @@ test("triggers expansion", () => {
   expect(selectionDispatch).toHaveBeenCalledWith({
     scroll: "none",
   });
-  expect(focusDispatch).toHaveBeenCalledTimes(1);
-  expect(focusDispatch).toHaveBeenCalledWith({
+  expect(expansionDispatch).toHaveBeenCalledTimes(1);
+  expect(expansionDispatch).toHaveBeenCalledWith({
     ...focusAction,
-    focus: { key: `section-${fileOne}`, value: ExpansionState.Expanded },
+    id: `section-${fileOne}`,
+    status: ExpansionStatus.Expanded,
   });
 
   // Trigger collapse of group two
@@ -226,9 +242,10 @@ test("triggers expansion", () => {
 
   fireEvent.click(toggleTwo!);
   expect(selectionDispatch).toHaveBeenCalledTimes(2);
-  expect(focusDispatch).toHaveBeenCalledTimes(2);
-  expect(focusDispatch).toHaveBeenLastCalledWith({
+  expect(expansionDispatch).toHaveBeenCalledTimes(2);
+  expect(expansionDispatch).toHaveBeenLastCalledWith({
     ...focusAction,
-    focus: { key: `section-${fileTwo}`, value: ExpansionState.Collapsed },
+    id: `section-${fileTwo}`,
+    status: ExpansionStatus.Collapsed,
   });
 });

@@ -1,5 +1,6 @@
 import { createContext, Dispatch, useContext } from "react";
-import { verify } from "../requests";
+import { publish } from "../events";
+import { remove, verify } from "../requests";
 import {
   AnalysisGroup,
   Report,
@@ -17,7 +18,7 @@ export interface VerificationState {
 export const emptyVerification: VerificationState = {};
 
 export interface VerificationAction {
-  type: "add" | "remove" | "pre-verify" | "verify" | "update";
+  type: "add" | "remove" | "verify" | "complete" | "update";
   group?: string;
   file?: VerificationFile;
   index?: number;
@@ -32,10 +33,12 @@ export const VerificationDispatchContext = createContext<
   Dispatch<VerificationAction>
 >(() => {});
 
+/* istanbul ignore next */
 export function useVerification() {
   return useContext(VerificationContext);
 }
 
+/* istanbul ignore next */
 export function useVerificationDispatch() {
   return useContext(VerificationDispatchContext);
 }
@@ -45,43 +48,31 @@ export function verificationReducer(
   action: VerificationAction,
 ): VerificationState {
   switch (action.type) {
-    case "pre-verify":
-      return doPreVerify(context);
     case "verify":
       return doVerify(context);
+    case "complete":
+      return doComplete(context);
     case "add":
-      return doAdd(context, action);
+      return doAddGroup(context, action);
     case "remove":
-      return doRemove(context, action);
+      return doRemoveGroup(context, action);
     case "update":
-      return updateGroup(context, action);
+      return doUpdateGroup(context, action);
   }
 }
 
-function doPreVerify(context: VerificationState): VerificationState {
-  const newContext = {};
-
-  Object.entries(context).forEach(([id, group]) => {
-    newContext[id] = {
-      ...group,
-      verifyRequested: true,
-      verifyPending: true,
-    } as AnalysisGroup;
-  });
-
-  return newContext;
-}
-
 function doVerify(context: VerificationState): VerificationState {
+  publish("verificationPending");
+
   const newContext = {};
+
+  const results: Promise<Report[]>[] = [];
 
   Object.entries(context).forEach(([id, group]) => {
     const { error } = checkAnalysisGroup(group.files);
 
     if (error) {
-      newContext[id] = {
-        ...group,
-      } as AnalysisGroup;
+      newContext[id] = group;
     } else {
       const fileResolution = new Promise<{
         request: VerificationRequest;
@@ -100,18 +91,20 @@ function doVerify(context: VerificationState): VerificationState {
           invariants: Object.keys(invariants),
         };
 
-        const resolveFilenames = (report: Report): Report => ({
-          ...report,
-          sourceLocations: report.sourceLocations.map(
-            ({ message, location }) => ({
-              message,
-              location: {
-                ...location,
-                source: all[location.file],
-              },
-            }),
-          ),
-        });
+        const resolveFilenames = (report: Report): Report => {
+          return {
+            ...report,
+            sourceLocations: report.sourceLocations.map(
+              ({ message, location }) => ({
+                message,
+                location: {
+                  ...location,
+                  source: all[location.file],
+                },
+              }),
+            ),
+          };
+        };
 
         resolve({
           request,
@@ -124,20 +117,42 @@ function doVerify(context: VerificationState): VerificationState {
         verify(request).then((reports) => reports.map(resolveFilenames)),
       );
 
+      // Cache promise to trigger completion event
+      results.push(reports);
+
       newContext[id] = {
         ...group,
         byId: fileResolution.then(({ byId }) => byId),
         reports,
         impacts: {},
-        verifyCompleted: reports.then(() => true).catch(() => false),
+        verifyPending: true,
+        verifyComplete: false,
       } as AnalysisGroup;
     }
+  });
+
+  Promise.all(results)
+    .then(() => publish("verificationComplete"))
+    .catch(() => publish("verificationError"));
+
+  return newContext;
+}
+
+function doComplete(context: VerificationState): VerificationState {
+  const newContext = {};
+
+  Object.entries(context).forEach(([id, group]) => {
+    newContext[id] = {
+      ...group,
+      verifyPending: false,
+      verifyComplete: true,
+    } as AnalysisGroup;
   });
 
   return newContext;
 }
 
-function doAdd(
+function doAddGroup(
   context: VerificationState,
   action: VerificationAction,
 ): VerificationState {
@@ -146,35 +161,48 @@ function doAdd(
     return context;
   }
 
-  // Copy current context
-  const group: AnalysisGroup = context[action.group] ?? {
+  if (context[action.group]) {
+    console.error(`Group "${action.group}" already exists`);
+    return context;
+  }
+
+  const newContext = { ...context };
+
+  newContext[action.group] = {
     ...emptyAnalysisGroup,
     name: action.group,
   };
-  const newContext = { ...context };
-  const newGroup = { ...group };
 
-  newContext[action.group] = newGroup;
   return newContext;
 }
 
-function doRemove(
+function doRemoveGroup(
   context: VerificationState,
   action: VerificationAction,
 ): VerificationState {
   if (!action.group) {
-    console.error(
-      `Invalid action: { file: ${action.file}, group: ${action.group} }`,
-    );
+    console.error(`Invalid action: ${JSON.stringify(action)}`);
     return context;
   }
 
   const group: AnalysisGroup = context[action.group];
 
   if (!group) {
-    console.error(`Group "${action.group} doesn't exist.`);
+    console.error(`Group "${action.group}" doesn't exist.`);
     return context;
   }
+
+  // Delete files from server
+  group.files.forEach((file) => {
+    file.original.resolved
+      .then(({ serverId }) => serverId)
+      .then((id) => remove(id));
+    file.versions.forEach((version) =>
+      version.resolved
+        .then(({ serverId }) => serverId)
+        .then((id) => remove(id)),
+    );
+  });
 
   const newContext = { ...context };
 
@@ -184,16 +212,17 @@ function doRemove(
   return newContext;
 }
 
-function updateGroup(
+function doUpdateGroup(
   context: VerificationState,
   action: VerificationAction,
 ): VerificationState {
-  if (!action.group || !action.update) {
+  if (!action.update) {
+    console.error("Invalid action: " + JSON.stringify(action));
     return context;
   }
 
   const newContext = { ...context };
-  newContext[action.group] = action.update;
+  newContext[action.update.name] = action.update;
 
   return newContext;
 }

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-var */
 import { render, screen, waitFor } from "@testing-library/react";
 import { AnalysisGroup, VerificationFile } from "../../lib/types";
 import { DiffRender } from "./DiffRender";
@@ -8,8 +6,8 @@ var analysisGroup: AnalysisGroup = {
   name: "",
   files: [],
   diffs: {},
-  verifyRequested: false,
   verifyPending: false,
+  verifyComplete: false,
 };
 
 var diff = Promise.resolve("");
@@ -35,13 +33,23 @@ jest.mock("../../lib/context/AnalysisGroupContext", () => ({
   useAnalysisGroupDispatch: jest.fn(() => jest.fn()),
 }));
 
+jest.mock("../../lib/context/ExpansionContext", () => ({
+  useExpansion: jest.fn(() => jest.fn()),
+  useExpansionDispatch: jest.fn(() => jest.fn()),
+}));
+
+jest.mock("../../lib/context/SelectionContext", () => ({
+  useSelection: jest.fn(() => jest.fn()),
+  useSelectionDispatch: jest.fn(() => jest.fn()),
+}));
+
 jest.mock("../../lib/requests", () => ({
   diff: jest.fn(() => diff),
   impact: jest.fn(() => impact),
 }));
 
 jest.mock("../shared/ProgressSpinner", () => ({
-  ProgressSpinner: jest.fn((text) => (
+  ProgressSpinner: jest.fn(({ text }) => (
     <div data-testid="progress-spinner" data-text={text}></div>
   )),
 }));

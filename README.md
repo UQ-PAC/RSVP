@@ -98,10 +98,10 @@ application. These instructions are for running verification via the web applica
 
    More detailed instructions can be found in the [npm documentation](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
 
-2. Install pnpm using npm
+2. Enable pnpm
 
    ```
-   npm install -g pnpm@latest-10
+   corepack enable pnpm
    ```
 
 3. Install project dependencies using pnpm

@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <div
+    class="source-files-container"
+  >
+    <div
+      data-instruction="Create a policy set"
+      data-testid="fallback"
+    />
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders 2`] = `
+<DocumentFragment>
+  <div
+    class="source-files-container"
+  >
+    <div
+      data-group="group one"
+      data-testid="analysis-group-provider"
+    >
+      <div
+        data-testid="analysis-group"
+      />
+    </div>
+    <div
+      data-group="group two"
+      data-testid="analysis-group-provider"
+    >
+      <div
+        data-testid="analysis-group"
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;

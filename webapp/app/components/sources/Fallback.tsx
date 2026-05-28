@@ -1,10 +1,10 @@
 "use client";
 
 import {
-  ExpansionState,
-  useFocus,
-  useFocusDispatch,
-} from "../../lib/context/FocusContext";
+  ExpansionStatus,
+  useExpansion,
+  useExpansionDispatch,
+} from "../../lib/context/ExpansionContext";
 
 interface FallbackProps {
   instruction: string;
@@ -12,8 +12,8 @@ interface FallbackProps {
 }
 
 export function Fallback({ instruction, target }: FallbackProps) {
-  const { drawer: drawerFocus } = useFocus();
-  const focusDispatch = useFocusDispatch();
+  const { drawer: drawerFocus } = useExpansion();
+  const expansionDispatch = useExpansionDispatch();
 
   return (
     <p className="source-files-instruction">
@@ -21,16 +21,18 @@ export function Fallback({ instruction, target }: FallbackProps) {
         className="source-files-upload-link"
         data-testid="source-files-upload-link"
         onClick={() => {
-          if (drawerFocus.expansions.left == ExpansionState.Collapsed) {
-            focusDispatch({
-              type: "focus",
-              target: "drawer",
-              focus: { key: "left", value: ExpansionState.Expanded },
+          if (drawerFocus.expansions.left == ExpansionStatus.Collapsed) {
+            expansionDispatch({
+              type: "toggle",
+              group: "drawer",
+              id: "left",
+              status: ExpansionStatus.Expanded,
             });
-            focusDispatch({
-              type: "focus",
-              target: "drawer",
-              focus: { key: "right", value: ExpansionState.Collapsed },
+            expansionDispatch({
+              type: "toggle",
+              group: "drawer",
+              id: "right",
+              status: ExpansionStatus.Collapsed,
             });
           }
         }}

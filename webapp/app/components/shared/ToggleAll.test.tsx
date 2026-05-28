@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { ExpansionState } from "../../lib/context/FocusContext";
+import { ExpansionStatus } from "../../lib/context/ExpansionContext";
 import { ToggleAll } from "./ToggleAll";
 
 test("renders", () => {
@@ -15,12 +15,12 @@ test("triggers toggle", () => {
 
   fireEvent.click(expand);
   expect(toggle).toHaveBeenCalledTimes(1);
-  expect(toggle).toHaveBeenNthCalledWith(1, ExpansionState.Expanded);
+  expect(toggle).toHaveBeenNthCalledWith(1, ExpansionStatus.Expanded);
 
   const collapse = screen.getByTestId("collapse-all");
   expect(collapse).toBeInTheDocument();
 
   fireEvent.click(collapse);
   expect(toggle).toHaveBeenCalledTimes(2);
-  expect(toggle).toHaveBeenNthCalledWith(2, ExpansionState.Collapsed);
+  expect(toggle).toHaveBeenNthCalledWith(2, ExpansionStatus.Collapsed);
 });

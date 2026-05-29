@@ -8,6 +8,12 @@ import uq.pac.rsvp.support.SourceLoc;
 
 import java.util.Objects;
 
+/**
+ * An object representing a type reference for entities and actions
+ * The type reference consists of a base name of a type and the namespace.
+ * For instance, with Photo::App::Account, the basename is 'Account'
+ * and the namespace os Photo::App
+ */
 public class TypeReference extends BuiltinType {
 
     public static String TYPE_REFERENCE_DELIMITER = "::";

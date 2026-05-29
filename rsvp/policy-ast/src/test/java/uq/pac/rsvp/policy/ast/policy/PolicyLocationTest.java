@@ -70,7 +70,6 @@ public class PolicyLocationTest {
             consumer.run();
             assertLocation(node);
             indent -= 3;
-
         }
 
         void log(String msg, AstNode node) {
@@ -225,6 +224,13 @@ public class PolicyLocationTest {
         @Override
         public void visitTypeExpr(TypeExpression expr) {
             log("Type: " + expr.toString(), expr);
+        }
+
+        @Override
+        public void visitHasExpr(HasExpression expr) {
+            log("Has: " + expr.toString(), expr, () -> {
+                expr.getExpression().accept(this);
+            });
         }
     }
 }

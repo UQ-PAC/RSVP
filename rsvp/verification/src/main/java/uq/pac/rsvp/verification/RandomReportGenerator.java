@@ -8,13 +8,7 @@ import uq.pac.rsvp.policy.ast.entity.RecordValue;
 import uq.pac.rsvp.policy.ast.policy.Invariant;
 import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
-import uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.CallExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.ConditionalExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.PropertyAccessExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.RecordExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.SetExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.*;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitorImpl;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.statement.ActionDefinition;
@@ -262,6 +256,12 @@ public class RandomReportGenerator {
         public void visitUnaryExpr(UnaryExpression expr) {
             maybeAddRandomReport(expr, 5);
             super.visitUnaryExpr(expr);
+        }
+
+        @Override
+        public void visitHasExpr(HasExpression expr) {
+            maybeAddRandomReport(expr, 5);
+            super.visitHasExpr(expr);
         }
 
         private void maybeAddRandomReport(AstNode entry, int probability) {

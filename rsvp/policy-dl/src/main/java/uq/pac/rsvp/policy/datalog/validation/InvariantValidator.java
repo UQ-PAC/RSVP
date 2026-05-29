@@ -162,11 +162,6 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
                 expectCompatible(lhs, rhs, TBoolean);
                 yield BooleanType;
             }
-            case HasAttr -> {
-                expect(lhs, TEntityOrAction, TRecord);
-                expect(rhs, TString);
-                yield BooleanType;
-            }
             case Is -> {
                 expect(lhs, TEntityOrAction);
                 expect(rhs, TTypeOfEntity);
@@ -178,6 +173,12 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
             }
             default -> throw new TranslationError("Unsupported");
         };
+    }
+
+    @Override
+    public BuiltinType visitHasExpr(HasExpression expr) {
+        expect(collect(expr.getExpression()), TEntityOrAction, TRecord);
+        return BooleanType;
     }
 
     @Override

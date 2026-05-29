@@ -147,14 +147,16 @@ public class TranslationVisitor extends VoidVisitorAdapter {
                         rhs = getOperand(expr.getRight());
                 expressions.add(new DLAtom(ParentOfRuleDecl, negated, rhs, lhs));
             }
-            case HasAttr -> {
-                DLTerm lhs = getOperand(expr.getLeft()),
-                    rhs = getOperand(expr.getRight());
-                expressions.add(new DLAtom(HasAttributeRuleDecl, negated, lhs, rhs));
-            }
             case And, Or -> throw new AssertionError("Unreachable");
             default -> throw new TranslationError("Unsupported: " + expr.getOp());
         }
+    }
+
+    @Override
+    public void visitHasExpr(HasExpression expr) {
+        DLTerm lhs = getOperand(expr.getExpression()),
+                rhs = new DLString(expr.getAttribute());
+        expressions.add(new DLAtom(HasAttributeRuleDecl, negated, lhs, rhs));
     }
 
     @Override

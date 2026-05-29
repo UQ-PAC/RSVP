@@ -21,8 +21,7 @@ public class BinaryExpression extends Expression {
         Mul,
         In,
         Like,
-        Is,
-        HasAttr
+        Is
     }
 
     private final BinaryOp op;
@@ -66,20 +65,20 @@ public class BinaryExpression extends Expression {
     public String toString() {
         String opStr = switch (op) {
             case Add -> "+";
-            case And -> "&&";
+            case Sub -> "-";
+            case Mul -> "*";
             case Eq -> "==";
+            case Neq -> "!=";
             case Greater -> ">";
             case GreaterEq -> ">=";
-            case HasAttr -> "has";
             case In -> "in";
             case Is -> "is";
             case Less -> "<";
             case LessEq -> "<=";
             case Like -> "like";
-            case Mul -> "*";
-            case Neq -> "!=";
+            case And -> "&&";
             case Or -> "||";
-            case Sub -> "-";
+
         };
         return '(' + left.toString() + ' ' + opStr + ' ' + right.toString() + ')';
     }

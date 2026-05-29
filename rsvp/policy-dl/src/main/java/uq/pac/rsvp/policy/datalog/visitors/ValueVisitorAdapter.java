@@ -102,4 +102,9 @@ public class ValueVisitorAdapter<T> implements PolicyComputationVisitor<T> {
     public T visitTypeExpr(TypeExpression expr) {
         return unsupported(expr);
     }
+
+    @Override
+    public T visitHasExpr(HasExpression expr) {
+        return unsupported(expr);
+    }
 }

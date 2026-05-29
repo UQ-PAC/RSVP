@@ -98,4 +98,9 @@ public class VoidVisitorAdapter implements PolicyVisitor {
     public void visitTypeExpr(TypeExpression expr) {
         unsupported(expr);
     }
+
+    @Override
+    public void visitHasExpr(HasExpression expr) {
+        unsupported(expr);
+    }
 }

@@ -3,21 +3,7 @@ package uq.pac.rsvp.policy.ast.policy;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import uq.pac.rsvp.policy.ast.CedarParser;
-import uq.pac.rsvp.policy.ast.policy.expr.ActionExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.BooleanExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.CallExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.ConditionalExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.EntityExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.Expression;
-import uq.pac.rsvp.policy.ast.policy.expr.LongExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.PropertyAccessExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.RecordExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.SetExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.StringExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.TypeExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression;
-import uq.pac.rsvp.policy.ast.policy.expr.VariableExpression;
+import uq.pac.rsvp.policy.ast.policy.expr.*;
 import uq.pac.rsvp.support.FileSource;
 
 import java.util.ArrayList;
@@ -33,7 +19,6 @@ import static uq.pac.rsvp.policy.ast.Util.unquote;
 import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.Eq;
 import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.Greater;
 import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.GreaterEq;
-import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.HasAttr;
 import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.Is;
 import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.Less;
 import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.LessEq;
@@ -146,8 +131,8 @@ public class ExpressionVisitor extends CedarSourceVisitor<Expression> {
         if (ctx.attributeName().STRING() != null) {
             attr = unquote(ctx.attributeName().STRING().getText());
         }
-        return new BinaryExpression(ctx.expression().accept(this),
-                HasAttr, new StringExpression(attr, location(ctx.attributeName())), location(ctx));
+        Expression expr = ctx.expression().accept(this);
+        return new HasExpression(expr, attr, location(ctx));
     }
 
     @Override

@@ -39,4 +39,6 @@ public interface PolicyComputationVisitor<T> {
     T visitStringExpr(StringExpression expr);
 
     T visitTypeExpr(TypeExpression expr);
+
+    T visitHasExpr(HasExpression expr);
 }

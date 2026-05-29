@@ -67,6 +67,11 @@ public class NFConverter extends ValueVisitorAdapter<Formula> {
     }
 
     @Override
+    public Formula visitHasExpr(HasExpression expr) {
+        return getVar(expr);
+    }
+
+    @Override
     public Formula visitBooleanExpr(BooleanExpression expr) {
         return factory.constant(expr.getValue());
     }

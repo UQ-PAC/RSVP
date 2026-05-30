@@ -7,7 +7,7 @@ import uq.pac.rsvp.policy.ast.policy.Quantifier;
 
 // Basic visitor implementation. Visits each expression tree in a policy set.
 // Subclasses can override some or all methods.
-public abstract class PolicyVisitorImpl implements PolicyVisitor {
+public abstract class PolicyVisitorAdapter implements PolicyVisitor {
 
     @Override
     public void visitPolicy(Policy policy) {

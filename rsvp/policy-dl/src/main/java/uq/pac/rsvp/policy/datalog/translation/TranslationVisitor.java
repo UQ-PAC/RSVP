@@ -1,9 +1,9 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
 import uq.pac.rsvp.policy.ast.policy.expr.*;
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
 import uq.pac.rsvp.policy.datalog.ast.*;
 import uq.pac.rsvp.policy.ast.policy.Quantifier;
-import uq.pac.rsvp.policy.datalog.visitors.VoidVisitorAdapter;
 import uq.pac.rsvp.support.error.TranslationError;
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ import static uq.pac.rsvp.Assertion.require;
  *  - An expression is a predicate boolean expression, there are no conjunctions or disjunctions
  *  - An expression can be negated but once only
  */
-public class TranslationVisitor extends VoidVisitorAdapter {
+public class TranslationVisitor implements PolicyVisitor {
     /**
      * Translation schema (entity definitions alongside with Datalog declarations)
      */

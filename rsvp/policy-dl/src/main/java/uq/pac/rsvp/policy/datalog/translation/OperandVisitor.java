@@ -1,8 +1,8 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
 import uq.pac.rsvp.policy.ast.policy.expr.*;
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.datalog.ast.*;
-import uq.pac.rsvp.policy.datalog.visitors.ValueVisitorAdapter;
 import uq.pac.rsvp.support.error.TranslationError;
 
 import java.util.Set;
@@ -10,7 +10,7 @@ import java.util.function.Function;
 
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.*;
 
-public class OperandVisitor extends ValueVisitorAdapter<DLTerm> {
+public class OperandVisitor implements PolicyComputationVisitor<DLTerm> {
 
     // Get a temporary variable. Here we assume that we are generating policies
     // over input variables 'principal', 'resource' and 'action', any variable names
@@ -34,8 +34,8 @@ public class OperandVisitor extends ValueVisitorAdapter<DLTerm> {
 
     @Override
     public DLTerm visitBinaryExpr(BinaryExpression expr) {
-        DLTerm lhs = compute(expr.getLeft()),
-                rhs = compute(expr.getRight());
+        DLTerm lhs = expr.getLeft().compute(this),
+                rhs = expr.getRight().compute(this);
         DLArithmeticTerm.Operator op = switch (expr.getOp()) {
             case Add -> DLArithmeticTerm.Operator.ADD;
             case Sub -> DLArithmeticTerm.Operator.SUB;

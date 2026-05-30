@@ -6,39 +6,39 @@ import uq.pac.rsvp.policy.ast.policy.expr.*;
 import uq.pac.rsvp.policy.ast.policy.Quantifier;
 
 public interface PolicyComputationVisitor<T> {
-    T visitPolicy(Policy policy);
+    default T visitPolicy(Policy policy) { throw new AssertionError(); }
 
-    T visitInvariant(Invariant invariant);
+    default T visitInvariant(Invariant invariant) { throw new AssertionError(); }
 
-    T visitQuantifier(Quantifier quantifier);
+    default T visitQuantifier(Quantifier quantifier) { throw new AssertionError(); }
 
-    T visitBinaryExpr(BinaryExpression expr);
+    default T visitBinaryExpr(BinaryExpression expr) { throw new AssertionError(); }
 
-    T visitCallExpr(CallExpression expr);
+    default T visitCallExpr(CallExpression expr) { throw new AssertionError(); }
 
-    T visitConditionalExpr(ConditionalExpression expr);
+    default T visitConditionalExpr(ConditionalExpression expr) { throw new AssertionError(); }
 
-    T visitPropertyAccessExpr(PropertyAccessExpression expr);
+    default T visitPropertyAccessExpr(PropertyAccessExpression expr) { throw new AssertionError(); }
 
-    T visitRecordExpr(RecordExpression expr);
+    default T visitRecordExpr(RecordExpression expr) { throw new AssertionError(); }
 
-    T visitSetExpr(SetExpression expr);
+    default T visitSetExpr(SetExpression expr) { throw new AssertionError(); }
 
-    T visitUnaryExpr(UnaryExpression expr);
+    default T visitUnaryExpr(UnaryExpression expr) { throw new AssertionError(); }
 
-    T visitVariableExpr(VariableExpression expr);
+    default T visitVariableExpr(VariableExpression expr) { throw new AssertionError(); }
 
-    T visitActionExpr(ActionExpression expr);
+    default T visitActionExpr(ActionExpression expr) { throw new AssertionError(); }
 
-    T visitBooleanExpr(BooleanExpression expr);
+    default T visitBooleanExpr(BooleanExpression expr) { throw new AssertionError(); }
 
-    T visitEntityExpr(EntityExpression expr);
+    default T visitEntityExpr(EntityExpression expr) { throw new AssertionError(); }
 
-    T visitLongExpr(LongExpression expr);
+    default T visitLongExpr(LongExpression expr) { throw new AssertionError(); }
 
-    T visitStringExpr(StringExpression expr);
+    default T visitStringExpr(StringExpression expr) { throw new AssertionError(); }
 
-    T visitTypeExpr(TypeExpression expr);
+    default T visitTypeExpr(TypeExpression expr) { throw new AssertionError(); }
 
-    T visitHasExpr(HasExpression expr);
+    default T visitHasExpr(HasExpression expr) { throw new AssertionError(); }
 }

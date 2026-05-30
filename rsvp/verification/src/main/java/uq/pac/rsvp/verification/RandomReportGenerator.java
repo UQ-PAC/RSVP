@@ -9,7 +9,7 @@ import uq.pac.rsvp.policy.ast.policy.Invariant;
 import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
 import uq.pac.rsvp.policy.ast.policy.expr.*;
-import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitorImpl;
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitorAdapter;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.statement.ActionDefinition;
 import uq.pac.rsvp.policy.ast.schema.statement.CommonTypeDefinition;
@@ -188,7 +188,7 @@ public class RandomReportGenerator {
         }
     }
 
-    private static class RandomPolicyReportGenerator extends PolicyVisitorImpl {
+    private static class RandomPolicyReportGenerator extends PolicyVisitorAdapter {
 
         private final Set<Report> reports;
         private final RandomReportGenerator generator;

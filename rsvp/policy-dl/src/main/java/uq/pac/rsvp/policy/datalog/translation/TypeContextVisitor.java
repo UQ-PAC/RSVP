@@ -1,8 +1,8 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
 import uq.pac.rsvp.policy.ast.policy.expr.*;
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.datalog.ast.*;
-import uq.pac.rsvp.policy.datalog.visitors.ValueVisitorAdapter;
 import uq.pac.rsvp.support.error.TranslationError;
 
 import java.util.HashMap;
@@ -19,7 +19,7 @@ import java.util.Map;
  *        Tor the moment we cannot combine the two together because invariant type checking
  *        does not support type inference, but it needs to be reworked to be able to do so.
  */
-public class TypeContextVisitor extends ValueVisitorAdapter<TypeContextVisitor.Context> {
+public class TypeContextVisitor implements PolicyComputationVisitor<TypeContextVisitor.Context> {
 
     public enum Context {
         NUMERIC, SYMBOLIC, UNDEFINED

@@ -6,39 +6,39 @@ import uq.pac.rsvp.policy.ast.policy.Invariant;
 import uq.pac.rsvp.policy.ast.policy.Quantifier;
 
 public interface PolicyVisitor {
-    void visitPolicy(Policy policy);
+    default void visitPolicy(Policy policy) { throw new AssertionError(); }
 
-    void visitInvariant(Invariant invariant);
+    default void visitInvariant(Invariant invariant) { throw new AssertionError(); }
 
-    void visitQuantifier(Quantifier quantifier);
+    default void visitQuantifier(Quantifier quantifier) { throw new AssertionError(); }
 
-    void visitBinaryExpr(BinaryExpression expr);
+    default void visitBinaryExpr(BinaryExpression expr) { throw new AssertionError(); }
 
-    void visitCallExpr(CallExpression expr);
+    default void visitCallExpr(CallExpression expr) { throw new AssertionError(); }
 
-    void visitConditionalExpr(ConditionalExpression expr);
+    default void visitConditionalExpr(ConditionalExpression expr) { throw new AssertionError(); }
 
-    void visitPropertyAccessExpr(PropertyAccessExpression expr);
+    default void visitPropertyAccessExpr(PropertyAccessExpression expr) { throw new AssertionError(); }
 
-    void visitRecordExpr(RecordExpression expr);
+    default void visitRecordExpr(RecordExpression expr) { throw new AssertionError(); }
 
-    void visitSetExpr(SetExpression expr);
+    default void visitSetExpr(SetExpression expr) { throw new AssertionError(); }
 
-    void visitUnaryExpr(UnaryExpression expr);
+    default void visitUnaryExpr(UnaryExpression expr) { throw new AssertionError(); }
 
-    void visitVariableExpr(VariableExpression expr);
+    default void visitVariableExpr(VariableExpression expr) { throw new AssertionError(); }
 
-    void visitActionExpr(ActionExpression expr);
+    default void visitActionExpr(ActionExpression expr) { throw new AssertionError(); }
 
-    void visitBooleanExpr(BooleanExpression expr);
+    default void visitBooleanExpr(BooleanExpression expr) { throw new AssertionError(); }
 
-    void visitEntityExpr(EntityExpression expr);
+    default void visitEntityExpr(EntityExpression expr) { throw new AssertionError(); }
 
-    void visitLongExpr(LongExpression expr);
+    default void visitLongExpr(LongExpression expr) { throw new AssertionError(); }
 
-    void visitStringExpr(StringExpression expr);
+    default void visitStringExpr(StringExpression expr) { throw new AssertionError(); }
 
-    void visitTypeExpr(TypeExpression expr);
+    default void visitTypeExpr(TypeExpression expr) { throw new AssertionError(); }
 
-    void visitHasExpr(HasExpression expr);
+    default void visitHasExpr(HasExpression expr) { throw new AssertionError(); }
 }

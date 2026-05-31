@@ -83,9 +83,7 @@ public class RecordValue extends EntityValue {
     @Override
     public JsonElement toJson() {
         JsonObject object = new JsonObject();
-        values.forEach((k, v) -> {
-            object.add(k.getValue(), v.toJson());
-        });
+        values.forEach((k, v) -> object.add(k.getValue(), v.toJson()));
         return object;
     }
 }

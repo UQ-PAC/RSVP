@@ -1,6 +1,5 @@
 package uq.pac.rsvp.policy.ast.policy.expr;
 
-import org.apache.commons.text.StringEscapeUtils;
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;

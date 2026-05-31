@@ -48,7 +48,7 @@ public class StringValue extends EntityValue {
     @Override
     public JsonElement toJson() {
         // We keep all String values unescaped,
-        // so to properly convert back we need to unescape as converting to Json string
+        // so to properly convert back we need to unescape as converting to JSON string
         // will keep things escaped
         return new JsonPrimitive(StringEscapeUtils.unescapeJava(value));
     }

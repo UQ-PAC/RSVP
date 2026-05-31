@@ -1,6 +1,5 @@
 package uq.pac.rsvp.policy.ast.policy;
 
-import org.antlr.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.*;
 import uq.pac.rsvp.policy.ast.CedarLexer;
 import uq.pac.rsvp.policy.ast.CedarParser;

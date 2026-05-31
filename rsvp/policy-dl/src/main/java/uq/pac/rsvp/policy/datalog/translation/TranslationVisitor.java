@@ -4,6 +4,7 @@ import uq.pac.rsvp.policy.ast.policy.expr.*;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
 import uq.pac.rsvp.policy.datalog.ast.*;
 import uq.pac.rsvp.policy.ast.policy.Quantifier;
+import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.support.error.TranslationError;
 
 import java.util.ArrayList;
@@ -180,8 +181,8 @@ public class TranslationVisitor implements PolicyVisitor {
 
     @Override
     public void visitPropertyAccessExpr(PropertyAccessExpression expr) {
-        StringExpression value = new StringExpression(Boolean.toString(!negated));
-        new BinaryExpression(expr, BinaryExpression.BinaryOp.Eq, value).accept(this);
+        StringExpression value = new StringExpression(Boolean.toString(!negated), SourceLoc.MISSING);
+        new BinaryExpression(expr, BinaryExpression.BinaryOp.Eq, value, SourceLoc.MISSING).accept(this);
     }
 
     @Override
@@ -191,7 +192,7 @@ public class TranslationVisitor implements PolicyVisitor {
             List<DLRuleExpr> exprs = function.translate(expr, negated, operandVisitor);
             expressions.addAll(exprs);
         } else {
-            throw new uq.pac.rsvp.support.error.TranslationError("Unsupported function: " + expr.getFunc());
+            throw new TranslationError("Unsupported function: " + expr.getFunc());
         }
     }
 }

@@ -24,14 +24,6 @@ public class CallExpression extends Expression {
         this(self, func, args, SourceLoc.MISSING);
     }
 
-    public CallExpression(String func, List<Expression> args, SourceLoc source) {
-        this(null, func, args, source);
-    }
-
-    public CallExpression(String func, List<Expression> args) {
-        this(func, args, null);
-    }
-
     public Expression getSelf() {
         return self;
     }

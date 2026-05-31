@@ -105,4 +105,9 @@ public abstract class PolicyVisitorAdapter implements PolicyVisitor {
         expr.getExpression().accept(this);
     }
 
+    @Override
+    public void visitIsExpr(IsExpression expr) {
+        expr.getExpression().accept(this);
+        expr.getTypeExpression().accept(this);
+    }
 }

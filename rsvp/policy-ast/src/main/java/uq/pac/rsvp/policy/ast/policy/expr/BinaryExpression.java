@@ -20,8 +20,7 @@ public class BinaryExpression extends Expression {
         Sub,
         Mul,
         In,
-        Like,
-        Is
+        Like
     }
 
     private final BinaryOp op;
@@ -72,7 +71,6 @@ public class BinaryExpression extends Expression {
             case Greater -> ">";
             case GreaterEq -> ">=";
             case In -> "in";
-            case Is -> "is";
             case Less -> "<";
             case LessEq -> "<=";
             case Like -> "like";

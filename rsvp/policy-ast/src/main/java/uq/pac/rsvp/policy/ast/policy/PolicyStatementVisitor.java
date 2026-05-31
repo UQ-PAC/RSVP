@@ -9,7 +9,6 @@ import uq.pac.rsvp.support.SourceLoc;
 import static uq.pac.rsvp.Assertion.require;
 import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -74,38 +73,25 @@ class PolicyStatementVisitor extends CedarSourceVisitor<PolicyStatement> {
     final static SourceLoc OMITTED = SourceLoc.empty();
 
     private Expression getVariableScopeExpression(TerminalNode term, CedarParser.VariableScopeContext ctx) {
-        VariableExpression var = new VariableExpression(term.getText(), location(term));
-
-        // Location for the entire rule context
-        SourceLoc loc = SourceLoc.MISSING;
-
-        List<BinaryExpression> exprs = new ArrayList<>(2);
-        if (ctx != null) {
-            if (ctx.EQ() != null) {
-                exprs.add(new BinaryExpression(var, Eq, expressions.visitEntity(ctx.entity()), OMITTED));
-            }
-            if (ctx.IN() != null) {
-                exprs.add(new BinaryExpression(var, In, expressions.visitEntity(ctx.entity()), OMITTED));
-            }
-            if (ctx.IS() != null) {
-                exprs.add(new BinaryExpression(var, Is, expressions.visitType(ctx.type()), OMITTED));
-            }
-            loc = location(term.getSymbol(), ctx.stop);
+        if (ctx == null) {
+            return null;
         }
 
-        return switch (exprs.size()) {
-            case 0 -> null;
-            // The case with one expression, which maps to a binary expression
-            // In this case we can just set the location
-            case 1 -> {
-                BinaryExpression e = exprs.getFirst();
-                yield new BinaryExpression(e.getLeft(), e.getOp(), e.getRight(), loc);
-            }
-            // The case with two expressions, i.e., var is ... in ...
-            // The individual locations are unset, but the overall location can be
-            case 2 -> new BinaryExpression(exprs.getFirst(), And, exprs.getLast(), loc);
-            default -> throw new AssertionError("unreachable");
-        };
+        VariableExpression var = new VariableExpression(term.getText(), location(term));
+        SourceLoc loc = location(term.getSymbol(), ctx.stop);
+        if (ctx.IN() != null && ctx.IS() != null) {
+            Expression lhs = new BinaryExpression(var, In, expressions.visitEntity(ctx.entity()), OMITTED);
+            Expression rhs = new IsExpression(var, (TypeExpression) expressions.visitType(ctx.type()), OMITTED);
+            return new BinaryExpression(lhs, And, rhs, loc);
+        } else if (ctx.EQ() != null) {
+            return new BinaryExpression(var, Eq, expressions.visitEntity(ctx.entity()), loc);
+        } else if (ctx.IN() != null) {
+            return new BinaryExpression(var, In, expressions.visitEntity(ctx.entity()), loc);
+        } else if (ctx.IS() != null) {
+            return new IsExpression(var, (TypeExpression) expressions.visitType(ctx.type()), loc);
+        } else {
+            return null;
+        }
     }
 
     private Expression getPrincipalExpression(CedarParser.PrincipalContext ctx) {

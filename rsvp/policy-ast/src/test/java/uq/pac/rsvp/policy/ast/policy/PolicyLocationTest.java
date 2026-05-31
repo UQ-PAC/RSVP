@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Testing policy source locations.
  */
-
 public class PolicyLocationTest {
 
     private final Path resourceDir =
@@ -230,6 +229,14 @@ public class PolicyLocationTest {
         public void visitHasExpr(HasExpression expr) {
             log("Has: " + expr.toString(), expr, () -> {
                 expr.getExpression().accept(this);
+            });
+        }
+
+        @Override
+        public void visitIsExpr(IsExpression expr) {
+            log("Is: " + expr.toString(), expr, () -> {
+                expr.getExpression().accept(this);
+                expr.getTypeExpression().accept(this);
             });
         }
     }

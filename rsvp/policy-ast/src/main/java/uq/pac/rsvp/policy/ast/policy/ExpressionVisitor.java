@@ -16,14 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static uq.pac.rsvp.policy.ast.Util.unquote;
-import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.Eq;
-import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.Greater;
-import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.GreaterEq;
-import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.Is;
-import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.Less;
-import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.LessEq;
-import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.Like;
-import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.Neq;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.*;
 import static uq.pac.rsvp.policy.ast.schema.type.TypeReference.TYPE_REFERENCE_DELIMITER;
 
 public class ExpressionVisitor extends CedarSourceVisitor<Expression> {
@@ -115,8 +108,8 @@ public class ExpressionVisitor extends CedarSourceVisitor<Expression> {
 
     @Override
     public Expression visitIsExpr(CedarParser.IsExprContext ctx) {
-        return new BinaryExpression(ctx.expression().accept(this), Is,
-                ctx.type().accept(this), location(ctx));
+        TypeExpression type = (TypeExpression) ctx.type().accept(this);
+        return new IsExpression(ctx.expression().accept(this), type, location(ctx));
     }
 
     @Override

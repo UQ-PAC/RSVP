@@ -41,4 +41,6 @@ public interface PolicyVisitor {
     default void visitTypeExpr(TypeExpression expr) { throw new AssertionError(); }
 
     default void visitHasExpr(HasExpression expr) { throw new AssertionError(); }
+
+    default void visitIsExpr(IsExpression expr) { throw new AssertionError(); }
 }

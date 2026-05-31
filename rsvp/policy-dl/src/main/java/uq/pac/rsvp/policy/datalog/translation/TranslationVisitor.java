@@ -135,12 +135,6 @@ public class TranslationVisitor implements PolicyVisitor {
                         rhs = TypeContextVisitor.normalise(getOperand(expr.getRight()), context);
                 expressions.add(new DLConstraint(lhs, rhs, getOperator(expr.getOp(), negated)));
             }
-            case Is -> {
-                TypeExpression typeExpr = require(expr.getRight(), TypeExpression.class);
-                DLTerm var = getOperand(expr.getLeft());
-                DLRuleDecl decl = schema.getTranslationEntityType(typeExpr.getValue()).getEntityRuleDecl();
-                expressions.add(new DLAtom(decl, negated, var));
-            }
             case In -> {
                 // FIXME: Need to check the case of `IN` where rhs is a set rather than an entity
                 DLTerm lhs = getOperand(expr.getLeft()),
@@ -150,6 +144,13 @@ public class TranslationVisitor implements PolicyVisitor {
             case And, Or -> throw new AssertionError("Unreachable");
             default -> throw new TranslationError("Unsupported: " + expr.getOp());
         }
+    }
+
+    @Override
+    public void visitIsExpr(IsExpression expr) {
+        DLTerm var = getOperand(expr.getExpression());
+        DLRuleDecl decl = schema.getTranslationEntityType(expr.getTypeExpression().getValue()).getEntityRuleDecl();
+        expressions.add(new DLAtom(decl, negated, var));
     }
 
     @Override

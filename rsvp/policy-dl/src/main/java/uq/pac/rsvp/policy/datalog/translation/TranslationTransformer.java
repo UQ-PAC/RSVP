@@ -188,6 +188,11 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
         return expr;
     }
 
+    @Override
+    public Expression visitIsExpr(IsExpression expr) {
+        return expr;
+    }
+
     // Unsupported expressions
     @Override
     public Expression visitPolicy(Policy policy) {

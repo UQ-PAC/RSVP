@@ -72,6 +72,11 @@ public class NFConverter implements PolicyComputationVisitor<Formula> {
     }
 
     @Override
+    public Formula visitIsExpr(IsExpression expr) {
+        return getVar(expr);
+    }
+
+    @Override
     public Formula visitBooleanExpr(BooleanExpression expr) {
         return factory.constant(expr.getValue());
     }

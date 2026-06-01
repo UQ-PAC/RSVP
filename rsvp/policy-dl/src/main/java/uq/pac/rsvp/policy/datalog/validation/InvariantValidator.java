@@ -47,11 +47,11 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
     final static TypeTest TAction = new TypeTest(InvariantValidator::isAction, "Action");
 
     private static boolean isAction(BuiltinType type) {
-        return type instanceof TypeReference ref && ref.getName().equals("Action");
+        return type instanceof TypeReference ref && ref.getBaseName().equals("Action");
     }
 
     private static boolean isEntity(BuiltinType type) {
-        return type instanceof TypeReference ref && !ref.getName().equals("Action");
+        return type instanceof TypeReference ref && !ref.getBaseName().equals("Action");
     }
 
     static TypeTest expect(BuiltinType actual, TypeTest ...tests) {

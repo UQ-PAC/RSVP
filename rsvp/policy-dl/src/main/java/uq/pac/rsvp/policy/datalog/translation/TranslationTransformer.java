@@ -77,6 +77,7 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
                         new BinaryExpression(negate.apply(lhs), And, negate.apply(rhs)));
             }
         } else if (expr.getOp() == BinaryExpression.BinaryOp.In && expr.getRight() instanceof SetExpression set) {
+            // Rewrite IN expressions over literal sets to disjunctions
             Expression init = new BooleanExpression(false);
             return set.getElements().stream()
                     .map(e ->  (Expression) new BinaryExpression(lhs, In, e))

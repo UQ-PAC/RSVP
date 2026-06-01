@@ -137,7 +137,10 @@ public class TranslationVisitor implements PolicyVisitor {
                 expressions.add(new DLConstraint(lhs, rhs, getOperator(expr.getOp(), negated)));
             }
             case In -> {
-                // FIXME: Need to check the case of `IN` where rhs is a set rather than an entity
+                // The expr in [ ... ] form should have been rewritten to disjunctions by this point
+                require(expr.getRight() instanceof VariableExpression ||
+                        expr.getRight() instanceof EuidExpression ||
+                        expr.getRight() instanceof PropertyAccessExpression);
                 DLTerm lhs = getOperand(expr.getLeft()),
                         rhs = getOperand(expr.getRight());
                 expressions.add(new DLAtom(ParentOfRuleDecl, negated, rhs, lhs));

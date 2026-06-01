@@ -56,6 +56,8 @@ public class TranslationTest {
 
     private final static Path TESTDIR = Path.of(TestUtil.RESOURCEDIR.toString(), "translation");
 
+    private final static String ONE_OFF = "in";
+
     @BeforeAll
     static void configure() {
         logger.setLevel(StdLogger.Level.Info);
@@ -105,8 +107,6 @@ public class TranslationTest {
             return policy.getFileName().toString().replaceAll("\\.cedar$", "");
         }
     }
-
-    private final static String ONE_OFF = "equals";
 
     // Running tests for one directory separately for no particular
     // reason apart from being able to launch it separately

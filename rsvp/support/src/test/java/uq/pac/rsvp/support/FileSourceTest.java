@@ -23,7 +23,7 @@ public class FileSourceTest {
     void ok(FileSource fs, int of, int ln, int col) {
         LineLoc loc = fs.getLineLoc(of);
         assertEquals(ln + ":" + col, loc.toString());
-        assertEquals(of, FS.getPosition(ln, col));
+        assertEquals(of, fs.getPosition(ln, col));
     }
 
     void offsetFail(FileSource fs, int of) {
@@ -61,24 +61,28 @@ public class FileSourceTest {
         ok(FS, 9, 4, 2);
         ok(FS, 10, 4, 3);
         ok(FS, 11, 5, 1);
-        offsetFail(FS,12);
+        ok(FS, 12, 6, 1); // end-of-file
+        offsetFail(FS,13);
 
         FileSource empty = new FileSource("", "");
-        offsetFail(empty, 1);
+        ok(empty, 1, 1, 1); // end-of-file
+        offsetFail(empty, 2);
 
         FileSource one = new FileSource("", "1");
         ok(one, 1, 1, 1);
-        offsetFail(one, 2);
+        ok(one, 2, 1, 2);
+        offsetFail(one, 3);
 
         FileSource two = new FileSource("", "\n1");
         ok(two, 1, 1, 1);
         ok(two, 2, 2, 1);
-        offsetFail(two, 3);
+        ok(two, 3, 2, 2); // end-of-file
+        offsetFail(two, 4);
 
         // Invalid line/column
         lineLocFail(FS, -1, 1);
         lineLocFail(FS, 0, 1);
-        lineLocFail(FS, 6, 1);
+        lineLocFail(FS, 6, 2);
         lineLocFail(FS, 7, 1);
         lineLocFail(FS, 1, -1);
         lineLocFail(FS, 1, 0);

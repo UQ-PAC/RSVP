@@ -12,9 +12,10 @@ import java.util.Objects;
  * Support class used to calculate line/column from an offset
  */
 public class FileSource {
-    // Keep track of line information for a file or a chunk of text broken down into lines
-    // The [0] index is always 0
-    // Each successive index represents a line number and mapped to the largest byte offset
+    // Keep track of line information for a file or a chunk of text broken down into lines.
+    // The [0] index is always 0. Each successive index represents a line number and mapped to the
+    // largest byte offset. The final index marks the end position of the last line (the last line
+    // may be empty, i.e. data[data.length-1] == data[data.length-2] is possible).
     private final int [] data;
     private final String file;
 
@@ -26,21 +27,23 @@ public class FileSource {
         }
     }
 
-    // Find the least element >= offset
-    // Binary search to find the least element less or equals to the offset
+    /**
+     * Find the greatest element with value less or equal to the specified offset
+     * via a binary search. (Ignores the last element, which marks the end of the final line).
+     */
     private int find(int offset) {
-        int min = 1; int max = data.length - 1;
-        int result = -1;
-        while (max >= min) {
-            int pos = (min + max) / 2;
-            if (offset <= data[pos]) {
+        int min = 0; int max = data.length - 2;
+        while (max > min) {
+            int pos = min + (max - min) / 2 + 1;
+            // Now: min < pos <= max
+            if (offset < data[pos]) {
                 max = pos - 1;
-                result = pos;
             } else {
-                min = pos + 1;
+                min = pos;
             }
         }
-        return result;
+
+        return min;
     }
 
     /**
@@ -64,29 +67,43 @@ public class FileSource {
         if (line < 1 || line >= data.length || column < 1) {
             return -1;
         }
+
         int position = data[line - 1] + column;
-        // The column exceeds line length
+
+        if (line == data.length - 1 || (line == data.length - 2 && data[line] == data[line + 1])) {
+            // position is allowed to extend one-past-the-end so that end-of-file is valid
+            if (position > (data[line] + 1)) {
+                return -1;
+            }
+            return position; // (end-of-file)
+        }
+
         if (position > data[line] || !isValid(position)) {
+            // The column exceeds line length
             return -1;
         }
+
         return position;
     }
 
-    // Split a string into a list of lines, accounts for leading
-    // and trailing empty lines
+    /**
+     * Split a string into a list of line lengths, accounting for leading and trailing empty
+     * lines. If the string ends with a newline, the returned array will indicate an empty final
+     * line (i.e. a trailing line with length 0).
+     */
     private static List<Integer> split(String contents) {
         List<Integer> lines = new ArrayList<>();
+        lines.add(0);
         int length = 0;
         for (char c : contents.toCharArray()) {
             length++;
             if (c == '\n') {
-                lines.add(length);
+                lines.set(lines.size() - 1, length);
+                lines.add(0);
                 length = 0;
             }
         }
-        if (length > 0) {
-            lines.add(length);
-        }
+        lines.set(lines.size() - 1, length);
         return lines;
     }
 
@@ -108,13 +125,13 @@ public class FileSource {
         if (!isValid(position)) {
             throw new RuntimeException("Invalid position: %d".formatted(position));
         }
-        int line = find(position);
+        int line = find(position - 1) + 1;
         int column = position - data[line - 1];
         return new LineLoc(line, column);
     }
 
     public boolean isValid(int position) {
-        return position > 0 && position <= data[data.length - 1];
+        return position > 0 && position <= (data[data.length - 1] + 1);
     }
 
     @Override

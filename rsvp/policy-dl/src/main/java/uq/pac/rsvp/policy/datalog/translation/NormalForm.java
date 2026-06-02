@@ -16,7 +16,7 @@ public class NormalForm {
 
         private NNFTransformer() { }
 
-        Expression transform(Expression expr) {
+        public static Expression transform(Expression expr) {
             return expr.compute(TRANSFORMER);
         }
 
@@ -35,7 +35,48 @@ public class NormalForm {
         }
     }
 
-    static class CNFTransformer extends ExpressionAdapter {
+    static class DNFTransformer extends ExpressionAdapter {
 
+        private static final DNFTransformer TRANSFORMER = new DNFTransformer();
+
+        private DNFTransformer() {}
+
+        public static Expression transform(Expression expr) {
+            Expression nnf = NNFTransformer.transform(expr);
+            return nnf.compute(TRANSFORMER);
+        }
+
+        public Expression visitBinaryExpr(BinaryExpression expr) {
+            Expression lhs = expr.getLeft().compute(this);
+            Expression rhs = expr.getRight().compute(this);
+
+            BinaryExpression left =
+                    lhs instanceof BinaryExpression bin && bin.getOp() == Or ? bin : null;
+            BinaryExpression right =
+                    rhs instanceof BinaryExpression bin && bin.getOp() == Or ? bin : null;
+
+            Expression result;
+            if (left != null && right != null) {
+                Expression a = new BinaryExpression(left.getLeft(), And, right.getLeft()),
+                    b = new BinaryExpression(left.getLeft(), And, right.getRight()),
+                    c = new BinaryExpression(left.getRight(), And, right.getLeft()),
+                    d = new BinaryExpression(left.getRight(), And, right.getRight());
+                a = new BinaryExpression(a, Or, b);
+                c = new BinaryExpression(c, Or, d);
+                result = new BinaryExpression(a, Or, c);
+            } else if (left != null) {
+                Expression a = new BinaryExpression(left.getLeft(), And, rhs),
+                        b = new BinaryExpression(left.getRight(), And, rhs);
+                result = new BinaryExpression(a, Or, b);
+            } else if (right != null) {
+                Expression a = new BinaryExpression(lhs, And, right.getLeft()),
+                        b = new BinaryExpression(lhs, And, right.getRight());
+                result = new BinaryExpression(a, Or, b);
+            } else {
+                result = new BinaryExpression(lhs, expr.getOp(), rhs, expr.getSourceLoc());
+            }
+
+            return result;
+        }
     }
 }

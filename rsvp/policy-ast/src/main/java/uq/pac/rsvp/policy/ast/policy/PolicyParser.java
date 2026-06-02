@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.*;
 import uq.pac.rsvp.policy.ast.CedarLexer;
 import uq.pac.rsvp.policy.ast.CedarParser;
 import uq.pac.rsvp.policy.ast.ThrowingErrorListener;
+import uq.pac.rsvp.policy.ast.policy.expr.Expression;
 import uq.pac.rsvp.support.FileSource;
 
 import java.util.ArrayList;
@@ -15,8 +16,10 @@ import java.util.List;
  */
 public class PolicyParser {
 
-    public static Collection<PolicyStatement> parse(String file, String text) {
-        FileSource fs = new FileSource(file, text);
+    private record Parser (CedarParser parser, FileSource fs) { }
+
+    private static Parser getParser(String filename, String text) {
+        FileSource fs = new FileSource(filename, text);
         ThrowingErrorListener errorListener = new ThrowingErrorListener(fs);
 
         CedarLexer lexer = new CedarLexer(CharStreams.fromString(text));
@@ -27,7 +30,17 @@ public class PolicyParser {
         CedarParser parser = new CedarParser(tokens);
         parser.removeErrorListeners();
         parser.addErrorListener(errorListener);
+        return new Parser(parser, fs);
+    }
 
+    public static Expression parse(String text) {
+        Parser parser = getParser("unknown", text);
+        return new ExpressionVisitor(parser.fs).visit(parser.parser.expression());
+    }
+
+    public static Collection<PolicyStatement> parse(String file, String text) {
+        Parser parser = getParser(file, text);
+        FileSource fs = parser.fs;
         PolicyStatementVisitor visitor = new PolicyStatementVisitor(fs);
         return new CedarSourceVisitor<List<PolicyStatement>>(fs) {
             @Override
@@ -38,6 +51,6 @@ public class PolicyParser {
                 }
                 return statements;
             }
-        }.visit(parser.program());
+        }.visit(parser.parser.program());
     }
 }

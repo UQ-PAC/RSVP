@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * A computation adapter re-combining expressions. In unmodified form clones an expression
+ */
 public class ExpressionAdapter implements PolicyComputationVisitor<Expression> {
     public Expression visitBinaryExpr(BinaryExpression expr) {
         Expression lhs = expr.getLeft().compute(this);
@@ -17,7 +20,10 @@ public class ExpressionAdapter implements PolicyComputationVisitor<Expression> {
     }
 
     public Expression visitCallExpr(CallExpression expr) {
-        Expression self = expr.getSelf().compute(this);
+        Expression self = expr.getSelf();
+        if (self != null) {
+            expr.getSelf().compute(this);
+        }
         List<Expression> args = expr.getArgs().stream()
                 .map(e -> e.compute(this))
                 .toList();

@@ -31,8 +31,6 @@ public class PolicyProgramValidator {
                 .map(Policy::toString)
                 .collect(Collectors.joining("\n"));
 
-        System.out.println(policies);
-
         PolicySet cedarPolicies = PolicySet.parsePolicies(policies);
 
         ValidationRequest vReq = new ValidationRequest(cedarSchema, cedarPolicies);

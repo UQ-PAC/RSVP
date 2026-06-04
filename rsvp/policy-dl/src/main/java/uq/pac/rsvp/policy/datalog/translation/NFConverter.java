@@ -9,6 +9,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static uq.pac.rsvp.Assertion.require;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.*;
+import static uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression.UnaryOp.*;
+
 /**
  * Converting a Cedar expression to DNF.
  * <p>
@@ -126,5 +130,29 @@ public class NFConverter implements PolicyComputationVisitor<Formula> {
                     .map(converter::toExpression)
                     .toList();
         }).toList();
+    }
+
+    /**
+     * Check if a given expression is scalar, i.e., has no logical connections
+     * such as disjunction, conjunction or logical negation
+     */
+    public static boolean isScalar(Expression expr) {
+        require(expr != null);
+
+        if (expr instanceof UnaryExpression e && e.getOp() == Not) {
+            expr = e.getExpression();
+        }
+
+        return expr.compute(new ExpressionAdapter() {
+            @Override
+            public Expression visitBinaryExpr(BinaryExpression expr) {
+                return (expr.getOp() == And || expr.getOp() == Or)  ? null : super.visitBinaryExpr(expr);
+            }
+
+            @Override
+            public Expression visitUnaryExpr(UnaryExpression expr) {
+                return expr.getOp() == Not ? null : super.visitUnaryExpr(expr);
+            }
+        }) != null;
     }
 }

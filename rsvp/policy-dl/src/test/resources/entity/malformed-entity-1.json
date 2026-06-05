@@ -2,5 +2,5 @@
     "foobar"
 ]
 
-// @MESSAGE: Parse Error: no viable alternative at input '["foobar"'
+// @MESSAGE: Syntax Error: no viable alternative at input '["foobar"'
 // @LOCATION: 6:8 [2:5-2:12]

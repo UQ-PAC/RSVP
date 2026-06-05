@@ -42,12 +42,28 @@ public class NFConverter implements PolicyComputationVisitor<Formula> {
     @Override
     public Formula visitBinaryExpr(BinaryExpression expr) {
         return switch (expr.getOp()) {
-            case BinaryExpression.BinaryOp.And ->
-                factory.and(expr.getLeft().compute(this),
-                        expr.getRight().compute(this));
-            case BinaryExpression.BinaryOp.Or ->
-                factory.or(expr.getLeft().compute(this),
-                        expr.getRight().compute(this));
+            case And ->
+                factory.and(expr.getLeft().compute(this), expr.getRight().compute(this));
+            case Or ->
+                factory.or(expr.getLeft().compute(this), expr.getRight().compute(this));
+            // In Cedar boolean-valued expressions can be compared via, '==' or '!=', that is, it is possible
+            // to construct something like '(a && b) == (c || d)'. In this case the expression is re-written to
+            // '((a && b) && (c || d)) || (!(a && b) && !(c || d))'
+            case Eq -> {
+                if (isScalar(expr.getLeft()) && isScalar(expr.getRight())) {
+                    yield getVar(expr);
+                } else {
+                    BinaryExpression lhs = new BinaryExpression(expr.getLeft(), And, expr.getRight());
+                    Expression e1 = new UnaryExpression(Not, expr.getLeft());
+                    Expression e2 = new UnaryExpression(Not, expr.getRight());
+                    Expression rhs = new BinaryExpression(e1, And, e2);
+                    yield new BinaryExpression(lhs, Or, rhs).compute(this);
+                }
+            }
+            // != operator by this point should have been re-written to ==
+            case Neq -> {
+                throw new AssertionError("unreachable");
+            }
             default -> getVar(expr);
         };
     }

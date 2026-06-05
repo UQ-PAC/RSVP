@@ -12,7 +12,7 @@ public abstract class LocationError extends RuntimeException {
     private final String title;
 
     public LocationError(String msg, String title, SourceLoc location) {
-        super(msg);
+        super(msg + " at: " + location.toString());
         this.location = location;
         this.title = title;
     }

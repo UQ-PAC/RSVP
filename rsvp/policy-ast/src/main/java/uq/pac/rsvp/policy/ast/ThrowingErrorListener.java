@@ -40,6 +40,6 @@ public class ThrowingErrorListener extends BaseErrorListener {
             int offset = fs.getPosition(line, pos == 0 ? 1 : pos) - 1;
             loc = fs.getSourceLoc(offset, 1);
         }
-        throw new SyntaxError("Parse Error: " + msg, loc);
+        throw new SyntaxError("Syntax Error: " + msg, loc);
     }
 }

@@ -1,0 +1,18 @@
+[
+    {
+        "uid": { "type": "Numeric", "id": "One" },
+        "attrs": {
+            "a": true,
+            "b": false
+        },
+        "parents": []
+    },
+    {
+        "uid": { "type": "Numeric", "id": "Next" },
+        "attrs": {
+            "a": false,
+            "b": true
+        },
+        "parents": []
+    }
+]

@@ -59,6 +59,7 @@ public class EntityValidationTest {
             // * Location of the form 'at file:offset:length [line:column-line-column]'
 
             String actualMessage = error.getMessage();
+            actualMessage = actualMessage.substring(0, expectedMessage.length());
             assertEquals(expectedMessage, actualMessage);
 
             String actualLocation = error.getLocation().toString();

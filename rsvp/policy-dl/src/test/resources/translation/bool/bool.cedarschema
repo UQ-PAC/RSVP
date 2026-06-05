@@ -1,0 +1,11 @@
+entity Numeric = {
+    a: Bool,
+    b: Bool
+};
+
+action compute appliesTo {
+    principal: Numeric,
+    resource: Numeric
+};
+
+

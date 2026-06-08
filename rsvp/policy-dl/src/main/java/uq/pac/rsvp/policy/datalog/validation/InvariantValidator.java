@@ -98,6 +98,9 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
         // Build types from entities
         schema.entityTypes().forEach(e -> types.add(e.getTypeReference()));
         // Build types from actions
+        // Actions in Cedar are basically specific entities, for the purpose of type checking we
+        // make actions be equivalent, i.e., rather than reason about specific actions an action type
+        // is an entity type named `Action` in a particular namespace
         schema.actions().forEach(e -> types.add(new TypeReference(e.getNamespace(), "Action")));
     }
 
@@ -294,7 +297,7 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
         return validator.validate(self, collect(expr.getArgs()));
     }
 
-    // == Unsupported
+    // == Unsupported (for now)
     @Override
     public BuiltinType visitConditionalExpr(ConditionalExpression expr) {
         throw new TranslationError("unsupported element: " + expr);
@@ -303,21 +306,6 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
     @Override
     public BuiltinType visitSetExpr(SetExpression expr) {
         throw new TranslationError("unsupported element: " + expr);
-    }
-
-    @Override
-    public BuiltinType visitPolicy(Policy policy) {
-        throw new TranslationError("unsupported element: " + policy);
-    }
-
-    @Override
-    public BuiltinType visitInvariant(Invariant invariant) {
-        throw new TranslationError("unsupported element: " + invariant);
-    }
-
-    @Override
-    public BuiltinType visitQuantifier(Quantifier quantifier) {
-        throw new TranslationError("unsupported element: " + quantifier);
     }
 
     @Override

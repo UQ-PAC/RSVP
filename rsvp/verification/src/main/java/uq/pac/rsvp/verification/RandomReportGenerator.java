@@ -66,8 +66,7 @@ public class RandomReportGenerator {
             }
         });
 
-
-        schema.accept(schemaReportGenerator);
+        schema.statements().forEach(s -> s.accept(schemaReportGenerator));
         policyAst.forEach(policy -> policy.accept(policyReportGenerator));
         invariantAst.forEach(invariant -> invariant.accept(policyReportGenerator));
         entitySet.forEach(entity -> entityReportGenerator.maybeAddRandomReports(entity, 20));

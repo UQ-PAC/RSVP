@@ -16,6 +16,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SchemaLocationTest {
 
+    private static final boolean GENERATE_ORACLES = false;
+
+    @Test
+    void testGenerate() {
+        assertFalse(GENERATE_ORACLES);
+    }
+
     @Test
     void test() throws IOException {
         String filename = "schema/location/photoapp.cedarschema";
@@ -23,12 +30,17 @@ public class SchemaLocationTest {
         Path path = Path.of(url.getPath());
         Schema schema = Schema.parse("file", Files.readString(path));
         Visitor visitor = new Visitor();
-        schema.accept(visitor);
+        schema.statements()
+                .sorted(Comparator.comparingInt(a -> a.getSourceLoc().offset))
+                .forEach(s -> s.accept(visitor));
         Path expectedPath =
                 Path.of(ClassLoader.getSystemResource(filename + ".expected").getPath());
+
+        if (GENERATE_ORACLES) {
+            Files.writeString(expectedPath, visitor.getData());
+        }
         String expected = Files.readString(expectedPath);
-        System.out.println(visitor.getData());
-        assertEquals(expected, visitor.getData());
+        assertEquals(expected.trim(), visitor.getData().trim());
     }
 
     static class Visitor implements SchemaVisitor {
@@ -44,11 +56,7 @@ public class SchemaLocationTest {
             indent += 3;
             log("%s at %s".formatted(msg, node.getSourceLoc().toString()));
             consumer.run();
-            if (node instanceof Schema) {
-                assertTrue(node.getSourceLoc().isEmpty());
-            } else {
-                assertFalse(node.getSourceLoc().isEmpty());
-            }
+            assertFalse(node.getSourceLoc().isEmpty());
             indent -= 3;
         }
 
@@ -58,14 +66,6 @@ public class SchemaLocationTest {
             }
             sb.repeat(" ", Math.max(0, indent));
             sb.append(msg);
-        }
-
-        @Override
-        public void visitSchema(Schema schema) {
-            log("Schema", schema,
-                    () -> schema.statements()
-                            .sorted(Comparator.comparingInt(a -> a.getSourceLoc().offset))
-                            .forEach(s -> s.accept(this)));
         }
 
         @Override

@@ -1,6 +1,5 @@
 package uq.pac.rsvp.policy.ast.schema.visitor;
 
-import uq.pac.rsvp.policy.ast.schema.*;
 import uq.pac.rsvp.policy.ast.schema.statement.ActionDefinition;
 import uq.pac.rsvp.policy.ast.schema.statement.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityTypeDefinition;
@@ -8,10 +7,6 @@ import uq.pac.rsvp.policy.ast.schema.statement.RecordEntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.type.*;
 
 public interface SchemaComputationVisitor<T> {
-    default T visitSchema(Schema schema) {
-        throw new AssertionError();
-    }
-
     // Statements
     default T visitRecordEntity(RecordEntityTypeDefinition entity) {
         throw new AssertionError();

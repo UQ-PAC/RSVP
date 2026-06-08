@@ -10,8 +10,10 @@ entity Directory = {
     permission: DirPermission
 };
 
-type FileAttr = String;
-type DirAttr = String;
+type Attribute = String;
+type FileAttr = Attribute;
+type DirAttr = Attribute;
+
 type FilePermission = {
     read: Bool,
     write: Bool,

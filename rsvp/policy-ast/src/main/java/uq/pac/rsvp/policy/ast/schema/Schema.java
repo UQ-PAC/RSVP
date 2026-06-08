@@ -13,9 +13,6 @@ import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.statement.RecordEntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.statement.SchemaStatement;
 import uq.pac.rsvp.policy.ast.schema.type.TypeReference;
-import uq.pac.rsvp.policy.ast.schema.visitor.SchemaComputationVisitor;
-import uq.pac.rsvp.policy.ast.schema.visitor.SchemaPayloadVisitor;
-import uq.pac.rsvp.policy.ast.schema.visitor.SchemaVisitor;
 import uq.pac.rsvp.policy.ast.schema.visitor.SchemaVisitorAdapter;
 import uq.pac.rsvp.support.SourceLoc;
 
@@ -35,13 +32,12 @@ import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
-public class Schema extends SchemaAstNode {
+public class Schema {
 
     private final Map<TypeReference, SchemaStatement> statements;
 
     // Private constructor for internal purposes
-    private Schema(Map<TypeReference, SchemaStatement> statements, SourceLoc location) {
-        super(location);
+    private Schema(Map<TypeReference, SchemaStatement> statements) {
         this.statements = Collections.unmodifiableMap(statements);
     }
 
@@ -65,8 +61,9 @@ public class Schema extends SchemaAstNode {
         return SchemaParser.parse(file.toString(), Files.readString(file));
     }
 
+    // FIXME: Bypasses checks
     public static Schema of(Map<TypeReference, SchemaStatement> statements) {
-        return new Schema(statements, SourceLoc.MISSING);
+        return new Schema(statements);
     }
 
     private <E extends SchemaStatement> Stream<E> statementStream(Class<E> target) {
@@ -192,7 +189,7 @@ public class Schema extends SchemaAstNode {
             types.put(ref, stmt);
         }
 
-        return new Schema(types, location);
+        return new Schema(types);
     }
 
     // The second stage of resolution.
@@ -205,7 +202,7 @@ public class Schema extends SchemaAstNode {
                     new StatementResolutionVisitor(schema, stmt.getNamespace());
             resolved.put(ref, stmt.compute(resolver));
         });
-        return new Schema(resolved, schema.getSourceLoc());
+        return new Schema(resolved);
     }
 
     // The third stage of resolution:
@@ -255,21 +252,35 @@ public class Schema extends SchemaAstNode {
                 }
             }
         }
+
+        return commonTypeResolutionPass(schema, typeGraphBuilder);
+    }
+
+    // Compute the order of resolution based on the dependency graph
+    private static List<TypeReference> getTypeResolutionOrder(MutableGraph<TypeReference> typeGraph) {
+        // Here, a successor S of a node N means that N depends on S
+        List<TypeReference> order = new ArrayList<>();
+        while (!typeGraph.nodes().isEmpty()) {
+            List<TypeReference> refs = typeGraph.nodes().stream()
+                    .filter(n -> typeGraph.successors(n).isEmpty())
+                    .toList();
+            refs.forEach(n -> {
+                Collection<TypeReference> successors = typeGraph.successors(n).stream().toList();
+                for (TypeReference s : successors) {
+                    typeGraph.removeEdge(n, s);
+                }
+                typeGraph.removeNode(n);
+                order.add(n);
+            });
+        }
+        return order;
+    }
+
+    // FIXME: Incomplete
+    // Resolve common types
+    private static Schema commonTypeResolutionPass(Schema schema, Graph<TypeReference> typeGraph) {
+        MutableGraph<TypeReference> graph = Graphs.copyOf(typeGraph);
+        List<TypeReference> order = getTypeResolutionOrder(graph);
         return schema;
-    }
-
-    @Override
-    public void accept(SchemaVisitor visitor) {
-        visitor.visitSchema(this);
-    }
-
-    @Override
-    public <T> T compute(SchemaComputationVisitor<T> visitor) {
-        return visitor.visitSchema(this);
-    }
-
-    @Override
-    public <T> void process(SchemaPayloadVisitor<T> visitor, T payload) {
-        visitor.visitSchema(this, payload);
     }
 }

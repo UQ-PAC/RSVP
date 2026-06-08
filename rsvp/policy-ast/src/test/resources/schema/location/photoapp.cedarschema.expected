@@ -1,61 +1,60 @@
-   Schema at <unknown>
-      Enum Entity Photo::App::Visibility at file:27:96 [2:5-4:64]
-         Reference Photo::App::Visibility at file:70:10 [4:12-4:21]
-      Enum Entity Photo::App::Role at file:128:37 [5:5-5:41]
-         Reference Photo::App::Role at file:135:4 [5:12-5:15]
-      Type Photo::App::Name at file:171:19 [7:5-7:23]
-         Reference Photo::App::Name at file:176:4 [7:10-7:13]
-         __cedar::String at file:183:6 [7:17-7:22]
-      Type Photo::App::Friends at file:195:28 [8:5-8:32]
-         Reference Photo::App::Friends at file:200:7 [8:10-8:16]
-         Set at file:210:12 [8:20-8:31]
-            Reference Photo::App::Account at file:214:7 [8:24-8:30]
-      Type Photo::App::Metadata at file:229:122 [10:5-16:6]
-         Reference Photo::App::Metadata at file:270:8 [12:10-12:17]
-         Record at file:281:69 [12:21-16:5]
-         Attribute "name"
-            Reference Photo::App::Name at file:297:4 [13:15-13:18]
-         Attribute "size"
-            __cedar::Long at file:318:4 [14:16-14:19]
-         Attribute "type"
-            __cedar::String at file:338:6 [15:15-15:20]
-      Record Entity Photo::App::Account at file:357:147 [18:5-25:6]
-         Reference Photo::App::Account at file:399:7 [20:12-20:18]
-         Record at file:409:94 [20:22-25:5]
-         Attribute "age"
-            __cedar::Long at file:446:4 [22:14-22:17]
-         Attribute "friends"
-            Reference Photo::App::Friends at file:489:7 [24:18-24:24]
-         Attribute "name"
-            __cedar::String at file:425:6 [21:15-21:20]
-         Attribute "role"
-            Reference Photo::App::Role at file:466:4 [23:15-23:18]
-      Record Entity Photo::App::Album at file:510:99 [27:5-31:6]
-         Reference Photo::App::Album at file:517:5 [27:12-27:16]
-         Record at file:525:83 [27:20-31:5]
-         Attribute "owner"
-            Reference Photo::App::Account at file:542:7 [28:16-28:22]
-         Attribute "visibility"
-            Reference Photo::App::Visibility at file:571:10 [29:21-29:30]
-         Attribute "year"?
-            __cedar::Long at file:598:4 [30:16-30:19]
-      Record Entity Photo::App::Photo at file:615:69 [33:5-36:6]
-         Reference Photo::App::Photo at file:622:5 [33:12-33:16]
-         Record at file:630:53 [33:20-36:5]
-         Attribute "album"
-            Reference Photo::App::Album at file:647:5 [34:16-34:20]
-         Attribute "data"
-            Reference Photo::App::Metadata at file:668:8 [35:15-35:22]
-      Action Photo::App::Action::"view" at file:690:106 [38:5-42:6]
-         Reference Photo::App::Action::"view" at file:697:4 [38:12-38:15]
-         Record at file:786:3 [41:18-41:20]
-         Reference Photo::App::Account at file:733:7 [39:20-39:26]
-         Reference Photo::App::Account at file:760:7 [40:19-40:25]
-      Action Photo::App::Action::"createAlbum" at file:802:205 [44:5-52:6]
-         Reference Photo::App::Action::"createAlbum" at file:847:11 [46:12-46:22]
-         Reference Photo::App::Action::"view" at file:864:4 [46:29-46:32]
-         Record at file:955:45 [49:18-51:9]
-         Attribute "authenticated"
-            __cedar::Bool at file:986:4 [50:30-50:33]
-         Reference Photo::App::Account at file:902:7 [47:20-47:26]
-         Reference Photo::App::Account at file:929:7 [48:19-48:25]
+   Enum Entity Photo::App::Visibility at file:27:96 [2:5-4:64]
+      Reference Photo::App::Visibility at file:70:10 [4:12-4:21]
+   Enum Entity Photo::App::Role at file:128:37 [5:5-5:41]
+      Reference Photo::App::Role at file:135:4 [5:12-5:15]
+   Type Photo::App::Name at file:171:19 [7:5-7:23]
+      Reference Photo::App::Name at file:176:4 [7:10-7:13]
+      __cedar::String at file:183:6 [7:17-7:22]
+   Type Photo::App::Friends at file:195:28 [8:5-8:32]
+      Reference Photo::App::Friends at file:200:7 [8:10-8:16]
+      Set at file:210:12 [8:20-8:31]
+         Reference Photo::App::Account at file:214:7 [8:24-8:30]
+   Type Photo::App::Metadata at file:229:122 [10:5-16:6]
+      Reference Photo::App::Metadata at file:270:8 [12:10-12:17]
+      Record at file:281:69 [12:21-16:5]
+      Attribute "name"
+         Reference Photo::App::Name at file:297:4 [13:15-13:18]
+      Attribute "size"
+         __cedar::Long at file:318:4 [14:16-14:19]
+      Attribute "type"
+         __cedar::String at file:338:6 [15:15-15:20]
+   Record Entity Photo::App::Account at file:357:147 [18:5-25:6]
+      Reference Photo::App::Account at file:399:7 [20:12-20:18]
+      Record at file:409:94 [20:22-25:5]
+      Attribute "age"
+         __cedar::Long at file:446:4 [22:14-22:17]
+      Attribute "friends"
+         Reference Photo::App::Friends at file:489:7 [24:18-24:24]
+      Attribute "name"
+         __cedar::String at file:425:6 [21:15-21:20]
+      Attribute "role"
+         Reference Photo::App::Role at file:466:4 [23:15-23:18]
+   Record Entity Photo::App::Album at file:510:99 [27:5-31:6]
+      Reference Photo::App::Album at file:517:5 [27:12-27:16]
+      Record at file:525:83 [27:20-31:5]
+      Attribute "owner"
+         Reference Photo::App::Account at file:542:7 [28:16-28:22]
+      Attribute "visibility"
+         Reference Photo::App::Visibility at file:571:10 [29:21-29:30]
+      Attribute "year"?
+         __cedar::Long at file:598:4 [30:16-30:19]
+   Record Entity Photo::App::Photo at file:615:69 [33:5-36:6]
+      Reference Photo::App::Photo at file:622:5 [33:12-33:16]
+      Record at file:630:53 [33:20-36:5]
+      Attribute "album"
+         Reference Photo::App::Album at file:647:5 [34:16-34:20]
+      Attribute "data"
+         Reference Photo::App::Metadata at file:668:8 [35:15-35:22]
+   Action Photo::App::Action::"view" at file:690:106 [38:5-42:6]
+      Reference Photo::App::Action::"view" at file:697:4 [38:12-38:15]
+      Record at file:786:3 [41:18-41:20]
+      Reference Photo::App::Account at file:733:7 [39:20-39:26]
+      Reference Photo::App::Account at file:760:7 [40:19-40:25]
+   Action Photo::App::Action::"createAlbum" at file:802:205 [44:5-52:6]
+      Reference Photo::App::Action::"createAlbum" at file:847:11 [46:12-46:22]
+      Reference Photo::App::Action::"view" at file:864:4 [46:29-46:32]
+      Record at file:955:45 [49:18-51:9]
+      Attribute "authenticated"
+         __cedar::Bool at file:986:4 [50:30-50:33]
+      Reference Photo::App::Account at file:902:7 [47:20-47:26]
+      Reference Photo::App::Account at file:929:7 [48:19-48:25]

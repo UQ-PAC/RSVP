@@ -8,10 +8,6 @@ import uq.pac.rsvp.policy.ast.schema.statement.RecordEntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.type.*;
 
 public interface SchemaVisitor {
-    default void visitSchema(Schema schema) {
-        throw new AssertionError();
-    }
-
     // Statements
     default void visitRecordEntity(RecordEntityTypeDefinition entity) {
         throw new AssertionError();

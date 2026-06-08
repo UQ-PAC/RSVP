@@ -1,0 +1,51 @@
+type Filesystem = {
+    component: Set<Partition>
+};
+
+type Name = String;
+
+type PartitionIndex = Long;
+
+type Partition = {
+    name: Name,
+    index: PartitionIndex,
+    directories: Set<Directory>
+};
+
+type Directory = {
+    name: Name,
+    alias: Name,
+    files: Set<File>
+};
+
+type PermissionValue = Bool;
+
+type Permission = {
+    read: PermissionValue,
+    write: PermissionValue,
+    execute: PermissionValue
+};
+
+type FileType = String;
+
+type File = {
+    name: Name,
+    permissions: Permission,
+    size: Long,
+    kind: FileType
+};
+
+entity FileComponent = {
+    file: File
+};
+
+entity DirectoryComponent = {
+    dir: Directory
+};
+
+action "introspect" appliesTo {
+    principal: [FileComponent, DirectoryComponent],
+    resource: [FileComponent, DirectoryComponent]
+};
+
+

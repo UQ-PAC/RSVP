@@ -1,15 +1,9 @@
 package uq.pac.rsvp.policy.ast.schema.visitor;
 
-import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.statement.*;
 import uq.pac.rsvp.policy.ast.schema.type.*;
 
 public class SchemaVisitorAdapter implements SchemaVisitor {
-
-    @Override
-    public void visitSchema(Schema schema) {
-        schema.statements().forEach(s -> s.accept(this));
-    }
 
     @Override
     public void visitRecordEntity(RecordEntityTypeDefinition entity) {

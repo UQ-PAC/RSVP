@@ -56,7 +56,7 @@ public class TranslationTest {
 
     private final static Path TESTDIR = Path.of(TestUtil.RESOURCEDIR.toString(), "translation");
 
-    private final static String ONE_OFF = "in";
+    private final static String ONE_OFF = "common-type-extra";
 
     @BeforeAll
     static void configure() {
@@ -155,6 +155,9 @@ public class TranslationTest {
         }
 
         Schema schema = Schema.parse(test.schema);
+
+        //System.out.println(schema);
+
         PolicyProgram policies = PolicyProgram.parse(test.policy);
         PolicyProgram invariants = PolicyProgram.parse(test.invariants);
         PolicyProgram program =

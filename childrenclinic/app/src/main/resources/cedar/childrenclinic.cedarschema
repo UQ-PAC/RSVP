@@ -165,13 +165,13 @@ namespace ChildrenClinic {
 
     action ListVisits in PatientOperations appliesTo {
         principal: [Employee, Guest],
-        resource: Clinic,
+        resource: Patient,
         context: { }
     };
 
     action AddVisit in PatientOperations appliesTo {
         principal: [Employee, Guest],
-        resource: Clinic,
+        resource: Patient,
         context: { }
     };
 

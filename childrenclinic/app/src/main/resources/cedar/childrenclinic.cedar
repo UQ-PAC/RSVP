@@ -25,8 +25,8 @@ permit (
 );
 
 // 'policy1'
-// Every Employee can list the Guardians, Patients, and Visits they are allowed to view.
-@id("Policy: Every Employee can list Guardians, Patients, and Visits.")
+// Every Employee can list the Guardians and Patients they are allowed to view.
+@id("Policy: Every Employee can list Guardians and Patients.")
 permit (
     principal is ChildrenClinic::Employee,
     action,
@@ -34,8 +34,7 @@ permit (
 )
 when {
     action in [ChildrenClinic::Action::"ListGuardians",
-               ChildrenClinic::Action::"ListPatients",
-               ChildrenClinic::Action::"ListVisits"]
+               ChildrenClinic::Action::"ListPatients"]
 };
 
 // 'policy2'
@@ -185,6 +184,7 @@ when {
         "level": ChildrenClinic::ProfessionalLevel::"Intern"
     }) &&
     action in [ChildrenClinic::Action::"EditPatient",
+               ChildrenClinic::Action::"AddVisit",
                ChildrenClinic::Action::"EditVisit"] &&
     (
         resource is ChildrenClinic::Patient ||
@@ -242,7 +242,9 @@ when {
 @id("Policy: Senior or Specialist Doctor can view all Patients.")
 permit (
     principal is ChildrenClinic::Employee,
-    action == ChildrenClinic::Action::"ViewPatient",
+    action in [ChildrenClinic::Action::"ViewPatient",
+               ChildrenClinic::Action::"ListVisits",
+               ChildrenClinic::Action::"ViewVisit"],
     resource
 )
 when {

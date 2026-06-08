@@ -135,7 +135,7 @@ class VisitController {
 	}
 
 	@GetMapping("/patients/{patientId}/visits/new")
-	@CedarAuthorization(action = "EditPatient", resourceType = "Patient", validate = true)
+	@CedarAuthorization(action = "AddVisit", resourceType = "Patient", validate = true)
 	public String initNewVisitForm(@PathVariable("patientId") int patientId, Model model) {
 		Patient patient = this.patients.findById(patientId).orElseThrow();
 		Visit visit = new Visit();
@@ -157,11 +157,11 @@ class VisitController {
 			return "patients/createOrUpdateVisitForm";
 		}
 
-		// Cedar authorization: can the principal edit this specific patient?
+		// Cedar authorization: can the principal add a visit to this specific patient?
 		EntityUID principal = cedarEvaluator.resolvePrincipal(session);
 
 		String resourceName = patient.getFirstName() + " " + patient.getLastName();
-		var patientEval = cedarEvaluator.evaluate(principal, "EditPatient", "Patient", resourceName, "Page");
+		var patientEval = cedarEvaluator.evaluate(principal, "AddVisit", "Patient", resourceName, "Page");
 		if (!patientEval.isGranted())
 			throw new CedarDeniedException("Access Denied.\n" + patientEval.responseBody());
 

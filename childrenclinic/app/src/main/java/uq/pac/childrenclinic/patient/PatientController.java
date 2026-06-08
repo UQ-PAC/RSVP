@@ -211,7 +211,7 @@ public class PatientController {
 		var editEval = cedarEvaluator.evaluate(principal, "EditPatient", "Patient", resourceName.trim(), "Background");
 		mav.addObject("canEdit", editEval.isGranted());
 
-		var addVisitEval = cedarEvaluator.evaluate(principal, "EditPatient", "Patient", resourceName.trim(),
+		var addVisitEval = cedarEvaluator.evaluate(principal, "AddVisit", "Patient", resourceName.trim(),
 				"Background");
 		mav.addObject("canAddVisit", addVisitEval.isGranted());
 

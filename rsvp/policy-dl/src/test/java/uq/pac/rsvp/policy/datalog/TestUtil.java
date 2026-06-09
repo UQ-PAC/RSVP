@@ -36,15 +36,6 @@ public class TestUtil {
     public final static Path RESOURCEDIR = Path.of(ROOTDIR.toString(), "src", "test", "resources");
 
     /**
-     * Whether to generate ot check test oracles
-     */
-    public final static boolean GENERATE_ORACLES;
-    static {
-        String testOracles = System.getProperty("test.oracles.generate");
-        GENERATE_ORACLES = testOracles != null && !testOracles.isEmpty();
-    }
-
-    /**
      * Get a system property asserting that it is defined
      */
     private static String getProperty(String property) {
@@ -114,10 +105,5 @@ public class TestUtil {
         assertEquals(1, files.size(),
                 "Expected exactly one file ending with %s in directory %s".formatted(ext, dir.toString()));
         return files.getFirst();
-    }
-
-    @Test
-    void generateOracles() {
-        assertFalse(GENERATE_ORACLES);
     }
 }

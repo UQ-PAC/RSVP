@@ -1,5 +1,6 @@
 package uq.pac.rsvp.policy.ast;
 
+import org.junit.jupiter.api.Test;
 import uq.pac.rsvp.StdLogger;
 
 import java.io.File;
@@ -12,6 +13,8 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 public class TestUtil {
 
     public final static StdLogger LOGGER = new StdLogger();
@@ -23,6 +26,14 @@ public class TestUtil {
     public final static Path TMPDIR =
             Path.of(ROOTDIR.toString(), "build", "tmp");
     public final static Path CEDAR;
+
+
+    public final static boolean GENERATE_ORACLES = false;
+
+    @Test
+    void generateOracles() {
+        assertFalse(GENERATE_ORACLES);
+    }
 
     static {
         CEDAR = findExecutable("cedar");

@@ -1,7 +1,6 @@
 package uq.pac.rsvp.policy.ast.policy;
 
 import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.policy.ast.AstNode;
 import uq.pac.rsvp.policy.ast.TestUtil;
@@ -25,18 +24,11 @@ public class PolicyLocationTest {
     private final Path resourceDir =
             TestUtil.getResourceDir("policy", "location");
 
-    private static final boolean GENERATE_ORACLES = false;
-
-    @Test
-    void testGenerate() {
-        assertFalse(GENERATE_ORACLES);
-    }
-
     void test(Path p) {
         try {
             String actual = Visitor.getData(p);
             Path expected = Path.of(p + ".expected");
-            if (GENERATE_ORACLES) {
+            if (TestUtil.GENERATE_ORACLES) {
                 Files.writeString(expected, actual);
             }
             assertEquals(Files.readString(expected), actual);

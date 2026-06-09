@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.ast.schema;
 
 import org.junit.jupiter.api.Test;
 import uq.pac.rsvp.policy.ast.AstNode;
+import uq.pac.rsvp.policy.ast.TestUtil;
 import uq.pac.rsvp.policy.ast.schema.statement.*;
 import uq.pac.rsvp.policy.ast.schema.type.*;
 import uq.pac.rsvp.policy.ast.schema.visitor.SchemaVisitor;
@@ -16,13 +17,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SchemaLocationTest {
 
-    private static final boolean GENERATE_ORACLES = false;
-
-    @Test
-    void testGenerate() {
-        assertFalse(GENERATE_ORACLES);
-    }
-
     @Test
     void test() throws IOException {
         String filename = "schema/location/photoapp.cedarschema";
@@ -36,7 +30,7 @@ public class SchemaLocationTest {
         Path expectedPath =
                 Path.of(ClassLoader.getSystemResource(filename + ".expected").getPath());
 
-        if (GENERATE_ORACLES) {
+        if (TestUtil.GENERATE_ORACLES) {
             Files.writeString(expectedPath, visitor.getData());
         }
         String expected = Files.readString(expectedPath);

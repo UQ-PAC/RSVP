@@ -12,7 +12,7 @@ import uq.pac.rsvp.policy.ast.schema.statement.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.statement.RecordEntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.statement.SchemaStatement;
-import uq.pac.rsvp.policy.ast.schema.type.TypeReference;
+import uq.pac.rsvp.policy.ast.schema.type.*;
 import uq.pac.rsvp.policy.ast.schema.visitor.SchemaVisitorAdapter;
 
 import java.io.IOException;
@@ -46,10 +46,6 @@ public class Schema {
 
     public Stream<SchemaStatement> statements() {
         return statements.values().stream();
-    }
-
-    public Stream<Map.Entry<TypeReference, SchemaStatement>> entries() {
-        return statements.entrySet().stream();
     }
 
     public static Schema parse(String file, String text) {
@@ -157,6 +153,7 @@ public class Schema {
         Schema result = uniquenessPass(statements);
         result = shallowResolutionPass(result);
         result = typeDependencyPass(result);
+        result = commonTypeResolutionPass(result);
         return result;
     }
 
@@ -247,34 +244,49 @@ public class Schema {
             }
         }
 
-        return commonTypeResolutionPass(schema, typeGraphBuilder);
-    }
-
-    // Compute the order of resolution based on the dependency graph
-    private static List<TypeReference> getTypeResolutionOrder(MutableGraph<TypeReference> typeGraph) {
-        // Here, a successor S of a node N means that N depends on S
-        List<TypeReference> order = new ArrayList<>();
-        while (!typeGraph.nodes().isEmpty()) {
-            List<TypeReference> refs = typeGraph.nodes().stream()
-                    .filter(n -> typeGraph.successors(n).isEmpty())
-                    .toList();
-            refs.forEach(n -> {
-                Collection<TypeReference> successors = typeGraph.successors(n).stream().toList();
-                for (TypeReference s : successors) {
-                    typeGraph.removeEdge(n, s);
-                }
-                typeGraph.removeNode(n);
-                order.add(n);
-            });
-        }
-        return order;
-    }
-
-    // FIXME: Incomplete
-    // Resolve common types
-    private static Schema commonTypeResolutionPass(Schema schema, Graph<TypeReference> typeGraph) {
-        MutableGraph<TypeReference> graph = Graphs.copyOf(typeGraph);
-        List<TypeReference> order = getTypeResolutionOrder(graph);
         return schema;
+    }
+
+    // Rewrite a built-in type into one containing no common types according to the schema
+    private static BuiltinType resolve(Schema schema, BuiltinType shape) {
+        return switch (shape) {
+            case SetType s ->
+                    new SetType(resolve(schema, s.getElementType()), s.getSourceLoc());
+            case RecordType r -> {
+                Map<RecordType.Attribute, BuiltinType> attributes = new HashMap<>();
+                r.getAttributes().forEach((attr, type) -> {
+                    attributes.put(attr, resolve(schema, type));
+                });
+                yield new RecordType(attributes, r.getSourceLoc());
+            }
+            case TypeReference t -> {
+                SchemaStatement stmt = schema.get(t);
+                if (stmt instanceof CommonTypeDefinition common) {
+                    yield resolve(schema, common.getDefinition());
+                }
+                yield shape;
+            }
+            default -> shape;
+        };
+    }
+
+    // Fourth stage of resolution
+    //  - resolve and in-line all common type definitions
+    private static Schema commonTypeResolutionPass(Schema schema) {
+        Map<TypeReference, SchemaStatement> resolved = new HashMap<>();
+        for (Map.Entry<TypeReference, SchemaStatement> entry : schema.statements.entrySet()) {
+            SchemaStatement stmt = entry.getValue();
+            if (stmt instanceof RecordEntityTypeDefinition rd) {
+                RecordType shape = (RecordType) resolve(schema, rd.getShape());
+                stmt = new RecordEntityTypeDefinition(
+                        rd.getTypeReference(), rd.getMemberOf(), shape,
+                        rd.getAnnotations(), rd.getSourceLoc());
+            }
+
+            if (!(stmt instanceof CommonTypeDefinition)) {
+                resolved.put(entry.getKey(), stmt);
+            }
+        }
+        return new Schema(resolved);
     }
 }

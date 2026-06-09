@@ -14,7 +14,6 @@ import uq.pac.rsvp.policy.ast.schema.statement.RecordEntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.statement.SchemaStatement;
 import uq.pac.rsvp.policy.ast.schema.type.TypeReference;
 import uq.pac.rsvp.policy.ast.schema.visitor.SchemaVisitorAdapter;
-import uq.pac.rsvp.support.SourceLoc;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -59,11 +58,6 @@ public class Schema {
 
     public static Schema parse(Path file) throws IOException {
         return SchemaParser.parse(file.toString(), Files.readString(file));
-    }
-
-    // FIXME: Bypasses checks
-    public static Schema of(Map<TypeReference, SchemaStatement> statements) {
-        return new Schema(statements);
     }
 
     private <E extends SchemaStatement> Stream<E> statementStream(Class<E> target) {
@@ -158,9 +152,9 @@ public class Schema {
     }
 
     // Build and validate Cedar schema
-    public static Schema build(Collection<SchemaStatement> statements, SourceLoc location) {
+    public static Schema of(Collection<SchemaStatement> statements) {
         // Ensure no illegal shadowing
-        Schema result = uniquenessPass(statements, location);
+        Schema result = uniquenessPass(statements);
         result = shallowResolutionPass(result);
         result = typeDependencyPass(result);
         return result;
@@ -170,7 +164,7 @@ public class Schema {
     // The resulting schema contains no duplicates (i.e., illegally shadowed statements)
     // This includes similarly named statements within the same namespace and conflicts with
     // global
-    private static Schema uniquenessPass(Collection<SchemaStatement> statements, SourceLoc location) {
+    private static Schema uniquenessPass(Collection<SchemaStatement> statements) {
         // Sort the list of statements such that entities from the global namespace come first
         statements = statements.stream()
                 .sorted(Comparator.comparingInt(a -> a.getNamespace().length()))

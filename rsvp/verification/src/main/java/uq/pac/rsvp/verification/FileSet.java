@@ -7,7 +7,6 @@ import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
 import uq.pac.rsvp.policy.ast.policy.PolicyStatement;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.statement.SchemaStatement;
-import uq.pac.rsvp.policy.ast.schema.type.TypeReference;
 import uq.pac.rsvp.support.util.Pair;
 
 import java.io.IOException;
@@ -39,12 +38,9 @@ public class FileSet {
 
     // Parsed files
     private final Map<String, Collection<PolicyStatement>> policies;
-    private final Map<String, Map<TypeReference, SchemaStatement>> schemas;
+    private final Map<String, Collection<SchemaStatement>> schemas;
     private final Map<String, Set<Entity>> entities;
     private final Map<String, Collection<PolicyStatement>> invariants;
-
-    // TODO: check state of fileset in add/get methods
-    private boolean loaded = false;
 
     public FileSet() {
         // Paths mapped to file IDs
@@ -66,7 +62,6 @@ public class FileSet {
     }
 
     public FileSet loadFiles() throws IOException, IllegalAccessException {
-
         // Load policies
         for (List<Pair<String, Path>> versionedPolicy : policyFiles) {
             for (Pair<String, Path> policyFile : versionedPolicy) {
@@ -86,7 +81,7 @@ public class FileSet {
 
             String content = Files.readString(location);
             schemaFileContent.put(id, content);
-            schemas.put(id, Schema.parse(id, content).entries().collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue)));
+            schemas.put(id, Schema.parse(id, content).statements().toList());
         }
 
         // Load entities
@@ -107,7 +102,6 @@ public class FileSet {
             invariants.put(id, PolicyParser.parse(id, Files.readString(location)));
         }
 
-        loaded = true;
         return this;
     }
 
@@ -171,8 +165,8 @@ public class FileSet {
         return String.join("\n", schemaFileContent.values());
     }
 
-    public Map<TypeReference, SchemaStatement> getSchemaStatements() {
-        return schemas.values().stream().map(Map::entrySet).flatMap(Collection::stream).collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+    public Collection<SchemaStatement> getSchemaStatements() {
+        return schemas.values().stream().flatMap(Collection::stream).toList();
     }
 
     public boolean noEntities() {

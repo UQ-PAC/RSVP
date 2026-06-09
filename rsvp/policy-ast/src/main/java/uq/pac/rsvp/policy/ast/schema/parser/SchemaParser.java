@@ -7,7 +7,6 @@ import uq.pac.rsvp.policy.ast.ThrowingErrorListener;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.statement.SchemaStatement;
 import uq.pac.rsvp.support.FileSource;
-import uq.pac.rsvp.support.SourceLoc;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -55,7 +54,7 @@ public class SchemaParser {
                         components.addAll(statements.visit(s));
                     }
                 }
-                return Schema.build(components, SourceLoc.MISSING);
+                return Schema.of(components);
             }
         }.visit(parser.schema());
     }

@@ -1,0 +1,38 @@
+entity Visibility enum [ "Private", "Protected", "Public" ];
+entity Role enum [ "User", "Admin" ];
+entity Photo {
+    "album": Album,
+    "size": __cedar::Long,
+    "type": __cedar::String,
+};
+entity Album {
+    "owner": Account,
+    "visibility": Visibility,
+    "year"?: __cedar::Long,
+};
+entity Account {
+    "age": __cedar::Long,
+    "friends": Set<Account>,
+    "name": __cedar::String,
+    "role": Role,
+};
+action "viewPhoto" appliesTo {
+    principal: [Account],
+    resource: [Photo],
+    context: { }
+};
+action "uploadPhoto" appliesTo {
+    principal: [Account],
+    resource: [Album],
+    context: { }
+};
+action "removeAlbum" appliesTo {
+    principal: [Account],
+    resource: [Album],
+    context: { }
+};
+action "createAlbum" appliesTo {
+    principal: [Account],
+    resource: [Account],
+    context: { }
+};

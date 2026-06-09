@@ -1,0 +1,40 @@
+namespace Photo::App { 
+    entity Visibility enum [ "Private", "Protected", "Public" ];
+    entity Role enum [ "User", "Admin" ];
+    entity Photo {
+        "album": Photo::App::Album,
+        "size": __cedar::Long,
+        "type": __cedar::String,
+    };
+    entity Album {
+        "owner": Photo::App::Account,
+        "visibility": Photo::App::Visibility,
+        "year"?: __cedar::Long,
+    };
+    entity Account {
+        "age": __cedar::Long,
+        "friends": Set<Photo::App::Account>,
+        "name": __cedar::String,
+        "role": Photo::App::Role,
+    };
+    action "viewPhoto" appliesTo {
+        principal: [Photo::App::Account],
+        resource: [Photo::App::Photo],
+        context: { }
+    };
+    action "uploadPhoto" appliesTo {
+        principal: [Photo::App::Account],
+        resource: [Photo::App::Album],
+        context: { }
+    };
+    action "removeAlbum" appliesTo {
+        principal: [Photo::App::Account],
+        resource: [Photo::App::Album],
+        context: { }
+    };
+    action "createAlbum" appliesTo {
+        principal: [Photo::App::Account],
+        resource: [Photo::App::Account],
+        context: { }
+    };
+}

@@ -18,15 +18,7 @@ import uq.pac.rsvp.policy.ast.schema.visitor.SchemaVisitorAdapter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
@@ -121,16 +113,37 @@ public class Schema {
         return statements.containsKey(reference);
     }
 
+    /**
+     * String representation of the schema. The toString representation generates a parseable
+     * schema, such that parsing the string representation generates an identical schema.
+     * The string representation is also stable and enforces lexicographical order of schema
+     * statements
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
+        // Generate initial associations mapping namespaces to the statements they contain
         Map<String, List<SchemaStatement>> namespaces = new HashMap<>();
         statements.values().forEach(v -> {
             namespaces.computeIfAbsent(v.getNamespace(), k -> new ArrayList<>()).add(v);
         });
 
-        namespaces.forEach((ns, stmts) -> {
+        // Sort the map
+        Map<String, List<SchemaStatement>> sortedNamespaces = new LinkedHashMap<>();
+        namespaces.keySet().stream().sorted()
+                .forEach(ns -> sortedNamespaces.put(ns, new ArrayList<>()));
+
+        for (String ns : namespaces.keySet()) {
+            List<SchemaStatement> statements = namespaces.get(ns);
+            List<SchemaStatement> sortedStatements =  statements.stream()
+                    .sorted(Comparator.comparing(Object::toString))
+                    .toList()
+                    .reversed();
+            sortedNamespaces.get(ns).addAll(sortedStatements);
+        }
+
+        sortedNamespaces.forEach((ns, stmts) -> {
             if (!ns.isEmpty()) {
                 sb.append("namespace ").append(ns).append(" { ").append("\n");
             }
@@ -153,7 +166,6 @@ public class Schema {
         Schema result = uniquenessPass(statements);
         result = shallowResolutionPass(result);
         result = typeDependencyPass(result);
-        result = commonTypeResolutionPass(result);
         return result;
     }
 
@@ -270,14 +282,13 @@ public class Schema {
         };
     }
 
-    // Fourth stage of resolution
-    //  - resolve and in-line all common type definitions
-    private static Schema commonTypeResolutionPass(Schema schema) {
+    // Generate a schema that resolves, in-lines and removes common type definitions
+    public Schema resolveCommonTypes() {
         Map<TypeReference, SchemaStatement> resolved = new HashMap<>();
-        for (Map.Entry<TypeReference, SchemaStatement> entry : schema.statements.entrySet()) {
+        for (Map.Entry<TypeReference, SchemaStatement> entry : statements.entrySet()) {
             SchemaStatement stmt = entry.getValue();
             if (stmt instanceof RecordEntityTypeDefinition rd) {
-                RecordType shape = (RecordType) resolve(schema, rd.getShape());
+                RecordType shape = (RecordType) resolve(this, rd.getShape());
                 stmt = new RecordEntityTypeDefinition(
                         rd.getTypeReference(), rd.getMemberOf(), shape,
                         rd.getAnnotations(), rd.getSourceLoc());

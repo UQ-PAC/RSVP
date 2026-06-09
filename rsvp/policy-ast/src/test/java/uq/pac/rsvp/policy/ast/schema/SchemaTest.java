@@ -1,27 +1,16 @@
 package uq.pac.rsvp.policy.ast.schema;
 
-import com.cedarpolicy.model.exception.InternalException;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
-import uq.pac.rsvp.StdLogger;
 import uq.pac.rsvp.policy.ast.TestUtil;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
-import static com.cedarpolicy.model.schema.Schema.JsonOrCedar.Json;
 import static org.junit.jupiter.api.Assertions.*;
 import static uq.pac.rsvp.policy.ast.TestUtil.*;
 
@@ -91,47 +80,17 @@ public class SchemaTest {
         return tests;
     }
 
-    // Get a normalised representation of a cedar file with resolved types by converting it to
-    // JSON with resolved types and then back to cedar
-    static String getNormalisedCedarSchemaText(Path schemaPath) throws InterruptedException, IOException, InternalException {
-
-
-        // Define the command and its arguments
-        ProcessBuilder pb = new ProcessBuilder(CEDAR.toString(),
-                "translate-schema",
-                "--direction=cedar-to-json-with-resolved-types",
-                "-s",
-                schemaPath.toAbsolutePath().toString());
-        Process process = pb.start();
-
-        StringBuilder stdout = new StringBuilder();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            stdout.append(line).append('\n');
-        }
-
-        assertEquals(0, process.waitFor());
-        return com.cedarpolicy.model.schema.Schema.parse(Json, stdout.toString()).toCedarFormat();
-    }
-
     // Differential test for overall schema representation.
     // Generate a cedar schema, convert it to string and compare to the output of cedar
     void completenessTest(Path path) {
         try {
-            if (CEDAR == null) {
-                LOGGER.warning("Cedar executable not found. Skip schema completeness tests for: "
-                        + path.getFileName().toString());
-            }
-            Assumptions.assumeTrue(CEDAR != null);
             Schema schema = Schema.parse(path);
-            System.out.println(schema.toString());
-            Path schemaPath = Files.createTempFile(TMPDIR, path.getFileName().toString(), null);
-            Files.writeString(schemaPath, schema.toString());
-            String expected = getNormalisedCedarSchemaText(path);
-            String actual = getNormalisedCedarSchemaText(schemaPath);
-            assertEquals(expected, actual);
-        } catch (IOException | InternalException | InterruptedException e) {
+            Path expected = Path.of(path.getParent().toString(), path.getFileName() + ".expected");
+            if (GENERATE_ORACLES) {
+                Files.writeString(expected, schema.toString());
+            }
+            assertEquals(Files.readString(expected), schema.toString());
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

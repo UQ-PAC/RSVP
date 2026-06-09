@@ -1,0 +1,19 @@
+entity User { };
+entity Document { };
+action "modify" appliesTo {
+    principal: [User],
+    resource: [Document],
+    context: { }
+};
+action "append" in [Action::"modify", App::Action::"edit"] appliesTo {
+    principal: [User],
+    resource: [Document],
+    context: { }
+};
+namespace App { 
+    action "edit" appliesTo {
+        principal: [User],
+        resource: [Document],
+        context: { }
+    };
+}

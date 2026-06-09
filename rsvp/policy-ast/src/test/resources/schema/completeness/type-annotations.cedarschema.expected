@@ -1,0 +1,18 @@
+namespace App { 
+    @Foo
+    @ATypeAnnotation("enough annotations already...")
+    type SomeType = App::SomeEntity;
+    @Baz
+    @AnActionAnnotation("with a totally different value?")
+    action "someAction" appliesTo {
+        principal: [App::SomeEntity],
+        resource: [App::SomeEntity],
+        context: { }
+    };
+    @AnEntityAnnotation("with a value!")
+    @Foo
+    entity SomeEntity { };
+    @AnEntityAnnotation("with a value!")
+    @Bar
+    entity OtherEntity enum [ "A" ];
+}

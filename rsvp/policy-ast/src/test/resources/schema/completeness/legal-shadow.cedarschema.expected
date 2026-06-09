@@ -1,0 +1,11 @@
+namespace One { 
+    entity A { };
+}
+namespace Two { 
+    entity B {
+        "a": One::A,
+        "b": Two::A,
+        "c": Two::A,
+    };
+    entity A { };
+}

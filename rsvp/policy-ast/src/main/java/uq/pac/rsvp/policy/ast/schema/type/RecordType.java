@@ -6,6 +6,7 @@ import uq.pac.rsvp.policy.ast.schema.visitor.SchemaVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Map;
 
 public class RecordType extends BuiltinType {
@@ -88,13 +89,16 @@ public class RecordType extends BuiltinType {
                 sb.append("{ }");
             } else {
                 sb.append("{").append("\n");
-                rec.getAttributes().forEach((a, t) -> {
-                    sb.append(indent).append("    ")
-                            .append(a.toString())
-                            .append(": ")
-                            .append(toString(t, indent + "    "))
-                            .append(",\n");
-                });
+                // Enforce lexicographical order when outputting attributes
+                rec.getAttributes().entrySet().stream()
+                        .sorted(Comparator.comparing(a -> a.getKey().toString()))
+                        .forEach(a -> {
+                            sb.append(indent).append("    ")
+                                    .append(a.getKey().toString())
+                                    .append(": ")
+                                    .append(toString(a.getValue(), indent + "    "))
+                                    .append(",\n");
+                        });
                 sb.append(indent).append("}");
             }
             return sb.toString();

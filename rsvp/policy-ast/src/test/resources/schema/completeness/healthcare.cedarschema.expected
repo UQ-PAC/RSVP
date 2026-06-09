@@ -1,0 +1,37 @@
+namespace HealthCareApp { 
+    type Diagnosis = __cedar::String;
+    type AppointmentDetails = {
+        "cost": __cedar::Long,
+        "reason": __cedar::String,
+    };
+    entity User in [HealthCareApp::Role] { };
+    entity Role enum [ "Admin", "Doctor", "InsuranceRep" ];
+    entity InfoType { };
+    entity Info in [HealthCareApp::InfoType] {
+        "patient": HealthCareApp::User,
+        "provider": HealthCareApp::User,
+    };
+    action "updateAppointment" appliesTo {
+        principal: [HealthCareApp::User],
+        resource: [HealthCareApp::Info],
+        context: { }
+    };
+    action "listAppointments" appliesTo {
+        principal: [HealthCareApp::User],
+        resource: [HealthCareApp::Info],
+        context: { }
+    };
+    action "deleteAppointment" appliesTo {
+        principal: [HealthCareApp::User],
+        resource: [HealthCareApp::Info],
+        context: { }
+    };
+    action "createAppointment" in [HealthCareApp::Action::"updateAppointment"] appliesTo {
+        principal: [HealthCareApp::User],
+        resource: [HealthCareApp::Info],
+        context: {
+            "detail": HealthCareApp::AppointmentDetails,
+            "referrer": HealthCareApp::User,
+        }
+    };
+}

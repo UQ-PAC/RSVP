@@ -1,0 +1,10 @@
+namespace DataCollectionApp { 
+    entity User {
+        "nicknames": Set<__cedar::String>,
+        "preferences": {
+            "colour": DataCollectionApp::Colour,
+            "diet": __cedar::String,
+        },
+    };
+    entity Colour enum [ "red", "green", "blue", "purple", "pink", "yellow" ];
+}

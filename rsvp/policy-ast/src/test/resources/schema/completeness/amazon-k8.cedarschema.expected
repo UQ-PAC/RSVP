@@ -1,0 +1,149 @@
+namespace k8s { 
+    type LabelRequirement = {
+        "key": __cedar::String,
+        "operator": __cedar::String,
+        "values": Set<__cedar::String>,
+    };
+    type FieldRequirement = {
+        "field": __cedar::String,
+        "operator": __cedar::String,
+        "value": __cedar::String,
+    };
+    type ExtraAttribute = {
+        "key": __cedar::String,
+        "values"?: Set<__cedar::String>,
+    };
+    entity User in [k8s::Group] {
+        "extra"?: Set<k8s::ExtraAttribute>,
+        "name": __cedar::String,
+    };
+    entity ServiceAccount in [k8s::Group] {
+        "extra"?: Set<k8s::ExtraAttribute>,
+        "name": __cedar::String,
+        "namespace": __cedar::String,
+    };
+    entity Resource {
+        "apiGroup": __cedar::String,
+        "fieldSelector"?: Set<k8s::FieldRequirement>,
+        "labelSelector"?: Set<k8s::LabelRequirement>,
+        "name"?: __cedar::String,
+        "namespace"?: __cedar::String,
+        "resource": __cedar::String,
+        "subresource"?: __cedar::String,
+    };
+    entity PrincipalUID { };
+    entity NonResourceURL {
+        "path": __cedar::String,
+    };
+    entity Node in [k8s::Group] {
+        "extra"?: Set<k8s::ExtraAttribute>,
+        "name": __cedar::String,
+    };
+    entity Group {
+        "name": __cedar::String,
+    };
+    entity Extra {
+        "key": __cedar::String,
+        "values"?: Set<__cedar::String>,
+    };
+    action "watch" appliesTo {
+        principal: [k8s::Group, k8s::Node, k8s::ServiceAccount, k8s::User],
+        resource: [k8s::Resource],
+        context: { }
+    };
+    action "use" appliesTo {
+        principal: [k8s::Group, k8s::Node, k8s::ServiceAccount, k8s::User],
+        resource: [k8s::Resource],
+        context: { }
+    };
+    action "update" appliesTo {
+        principal: [k8s::Group, k8s::Node, k8s::ServiceAccount, k8s::User],
+        resource: [k8s::Resource],
+        context: { }
+    };
+    action "sign" appliesTo {
+        principal: [k8s::Group, k8s::Node, k8s::ServiceAccount, k8s::User],
+        resource: [k8s::Resource],
+        context: { }
+    };
+    action "readOnly" appliesTo {
+        principal: [k8s::Group, k8s::Node, k8s::ServiceAccount, k8s::User],
+        resource: [k8s::Resource],
+        context: { }
+    };
+    action "put" appliesTo {
+        principal: [k8s::Group, k8s::Node, k8s::ServiceAccount, k8s::User],
+        resource: [k8s::NonResourceURL],
+        context: { }
+    };
+    action "post" appliesTo {
+        principal: [k8s::Group, k8s::Node, k8s::ServiceAccount, k8s::User],
+        resource: [k8s::NonResourceURL],
+        context: { }
+    };
+    action "patch" appliesTo {
+        principal: [k8s::Group, k8s::Node, k8s::ServiceAccount, k8s::User],
+        resource: [k8s::NonResourceURL, k8s::Resource],
+        context: { }
+    };
+    action "options" appliesTo {
+        principal: [k8s::Group, k8s::Node, k8s::ServiceAccount, k8s::User],
+        resource: [k8s::NonResourceURL],
+        context: { }
+    };
+    action "list" in [k8s::Action::"readOnly"] appliesTo {
+        principal: [k8s::Group, k8s::Node, k8s::ServiceAccount, k8s::User],
+        resource: [k8s::Resource],
+        context: { }
+    };
+    action "impersonate" appliesTo {
+        principal: [k8s::Group, k8s::Node, k8s::ServiceAccount, k8s::User],
+        resource: [k8s::Extra, k8s::Group, k8s::Node, k8s::PrincipalUID, k8s::ServiceAccount, k8s::User],
+        context: { }
+    };
+    action "head" appliesTo {
+        principal: [k8s::Group, k8s::Node, k8s::ServiceAccount, k8s::User],
+        resource: [k8s::NonResourceURL],
+        context: { }
+    };
+    action "get" in [k8s::Action::"readOnly"] appliesTo {
+        principal: [k8s::Group, k8s::Node, k8s::ServiceAccount, k8s::User],
+        resource: [k8s::NonResourceURL, k8s::Resource],
+        context: { }
+    };
+    action "escalate" appliesTo {
+        principal: [k8s::Group, k8s::Node, k8s::ServiceAccount, k8s::User],
+        resource: [k8s::Resource],
+        context: { }
+    };
+    action "deletecollection" appliesTo {
+        principal: [k8s::Group, k8s::Node, k8s::ServiceAccount, k8s::User],
+        resource: [k8s::Resource],
+        context: { }
+    };
+    action "delete" appliesTo {
+        principal: [k8s::Group, k8s::Node, k8s::ServiceAccount, k8s::User],
+        resource: [k8s::NonResourceURL, k8s::Resource],
+        context: { }
+    };
+    action "create" appliesTo {
+        principal: [k8s::Group, k8s::Node, k8s::ServiceAccount, k8s::User],
+        resource: [k8s::Resource],
+        context: { }
+    };
+    action "bind" appliesTo {
+        principal: [k8s::Group, k8s::Node, k8s::ServiceAccount, k8s::User],
+        resource: [k8s::Resource],
+        context: { }
+    };
+    action "attest" appliesTo {
+        principal: [k8s::Group, k8s::Node, k8s::ServiceAccount, k8s::User],
+        resource: [k8s::Resource],
+        context: { }
+    };
+    action "approve" appliesTo {
+        principal: [k8s::Group, k8s::Node, k8s::ServiceAccount, k8s::User],
+        resource: [k8s::Resource],
+        context: { }
+    };
+}

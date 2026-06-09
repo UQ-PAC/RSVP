@@ -1,0 +1,9 @@
+entity Person {
+    "age": __cedar::Long,
+    "name": __cedar::String,
+};
+action "slap" appliesTo {
+    principal: [Person],
+    resource: [Person],
+    context: { }
+};

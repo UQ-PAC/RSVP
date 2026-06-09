@@ -1,0 +1,28 @@
+type Path = __cedar::String;
+type FilePermission = {
+    "exec": __cedar::Bool,
+    "read": __cedar::Bool,
+    "write": __cedar::Bool,
+};
+type FileAttr = __cedar::String;
+type DirPermission = {
+    "exec": __cedar::Bool,
+    "read": __cedar::Bool,
+    "write": __cedar::Bool,
+};
+type DirAttr = __cedar::String;
+entity File {
+    "access": FileAttr,
+    "path": Path,
+    "permission": FilePermission,
+};
+entity Directory {
+    "access": DirAttr,
+    "path": Path,
+    "permission": DirPermission,
+};
+action "introspect" appliesTo {
+    principal: [File, Directory],
+    resource: [File, Directory],
+    context: { }
+};

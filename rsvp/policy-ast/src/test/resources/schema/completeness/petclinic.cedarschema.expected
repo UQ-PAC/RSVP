@@ -1,0 +1,74 @@
+namespace PetClinic { 
+    entity ProfessionalLevel enum [ "Intern", "Resident", "Staff", "Senior", "Registrar", "Specialist" ];
+    entity PetVisit {
+        "clinics": Set<PetClinic::Clinic>,
+        "confidentiality": PetClinic::Confidentiality,
+        "pet": PetClinic::Pet,
+        "veterinarians": Set<PetClinic::Employee>,
+    };
+    entity PetOwner {
+        "clinics": Set<PetClinic::Clinic>,
+        "name": __cedar::String,
+        "pets": Set<PetClinic::Pet>,
+        "veterinarians": Set<PetClinic::Employee>,
+    };
+    entity Pet {
+        "clinics": Set<PetClinic::Clinic>,
+        "name": __cedar::String,
+        "owner": PetClinic::PetOwner,
+        "veterinarians": Set<PetClinic::Employee>,
+    };
+    entity Guest { };
+    entity EmployeeRole enum [ "Administrator", "Secretary", "Veterinarian" ];
+    entity Employee {
+        "clinics": Set<PetClinic::Clinic>,
+        "level"?: PetClinic::ProfessionalLevel,
+        "manager"?: PetClinic::Employee,
+        "name": __cedar::String,
+        "roles": Set<PetClinic::EmployeeRole>,
+    };
+    entity Confidentiality enum [ "Official", "Sensitive", "Protected" ];
+    entity Clinic { };
+    action "ViewEmployee" in [PetClinic::Action::"EmployeeOperations"] appliesTo {
+        principal: [PetClinic::Employee, PetClinic::Guest],
+        resource: [PetClinic::Employee],
+        context: { }
+    };
+    action "ViewClient" in [PetClinic::Action::"ClientOperations"] appliesTo {
+        principal: [PetClinic::Employee, PetClinic::Guest],
+        resource: [PetClinic::PetOwner, PetClinic::Pet, PetClinic::PetVisit],
+        context: { }
+    };
+    action "EmployeeOperations" ;
+    action "EditEmployee" in [PetClinic::Action::"EmployeeOperations"] appliesTo {
+        principal: [PetClinic::Employee, PetClinic::Guest],
+        resource: [PetClinic::Employee],
+        context: { }
+    };
+    action "EditClient" in [PetClinic::Action::"ClientOperations"] appliesTo {
+        principal: [PetClinic::Employee, PetClinic::Guest],
+        resource: [PetClinic::PetOwner, PetClinic::Pet, PetClinic::PetVisit],
+        context: { }
+    };
+    action "DeleteEmployee" in [PetClinic::Action::"EmployeeOperations"] appliesTo {
+        principal: [PetClinic::Employee, PetClinic::Guest],
+        resource: [PetClinic::Employee],
+        context: { }
+    };
+    action "DeleteClient" in [PetClinic::Action::"ClientOperations"] appliesTo {
+        principal: [PetClinic::Employee, PetClinic::Guest],
+        resource: [PetClinic::PetOwner, PetClinic::Pet, PetClinic::PetVisit],
+        context: { }
+    };
+    action "ClientOperations" ;
+    action "AddEmployee" in [PetClinic::Action::"EmployeeOperations"] appliesTo {
+        principal: [PetClinic::Employee, PetClinic::Guest],
+        resource: [PetClinic::Clinic],
+        context: { }
+    };
+    action "AddClient" in [PetClinic::Action::"ClientOperations"] appliesTo {
+        principal: [PetClinic::Employee, PetClinic::Guest],
+        resource: [PetClinic::Clinic],
+        context: { }
+    };
+}

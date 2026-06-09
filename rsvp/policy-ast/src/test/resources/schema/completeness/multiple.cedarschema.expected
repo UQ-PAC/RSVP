@@ -1,0 +1,15 @@
+entity Y {
+    "size": __cedar::Long,
+    "type": __cedar::String,
+};
+entity X {
+    "size": __cedar::Long,
+    "type": __cedar::String,
+};
+entity B enum [ "K", "L", "M" ];
+entity A enum [ "K", "L", "M" ];
+action "viewPhoto" appliesTo {
+    principal: [A],
+    resource: [X],
+    context: { }
+};

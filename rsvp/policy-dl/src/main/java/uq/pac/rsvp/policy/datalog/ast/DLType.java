@@ -25,8 +25,8 @@ public class DLType extends DLNode {
         }
     }
 
-    public static DLType NUMBER = RESERVED_TYPES.get("number");
-    public static DLType SYMBOL = RESERVED_TYPES.get("symbol");
+    public static final DLType NUMBER = RESERVED_TYPES.get("number");
+    public static final DLType SYMBOL = RESERVED_TYPES.get("symbol");
 
     private final String name;
 

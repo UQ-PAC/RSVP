@@ -5,13 +5,17 @@ import org.logicng.transformations.dnf.DNFFactorization;
 import uq.pac.rsvp.policy.ast.policy.expr.*;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static uq.pac.rsvp.Assertion.require;
-import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.*;
-import static uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression.UnaryOp.*;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.And;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.Or;
+import static uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression.UnaryOp.Not;
 
 /**
  * Converting a Cedar expression to DNF.

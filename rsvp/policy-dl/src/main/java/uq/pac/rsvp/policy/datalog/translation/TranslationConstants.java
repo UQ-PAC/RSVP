@@ -17,7 +17,7 @@ public class TranslationConstants {
     /**
      * Name for the datalog specification the translation to generate
      */
-    public static String ProgramName = "auth.dl";
+    public static final String ProgramName = "auth.dl";
 
     /**
      * The translation revolves around rules of the form using principal, resource
@@ -209,7 +209,7 @@ public class TranslationConstants {
      * attributes if there are associated values. For instance, for the case when an attribute is
      * mapped to an empty list it will not be tracked.
 	*/
-    public static DLRuleDecl AttributeRuleDecl =
+    public static final DLRuleDecl AttributeRuleDecl =
             new DLRuleDecl("Attribute",
                     DLDeclTerm.symbolic("uid"),
                     DLDeclTerm.symbolic("attr"),
@@ -220,7 +220,7 @@ public class TranslationConstants {
      * has an attribute regardless if there are associated values or not. The below
      * declaration does exactly that. It maps EUIDs to the attributes it has
      */
-    public static DLRuleDecl HasAttributeRuleDecl =
+    public static final DLRuleDecl HasAttributeRuleDecl =
             new DLRuleDecl("HasAttribute",
                     DLDeclTerm.symbolic("uid"),
                     DLDeclTerm.symbolic("attr"));
@@ -231,7 +231,7 @@ public class TranslationConstants {
      * level as a string, as such make sure it is syntactically malformed
      * to avoid clashes with user types
      */
-    public static String TmpRecordType = "#RSVP::Tmp";
+    public static final String TmpRecordType = "#RSVP::Tmp";
 
     /**
      * Generate a random EUID based on the {@link TranslationConstants#TmpRecordType}
@@ -243,7 +243,7 @@ public class TranslationConstants {
     /**
      * UID name denoting an "unknown entity"
      */
-    public static String UndefinedEntityUIDName = "???";
+    public static final String UndefinedEntityUIDName = "???";
 
     /**
      * Get an unknown entity (UID) only. Abstraction over entities that can be given for

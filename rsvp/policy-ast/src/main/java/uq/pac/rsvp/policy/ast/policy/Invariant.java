@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.ast.policy;
 
 import uq.pac.rsvp.policy.ast.policy.expr.Expression;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyPayloadVisitor;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
@@ -40,5 +41,10 @@ public class Invariant extends PolicyStatement {
     @Override
     public <T> T compute(PolicyComputationVisitor<T> visitor) {
         return visitor.visitInvariant(this);
+    }
+
+    @Override
+    public <T, P> T compute(PolicyPayloadVisitor<T, P> visitor, P payload) {
+        return visitor.visitInvariant(this, payload);
     }
 }

@@ -3,6 +3,7 @@ package uq.pac.rsvp.policy.ast.policy;
 import uq.pac.rsvp.policy.ast.policy.expr.TypeExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.VariableExpression;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyPayloadVisitor;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
@@ -71,6 +72,11 @@ public class Quantifier extends PolicyAstNode {
     @Override
     public <T> T compute(PolicyComputationVisitor<T> visitor) {
         return visitor.visitQuantifier(this);
+    }
+
+    @Override
+    public <T, P> T compute(PolicyPayloadVisitor<T, P> visitor, P payload) {
+        return visitor.visitQuantifier(this, payload);
     }
 
     @Override

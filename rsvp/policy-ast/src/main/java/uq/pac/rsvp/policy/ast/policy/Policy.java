@@ -5,6 +5,7 @@ import java.util.*;
 import uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.BooleanExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression;
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyPayloadVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
 import uq.pac.rsvp.policy.ast.policy.expr.Expression;
@@ -75,6 +76,11 @@ public class Policy extends PolicyStatement {
     @Override
     public <T> T compute(PolicyComputationVisitor<T> visitor) {
         return visitor.visitPolicy(this);
+    }
+
+    @Override
+    public <T, P> T compute(PolicyPayloadVisitor<T, P> visitor, P payload) {
+        return visitor.visitPolicy(this, payload);
     }
 
     @Override

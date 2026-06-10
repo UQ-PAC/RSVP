@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyPayloadVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
@@ -35,6 +36,11 @@ public class SetExpression extends Expression {
     @Override
     public <T> T compute(PolicyComputationVisitor<T> visitor) {
         return visitor.visitSetExpr(this);
+    }
+
+    @Override
+    public <T, P> T compute(PolicyPayloadVisitor<T, P> visitor, P payload) {
+        return visitor.visitSetExpr(this, payload);
     }
 
     @Override

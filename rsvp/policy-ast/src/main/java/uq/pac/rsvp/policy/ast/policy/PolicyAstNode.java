@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.ast.policy;
 
 import uq.pac.rsvp.policy.ast.AstNode;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyPayloadVisitor;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 
@@ -14,4 +15,6 @@ public abstract class PolicyAstNode extends AstNode {
     public abstract void accept(PolicyVisitor visitor);
 
     public abstract <T> T compute(PolicyComputationVisitor<T> visitor);
+
+    public abstract <T, P> T compute(PolicyPayloadVisitor<T, P> visitor, P payload);
 }

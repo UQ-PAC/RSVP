@@ -1,6 +1,7 @@
 package uq.pac.rsvp.policy.ast.policy.expr;
 
 
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyPayloadVisitor;
 import uq.pac.rsvp.support.SourceLoc;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
@@ -58,6 +59,11 @@ public class BinaryExpression extends Expression {
     @Override
     public <T> T compute(PolicyComputationVisitor<T> visitor) {
         return visitor.visitBinaryExpr(this);
+    }
+
+    @Override
+    public <T, P> T compute(PolicyPayloadVisitor<T, P> visitor, P payload) {
+        return visitor.visitBinaryExpr(this, payload);
     }
 
     @Override

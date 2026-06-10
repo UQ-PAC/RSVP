@@ -86,16 +86,17 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
         this.types = new HashSet<>();
         this.variables = null;
         this.schema = schema.resolveCommonTypes();
+
         // Common types should have been eliminated by this point
-        require(schema.types().findAny().isEmpty());
+        require(this.schema.types().findAny().isEmpty());
 
         // Build types from entities
-        schema.entityTypes().forEach(e -> types.add(e.getTypeReference()));
+        this.schema.entityTypes().forEach(e -> types.add(e.getTypeReference()));
         // Build types from actions.
         // Actions in Cedar are basically specific entities, for the purpose of type checking we
         // make actions be equivalent, i.e., rather than reason about specific actions an action type
         // is an entity type named `Action` in a particular namespace
-        schema.actions().forEach(e -> types.add(new TypeReference(e.getNamespace(), "Action")));
+        this.schema.actions().forEach(e -> types.add(new TypeReference(e.getNamespace(), "Action")));
     }
 
     private static Map<String, TypeReference> getVariables(Invariant invariant, Set<TypeReference> types) {

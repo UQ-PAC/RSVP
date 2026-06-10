@@ -1,6 +1,5 @@
 package uq.pac.rsvp.policy.ast.schema.visitor;
 
-import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.statement.ActionDefinition;
 import uq.pac.rsvp.policy.ast.schema.statement.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityTypeDefinition;

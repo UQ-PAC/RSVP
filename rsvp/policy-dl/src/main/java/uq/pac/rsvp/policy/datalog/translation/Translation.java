@@ -1,5 +1,6 @@
 package uq.pac.rsvp.policy.datalog.translation;
 
+import com.cedarpolicy.model.exception.AuthException;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Multimap;
@@ -86,8 +87,8 @@ public class Translation {
 
             this.datalogProgram = translate();
             datalogProgram.execute(datalogDir);
-        } catch (Throwable e) {
-            throw new AssertionError(e);
+        } catch (IOException | InterruptedException | AuthException e) {
+            throw new RuntimeException(e);
         }
     }
 

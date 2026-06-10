@@ -3,7 +3,6 @@ package uq.pac.rsvp.policy.ast.policy.visitor;
 import uq.pac.rsvp.policy.ast.policy.Invariant;
 import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.policy.expr.*;
-import uq.pac.rsvp.policy.ast.policy.Quantifier;
 
 public interface PolicyComputationVisitor<T> {
     default T visitPolicy(Policy policy) { throw new AssertionError(); }

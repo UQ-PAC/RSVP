@@ -1,10 +1,7 @@
 package uq.pac.rsvp.policy.datalog.validation;
 
 import uq.pac.rsvp.policy.ast.schema.Schema;
-import uq.pac.rsvp.policy.ast.schema.statement.CommonTypeDefinition;
-import uq.pac.rsvp.policy.ast.schema.statement.EntityTypeDefinition;
-import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityTypeDefinition;
-import uq.pac.rsvp.policy.ast.schema.statement.RecordEntityTypeDefinition;
+import uq.pac.rsvp.policy.ast.schema.statement.*;
 import uq.pac.rsvp.policy.ast.schema.type.*;
 import uq.pac.rsvp.policy.ast.schema.visitor.SchemaPayloadVisitor;
 import uq.pac.rsvp.policy.ast.entity.*;
@@ -100,27 +97,28 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
 
         // Here we parse only the type. Then, if this is an action reference then the type name is 'Action'
         TypeReference ref = TypeReference.parse(euid.getType());
-        EntityTypeDefinition def = schema.getEntityType(ref);
-        if (def == null) {
-            if (ref.getBaseName().equals("Action")) {
-                throw new TranslationError( "Action entity: " + entity.getEuid(), entity.getSourceLoc());
-            } else {
-                throw new TranslationError( "Undefined entity type: " + euid.getType(), entity.getSourceLoc());
-            }
-        }
-        def.getShape().accept(this, entity.getAttrs());
 
-        for (EntityReference value : entity.getParents()) {
-            if (value instanceof EntityReference parent) {
-                // FIXME: Cache
-                Set<String> memberOf = def.getMemberOf().stream()
-                        .map(TypeReference::getName)
-                        .collect(Collectors.toSet());
-                memberOf.add(def.getName());
-                if (!memberOf.contains(parent.getType())) {
-                    throw new TranslationError( "Unexpected parent type: " + parent.getType() + " expected one of " + memberOf, value.getSourceLoc());
+        switch (schema.get(ref)) {
+            case EntityTypeDefinition def -> {
+                def.getShape().accept(this, entity.getAttrs());
+                for (EntityReference value : entity.getParents()) {
+                    if (value instanceof EntityReference parent) {
+                        // FIXME: Cache
+                        Set<String> memberOf = def.getMemberOf().stream()
+                                .map(TypeReference::getName)
+                                .collect(Collectors.toSet());
+                        memberOf.add(def.getName());
+                        if (!memberOf.contains(parent.getType())) {
+                            throw new TranslationError( "Unexpected parent type: " +
+                                    parent.getType() + " expected one of " + memberOf, value.getSourceLoc());
+                        }
+                    }
                 }
             }
+            // Action entities are allowed but ignored
+            case ActionDefinition act -> {}
+            case null, default ->
+                    throw new TranslationError("Undefined entity type: " + euid.getType(), entity.getSourceLoc());
         }
     }
 

@@ -1,7 +1,6 @@
 package uq.pac.rsvp.policy.ast;
 
 import org.junit.jupiter.api.Test;
-import uq.pac.rsvp.StdLogger;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,9 +12,6 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class TestUtil {
-
-    public final static StdLogger LOGGER = new StdLogger();
-
     public final static Path ROOTDIR =
             Path.of(System.getProperty("test.rootdir")).toAbsolutePath();
     public final static Path RESOURCEDIR =

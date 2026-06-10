@@ -6,15 +6,14 @@ import uq.pac.rsvp.policy.ast.schema.statement.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.statement.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.type.*;
-import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.policy.Invariant;
-import uq.pac.rsvp.policy.ast.policy.Quantifier;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.support.error.TranslationError;
 import uq.pac.rsvp.support.error.ValidationError;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static uq.pac.rsvp.Assertion.require;
@@ -30,19 +29,14 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
     final static BooleanType BooleanType = new BooleanType();
     final static StringType StringType = new StringType();
     final static LongType LongType = new LongType();
-    final static BooleanType TypeOfEntityType = new BooleanType();
 
     public record TypeTest(Function<BuiltinType, Boolean> test, String expected) { }
 
-    final static TypeTest TBoolean = new TypeTest(t -> t.equals(BooleanType), "__cedar::Boolean");
+    final static TypeTest TBoolean = new TypeTest(t -> t.equals(BooleanType), "__cedar::Bool");
     final static TypeTest TLong = new TypeTest(t -> t.equals(LongType), "__cedar::Long");
     final static TypeTest TString = new TypeTest(t -> t.equals(StringType), "__cedar::String");
-    final static TypeTest TTypeOfEntity = new TypeTest(t -> t == TypeOfEntityType, "Entity");
     final static TypeTest TSet = new TypeTest(t -> t instanceof SetType, "Set<?>");
-    final static TypeTest TRecord = new TypeTest(
-            t -> t instanceof RecordType, "Record, Entity, Action");
-    final static TypeTest TEntityOrAction = new TypeTest(
-            t -> isEntity(t) || isAction(t), "Entity, Action");
+    final static TypeTest TRecord = new TypeTest(t -> t instanceof RecordType, "Record");
     final static TypeTest TEntity = new TypeTest(InvariantValidator::isEntity, "Entity");
     final static TypeTest TAction = new TypeTest(InvariantValidator::isAction, "Action");
 
@@ -54,10 +48,10 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
         return type instanceof TypeReference ref && !ref.getBaseName().equals("Action");
     }
 
-    static TypeTest expect(BuiltinType actual, TypeTest ...tests) {
+    static void expect(BuiltinType actual, TypeTest ...tests) {
         for (TypeTest test : tests) {
             if (test.test().apply(actual)) {
-                return test;
+                return;
             }
         }
         String expected = Stream.of(tests).map(TypeTest::expected).toList().toString();
@@ -65,16 +59,14 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
     }
 
 
-    static TypeTest expect(BuiltinType actual, List<TypeTest> tests) {
-        return expect(actual, tests.toArray(new TypeTest[0]));
+    static void expect(BuiltinType actual, List<TypeTest> tests) {
+        expect(actual, tests.toArray(new TypeTest[0]));
     }
 
-    static TypeTest expectCompatible(BuiltinType one, BuiltinType another, TypeTest ...tests) {
-        return expect(another,  expect(one, tests));
-    }
-
-    static TypeTest expectCompatible(BuiltinType one, BuiltinType another, List<TypeTest> tests) {
-        return expectCompatible(one, another, tests.toArray(new TypeTest[0]));
+    static void expectCompatible(BuiltinType one, BuiltinType another) {
+        if (!one.equals(another)) {
+            throw new ValidationError("Incompatible types: %s <> %s".formatted(one, another));
+        }
     }
 
     private InvariantValidator(InvariantValidator factory, Invariant invariant) {
@@ -93,11 +85,13 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
     public InvariantValidator(Schema schema) {
         this.types = new HashSet<>();
         this.variables = null;
-        this.schema = schema;
+        this.schema = schema.resolveCommonTypes();
+        // Common types should have been eliminated by this point
+        require(schema.types().findAny().isEmpty());
 
         // Build types from entities
         schema.entityTypes().forEach(e -> types.add(e.getTypeReference()));
-        // Build types from actions
+        // Build types from actions.
         // Actions in Cedar are basically specific entities, for the purpose of type checking we
         // make actions be equivalent, i.e., rather than reason about specific actions an action type
         // is an entity type named `Action` in a particular namespace
@@ -133,7 +127,7 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
     }
 
     private List<BuiltinType> collect(Collection<Expression> exprs) {
-        return exprs.stream().map(this::collect).toList();
+        return exprs.stream().map(this::collect).collect(Collectors.toCollection(ArrayList::new));
     }
 
     public void validate(Invariant invariant) {
@@ -149,24 +143,27 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
 
         return switch (expr.getOp()) {
             case Add, Sub, Mul -> {
-                expectCompatible(lhs, rhs, TLong);
+                expect(lhs, TLong);
+                expect(rhs, TLong);
                 yield LongType;
             }
             case Less, LessEq, Greater, GreaterEq -> {
-                expectCompatible(lhs, rhs, TLong);
+                expect(lhs, TLong);
+                expect(rhs, TLong);
                 yield BooleanType;
             }
             case Eq, Neq -> {
-                // FIXME: we need record here as well
-                expectCompatible(lhs, rhs, TBoolean, TLong, TString, TEntityOrAction);
+                expectCompatible(lhs, rhs);
                 yield BooleanType;
             }
             case Or, And -> {
-                expectCompatible(lhs, rhs, TBoolean);
+                expect(lhs, TBoolean);
+                expect(rhs, TBoolean);
                 yield BooleanType;
             }
             case In -> {
-                expectCompatible(lhs, rhs, TEntityOrAction);
+                expectCompatible(lhs, rhs);
+                expect(lhs, TEntity, TAction);
                 yield BooleanType;
             }
             default -> throw new TranslationError("Unsupported");
@@ -175,14 +172,18 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
 
     @Override
     public BuiltinType visitIsExpr(IsExpression expr) {
-        expect(collect(expr.getExpression()), TEntityOrAction);
-        expect(collect(expr.getTypeExpression()), TTypeOfEntity);
+        expect(collect(expr.getExpression()), TEntity, TAction);
+        TypeReference ref = TypeReference.parse(expr.getTypeExpression().getValue());
+        if (!types.contains(ref)) {
+            throw new ValidationError("invalid type: %s in type expression: %s. Available types: %s"
+                    .formatted(ref, expr, types));
+        }
         return BooleanType;
     }
 
     @Override
     public BuiltinType visitHasExpr(HasExpression expr) {
-        expect(collect(expr.getExpression()), TEntityOrAction, TRecord);
+        expect(collect(expr.getExpression()), TEntity, TAction, TRecord);
         return BooleanType;
     }
 
@@ -276,16 +277,6 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
     }
 
     @Override
-    public BuiltinType visitTypeExpr(TypeExpression expr) {
-        TypeReference ref = TypeReference.parse(expr.getValue());
-        if (types.contains(ref)) {
-            return TypeOfEntityType;
-        }
-        throw new ValidationError("invalid type: %s in type expression: %s. Available types: %s"
-                .formatted(expr.getValue(), expr, types));
-    }
-
-    @Override
     public BuiltinType visitCallExpr(CallExpression expr) {
         String name = expr.getFunc();
         InvariantFunctionValidator.FunctionValidator validator =
@@ -297,19 +288,35 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
         return validator.validate(self, collect(expr.getArgs()));
     }
 
-    // == Unsupported (for now)
     @Override
     public BuiltinType visitConditionalExpr(ConditionalExpression expr) {
-        throw new TranslationError("unsupported element: " + expr);
+        BuiltinType condition = collect(expr.getCondition());
+        expect(condition, TBoolean);
+        BuiltinType then = collect(expr.getThen()),
+                els = collect(expr.getElse());
+        expectCompatible(then, els);
+        return then;
     }
 
     @Override
     public BuiltinType visitSetExpr(SetExpression expr) {
-        throw new TranslationError("unsupported element: " + expr);
+        // We need to make sure sets are homogenous
+        List<BuiltinType> types = collect(expr.getElements());
+        // Empty set literals are forbidden in Cedar
+        if (types.isEmpty()) {
+            throw new ValidationError("Empty set literals are forbidden im policies");
+        }
+        BuiltinType type = types.removeLast();
+        types.forEach(t -> expectCompatible(type, t));
+        return new SetType(type);
     }
 
     @Override
     public BuiltinType visitRecordExpr(RecordExpression expr) {
-        throw new TranslationError("unsupported element: " + expr);
+        Map<RecordType.Attribute, BuiltinType> attributes =
+                expr.getProperties().entrySet().stream().collect(Collectors.toMap(
+                        e -> new RecordType.Attribute(e.getKey()),
+                        e -> collect(e.getValue())));
+        return new RecordType(attributes);
     }
 }

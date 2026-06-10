@@ -50,8 +50,11 @@ public class InvariantValidatorTest {
             "no: principal == Accounts::\"Alice\" for all principal: Account",
             // Even though the entity does not exist, from type perspective this is valid
             "ok: principal == Account::\"Alic\" for all principal: Account",
-            "ok: principal == Role::\"User\" for all principal: Account",
-            "no: principal == Role::\"Driver\" for all principal: Account",
+            // Type mismatch, principal is account and it is compared to role
+            "no: principal == Role::\"User\" for all principal: Account",
+            "ok: principal == Role::\"User\" for all principal: Role",
+            // Entity cannot exist because this is an enum entity declared in the schema
+            "no: principal == Role::\"Driver\" for all principal: Role",
 
             // Invalid action name (type reference)
             "ok: action == Action::\"createAlbum\" for all action: Action",
@@ -83,20 +86,21 @@ public class InvariantValidatorTest {
             "no: alice.age == (bob.name * 1)  for all alice: Account, bob: Account",
             "no: alice.age == (bob.name + 1)  for all alice: Account, bob: Account",
 
-            // ==|!= over Long, String, Bool or Entity is ok.
-            // but it cannot be over records or sets
-            "ok: alice == bob for all alice: Account, bob: Role",
+            // ==|!= over any compatible types
+            "no: alice == bob for all alice: Account, bob: Role",
             "ok: alice == bob for all alice: Action, bob: Action",
             "ok: alice.age == bob.age for all alice: Account, bob: Account",
-            "ok: alice.age == bob.age for all alice: Account, bob: Account",
+            "no: alice.age == bob.name for all alice: Account, bob: Account",
             "ok: one.code == another.code for all one: PhotoPermission, another: PhotoPermission",
             "ok: one.permission.read == another.permission.write for all one: PhotoPermission, another: PhotoPermission",
-            "ok: one == another for all one: Action, another: Photo",
-            // but it cannot be over records or sets
-            "no: alice.friends == bob.friends for all alice: Account, bob: Account",
-            "no: one.permission == another.permission for all one: PhotoPermission, another: PhotoPermission",
+            "ok: alice.friends == bob.friends for all alice: Account, bob: Account",
+            "ok: one.permission == another.permission for all one: PhotoPermission, another: PhotoPermission",
             // ==/!= should be over compatible types
             "no: one.code == another.index for all one: PhotoPermission, another: PhotoPermission",
+            "no: one == another for all one: Account, another: Action",
+            "no: [123] == true",
+            "no: 1 == true",
+            "no: \"foo\" == { bar: \"bar\" }",
 
             // && only over boolean types
             "ok: one.permission.read && another.permission.write for all one: PhotoPermission, another: PhotoPermission",
@@ -140,17 +144,42 @@ public class InvariantValidatorTest {
             "no: alice.age is Account for all alice: Account",
 
             // in: expects valid entity types
-            "ok: alice in Account::\"Alice\" for all alice: Action",
-            "ok: alice in Account::\"Alice\" for all alice: Photoapp::Action",
+            "ok: alice in Action::\"viewPhoto\" for all alice: Action",
+            "ok: alice in Account::\"Alice\" for all alice: Account",
+            "no: alice in Account::\"Alice\" for all alice: Action",
+            "no: alice in Account::\"Alice\" for all alice: Photoapp::Action",
             "no: alice.age in Account::\"Alice\" for all alice: Account",
 
             // '???' entities
             // Type checking does not check whether entities exist
-            "ok: alice == Account::\"???\" for some alice: Photoapp::Action",
+            "ok: alice == Account::\"???\" for some alice: Account",
+            "no: alice == Account::\"???\" for some alice: Photoapp::Action",
             // But since actions are specified by the schema they are checked
             "no: alice == Action::\"???\" for some alice: Photoapp::Action",
             // Nor for enum-based entities
             "no: alice == Role::\"???\" for some alice: Photoapp::Action",
+
+            // Literal sets
+            "ok: [2, 3, 4] == [1]",
+            // Different types of sets
+            "no: [2, 3, 4] == [true]",
+            // Non-homogeneous set
+            "no: [true, 3, true] == [true]",
+            // Empty sets are forbidden in policies
+            "no: [] == [true]",
+
+            // literal records
+            "ok: { } == { }",
+            "no: { \"foo\" : 3 } == { \"bar\" : 6 }",
+            "ok: { \"foo\" : 3 } == { \"foo\" : 6 }",
+
+            // Conditional expressions
+            "ok: if true then true else false",
+            "ok: (if true then 1 else 2) == 1",
+            "ok: principal in (if true then Account::\"Alice\" else Account::\"Bob\") for all principal: Account",
+            "ok: (if true then [1, 2] else [3, 4]) == [1, 3]",
+            "no: (if true then true else 2) == 1",
+            "no: (if true then true else false) == 1",
 
             // Function validation
 
@@ -192,13 +221,14 @@ public class InvariantValidatorTest {
 
             // contains
             "ok: a.friends.contains(b) for all a: Account, b: Account",
-            "ok: a.friends.contains(b.role) for all a: Account, b: Account",
+            "no: a.friends.contains(b.role) for all a: Account, b: Account",
             "ok: c.contents.booleans.contains(true) for all c: Container",
             "ok: c.contents.numbers.contains(1) for all c: Container",
             "ok: c.contents.numbers.contains(1) for all c: Container",
             // allow entities/actions to be compared
-            "ok: a.friends.contains(a.role) for all a: Account",
-            "ok: a.friends.contains(Action::\"viewPhoto\") for all a: Account",
+            "no: a.friends.contains(a.role) for all a: Account",
+            "no: a.friends.contains(Action::\"viewPhoto\") for all a: Account",
+            "ok: a.friends.contains(Account::\"Timm\") for all a: Account",
             "no: a.friends.contains(1) for all a: Account",
             "no: c.contents.numbers.contains(false) for all c: Container",
             "no: c.contents.numbers.contains(\"a\") for all c: Container",

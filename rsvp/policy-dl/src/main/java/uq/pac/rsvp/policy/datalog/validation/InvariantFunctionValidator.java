@@ -85,7 +85,7 @@ public class InvariantFunctionValidator {
         SetContainsFunctionValidator(String name) {
             super(name,
                     List.of(TSet),
-                    List.of(List.of(TBoolean, TLong, TString, TEntityOrAction)),
+                    List.of(List.of(TBoolean, TLong, TString, TEntity, TAction)),
                     BooleanType);
         }
 
@@ -96,7 +96,8 @@ public class InvariantFunctionValidator {
             require(arguments.size() == 1);
 
             BuiltinType element = ((SetType) actualSelf).getElementType();
-            InvariantValidator.expectCompatible(element, actualArguments.getFirst(), this.arguments.getFirst());
+            InvariantValidator.expectCompatible(element, actualArguments.getFirst());
+            InvariantValidator.expect(element, this.arguments.getFirst());
         }
     }
 
@@ -115,8 +116,8 @@ public class InvariantFunctionValidator {
             BuiltinType selfElement = ((SetType) actualSelf).getElementType();
             BuiltinType argElement = ((SetType) actualArguments.getFirst()).getElementType();
 
-            InvariantValidator.expectCompatible(selfElement, argElement,
-                    getValidator("contains").arguments.getFirst());
+            InvariantValidator.expectCompatible(selfElement, argElement);
+            InvariantValidator.expect(selfElement, getValidator("contains").arguments.getFirst());
         }
     }
 

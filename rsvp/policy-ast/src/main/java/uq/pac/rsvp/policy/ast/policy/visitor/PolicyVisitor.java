@@ -10,8 +10,6 @@ public interface PolicyVisitor {
 
     default void visitInvariant(Invariant invariant) { throw new AssertionError(); }
 
-    default void visitQuantifier(Quantifier quantifier) { throw new AssertionError(); }
-
     default void visitBinaryExpr(BinaryExpression expr) { throw new AssertionError(); }
 
     default void visitCallExpr(CallExpression expr) { throw new AssertionError(); }

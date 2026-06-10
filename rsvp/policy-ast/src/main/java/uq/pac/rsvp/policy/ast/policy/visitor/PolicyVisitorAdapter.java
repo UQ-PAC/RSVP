@@ -17,12 +17,7 @@ public abstract class PolicyVisitorAdapter implements PolicyVisitor {
     @Override
     public void visitInvariant(Invariant invariant) {
         invariant.getExpression().accept(this);
-        invariant.getQuantifier().accept(this);
-    }
-
-    @Override
-    public void visitQuantifier(Quantifier quantifier) {
-        quantifier.getVariables().forEach(v -> {
+        invariant.getQuantifier().getVariables().forEach(v -> {
             v.name().accept(this);
             v.type().accept(this);
         });

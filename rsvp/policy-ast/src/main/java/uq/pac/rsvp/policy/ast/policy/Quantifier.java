@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 /**
  * Representation of a quantifier for invariant that captures
  */
-public class Quantifier extends PolicyAstNode {
+public class Quantifier {
 
     public enum Scope {
         ALL("all"),
@@ -39,7 +39,6 @@ public class Quantifier extends PolicyAstNode {
     private final Scope scope;
 
     public Quantifier(Scope scope, List<Variable> variables, SourceLoc location) {
-        super(location);
         this.variables = List.copyOf(variables);
         this.scope = scope;
     }
@@ -65,21 +64,6 @@ public class Quantifier extends PolicyAstNode {
     }
 
     @Override
-    public void accept(PolicyVisitor visitor) {
-        visitor.visitQuantifier(this);
-    }
-
-    @Override
-    public <T> T compute(PolicyComputationVisitor<T> visitor) {
-        return visitor.visitQuantifier(this);
-    }
-
-    @Override
-    public <T, P> T compute(PolicyPayloadVisitor<T, P> visitor, P payload) {
-        return visitor.visitQuantifier(this, payload);
-    }
-
-    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         String vars = variables.stream()
@@ -93,5 +77,4 @@ public class Quantifier extends PolicyAstNode {
         }
         return sb.toString();
     }
-
 }

@@ -32,7 +32,6 @@ public class PolicyLocationTest {
                 Files.writeString(expected, actual);
             }
             assertEquals(Files.readString(expected), actual);
-            System.out.println(actual);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -109,16 +108,8 @@ public class PolicyLocationTest {
         @Override
         public void visitInvariant(Invariant invariant) {
             log("Invariant", invariant, () -> {
-                invariant.getQuantifier().accept(this);
                 invariant.getExpression().accept(this);
-            });
-
-        }
-
-        @Override
-        public void visitQuantifier(Quantifier quantifier) {
-            log("Quantifier", quantifier, () -> {
-                quantifier.getVariables().forEach(v -> {
+                invariant.getQuantifier().getVariables().forEach(v -> {
                     v.name().accept(this);
                     v.type().accept(this);
                 });

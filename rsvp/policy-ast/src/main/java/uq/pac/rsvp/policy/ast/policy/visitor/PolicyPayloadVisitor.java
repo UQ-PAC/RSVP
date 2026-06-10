@@ -10,8 +10,6 @@ public interface PolicyPayloadVisitor<T, P> {
 
     default T visitInvariant(Invariant invariant, P p) { throw new AssertionError(); }
 
-    default T visitQuantifier(Quantifier quantifier, P p) { throw new AssertionError(); }
-
     default T visitBinaryExpr(BinaryExpression expr, P p) { throw new AssertionError(); }
 
     default T visitCallExpr(CallExpression expr, P p) { throw new AssertionError(); }

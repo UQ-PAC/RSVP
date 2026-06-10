@@ -194,7 +194,7 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
         return expr;
     }
 
-    // Unsupported expressions
+    // Unsupported
     @Override
     public Expression visitPolicy(Policy policy) {
         throw new TranslationError("Unsupported transformation for: " + policy);
@@ -203,10 +203,5 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
     @Override
     public Expression visitInvariant(Invariant invariant) {
         throw new TranslationError("Unsupported transformation for: " + invariant);
-    }
-
-    @Override
-    public Expression visitQuantifier(Quantifier quantifier) {
-        throw new TranslationError("Unsupported transformation for: " + quantifier);
     }
 }

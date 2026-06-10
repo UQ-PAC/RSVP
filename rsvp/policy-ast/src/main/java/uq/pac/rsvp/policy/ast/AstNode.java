@@ -1,6 +1,7 @@
 package uq.pac.rsvp.policy.ast;
 
 import uq.pac.rsvp.support.SourceLoc;
+import uq.pac.rsvp.support.error.TranslationError;
 
 public abstract class AstNode {
 
@@ -12,5 +13,9 @@ public abstract class AstNode {
 
     public final SourceLoc getSourceLoc() {
         return source != null ? source : SourceLoc.MISSING;
+    }
+
+    public static TranslationError unsupported(AstNode node) {
+        throw new TranslationError("Unsupported element: " + node, node.getSourceLoc());
     }
 }

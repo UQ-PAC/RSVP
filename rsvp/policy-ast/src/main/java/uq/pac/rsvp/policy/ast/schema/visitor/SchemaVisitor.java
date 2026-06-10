@@ -1,71 +1,72 @@
 package uq.pac.rsvp.policy.ast.schema.visitor;
 
-import uq.pac.rsvp.policy.ast.schema.*;
 import uq.pac.rsvp.policy.ast.schema.statement.ActionDefinition;
 import uq.pac.rsvp.policy.ast.schema.statement.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.statement.RecordEntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.type.*;
 
+import static uq.pac.rsvp.policy.ast.AstNode.unsupported;
+
 public interface SchemaVisitor {
     // Statements
     default void visitRecordEntity(RecordEntityTypeDefinition entity) {
-        throw new AssertionError();
+        throw unsupported(entity);
     }
 
     default void visitEnumEntity(EnumEntityTypeDefinition entity) {
-        throw new AssertionError();
+        throw unsupported(entity);
     }
 
     default void visitAction(ActionDefinition action) {
-        throw new AssertionError();
+        throw unsupported(action);
     }
 
     default void visitCommon(CommonTypeDefinition type) {
-        throw new AssertionError();
+        throw unsupported(type);
     }
 
     // Compound types
     default void visitRecord(RecordType type) {
-        throw new AssertionError();
+        throw unsupported(type);
     }
 
     default void visitSet(SetType type) {
-        throw new AssertionError();
+        throw unsupported(type);
     }
 
     // Type references
     default void visitTypeReference(TypeReference type) {
-        throw new AssertionError();
+        throw unsupported(type);
     }
 
     // Primitive types
     default void visitBoolean(BooleanType type) {
-        throw new AssertionError();
+        throw unsupported(type);
     }
 
     default void visitLong(LongType type) {
-        throw new AssertionError();
+        throw unsupported(type);
     }
 
     default void visitString(StringType type) {
-        throw new AssertionError();
+        throw unsupported(type);
     }
 
     // Extension types
     default void visitIpAddress(IpAddressType type) {
-        throw new AssertionError();
+        throw unsupported(type);
     }
 
     default void visitDecimal(DecimalType type) {
-        throw new AssertionError();
+        throw unsupported(type);
     }
 
     default void visitDateTime(DateTimeType type) {
-        throw new AssertionError();
+        throw unsupported(type);
     }
 
     default void visitDuration(DurationType type) {
-        throw new AssertionError();
+        throw unsupported(type);
     }
 }

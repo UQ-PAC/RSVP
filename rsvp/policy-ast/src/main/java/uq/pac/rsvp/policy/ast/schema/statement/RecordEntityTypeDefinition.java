@@ -33,7 +33,7 @@ public class RecordEntityTypeDefinition extends EntityTypeDefinition {
     }
 
     @Override
-    public <T> void process(SchemaPayloadVisitor<T> visitor, T payload) {
+    public <T> void accept(SchemaPayloadVisitor<T> visitor, T payload) {
         visitor.visitRecordEntity(this, payload);
     }
 

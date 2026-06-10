@@ -44,7 +44,7 @@ public class ActionDefinition extends SchemaStatement {
     }
 
     @Override
-    public <T> void process(SchemaPayloadVisitor<T> visitor, T payload) {
+    public <T> void accept(SchemaPayloadVisitor<T> visitor, T payload) {
         visitor.visitAction(this, payload);
     }
 }

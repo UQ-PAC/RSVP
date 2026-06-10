@@ -91,7 +91,7 @@ public class TypeReference extends BuiltinType {
     }
 
     @Override
-    public <T> void process(SchemaPayloadVisitor<T> visitor, T payload) {
+    public <T> void accept(SchemaPayloadVisitor<T> visitor, T payload) {
         visitor.visitTypeReference(this, payload);
     }
 }

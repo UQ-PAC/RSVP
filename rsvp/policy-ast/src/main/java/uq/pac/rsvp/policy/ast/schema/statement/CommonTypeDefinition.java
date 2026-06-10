@@ -36,7 +36,7 @@ public class CommonTypeDefinition extends SchemaStatement {
     }
 
     @Override
-    public <T> void process(SchemaPayloadVisitor<T> visitor, T payload) {
+    public <T> void accept(SchemaPayloadVisitor<T> visitor, T payload) {
         visitor.visitCommon(this, payload);
     }
 }

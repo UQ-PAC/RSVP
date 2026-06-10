@@ -108,7 +108,7 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
                 throw new TranslationError( "Undefined entity type: " + euid.getType(), entity.getSourceLoc());
             }
         }
-        def.getShape().process(this, entity.getAttrs());
+        def.getShape().accept(this, entity.getAttrs());
 
         for (EntityReference value : entity.getParents()) {
             if (value instanceof EntityReference parent) {
@@ -138,7 +138,7 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
         rec.getAttributes().forEach((attr, type) -> {
             EntityValue attrValue = value.getValue(new AttributeName(attr.getName()));
             if (attrValue != null) {
-                type.process(this, attrValue);
+                type.accept(this, attrValue);
             }
             if (attrValue == null && attr.isRequired()) {
                 throw new TranslationError("Missing attribute: " + attr, payload.getSourceLoc());
@@ -155,7 +155,7 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
     @Override
     public void visitSet(SetType type, EntityValue payload) {
         SetValue value = expectedType(payload, SetValue.class, "set");
-        value.getValues().forEach(v -> type.getElementType().process(this, v));
+        value.getValues().forEach(v -> type.getElementType().accept(this, v));
     }
 
     @Override
@@ -195,7 +195,7 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
 
     @Override
     public void visitTypeReference(TypeReference reference, EntityValue payload) {
-        schema.getStatement(reference).process(this, payload);
+        schema.getStatement(reference).accept(this, payload);
     }
 
     @Override
@@ -210,6 +210,6 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
 
     @Override
     public void visitCommon(CommonTypeDefinition type, EntityValue payload) {
-        type.getDefinition().process(this, payload);
+        type.getDefinition().accept(this, payload);
     }
 }

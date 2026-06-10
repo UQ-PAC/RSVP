@@ -15,5 +15,5 @@ public abstract class SchemaAstNode extends AstNode {
 
     public abstract <T> T compute(SchemaComputationVisitor<T> visitor);
 
-    public abstract <T> void process(SchemaPayloadVisitor<T> visitor, T payload);
+    public abstract <T> void accept(SchemaPayloadVisitor<T> visitor, T payload);
 }

@@ -36,7 +36,7 @@ public class BooleanType extends BuiltinType {
     }
 
     @Override
-    public <T> void process(SchemaPayloadVisitor<T> visitor, T payload) {
+    public <T> void accept(SchemaPayloadVisitor<T> visitor, T payload) {
         visitor.visitBoolean(this, payload);
     }
 }

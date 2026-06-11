@@ -1,13 +1,13 @@
 package uq.pac.rsvp.policy.datalog.validation;
 
 import uq.pac.rsvp.policy.ast.policy.expr.*;
+import uq.pac.rsvp.policy.ast.policy.visitor.PolicyPayloadVisitor;
 import uq.pac.rsvp.policy.ast.schema.Schema;
 import uq.pac.rsvp.policy.ast.schema.statement.CommonTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.statement.EntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.type.*;
 import uq.pac.rsvp.policy.ast.policy.Invariant;
-import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.support.error.TranslationError;
 import uq.pac.rsvp.support.error.ValidationError;
 
@@ -18,11 +18,9 @@ import java.util.stream.Stream;
 
 import static uq.pac.rsvp.Assertion.require;
 
-public class InvariantValidator implements PolicyComputationVisitor<BuiltinType> {
-    // Overall custom-types including actions types and entity types
+public class InvariantValidator implements PolicyPayloadVisitor<BuiltinType, Map<String, TypeReference>> {
+    // Types including comprising entities and actions
     private final Set<TypeReference> types;
-    // Types of quantifier variables
-    private final Map<String, TypeReference> variables;
     // Types of entities
     private final Schema schema;
 
@@ -69,12 +67,6 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
         }
     }
 
-    private InvariantValidator(InvariantValidator factory, Invariant invariant) {
-        this.types = Set.copyOf(factory.types);
-        this.variables = getVariables(invariant, types);
-        this.schema = factory.schema;
-    }
-
     /**
      * Public constructor. Acts like a factory in that it builds internal structures,
      * such as available types, entities and actions. It deliberately leaves invariant-specific
@@ -84,7 +76,6 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
      */
     public InvariantValidator(Schema schema) {
         this.types = new HashSet<>();
-        this.variables = null;
         this.schema = schema.resolveCommonTypes();
 
         // Common types should have been eliminated by this point
@@ -123,24 +114,31 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
         return variables;
     }
 
-    private BuiltinType collect(Expression expr) {
-        return Objects.requireNonNull(expr.compute(this));
+    private BuiltinType collect(Expression expr, Map<String, TypeReference> payload) {
+        return Objects.requireNonNull(expr.compute(this, payload));
     }
 
-    private List<BuiltinType> collect(Collection<Expression> exprs) {
-        return exprs.stream().map(this::collect).collect(Collectors.toCollection(ArrayList::new));
+    private List<BuiltinType> collect(Collection<Expression> exprs, Map<String, TypeReference> payload) {
+        return exprs.stream()
+                .map(e -> collect(e, payload))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public void validate(Invariant invariant) {
-        require(this.variables == null);
-        InvariantValidator validator = new InvariantValidator(this, invariant);
-        expect(validator.collect(invariant.getExpression()), TBoolean);
+        Map<String, TypeReference> payload = getVariables(invariant, types);
+        invariant.compute(this, payload);
     }
 
     @Override
-    public BuiltinType visitBinaryExpr(BinaryExpression expr) {
-        BuiltinType lhs = collect(expr.getLeft());
-        BuiltinType rhs = collect(expr.getRight());
+    public BuiltinType visitInvariant(Invariant invariant, Map<String, TypeReference> payload) {
+        expect(collect(invariant.getExpression(), payload), TBoolean);
+        return BooleanType;
+    }
+
+    @Override
+    public BuiltinType visitBinaryExpr(BinaryExpression expr, Map<String, TypeReference> payload) {
+        BuiltinType lhs = collect(expr.getLeft(), payload);
+        BuiltinType rhs = collect(expr.getRight(), payload);
 
         return switch (expr.getOp()) {
             case Add, Sub, Mul -> {
@@ -172,8 +170,8 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
     }
 
     @Override
-    public BuiltinType visitIsExpr(IsExpression expr) {
-        expect(collect(expr.getExpression()), TEntity, TAction);
+    public BuiltinType visitIsExpr(IsExpression expr, Map<String, TypeReference> payload) {
+        expect(collect(expr.getExpression(), payload), TEntity, TAction);
         TypeReference ref = TypeReference.parse(expr.getTypeExpression().getValue());
         if (!types.contains(ref)) {
             throw new ValidationError("invalid type: %s in type expression: %s. Available types: %s"
@@ -183,14 +181,14 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
     }
 
     @Override
-    public BuiltinType visitHasExpr(HasExpression expr) {
-        expect(collect(expr.getExpression()), TEntity, TAction, TRecord);
+    public BuiltinType visitHasExpr(HasExpression expr, Map<String, TypeReference> payload) {
+        expect(collect(expr.getExpression(), payload), TEntity, TAction, TRecord);
         return BooleanType;
     }
 
     @Override
-    public BuiltinType visitPropertyAccessExpr(PropertyAccessExpression expr) {
-        BuiltinType objectType = collect(expr.getObject());
+    public BuiltinType visitPropertyAccessExpr(PropertyAccessExpression expr, Map<String, TypeReference> payload) {
+        BuiltinType objectType = collect(expr.getObject(), payload);
         if (objectType instanceof TypeReference ref) {
             objectType = switch (schema.get(ref)) {
                 case EntityTypeDefinition t -> t.getShape();
@@ -209,8 +207,8 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
     }
 
     @Override
-    public BuiltinType visitUnaryExpr(UnaryExpression expr) {
-        BuiltinType type = collect(expr.getExpression());
+    public BuiltinType visitUnaryExpr(UnaryExpression expr, Map<String, TypeReference> payload) {
+        BuiltinType type = collect(expr.getExpression(), payload);
         return switch (expr.getOp()) {
             case Not -> {
                 expect(type, TBoolean);
@@ -224,31 +222,31 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
     }
 
     @Override
-    public BuiltinType visitBooleanExpr(BooleanExpression expr) {
+    public BuiltinType visitBooleanExpr(BooleanExpression expr, Map<String, TypeReference> payload) {
         return BooleanType;
     }
 
     @Override
-    public BuiltinType visitVariableExpr(VariableExpression expr) {
+    public BuiltinType visitVariableExpr(VariableExpression expr, Map<String, TypeReference> payload) {
         String ref = expr.getReference();
-        if (variables.containsKey(ref)) {
-            return variables.get(ref);
+        if (payload.containsKey(ref)) {
+            return payload.get(ref);
         }
         throw new ValidationError("Ungrounded variable: " + ref);
     }
 
     @Override
-    public BuiltinType visitLongExpr(LongExpression expr) {
+    public BuiltinType visitLongExpr(LongExpression expr, Map<String, TypeReference> payload) {
         return LongType;
     }
 
     @Override
-    public BuiltinType visitStringExpr(StringExpression expr) {
+    public BuiltinType visitStringExpr(StringExpression expr, Map<String, TypeReference> payload) {
         return StringType;
     }
 
     @Override
-    public BuiltinType visitEntityExpr(EntityExpression expr) {
+    public BuiltinType visitEntityExpr(EntityExpression expr, Map<String, TypeReference> payload) {
         TypeReference ref = TypeReference.parse(expr.getType());
 
         EnumEntityTypeDefinition enumType = schema.getEnumEntityType(ref);
@@ -265,7 +263,7 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
     }
 
     @Override
-    public BuiltinType visitActionExpr(ActionExpression expr) {
+    public BuiltinType visitActionExpr(ActionExpression expr, Map<String, TypeReference> payload) {
         TypeReference action = TypeReference.parse(expr.getQualifiedName());
         if (schema.getAction(action) == null) {
             throw new ValidationError("invalid action: " + action);
@@ -278,31 +276,31 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
     }
 
     @Override
-    public BuiltinType visitCallExpr(CallExpression expr) {
+    public BuiltinType visitCallExpr(CallExpression expr, Map<String, TypeReference> payload) {
         String name = expr.getFunc();
         InvariantFunctionValidator.FunctionValidator validator =
                 InvariantFunctionValidator.getValidator(name);
         if (validator == null) {
             throw new ValidationError("Function: " + name + " not registered");
         }
-        BuiltinType self = expr.getSelf() == null ? null : collect(expr.getSelf());
-        return validator.validate(self, collect(expr.getArgs()));
+        BuiltinType self = expr.getSelf() == null ? null : collect(expr.getSelf(), payload);
+        return validator.validate(self, collect(expr.getArgs(), payload));
     }
 
     @Override
-    public BuiltinType visitConditionalExpr(ConditionalExpression expr) {
-        BuiltinType condition = collect(expr.getCondition());
+    public BuiltinType visitConditionalExpr(ConditionalExpression expr, Map<String, TypeReference> payload) {
+        BuiltinType condition = collect(expr.getCondition(), payload);
         expect(condition, TBoolean);
-        BuiltinType then = collect(expr.getThen()),
-                els = collect(expr.getElse());
+        BuiltinType then = collect(expr.getThen(), payload),
+                els = collect(expr.getElse(), payload);
         expectCompatible(then, els);
         return then;
     }
 
     @Override
-    public BuiltinType visitSetExpr(SetExpression expr) {
+    public BuiltinType visitSetExpr(SetExpression expr, Map<String, TypeReference> payload) {
         // We need to make sure sets are homogenous
-        List<BuiltinType> types = collect(expr.getElements());
+        List<BuiltinType> types = collect(expr.getElements(), payload);
         // Empty set literals are forbidden in Cedar
         if (types.isEmpty()) {
             throw new ValidationError("Empty set literals are forbidden im policies");
@@ -313,11 +311,11 @@ public class InvariantValidator implements PolicyComputationVisitor<BuiltinType>
     }
 
     @Override
-    public BuiltinType visitRecordExpr(RecordExpression expr) {
+    public BuiltinType visitRecordExpr(RecordExpression expr, Map<String, TypeReference> payload) {
         Map<RecordType.Attribute, BuiltinType> attributes =
                 expr.getProperties().entrySet().stream().collect(Collectors.toMap(
                         e -> new RecordType.Attribute(e.getKey()),
-                        e -> collect(e.getValue())));
+                        e -> collect(e.getValue(), payload)));
         return new RecordType(attributes);
     }
 }

@@ -2,6 +2,7 @@ package uq.pac.rsvp.policy.datalog.translation;
 
 import org.logicng.formulas.*;
 import org.logicng.transformations.dnf.DNFFactorization;
+import org.logicng.transformations.NNFTransformation;
 import uq.pac.rsvp.policy.ast.policy.expr.*;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
 
@@ -135,6 +136,13 @@ public class NFConverter implements PolicyComputationVisitor<Formula> {
             case CFalse f -> new BooleanExpression(false);
             default -> throw new RuntimeException("Unreachable");
         };
+    }
+
+    public static Expression toNNF(Expression expr) {
+        NFConverter converter = new NFConverter();
+        Formula formula = expr.compute(converter);
+        Formula nf = formula.transform(NNFTransformation.get());
+        return converter.toExpression(nf);
     }
 
     public static List<List<Expression>> toDNF(Expression expr) {

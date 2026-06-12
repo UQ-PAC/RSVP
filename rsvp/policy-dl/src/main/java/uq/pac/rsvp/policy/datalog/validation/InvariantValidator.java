@@ -25,6 +25,10 @@ public class InvariantValidator implements PolicyPayloadVisitor<BuiltinType, Pay
     // Types of entities
     private final Schema schema;
 
+    /**
+     * Abstraction for the visitor payload. At all stages of resolution the information
+     * that is being passed around is the mapping from variables to their types
+     */
     public static class Payload extends HashMap<String, TypeReference> { }
 
     final static BooleanType BooleanType = new BooleanType();
@@ -33,9 +37,9 @@ public class InvariantValidator implements PolicyPayloadVisitor<BuiltinType, Pay
 
     public record TypeTest(Function<BuiltinType, Boolean> test, String expected) { }
 
-    final static TypeTest TBoolean = new TypeTest(t -> t.equals(BooleanType), "__cedar::Bool");
-    final static TypeTest TLong = new TypeTest(t -> t.equals(LongType), "__cedar::Long");
-    final static TypeTest TString = new TypeTest(t -> t.equals(StringType), "__cedar::String");
+    final static TypeTest TBoolean = new TypeTest(t -> t instanceof BooleanType, "__cedar::Bool");
+    final static TypeTest TLong = new TypeTest(t -> t instanceof LongType, "__cedar::Long");
+    final static TypeTest TString = new TypeTest(t -> t instanceof StringType, "__cedar::String");
     final static TypeTest TSet = new TypeTest(t -> t instanceof SetType, "Set<?>");
     final static TypeTest TRecord = new TypeTest(t -> t instanceof RecordType, "Record");
     final static TypeTest TEntity = new TypeTest(InvariantValidator::isEntity, "Entity");

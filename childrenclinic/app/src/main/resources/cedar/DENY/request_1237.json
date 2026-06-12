@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Guest::\"???\"",
-  "resource": "ChildrenClinic::Visit::\"Basil Davis 1\"",
-  "action": "ChildrenClinic::Action::\"DeleteVisit\"",
+  "principal": "ChildrenClinic::Guest::\"Unknown\"",
+  "resource": "ChildrenClinic::Patient::\"Max Coleman\"",
+  "action": "ChildrenClinic::Action::\"ListVisits\"",
   "context": {}
 }

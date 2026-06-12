@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
-  "resource": "ChildrenClinic::Visit::\"Leo Franklin 2\"",
-  "action": "ChildrenClinic::Action::\"ViewVisit\"",
+  "principal": "ChildrenClinic::Employee::\"James Carter\"",
+  "resource": "ChildrenClinic::Guardian::\"Betty Davis\"",
+  "action": "ChildrenClinic::Action::\"EditGuardian\"",
   "context": {}
 }

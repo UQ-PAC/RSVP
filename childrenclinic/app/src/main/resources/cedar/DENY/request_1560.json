@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Guest::\"???\"",
-  "resource": "ChildrenClinic::Guardian::\"Jean Coleman\"",
-  "action": "ChildrenClinic::Action::\"DeleteGuardian\"",
+  "principal": "ChildrenClinic::Guest::\"Unknown\"",
+  "resource": "ChildrenClinic::Employee::\"Carl Bradford\"",
+  "action": "ChildrenClinic::Action::\"DeleteEmployee\"",
   "context": {}
 }

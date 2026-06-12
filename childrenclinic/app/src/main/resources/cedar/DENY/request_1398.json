@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Sharon Jenkins\"",
+  "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
   "resource": "ChildrenClinic::Patient::\"Jewel Rodriquez\"",
-  "action": "ChildrenClinic::Action::\"DeletePatient\"",
+  "action": "ChildrenClinic::Action::\"AddVisit\"",
   "context": {}
 }

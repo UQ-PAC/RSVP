@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"???\"",
-  "resource": "ChildrenClinic::Clinic::\"A\"",
+  "principal": "ChildrenClinic::Employee::\"Bob Buchanan\"",
+  "resource": "ChildrenClinic::Clinic::\"???\"",
   "action": "ChildrenClinic::Action::\"AddPatient\"",
   "context": {}
 }

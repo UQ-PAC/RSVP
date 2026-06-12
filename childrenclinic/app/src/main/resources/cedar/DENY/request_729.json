@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Guest::\"Unknown\"",
-  "resource": "ChildrenClinic::Visit::\"Rosy Rodriquez 2\"",
-  "action": "ChildrenClinic::Action::\"DeleteVisit\"",
+  "principal": "ChildrenClinic::Employee::\"Linda Douglas\"",
+  "resource": "ChildrenClinic::Visit::\"Rosy Rodriquez 1\"",
+  "action": "ChildrenClinic::Action::\"ViewVisit\"",
   "context": {}
 }

@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
-  "resource": "ChildrenClinic::Guardian::\"Jean Coleman\"",
-  "action": "ChildrenClinic::Action::\"EditGuardian\"",
+  "principal": "ChildrenClinic::Guest::\"Unknown\"",
+  "resource": "ChildrenClinic::Visit::\"Basil Davis 2\"",
+  "action": "ChildrenClinic::Action::\"DeleteVisit\"",
   "context": {}
 }

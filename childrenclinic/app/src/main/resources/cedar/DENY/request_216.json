@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Bob Buchanan\"",
-  "resource": "ChildrenClinic::Guardian::\"???\"",
-  "action": "ChildrenClinic::Action::\"DeleteGuardian\"",
+  "principal": "ChildrenClinic::Employee::\"???\"",
+  "resource": "ChildrenClinic::Visit::\"Lucky Estaban 2\"",
+  "action": "ChildrenClinic::Action::\"DeleteVisit\"",
   "context": {}
 }

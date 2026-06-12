@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Sharon Jenkins\"",
-  "resource": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
-  "action": "ChildrenClinic::Action::\"ViewEmployee\"",
+  "principal": "ChildrenClinic::Employee::\"Kathaleen Tramonte\"",
+  "resource": "ChildrenClinic::Clinic::\"A\"",
+  "action": "ChildrenClinic::Action::\"AddGuardian\"",
   "context": {}
 }

@@ -1,5 +1,5 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
+  "principal": "ChildrenClinic::Guest::\"???\"",
   "resource": "ChildrenClinic::Visit::\"Jewel Rodriquez 1\"",
   "action": "ChildrenClinic::Action::\"DeleteVisit\"",
   "context": {}

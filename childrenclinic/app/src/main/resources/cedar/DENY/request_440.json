@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Guest::\"Unknown\"",
-  "resource": "ChildrenClinic::Guardian::\"Carlos Estaban\"",
-  "action": "ChildrenClinic::Action::\"EditGuardian\"",
-  "context": {}
-}

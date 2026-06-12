@@ -1,0 +1,6 @@
+{
+  "principal": "ChildrenClinic::Employee::\"???\"",
+  "resource": "ChildrenClinic::Guardian::\"George Franklin\"",
+  "action": "ChildrenClinic::Action::\"EditGuardian\"",
+  "context": {}
+}

@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Guest::\"Unknown\"",
-  "resource": "ChildrenClinic::Patient::\"Rosy Rodriquez\"",
-  "action": "ChildrenClinic::Action::\"EditPatient\"",
+  "principal": "ChildrenClinic::Guest::\"???\"",
+  "resource": "ChildrenClinic::Clinic::\"B\"",
+  "action": "ChildrenClinic::Action::\"AddGuardian\"",
   "context": {}
 }

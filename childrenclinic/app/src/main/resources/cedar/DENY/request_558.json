@@ -1,6 +1,6 @@
 {
   "principal": "ChildrenClinic::Employee::\"Kathaleen Tramonte\"",
-  "resource": "ChildrenClinic::Clinic::\"???\"",
-  "action": "ChildrenClinic::Action::\"AddGuardian\"",
+  "resource": "ChildrenClinic::Guardian::\"Jean Coleman\"",
+  "action": "ChildrenClinic::Action::\"EditGuardian\"",
   "context": {}
 }

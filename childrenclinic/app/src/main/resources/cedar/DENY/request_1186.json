@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Sharon Jenkins\"",
-  "resource": "ChildrenClinic::Guardian::\"Betty Davis\"",
+  "principal": "ChildrenClinic::Guest::\"Unknown\"",
+  "resource": "ChildrenClinic::Guardian::\"???\"",
   "action": "ChildrenClinic::Action::\"EditGuardian\"",
   "context": {}
 }

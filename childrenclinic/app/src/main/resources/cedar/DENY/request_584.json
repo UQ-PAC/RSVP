@@ -1,0 +1,6 @@
+{
+  "principal": "ChildrenClinic::Employee::\"???\"",
+  "resource": "ChildrenClinic::Guardian::\"Clara Higgins\"",
+  "action": "ChildrenClinic::Action::\"ViewGuardian\"",
+  "context": {}
+}

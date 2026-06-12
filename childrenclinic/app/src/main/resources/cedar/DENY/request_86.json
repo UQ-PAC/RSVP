@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
-  "resource": "ChildrenClinic::Visit::\"Samantha Coleman 2\"",
-  "action": "ChildrenClinic::Action::\"ViewVisit\"",
+  "principal": "ChildrenClinic::Employee::\"Kathaleen Tramonte\"",
+  "resource": "ChildrenClinic::Visit::\"Lucky Estaban 2\"",
+  "action": "ChildrenClinic::Action::\"DeleteVisit\"",
   "context": {}
 }

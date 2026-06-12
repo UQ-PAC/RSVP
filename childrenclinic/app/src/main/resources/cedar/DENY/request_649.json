@@ -1,6 +1,6 @@
 {
   "principal": "ChildrenClinic::Employee::\"James Carter\"",
-  "resource": "ChildrenClinic::Employee::\"Linda Douglas\"",
-  "action": "ChildrenClinic::Action::\"EditEmployee\"",
+  "resource": "ChildrenClinic::Visit::\"Basil Davis 2\"",
+  "action": "ChildrenClinic::Action::\"DeleteVisit\"",
   "context": {}
 }

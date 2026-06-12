@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
-  "resource": "ChildrenClinic::Guardian::\"Clara Higgins\"",
-  "action": "ChildrenClinic::Action::\"EditGuardian\"",
+  "principal": "ChildrenClinic::Employee::\"???\"",
+  "resource": "ChildrenClinic::Patient::\"Rosy Rodriquez\"",
+  "action": "ChildrenClinic::Action::\"EditPatient\"",
   "context": {}
 }

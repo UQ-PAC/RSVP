@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
-  "resource": "ChildrenClinic::Guardian::\"Betty Davis\"",
-  "action": "ChildrenClinic::Action::\"EditGuardian\"",
-  "context": {}
-}

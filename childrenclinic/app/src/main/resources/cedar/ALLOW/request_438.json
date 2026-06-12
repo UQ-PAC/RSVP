@@ -1,6 +1,6 @@
 {
   "principal": "ChildrenClinic::Employee::\"Alice\"",
-  "resource": "ChildrenClinic::Employee::\"Linda Douglas\"",
-  "action": "ChildrenClinic::Action::\"ViewEmployee\"",
+  "resource": "ChildrenClinic::Guardian::\"George Franklin\"",
+  "action": "ChildrenClinic::Action::\"DeleteGuardian\"",
   "context": {}
 }

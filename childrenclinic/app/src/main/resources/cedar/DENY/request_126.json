@@ -1,6 +1,6 @@
 {
   "principal": "ChildrenClinic::Guest::\"???\"",
-  "resource": "ChildrenClinic::Patient::\"Sly Estaban\"",
-  "action": "ChildrenClinic::Action::\"EditPatient\"",
+  "resource": "ChildrenClinic::Visit::\"Max Coleman 2\"",
+  "action": "ChildrenClinic::Action::\"EditVisit\"",
   "context": {}
 }

@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Bob Buchanan\"",
-  "resource": "ChildrenClinic::Employee::\"James Carter\"",
-  "action": "ChildrenClinic::Action::\"EditEmployee\"",
+  "principal": "ChildrenClinic::Employee::\"???\"",
+  "resource": "ChildrenClinic::Employee::\"Carl Bradford\"",
+  "action": "ChildrenClinic::Action::\"ViewEmployee\"",
   "context": {}
 }

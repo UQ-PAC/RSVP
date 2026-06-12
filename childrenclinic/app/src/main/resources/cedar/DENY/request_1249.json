@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
-  "resource": "ChildrenClinic::Clinic::\"???\"",
-  "action": "ChildrenClinic::Action::\"AddGuardian\"",
+  "principal": "ChildrenClinic::Guest::\"Unknown\"",
+  "resource": "ChildrenClinic::Patient::\"Lucky Estaban\"",
+  "action": "ChildrenClinic::Action::\"DeletePatient\"",
   "context": {}
 }

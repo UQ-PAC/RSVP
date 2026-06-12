@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"James Carter\"",
-  "resource": "ChildrenClinic::Visit::\"Lucky Estaban 1\"",
-  "action": "ChildrenClinic::Action::\"ViewVisit\"",
+  "principal": "ChildrenClinic::Employee::\"Linda Douglas\"",
+  "resource": "ChildrenClinic::Patient::\"Leo Franklin\"",
+  "action": "ChildrenClinic::Action::\"ListVisits\"",
   "context": {}
 }

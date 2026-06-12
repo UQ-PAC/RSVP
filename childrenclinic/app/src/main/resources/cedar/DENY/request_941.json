@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Guest::\"???\"",
-  "resource": "ChildrenClinic::Visit::\"Sly Estaban 1\"",
-  "action": "ChildrenClinic::Action::\"ViewVisit\"",
+  "principal": "ChildrenClinic::Employee::\"James Carter\"",
+  "resource": "ChildrenClinic::Guardian::\"???\"",
+  "action": "ChildrenClinic::Action::\"ViewGuardian\"",
   "context": {}
 }

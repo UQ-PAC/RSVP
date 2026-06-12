@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
-  "resource": "ChildrenClinic::Patient::\"???\"",
-  "action": "ChildrenClinic::Action::\"ViewPatient\"",
+  "principal": "ChildrenClinic::Employee::\"Bob Buchanan\"",
+  "resource": "ChildrenClinic::Guardian::\"Clara Higgins\"",
+  "action": "ChildrenClinic::Action::\"DeleteGuardian\"",
   "context": {}
 }

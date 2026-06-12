@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Kathaleen Tramonte\"",
-  "resource": "ChildrenClinic::Visit::\"Max Coleman 2\"",
-  "action": "ChildrenClinic::Action::\"EditVisit\"",
+  "principal": "ChildrenClinic::Employee::\"Sharon Jenkins\"",
+  "resource": "ChildrenClinic::Guardian::\"Betty Davis\"",
+  "action": "ChildrenClinic::Action::\"ViewGuardian\"",
   "context": {}
 }

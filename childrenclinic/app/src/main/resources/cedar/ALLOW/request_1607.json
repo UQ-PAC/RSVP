@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Carl Bradford\"",
-  "resource": "ChildrenClinic::Guardian::\"George Franklin\"",
-  "action": "ChildrenClinic::Action::\"ViewGuardian\"",
+  "principal": "ChildrenClinic::Employee::\"James Carter\"",
+  "resource": "ChildrenClinic::Visit::\"Samantha Coleman 2\"",
+  "action": "ChildrenClinic::Action::\"ViewVisit\"",
   "context": {}
 }

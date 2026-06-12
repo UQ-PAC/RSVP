@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Bob Buchanan\"",
-  "resource": "ChildrenClinic::Patient::\"Samantha Coleman\"",
-  "action": "ChildrenClinic::Action::\"DeletePatient\"",
+  "principal": "ChildrenClinic::Guest::\"Unknown\"",
+  "resource": "ChildrenClinic::Patient::\"Basil Davis\"",
+  "action": "ChildrenClinic::Action::\"ViewPatient\"",
   "context": {}
 }

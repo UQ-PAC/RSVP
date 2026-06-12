@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Guest::\"???\"",
-  "resource": "ChildrenClinic::Guardian::\"George Franklin\"",
-  "action": "ChildrenClinic::Action::\"DeleteGuardian\"",
-  "context": {}
-}

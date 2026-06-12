@@ -1,6 +1,6 @@
 {
   "principal": "ChildrenClinic::Guest::\"Unknown\"",
-  "resource": "ChildrenClinic::Patient::\"Leo Franklin\"",
-  "action": "ChildrenClinic::Action::\"DeletePatient\"",
+  "resource": "ChildrenClinic::Patient::\"Lucky Estaban\"",
+  "action": "ChildrenClinic::Action::\"ListVisits\"",
   "context": {}
 }

@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Bob Buchanan\"",
-  "resource": "ChildrenClinic::Employee::\"Alice\"",
-  "action": "ChildrenClinic::Action::\"ViewEmployee\"",
+  "principal": "ChildrenClinic::Employee::\"James Carter\"",
+  "resource": "ChildrenClinic::Guardian::\"Eduardo Rodriquez\"",
+  "action": "ChildrenClinic::Action::\"DeleteGuardian\"",
   "context": {}
 }

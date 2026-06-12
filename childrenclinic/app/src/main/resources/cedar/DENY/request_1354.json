@@ -1,0 +1,6 @@
+{
+  "principal": "ChildrenClinic::Guest::\"???\"",
+  "resource": "ChildrenClinic::Guardian::\"Clara Higgins\"",
+  "action": "ChildrenClinic::Action::\"EditGuardian\"",
+  "context": {}
+}

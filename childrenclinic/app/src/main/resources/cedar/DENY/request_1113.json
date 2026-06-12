@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Sharon Jenkins\"",
-  "resource": "ChildrenClinic::Clinic::\"???\"",
-  "action": "ChildrenClinic::Action::\"AddEmployee\"",
+  "principal": "ChildrenClinic::Employee::\"Carl Bradford\"",
+  "resource": "ChildrenClinic::Patient::\"Sly Estaban\"",
+  "action": "ChildrenClinic::Action::\"EditPatient\"",
   "context": {}
 }

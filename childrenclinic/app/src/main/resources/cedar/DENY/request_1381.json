@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"???\"",
-  "resource": "ChildrenClinic::Guardian::\"George Franklin\"",
-  "action": "ChildrenClinic::Action::\"ViewGuardian\"",
+  "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
+  "resource": "ChildrenClinic::Visit::\"???\"",
+  "action": "ChildrenClinic::Action::\"EditVisit\"",
   "context": {}
 }

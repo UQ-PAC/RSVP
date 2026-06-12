@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Bob Buchanan\"",
-  "resource": "ChildrenClinic::Employee::\"James Carter\"",
-  "action": "ChildrenClinic::Action::\"DeleteEmployee\"",
+  "principal": "ChildrenClinic::Employee::\"???\"",
+  "resource": "ChildrenClinic::Visit::\"Max Coleman 1\"",
+  "action": "ChildrenClinic::Action::\"EditVisit\"",
   "context": {}
 }

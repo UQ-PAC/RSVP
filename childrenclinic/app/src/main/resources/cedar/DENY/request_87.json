@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Linda Douglas\"",
-  "resource": "ChildrenClinic::Guardian::\"Carlos Estaban\"",
-  "action": "ChildrenClinic::Action::\"EditGuardian\"",
+  "principal": "ChildrenClinic::Employee::\"Sharon Jenkins\"",
+  "resource": "ChildrenClinic::Visit::\"Leo Franklin 2\"",
+  "action": "ChildrenClinic::Action::\"ViewVisit\"",
   "context": {}
 }

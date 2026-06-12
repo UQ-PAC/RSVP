@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"???\"",
-  "resource": "ChildrenClinic::Clinic::\"???\"",
-  "action": "ChildrenClinic::Action::\"AddGuardian\"",
+  "principal": "ChildrenClinic::Guest::\"Unknown\"",
+  "resource": "ChildrenClinic::Visit::\"Rosy Rodriquez 2\"",
+  "action": "ChildrenClinic::Action::\"ViewVisit\"",
   "context": {}
 }

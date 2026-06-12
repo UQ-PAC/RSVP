@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Guest::\"Unknown\"",
-  "resource": "ChildrenClinic::Patient::\"Max Coleman\"",
-  "action": "ChildrenClinic::Action::\"ViewPatient\"",
+  "principal": "ChildrenClinic::Employee::\"Kathaleen Tramonte\"",
+  "resource": "ChildrenClinic::Visit::\"Samantha Coleman 1\"",
+  "action": "ChildrenClinic::Action::\"ViewVisit\"",
   "context": {}
 }

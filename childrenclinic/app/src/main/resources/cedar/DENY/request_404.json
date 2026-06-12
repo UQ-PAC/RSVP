@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Sharon Jenkins\"",
-  "resource": "ChildrenClinic::Employee::\"Bob Buchanan\"",
-  "action": "ChildrenClinic::Action::\"DeleteEmployee\"",
+  "principal": "ChildrenClinic::Guest::\"Unknown\"",
+  "resource": "ChildrenClinic::Guardian::\"George Franklin\"",
+  "action": "ChildrenClinic::Action::\"EditGuardian\"",
   "context": {}
 }

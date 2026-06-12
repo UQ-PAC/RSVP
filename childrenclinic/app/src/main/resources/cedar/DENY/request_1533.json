@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Guest::\"???\"",
-  "resource": "ChildrenClinic::Clinic::\"???\"",
-  "action": "ChildrenClinic::Action::\"AddPatient\"",
+  "principal": "ChildrenClinic::Employee::\"Bob Buchanan\"",
+  "resource": "ChildrenClinic::Guardian::\"Eduardo Rodriquez\"",
+  "action": "ChildrenClinic::Action::\"DeleteGuardian\"",
   "context": {}
 }

@@ -1,6 +1,6 @@
 {
   "principal": "ChildrenClinic::Guest::\"???\"",
-  "resource": "ChildrenClinic::Guardian::\"Eduardo Rodriquez\"",
-  "action": "ChildrenClinic::Action::\"EditGuardian\"",
+  "resource": "ChildrenClinic::Visit::\"Rosy Rodriquez 2\"",
+  "action": "ChildrenClinic::Action::\"DeleteVisit\"",
   "context": {}
 }

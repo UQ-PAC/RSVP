@@ -1,6 +1,6 @@
 {
   "principal": "ChildrenClinic::Employee::\"Alice\"",
-  "resource": "ChildrenClinic::Guardian::\"George Franklin\"",
-  "action": "ChildrenClinic::Action::\"DeleteGuardian\"",
+  "resource": "ChildrenClinic::Visit::\"Lucky Estaban 1\"",
+  "action": "ChildrenClinic::Action::\"EditVisit\"",
   "context": {}
 }

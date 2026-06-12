@@ -1,6 +1,6 @@
 {
   "principal": "ChildrenClinic::Employee::\"Alice\"",
-  "resource": "ChildrenClinic::Guardian::\"Eduardo Rodriquez\"",
-  "action": "ChildrenClinic::Action::\"EditGuardian\"",
+  "resource": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
+  "action": "ChildrenClinic::Action::\"DeleteEmployee\"",
   "context": {}
 }

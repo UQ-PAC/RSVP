@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
-  "resource": "ChildrenClinic::Guardian::\"Jean Coleman\"",
-  "action": "ChildrenClinic::Action::\"DeleteGuardian\"",
-  "context": {}
-}

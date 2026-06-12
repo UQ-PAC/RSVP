@@ -1,6 +1,0 @@
-{
-  "principal": "ChildrenClinic::Employee::\"Sharon Jenkins\"",
-  "resource": "ChildrenClinic::Guardian::\"Jean Coleman\"",
-  "action": "ChildrenClinic::Action::\"ViewGuardian\"",
-  "context": {}
-}

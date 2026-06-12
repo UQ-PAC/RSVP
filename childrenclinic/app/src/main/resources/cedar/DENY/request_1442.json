@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
-  "resource": "ChildrenClinic::Clinic::\"A\"",
-  "action": "ChildrenClinic::Action::\"ViewClinic\"",
+  "principal": "ChildrenClinic::Guest::\"Unknown\"",
+  "resource": "ChildrenClinic::Clinic::\"B\"",
+  "action": "ChildrenClinic::Action::\"AddPatient\"",
   "context": {}
 }

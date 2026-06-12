@@ -1,6 +1,6 @@
 {
   "principal": "ChildrenClinic::Employee::\"???\"",
-  "resource": "ChildrenClinic::Guardian::\"Jean Coleman\"",
-  "action": "ChildrenClinic::Action::\"EditGuardian\"",
+  "resource": "ChildrenClinic::Visit::\"Jewel Rodriquez 1\"",
+  "action": "ChildrenClinic::Action::\"DeleteVisit\"",
   "context": {}
 }

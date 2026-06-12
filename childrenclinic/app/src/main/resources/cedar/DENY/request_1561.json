@@ -1,6 +1,6 @@
 {
   "principal": "ChildrenClinic::Employee::\"Jestine Teixeira\"",
-  "resource": "ChildrenClinic::Guardian::\"Clara Higgins\"",
-  "action": "ChildrenClinic::Action::\"ViewGuardian\"",
+  "resource": "ChildrenClinic::Employee::\"Alice\"",
+  "action": "ChildrenClinic::Action::\"ViewEmployee\"",
   "context": {}
 }

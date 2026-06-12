@@ -1,6 +1,6 @@
 {
   "principal": "ChildrenClinic::Guest::\"???\"",
-  "resource": "ChildrenClinic::Visit::\"Lucky Estaban 1\"",
-  "action": "ChildrenClinic::Action::\"ViewVisit\"",
+  "resource": "ChildrenClinic::Patient::\"Jewel Rodriquez\"",
+  "action": "ChildrenClinic::Action::\"ListVisits\"",
   "context": {}
 }

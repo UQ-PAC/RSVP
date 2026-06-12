@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Guest::\"Unknown\"",
-  "resource": "ChildrenClinic::Employee::\"Linda Douglas\"",
-  "action": "ChildrenClinic::Action::\"EditEmployee\"",
+  "principal": "ChildrenClinic::Employee::\"Carl Bradford\"",
+  "resource": "ChildrenClinic::Patient::\"Samantha Coleman\"",
+  "action": "ChildrenClinic::Action::\"ViewPatient\"",
   "context": {}
 }

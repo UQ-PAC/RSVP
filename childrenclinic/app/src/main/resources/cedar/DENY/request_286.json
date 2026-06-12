@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Kathaleen Tramonte\"",
+  "principal": "ChildrenClinic::Guest::\"???\"",
   "resource": "ChildrenClinic::Visit::\"Basil Davis 2\"",
-  "action": "ChildrenClinic::Action::\"EditVisit\"",
+  "action": "ChildrenClinic::Action::\"ViewVisit\"",
   "context": {}
 }

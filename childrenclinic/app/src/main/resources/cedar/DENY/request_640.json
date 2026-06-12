@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Guest::\"Unknown\"",
-  "resource": "ChildrenClinic::Visit::\"???\"",
-  "action": "ChildrenClinic::Action::\"EditVisit\"",
+  "principal": "ChildrenClinic::Guest::\"???\"",
+  "resource": "ChildrenClinic::Visit::\"Leo Franklin 3\"",
+  "action": "ChildrenClinic::Action::\"ViewVisit\"",
   "context": {}
 }

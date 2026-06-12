@@ -1,6 +1,6 @@
 {
   "principal": "ChildrenClinic::Employee::\"Kathaleen Tramonte\"",
-  "resource": "ChildrenClinic::Clinic::\"???\"",
-  "action": "ChildrenClinic::Action::\"ListGuardians\"",
+  "resource": "ChildrenClinic::Guardian::\"Betty Davis\"",
+  "action": "ChildrenClinic::Action::\"ViewGuardian\"",
   "context": {}
 }

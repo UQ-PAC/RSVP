@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"James Carter\"",
-  "resource": "ChildrenClinic::Clinic::\"???\"",
+  "principal": "ChildrenClinic::Employee::\"Kathaleen Tramonte\"",
+  "resource": "ChildrenClinic::Patient::\"Sly Estaban\"",
   "action": "ChildrenClinic::Action::\"AddVisit\"",
   "context": {}
 }

@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Bob Buchanan\"",
-  "resource": "ChildrenClinic::Employee::\"Kathaleen Tramonte\"",
-  "action": "ChildrenClinic::Action::\"DeleteEmployee\"",
+  "principal": "ChildrenClinic::Guest::\"???\"",
+  "resource": "ChildrenClinic::Guardian::\"Betty Davis\"",
+  "action": "ChildrenClinic::Action::\"EditGuardian\"",
   "context": {}
 }

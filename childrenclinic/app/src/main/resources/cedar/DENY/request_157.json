@@ -1,6 +1,6 @@
 {
   "principal": "ChildrenClinic::Employee::\"Kathaleen Tramonte\"",
-  "resource": "ChildrenClinic::Visit::\"Max Coleman 1\"",
-  "action": "ChildrenClinic::Action::\"ViewVisit\"",
+  "resource": "ChildrenClinic::Employee::\"Bob Buchanan\"",
+  "action": "ChildrenClinic::Action::\"DeleteEmployee\"",
   "context": {}
 }

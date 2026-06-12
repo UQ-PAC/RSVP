@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Guest::\"Unknown\"",
-  "resource": "ChildrenClinic::Guardian::\"Clara Higgins\"",
-  "action": "ChildrenClinic::Action::\"ViewGuardian\"",
+  "principal": "ChildrenClinic::Employee::\"Sharon Jenkins\"",
+  "resource": "ChildrenClinic::Visit::\"Lucky Estaban 1\"",
+  "action": "ChildrenClinic::Action::\"EditVisit\"",
   "context": {}
 }

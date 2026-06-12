@@ -1,5 +1,5 @@
 {
-  "principal": "ChildrenClinic::Employee::\"James Carter\"",
+  "principal": "ChildrenClinic::Guest::\"???\"",
   "resource": "ChildrenClinic::Visit::\"Max Coleman 1\"",
   "action": "ChildrenClinic::Action::\"ViewVisit\"",
   "context": {}

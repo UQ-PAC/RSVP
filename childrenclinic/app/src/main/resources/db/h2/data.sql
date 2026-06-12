@@ -56,7 +56,7 @@ INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 1);
 INSERT INTO entity_clinics (entity_id, clinic_id) VALUES (@new_entity_id, 2);
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Administrator');
 INSERT INTO user_roles (user_id, role_id) VALUES (@new_entity_id, 1);
-INSERT INTO user_role_levels (user_id, role_id, level_id) VALUES (@new_entity_id, 1, 4);
+UPDATE users SET level_id = 4 WHERE entity_id = @new_entity_id;
 
 -- Receptionists (Users).
 
@@ -70,7 +70,7 @@ INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VA
 INSERT INTO receptionists (entity_id, telephone) VALUES (@new_entity_id, '6085559001');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Receptionist');
 INSERT INTO user_roles (user_id, role_id) VALUES (@new_entity_id, 2);
-INSERT INTO user_role_levels (user_id, role_id, level_id) VALUES (@new_entity_id, 2, 3);
+UPDATE users SET level_id = 3 WHERE entity_id = @new_entity_id;
 
 -- Carl Bradford
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
@@ -81,7 +81,7 @@ INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VA
 INSERT INTO receptionists (entity_id, telephone) VALUES (@new_entity_id, '6085559002');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Receptionist');
 INSERT INTO user_roles (user_id, role_id) VALUES (@new_entity_id, 2);
-INSERT INTO user_role_levels (user_id, role_id, level_id) VALUES (@new_entity_id, 2, 1);
+UPDATE users SET level_id = 1 WHERE entity_id = @new_entity_id;
 SET @recovered_user_id = (SELECT entity_id FROM users WHERE username = 'Bob Buchanan');
 INSERT INTO user_manager (user_id, manager_id) VALUES (@new_entity_id, @recovered_user_id);
 
@@ -97,7 +97,7 @@ INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VA
 INSERT INTO doctors (entity_id, telephone) VALUES (@new_entity_id, '6085559003');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Doctor');
 INSERT INTO user_roles (user_id, role_id) VALUES (@new_entity_id, 3);
-INSERT INTO user_role_levels (user_id, role_id, level_id) VALUES (@new_entity_id, 3, 4);
+UPDATE users SET level_id = 4 WHERE entity_id = @new_entity_id;
 
 -- Linda Douglas
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
@@ -110,7 +110,7 @@ INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Docto
 INSERT INTO doctor_specialties (doctor_id, specialty_id) VALUES (@new_entity_id, 2);
 INSERT INTO doctor_specialties (doctor_id, specialty_id) VALUES (@new_entity_id, 3);
 INSERT INTO user_roles (user_id, role_id) VALUES (@new_entity_id, 3);
-INSERT INTO user_role_levels (user_id, role_id, level_id) VALUES (@new_entity_id, 3, 6);
+UPDATE users SET level_id = 6 WHERE entity_id = @new_entity_id;
 
 -- Sharon Jenkins
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
@@ -121,7 +121,7 @@ INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VA
 INSERT INTO doctors (entity_id, telephone) VALUES (@new_entity_id, '6085559005');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Doctor');
 INSERT INTO user_roles (user_id, role_id) VALUES (@new_entity_id, 3);
-INSERT INTO user_role_levels (user_id, role_id, level_id) VALUES (@new_entity_id, 3, 2);
+UPDATE users SET level_id = 2 WHERE entity_id = @new_entity_id;
 
 -- Jestine Teixeira
 SET @new_entity_id = (SELECT entity_id FROM FINAL TABLE (INSERT INTO entities DEFAULT VALUES));
@@ -132,7 +132,7 @@ INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VA
 INSERT INTO doctors (entity_id, telephone) VALUES (@new_entity_id, '6085559006');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Doctor');
 INSERT INTO user_roles (user_id, role_id) VALUES (@new_entity_id, 3);
-INSERT INTO user_role_levels (user_id, role_id, level_id) VALUES (@new_entity_id, 3, 1);
+UPDATE users SET level_id = 1 WHERE entity_id = @new_entity_id;
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'James' AND p.last_name = 'Carter');
 INSERT INTO user_manager (user_id, manager_id) VALUES (@new_entity_id, @recovered_doctor_id);
 
@@ -145,7 +145,7 @@ INSERT INTO persons (entity_id, first_name, last_name, birth_date, gender_id) VA
 INSERT INTO doctors (entity_id, telephone) VALUES (@new_entity_id, '6085559007');
 INSERT INTO entity_types (entity_id, entity_type) VALUES (@new_entity_id, 'Doctor');
 INSERT INTO user_roles (user_id, role_id) VALUES (@new_entity_id, 3);
-INSERT INTO user_role_levels (user_id, role_id, level_id) VALUES (@new_entity_id, 3, 5);
+UPDATE users SET level_id = 5 WHERE entity_id = @new_entity_id;
 SET @recovered_doctor_id = (SELECT d.entity_id FROM doctors d JOIN persons p ON d.entity_id = p.entity_id WHERE p.first_name = 'Linda' AND p.last_name = 'Douglas');
 INSERT INTO user_manager (user_id, manager_id) VALUES (@new_entity_id, @recovered_doctor_id);
 

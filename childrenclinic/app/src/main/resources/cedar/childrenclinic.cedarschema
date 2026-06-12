@@ -25,16 +25,11 @@ namespace ChildrenClinic {
 
     entity Specialty;
 
-    type RoleLevel = {
-        role: EmployeeRole,
-        level: ProfessionalLevel
-    };
-
     entity Employee = {
         name: String,
         clinics: Set<Clinic>,
         roles: Set<EmployeeRole>,
-        levels?: Set<RoleLevel>,
+        level?: ProfessionalLevel,
         manager?: Employee,
         specialties?: Set<Specialty>
     };

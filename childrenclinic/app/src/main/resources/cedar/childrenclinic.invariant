@@ -31,160 +31,70 @@ entity has clinics && entity.clinics != [] &&
 entity has roles && entity.roles != []
     for all entity: ChildrenClinic::Employee;
 
-// St3. Every "Doctor" should have non-empty levels.
+// St3. Every "Doctor" should have a level.
 invariant
 !entity.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") ||
-entity has levels && entity.levels != []
+entity has level
     for all entity: ChildrenClinic::Employee;
 
 // St4. A "Doctor" may only hold the "Intern", "Resident", "Staff", "Senior", "Registrar",
 // or "Specialist" level.
 invariant
 !(entity.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
-  entity has levels) ||
-(entity.levels.contains({
-    "role": ChildrenClinic::EmployeeRole::"Doctor",
-    "level": ChildrenClinic::ProfessionalLevel::"Intern"
-}) ||
- entity.levels.contains({
-    "role": ChildrenClinic::EmployeeRole::"Doctor",
-    "level": ChildrenClinic::ProfessionalLevel::"Resident"
-}) ||
- entity.levels.contains({
-    "role": ChildrenClinic::EmployeeRole::"Doctor",
-    "level": ChildrenClinic::ProfessionalLevel::"Staff"
-}) ||
- entity.levels.contains({
-    "role": ChildrenClinic::EmployeeRole::"Doctor",
-    "level": ChildrenClinic::ProfessionalLevel::"Senior"
-}) ||
- entity.levels.contains({
-    "role": ChildrenClinic::EmployeeRole::"Doctor",
-    "level": ChildrenClinic::ProfessionalLevel::"Registrar"
-}) ||
- entity.levels.contains({
-    "role": ChildrenClinic::EmployeeRole::"Doctor",
-    "level": ChildrenClinic::ProfessionalLevel::"Specialist"
-}))
+  entity has level) ||
+(entity.level == ChildrenClinic::ProfessionalLevel::"Intern" ||
+ entity.level == ChildrenClinic::ProfessionalLevel::"Resident" ||
+ entity.level == ChildrenClinic::ProfessionalLevel::"Staff" ||
+ entity.level == ChildrenClinic::ProfessionalLevel::"Senior" ||
+ entity.level == ChildrenClinic::ProfessionalLevel::"Registrar" ||
+ entity.level == ChildrenClinic::ProfessionalLevel::"Specialist")
     for all entity: ChildrenClinic::Employee;
 
 // St5. An "Administrator" may only hold the "Intern", "Staff", or "Senior" level.
 invariant
 !(entity.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
-  entity has levels) ||
-(entity.levels.contains({
-    "role": ChildrenClinic::EmployeeRole::"Administrator",
-    "level": ChildrenClinic::ProfessionalLevel::"Intern"
-}) ||
- entity.levels.contains({
-    "role": ChildrenClinic::EmployeeRole::"Administrator",
-    "level": ChildrenClinic::ProfessionalLevel::"Staff"
-}) ||
- entity.levels.contains({
-    "role": ChildrenClinic::EmployeeRole::"Administrator",
-    "level": ChildrenClinic::ProfessionalLevel::"Senior"
-}))
+  entity has level) ||
+(entity.level == ChildrenClinic::ProfessionalLevel::"Intern" ||
+ entity.level == ChildrenClinic::ProfessionalLevel::"Staff" ||
+ entity.level == ChildrenClinic::ProfessionalLevel::"Senior")
     for all entity: ChildrenClinic::Employee;
 
 // St6. A "Receptionist" may only hold the "Intern", "Staff", or "Senior" level.
 invariant
 !(entity.roles.contains(ChildrenClinic::EmployeeRole::"Receptionist") &&
-  entity has levels) ||
-(entity.levels.contains({
-    "role": ChildrenClinic::EmployeeRole::"Receptionist",
-    "level": ChildrenClinic::ProfessionalLevel::"Intern"
-}) ||
- entity.levels.contains({
-    "role": ChildrenClinic::EmployeeRole::"Receptionist",
-    "level": ChildrenClinic::ProfessionalLevel::"Staff"
-}) ||
- entity.levels.contains({
-    "role": ChildrenClinic::EmployeeRole::"Receptionist",
-    "level": ChildrenClinic::ProfessionalLevel::"Senior"
-}))
+  entity has level) ||
+(entity.level == ChildrenClinic::ProfessionalLevel::"Intern" ||
+ entity.level == ChildrenClinic::ProfessionalLevel::"Staff" ||
+ entity.level == ChildrenClinic::ProfessionalLevel::"Senior")
     for all entity: ChildrenClinic::Employee;
 
 // St7. Every "Intern" and "Registrar" must have a manager.
-
-// St7a. Every "Intern" "Doctor" and "Registrar" "Doctor" must have a manager.
 invariant
-!(
-    entity has levels &&
-    (
-        entity.levels.contains({
-            "role": ChildrenClinic::EmployeeRole::"Doctor",
-            "level": ChildrenClinic::ProfessionalLevel::"Intern"
-        }) ||
-        entity.levels.contains({
-            "role": ChildrenClinic::EmployeeRole::"Doctor",
-            "level": ChildrenClinic::ProfessionalLevel::"Registrar"
-        })
-    )
-) || entity has manager
-    for all entity: ChildrenClinic::Employee;
-
-// St7b. Every "Intern" "Receptionist" must have a manager.
-invariant
-!(
-    entity has levels &&
-    entity.levels.contains({
-        "role": ChildrenClinic::EmployeeRole::"Receptionist",
-        "level": ChildrenClinic::ProfessionalLevel::"Intern"
-    })
-) || entity has manager
-    for all entity: ChildrenClinic::Employee;
-
-// St7c. Every "Intern" "Administrator" must have a manager.
-invariant
-!(
-    entity has levels &&
-    entity.levels.contains({
-        "role": ChildrenClinic::EmployeeRole::"Administrator",
-        "level": ChildrenClinic::ProfessionalLevel::"Intern"
-    })
+!(entity has level &&
+  (entity.level == ChildrenClinic::ProfessionalLevel::"Intern" ||
+   entity.level == ChildrenClinic::ProfessionalLevel::"Registrar")
 ) || entity has manager
     for all entity: ChildrenClinic::Employee;
 
 // St8. An "Intern" must be managed by a "Resident", "Staff", "Senior", or "Specialist".
 invariant
 !(entity has manager &&
-  entity has levels &&
-  entity.levels.contains({
-      "role": ChildrenClinic::EmployeeRole::"Doctor",
-      "level": ChildrenClinic::ProfessionalLevel::"Intern"
-  })) ||
-(entity.manager has levels &&
- (entity.manager.levels.contains({
-      "role": ChildrenClinic::EmployeeRole::"Doctor",
-      "level": ChildrenClinic::ProfessionalLevel::"Resident"
-  }) ||
-  entity.manager.levels.contains({
-      "role": ChildrenClinic::EmployeeRole::"Doctor",
-      "level": ChildrenClinic::ProfessionalLevel::"Staff"
-  }) ||
-  entity.manager.levels.contains({
-      "role": ChildrenClinic::EmployeeRole::"Doctor",
-      "level": ChildrenClinic::ProfessionalLevel::"Senior"
-  }) ||
-  entity.manager.levels.contains({
-      "role": ChildrenClinic::EmployeeRole::"Doctor",
-      "level": ChildrenClinic::ProfessionalLevel::"Specialist"
-  })))
+  entity has level &&
+  entity.level == ChildrenClinic::ProfessionalLevel::"Intern") ||
+(entity.manager has level &&
+ (entity.manager.level == ChildrenClinic::ProfessionalLevel::"Resident" ||
+  entity.manager.level == ChildrenClinic::ProfessionalLevel::"Staff" ||
+  entity.manager.level == ChildrenClinic::ProfessionalLevel::"Senior" ||
+  entity.manager.level == ChildrenClinic::ProfessionalLevel::"Specialist"))
     for all entity: ChildrenClinic::Employee;
 
 // St9. A "Registrar" must be managed by a "Specialist".
 invariant
 !(entity has manager &&
-  entity has levels &&
-  entity.levels.contains({
-      "role": ChildrenClinic::EmployeeRole::"Doctor",
-      "level": ChildrenClinic::ProfessionalLevel::"Registrar"
-  })) ||
-(entity.manager has levels &&
- entity.manager.levels.contains({
-     "role": ChildrenClinic::EmployeeRole::"Doctor",
-     "level": ChildrenClinic::ProfessionalLevel::"Specialist"
- }))
+  entity has level &&
+  entity.level == ChildrenClinic::ProfessionalLevel::"Registrar") ||
+(entity.manager has level &&
+ entity.manager.level == ChildrenClinic::ProfessionalLevel::"Specialist")
     for all entity: ChildrenClinic::Employee;
 
 // St10. No Employee can be their own manager.
@@ -239,21 +149,15 @@ entity is ChildrenClinic::Clinic
 invariant
 !(entity.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
   entity has specialties && entity.specialties != []) ||
-(entity has levels &&
- entity.levels.contains({
-     "role": ChildrenClinic::EmployeeRole::"Doctor",
-     "level": ChildrenClinic::ProfessionalLevel::"Specialist"
- }))
+(entity has level &&
+ entity.level == ChildrenClinic::ProfessionalLevel::"Specialist")
     for all entity: ChildrenClinic::Employee;
 
 // St18. A "Specialist" "Doctor" must have at least one specialty.
 invariant
 !(entity.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
-  entity has levels &&
-  entity.levels.contains({
-      "role": ChildrenClinic::EmployeeRole::"Doctor",
-      "level": ChildrenClinic::ProfessionalLevel::"Specialist"
-  })) ||
+  entity has level &&
+  entity.level == ChildrenClinic::ProfessionalLevel::"Specialist") ||
 (entity has specialties && entity.specialties != [])
     for all entity: ChildrenClinic::Employee;
 
@@ -304,11 +208,8 @@ allow(principal, resource, ChildrenClinic::Action::"ViewEmployee")
 // ('policy9')
 invariant
 !(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
-  principal has levels &&
-  principal.levels.contains({
-      "role": ChildrenClinic::EmployeeRole::"Doctor",
-      "level": ChildrenClinic::ProfessionalLevel::"Intern"
-  }) &&
+  principal has level &&
+  principal.level == ChildrenClinic::ProfessionalLevel::"Intern" &&
   principal in resource.doctors) ||
 deny(principal, resource, ChildrenClinic::Action::"EditPatient")
     for all principal: ChildrenClinic::Employee,
@@ -318,11 +219,8 @@ deny(principal, resource, ChildrenClinic::Action::"EditPatient")
 // ('policy9')
 invariant
 !(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
-  principal has levels &&
-  principal.levels.contains({
-      "role": ChildrenClinic::EmployeeRole::"Doctor",
-      "level": ChildrenClinic::ProfessionalLevel::"Intern"
-  }) &&
+  principal has level &&
+  principal.level == ChildrenClinic::ProfessionalLevel::"Intern" &&
   principal in resource.doctors) ||
 deny(principal, resource, ChildrenClinic::Action::"EditVisit")
     for all principal: ChildrenClinic::Employee,
@@ -332,11 +230,8 @@ deny(principal, resource, ChildrenClinic::Action::"EditVisit")
 // ('policy8')
 invariant
 !(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
-  principal has levels &&
-  principal.levels.contains({
-      "role": ChildrenClinic::EmployeeRole::"Doctor",
-      "level": ChildrenClinic::ProfessionalLevel::"Intern"
-  })) ||
+  principal has level &&
+  principal.level == ChildrenClinic::ProfessionalLevel::"Intern") ||
 deny(principal, resource, action)
     for all principal: ChildrenClinic::Employee,
             resource: ChildrenClinic::Clinic,
@@ -346,11 +241,8 @@ deny(principal, resource, action)
 // ('policy8')
 invariant
 !(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
-  principal has levels &&
-  principal.levels.contains({
-      "role": ChildrenClinic::EmployeeRole::"Doctor",
-      "level": ChildrenClinic::ProfessionalLevel::"Intern"
-  })) ||
+  principal has level &&
+  principal.level == ChildrenClinic::ProfessionalLevel::"Intern") ||
 deny(principal, resource, action)
     for all principal: ChildrenClinic::Employee,
             resource: ChildrenClinic::Clinic,
@@ -392,15 +284,9 @@ allow(principal, principal, action)
 invariant
 !(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
   !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
-  principal has levels &&
-  !principal.levels.contains({
-      "role": ChildrenClinic::EmployeeRole::"Doctor",
-      "level": ChildrenClinic::ProfessionalLevel::"Senior"
-  }) &&
-  !principal.levels.contains({
-      "role": ChildrenClinic::EmployeeRole::"Doctor",
-      "level": ChildrenClinic::ProfessionalLevel::"Specialist"
-  })) ||
+  principal has level &&
+  principal.level != ChildrenClinic::ProfessionalLevel::"Senior" &&
+  principal.level != ChildrenClinic::ProfessionalLevel::"Specialist") ||
 deny(principal, resource, action)
     for all principal: ChildrenClinic::Employee,
             resource: ChildrenClinic::Patient,
@@ -411,15 +297,9 @@ deny(principal, resource, action)
 invariant
 !(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
   !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
-  principal has levels &&
-  !principal.levels.contains({
-      "role": ChildrenClinic::EmployeeRole::"Doctor",
-      "level": ChildrenClinic::ProfessionalLevel::"Senior"
-  }) &&
-  !principal.levels.contains({
-      "role": ChildrenClinic::EmployeeRole::"Doctor",
-      "level": ChildrenClinic::ProfessionalLevel::"Specialist"
-  })) ||
+  principal has level &&
+  principal.level != ChildrenClinic::ProfessionalLevel::"Senior" &&
+  principal.level != ChildrenClinic::ProfessionalLevel::"Specialist") ||
 deny(principal, resource, action)
     for all principal: ChildrenClinic::Employee,
             resource: ChildrenClinic::Visit,
@@ -429,15 +309,9 @@ deny(principal, resource, action)
 // ('policy12')
 invariant
 !(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
-  principal has levels &&
-  (principal.levels.contains({
-      "role": ChildrenClinic::EmployeeRole::"Doctor",
-      "level": ChildrenClinic::ProfessionalLevel::"Senior"
-  }) ||
-   principal.levels.contains({
-      "role": ChildrenClinic::EmployeeRole::"Doctor",
-      "level": ChildrenClinic::ProfessionalLevel::"Specialist"
-  })) &&
+  principal has level &&
+  (principal.level == ChildrenClinic::ProfessionalLevel::"Senior" ||
+   principal.level == ChildrenClinic::ProfessionalLevel::"Specialist") &&
   !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
   !(principal in resource.doctors)) ||
 allow(principal, resource, ChildrenClinic::Action::"ViewPatient")
@@ -449,15 +323,9 @@ allow(principal, resource, ChildrenClinic::Action::"ViewPatient")
 // ('policy12')
 invariant
 !(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
-  principal has levels &&
-  (principal.levels.contains({
-      "role": ChildrenClinic::EmployeeRole::"Doctor",
-      "level": ChildrenClinic::ProfessionalLevel::"Senior"
-  }) ||
-   principal.levels.contains({
-      "role": ChildrenClinic::EmployeeRole::"Doctor",
-      "level": ChildrenClinic::ProfessionalLevel::"Specialist"
-  })) &&
+  principal has level &&
+  (principal.level == ChildrenClinic::ProfessionalLevel::"Senior" ||
+   principal.level == ChildrenClinic::ProfessionalLevel::"Specialist") &&
   !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
   !(principal in resource.doctors) &&
   !(resource has confidentiality &&

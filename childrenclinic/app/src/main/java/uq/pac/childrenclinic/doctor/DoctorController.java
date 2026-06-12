@@ -373,10 +373,9 @@ class DoctorController {
 				result.reject("managerRequired", "An Intern or Registrar Doctor must have a manager.");
 			}
 			else if (managerId != null) {
-				Integer managerLevelId = jdbcTemplate.query(
-						"SELECT level_id FROM user_role_levels WHERE user_id = ? AND role_id = "
-								+ "(SELECT id FROM roles WHERE name = ?)",
-						rs -> rs.next() ? rs.getInt("level_id") : null, managerId, DOCTOR_ROLE_NAME);
+					Integer managerLevelId = jdbcTemplate.query(
+							"SELECT level_id FROM users WHERE entity_id = ?",
+							rs -> rs.next() ? rs.getInt("level_id") : null, managerId);
 
 				String managerLevelName = null;
 				if (managerLevelId != null) {
@@ -467,7 +466,7 @@ class DoctorController {
 		model.addAttribute("potentialManagers", userRepository.findByRoleName(DOCTOR_ROLE_NAME));
 		model.addAttribute("managerLevelMap", buildManagerLevelMap(DOCTOR_ROLE_NAME));
 
-		Integer currentLevelId = jdbcTemplate.query("SELECT level_id FROM user_role_levels WHERE user_id = ?",
+		Integer currentLevelId = jdbcTemplate.query("SELECT level_id FROM users WHERE entity_id = ?",
 				rs -> rs.next() ? rs.getInt("level_id") : null, doctorId);
 		Integer currentManagerId = jdbcTemplate.query("SELECT manager_id FROM user_manager WHERE user_id = ?",
 				rs -> rs.next() ? rs.getInt("manager_id") : null, doctorId);
@@ -589,9 +588,8 @@ class DoctorController {
 			}
 			else if (managerId != null) {
 				Integer managerLevelId = jdbcTemplate.query(
-						"SELECT level_id FROM user_role_levels WHERE user_id = ? AND role_id = "
-								+ "(SELECT id FROM roles WHERE name = ?)",
-						rs -> rs.next() ? rs.getInt("level_id") : null, managerId, DOCTOR_ROLE_NAME);
+						"SELECT level_id FROM users WHERE entity_id = ?",
+						rs -> rs.next() ? rs.getInt("level_id") : null, managerId);
 
 				String managerLevelName = null;
 				if (managerLevelId != null) {
@@ -664,15 +662,9 @@ class DoctorController {
 		}
 
 		String updatedUsername = doctor.getFirstName() + " " + doctor.getLastName();
-		jdbcTemplate.update("UPDATE users SET username = ? WHERE entity_id = ?", updatedUsername, doctorId);
+		jdbcTemplate.update("UPDATE users SET username = ?, level_id = ? WHERE entity_id = ?", updatedUsername,
+				levelId, doctorId);
 
-		Integer roleId = jdbcTemplate.queryForObject("SELECT id FROM roles WHERE name = ?", Integer.class,
-				DOCTOR_ROLE_NAME);
-		jdbcTemplate.update("DELETE FROM user_role_levels WHERE user_id = ?", doctorId);
-		if (levelId != null) {
-			jdbcTemplate.update("INSERT INTO user_role_levels (user_id, role_id, level_id) VALUES (?, ?, ?)", doctorId,
-					roleId, levelId);
-		}
 		jdbcTemplate.update("DELETE FROM user_manager WHERE user_id = ?", doctorId);
 		if (managerId != null) {
 			jdbcTemplate.update("INSERT INTO user_manager (user_id, manager_id) VALUES (?, ?)", doctorId, managerId);
@@ -687,22 +679,18 @@ class DoctorController {
 		Integer entityId = doctor.getId();
 		String username = doctor.getFirstName() + " " + doctor.getLastName();
 
-		jdbcTemplate.update("INSERT INTO users (entity_id, username) VALUES (?, ?)", entityId, username);
+		Integer effectiveLevelId = levelId;
+		if (effectiveLevelId == null) {
+			effectiveLevelId = jdbcTemplate.queryForObject("SELECT id FROM levels WHERE name = ?", Integer.class,
+					DEFAULT_LEVEL_NAME);
+		}
+
+		jdbcTemplate.update("INSERT INTO users (entity_id, username, level_id) VALUES (?, ?, ?)", entityId, username,
+				effectiveLevelId);
 
 		Integer roleId = jdbcTemplate.queryForObject("SELECT id FROM roles WHERE name = ?", Integer.class,
 				DOCTOR_ROLE_NAME);
 		jdbcTemplate.update("INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)", entityId, roleId);
-
-		if (levelId != null) {
-			jdbcTemplate.update("INSERT INTO user_role_levels (user_id, role_id, level_id) VALUES (?, ?, ?)", entityId,
-					roleId, levelId);
-		}
-		else {
-			Integer defaultLevelId = jdbcTemplate.queryForObject("SELECT id FROM levels WHERE name = ?", Integer.class,
-					DEFAULT_LEVEL_NAME);
-			jdbcTemplate.update("INSERT INTO user_role_levels (user_id, role_id, level_id) VALUES (?, ?, ?)", entityId,
-					roleId, defaultLevelId);
-		}
 
 		if (managerId != null) {
 			jdbcTemplate.update("INSERT INTO user_manager (user_id, manager_id) VALUES (?, ?)", entityId, managerId);
@@ -710,9 +698,10 @@ class DoctorController {
 	}
 
 	private Map<Integer, String> buildManagerLevelMap(String roleName) {
-		List<Map<String, Object>> rows = jdbcTemplate.queryForList("SELECT url.user_id, l.name AS level_name "
-				+ "FROM user_role_levels url " + "JOIN levels l ON url.level_id = l.id "
-				+ "JOIN roles r ON url.role_id = r.id " + "WHERE r.name = ?", roleName);
+		List<Map<String, Object>> rows = jdbcTemplate.queryForList("SELECT u.entity_id AS user_id, l.name AS level_name "
+				+ "FROM users u " + "JOIN levels l ON u.level_id = l.id "
+				+ "JOIN user_roles ur ON u.entity_id = ur.user_id "
+				+ "JOIN roles r ON ur.role_id = r.id " + "WHERE r.name = ?", roleName);
 
 		Map<Integer, String> result = new HashMap<>();
 		for (Map<String, Object> row : rows) {

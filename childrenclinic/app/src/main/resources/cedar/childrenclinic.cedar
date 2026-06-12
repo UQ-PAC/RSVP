@@ -161,11 +161,8 @@ when {
     principal.clinics.contains(resource)
 }
 unless {
-    principal has levels &&
-    principal.levels.contains({
-        "role": ChildrenClinic::EmployeeRole::"Doctor",
-        "level": ChildrenClinic::ProfessionalLevel::"Intern"
-    })
+    principal has level &&
+    principal.level == ChildrenClinic::ProfessionalLevel::"Intern"
 };
 
 // 'policy9'
@@ -178,11 +175,8 @@ forbid (
 )
 when {
     principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
-    principal has levels &&
-    principal.levels.contains({
-        "role": ChildrenClinic::EmployeeRole::"Doctor",
-        "level": ChildrenClinic::ProfessionalLevel::"Intern"
-    }) &&
+    principal has level &&
+    principal.level == ChildrenClinic::ProfessionalLevel::"Intern" &&
     action in [ChildrenClinic::Action::"EditPatient",
                ChildrenClinic::Action::"AddVisit",
                ChildrenClinic::Action::"EditVisit"] &&
@@ -217,16 +211,10 @@ permit (
 )
 when {
     principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
-    principal has levels &&
+    principal has level &&
     (
-        principal.levels.contains({
-            "role": ChildrenClinic::EmployeeRole::"Doctor",
-            "level": ChildrenClinic::ProfessionalLevel::"Senior"
-        }) ||
-        principal.levels.contains({
-            "role": ChildrenClinic::EmployeeRole::"Doctor",
-            "level": ChildrenClinic::ProfessionalLevel::"Specialist"
-        })
+        principal.level == ChildrenClinic::ProfessionalLevel::"Senior" ||
+        principal.level == ChildrenClinic::ProfessionalLevel::"Specialist"
     ) &&
     (
         resource is ChildrenClinic::Patient ||
@@ -249,16 +237,10 @@ permit (
 )
 when {
     principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
-    principal has levels &&
+    principal has level &&
     (
-        principal.levels.contains({
-            "role": ChildrenClinic::EmployeeRole::"Doctor",
-            "level": ChildrenClinic::ProfessionalLevel::"Senior"
-        }) ||
-        principal.levels.contains({
-            "role": ChildrenClinic::EmployeeRole::"Doctor",
-            "level": ChildrenClinic::ProfessionalLevel::"Specialist"
-        })
+        principal.level == ChildrenClinic::ProfessionalLevel::"Senior" ||
+        principal.level == ChildrenClinic::ProfessionalLevel::"Specialist"
     ) &&
     (
         resource is ChildrenClinic::Patient ||

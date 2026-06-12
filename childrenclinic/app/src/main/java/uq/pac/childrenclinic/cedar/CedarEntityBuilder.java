@@ -137,7 +137,7 @@ public class CedarEntityBuilder {
 		// Pre-fetch all relational data into maps keyed by entity_id.
 		Map<Integer, List<String>> clinicsByUser = fetchEntityClinics();
 		Map<Integer, List<String>> rolesByUser = fetchUserRoles();
-		Map<Integer, List<Map<String, String>>> roleLevelsByUser = fetchUserRoleLevels();
+		Map<Integer, String> levelByUser = fetchUserLevels();
 		Map<Integer, String> managerByUser = fetchUserManagers();
 		Map<Integer, List<String>> specialtiesByDoctor = fetchDoctorSpecialties();
 
@@ -155,16 +155,9 @@ public class CedarEntityBuilder {
 			List<String> userRoles = rolesByUser.getOrDefault(entityId, List.of());
 			attrs.put("roles", userRoles.stream().map(r -> entityRef("EmployeeRole", r)).collect(Collectors.toList()));
 
-			List<Map<String, String>> userRoleLevels = roleLevelsByUser.getOrDefault(entityId, List.of());
-			if (!userRoleLevels.isEmpty()) {
-				List<Map<String, Object>> roleLevelRecords = new ArrayList<>();
-				for (Map<String, String> rl : userRoleLevels) {
-					Map<String, Object> record = new LinkedHashMap<>();
-					record.put("role", entityRef("EmployeeRole", rl.get("role")));
-					record.put("level", entityRef("ProfessionalLevel", rl.get("level")));
-					roleLevelRecords.add(record);
-				}
-				attrs.put("levels", roleLevelRecords);
+			String userLevel = levelByUser.get(entityId);
+			if (userLevel != null) {
+				attrs.put("level", entityRef("ProfessionalLevel", userLevel));
 			}
 
 			List<String> doctorSpecialties = specialtiesByDoctor.getOrDefault(entityId, List.of());
@@ -349,17 +342,14 @@ public class CedarEntityBuilder {
 					Collectors.mapping(row -> (String) row.get("name"), Collectors.toList())));
 	}
 
-	private Map<Integer, List<Map<String, String>>> fetchUserRoleLevels() {
+	private Map<Integer, String> fetchUserLevels() {
 		List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-				"SELECT url.user_id, r.name AS role_name, l.name AS level_name " + "FROM user_role_levels url "
-						+ "JOIN roles r ON url.role_id = r.id " + "JOIN levels l ON url.level_id = l.id");
+				"SELECT u.entity_id, l.name AS level_name " + "FROM users u "
+						+ "JOIN levels l ON u.level_id = l.id " + "WHERE u.level_id IS NOT NULL");
 
-		Map<Integer, List<Map<String, String>>> result = new HashMap<>();
+		Map<Integer, String> result = new HashMap<>();
 		for (Map<String, Object> row : rows) {
-			Integer userId = (Integer) row.get("user_id");
-			String roleName = (String) row.get("role_name");
-			String levelName = (String) row.get("level_name");
-			result.computeIfAbsent(userId, k -> new ArrayList<>()).add(Map.of("role", roleName, "level", levelName));
+			result.put((Integer) row.get("entity_id"), (String) row.get("level_name"));
 		}
 		return result;
 	}

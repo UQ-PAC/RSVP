@@ -13,8 +13,8 @@ import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
 
 import static uq.pac.rsvp.policy.ast.policy.Policy.Effect.Permit;
-import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.And;
-import static uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression.UnaryOp.Not;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.Operator.And;
+import static uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression.Operator.Not;
 import static uq.pac.rsvp.support.SourceLoc.MISSING;
 
 public class Policy extends PolicyStatement {

@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static uq.pac.rsvp.policy.ast.Util.unquote;
-import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.*;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.Operator.*;
 import static uq.pac.rsvp.policy.ast.schema.type.TypeReference.TYPE_REFERENCE_DELIMITER;
 
 public class ExpressionVisitor extends CedarSourceVisitor<Expression> {
@@ -77,23 +77,23 @@ public class ExpressionVisitor extends CedarSourceVisitor<Expression> {
     @Override
     public Expression visitConjunctionExpr(CedarParser.ConjunctionExprContext ctx) {
         return new BinaryExpression(ctx.expression(0).accept(this),
-                BinaryExpression.BinaryOp.And, ctx.expression(1).accept(this), location(ctx));
+                BinaryExpression.Operator.And, ctx.expression(1).accept(this), location(ctx));
     }
 
     @Override
     public Expression visitNegationExpr(CedarParser.NegationExprContext ctx) {
-        return new UnaryExpression(UnaryExpression.UnaryOp.Not, ctx.expression().accept(this), location(ctx));
+        return new UnaryExpression(UnaryExpression.Operator.Not, ctx.expression().accept(this), location(ctx));
     }
 
     @Override
     public Expression visitArithNegationExpr(CedarParser.ArithNegationExprContext ctx) {
-        return new UnaryExpression(UnaryExpression.UnaryOp.Neg, ctx.expression().accept(this), location(ctx));
+        return new UnaryExpression(UnaryExpression.Operator.Neg, ctx.expression().accept(this), location(ctx));
     }
 
     @Override
     public Expression visitDisjunctionExpr(CedarParser.DisjunctionExprContext ctx) {
         return new BinaryExpression(ctx.expression(0).accept(this),
-                BinaryExpression.BinaryOp.Or, ctx.expression(1).accept(this), location(ctx));
+                BinaryExpression.Operator.Or, ctx.expression(1).accept(this), location(ctx));
     }
 
     @Override
@@ -115,7 +115,7 @@ public class ExpressionVisitor extends CedarSourceVisitor<Expression> {
     @Override
     public Expression visitInExpr(CedarParser.InExprContext ctx) {
         return new BinaryExpression(ctx.expression(0).accept(this),
-                BinaryExpression.BinaryOp.In, ctx.expression(1).accept(this), location(ctx));
+                BinaryExpression.Operator.In, ctx.expression(1).accept(this), location(ctx));
     }
 
     @Override
@@ -130,7 +130,7 @@ public class ExpressionVisitor extends CedarSourceVisitor<Expression> {
 
     @Override
     public Expression visitComparisonExpr(CedarParser.ComparisonExprContext ctx) {
-        BinaryExpression.BinaryOp op = switch (ctx.op.getText()) {
+        BinaryExpression.Operator op = switch (ctx.op.getText()) {
             case "==" -> Eq;
             case "!=" -> Neq;
             case ">" -> Greater;
@@ -146,10 +146,10 @@ public class ExpressionVisitor extends CedarSourceVisitor<Expression> {
 
     @Override
     public Expression visitArithExpr(CedarParser.ArithExprContext ctx) {
-        BinaryExpression.BinaryOp op = switch (ctx.op.getText()) {
-            case "+" -> BinaryExpression.BinaryOp.Add;
-            case "-" -> BinaryExpression.BinaryOp.Sub;
-            case "*" -> BinaryExpression.BinaryOp.Mul;
+        BinaryExpression.Operator op = switch (ctx.op.getText()) {
+            case "+" -> BinaryExpression.Operator.Add;
+            case "-" -> BinaryExpression.Operator.Sub;
+            case "*" -> BinaryExpression.Operator.Mul;
             default -> throw new AssertionError("unreachable");
         };
         return new BinaryExpression(ctx.expression(0).accept(this), op,

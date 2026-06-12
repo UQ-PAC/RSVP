@@ -103,7 +103,7 @@ public class TranslationVisitor implements PolicyVisitor {
     /**
      * Translation between cedar to souffle operators in presence of negation
      */
-    DLConstraint.Operator getOperator(BinaryExpression.BinaryOp op, boolean negated) {
+    DLConstraint.Operator getOperator(BinaryExpression.Operator op, boolean negated) {
         DLConstraint.Operator dlOp = switch (op) {
             case Eq -> DLConstraint.Operator.EQ;
             case Neq -> DLConstraint.Operator.NEQ;
@@ -185,7 +185,7 @@ public class TranslationVisitor implements PolicyVisitor {
     @Override
     public void visitPropertyAccessExpr(PropertyAccessExpression expr) {
         StringExpression value = new StringExpression(Boolean.toString(!negated), SourceLoc.MISSING);
-        new BinaryExpression(expr, BinaryExpression.BinaryOp.Eq, value, SourceLoc.MISSING).accept(this);
+        new BinaryExpression(expr, BinaryExpression.Operator.Eq, value, SourceLoc.MISSING).accept(this);
     }
 
     @Override

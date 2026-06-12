@@ -6,25 +6,25 @@ import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
 
 public class UnaryExpression extends Expression {
-    public enum UnaryOp {
+    public enum Operator {
         Not,
         Neg
     }
 
-    private final UnaryOp op;
+    private final Operator op;
     private final Expression expr;
 
-    public UnaryExpression(UnaryOp op, Expression expr, SourceLoc source) {
+    public UnaryExpression(Operator op, Expression expr, SourceLoc source) {
         super(source);
         this.op = op;
         this.expr = expr;
     }
 
-    public UnaryExpression(UnaryOp op, Expression expr) {
+    public UnaryExpression(Operator op, Expression expr) {
         this(op, expr, SourceLoc.MISSING);
     }
 
-    public UnaryOp getOp() {
+    public Operator getOp() {
         return op;
     }
 

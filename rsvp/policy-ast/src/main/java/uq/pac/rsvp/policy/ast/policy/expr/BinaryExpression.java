@@ -8,7 +8,7 @@ import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
 
 public class BinaryExpression extends Expression {
 
-    public enum BinaryOp {
+    public enum Operator {
         Eq,
         Neq,
         And,
@@ -24,18 +24,18 @@ public class BinaryExpression extends Expression {
         Like
     }
 
-    private final BinaryOp op;
+    private final Operator op;
     private final Expression left;
     private final Expression right;
 
-    public BinaryExpression(Expression left, BinaryOp op, Expression right, SourceLoc source) {
+    public BinaryExpression(Expression left, Operator op, Expression right, SourceLoc source) {
         super(source);
         this.left = left;
         this.op = op;
         this.right = right;
     }
 
-    public BinaryExpression(Expression left, BinaryOp op, Expression right) {
+    public BinaryExpression(Expression left, Operator op, Expression right) {
         this(left, op, right, SourceLoc.MISSING);
     }
 
@@ -47,7 +47,7 @@ public class BinaryExpression extends Expression {
         return right;
     }
 
-    public BinaryOp getOp() {
+    public Operator getOp() {
         return op;
     }
 

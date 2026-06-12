@@ -4,7 +4,6 @@ import uq.pac.rsvp.policy.ast.policy.expr.*;
 import uq.pac.rsvp.policy.ast.schema.type.BooleanType;
 import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.policy.Invariant;
-import uq.pac.rsvp.policy.ast.policy.Quantifier;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
 import uq.pac.rsvp.policy.datalog.validation.InvariantFunctionValidator;
 import uq.pac.rsvp.support.error.TranslationError;
@@ -14,8 +13,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.*;
-import static uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression.UnaryOp.*;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.Operator.*;
+import static uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression.Operator.*;
 import static uq.pac.rsvp.Assertion.require;
 
 /**
@@ -76,7 +75,7 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
                 return new BinaryExpression(new BinaryExpression(lhs, And, rhs), Or,
                         new BinaryExpression(negate.apply(lhs), And, negate.apply(rhs)));
             }
-        } else if (expr.getOp() == BinaryExpression.BinaryOp.In && expr.getRight() instanceof SetExpression set) {
+        } else if (expr.getOp() == BinaryExpression.Operator.In && expr.getRight() instanceof SetExpression set) {
             // Rewrite IN expressions over literal sets to disjunctions
             Expression init = new BooleanExpression(false);
             return set.getElements().stream()
@@ -102,7 +101,7 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
         // set.containsAny([a, b]) -> set.contains(a) || set.contains(b)
         if (fun.equals("containsAll") || fun.contains("containsAny")) {
             require(expr.getArgs().size() == 1);
-            BinaryExpression.BinaryOp op = fun.equals("containsAny") ? Or : And;
+            BinaryExpression.Operator op = fun.equals("containsAny") ? Or : And;
             if (expr.getArgs().getFirst() instanceof SetExpression set) {
                 List<Expression> elements = new ArrayList<>(set.getElements());
                 if (elements.isEmpty()) {

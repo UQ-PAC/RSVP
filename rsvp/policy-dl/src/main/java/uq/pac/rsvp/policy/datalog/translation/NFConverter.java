@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static uq.pac.rsvp.Assertion.require;
-import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.And;
-import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.Or;
-import static uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression.UnaryOp.Not;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.Operator.And;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.Operator.Or;
+import static uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression.Operator.Not;
 
 /**
  * Converting a Cedar expression to DNF.
@@ -85,8 +85,8 @@ public class NFConverter implements PolicyComputationVisitor<Formula> {
     @Override
     public Formula visitUnaryExpr(UnaryExpression expr) {
         return switch (expr.getOp()) {
-            case UnaryExpression.UnaryOp.Not -> factory.not(expr.getExpression().compute(this));
-            case UnaryExpression.UnaryOp.Neg -> getVar(expr);
+            case UnaryExpression.Operator.Not -> factory.not(expr.getExpression().compute(this));
+            case UnaryExpression.Operator.Neg -> getVar(expr);
         };
     }
 
@@ -110,7 +110,7 @@ public class NFConverter implements PolicyComputationVisitor<Formula> {
         return factory.constant(expr.getValue());
     }
 
-    private Expression fromStream(Stream<Formula> stream, BinaryExpression.BinaryOp op) {
+    private Expression fromStream(Stream<Formula> stream, BinaryExpression.Operator op) {
         List<Expression> exprs = stream
                 .map(this::toExpression)
                 .collect(Collectors.toCollection(LinkedList::new));
@@ -124,13 +124,13 @@ public class NFConverter implements PolicyComputationVisitor<Formula> {
 
     private Expression toExpression(Formula formula) {
         return switch (formula) {
-            case Or or -> fromStream(or.stream(), BinaryExpression.BinaryOp.Or);
-            case And and -> fromStream(and.stream(), BinaryExpression.BinaryOp.And);
+            case Or or -> fromStream(or.stream(), Or);
+            case And and -> fromStream(and.stream(), And);
             case Variable v -> cache.get(v.name());
 			// Negated literal (equivalent of not)
             case Literal l -> l.phase() ? cache.get(l.variable().name()) :
-                    new UnaryExpression(UnaryExpression.UnaryOp.Not, toExpression(l.variable()));
-            case Not n -> new UnaryExpression(UnaryExpression.UnaryOp.Not, toExpression(n.operand()));
+                    new UnaryExpression(Not, toExpression(l.variable()));
+            case Not n -> new UnaryExpression(Not, toExpression(n.operand()));
             case CTrue t -> new BooleanExpression(true);
             case CFalse f -> new BooleanExpression(false);
             default -> throw new RuntimeException("Unreachable");

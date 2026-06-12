@@ -7,7 +7,7 @@ import uq.pac.rsvp.support.FileSource;
 import uq.pac.rsvp.support.SourceLoc;
 
 import static uq.pac.rsvp.Assertion.require;
-import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.BinaryOp.*;
+import static uq.pac.rsvp.policy.ast.policy.expr.BinaryExpression.Operator.*;
 
 import java.util.List;
 import java.util.Set;

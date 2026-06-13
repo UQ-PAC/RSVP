@@ -3,12 +3,12 @@ package uq.pac.rsvp.policy.datalog.logic;
 public class Negation extends Formula {
     private final Formula formula;
 
-    private Negation(Formula formula) {
+    public Negation(Formula formula) {
         this.formula = formula;
     }
 
     protected String stringify() {
-        return formula.toString();
+        return "!" + formula.toString();
     }
 
     @Override

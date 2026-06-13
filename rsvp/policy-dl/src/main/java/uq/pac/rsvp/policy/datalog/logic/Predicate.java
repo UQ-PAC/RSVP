@@ -3,7 +3,7 @@ package uq.pac.rsvp.policy.datalog.logic;
 public class Predicate<E> extends Formula {
     private final E value;
 
-    private Predicate(E value) {
+    public Predicate(E value) {
         this.value = value;
     }
 

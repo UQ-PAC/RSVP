@@ -15,6 +15,11 @@ public class Literal extends Formula {
     }
 
     @Override
+    public <T> T accept(FormulaVisitor<T> visitor) {
+        return visitor.visitLiteral(this);
+    }
+
+    @Override
     public boolean equals(Object other) {
         if (other == null) {
             return false;

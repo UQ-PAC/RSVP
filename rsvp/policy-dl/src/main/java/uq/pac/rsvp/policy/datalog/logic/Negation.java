@@ -11,6 +11,11 @@ public class Negation extends Formula {
         return formula.toString();
     }
 
+    @Override
+    public <T> T accept(FormulaVisitor<T> visitor) {
+        return visitor.visitNegation(this);
+    }
+
     public Formula getFormula() {
         return formula;
     }

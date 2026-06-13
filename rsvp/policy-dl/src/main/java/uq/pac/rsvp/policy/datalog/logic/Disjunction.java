@@ -22,4 +22,9 @@ public class Disjunction extends LogicalOperator {
         }
         return false;
     }
+
+    @Override
+    public <T> T accept(FormulaVisitor<T> visitor) {
+        return visitor.visitDisjunction(this);
+    }
 }

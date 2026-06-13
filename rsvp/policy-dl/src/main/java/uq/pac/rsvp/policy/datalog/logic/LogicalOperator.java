@@ -1,6 +1,6 @@
 package uq.pac.rsvp.policy.datalog.logic;
 
-public abstract class LogicalOperator {
+public abstract class LogicalOperator extends Formula {
     private final Formula left;
     private final Formula right;
 

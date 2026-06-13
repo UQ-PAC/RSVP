@@ -13,4 +13,6 @@ public abstract class Formula {
         }
         return cache;
     }
+
+    public abstract <T> T accept(FormulaVisitor<T> visitor);
 }

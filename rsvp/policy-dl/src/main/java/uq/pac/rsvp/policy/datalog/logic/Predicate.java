@@ -1,14 +1,19 @@
 package uq.pac.rsvp.policy.datalog.logic;
 
-public class Predicate<T> extends Formula {
-    private final T value;
+public class Predicate<E> extends Formula {
+    private final E value;
 
-    private Predicate(T value) {
+    private Predicate(E value) {
         this.value = value;
     }
 
     protected String stringify() {
         return value.toString();
+    }
+
+    @Override
+    public <T> T accept(FormulaVisitor<T> visitor) {
+        return visitor.visitPredicate(this);
     }
 
     @Override

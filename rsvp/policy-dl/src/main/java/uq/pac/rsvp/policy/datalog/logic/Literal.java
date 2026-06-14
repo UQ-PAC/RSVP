@@ -7,8 +7,8 @@ public class Literal extends Formula {
         this.value = value;
     }
 
-    private static final Literal TRUE = new Literal(true);
-    private static final Literal FALSE = new Literal(false);
+    public static final Literal TRUE = new Literal(true);
+    public static final Literal FALSE = new Literal(false);
 
     protected String stringify() {
         return Boolean.toString(value);

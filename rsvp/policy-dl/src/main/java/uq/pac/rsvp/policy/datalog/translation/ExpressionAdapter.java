@@ -16,7 +16,7 @@ public class ExpressionAdapter implements PolicyComputationVisitor<Expression> {
     public Expression visitBinaryExpr(BinaryExpression expr) {
         Expression lhs = expr.getLeft().compute(this);
         Expression rhs = expr.getRight().compute(this);
-        return new BinaryExpression(lhs, expr.getOp(), rhs, expr.getSourceLoc());
+        return new BinaryExpression(lhs, expr.getOperator(), rhs, expr.getSourceLoc());
     }
 
     public Expression visitCallExpr(CallExpression expr) {
@@ -56,7 +56,7 @@ public class ExpressionAdapter implements PolicyComputationVisitor<Expression> {
     }
 
     public Expression visitUnaryExpr(UnaryExpression expr) {
-        return new UnaryExpression(expr.getOp(),
+        return new UnaryExpression(expr.getOperator(),
                 expr.getExpression().compute(this),
                 expr.getSourceLoc());
     }

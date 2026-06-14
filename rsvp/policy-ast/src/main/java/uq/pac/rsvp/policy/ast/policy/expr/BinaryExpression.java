@@ -47,7 +47,7 @@ public class BinaryExpression extends Expression {
         return right;
     }
 
-    public Operator getOp() {
+    public Operator getOperator() {
         return op;
     }
 

@@ -147,7 +147,7 @@ public class InvariantValidator implements PolicyPayloadVisitor<BuiltinType, Pay
         BuiltinType lhs = collect(expr.getLeft(), payload);
         BuiltinType rhs = collect(expr.getRight(), payload);
 
-        return switch (expr.getOp()) {
+        return switch (expr.getOperator()) {
             case Add, Sub, Mul -> {
                 expect(lhs, TLong);
                 expect(rhs, TLong);
@@ -216,7 +216,7 @@ public class InvariantValidator implements PolicyPayloadVisitor<BuiltinType, Pay
     @Override
     public BuiltinType visitUnaryExpr(UnaryExpression expr, Payload payload) {
         BuiltinType type = collect(expr.getExpression(), payload);
-        return switch (expr.getOp()) {
+        return switch (expr.getOperator()) {
             case Not -> {
                 expect(type, TBoolean);
                 yield BooleanType;

@@ -129,12 +129,12 @@ public class TranslationVisitor implements PolicyVisitor {
 
     @Override
     public void visitBinaryExpr(BinaryExpression expr) {
-        switch (expr.getOp()) {
+        switch (expr.getOperator()) {
             case Eq, Neq, Less, LessEq, Greater, GreaterEq -> {
                 TypeContextVisitor.Context context = TypeContextVisitor.infer(expr, getContext());
                 DLTerm lhs = TypeContextVisitor.normalise(getOperand(expr.getLeft()), context),
                         rhs = TypeContextVisitor.normalise(getOperand(expr.getRight()), context);
-                expressions.add(new DLConstraint(lhs, rhs, getOperator(expr.getOp(), negated)));
+                expressions.add(new DLConstraint(lhs, rhs, getOperator(expr.getOperator(), negated)));
             }
             case In -> {
                 // The expr in [ ... ] form should have been rewritten to disjunctions by this point
@@ -146,7 +146,7 @@ public class TranslationVisitor implements PolicyVisitor {
                 expressions.add(new DLAtom(ParentOfRuleDecl, negated, rhs, lhs));
             }
             case And, Or -> throw new AssertionError("Unreachable");
-            default -> throw new TranslationError("Unsupported: " + expr.getOp());
+            default -> throw new TranslationError("Unsupported: " + expr.getOperator());
         }
     }
 
@@ -167,7 +167,7 @@ public class TranslationVisitor implements PolicyVisitor {
     @Override
     public void visitUnaryExpr(UnaryExpression expr) {
         require(!negated);
-        switch (expr.getOp()) {
+        switch (expr.getOperator()) {
             case Neg -> throw new TranslationError("Unsupported: " + expr);
             case Not -> negated = true;
         }

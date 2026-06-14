@@ -46,7 +46,7 @@ public class NFConverter implements PolicyComputationVisitor<Formula> {
 
     @Override
     public Formula visitBinaryExpr(BinaryExpression expr) {
-        return switch (expr.getOp()) {
+        return switch (expr.getOperator()) {
             case And ->
                 factory.and(expr.getLeft().compute(this), expr.getRight().compute(this));
             case Or ->
@@ -85,7 +85,7 @@ public class NFConverter implements PolicyComputationVisitor<Formula> {
 
     @Override
     public Formula visitUnaryExpr(UnaryExpression expr) {
-        return switch (expr.getOp()) {
+        return switch (expr.getOperator()) {
             case UnaryExpression.Operator.Not -> factory.not(expr.getExpression().compute(this));
             case UnaryExpression.Operator.Neg -> getVar(expr);
         };
@@ -167,19 +167,19 @@ public class NFConverter implements PolicyComputationVisitor<Formula> {
     public static boolean isScalar(Expression expr) {
         require(expr != null);
 
-        if (expr instanceof UnaryExpression e && e.getOp() == Not) {
+        if (expr instanceof UnaryExpression e && e.getOperator() == Not) {
             expr = e.getExpression();
         }
 
         return expr.compute(new ExpressionAdapter() {
             @Override
             public Expression visitBinaryExpr(BinaryExpression expr) {
-                return (expr.getOp() == And || expr.getOp() == Or)  ? null : super.visitBinaryExpr(expr);
+                return (expr.getOperator() == And || expr.getOperator() == Or)  ? null : super.visitBinaryExpr(expr);
             }
 
             @Override
             public Expression visitUnaryExpr(UnaryExpression expr) {
-                return expr.getOp() == Not ? null : super.visitUnaryExpr(expr);
+                return expr.getOperator() == Not ? null : super.visitUnaryExpr(expr);
             }
         }) != null;
     }

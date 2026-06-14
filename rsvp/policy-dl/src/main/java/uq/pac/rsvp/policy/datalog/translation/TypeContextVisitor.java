@@ -64,7 +64,7 @@ public class TypeContextVisitor implements PolicyComputationVisitor<TypeContextV
         Context lhsContext = expr.getLeft().compute(this),
                 rhsContext = expr.getRight().compute(this);
         Context operandContext = merge(lhsContext, rhsContext);
-        Context operatorContext = switch (expr.getOp()) {
+        Context operatorContext = switch (expr.getOperator()) {
             case Add, Mul, Sub, Greater, GreaterEq, Less, LessEq -> Context.NUMERIC;
             case Eq, Neq -> Context.UNDEFINED;
             default -> Context.SYMBOLIC;
@@ -74,7 +74,7 @@ public class TypeContextVisitor implements PolicyComputationVisitor<TypeContextV
 
     @Override
     public Context visitUnaryExpr(UnaryExpression expr) {
-        Context operatorContext = switch (expr.getOp()) {
+        Context operatorContext = switch (expr.getOperator()) {
             case Neg -> Context.NUMERIC;
             case Not -> Context.SYMBOLIC;
         };

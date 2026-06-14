@@ -48,7 +48,7 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
                 rhs = expr.getRight().compute(this);
 
         // Rewrite != to ==
-        if (expr.getOp() == Neq) {
+        if (expr.getOperator() == Neq) {
             return new UnaryExpression(Not, new BinaryExpression(expr.getLeft(), Eq, expr.getRight()))
                     .compute(this);
         // Booleans at the Datalog level are represented by strings, i.e., if we want to compare
@@ -57,7 +57,7 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
         // string and boolean representation in Souffle. To aid this situation expressions of the form
         // x == y are rewritten to x && y || !x || !y. This is done for the limited number of expressions,
         // for the moment only literal boolean values and boolean-valued functions.
-        } else if (expr.getOp() == Eq) {
+        } else if (expr.getOperator() == Eq) {
             Predicate<Expression> isBoolean = e -> {
                 if (e instanceof BooleanExpression) {
                     return true;
@@ -75,19 +75,19 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
                 return new BinaryExpression(new BinaryExpression(lhs, And, rhs), Or,
                         new BinaryExpression(negate.apply(lhs), And, negate.apply(rhs)));
             }
-        } else if (expr.getOp() == BinaryExpression.Operator.In && expr.getRight() instanceof SetExpression set) {
+        } else if (expr.getOperator() == BinaryExpression.Operator.In && expr.getRight() instanceof SetExpression set) {
             // Rewrite IN expressions over literal sets to disjunctions
             Expression init = new BooleanExpression(false);
             return set.getElements().stream()
                     .map(e ->  (Expression) new BinaryExpression(lhs, In, e))
                     .reduce(init, (l, r) -> new BinaryExpression(l, Or, r));
         }
-        return new BinaryExpression(lhs, expr.getOp(), rhs);
+        return new BinaryExpression(lhs, expr.getOperator(), rhs);
     }
 
     @Override
     public Expression visitUnaryExpr(UnaryExpression expr) {
-        return new UnaryExpression(expr.getOp(), compute(expr.getExpression()));
+        return new UnaryExpression(expr.getOperator(), compute(expr.getExpression()));
     }
 
     @Override

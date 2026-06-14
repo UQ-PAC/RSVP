@@ -36,11 +36,11 @@ public class OperandVisitor implements PolicyComputationVisitor<DLTerm> {
     public DLTerm visitBinaryExpr(BinaryExpression expr) {
         DLTerm lhs = expr.getLeft().compute(this),
                 rhs = expr.getRight().compute(this);
-        DLArithmeticTerm.Operator op = switch (expr.getOp()) {
+        DLArithmeticTerm.Operator op = switch (expr.getOperator()) {
             case Add -> DLArithmeticTerm.Operator.ADD;
             case Sub -> DLArithmeticTerm.Operator.SUB;
             case Mul -> DLArithmeticTerm.Operator.MUL;
-            default -> throw new TranslationError("Unsupported binary operator: " + expr.getOp());
+            default -> throw new TranslationError("Unsupported binary operator: " + expr.getOperator());
         };
 
         Function<DLTerm, DLTerm> normalise = t ->

@@ -24,7 +24,7 @@ public class UnaryExpression extends Expression {
         this(op, expr, SourceLoc.MISSING);
     }
 
-    public Operator getOp() {
+    public Operator getOperator() {
         return op;
     }
 

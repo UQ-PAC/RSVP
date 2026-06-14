@@ -11,19 +11,6 @@ public class Conjunction extends LogicalOperator {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (other == null) {
-            return false;
-        } else if (other == this) {
-            return true;
-        } else if (other instanceof Conjunction c) {
-            return getLeft().equals(c.getLeft()) &&
-                    getRight().equals(c.getRight());
-        }
-        return false;
-    }
-
-    @Override
     public <T> T accept(FormulaVisitor<T> visitor) {
         return visitor.visitConjunction(this);
     }

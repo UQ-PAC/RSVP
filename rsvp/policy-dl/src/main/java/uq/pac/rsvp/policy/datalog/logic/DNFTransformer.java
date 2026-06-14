@@ -1,5 +1,7 @@
 package uq.pac.rsvp.policy.datalog.logic;
 
+import static uq.pac.rsvp.Assertion.require;
+
 /**
  * Conversion of a formula to a negated normal form via De Morgan rules
  */
@@ -14,37 +16,39 @@ public class DNFTransformer implements FormulaVisitor<Formula> {
     }
 
     @Override
-    public Formula visitLiteral(Literal formula) {
-        return formula;
+    public Formula visitLiteral(Literal literal) {
+        return literal;
     }
 
     @Override
-    public Formula visitPredicate(Predicate<?> formula) {
-        return formula;
+    public Formula visitPredicate(Predicate<?> predicate) {
+        return predicate;
     }
 
     @Override
-    public Formula visitConjunction(Conjunction formula) {
-        if (formula.getLeft() instanceof Disjunction d) {
+    public Formula visitConjunction(Conjunction conjunction) {
+        require(conjunction.arity() == 2);
+        if (conjunction.get(0) instanceof Disjunction d) {
             return new Disjunction(
-                    new Conjunction(d.getLeft(), formula.getRight()),
-                    new Conjunction(d.getRight(), formula.getRight())).accept(this);
-        } else if (formula.getRight() instanceof Disjunction d) {
+                    new Conjunction(d.get(0), conjunction.get(1)),
+                    new Conjunction(d.get(1), conjunction.get(1))).accept(this);
+        } else if (conjunction.get(1) instanceof Disjunction d) {
             return new Disjunction(
-                    new Conjunction(formula.getLeft(), d.getLeft()),
-                    new Conjunction(formula.getLeft(), d.getRight())).accept(this);
+                    new Conjunction(conjunction.get(0), d.get(0)),
+                    new Conjunction(conjunction.get(0), d.get(1))).accept(this);
         } else {
             return new Conjunction(
-                    formula.getLeft().accept(this),
-                    formula.getRight().accept(this));
+                    conjunction.get(0).accept(this),
+                    conjunction.get(1).accept(this));
         }
     }
 
     @Override
-    public Formula visitDisjunction(Disjunction formula) {
+    public Formula visitDisjunction(Disjunction disjunction) {
+        require(disjunction.arity() == 2);
         return new Disjunction(
-                formula.getLeft().accept(this),
-                formula.getRight().accept(this));
+                disjunction.get(0).accept(this),
+                disjunction.get(1).accept(this));
     }
 
     @Override

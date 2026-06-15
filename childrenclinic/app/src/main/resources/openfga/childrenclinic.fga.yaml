@@ -860,7 +860,7 @@ tests:
 
   # Access grants (permit policies).
 
-  - name: "Administrator: unrestricted access"
+  - name: "Administrator: unrestricted access."
     check:
       # All Clinic permissions.
       - user: employee:alice
@@ -911,9 +911,309 @@ tests:
           can_edit: true
           can_delete: true
 
+  - name: "Anyone can list Employees at any Clinic."
+    check:
+      # Employee at own Clinic.
+      - user: employee:james_carter
+        object: clinic:A
+        assertions:
+          can_list_employees: true
+      # Employee at other Clinic.
+      - user: employee:james_carter
+        object: clinic:B
+        assertions:
+          can_list_employees: true
+      # Guest at any Clinic.
+      - user: guest:unknown
+        object: clinic:B
+        assertions:
+          can_list_employees: true
+
+  - name: "Public visibility: Doctors and Receptionists."
+    check:
+      - user: employee:bob_buchanan
+        object: employee:james_carter
+        assertions:
+          can_view: true
+      # Guest can view a Doctor.
+      - user: guest:unknown
+        object: employee:james_carter
+        assertions:
+          can_view: true
+      # Guest can view a Receptionist.
+      - user: guest:unknown
+        object: employee:bob_buchanan
+        assertions:
+          can_view: true
+      # Guest cannot view an Administrator.
+      - user: guest:unknown
+        object: employee:alice
+        assertions:
+          can_view: false
+
+  - name: "Employee self-view and self-edit."
+    check:
+      # Doctor views and edits own record.
+      - user: employee:james_carter
+        object: employee:james_carter
+        assertions:
+          can_view: true
+          can_edit: true
+      # Receptionist views and edits own record.
+      - user: employee:bob_buchanan
+        object: employee:bob_buchanan
+        assertions:
+          can_view: true
+          can_edit: true
+      # Doctor cannot edit another Doctor (not self, not Receptionist).
+      - user: employee:james_carter
+        object: employee:sharon_jenkins
+        assertions:
+          can_view: true
+          can_edit: false
+
+  - name: "Employee can view assigned Clinics only."
+    check:
+      # Linda at Clinic A: allowed.
+      - user: employee:linda_douglas
+        object: clinic:A
+        assertions:
+          can_view: true
+      # Linda not at Clinic B: denied.
+      - user: employee:linda_douglas
+        object: clinic:B
+        assertions:
+          can_view: false
+      # Jestine at Clinic B: allowed.
+      - user: employee:jestine_teixeira
+        object: clinic:B
+        assertions:
+          can_view: true
+      # Jestine not at Clinic A: denied.
+      - user: employee:jestine_teixeira
+        object: clinic:A
+        assertions:
+          can_view: false
+
+  - name: "Every Employee can list Patients and Guardians at any Clinic."
+    check:
+      # Jestine (Clinic B) can list at Clinic A.
+      - user: employee:jestine_teixeira
+        object: clinic:A
+        assertions:
+          can_list_patients: true
+          can_list_guardians: true
+      # Linda (Clinic A) can list at Clinic B.
+      - user: employee:linda_douglas
+        object: clinic:B
+        assertions:
+          can_list_patients: true
+          can_list_guardians: true
+
+  - name: "Receptionist: view and edit in same Clinic."
+    check:
+      # Receptionist at Clinic A: Patient access.
+      - user: employee:bob_buchanan
+        object: patient:basil_davis
+        assertions:
+          can_edit: true
+          can_delete: false
+      # Receptionist at Clinic A: Guardian access.
+      - user: employee:bob_buchanan
+        object: guardian:betty_davis
+        assertions:
+          can_view: true
+          can_edit: true
+          can_delete: false
+      # Receptionist: Employee view and edit (non-Administrator).
+      - user: employee:bob_buchanan
+        object: employee:james_carter
+        assertions:
+          can_edit: true
+      # Receptionist: Visit access.
+      - user: employee:bob_buchanan
+        object: visit:basil_davis_2
+        assertions:
+          can_view: true
+          can_edit: true
+          can_delete: false
+      - user: employee:carl_bradford
+        object: patient:basil_davis
+        assertions:
+          can_view: false
+          can_edit: false
+
+  - name: "Receptionist: add Patients and Guardians to their Clinics."
+    check:
+      # Bob at Clinic A: allowed.
+      - user: employee:bob_buchanan
+        object: clinic:A
+        assertions:
+          can_add_patient: true
+          can_add_guardian: true
+      # Bob at Clinic B: allowed.
+      - user: employee:bob_buchanan
+        object: clinic:B
+        assertions:
+          can_add_patient: true
+          can_add_guardian: true
+      # Carl not at Clinic A: denied.
+      - user: employee:carl_bradford
+        object: clinic:A
+        assertions:
+          can_add_patient: false
+          can_add_guardian: false
+      # Carl at Clinic B: allowed.
+      - user: employee:carl_bradford
+        object: clinic:B
+        assertions:
+          can_add_patient: true
+          can_add_guardian: true
+
+  - name: "Assigned Doctor: view and edit Patients and Visits."
+    check:
+      # James assigned to Leo: full access.
+      - user: employee:james_carter
+        object: patient:leo_franklin
+        assertions:
+          can_view: true
+          can_edit: true
+      # James assigned to Leo's Visit: full access.
+      - user: employee:james_carter
+        object: visit:leo_franklin_1
+        assertions:
+          can_view: true
+          can_edit: true
+      - user: employee:sharon_jenkins
+        object: patient:samantha_coleman
+        assertions:
+          can_view: true
+          can_edit: true
+      # Sharon not assigned to Leo: denied.
+      - user: employee:sharon_jenkins
+        object: patient:leo_franklin
+        assertions:
+          can_view: false
+
+  - name: "Senior or Specialist Doctor: broad Patient visibility."
+    check:
+      # James (Senior) views unassigned Patient at own Clinic.
+      - user: employee:james_carter
+        object: patient:samantha_coleman
+        assertions:
+          can_view: true
+      # Linda (Specialist) views unassigned Patient at Clinic A.
+      - user: employee:linda_douglas
+        object: patient:basil_davis
+        assertions:
+          can_view: true
+      # Linda cannot view Patient at Clinic B (cross-clinic).
+      - user: employee:linda_douglas
+        object: patient:rosy_rodriquez
+        assertions:
+          can_view: false
+      # Sharon (Resident) has no broad view.
+      - user: employee:sharon_jenkins
+        object: patient:basil_davis
+        assertions:
+          can_view: false
+
+  - name: "Senior or Specialist Doctor: broad Visit visibility with confidentiality restriction."
+    check:
+      # James (Senior) views unassigned Official Visit.
+      - user: employee:james_carter
+        object: visit:samantha_coleman_1
+        assertions:
+          can_view: true
+      # Linda (Specialist) views unassigned Official Visit at Clinic A.
+      - user: employee:linda_douglas
+        object: visit:leo_franklin_1
+        assertions:
+          can_view: true
+      # Linda cannot view Visit at Clinic B (cross-clinic).
+      - user: employee:linda_douglas
+        object: visit:rosy_rodriquez_1
+        assertions:
+          can_view: false
+      # James views Protected Visit (assigned Doctor).
+      - user: employee:james_carter
+        object: visit:basil_davis_1
+        assertions:
+          can_view: true
+      # Linda blocked from Protected Visit (not assigned).
+      - user: employee:linda_douglas
+        object: visit:basil_davis_1
+        assertions:
+          can_view: false
+      # Linda blocked from second Protected Visit.
+      - user: employee:linda_douglas
+        object: visit:basil_davis_3
+        assertions:
+          can_view: false
+
+  - name: "Senior or Specialist Doctor: delete assigned Patients and Visits."
+    check:
+      # James (Senior) can delete assigned Patient.
+      - user: employee:james_carter
+        object: patient:leo_franklin
+        assertions:
+          can_delete: true
+      # James can delete assigned Visit.
+      - user: employee:james_carter
+        object: visit:leo_franklin_1
+        assertions:
+          can_delete: true
+      # Sharon (Resident) cannot delete.
+      - user: employee:sharon_jenkins
+        object: patient:samantha_coleman
+        assertions:
+          can_delete: false
+      - user: employee:sharon_jenkins
+        object: visit:samantha_coleman_1
+        assertions:
+          can_delete: false
+      # Linda (Specialist) can delete assigned Patient.
+      - user: employee:linda_douglas
+        object: patient:samantha_coleman
+        assertions:
+          can_delete: true
+      # Linda can delete assigned Visit.
+      - user: employee:linda_douglas
+        object: visit:samantha_coleman_3
+        assertions:
+          can_delete: true
+
+  - name: "Doctor: view Guardians in their Clinics."
+    check:
+      # James (Clinics A and B): Guardian at Clinics A and B.
+      - user: employee:james_carter
+        object: guardian:george_franklin
+        assertions:
+          can_view: true
+      # James: Guardian at Clinic B.
+      - user: employee:james_carter
+        object: guardian:eduardo_rodriquez
+        assertions:
+          can_view: true
+      # Linda (Clinic A): Guardian at Clinic A.
+      - user: employee:linda_douglas
+        object: guardian:betty_davis
+        assertions:
+          can_view: true
+      # Jestine (Clinic B): Guardian at Clinic B.
+      - user: employee:jestine_teixeira
+        object: guardian:eduardo_rodriquez
+        assertions:
+          can_view: true
+      # Jestine cannot view Guardian at Clinic A.
+      - user: employee:jestine_teixeira
+        object: guardian:betty_davis
+        assertions:
+          can_view: false
+
   # Access denials (forbid policies).
 
-  - name: "Guest: denied Patient operations"
+  - name: "Guest: denied Patient operations."
     check:
       # Guest can list Employees but nothing else on Clinic.
       - user: guest:unknown
@@ -943,3 +1243,117 @@ tests:
         object: visit:leo_franklin_1
         assertions:
           can_view: false
+
+  - name: "Guest: comprehensive denial of remaining permissions."
+    check:
+      # Guest denied Clinic add operations.
+      - user: guest:unknown
+        object: clinic:A
+        assertions:
+          can_add_employee: false
+          can_add_guardian: false
+      # Guest denied Employee edit and delete.
+      - user: guest:unknown
+        object: employee:james_carter
+        assertions:
+          can_edit: false
+          can_delete: false
+      # Guest denied Visit edit and delete.
+      - user: guest:unknown
+        object: visit:leo_franklin_1
+        assertions:
+          can_edit: false
+          can_delete: false
+
+  - name: "Intern Doctor: cannot edit assigned Patients or Visits."
+    check:
+      # Intern Doctor can view but not edit assigned Patient.
+      - user: employee:jestine_teixeira
+        object: patient:rosy_rodriquez
+        assertions:
+          can_view: true
+          can_edit: false
+      # Same for second Patient.
+      - user: employee:jestine_teixeira
+        object: patient:jewel_rodriquez
+        assertions:
+          can_view: true
+          can_edit: false
+      # Intern Doctor can view but not edit assigned Visit.
+      - user: employee:jestine_teixeira
+        object: visit:rosy_rodriquez_1
+        assertions:
+          can_view: true
+          can_edit: false
+      # Same for second Visit.
+      - user: employee:jestine_teixeira
+        object: visit:rosy_rodriquez_2
+        assertions:
+          can_view: true
+          can_edit: false
+
+  - name: "Intern Doctor: cannot add Patients or Guardians to Clinics."
+    check:
+      # Jestine (Intern) denied add at own Clinic.
+      - user: employee:jestine_teixeira
+        object: clinic:B
+        assertions:
+          can_add_patient: false
+          can_add_guardian: false
+      # James (Senior, non-Intern) allowed.
+      - user: employee:james_carter
+        object: clinic:A
+        assertions:
+          can_add_patient: true
+          can_add_guardian: true
+
+  - name: "Cross-Clinic isolation."
+    check:
+      - user: employee:bob_buchanan
+        object: patient:basil_davis
+        assertions:
+          can_view: true
+      # Sharon (Clinic A) denied Patient view and edit at Clinic B.
+      - user: employee:sharon_jenkins
+        object: patient:rosy_rodriquez
+        assertions:
+          can_view: false
+          can_edit: false
+      # Linda (Clinic A) denied Guardian view at Clinic B.
+      - user: employee:linda_douglas
+        object: guardian:eduardo_rodriquez
+        assertions:
+          can_view: false
+      # Jestine (Clinic B) denied Patient view at Clinic A.
+      - user: employee:jestine_teixeira
+        object: patient:basil_davis
+        assertions:
+          can_view: false
+
+  - name: "Receptionist: cannot add or delete Employees."
+    check:
+      # Receptionist denied add Employee.
+      - user: employee:bob_buchanan
+        object: clinic:A
+        assertions:
+          can_add_employee: false
+      # Receptionist denied delete Employee.
+      - user: employee:bob_buchanan
+        object: employee:james_carter
+        assertions:
+          can_delete: false
+
+  - name: "Receptionist: cannot view or edit Administrators."
+    check:
+      # Bob cannot view and edit Alice (Administrator).
+      - user: employee:bob_buchanan
+        object: employee:alice
+        assertions:
+          can_view: false
+          can_edit: false
+      # Carl cannot view and edit Alice (Administrator).
+      - user: employee:carl_bradford
+        object: employee:alice
+        assertions:
+          can_view: false
+          can_edit: false

@@ -69,6 +69,7 @@ dependencies {
   implementation 'jakarta.xml.bind:jakarta.xml.bind-api'
   // implementation 'com.cedarpolicy:cedar-java:4.8.0:uber'
   implementation 'com.cedarpolicy:cedar-java:4.8.0-rsvp-4:uber'
+  implementation 'dev.openfga:openfga-sdk:0.9.7'
   implementation 'com.fasterxml.jackson.core:jackson-databind:2.20.0'
   implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.20.0'
   runtimeOnly 'org.springframework.boot:spring-boot-starter-actuator'
@@ -277,5 +278,15 @@ spotless {
     format 'cedar', {
         target 'src/**/*.cedar', 'src/**/*.cedarschema', 'src/**/*.invariant'
         licenseHeader toSlashBlockNoTrail(rawNew), CEDAR_DELIM
+    }
+
+    // OpenFGA: all new.
+    format 'openfga', {
+        target 'src/**/*.fga'
+        licenseHeader toHashBlockNoTrail(rawNew), '(model|type )'
+    }
+    format 'openfgaYaml', {
+        target 'src/**/*.fga.yaml'
+        licenseHeader toHashBlockNoTrail(rawNew), '(model_file:|tuples:)'
     }
 }

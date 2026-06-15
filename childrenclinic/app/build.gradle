@@ -289,4 +289,11 @@ spotless {
         target 'src/**/*.fga.yaml'
         licenseHeader toHashBlockNoTrail(rawNew), '(model_file:|tuples:)'
     }
+
+    // Python: all new.
+    // '#!/usr/bin/env python3' only.
+    format 'python', {
+        target 'src/**/*.py'
+        licenseHeader toShBlock(rawNew, '#!/usr/bin/env python3'), '("""|import |from |def |class )'
+    }
 }

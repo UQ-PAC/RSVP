@@ -89,7 +89,14 @@ application. These instructions are for running verification via the web applica
    node -v
    ```
 
-   Install Node.js by following the relevant instructions in the [npm documentation](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm), if required.
+   Install Node.js, if required
+
+   ```
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.5/install.sh | bash
+   nvm install 24
+   ```
+
+   More detailed instructions can be found in the [npm documentation](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
 
 2. Install pnpm using npm
 

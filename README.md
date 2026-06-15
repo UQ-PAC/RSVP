@@ -119,6 +119,6 @@ application. These instructions are for running verification via the web applica
 
 7. For further instructions on the web application front-end, see [webapp/README.md](https://github.com/UQ-PAC/RSVP/blob/main/webapp/README.md).
 
-### Examples of Cedar Policies
+## Cedar policy examples
 
 Examples of Cedar policies as well as RSVP-style invariants useable with the RSVP toolkit can be found in [examples](examples) directory.

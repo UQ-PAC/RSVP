@@ -1,13 +1,13 @@
 package uq.pac.rsvp.policy.datalog.logic;
 
 public interface FormulaVisitor<T> {
-    T visitConjunction(Conjunction formula);
+    T visitLiteral(Literal literal);
 
-    T visitDisjunction(Disjunction formula);
+    T visitPredicate(Predicate<?> predicate);
 
-    T visitNegation(Negation formula);
+    T visitNegation(Negation negation);
 
-    T visitLiteral(Literal formula);
+    T visitConjunction(Conjunction conjunction);
 
-    T visitPredicate(Predicate<?> formula);
+    T visitDisjunction(Disjunction disjunction);
 }

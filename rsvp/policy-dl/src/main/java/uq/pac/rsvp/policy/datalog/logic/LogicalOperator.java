@@ -19,7 +19,7 @@ public abstract class LogicalOperator extends Formula {
     protected String stringify() {
         return "(" + formulae.stream()
                 .map(Formula::toString)
-                .collect(Collectors.joining(getStringOperator())) + ")";
+                .collect(Collectors.joining(" " + getStringOperator() + " ")) + ")";
     }
 
     public Formula get(int index) {

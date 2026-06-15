@@ -118,3 +118,7 @@ application. These instructions are for running verification via the web applica
 6. Access the web application by navigating to [http://localhost:3000](http://localhost:3000) in Firefox.
 
 7. For further instructions on the web application front-end, see [webapp/README.md](https://github.com/UQ-PAC/RSVP/blob/main/webapp/README.md).
+
+### Examples of Cedar Policies
+
+Examples of Cedar policies as well as RSVP-style invariants useable with the RSVP toolkit can be found in [examples](examples) directory.

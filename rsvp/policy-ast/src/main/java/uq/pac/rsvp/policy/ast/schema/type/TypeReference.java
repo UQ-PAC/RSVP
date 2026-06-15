@@ -94,4 +94,8 @@ public class TypeReference extends BuiltinType {
     public <T> void accept(SchemaPayloadVisitor<T> visitor, T payload) {
         visitor.visitTypeReference(this, payload);
     }
+
+    public boolean isAction() {
+        return getBaseName().equals("Action");
+    }
 }

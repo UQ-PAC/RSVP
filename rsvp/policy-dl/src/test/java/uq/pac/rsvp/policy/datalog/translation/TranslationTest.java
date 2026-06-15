@@ -56,7 +56,7 @@ public class TranslationTest {
 
     private final static Path TESTDIR = Path.of(TestUtil.RESOURCEDIR.toString(), "translation");
 
-    private final static String ONE_OFF = "common-type-extra";
+    private final static String ONE_OFF = "demo";
 
     @BeforeAll
     static void configure() {

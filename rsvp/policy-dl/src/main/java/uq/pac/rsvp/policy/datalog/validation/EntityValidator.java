@@ -98,27 +98,28 @@ public class EntityValidator implements SchemaPayloadVisitor<EntityValue> {
         // Here we parse only the type. Then, if this is an action reference then the type name is 'Action'
         TypeReference ref = TypeReference.parse(euid.getType());
 
-        switch (schema.get(ref)) {
-            case EntityTypeDefinition def -> {
-                def.getShape().accept(this, entity.getAttrs());
-                for (EntityReference value : entity.getParents()) {
-                    if (value instanceof EntityReference parent) {
-                        // FIXME: Cache
-                        Set<String> memberOf = def.getMemberOf().stream()
-                                .map(TypeReference::getName)
-                                .collect(Collectors.toSet());
-                        memberOf.add(def.getName());
-                        if (!memberOf.contains(parent.getType())) {
-                            throw new TranslationError( "Unexpected parent type: " +
-                                    parent.getType() + " expected one of " + memberOf, value.getSourceLoc());
+        // Ignore actions
+        if (ref == null || !ref.isAction()) {
+            switch (schema.get(ref)) {
+                case EntityTypeDefinition def -> {
+                    def.getShape().accept(this, entity.getAttrs());
+                    for (EntityReference value : entity.getParents()) {
+                        if (value instanceof EntityReference parent) {
+                            // FIXME: Cache
+                            Set<String> memberOf = def.getMemberOf().stream()
+                                    .map(TypeReference::getName)
+                                    .collect(Collectors.toSet());
+                            memberOf.add(def.getName());
+                            if (!memberOf.contains(parent.getType())) {
+                                throw new TranslationError("Unexpected parent type: " +
+                                        parent.getType() + " expected one of " + memberOf, value.getSourceLoc());
+                            }
                         }
                     }
                 }
+                case null, default ->
+                        throw new TranslationError("Undefined entity type: " + euid.getType(), entity.getSourceLoc());
             }
-            // Action entities are allowed but ignored
-            case ActionDefinition act -> {}
-            case null, default ->
-                    throw new TranslationError("Undefined entity type: " + euid.getType(), entity.getSourceLoc());
         }
     }
 

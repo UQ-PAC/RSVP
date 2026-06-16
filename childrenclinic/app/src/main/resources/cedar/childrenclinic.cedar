@@ -226,7 +226,7 @@ when {
 };
 
 // 'policy12'
-// Every "Senior" or "Specialist" "Doctor" can view all Patients' data.
+// Every "Senior" or "Specialist" "Doctor" can view all Patients' data in their Clinic.
 @id("Policy: Senior or Specialist Doctor can view all Patients.")
 permit (
     principal is ChildrenClinic::Employee,
@@ -245,7 +245,10 @@ when {
     (
         resource is ChildrenClinic::Patient ||
         resource is ChildrenClinic::Visit
-    )
+    ) &&
+    principal has clinics &&
+    resource has clinics &&
+    resource.clinics.containsAny(principal.clinics)
 }
 unless {
     resource has confidentiality &&

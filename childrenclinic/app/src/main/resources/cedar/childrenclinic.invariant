@@ -314,6 +314,9 @@ invariant
   principal has level &&
   (principal.level == ChildrenClinic::ProfessionalLevel::"Senior" ||
    principal.level == ChildrenClinic::ProfessionalLevel::"Specialist") &&
+  principal has clinics &&
+  resource has clinics &&
+  resource.clinics.containsAny(principal.clinics) &&
   !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
   !resource.doctors.contains(principal)) ||
 allow(principal, resource, ChildrenClinic::Action::"ViewPatient")
@@ -328,6 +331,9 @@ invariant
   principal has level &&
   (principal.level == ChildrenClinic::ProfessionalLevel::"Senior" ||
    principal.level == ChildrenClinic::ProfessionalLevel::"Specialist") &&
+  principal has clinics &&
+  resource has clinics &&
+  resource.clinics.containsAny(principal.clinics) &&
   !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
   !(resource.doctors.contains(principal)) &&
   !(resource has confidentiality &&

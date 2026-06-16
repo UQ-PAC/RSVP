@@ -1,11 +1,17 @@
 package uq.pac.rsvp.policy.datalog.logic;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static uq.pac.rsvp.Assertion.require;
 
 /**
  * Conversion of a formula to a negated normal form via De Morgan rules
+ * Assumes:
+ *  - All conjunctions and disjunctions are binary
+ *  - An input formula is not expected to be a NNF
  */
-public class DNFTransformer implements FormulaVisitor<Formula> {
+public class DNFTransformer implements FormulaValueVisitor<Formula> {
 
     private DNFTransformer() {}
 
@@ -13,6 +19,88 @@ public class DNFTransformer implements FormulaVisitor<Formula> {
 
     public static Formula transform(Formula f) {
         return NNFTransformer.transform(f).accept(TRANSFORMER);
+    }
+
+    public static List<List<Formula>> getNormalForm(Formula formula) {
+        Formula dnf = transform(formula);
+        List<List<Formula>> view = new ArrayList<>();
+        List<Formula> conjunctions = splitDisjunctions(dnf);
+        return conjunctions.stream()
+                .map(DNFTransformer::splitConjunctions)
+                .toList();
+    }
+
+    /**
+     * Split a formula into individual predicates assuming the formula does not contain disjunctions
+     */
+    private static List<Formula> splitConjunctions(Formula f) {
+        List<Formula> result = new ArrayList<>();
+        f.accept(new FormulaVoidVisitor() {
+            @Override
+            public void visitLiteral(Literal literal) {
+                result.add(literal);
+            }
+
+            @Override
+            public void visitPredicate(Predicate<?> predicate) {
+                result.add(predicate);
+            }
+
+            @Override
+            public void visitNegation(Negation negation) {
+                require(negation.getFormula() instanceof Literal ||
+                        negation.getFormula() instanceof Predicate<?>);
+                result.add(negation);
+            }
+
+            @Override
+            public void visitConjunction(Conjunction conjunction) {
+                conjunction.getFormulae().forEach(f -> f.accept(this));
+            }
+
+            @Override
+            public void visitDisjunction(Disjunction disjunction) {
+                throw new AssertionError("Unexpected disjunction: " + disjunction);
+            }
+        });
+    }
+
+    /**
+     * Split a DNF formula into a list of conjunctions or disjunctions assuming that
+     * the input formula is in a DNF.
+     */
+    private static List<Formula> splitDisjunctions(Formula f) {
+        List<Formula> result = new ArrayList<>();
+        // Generate the list of conjunctions first
+        f.accept(new FormulaVoidVisitor() {
+            @Override
+            public void visitLiteral(Literal literal) {
+                result.add(literal);
+            }
+
+            @Override
+            public void visitPredicate(Predicate<?> predicate) {
+                result.add(predicate);
+            }
+
+            @Override
+            public void visitNegation(Negation negation) {
+                require(negation.getFormula() instanceof Literal ||
+                        negation.getFormula() instanceof Predicate<?>);
+                result.add(negation);
+            }
+
+            @Override
+            public void visitConjunction(Conjunction conjunction) {
+                result.add(conjunction);
+            }
+
+            @Override
+            public void visitDisjunction(Disjunction disjunction) {
+                disjunction.getFormulae().forEach(f -> f.accept(this));
+            }
+        });
+        return result;
     }
 
     @Override

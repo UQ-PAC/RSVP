@@ -41,4 +41,8 @@ public abstract class LogicalOperator extends Formula {
     public int arity() {
         return formulae.size();
     }
+
+    public List<Formula> getFormulae() {
+        return formulae;
+    }
 }

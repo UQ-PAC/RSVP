@@ -15,8 +15,13 @@ public class Literal extends Formula {
     }
 
     @Override
-    public <T> T accept(FormulaVisitor<T> visitor) {
+    public <T> T accept(FormulaValueVisitor<T> visitor) {
         return visitor.visitLiteral(this);
+    }
+
+    @Override
+    public void accept(FormulaVoidVisitor listener) {
+        listener.visitLiteral(this);
     }
 
     @Override

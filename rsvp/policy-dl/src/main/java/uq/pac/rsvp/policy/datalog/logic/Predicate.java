@@ -12,8 +12,13 @@ public class Predicate<E> extends Formula {
     }
 
     @Override
-    public <T> T accept(FormulaVisitor<T> visitor) {
+    public <T> T accept(FormulaValueVisitor<T> visitor) {
         return visitor.visitPredicate(this);
+    }
+
+    @Override
+    public void accept(FormulaVoidVisitor listener) {
+        listener.visitPredicate(this);
     }
 
     @Override

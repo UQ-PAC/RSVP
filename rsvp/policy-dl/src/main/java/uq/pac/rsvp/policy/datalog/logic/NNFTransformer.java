@@ -5,7 +5,7 @@ import static uq.pac.rsvp.Assertion.require;
 /**
  * Conversion of a formula to a negated normal form via De Morgan rules
  */
-public class NNFTransformer implements FormulaVisitor<Formula> {
+public class NNFTransformer implements FormulaValueVisitor<Formula> {
 
     private NNFTransformer() {}
 

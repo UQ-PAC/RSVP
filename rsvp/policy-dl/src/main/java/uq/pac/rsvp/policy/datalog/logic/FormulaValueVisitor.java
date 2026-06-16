@@ -1,6 +1,6 @@
 package uq.pac.rsvp.policy.datalog.logic;
 
-public interface FormulaVisitor<T> {
+public interface FormulaValueVisitor<T> {
     T visitLiteral(Literal literal);
 
     T visitPredicate(Predicate<?> predicate);

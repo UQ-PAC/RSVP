@@ -194,7 +194,7 @@ The final invariant ensures that the security requirement prohibiting administra
 albums is enforced by the policies
 ```
 invariant
-tim.role == Role::"Admin" && anyone.role == Role::"Admin" --> deny(tim, anyone, Action::"createAlbum")
+if (tim.role == Role::"Admin" && anyone.role == Role::"Admin") then deny(tim, anyone, Action::"createAlbum") else true
     for all tim: Account, anyone: Account;
 ```
 

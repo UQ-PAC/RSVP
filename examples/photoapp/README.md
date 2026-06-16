@@ -32,14 +32,14 @@ entity Photo = {
 };
 
 // Photo visibility levels
-entity Visibility enum [ 
-    "Private", 
-    "Protected", 
-    "Public" 
+entity Visibility enum [
+    "Private",
+    "Protected",
+    "Public"
 ];
 
 // Roles of platform participants
-entity Role enum [ 
+entity Role enum [
     "User",  // Regular user
     "Admin"  // Administrator
 ];
@@ -102,9 +102,9 @@ permit (
     resource is Photo)
 when {
     // + Anyone can see public photos
-    resource.album.visibility == Visibility::"Public" ||   
+    resource.album.visibility == Visibility::"Public" ||
     // + Owner can see their photos
-    principal == resource.album.owner ||     
+    principal == resource.album.owner ||
     // + Owner's friends can see protected photos
     resource.album.visibility == Visibility::"Protected" && principal in resource.album.owner.friends ||
     // + Admins can see any photos
@@ -166,8 +166,8 @@ The following invariant can be used to check whether this security requirement h
 in the given system. Namely, this ensures that there exists no system administrators
 who own albums.
 ```
-@invariant("Administrators do not own photo albums")
-album.owner.role == Role::"Admin" 
+invariant
+album.owner.role == Role::"Admin"
     for none album : Album;
 ```
 
@@ -177,7 +177,7 @@ access any photo regardless of its classification. The following invariant takes
 the state of the system as well as queries permissions given by the above security policies.
 
 ```
-@invariant("Administrators can view any photo")
+invariant
 if (principal.role == Role::"Admin") then allow(principal, resource, Action::"viewPhoto") else true
     for all principal: Account, resource: Photo;
 ```
@@ -186,7 +186,7 @@ The next invariant ensures that users cannot create albums for anyone else but t
 In other words if one user can create an album for another user then this is the same user.
 
 ```
-@invariant("UserRights")
+invariant
 !(bob.role == Role::"User" && alice.role == Role::"User" && allow(bob, alice, Action::"createAlbum")) || bob == alice
     for all bob: Account, alice: Account;
 ```
@@ -194,7 +194,7 @@ In other words if one user can create an album for another user then this is the
 The final invariant ensures that the security requirement prohibiting administrators from creating
 albums is enforced by the policies
 ```
-@invariant("Administrators should not create albums")
+invariant
 tim.role == Role::"Admin" && anyone.role == Role::"Admin" --> deny(tim, anyone, Action::"createAlbum")
     for all tim: Account, anyone: Account;
 ```
@@ -206,7 +206,7 @@ photoapp](photoapp.cedar) and its [schema](photoapp.cedarschema).
 
 ## 1. Detect redundant, irrelevant or correlated policies
 
-#### Irrelevance 
+#### Irrelevance
 
 An _irrelevant_ policy is a policy that has does not affect permissiveness.
 Typically, an irrelevant policy features an impossible condition.
@@ -250,7 +250,7 @@ policy is redundant.
 Policies _P_ and _Q_ are considered _correlated_ if _P_ allows (resp. forbids) some of the requests
 that _Q_ allows (resp. forbids) and vice versa. The significance of policy correlation is that if
 one wants to fully eliminate the effects of _P_ it is also necessary to modify all policies that
-_P_ is correlated with. 
+_P_ is correlated with.
 
 Consider the following policies
 
@@ -277,7 +277,7 @@ when {
 In the example above the policies are correlated in that admins will have the rights to see public
 photos regardless whether the _P_ is in effect or not.
 
-Since RSVP views policies and their effects as request sets, _redundant_, _irrelevant_ or _correlated_ 
+Since RSVP views policies and their effects as request sets, _redundant_, _irrelevant_ or _correlated_
 policies can be identified.
 
 ## Resource/action coverage
@@ -292,26 +292,26 @@ action removeAccount appliesTo {
 };
 ```
 
-However, since no policies allowing account removal exist our analysis can identify that 
-this particular action is not covered by the policies. 
+However, since no policies allowing account removal exist our analysis can identify that
+this particular action is not covered by the policies.
 Note, that because we use closed-world encoding the analysis can distinguish between
 
 + A case where no policies involving a particular action have been defined in the policy set
 + A case where policies exist, but disallow actions of a given type
 
-In other words RSVP can determine whether policies for a given action exist or they are 
+In other words RSVP can determine whether policies for a given action exist or they are
 deliberately restrictive.
 
-Similar analysis can be applied to entity types (e.g., check whether there are policies 
-involving a particular entity type) or even to specific entities. 
+Similar analysis can be applied to entity types (e.g., check whether there are policies
+involving a particular entity type) or even to specific entities.
 
 ## Conflicts within policy sets
 
 Within a policy set Cedar combines results of multiple policies to arrive at a decision.
-A request is permitted only if it is explicitly permitted and not explicitly denied. 
+A request is permitted only if it is explicitly permitted and not explicitly denied.
 
-However, an application deployed in different Cloud environments may have different security 
-requirements and different policies, and it can be beneficial to understand these 
+However, an application deployed in different Cloud environments may have different security
+requirements and different policies, and it can be beneficial to understand these
 differences. RSVP can analyse and identify conflicts between different policy sets.
 In this context, a _conflict_ refers to a request permitted by one policy set and denied by another.
 
@@ -334,7 +334,7 @@ D1 and D2 and pinpoint the offending (above) policy as the reason behind conflic
 
 ## Change impact analysis
 
-One key feature of RSVP analysis is that it can quantify and reason about 
+One key feature of RSVP analysis is that it can quantify and reason about
 changes in permissiveness due to changes in policies.
 
 Consider the following policy:
@@ -350,13 +350,13 @@ when {
 };
 ```
 
-and requests 
+and requests
 ```
 (1) { principal: 'Account::"Alice"', resource: 'Photo::"Meadow.jpg"', action: 'Action::"viewPhoto"' }
 (2) { principal: 'Account::"Tim"', resource: 'Photo::"Meadow.jpg"', action: 'Action::"viewPhoto"' }
 ```
 
-Since anyone can see public photo then both user `Alice` and administrator `Tim` 
+Since anyone can see public photo then both user `Alice` and administrator `Tim`
 are allowed to view public photo `Meadow.jpg`.
 
 Now consider a slight change that forbids anyone to see public photos as follows:
@@ -371,6 +371,6 @@ when {
 };
 ```
 
-The effect of this change is that request (1) is now denied and 
+The effect of this change is that request (1) is now denied and
 this change of request status can be reported as a change in permissiveness.
 

@@ -177,7 +177,9 @@ public class TranslationVisitor implements PolicyVisitor {
 
     @Override
     public void visitBooleanExpr(BooleanExpression expr) {
-        if (!expr.getValue()) {
+        boolean value = expr.getValue();
+        // No need to do anything for true or !false, but otherwise no requests are produced
+        if ((value && negated) || (!value && !negated)) {
             expressions.add(makeAtom(NullifiedRequestsRuleDecl));
         }
     }

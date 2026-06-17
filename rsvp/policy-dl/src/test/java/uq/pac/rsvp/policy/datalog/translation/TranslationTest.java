@@ -156,8 +156,6 @@ public class TranslationTest {
 
         Schema schema = Schema.parse(test.schema);
 
-        //System.out.println(schema);
-
         PolicyProgram policies = PolicyProgram.parse(test.policy);
         PolicyProgram invariants = PolicyProgram.parse(test.invariants);
         PolicyProgram program =

@@ -39,4 +39,8 @@ public class Literal extends Formula {
     public boolean asBoolean() {
         return value;
     }
+
+    public static Literal get(boolean value) {
+        return value ? TRUE : FALSE;
+    }
 }

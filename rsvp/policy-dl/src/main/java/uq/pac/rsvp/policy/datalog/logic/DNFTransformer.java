@@ -22,9 +22,7 @@ public class DNFTransformer implements FormulaValueVisitor<Formula> {
     }
 
     public static List<List<Formula>> getNormalForm(Formula formula) {
-        Formula dnf = transform(formula);
-        List<List<Formula>> view = new ArrayList<>();
-        List<Formula> conjunctions = splitDisjunctions(dnf);
+        List<Formula> conjunctions = splitDisjunctions(transform(formula));
         return conjunctions.stream()
                 .map(DNFTransformer::splitConjunctions)
                 .toList();
@@ -63,6 +61,7 @@ public class DNFTransformer implements FormulaValueVisitor<Formula> {
                 throw new AssertionError("Unexpected disjunction: " + disjunction);
             }
         });
+        return result;
     }
 
     /**
@@ -116,19 +115,22 @@ public class DNFTransformer implements FormulaValueVisitor<Formula> {
     @Override
     public Formula visitConjunction(Conjunction conjunction) {
         require(conjunction.arity() == 2);
+        conjunction = new Conjunction(
+                conjunction.get(0).accept(this),
+                conjunction.get(1).accept(this));
+        require(conjunction.arity() == 2);
         if (conjunction.get(0) instanceof Disjunction d) {
-            return new Disjunction(
+            d = new Disjunction(
                     new Conjunction(d.get(0), conjunction.get(1)),
-                    new Conjunction(d.get(1), conjunction.get(1))).accept(this);
+                    new Conjunction(d.get(1), conjunction.get(1)));
+            return d.accept(this);
         } else if (conjunction.get(1) instanceof Disjunction d) {
-            return new Disjunction(
+            d = new Disjunction(
                     new Conjunction(conjunction.get(0), d.get(0)),
-                    new Conjunction(conjunction.get(0), d.get(1))).accept(this);
-        } else {
-            return new Conjunction(
-                    conjunction.get(0).accept(this),
-                    conjunction.get(1).accept(this));
+                    new Conjunction(conjunction.get(0), d.get(1)));
+            return d.accept(this);
         }
+        return conjunction;
     }
 
     @Override

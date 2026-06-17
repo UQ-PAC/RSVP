@@ -56,6 +56,7 @@ public class FormulaTest {
             "a && (b || c), ((a && b) || (a && c))",
             "(a || b) && (c || d), (((a && c) || (a && d)) || ((b && c) || (b && d)))",
             "(a || b || c) && d, (((a && d) || (b && d)) || (c && d))",
+            "(a && (b && (c || d))), ((a && (b && c)) || (a && (b && d)))",
     })
     void dnf(String input, String expected) {
         Formula f = FormulaParser.parse(input);

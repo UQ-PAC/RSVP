@@ -32,4 +32,8 @@ public class Predicate<E> extends Formula {
         }
         return false;
     }
+
+    public E get() {
+        return value;
+    }
 }

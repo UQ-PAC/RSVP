@@ -33,7 +33,12 @@ public class Predicate<E> extends Formula {
         return false;
     }
 
-    public E get() {
+    public E getValue() {
         return value;
+    }
+
+    @Override
+    public int hashCode() {
+        return value.hashCode();
     }
 }

@@ -100,7 +100,7 @@ public class NFConverter implements PolicyComputationVisitor<Formula> {
 
             @Override
             public Expression visitPredicate(Predicate<?> predicate) {
-                return (Expression) predicate.get();
+                return (Expression) predicate.getValue();
             }
 
             @Override

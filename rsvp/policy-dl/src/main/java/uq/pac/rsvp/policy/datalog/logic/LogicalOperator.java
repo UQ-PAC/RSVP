@@ -3,6 +3,7 @@ package uq.pac.rsvp.policy.datalog.logic;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static uq.pac.rsvp.Assertion.require;
 
@@ -44,5 +45,9 @@ public abstract class LogicalOperator extends Formula {
 
     public List<Formula> getFormulae() {
         return formulae;
+    }
+
+    public Stream<Formula> formulae() {
+        return formulae.stream();
     }
 }

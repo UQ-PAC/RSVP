@@ -7,9 +7,12 @@ import static uq.pac.rsvp.Assertion.require;
 
 /**
  * Conversion of a formula to a negated normal form via De Morgan rules
- * Assumes:
- *  - All conjunctions and disjunctions are binary
- *  - An input formula is not expected to be a NNF
+ * This conversion assumes that that all conjunctions and disjunctions
+ * are binary. An input formula is not expected to be a NNF.
+ * <p>
+ * The main reason this custom factorisation is used instead of something like
+ * LogicNG is because we want to make sure order-preserving transformation
+ * since this is important for Cedar short-circuiting and dynamic type inference.
  */
 public class DNFTransformer implements FormulaValueVisitor<Formula> {
 

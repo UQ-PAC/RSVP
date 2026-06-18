@@ -1,960 +1,816 @@
 [
     {
-        "uid": { "type": "Clinic", "id": "A" },
+        "uid": { "type": "ChildrenClinic::Clinic", "id": "A" },
         "attrs": { },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Clinic", "id": "B" },
-        "attrs": { },
-        "parents": [ ]
-    },
-
-    {
-        "uid": { "type": "AdultAuthority", "id": "Parent" },
-        "attrs": { },
-        "parents": [ ]
-    },
-    {
-        "uid": { "type": "AdultAuthority", "id": "Legal Guardian" },
-        "attrs": { },
-        "parents": [ ]
-    },
-    {
-        "uid": { "type": "AdultAuthority", "id": "Designated Representative" },
-        "attrs": { },
-        "parents": [ ]
-    },
-    {
-        "uid": { "type": "AdultAuthority", "id": "Authorised Adult" },
+        "uid": { "type": "ChildrenClinic::Clinic", "id": "B" },
         "attrs": { },
         "parents": [ ]
     },
 
     {
-        "uid": { "type": "Confidentiality", "id": "Official" },
+        "uid": { "type": "ChildrenClinic::GuardianAuthority", "id": "Parent" },
         "attrs": { },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Confidentiality", "id": "Sensitive" },
+        "uid": { "type": "ChildrenClinic::GuardianAuthority", "id": "Legal Guardian" },
         "attrs": { },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Confidentiality", "id": "Protected" },
-        "attrs": { },
-        "parents": [ ]
-    },
-
-    {
-        "uid": { "type": "EmployeeRole", "id": "Administrator" },
+        "uid": { "type": "ChildrenClinic::GuardianAuthority", "id": "Designated Representative" },
         "attrs": { },
         "parents": [ ]
     },
     {
-        "uid": { "type": "EmployeeRole", "id": "Assistant" },
-        "attrs": { },
-        "parents": [ ]
-    },
-    {
-        "uid": { "type": "EmployeeRole", "id": "Doctor" },
+        "uid": { "type": "ChildrenClinic::GuardianAuthority", "id": "Authorised Adult" },
         "attrs": { },
         "parents": [ ]
     },
 
     {
-        "uid": { "type": "ProfessionalLevel", "id": "Intern" },
+        "uid": { "type": "ChildrenClinic::Confidentiality", "id": "Official" },
         "attrs": { },
         "parents": [ ]
     },
     {
-        "uid": { "type": "ProfessionalLevel", "id": "Resident" },
+        "uid": { "type": "ChildrenClinic::Confidentiality", "id": "Sensitive" },
         "attrs": { },
         "parents": [ ]
     },
     {
-        "uid": { "type": "ProfessionalLevel", "id": "Staff" },
-        "attrs": { },
-        "parents": [ ]
-    },
-    {
-        "uid": { "type": "ProfessionalLevel", "id": "Senior" },
-        "attrs": { },
-        "parents": [ ]
-    },
-    {
-        "uid": { "type": "ProfessionalLevel", "id": "Registrar" },
-        "attrs": { },
-        "parents": [ ]
-    },
-    {
-        "uid": { "type": "ProfessionalLevel", "id": "Specialist" },
+        "uid": { "type": "ChildrenClinic::Confidentiality", "id": "Protected" },
         "attrs": { },
         "parents": [ ]
     },
 
     {
-        "uid": { "type": "Employee", "id": "James Carter" },
+        "uid": { "type": "ChildrenClinic::EmployeeRole", "id": "Administrator" },
+        "attrs": { },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "ChildrenClinic::EmployeeRole", "id": "Receptionist" },
+        "attrs": { },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "ChildrenClinic::EmployeeRole", "id": "Doctor" },
+        "attrs": { },
+        "parents": [ ]
+    },
+
+    {
+        "uid": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Intern" },
+        "attrs": { },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Resident" },
+        "attrs": { },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Staff" },
+        "attrs": { },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Senior" },
+        "attrs": { },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Registrar" },
+        "attrs": { },
+        "parents": [ ]
+    },
+    {
+        "uid": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Specialist" },
+        "attrs": { },
+        "parents": [ ]
+    },
+
+    {
+        "uid": { "type": "ChildrenClinic::Specialty", "id": "Radiology" },
+        "attrs": {},
+        "parents": []
+    },
+    {
+        "uid": { "type": "ChildrenClinic::Specialty", "id": "Surgery" },
+        "attrs": {},
+        "parents": []
+    },
+    {
+        "uid": { "type": "ChildrenClinic::Specialty", "id": "Dentistry" },
+        "attrs": {},
+        "parents": []
+    },
+
+    {
+        "uid": { "type": "ChildrenClinic::Employee", "id": "James Carter" },
         "attrs": {
             "name": "James Carter",
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } },
-                { "__entity": { "type": "Clinic", "id": "B" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } },
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
             ],
             "roles": [
-                { "__entity": { "type": "EmployeeRole", "id": "Doctor" } }
+                { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Doctor" } }
             ],
-            "level": { "__entity": { "type": "ProfessionalLevel", "id": "Senior" } }
+            "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Senior" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Employee", "id": "Linda Douglas" },
+        "uid": { "type": "ChildrenClinic::Employee", "id": "Linda Douglas" },
         "attrs": {
             "name": "Linda Douglas",
             "clinics" : [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "roles": [
-                { "__entity": { "type": "EmployeeRole", "id": "Doctor" } }
+                { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Doctor" } }
             ],
-            "level": { "__entity": { "type": "ProfessionalLevel", "id": "Specialist" } }
+            "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Specialist" } },
+            "specialties": [
+                { "__entity": { "type": "ChildrenClinic::Specialty", "id": "Radiology" } },
+                { "__entity": { "type": "ChildrenClinic::Specialty", "id": "Surgery" } }
+            ]
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Employee", "id": "Sharon Jenkins" },
+        "uid": { "type": "ChildrenClinic::Employee", "id": "Sharon Jenkins" },
         "attrs": {
             "name": "Sharon Jenkins",
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "roles": [
-                { "__entity": { "type": "EmployeeRole", "id": "Doctor" } }
+                { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Doctor" } }
             ],
-            "level": { "__entity": { "type": "ProfessionalLevel", "id": "Resident" } }
+            "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Resident" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Employee", "id": "Jestine Teixeira" },
+        "uid": { "type": "ChildrenClinic::Employee", "id": "Jestine Teixeira" },
         "attrs": {
             "name": "Jestine Teixeira",
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "B" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
             ],
             "roles": [
-                { "__entity": { "type": "EmployeeRole", "id": "Doctor" } }
+                { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Doctor" } }
             ],
-            "level": { "__entity": { "type": "ProfessionalLevel", "id": "Intern" } },
-            "manager": { "__entity": { "type": "Employee", "id": "James Carter" } }
+            "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Intern" } },
+            "manager": { "__entity": { "type": "ChildrenClinic::Employee", "id": "James Carter" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Employee", "id": "Kathaleen Tramonte" },
+        "uid": { "type": "ChildrenClinic::Employee", "id": "Kathaleen Tramonte" },
         "attrs": {
             "name": "Kathaleen Tramonte",
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "roles": [
-                { "__entity": { "type": "EmployeeRole", "id": "Doctor" } }
+                { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Doctor" } }
             ],
-            "level": { "__entity": { "type": "ProfessionalLevel", "id": "Registrar" } },
-            "manager": { "__entity": { "type": "Employee", "id": "Linda Douglas" } }
+            "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Registrar" } },
+            "manager": { "__entity": { "type": "ChildrenClinic::Employee", "id": "Linda Douglas" } }
         },
         "parents": [ ]
     },
 
     {
-        "uid": { "type": "Employee", "id": "Alice" },
+        "uid": { "type": "ChildrenClinic::Employee", "id": "Alice" },
         "attrs": {
             "name": "Alice",
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } },
-                { "__entity": { "type": "Clinic", "id": "B" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } },
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
             ],
             "roles": [
-                { "__entity": { "type": "EmployeeRole", "id": "Administrator" } }
+                { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Administrator" } }
             ],
-            "level": { "__entity": { "type": "ProfessionalLevel", "id": "Senior" } }
+            "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Senior" } }
         },
         "parents": [ ]
     },
 
     {
-        "uid": { "type": "Employee", "id": "Bob Buchanan" },
+        "uid": { "type": "ChildrenClinic::Employee", "id": "Bob Buchanan" },
         "attrs": {
             "name": "Bob Buchanan",
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } },
-                { "__entity": { "type": "Clinic", "id": "B" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } },
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
             ],
             "roles": [
-                { "__entity": { "type": "EmployeeRole", "id": "Assistant" } }
+                { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Receptionist" } }
             ],
-            "level": { "__entity": { "type": "ProfessionalLevel", "id": "Staff" } }
+            "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Staff" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Employee", "id": "Carl Bradford" },
+        "uid": { "type": "ChildrenClinic::Employee", "id": "Carl Bradford" },
         "attrs": {
             "name": "Carl Bradford",
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "B" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
             ],
             "roles": [
-                { "__entity": { "type": "EmployeeRole", "id": "Assistant" } }
+                { "__entity": { "type": "ChildrenClinic::EmployeeRole", "id": "Receptionist" } }
             ],
-            "level": { "__entity": { "type": "ProfessionalLevel", "id": "Intern" } },
-            "manager": { "__entity": { "type": "Employee", "id": "Bob Buchanan" } }
+            "level": { "__entity": { "type": "ChildrenClinic::ProfessionalLevel", "id": "Intern" } },
+            "manager": { "__entity": { "type": "ChildrenClinic::Employee", "id": "Bob Buchanan" } }
         },
         "parents": [ ]
     },
 
     {
-        "uid": { "type": "Guest", "id": "Unknown" },
+        "uid": { "type": "ChildrenClinic::Guest", "id": "Unknown" },
         "attrs": { },
         "parents": [ ]
     },
 
     {
-        "uid": { "type": "ResponsibleAdult", "id": "George Franklin" },
+        "uid": { "type": "ChildrenClinic::Guardian", "id": "George Franklin" },
         "attrs": {
             "name": "George Franklin",
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } },
-                { "__entity": { "type": "Clinic", "id": "B" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } },
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
             ]
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "ResponsibleAdult", "id": "Betty Davis" },
+        "uid": { "type": "ChildrenClinic::Guardian", "id": "Betty Davis" },
         "attrs": {
             "name": "Betty Davis",
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ]
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "ResponsibleAdult", "id": "Eduardo Rodriquez" },
+        "uid": { "type": "ChildrenClinic::Guardian", "id": "Eduardo Rodriquez" },
         "attrs": {
             "name": "Eduardo Rodriquez",
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "B" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
             ]
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "ResponsibleAdult", "id": "Jean Coleman" },
+        "uid": { "type": "ChildrenClinic::Guardian", "id": "Jean Coleman" },
         "attrs": {
             "name": "Jean Coleman",
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ]
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "ResponsibleAdult", "id": "Carlos Estaban" },
+        "uid": { "type": "ChildrenClinic::Guardian", "id": "Carlos Estaban" },
         "attrs": {
             "name": "Carlos Estaban",
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ]
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "ResponsibleAdult", "id": "Clara Higgins" },
+        "uid": { "type": "ChildrenClinic::Guardian", "id": "Clara Higgins" },
         "attrs": {
             "name": "Clara Higgins",
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ]
         },
         "parents": [ ]
     },
 
     {
-        "uid": { "type": "Patient", "id": "Leo Franklin" },
+        "uid": { "type": "ChildrenClinic::Patient", "id": "Leo Franklin" },
         "attrs": {
             "name": "Leo Franklin",
-            "adults": [
+            "guardians": [
                 {
-                    "adult": { "__entity": { "type": "ResponsibleAdult", "id": "George Franklin" } },
-                    "authority": { "__entity": { "type": "AdultAuthority", "id": "Parent" } }
+                    "guardian": { "__entity": { "type": "ChildrenClinic::Guardian", "id": "George Franklin" } },
+                    "authority": { "__entity": { "type": "ChildrenClinic::GuardianAuthority", "id": "Parent" } }
                 },
                 {
-                    "adult": { "__entity": { "type": "ResponsibleAdult", "id": "Clara Higgins" } },
-                    "authority": { "__entity": { "type": "AdultAuthority", "id": "Authorised Adult" } }
+                    "guardian": { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Clara Higgins" } },
+                    "authority": { "__entity": { "type": "ChildrenClinic::GuardianAuthority", "id": "Authorised Adult" } }
                 }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } },
-                { "__entity": { "type": "Clinic", "id": "B" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } },
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "James Carter" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "James Carter" } }
             ]
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Patient", "id": "Basil Davis" },
+        "uid": { "type": "ChildrenClinic::Patient", "id": "Basil Davis" },
         "attrs": {
             "name": "Basil Davis",
-            "adults": [
+            "guardians": [
                 {
-                    "adult": { "__entity": { "type": "ResponsibleAdult", "id": "Betty Davis" } },
-                    "authority": { "__entity": { "type": "AdultAuthority", "id": "Parent" } }
+                    "guardian": { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Betty Davis" } },
+                    "authority": { "__entity": { "type": "ChildrenClinic::GuardianAuthority", "id": "Parent" } }
                 }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "James Carter" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "James Carter" } }
             ]
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Patient", "id": "Rosy Rodriquez" },
+        "uid": { "type": "ChildrenClinic::Patient", "id": "Rosy Rodriquez" },
         "attrs": {
             "name": "Rosy Rodriquez",
-            "adults": [
+            "guardians": [
                 {
-                    "adult": { "__entity": { "type": "ResponsibleAdult", "id": "Eduardo Rodriquez" } },
-                    "authority": { "__entity": { "type": "AdultAuthority", "id": "Parent" } }
+                    "guardian": { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Eduardo Rodriquez" } },
+                    "authority": { "__entity": { "type": "ChildrenClinic::GuardianAuthority", "id": "Parent" } }
                 }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "B" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "James Carter" } },
-                { "__entity": { "type": "Employee", "id": "Jestine Teixeira" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "James Carter" } },
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Jestine Teixeira" } }
             ]
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Patient", "id": "Jewel Rodriquez" },
+        "uid": { "type": "ChildrenClinic::Patient", "id": "Jewel Rodriquez" },
         "attrs": {
             "name": "Jewel Rodriquez",
-            "adults": [
+            "guardians": [
                 {
-                    "adult": { "__entity": { "type": "ResponsibleAdult", "id": "Eduardo Rodriquez" } },
-                    "authority": { "__entity": { "type": "AdultAuthority", "id": "Parent" } }
+                    "guardian": { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Eduardo Rodriquez" } },
+                    "authority": { "__entity": { "type": "ChildrenClinic::GuardianAuthority", "id": "Parent" } }
                 }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "B" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "James Carter" } },
-                { "__entity": { "type": "Employee", "id": "Jestine Teixeira" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "James Carter" } },
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Jestine Teixeira" } }
             ]
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Patient", "id": "Samantha Coleman" },
+        "uid": { "type": "ChildrenClinic::Patient", "id": "Samantha Coleman" },
         "attrs": {
             "name": "Samantha Coleman",
-            "adults": [
+            "guardians": [
                 {
-                    "adult": { "__entity": { "type": "ResponsibleAdult", "id": "Jean Coleman" } },
-                    "authority": { "__entity": { "type": "AdultAuthority", "id": "Parent" } }
+                    "guardian": { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Jean Coleman" } },
+                    "authority": { "__entity": { "type": "ChildrenClinic::GuardianAuthority", "id": "Parent" } }
                 }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "Sharon Jenkins" } },
-                { "__entity": { "type": "Employee", "id": "Linda Douglas" } },
-                { "__entity": { "type": "Employee", "id": "Kathaleen Tramonte" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Sharon Jenkins" } },
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Linda Douglas" } },
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Kathaleen Tramonte" } }
             ]
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Patient", "id": "Max Coleman" },
+        "uid": { "type": "ChildrenClinic::Patient", "id": "Max Coleman" },
         "attrs": {
             "name": "Max Coleman",
-            "adults": [
+            "guardians": [
                 {
-                    "adult": { "__entity": { "type": "ResponsibleAdult", "id": "Jean Coleman" } },
-                    "authority": { "__entity": { "type": "AdultAuthority", "id": "Parent" } }
+                    "guardian": { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Jean Coleman" } },
+                    "authority": { "__entity": { "type": "ChildrenClinic::GuardianAuthority", "id": "Parent" } }
                 }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "Sharon Jenkins" } },
-                { "__entity": { "type": "Employee", "id": "Linda Douglas" } },
-                { "__entity": { "type": "Employee", "id": "Kathaleen Tramonte" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Sharon Jenkins" } },
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Linda Douglas" } },
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Kathaleen Tramonte" } }
             ]
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Patient", "id": "Lucky Estaban" },
+        "uid": { "type": "ChildrenClinic::Patient", "id": "Lucky Estaban" },
         "attrs": {
             "name": "Lucky Estaban",
-            "adults": [
+            "guardians": [
                 {
-                    "adult": { "__entity": { "type": "ResponsibleAdult", "id": "Carlos Estaban" } },
-                    "authority": { "__entity": { "type": "AdultAuthority", "id": "Parent" } }
+                    "guardian": { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Carlos Estaban" } },
+                    "authority": { "__entity": { "type": "ChildrenClinic::GuardianAuthority", "id": "Parent" } }
                 }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "James Carter" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "James Carter" } }
             ]
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Patient", "id": "Sly Estaban" },
+        "uid": { "type": "ChildrenClinic::Patient", "id": "Sly Estaban" },
         "attrs": {
             "name": "Sly Estaban",
-            "adults": [
+            "guardians": [
                 {
-                    "adult": { "__entity": { "type": "ResponsibleAdult", "id": "Carlos Estaban" } },
-                    "authority": { "__entity": { "type": "AdultAuthority", "id": "Parent" } }
+                    "guardian": { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Carlos Estaban" } },
+                    "authority": { "__entity": { "type": "ChildrenClinic::GuardianAuthority", "id": "Parent" } }
                 }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "James Carter" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "James Carter" } }
             ]
         },
         "parents": [ ]
     },
 
     {
-        "uid": { "type": "Visit", "id": "Samantha Coleman 1" },
+        "uid": { "type": "ChildrenClinic::Visit", "id": "Samantha Coleman 1" },
         "attrs": {
-            "patient": { "__entity": { "type": "Patient", "id": "Samantha Coleman" } },
-            "adults": [
-                { "__entity": { "type": "ResponsibleAdult", "id": "Jean Coleman" } }
+            "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Samantha Coleman" } },
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Jean Coleman" } }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "Sharon Jenkins" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Sharon Jenkins" } }
             ],
-            "confidentiality": { "__entity": { "type": "Confidentiality", "id": "Official" } }
+            "confidentiality": { "__entity": { "type": "ChildrenClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Visit", "id": "Max Coleman 1" },
+        "uid": { "type": "ChildrenClinic::Visit", "id": "Max Coleman 1" },
         "attrs": {
-            "patient": { "__entity": { "type": "Patient", "id": "Max Coleman" } },
-            "adults": [
-                { "__entity": { "type": "ResponsibleAdult", "id": "Jean Coleman" } }
+            "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Max Coleman" } },
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Jean Coleman" } }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "Sharon Jenkins" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Sharon Jenkins" } }
             ],
-            "confidentiality": { "__entity": { "type": "Confidentiality", "id": "Official" } }
+            "confidentiality": { "__entity": { "type": "ChildrenClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Visit", "id": "Max Coleman 2" },
+        "uid": { "type": "ChildrenClinic::Visit", "id": "Max Coleman 2" },
         "attrs": {
-            "patient": { "__entity": { "type": "Patient", "id": "Max Coleman" } },
-            "adults": [
-                { "__entity": { "type": "ResponsibleAdult", "id": "Jean Coleman" } }
+            "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Max Coleman" } },
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Jean Coleman" } }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "Sharon Jenkins" } },
-                { "__entity": { "type": "Employee", "id": "Linda Douglas" } },
-                { "__entity": { "type": "Employee", "id": "Kathaleen Tramonte" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Sharon Jenkins" } },
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Linda Douglas" } },
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Kathaleen Tramonte" } }
             ],
-            "confidentiality": { "__entity": { "type": "Confidentiality", "id": "Sensitive" } }
+            "confidentiality": { "__entity": { "type": "ChildrenClinic::Confidentiality", "id": "Sensitive" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Visit", "id": "Samantha Coleman 2" },
+        "uid": { "type": "ChildrenClinic::Visit", "id": "Samantha Coleman 2" },
         "attrs": {
-            "patient": { "__entity": { "type": "Patient", "id": "Samantha Coleman" } },
-            "adults": [
-                { "__entity": { "type": "ResponsibleAdult", "id": "Jean Coleman" } }
+            "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Samantha Coleman" } },
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Jean Coleman" } }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "Sharon Jenkins" } },
-                { "__entity": { "type": "Employee", "id": "Linda Douglas" } },
-                { "__entity": { "type": "Employee", "id": "Kathaleen Tramonte" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Sharon Jenkins" } },
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Linda Douglas" } },
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Kathaleen Tramonte" } }
             ],
-            "confidentiality": { "__entity": { "type": "Confidentiality", "id": "Sensitive" } }
+            "confidentiality": { "__entity": { "type": "ChildrenClinic::Confidentiality", "id": "Sensitive" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Visit", "id": "Rosy Rodriquez 1" },
+        "uid": { "type": "ChildrenClinic::Visit", "id": "Rosy Rodriquez 1" },
         "attrs": {
-            "patient": { "__entity": { "type": "Patient", "id": "Rosy Rodriquez" } },
-            "adults": [
-                { "__entity": { "type": "ResponsibleAdult", "id": "Eduardo Rodriquez" } }
+            "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Rosy Rodriquez" } },
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Eduardo Rodriquez" } }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "B" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "James Carter" } },
-                { "__entity": { "type": "Employee", "id": "Jestine Teixeira" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "James Carter" } },
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Jestine Teixeira" } }
             ],
-            "confidentiality": { "__entity": { "type": "Confidentiality", "id": "Official" } }
+            "confidentiality": { "__entity": { "type": "ChildrenClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Visit", "id": "Jewel Rodriquez 1" },
+        "uid": { "type": "ChildrenClinic::Visit", "id": "Jewel Rodriquez 1" },
         "attrs": {
-            "patient": { "__entity": { "type": "Patient", "id": "Jewel Rodriquez" } },
-            "adults": [
-                { "__entity": { "type": "ResponsibleAdult", "id": "Eduardo Rodriquez" } }
+            "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Jewel Rodriquez" } },
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Eduardo Rodriquez" } }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "B" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "James Carter" } },
-                { "__entity": { "type": "Employee", "id": "Jestine Teixeira" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "James Carter" } },
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Jestine Teixeira" } }
             ],
-            "confidentiality": { "__entity": { "type": "Confidentiality", "id": "Official" } }
+            "confidentiality": { "__entity": { "type": "ChildrenClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Visit", "id": "Lucky Estaban 1" },
+        "uid": { "type": "ChildrenClinic::Visit", "id": "Lucky Estaban 1" },
         "attrs": {
-            "patient": { "__entity": { "type": "Patient", "id": "Lucky Estaban" } },
-            "adults": [
-                { "__entity": { "type": "ResponsibleAdult", "id": "Carlos Estaban" } }
+            "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Lucky Estaban" } },
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Carlos Estaban" } }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "James Carter" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "James Carter" } }
             ],
-            "confidentiality": { "__entity": { "type": "Confidentiality", "id": "Official" } }
+            "confidentiality": { "__entity": { "type": "ChildrenClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Visit", "id": "Sly Estaban 1" },
+        "uid": { "type": "ChildrenClinic::Visit", "id": "Sly Estaban 1" },
         "attrs": {
-            "patient": { "__entity": { "type": "Patient", "id": "Sly Estaban" } },
-            "adults": [
-                { "__entity": { "type": "ResponsibleAdult", "id": "Carlos Estaban" } }
+            "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Sly Estaban" } },
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Carlos Estaban" } }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "James Carter" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "James Carter" } }
             ],
-            "confidentiality": { "__entity": { "type": "Confidentiality", "id": "Official" } }
+            "confidentiality": { "__entity": { "type": "ChildrenClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Visit", "id": "Basil Davis 1" },
+        "uid": { "type": "ChildrenClinic::Visit", "id": "Basil Davis 1" },
         "attrs": {
-            "patient": { "__entity": { "type": "Patient", "id": "Basil Davis" } },
-            "adults": [
-                { "__entity": { "type": "ResponsibleAdult", "id": "Betty Davis" } }
+            "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Basil Davis" } },
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Betty Davis" } }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "James Carter" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "James Carter" } }
             ],
-            "confidentiality": { "__entity": { "type": "Confidentiality", "id": "Protected" } }
+            "confidentiality": { "__entity": { "type": "ChildrenClinic::Confidentiality", "id": "Protected" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Visit", "id": "Leo Franklin 1" },
+        "uid": { "type": "ChildrenClinic::Visit", "id": "Leo Franklin 1" },
         "attrs": {
-            "patient": { "__entity": { "type": "Patient", "id": "Leo Franklin" } },
-            "adults": [
-                { "__entity": { "type": "ResponsibleAdult", "id": "Clara Higgins" } }
+            "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Leo Franklin" } },
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Clara Higgins" } }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "James Carter" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "James Carter" } }
             ],
-            "confidentiality": { "__entity": { "type": "Confidentiality", "id": "Official" } }
+            "confidentiality": { "__entity": { "type": "ChildrenClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Visit", "id": "Leo Franklin 2" },
+        "uid": { "type": "ChildrenClinic::Visit", "id": "Leo Franklin 2" },
         "attrs": {
-            "patient": { "__entity": { "type": "Patient", "id": "Leo Franklin" } },
-            "adults": [
-                { "__entity": { "type": "ResponsibleAdult", "id": "George Franklin" } }
+            "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Leo Franklin" } },
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "George Franklin" } }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "James Carter" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "James Carter" } }
             ],
-            "confidentiality": { "__entity": { "type": "Confidentiality", "id": "Official" } }
+            "confidentiality": { "__entity": { "type": "ChildrenClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Visit", "id": "Basil Davis 2" },
+        "uid": { "type": "ChildrenClinic::Visit", "id": "Basil Davis 2" },
         "attrs": {
-            "patient": { "__entity": { "type": "Patient", "id": "Basil Davis" } },
-            "adults": [
-                { "__entity": { "type": "ResponsibleAdult", "id": "Betty Davis" } }
+            "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Basil Davis" } },
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Betty Davis" } }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "Sharon Jenkins" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Sharon Jenkins" } }
             ],
-            "confidentiality": { "__entity": { "type": "Confidentiality", "id": "Official" } }
+            "confidentiality": { "__entity": { "type": "ChildrenClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Visit", "id": "Rosy Rodriquez 2" },
+        "uid": { "type": "ChildrenClinic::Visit", "id": "Rosy Rodriquez 2" },
         "attrs": {
-            "patient": { "__entity": { "type": "Patient", "id": "Rosy Rodriquez" } },
-            "adults": [
-                { "__entity": { "type": "ResponsibleAdult", "id": "Eduardo Rodriquez" } }
+            "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Rosy Rodriquez" } },
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Eduardo Rodriquez" } }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "B" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "Jestine Teixeira" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Jestine Teixeira" } }
             ],
-            "confidentiality": { "__entity": { "type": "Confidentiality", "id": "Official" } }
+            "confidentiality": { "__entity": { "type": "ChildrenClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Visit", "id": "Jewel Rodriquez 2" },
+        "uid": { "type": "ChildrenClinic::Visit", "id": "Jewel Rodriquez 2" },
         "attrs": {
-            "patient": { "__entity": { "type": "Patient", "id": "Jewel Rodriquez" } },
-            "adults": [
-                { "__entity": { "type": "ResponsibleAdult", "id": "Eduardo Rodriquez" } }
+            "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Jewel Rodriquez" } },
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Eduardo Rodriquez" } }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "B" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "Jestine Teixeira" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Jestine Teixeira" } }
             ],
-            "confidentiality": { "__entity": { "type": "Confidentiality", "id": "Official" } }
+            "confidentiality": { "__entity": { "type": "ChildrenClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Visit", "id": "Samantha Coleman 3" },
+        "uid": { "type": "ChildrenClinic::Visit", "id": "Samantha Coleman 3" },
         "attrs": {
-            "patient": { "__entity": { "type": "Patient", "id": "Samantha Coleman" } },
-            "adults": [
-                { "__entity": { "type": "ResponsibleAdult", "id": "Jean Coleman" } }
+            "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Samantha Coleman" } },
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Jean Coleman" } }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "Linda Douglas" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Linda Douglas" } }
             ],
-            "confidentiality": { "__entity": { "type": "Confidentiality", "id": "Sensitive" } }
+            "confidentiality": { "__entity": { "type": "ChildrenClinic::Confidentiality", "id": "Sensitive" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Visit", "id": "Max Coleman 3" },
+        "uid": { "type": "ChildrenClinic::Visit", "id": "Max Coleman 3" },
         "attrs": {
-            "patient": { "__entity": { "type": "Patient", "id": "Max Coleman" } },
-            "adults": [
-                { "__entity": { "type": "ResponsibleAdult", "id": "Jean Coleman" } }
+            "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Max Coleman" } },
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Jean Coleman" } }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "Linda Douglas" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Linda Douglas" } }
             ],
-            "confidentiality": { "__entity": { "type": "Confidentiality", "id": "Sensitive" } }
+            "confidentiality": { "__entity": { "type": "ChildrenClinic::Confidentiality", "id": "Sensitive" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Visit", "id": "Lucky Estaban 2" },
+        "uid": { "type": "ChildrenClinic::Visit", "id": "Lucky Estaban 2" },
         "attrs": {
-            "patient": { "__entity": { "type": "Patient", "id": "Lucky Estaban" } },
-            "adults": [
-                { "__entity": { "type": "ResponsibleAdult", "id": "Carlos Estaban" } }
+            "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Lucky Estaban" } },
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Carlos Estaban" } }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "B" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "James Carter" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "James Carter" } }
             ],
-            "confidentiality": { "__entity": { "type": "Confidentiality", "id": "Official" } }
+            "confidentiality": { "__entity": { "type": "ChildrenClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Visit", "id": "Sly Estaban 2" },
+        "uid": { "type": "ChildrenClinic::Visit", "id": "Sly Estaban 2" },
         "attrs": {
-            "patient": { "__entity": { "type": "Patient", "id": "Sly Estaban" } },
-            "adults": [
-                { "__entity": { "type": "ResponsibleAdult", "id": "Carlos Estaban" } }
+            "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Sly Estaban" } },
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Carlos Estaban" } }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "B" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "B" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "James Carter" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "James Carter" } }
             ],
-            "confidentiality": { "__entity": { "type": "Confidentiality", "id": "Official" } }
+            "confidentiality": { "__entity": { "type": "ChildrenClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Visit", "id": "Leo Franklin 3" },
+        "uid": { "type": "ChildrenClinic::Visit", "id": "Leo Franklin 3" },
         "attrs": {
-            "patient": { "__entity": { "type": "Patient", "id": "Leo Franklin" } },
-            "adults": [
-                { "__entity": { "type": "ResponsibleAdult", "id": "Clara Higgins" } }
+            "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Leo Franklin" } },
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Clara Higgins" } }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "Sharon Jenkins" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Sharon Jenkins" } }
             ],
-            "confidentiality": { "__entity": { "type": "Confidentiality", "id": "Official" } }
+            "confidentiality": { "__entity": { "type": "ChildrenClinic::Confidentiality", "id": "Official" } }
         },
         "parents": [ ]
     },
     {
-        "uid": { "type": "Visit", "id": "Basil Davis 3" },
+        "uid": { "type": "ChildrenClinic::Visit", "id": "Basil Davis 3" },
         "attrs": {
-            "patient": { "__entity": { "type": "Patient", "id": "Basil Davis" } },
-            "adults": [
-                { "__entity": { "type": "ResponsibleAdult", "id": "Betty Davis" } }
+            "patient": { "__entity": { "type": "ChildrenClinic::Patient", "id": "Basil Davis" } },
+            "guardians": [
+                { "__entity": { "type": "ChildrenClinic::Guardian", "id": "Betty Davis" } }
             ],
             "clinics": [
-                { "__entity": { "type": "Clinic", "id": "A" } }
+                { "__entity": { "type": "ChildrenClinic::Clinic", "id": "A" } }
             ],
             "doctors": [
-                { "__entity": { "type": "Employee", "id": "Sharon Jenkins" } }
+                { "__entity": { "type": "ChildrenClinic::Employee", "id": "Sharon Jenkins" } }
             ],
-            "confidentiality": { "__entity": { "type": "Confidentiality", "id": "Protected" } }
+            "confidentiality": { "__entity": { "type": "ChildrenClinic::Confidentiality", "id": "Protected" } }
         },
         "parents": [ ]
-    },
-
-    {
-        "uid": { "type": "Action", "id": "EmployeeOperations" },
-        "attrs": { },
-        "parents": [ ]
-    },
-    {
-        "uid": { "type": "Action", "id": "PatientOperations" },
-        "attrs": { },
-        "parents": [ ]
-    },
-
-    {
-        "uid": { "type": "Action", "id": "ViewClinic" },
-        "attrs": { },
-        "parents": [
-            { "type": "Action", "id": "EmployeeOperations" },
-            { "type": "Action", "id": "PatientOperations" }
-        ]
-    },
-
-    {
-        "uid": { "type": "Action", "id": "ListEmployees" },
-        "attrs": { },
-        "parents": [
-            { "type": "Action", "id": "EmployeeOperations" }
-        ]
-    },
-    {
-        "uid": { "type": "Action", "id": "AddEmployee" },
-        "attrs": { },
-        "parents": [
-            { "type": "Action", "id": "EmployeeOperations" }
-        ]
-    },
-    {
-        "uid": { "type": "Action", "id": "ViewEmployee" },
-        "attrs": { },
-        "parents": [
-            { "type": "Action", "id": "EmployeeOperations" }
-        ]
-    },
-    {
-        "uid": { "type": "Action", "id": "EditEmployee" },
-        "attrs": { },
-        "parents": [
-            { "type": "Action", "id": "EmployeeOperations" }
-        ]
-    },
-    {
-        "uid": { "type": "Action", "id": "DeleteEmployee" },
-        "attrs": { },
-        "parents": [
-            { "type": "Action", "id": "EmployeeOperations" }
-        ]
-    },
-
-    {
-        "uid": { "type": "Action", "id": "ListPatients" },
-        "attrs": { },
-        "parents": [
-            { "type": "Action", "id": "PatientOperations" }
-        ]
-    },
-    {
-        "uid": { "type": "Action", "id": "AddPatient" },
-        "attrs": { },
-        "parents": [
-            { "type": "Action", "id": "PatientOperations" }
-        ]
-    },
-    {
-        "uid": { "type": "Action", "id": "ViewPatient" },
-        "attrs": { },
-        "parents": [
-            { "type": "Action", "id": "PatientOperations" }
-        ]
-    },
-    {
-        "uid": { "type": "Action", "id": "EditPatient" },
-        "attrs": { },
-        "parents": [
-            { "type": "Action", "id": "PatientOperations" }
-        ]
-    },
-    {
-        "uid": { "type": "Action", "id": "DeletePatient" },
-        "attrs": { },
-        "parents": [
-            { "type": "Action", "id": "PatientOperations" }
-        ]
-    },
-
-    {
-        "uid": { "type": "Action", "id": "ListAdults" },
-        "attrs": { },
-        "parents": [
-            { "type": "Action", "id": "PatientOperations" }
-        ]
-    },
-    {
-        "uid": { "type": "Action", "id": "AddAdult" },
-        "attrs": { },
-        "parents": [
-            { "type": "Action", "id": "PatientOperations" }
-        ]
-    },
-    {
-        "uid": { "type": "Action", "id": "ViewAdult" },
-        "attrs": { },
-        "parents": [
-            { "type": "Action", "id": "PatientOperations" }
-        ]
-    },
-    {
-        "uid": { "type": "Action", "id": "EditAdult" },
-        "attrs": { },
-        "parents": [
-            { "type": "Action", "id": "PatientOperations" }
-        ]
-    },
-    {
-        "uid": { "type": "Action", "id": "DeleteAdult" },
-        "attrs": { },
-        "parents": [
-           { "type": "Action", "id": "PatientOperations" }
-        ]
-    },
-
-    {
-        "uid": { "type": "Action", "id": "ListVisits" },
-        "attrs": { },
-        "parents": [
-            { "type": "Action", "id": "PatientOperations" }
-        ]
-    },
-    {
-        "uid": { "type": "Action", "id": "AddVisit" },
-        "attrs": { },
-        "parents": [
-            { "type": "Action", "id": "PatientOperations" }
-        ]
-    },
-    {
-        "uid": { "type": "Action", "id": "ViewVisit" },
-        "attrs": { },
-        "parents": [
-            { "type": "Action", "id": "PatientOperations" }
-        ]
-    },
-    {
-        "uid": { "type": "Action", "id": "EditVisit" },
-        "attrs": { },
-        "parents": [
-            { "type": "Action", "id": "PatientOperations" }
-        ]
-    },
-    {
-        "uid": { "type": "Action", "id": "DeleteVisit" },
-        "attrs": { },
-        "parents": [
-            { "type": "Action", "id": "PatientOperations" }
-        ]
     }
 ]

@@ -1,0 +1,407 @@
+// Copyright 2026 Gabriel Henrique Lopes Gomes Alves Nunes.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// ChildrenClinic RSVP Invariants
+
+//***********************//
+// Structural Invariants
+//***********************//
+
+// St1. There is at least one "Administrator".
+invariant
+entity.roles.contains(ChildrenClinic::EmployeeRole::"Administrator")
+    for some entity: ChildrenClinic::Employee;
+
+// St2. Every Employee should have non-empty name, clinics, and roles.
+invariant
+entity == ChildrenClinic::Employee::"???" ||
+entity has name && entity.name != "" &&
+entity has clinics && !entity.clinics.isEmpty() &&
+entity has roles && !entity.roles.isEmpty()
+    for all entity: ChildrenClinic::Employee;
+
+// St3. Every "Doctor" should have a level.
+invariant
+!entity.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") ||
+entity has level
+    for all entity: ChildrenClinic::Employee;
+
+// St4. A "Doctor" may only hold the "Intern", "Resident", "Staff", "Senior", "Registrar",
+// or "Specialist" level.
+invariant
+!(entity.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
+  entity has level) ||
+(entity.level == ChildrenClinic::ProfessionalLevel::"Intern" ||
+ entity.level == ChildrenClinic::ProfessionalLevel::"Resident" ||
+ entity.level == ChildrenClinic::ProfessionalLevel::"Staff" ||
+ entity.level == ChildrenClinic::ProfessionalLevel::"Senior" ||
+ entity.level == ChildrenClinic::ProfessionalLevel::"Registrar" ||
+ entity.level == ChildrenClinic::ProfessionalLevel::"Specialist")
+    for all entity: ChildrenClinic::Employee;
+
+// St5. An "Administrator" may only hold the "Intern", "Staff", or "Senior" level.
+invariant
+!(entity.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
+  entity has level) ||
+(entity.level == ChildrenClinic::ProfessionalLevel::"Intern" ||
+ entity.level == ChildrenClinic::ProfessionalLevel::"Staff" ||
+ entity.level == ChildrenClinic::ProfessionalLevel::"Senior")
+    for all entity: ChildrenClinic::Employee;
+
+// St6. A "Receptionist" may only hold the "Intern", "Staff", or "Senior" level.
+invariant
+!(entity.roles.contains(ChildrenClinic::EmployeeRole::"Receptionist") &&
+  entity has level) ||
+(entity.level == ChildrenClinic::ProfessionalLevel::"Intern" ||
+ entity.level == ChildrenClinic::ProfessionalLevel::"Staff" ||
+ entity.level == ChildrenClinic::ProfessionalLevel::"Senior")
+    for all entity: ChildrenClinic::Employee;
+
+// St7. Every "Intern" and "Registrar" must have a manager.
+invariant
+!(entity has level &&
+  (entity.level == ChildrenClinic::ProfessionalLevel::"Intern" ||
+   entity.level == ChildrenClinic::ProfessionalLevel::"Registrar")
+) || entity has manager
+    for all entity: ChildrenClinic::Employee;
+
+// St8. An "Intern" must be managed by a "Resident", "Staff", "Senior", or "Specialist".
+invariant
+!(entity has manager &&
+  entity has level &&
+  entity.level == ChildrenClinic::ProfessionalLevel::"Intern") ||
+(entity.manager has level &&
+ (entity.manager.level == ChildrenClinic::ProfessionalLevel::"Resident" ||
+  entity.manager.level == ChildrenClinic::ProfessionalLevel::"Staff" ||
+  entity.manager.level == ChildrenClinic::ProfessionalLevel::"Senior" ||
+  entity.manager.level == ChildrenClinic::ProfessionalLevel::"Specialist"))
+    for all entity: ChildrenClinic::Employee;
+
+// St9. A "Registrar" must be managed by a "Specialist".
+invariant
+!(entity has manager &&
+  entity has level &&
+  entity.level == ChildrenClinic::ProfessionalLevel::"Registrar") ||
+(entity.manager has level &&
+ entity.manager.level == ChildrenClinic::ProfessionalLevel::"Specialist")
+    for all entity: ChildrenClinic::Employee;
+
+// St10. No Employee can be their own manager.
+invariant
+!(entity has manager) || entity.manager != entity
+    for all entity: ChildrenClinic::Employee;
+
+// St11. Every Guardian should have non-empty name and clinics.
+invariant
+entity == ChildrenClinic::Guardian::"???" ||
+entity has name && entity.name != "" &&
+entity has clinics && !entity.clinics.isEmpty()
+    for all entity: ChildrenClinic::Guardian;
+
+// St12. Every Patient should have non-empty name, guardians, clinics, and doctors.
+invariant
+entity == ChildrenClinic::Patient::"???" ||
+entity has name && entity.name != "" &&
+entity has guardians && !entity.guardians.isEmpty() &&
+entity has clinics && !entity.clinics.isEmpty() &&
+entity has doctors && !entity.doctors.isEmpty()
+    for all entity: ChildrenClinic::Patient;
+
+// St13. Every Visit should have non-empty guardians, clinics, and doctors.
+invariant
+entity == ChildrenClinic::Visit::"???" ||
+entity has guardians && !entity.guardians.isEmpty() &&
+entity has clinics && !entity.clinics.isEmpty() &&
+entity has doctors && !entity.doctors.isEmpty()
+    for all entity: ChildrenClinic::Visit;
+
+// St14. An Employee who is an "Administrator" should not simultaneously
+// hold the "Doctor" or "Receptionist" role.
+invariant
+!entity.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") ||
+(!entity.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
+ !entity.roles.contains(ChildrenClinic::EmployeeRole::"Receptionist"))
+    for all entity: ChildrenClinic::Employee;
+
+// St15. A Patient's doctors must each hold the "Doctor" role.
+invariant
+!patient.doctors.contains(employee) ||
+employee.roles.contains(ChildrenClinic::EmployeeRole::"Doctor")
+    for all patient: ChildrenClinic::Patient, employee: ChildrenClinic::Employee;
+
+// St16. There exists at least one Clinic in the system.
+invariant 
+entity is ChildrenClinic::Clinic 
+    for some entity: ChildrenClinic::Clinic;
+
+// St17. Only a "Specialist" "Doctor" may have specialties.
+invariant
+!(entity.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
+  entity has specialties && !entity.specialties.isEmpty()) ||
+(entity has level &&
+ entity.level == ChildrenClinic::ProfessionalLevel::"Specialist")
+    for all entity: ChildrenClinic::Employee;
+
+// St18. A "Specialist" "Doctor" must have at least one specialty.
+invariant
+!(entity.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
+  entity has level &&
+  entity.level == ChildrenClinic::ProfessionalLevel::"Specialist") ||
+(entity has specialties && !entity.specialties.isEmpty())
+    for all entity: ChildrenClinic::Employee;
+
+//*********************//
+// Semantic Invariants
+//*********************//
+
+// NOTE: Placeholder should be changed back to a more general value once RSVP supports this.
+// For instance:
+// allow(principal, resource, ChildrenClinic::Action::"AddPatient")  // Placeholder Action: "AddPatient".
+//     for all principal: ChildrenClinic::Employee,
+//             resource: ChildrenClinic::Clinic;                     // Placeholder Resource: Clinic.
+// Should be changed back to:
+// allow(principal, resource, action)
+//     for all principal: ChildrenClinic::Employee,
+//             resource
+//             action;
+
+// Se1. An "Administrator" is never denied any action on any resource.
+// ('policy4')
+invariant
+!principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") ||
+allow(principal, resource, ChildrenClinic::Action::"AddPatient")  // Placeholder Action: "AddPatient".
+    for all principal: ChildrenClinic::Employee,
+            resource: ChildrenClinic::Clinic;                     // Placeholder Resource: Clinic.
+
+// Se2. A Guest is always denied any action in "PatientOperations".
+// ('policy3')
+invariant
+!(resource is ChildrenClinic::Clinic ||
+  resource is ChildrenClinic::Patient ||
+  resource is ChildrenClinic::Guardian ||
+  resource is ChildrenClinic::Visit) ||
+deny(principal, resource, ChildrenClinic::Action::"PatientOperations")
+    for all principal: ChildrenClinic::Guest,
+            resource: ChildrenClinic::Patient;                    // Placeholder Resource: Patient.
+
+// Se3. Any Employee can view a "Doctor" or a "Receptionist".
+// ('policy2')
+invariant
+!resource.roles.containsAny([ChildrenClinic::EmployeeRole::"Doctor",
+                             ChildrenClinic::EmployeeRole::"Receptionist"]) ||
+allow(principal, resource, ChildrenClinic::Action::"ViewEmployee")
+    for all principal: ChildrenClinic::Employee,
+            resource: ChildrenClinic::Employee;
+
+// Se4. Any Guest can view a "Doctor" or a "Receptionist".
+// ('policy2')
+invariant
+!resource.roles.containsAny([ChildrenClinic::EmployeeRole::"Doctor",
+                             ChildrenClinic::EmployeeRole::"Receptionist"]) ||
+allow(principal, resource, ChildrenClinic::Action::"ViewEmployee")
+    for all principal: ChildrenClinic::Guest,
+            resource: ChildrenClinic::Employee;
+
+// Se5. An "Intern" "Doctor" is always denied "EditPatient" on their patients.
+// ('policy9')
+invariant
+!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
+  principal has level &&
+  principal.level == ChildrenClinic::ProfessionalLevel::"Intern" &&
+  resource.doctors.contains(principal)) ||
+deny(principal, resource, ChildrenClinic::Action::"EditPatient")
+    for all principal: ChildrenClinic::Employee,
+            resource: ChildrenClinic::Patient;
+
+// Se6. An "Intern" "Doctor" is always denied "EditVisit" on their visits.
+// ('policy9')
+invariant
+!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
+  principal has level &&
+  principal.level == ChildrenClinic::ProfessionalLevel::"Intern" &&
+  resource.doctors.contains(principal)) ||
+deny(principal, resource, ChildrenClinic::Action::"EditVisit")
+    for all principal: ChildrenClinic::Employee,
+            resource: ChildrenClinic::Visit;
+
+// Se7. An "Intern" "Doctor" cannot add Guardians to their clinics.
+// ('policy8')
+invariant
+!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
+  principal has level &&
+  principal.level == ChildrenClinic::ProfessionalLevel::"Intern") ||
+deny(principal, resource, ChildrenClinic::Action::"AddGuardian")
+    for all principal: ChildrenClinic::Employee,
+            resource: ChildrenClinic::Clinic;
+
+// Se8. An "Intern" "Doctor" cannot add Patients to their clinics.
+// ('policy8')
+invariant
+!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
+  principal has level &&
+  principal.level == ChildrenClinic::ProfessionalLevel::"Intern") ||
+deny(principal, resource, ChildrenClinic::Action::"AddPatient")
+    for all principal: ChildrenClinic::Employee,
+            resource: ChildrenClinic::Clinic;
+
+// Se9. A non-"Administrator" Employee cannot access data from a Clinic they are not assigned to.
+// ('policy13')
+invariant
+!(principal has clinics && resource has clinics &&
+  !resource.clinics.containsAny(principal.clinics) &&
+  !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
+  // action != ChildrenClinic::Action::"ViewEmployee" &&          // Invalid due to placeholder Action.
+  (resource is ChildrenClinic::Patient ||
+   resource is ChildrenClinic::Guardian ||
+   resource is ChildrenClinic::Visit)) ||
+deny(principal, resource, ChildrenClinic::Action::"ViewPatient")  // Placeholder Action: "ViewPatient".
+    for all principal: ChildrenClinic::Employee,
+            resource: ChildrenClinic::Patient;
+
+// Se10. Every Employee can view their own Employee record.
+// ('policy10')
+invariant
+principal == ChildrenClinic::Employee::"???" ||
+allow(principal, principal, ChildrenClinic::Action::"ViewEmployee")
+    for all principal: ChildrenClinic::Employee;
+
+// Se11. Every Employee can edit their own Employee record.
+// ('policy10')
+invariant
+principal == ChildrenClinic::Employee::"???" ||
+allow(principal, principal, ChildrenClinic::Action::"EditEmployee")
+    for all principal: ChildrenClinic::Employee;
+
+// Se12. Only a "Senior" or "Specialist" "Doctor" may delete Patient records.
+// ('policy7', 'policy11')
+invariant
+!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
+  !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
+  principal has level &&
+  principal.level != ChildrenClinic::ProfessionalLevel::"Senior" &&
+  principal.level != ChildrenClinic::ProfessionalLevel::"Specialist") ||
+deny(principal, resource, ChildrenClinic::Action::"DeletePatient")
+    for all principal: ChildrenClinic::Employee,
+            resource: ChildrenClinic::Patient;
+
+// Se13. Only a "Senior" or "Specialist" "Doctor" may delete Visit records.
+// ('policy7', 'policy11')
+invariant
+!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
+  !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
+  principal has level &&
+  principal.level != ChildrenClinic::ProfessionalLevel::"Senior" &&
+  principal.level != ChildrenClinic::ProfessionalLevel::"Specialist") ||
+deny(principal, resource, ChildrenClinic::Action::"DeleteVisit")
+    for all principal: ChildrenClinic::Employee,
+            resource: ChildrenClinic::Visit;
+
+// Se14. A "Senior" or "Specialist" "Doctor" can view any Patient.
+// ('policy12')
+invariant
+!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
+  principal has level &&
+  (principal.level == ChildrenClinic::ProfessionalLevel::"Senior" ||
+   principal.level == ChildrenClinic::ProfessionalLevel::"Specialist") &&
+  principal has clinics &&
+  resource has clinics &&
+  resource.clinics.containsAny(principal.clinics) &&
+  !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
+  !resource.doctors.contains(principal)) ||
+allow(principal, resource, ChildrenClinic::Action::"ViewPatient")
+    for all principal: ChildrenClinic::Employee,
+            resource: ChildrenClinic::Patient;
+
+// Se15. A "Senior" or "Specialist" "Doctor" can view any Visit,
+// unless the Visit has "Protected" confidentiality.
+// ('policy12')
+invariant
+!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
+  principal has level &&
+  (principal.level == ChildrenClinic::ProfessionalLevel::"Senior" ||
+   principal.level == ChildrenClinic::ProfessionalLevel::"Specialist") &&
+  principal has clinics &&
+  resource has clinics &&
+  resource.clinics.containsAny(principal.clinics) &&
+  !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
+  !(resource.doctors.contains(principal)) &&
+  !(resource has confidentiality &&
+    resource.confidentiality == ChildrenClinic::Confidentiality::"Protected")) ||
+allow(principal, resource, ChildrenClinic::Action::"ViewVisit")
+    for all principal: ChildrenClinic::Employee,
+            resource: ChildrenClinic::Visit;
+
+// Se16. A "Receptionist" cannot add Employees.
+// ('policy5')
+invariant
+!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Receptionist") &&
+  !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator")) ||
+deny(principal, resource, ChildrenClinic::Action::"AddEmployee")
+    for all principal: ChildrenClinic::Employee,
+            resource: ChildrenClinic::Clinic;
+
+// Se17. A "Receptionist" cannot delete Employees.
+// ('policy5')
+invariant
+!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Receptionist") &&
+  !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator")) ||
+deny(principal, resource, ChildrenClinic::Action::"DeleteEmployee")
+    for all principal: ChildrenClinic::Employee,
+            resource: ChildrenClinic::Clinic;
+
+// Se18. A "Receptionist" cannot view the record of an "Administrator".
+// ('policy5')
+invariant
+!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Receptionist") &&
+  !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
+  resource.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
+  principal != resource) ||
+deny(principal, resource, ChildrenClinic::Action::"ViewEmployee")
+    for all principal: ChildrenClinic::Employee,
+            resource: ChildrenClinic::Employee;
+
+// Se19. A "Receptionist" cannot edit the record of an "Administrator".
+// ('policy5')
+invariant
+!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Receptionist") &&
+  !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
+  resource.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
+  principal != resource) ||
+deny(principal, resource, ChildrenClinic::Action::"EditEmployee")
+    for all principal: ChildrenClinic::Employee,
+            resource: ChildrenClinic::Employee;
+
+// Se20. Every Employee can list Employees at any Clinic.
+// ('policy0')
+invariant
+allow(principal, resource, ChildrenClinic::Action::"ListEmployees")
+    for all principal: ChildrenClinic::Employee,
+            resource: ChildrenClinic::Clinic;
+
+// Se21. Every Guest can list Employees at any Clinic.
+// ('policy0')
+invariant
+allow(principal, resource, ChildrenClinic::Action::"ListEmployees")
+    for all principal: ChildrenClinic::Guest,
+            resource: ChildrenClinic::Clinic;
+
+// Se22. A "Doctor" can view any Guardian in their Clinics.
+// ('policy15')
+invariant
+!(principal.roles.contains(ChildrenClinic::EmployeeRole::"Doctor") &&
+  !principal.roles.contains(ChildrenClinic::EmployeeRole::"Administrator") &&
+  resource.clinics.containsAny(principal.clinics)) ||
+allow(principal, resource, ChildrenClinic::Action::"ViewGuardian")
+    for all principal: ChildrenClinic::Employee,
+            resource: ChildrenClinic::Guardian;

@@ -1,33 +1,51 @@
+// Copyright 2026 Gabriel Henrique Lopes Gomes Alves Nunes.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace ChildrenClinic {
     entity Clinic;
 
-    entity AdultAuthority enum ["Parent", "Legal Guardian", "Designated Representative", "Authorised Adult"];
+    entity GuardianAuthority enum ["Parent", "Legal Guardian", "Designated Representative", "Authorised Adult"];
 
     entity Confidentiality enum ["Official", "Sensitive", "Protected"];
 
-    entity EmployeeRole enum ["Administrator", "Assistant", "Doctor"];
+    entity EmployeeRole enum ["Administrator", "Receptionist", "Doctor"];
 
     entity ProfessionalLevel enum ["Intern", "Resident", "Staff", "Senior", "Registrar", "Specialist"];
+
+    entity Specialty;
 
     entity Employee = {
         name: String,
         clinics: Set<Clinic>,
         roles: Set<EmployeeRole>,
         level?: ProfessionalLevel,
-        manager?: Employee
+        manager?: Employee,
+        specialties?: Set<Specialty>
     };
 
     entity Guest;
 
-    entity ResponsibleAdult = {
+    entity Guardian = {
         name: String,
         clinics: Set<Clinic>
     };
 
     entity Patient = {
         name: String,
-        adults: Set<{
-            adult: ResponsibleAdult,
-            authority: AdultAuthority
+        guardians: Set<{
+            guardian: Guardian,
+            authority: GuardianAuthority
         }>,
         clinics: Set<Clinic>,
         doctors: Set<Employee>
@@ -35,7 +53,7 @@
 
     entity Visit = {
         patient: Patient,
-        adults: Set<ResponsibleAdult>,
+        guardians: Set<Guardian>,
         clinics: Set<Clinic>,
         doctors: Set<Employee>,
         confidentiality: Confidentiality
@@ -110,45 +128,45 @@
         context: { }
     };
 
-    action ListAdults in PatientOperations appliesTo {
+    action ListGuardians in PatientOperations appliesTo {
         principal: [Employee, Guest],
         resource: Clinic,
         context: { }
     };
 
-    action AddAdult in PatientOperations appliesTo {
+    action AddGuardian in PatientOperations appliesTo {
         principal: [Employee, Guest],
         resource: Clinic,
         context: { }
     };
 
-    action ViewAdult in PatientOperations appliesTo {
+    action ViewGuardian in PatientOperations appliesTo {
         principal: [Employee, Guest],
-        resource: ResponsibleAdult,
+        resource: Guardian,
         context: { }
     };
 
-    action EditAdult in PatientOperations appliesTo {
+    action EditGuardian in PatientOperations appliesTo {
         principal: [Employee, Guest],
-        resource: ResponsibleAdult,
+        resource: Guardian,
         context: { }
     };
 
-    action DeleteAdult in PatientOperations appliesTo {
+    action DeleteGuardian in PatientOperations appliesTo {
         principal: [Employee, Guest],
-        resource: ResponsibleAdult,
+        resource: Guardian,
         context: { }
     };
 
     action ListVisits in PatientOperations appliesTo {
         principal: [Employee, Guest],
-        resource: Clinic,
+        resource: Patient,
         context: { }
     };
 
     action AddVisit in PatientOperations appliesTo {
         principal: [Employee, Guest],
-        resource: Clinic,
+        resource: Patient,
         context: { }
     };
 
@@ -169,3 +187,4 @@
         resource: Visit,
         context: { }
     };
+}

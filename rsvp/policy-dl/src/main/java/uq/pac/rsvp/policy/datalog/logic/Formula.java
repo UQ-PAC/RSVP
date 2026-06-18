@@ -14,6 +14,19 @@ public abstract class Formula {
         return cache;
     }
 
+    @Override
+    public final boolean equals(Object other) {
+        if (other instanceof Formula f) {
+            return this.toString().equals(other.toString());
+        }
+        return false;
+    }
+
+    @Override
+    public final int hashCode() {
+        return toString().hashCode();
+    }
+
     public abstract <T> T accept(FormulaValueVisitor<T> visitor);
 
     public abstract void accept(FormulaVoidVisitor visitor);

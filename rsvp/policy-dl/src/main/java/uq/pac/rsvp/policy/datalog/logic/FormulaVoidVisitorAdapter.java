@@ -5,7 +5,7 @@ public class FormulaVoidVisitorAdapter implements FormulaVoidVisitor {
     public void visitLiteral(Literal literal) {}
 
     @Override
-    public void visitPredicate(Predicate<?> predicate) {}
+    public void visitPredicate(Term<?> term) {}
 
     @Override
     public void visitNegation(Negation negation) {

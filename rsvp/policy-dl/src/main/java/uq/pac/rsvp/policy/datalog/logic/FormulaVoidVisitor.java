@@ -3,7 +3,7 @@ package uq.pac.rsvp.policy.datalog.logic;
 public interface FormulaVoidVisitor {
     void visitLiteral(Literal literal);
 
-    void visitPredicate(Predicate<?> predicate);
+    void visitPredicate(Term<?> term);
 
     void visitNegation(Negation negation);
 

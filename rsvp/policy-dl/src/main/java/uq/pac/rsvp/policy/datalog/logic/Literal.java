@@ -24,18 +24,6 @@ public class Literal extends Formula {
         listener.visitLiteral(this);
     }
 
-    @Override
-    public boolean equals(Object other) {
-        if (other == null) {
-            return false;
-        } if (other == this) {
-            return true;
-        } else if (other instanceof Literal lit) {
-            return this.value == lit.value;
-        }
-        return false;
-    }
-
     public boolean asBoolean() {
         return value;
     }

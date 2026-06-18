@@ -40,14 +40,14 @@ public class DNFTransformer implements FormulaValueVisitor<Formula> {
             }
 
             @Override
-            public void visitPredicate(Predicate<?> predicate) {
-                result.add(predicate);
+            public void visitPredicate(Term<?> term) {
+                result.add(term);
             }
 
             @Override
             public void visitNegation(Negation negation) {
                 require(negation.getFormula() instanceof Literal ||
-                        negation.getFormula() instanceof Predicate<?>);
+                        negation.getFormula() instanceof Term<?>);
                 result.add(negation);
             }
 
@@ -78,14 +78,14 @@ public class DNFTransformer implements FormulaValueVisitor<Formula> {
             }
 
             @Override
-            public void visitPredicate(Predicate<?> predicate) {
-                result.add(predicate);
+            public void visitPredicate(Term<?> term) {
+                result.add(term);
             }
 
             @Override
             public void visitNegation(Negation negation) {
                 require(negation.getFormula() instanceof Literal ||
-                        negation.getFormula() instanceof Predicate<?>);
+                        negation.getFormula() instanceof Term<?>);
                 result.add(negation);
             }
 
@@ -108,8 +108,8 @@ public class DNFTransformer implements FormulaValueVisitor<Formula> {
     }
 
     @Override
-    public Formula visitPredicate(Predicate<?> predicate) {
-        return predicate;
+    public Formula visitPredicate(Term<?> term) {
+        return term;
     }
 
     @Override

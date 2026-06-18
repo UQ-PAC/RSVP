@@ -38,7 +38,7 @@ public class FormulaTest {
 
             @Override
             public Formula visitVariableExpr(VariableExpression expr) {
-                return new Predicate<>(expr.getReference());
+                return new Term<>(expr.getReference());
             }
 
             @Override
@@ -49,26 +49,26 @@ public class FormulaTest {
     }
 
     static class FormulaComparator {
-        private final List<Predicate<?>> predicates;
+        private final List<Term<?>> terms;
         private final List<List<Boolean>> inputs;
         private final Formula formula;
 
         FormulaComparator(Formula formula) {
             this.formula = formula;
-            this.predicates = getPredicates(formula);
-            this.inputs = getInputs(predicates.size());
+            this.terms = getPredicates(formula);
+            this.inputs = getInputs(terms.size());
         }
 
         /* Get a list of unique predicates of a formula */
-        public static List<Predicate<?>> getPredicates(Formula f) {
-            Set<Predicate<?>> predicates = new HashSet<>();
+        public static List<Term<?>> getPredicates(Formula f) {
+            Set<Term<?>> terms = new HashSet<>();
             f.accept(new FormulaVoidVisitorAdapter() {
                 @Override
-                public void visitPredicate(Predicate<?> predicate) {
-                    predicates.add(predicate);
+                public void visitPredicate(Term<?> term) {
+                    terms.add(term);
                 }
             });
-            return predicates.stream().toList();
+            return terms.stream().toList();
         }
 
         public static List<List<Boolean>> getInputs(int predicates) {
@@ -87,7 +87,7 @@ public class FormulaTest {
             return inputs;
         }
 
-        private boolean execute(Formula formula, Map<Predicate<?>, Boolean> index) {
+        private boolean execute(Formula formula, Map<Term<?>, Boolean> index) {
             return formula.accept(new FormulaValueVisitor<>() {
                 @Override
                 public Boolean visitLiteral(Literal literal) {
@@ -95,10 +95,10 @@ public class FormulaTest {
                 }
 
                 @Override
-                public Boolean visitPredicate(Predicate<?> predicate) {
-                    assertTrue(index.containsKey(predicate),
-                            "Predicate %s missing from index: " + predicate.stringify());
-                    return index.get(predicate);
+                public Boolean visitPredicate(Term<?> term) {
+                    assertTrue(index.containsKey(term),
+                            "Predicate %s missing from index: " + term.stringify());
+                    return index.get(term);
                 }
 
                 @Override
@@ -132,9 +132,9 @@ public class FormulaTest {
 
         void assertCompare(Formula another) {
             for (List<Boolean> input : inputs) {
-                Map<Predicate<?>, Boolean> index = new HashMap<>();
-                for (int i = 0; i < predicates.size(); i++) {
-                    index.put(predicates.get(i), input.get(i));
+                Map<Term<?>, Boolean> index = new HashMap<>();
+                for (int i = 0; i < terms.size(); i++) {
+                    index.put(terms.get(i), input.get(i));
                 }
                 boolean f1 = execute(formula, index);
                 boolean f2 = execute(another, index);

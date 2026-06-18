@@ -27,18 +27,6 @@ public abstract class LogicalOperator extends Formula {
         return formulae.get(index);
     }
 
-    @Override
-    public boolean equals(Object other) {
-        if (other == null) {
-            return false;
-        } else if (other == this) {
-            return true;
-        } else if (other instanceof LogicalOperator l) {
-            return getClass().equals(l.getClass()) && formulae.equals(l.formulae);
-        }
-        return false;
-    }
-
     public int arity() {
         return formulae.size();
     }

@@ -21,8 +21,8 @@ public class NNFTransformer implements FormulaValueVisitor<Formula> {
     }
 
     @Override
-    public Formula visitPredicate(Predicate<?> predicate) {
-        return predicate;
+    public Formula visitPredicate(Term<?> term) {
+        return term;
     }
 
     @Override

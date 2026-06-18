@@ -38,7 +38,7 @@ public class NFConverter implements PolicyComputationVisitor<Formula> {
             // '((a && b) && (c || d)) || (!(a && b) && !(c || d))'
             case Eq -> {
                 if (isScalar(expr.getLeft()) && isScalar(expr.getRight())) {
-                    yield new Predicate<>(expr);
+                    yield new Term<>(expr);
                 } else {
                     BinaryExpression lhs = new BinaryExpression(expr.getLeft(), And, expr.getRight());
                     Expression e1 = new UnaryExpression(Not, expr.getLeft());
@@ -49,41 +49,41 @@ public class NFConverter implements PolicyComputationVisitor<Formula> {
             }
             // != operator by this point should have been re-written to ==
             case Neq -> throw new AssertionError("unreachable");
-            default -> new Predicate<>(expr);
+            default -> new Term<>(expr);
         };
     }
 
     @Override
     public Formula visitCallExpr(CallExpression expr) {
-        return new Predicate<>(expr);
+        return new Term<>(expr);
     }
 
     @Override
     public Formula visitPropertyAccessExpr(PropertyAccessExpression expr) {
-        return new Predicate<>(expr);
+        return new Term<>(expr);
     }
 
     @Override
     public Formula visitUnaryExpr(UnaryExpression expr) {
         return switch (expr.getOperator()) {
             case UnaryExpression.Operator.Not -> new Negation(expr.getExpression().compute(this));
-            case UnaryExpression.Operator.Neg -> new Predicate<>(expr);
+            case UnaryExpression.Operator.Neg -> new Term<>(expr);
         };
     }
 
     @Override
     public Formula visitHasExpr(HasExpression expr) {
-        return new Predicate<>(expr);
+        return new Term<>(expr);
     }
 
     @Override
     public Formula visitVariableExpr(VariableExpression expr) {
-        return new Predicate<>(expr);
+        return new Term<>(expr);
     }
 
     @Override
     public Formula visitIsExpr(IsExpression expr) {
-        return new Predicate<>(expr);
+        return new Term<>(expr);
     }
 
     @Override
@@ -99,8 +99,8 @@ public class NFConverter implements PolicyComputationVisitor<Formula> {
             }
 
             @Override
-            public Expression visitPredicate(Predicate<?> predicate) {
-                return (Expression) predicate.getValue();
+            public Expression visitPredicate(Term<?> term) {
+                return (Expression) term.getValue();
             }
 
             @Override

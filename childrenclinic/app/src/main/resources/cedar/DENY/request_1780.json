@@ -1,5 +1,5 @@
 {
-  "principal": "ChildrenClinic::Guest::\"???\"",
+  "principal": "ChildrenClinic::Employee::\"Sharon Jenkins\"",
   "resource": "ChildrenClinic::Patient::\"Sly Estaban\"",
   "action": "ChildrenClinic::Action::\"AddVisit\"",
   "context": {}

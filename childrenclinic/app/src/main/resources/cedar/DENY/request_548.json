@@ -1,6 +1,6 @@
 {
-  "principal": "ChildrenClinic::Employee::\"Kathaleen Tramonte\"",
+  "principal": "ChildrenClinic::Employee::\"Linda Douglas\"",
   "resource": "ChildrenClinic::Guardian::\"Eduardo Rodriquez\"",
-  "action": "ChildrenClinic::Action::\"DeleteGuardian\"",
+  "action": "ChildrenClinic::Action::\"EditGuardian\"",
   "context": {}
 }

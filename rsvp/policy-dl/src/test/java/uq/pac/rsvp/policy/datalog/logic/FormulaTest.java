@@ -1,5 +1,6 @@
 package uq.pac.rsvp.policy.datalog.logic;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.opentest4j.AssertionFailedError;
@@ -173,5 +174,63 @@ public class FormulaTest {
         Formula f = parse(input);
         Formula dnf = NNFTransformer.transform(f);
         assertEquals(expected, dnf.toString());
+    }
+
+    /**
+     * Exhaustive enumeration of formulae over given terms
+     */
+    static List<Formula> combinations(List<Formula> terms) {
+        return switch (terms.size()) {
+            case 0: throw new AssertionFailedError();
+            case 1: yield terms;
+            case 2: yield List.of(
+                    new Conjunction(terms.get(0), terms.get(1)),
+                    new Disjunction(terms.get(0), terms.get(1)),
+                    new Negation(new Conjunction(terms.get(0), terms.get(1))),
+                    new Negation(new Disjunction(terms.get(0), terms.get(1)))
+            );
+            default:
+                List<Formula> more = new ArrayList<>();
+                for (int i = 1; i < terms.size(); i++) {
+                    List<Formula> lhs = combinations(terms.subList(0, i));
+                    List<Formula> rhs = combinations(terms.subList(i, terms.size()));
+                    for (Formula l : lhs) {
+                        for (Formula r : rhs) {
+                            more.add(new Conjunction(l, r));
+                            more.add(new Disjunction(l, r));
+                            more.add(new Negation(new Conjunction(l, r)));
+                            more.add(new Negation(new Disjunction(l, r)));
+                        }
+                    }
+                }
+                yield more;
+        };
+    }
+
+    // Exhaustive testing
+    @Test
+    void dnf() {
+        List<Formula> formulae = List.of(
+                new Term<>("a"),
+                new Term<>("b"),
+                new Term<>("c"),
+                new Term<>("d"),
+                new Term<>("e"),
+                new Term<>("f"));
+
+        combinations(formulae).forEach(f -> {
+            Formula dnf = DNFTransformer.transform(f);
+            List<List<Formula>> partitioned = DNFTransformer.getNormalForm(f);
+
+            partitioned.forEach(clause -> {
+                clause.forEach(term -> {
+                    Formula form = term instanceof Negation n ? n.getFormula() : term;
+                    assertTrue(form instanceof Literal || form instanceof Term<?>);
+                });
+            });
+
+            FormulaComparator comparator = new FormulaComparator(f);
+            comparator.assertCompare(dnf);
+        });
     }
 }

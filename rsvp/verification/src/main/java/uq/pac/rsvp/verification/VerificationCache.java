@@ -1,6 +1,7 @@
 package uq.pac.rsvp.verification;
 
 import uq.pac.rsvp.policy.datalog.translation.Request;
+import uq.pac.rsvp.policy.datalog.translation.RequestSet;
 import uq.pac.rsvp.verification.impact.ChangeImpact;
 
 import java.util.HashMap;
@@ -9,11 +10,13 @@ import java.util.Map;
 public class VerificationCache {
     private final Map<String, Map<Request, RequestResult>> requestMappings;
     private final Map<String, Map<String, ChangeImpact>> changeImpacts;
+    private final Map<String, RequestSet> requestSets;
     private final FileSet fileset;
 
     public VerificationCache(FileSet fileset) {
         requestMappings = new HashMap<>();
         changeImpacts = new HashMap<>();
+        requestSets = new HashMap<>();
 
         // TODO: check that fileset is finalised
         this.fileset = fileset;
@@ -33,6 +36,10 @@ public class VerificationCache {
         return requestMappings.get(file);
     }
 
+    public RequestSet getRequests(String policyVersion) {
+        return requestSets.get(policyVersion);
+    }
+
     public FileSet getFileset() {
         return fileset;
     }
@@ -45,4 +52,7 @@ public class VerificationCache {
         requestMappings.put(policyVersion, mapping);
     }
 
+    public void cacheRequests(String policyVersion, RequestSet requests) {
+        requestSets.put(policyVersion, requests);
+    }
 }

@@ -56,12 +56,13 @@ public class Verification {
             cache = new VerificationCache(fileset);
             Translation translation = translate(fileset);
             Map<Policy, RequestSet> policyResults = translation.getPolicyResult();
+            RequestSet allRequests = translation.getActionableRequests();
 
             // Generate the inverse map, request -> policy set:
             Map<Request, RequestResult> requestPolicyMap = createReverseMapping(policyResults);
             cache.cacheMapping(FileSet.LATEST, requestPolicyMap);
 
-            reports.addAll(PolicyAnalysis.checkPolicies(policyResults, requestPolicyMap));
+            reports.addAll(PolicyAnalysis.checkPolicies(allRequests, policyResults, requestPolicyMap));
             reports.addAll(PolicyAnalysis.checkInvariants(translation.getInvariantResult()));
         } catch (LocationError e) {
             // User-error, such as syntax or validation error

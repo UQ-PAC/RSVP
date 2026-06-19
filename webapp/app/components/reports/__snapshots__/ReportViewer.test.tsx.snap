@@ -1,0 +1,210 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`handles verification events 1`] = `
+<DocumentFragment>
+  <div
+    class="reports-container"
+  >
+    <div
+      data-testid="progress-spinner"
+      data-text="Verifying policies..."
+    />
+  </div>
+</DocumentFragment>
+`;
+
+exports[`handles verification events 2`] = `
+<DocumentFragment>
+  <div
+    class="reports-container"
+  >
+    <div
+      data-severity="err"
+      data-testid="report-section-Errors"
+      data-title="Errors"
+    >
+      <div
+        data-filename="test-file-one.txt"
+        data-filetype="text"
+        data-groupid="123"
+        data-testid="report-group"
+      >
+        <div
+          data-testid="report-item"
+        >
+          An Error Message
+        </div>
+      </div>
+      <div
+        data-filename="test-file-two.txt"
+        data-filetype="text"
+        data-groupid="456"
+        data-testid="report-group"
+      >
+        <div
+          data-testid="report-item"
+        >
+          Another Error Message
+        </div>
+      </div>
+    </div>
+    <div
+      data-severity="warn"
+      data-testid="report-section-Warnings"
+      data-title="Warnings"
+    >
+      <div
+        data-filename="test-file-one.txt"
+        data-filetype="text"
+        data-groupid="123"
+        data-testid="report-group"
+      >
+        <div
+          data-testid="report-item"
+        >
+          Heed this warning!
+        </div>
+        <div
+          data-testid="report-item"
+        >
+          You have beeen warned.
+        </div>
+      </div>
+    </div>
+    <div
+      data-severity="info"
+      data-testid="report-section-Information"
+      data-title="Information"
+    >
+      <div
+        data-filename="test-file-three.txt"
+        data-filetype="text"
+        data-groupid="987654321"
+        data-testid="report-group"
+      >
+        <div
+          data-testid="report-item"
+        >
+          Information
+        </div>
+      </div>
+      <div
+        data-filename="Other"
+        data-groupid="other"
+        data-testid="report-group"
+      >
+        <div
+          data-testid="report-item"
+        >
+          Where do I belong?
+        </div>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <div
+    class="reports-container"
+  >
+    <p
+      class="reports-instruction no-reports"
+    >
+      No reports to display
+    </p>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders 2`] = `
+<DocumentFragment>
+  <div
+    class="reports-container"
+  >
+    <div
+      data-severity="err"
+      data-testid="report-section-Errors"
+      data-title="Errors"
+    >
+      <div
+        data-filename="test-file-one.txt"
+        data-filetype="text"
+        data-groupid="123"
+        data-testid="report-group"
+      >
+        <div
+          data-testid="report-item"
+        >
+          An Error Message
+        </div>
+      </div>
+      <div
+        data-filename="test-file-two.txt"
+        data-filetype="text"
+        data-groupid="456"
+        data-testid="report-group"
+      >
+        <div
+          data-testid="report-item"
+        >
+          Another Error Message
+        </div>
+      </div>
+    </div>
+    <div
+      data-severity="warn"
+      data-testid="report-section-Warnings"
+      data-title="Warnings"
+    >
+      <div
+        data-filename="test-file-one.txt"
+        data-filetype="text"
+        data-groupid="123"
+        data-testid="report-group"
+      >
+        <div
+          data-testid="report-item"
+        >
+          Heed this warning!
+        </div>
+        <div
+          data-testid="report-item"
+        >
+          You have beeen warned.
+        </div>
+      </div>
+    </div>
+    <div
+      data-severity="info"
+      data-testid="report-section-Information"
+      data-title="Information"
+    >
+      <div
+        data-filename="test-file-three.txt"
+        data-filetype="text"
+        data-groupid="987654321"
+        data-testid="report-group"
+      >
+        <div
+          data-testid="report-item"
+        >
+          Information
+        </div>
+      </div>
+      <div
+        data-filename="Other"
+        data-groupid="other"
+        data-testid="report-group"
+      >
+        <div
+          data-testid="report-item"
+        >
+          Where do I belong?
+        </div>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;

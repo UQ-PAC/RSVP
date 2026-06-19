@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import Home from "./page";
 
-jest.mock("./components/providers/ContextProvider", () => ({
-  ContextProvider: jest.fn(({ children }) => (
-    <div data-testid="context-provider">{children}</div>
+jest.mock("./components/providers/ApplicationStateProvider", () => ({
+  ApplicationStateProvider: jest.fn(({ children }) => (
+    <div data-testid="app-state-provider">{children}</div>
   )),
 }));
 jest.mock("./components/sources/SourceFileViewer", () => ({

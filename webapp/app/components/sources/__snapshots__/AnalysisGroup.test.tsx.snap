@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <div
+    class="source-files-analysis-group"
+    data-testid="source-analysis-group"
+  >
+    <div
+      data-instruction="Upload Cedar policy, schema and entities files"
+      data-target="name"
+      data-testid="fallback"
+    />
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders 2`] = `
+<DocumentFragment>
+  <div
+    class="source-files-analysis-group"
+    data-testid="source-analysis-group"
+  >
+    <span
+      class="source-files-analysis-group-header"
+    >
+      <h2
+        class="source-files-analysis-group-title"
+      >
+        name
+      </h2>
+      <div
+        data-name="source-file-analysis-group"
+        data-testid="toggle-all"
+      />
+    </span>
+    <div
+      data-source="file-one.txt"
+      data-testid="source-file"
+    />
+    <div
+      data-source="file-two.txt"
+      data-testid="source-file"
+    />
+    <div
+      data-source="file-three.txt"
+      data-testid="source-file"
+    />
+  </div>
+</DocumentFragment>
+`;

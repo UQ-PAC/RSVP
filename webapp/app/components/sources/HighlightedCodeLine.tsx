@@ -3,10 +3,10 @@
 import cx from "classnames";
 import { JSX, Ref, useEffect, useMemo, useRef } from "react";
 import {
-  ExpansionState,
-  useFocus,
-  useFocusDispatch,
-} from "../../lib/context/FocusContext";
+  ExpansionStatus,
+  useExpansion,
+  useExpansionDispatch,
+} from "../../lib/context/ExpansionContext";
 import {
   useSelection,
   useSelectionDispatch,
@@ -20,7 +20,7 @@ import { FileType, Report, SourceLoc } from "../../lib/types";
 import { getSourceIdentifier } from "../../lib/util";
 
 interface HighlightedCodeLineProps {
-  line: string;
+  children: string;
   n: number;
   syntax: FileType;
   reports: ReportLine[];
@@ -28,7 +28,7 @@ interface HighlightedCodeLineProps {
 }
 
 export function HighlightedCodeLine({
-  line,
+  children: line,
   n,
   syntax,
   reports,
@@ -37,8 +37,8 @@ export function HighlightedCodeLine({
   const { selected, hovered, scroll, loc: selectedLoc } = useSelection();
   const selectionDispatch = useSelectionDispatch();
 
-  const { drawer: drawerFocus } = useFocus();
-  const focusDispatch = useFocusDispatch();
+  const { drawer: drawerFocus } = useExpansion();
+  const expansionDispatch = useExpansionDispatch();
 
   // Scroll selected policy into view
   const focus = useRef<HTMLSpanElement>(null);
@@ -64,29 +64,26 @@ export function HighlightedCodeLine({
     const id = report.id;
     const severity = report.severity;
     if (selected !== id) {
-      if (drawerFocus.expansions.right !== ExpansionState.Expanded) {
-        focusDispatch({
-          type: "focus",
-          target: "drawer",
-          focus: { key: "left", value: ExpansionState.Collapsed },
+      if (drawerFocus.expansions.right !== ExpansionStatus.Expanded) {
+        expansionDispatch({
+          type: "toggle",
+          group: "drawer",
+          id: "left",
+          status: ExpansionStatus.Collapsed,
         });
-        focusDispatch({
-          type: "focus",
-          target: "drawer",
-          focus: {
-            key: "right",
-            value: ExpansionState.Expanded,
-          },
+        expansionDispatch({
+          type: "toggle",
+          group: "drawer",
+          id: "right",
+          status: ExpansionStatus.Expanded,
         });
       }
 
-      focusDispatch({
-        type: "focus",
-        target: "report-group",
-        focus: {
-          key: `${severity}-${loc.source?.filename}`,
-          value: ExpansionState.Expanded,
-        },
+      expansionDispatch({
+        type: "toggle",
+        group: "report-group",
+        id: `${severity}-${loc.source?.filename}`,
+        status: ExpansionStatus.Expanded,
       });
     }
 
@@ -265,8 +262,8 @@ export function HighlightedCodeLine({
     i++;
   }
 
-  const severity = (hoveredReport ?? selectedReport ?? mostSevere.report)
-    .severity;
+  const severity = (hoveredReport ?? selectedReport ?? mostSevere?.report)
+    ?.severity;
 
   const numberClass = cx(
     "source-file-line-number",
@@ -296,7 +293,7 @@ export function HighlightedCodeLine({
             : undefined
         }
         onMouseOver={
-          mostRelevant && !temporaryHighlight
+          mostRelevant && !temporaryHighlight(n)
             ? (e) => enter(e, mostRelevant?.report, mostRelevant?.loc)
             : undefined
         }

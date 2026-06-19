@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class VerificationTest {
 
@@ -25,7 +24,9 @@ public class VerificationTest {
 
         VerificationResult result = Verification.verifyPolicies(fileset);
 
-        assertTrue(result.reports().isEmpty());
+        // Single coverage report
+        assertEquals(1, result.reports().size());
+        assertEquals(Report.Severity.Info, result.reports().iterator().next().getSeverity());
     }
 
     @Test
@@ -44,12 +45,21 @@ public class VerificationTest {
 
         Set<Report> reports = Verification.verifyPolicies(fileset).reports();
 
-        assertEquals(2, reports.size());
+        assertEquals(3, reports.size());
 
+        int subsumedCount = 0;
+        int noCoverageCount = 0;
         for (Report report : reports) {
-            assertEquals("Subsumed Policy", report.getMessage());
+            if (report.getMessage().equals("Subsumed Policy")) {
+                subsumedCount++;
+            }
+            else if (report.getMessage().equals("Not all requests are covered by policy")) {
+                noCoverageCount++;
+            }
         }
 
+        assertEquals(2, subsumedCount);
+        assertEquals(1, noCoverageCount);
     }
 
 }

@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import static uq.pac.rsvp.Assertion.require;
+import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.ActionableRequestsRuleDecl;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.AttributeRuleDecl;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.ForbidRuleDecl;
 import static uq.pac.rsvp.policy.datalog.translation.TranslationConstants.HasAttributeRuleDecl;
@@ -289,6 +290,14 @@ public class Translation {
             result.put(invariant, new InvariantResult(invariant, loadRelation(invariant)));
         });
         return result;
+    }
+
+    /**
+     * Get the complete set of actionable requests (i.e. requests that are valid according to the
+     * policy schema).
+     */
+    public RequestSet getActionableRequests() {
+        return loadRequests(ActionableRequestsRuleDecl);
     }
 
     public Schema getSchema() {

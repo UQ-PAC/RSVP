@@ -1,15 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-var */
-import { fireEvent, render, screen } from "@testing-library/react";
-import { ExpansionState } from "../../lib/context/FocusContext";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import { ExpansionStatus } from "../../lib/context/ExpansionContext";
 import { Report, SourceLoc } from "../../lib/types";
 import { ReportItem } from "./ReportItem";
 
-var focusDispatch = jest.fn();
+var expansionDispatch = jest.fn();
 var selectionDispatch = jest.fn();
 var selectedReport = "";
 var hoveredReport = "";
 var scrollSelection = "none";
+var selectedLoc = "";
 
 jest.mock("@fortawesome/react-fontawesome", () => ({
   FontAwesomeIcon: jest.fn(({ icon }) => (
@@ -25,9 +24,9 @@ jest.mock("@fortawesome/free-solid-svg-icons", () => ({
   faCircleXmark: "faCircleXmark",
 }));
 
-jest.mock("../../lib/context/FocusContext", () => ({
-  ...jest.requireActual("../../lib/context/FocusContext"),
-  useFocusDispatch: () => focusDispatch,
+jest.mock("../../lib/context/ExpansionContext", () => ({
+  ...jest.requireActual("../../lib/context/ExpansionContext"),
+  useExpansionDispatch: () => expansionDispatch,
 }));
 
 jest.mock("../../lib/context/SelectionContext", () => ({
@@ -35,6 +34,7 @@ jest.mock("../../lib/context/SelectionContext", () => ({
     selected: selectedReport,
     hovered: hoveredReport,
     scroll: scrollSelection,
+    loc: selectedLoc,
   }),
   useSelectionDispatch: () => selectionDispatch,
 }));
@@ -47,7 +47,7 @@ jest.mock("../../lib/util", () => ({
 }));
 
 beforeEach(() => {
-  focusDispatch.mockClear();
+  expansionDispatch.mockClear();
   selectionDispatch.mockClear();
   selectedReport = "";
   hoveredReport = "";
@@ -95,7 +95,9 @@ test("renders", () => {
   expect(asFragment()).toMatchSnapshot();
 
   // Selected
-  selectedReport = "123";
+  act(() => {
+    selectedReport = "123";
+  });
 
   rerender(
     <ReportItem
@@ -110,7 +112,9 @@ test("renders", () => {
   );
   expect(asFragment()).toMatchSnapshot();
 
-  hoveredReport = "123";
+  act(() => {
+    hoveredReport = "123";
+  });
 
   rerender(
     <ReportItem
@@ -157,13 +161,17 @@ test("scrolls into view", async () => {
   const scrollIntoView = jest.fn();
   element.scrollIntoView = scrollIntoView;
 
-  scrollSelection = "report";
+  act(() => {
+    scrollSelection = "report";
+  });
 
   rerender(<ReportItem report={report} />);
 
   expect(scrollIntoView).toHaveBeenCalledTimes(1);
 
-  selectedReport = "456";
+  act(() => {
+    selectedReport = "456";
+  });
 
   rerender(<ReportItem report={report} />);
 
@@ -193,11 +201,13 @@ test("triggers selection", async () => {
   });
 
   // Deselect
-  selectedReport = "123";
+  act(() => {
+    selectedReport = "123";
+  });
   rerender(<ReportItem report={report} />);
   fireEvent.click(element);
 
-  expect(focusDispatch).not.toHaveBeenCalled();
+  expect(expansionDispatch).not.toHaveBeenCalled();
   expect(selectionDispatch).toHaveBeenCalledTimes(2);
   expect(selectionDispatch).toHaveBeenNthCalledWith(2, {
     selected: "",
@@ -205,7 +215,9 @@ test("triggers selection", async () => {
   });
 
   // Select triggers focus on source location
-  selectedReport = "";
+  act(() => {
+    selectedReport = "";
+  });
   report.sourceLocations.push({
     location: {
       file: "some-file.txt",
@@ -216,11 +228,12 @@ test("triggers selection", async () => {
   fireEvent.click(element);
 
   expect(selectionDispatch).toHaveBeenCalledTimes(3);
-  expect(focusDispatch).toHaveBeenCalledTimes(1);
-  expect(focusDispatch).toHaveBeenCalledWith({
-    type: "focus",
-    target: "source-file",
-    focus: { key: "some-file.txt", value: ExpansionState.Expanded },
+  expect(expansionDispatch).toHaveBeenCalledTimes(1);
+  expect(expansionDispatch).toHaveBeenCalledWith({
+    type: "toggle",
+    group: "source-file",
+    id: "some-file.txt",
+    status: ExpansionStatus.Expanded,
   });
 });
 
@@ -248,7 +261,9 @@ test("triggers hover", () => {
   });
 
   // Stop hover
-  selectedReport = "123";
+  act(() => {
+    selectedReport = "123";
+  });
   rerender(<ReportItem report={report} />);
   fireEvent.mouseOut(element);
 
@@ -266,6 +281,7 @@ describe("multiple source locations", () => {
     severity: "info",
     sourceLocations: [
       {
+        message: "source location message",
         location: {
           file: "test-file.txt",
           offset: 100,
@@ -282,6 +298,14 @@ describe("multiple source locations", () => {
           },
         },
       },
+      {
+        message: "a mystery!",
+        location: {
+          file: "unresolved-file.txt",
+          offset: 350,
+          len: 2,
+        },
+      },
     ] as any[],
     message: "Test Report",
   };
@@ -292,14 +316,26 @@ describe("multiple source locations", () => {
     expect(asFragment()).toMatchSnapshot();
 
     // Selected
-    selectedReport = "123";
+    act(() => {
+      selectedReport = "123";
+    });
+
+    rerender(<ReportItem report={report} />);
+    expect(asFragment()).toMatchSnapshot();
+
+    // Hover over location
+    act(() => {
+      selectedLoc = "123:test-file.txt:100:10-ident";
+    });
 
     rerender(<ReportItem report={report} />);
     expect(asFragment()).toMatchSnapshot();
   });
 
   test("triggers source location selection", async () => {
-    selectedReport = "123";
+    act(() => {
+      selectedReport = "123";
+    });
 
     render(<ReportItem report={report} />);
 
@@ -316,11 +352,12 @@ describe("multiple source locations", () => {
       loc: "123:test-file.txt:100:10-ident",
     });
 
-    expect(focusDispatch).toHaveBeenCalledTimes(1);
-    expect(focusDispatch).toHaveBeenCalledWith({
-      type: "focus",
-      target: "source-file",
-      focus: { key: "test-file.txt", value: ExpansionState.Expanded },
+    expect(expansionDispatch).toHaveBeenCalledTimes(1);
+    expect(expansionDispatch).toHaveBeenCalledWith({
+      type: "toggle",
+      group: "source-file",
+      id: "test-file.txt",
+      status: ExpansionStatus.Expanded,
     });
 
     // Select second source location
@@ -336,16 +373,19 @@ describe("multiple source locations", () => {
       loc: "123:another-file.txt:10:50-ident",
     });
 
-    expect(focusDispatch).toHaveBeenCalledTimes(2);
-    expect(focusDispatch).toHaveBeenNthCalledWith(2, {
-      type: "focus",
-      target: "source-file",
-      focus: { key: "another-file.txt", value: ExpansionState.Expanded },
+    expect(expansionDispatch).toHaveBeenCalledTimes(2);
+    expect(expansionDispatch).toHaveBeenNthCalledWith(2, {
+      type: "toggle",
+      group: "source-file",
+      id: "another-file.txt",
+      status: ExpansionStatus.Expanded,
     });
   });
 
   test("triggers source location hover", () => {
-    selectedReport = "123";
+    act(() => {
+      selectedReport = "123";
+    });
 
     render(<ReportItem report={report} />);
 

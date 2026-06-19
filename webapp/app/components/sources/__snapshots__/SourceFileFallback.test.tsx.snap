@@ -1,0 +1,145 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <div
+    class="source-file expanded"
+  >
+    <div
+      class="source-file-header"
+      data-testid="source-fallback-header"
+    >
+      <div
+        data-icon="text-icon"
+        data-testid="font-awesome-icon"
+      />
+      <h2
+        class="source-file-name"
+      >
+        file.txt
+      </h2>
+      <div
+        data-icon="icon"
+        data-testid="font-awesome-icon"
+      />
+    </div>
+    <div
+      class="source-file-content"
+    >
+      <div
+        data-file="file.txt"
+        data-reports="0"
+        data-testid="code-render"
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`toggles icon on hover 1`] = `
+<DocumentFragment>
+  <div
+    class="source-file expanded"
+  >
+    <div
+      class="source-file-header"
+      data-testid="source-fallback-header"
+    >
+      <div
+        data-icon="text-icon"
+        data-testid="font-awesome-icon"
+      />
+      <h2
+        class="source-file-name"
+      >
+        file.txt
+      </h2>
+      <div
+        data-icon="icon"
+        data-testid="font-awesome-icon"
+      />
+    </div>
+    <div
+      class="source-file-content"
+    >
+      <div
+        data-file="file.txt"
+        data-reports="0"
+        data-testid="code-render"
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`toggles icon on hover 2`] = `
+<DocumentFragment>
+  <div
+    class="source-file expanded"
+  >
+    <div
+      class="source-file-header"
+      data-testid="source-fallback-header"
+    >
+      <div
+        data-icon="text-icon"
+        data-testid="font-awesome-icon"
+      />
+      <h2
+        class="source-file-name"
+      >
+        file.txt
+      </h2>
+      <div
+        data-icon="hovered-icon"
+        data-testid="font-awesome-icon"
+      />
+    </div>
+    <div
+      class="source-file-content"
+    >
+      <div
+        data-file="file.txt"
+        data-reports="0"
+        data-testid="code-render"
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`toggles icon on hover 3`] = `
+<DocumentFragment>
+  <div
+    class="source-file expanded"
+  >
+    <div
+      class="source-file-header"
+      data-testid="source-fallback-header"
+    >
+      <div
+        data-icon="text-icon"
+        data-testid="font-awesome-icon"
+      />
+      <h2
+        class="source-file-name"
+      >
+        file.txt
+      </h2>
+      <div
+        data-icon="icon"
+        data-testid="font-awesome-icon"
+      />
+    </div>
+    <div
+      class="source-file-content"
+    >
+      <div
+        data-file="file.txt"
+        data-reports="0"
+        data-testid="code-render"
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;

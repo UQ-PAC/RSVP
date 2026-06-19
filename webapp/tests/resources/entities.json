@@ -1,0 +1,19 @@
+[
+  {
+    "uid": { "type": "Role", "id": "User" },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": { "type": "Role", "id": "Admin" },
+    "attrs": {},
+    "parents": []
+  },
+  {
+    "uid": { "type": "Account", "id": "Alice" },
+    "attrs": {
+      "role": { "__entity": { "type": "Role", "id": "User" } }
+    },
+    "parents": []
+  }
+]

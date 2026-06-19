@@ -75,8 +75,8 @@
     color: var(--color-err-darkest);
     font-size: 0.7rem;
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 0.1rem;
+    right: 0.1rem;
   }
 
   .create-analysis-group-form .create-analysis-group-buttons {
@@ -137,7 +137,6 @@
 
   .upload-container .analysis-group-filelist {
     padding: 0.5rem 0 0 0;
-    margin-bottom: 0.5rem;
   }
 
   .upload-container .file-list-title {
@@ -240,7 +239,7 @@
   .analysis-group .analysis-group-errors {
     display: flex;
     flex-direction: column;
-    padding: 0.5rem;
+    padding: 0 0.5rem 0.5rem;
   }
 
   .analysis-group .analysis-group-errors .analysis-group-error {
@@ -272,9 +271,19 @@
     font-size: 0.9rem;
   }
 
-  .file-input .drop-zone:hover {
+  .file-input .drop-zone:hover:not(.error) {
     border-color: var(--color-gray-400);
     color: var(--color-gray-600);
+  }
+
+  .file-input .drop-zone.error {
+    border-color: var(--color-err-darker);
+    color: var(--color-red-700);
+  }
+
+  .file-input .drop-zone.error:hover {
+    border-color: var(--color-err-darkest);
+    color: var(--color-red-700);
   }
 
   .file-input .drop-zone .drop-message {

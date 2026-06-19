@@ -13,12 +13,13 @@ export function HiddenFileInput({
   ref,
   handleFileInput,
 }: HiddenFileInputProps) {
-  // Hidden file input for traditional file selection
+  // Hidden file input for traditional file selection triggered
+  // programmatically using ref.click()
   return (
     <input
       ref={ref}
       type="file"
-      multiple
+      multiple // Allow multiple file selection
       onChange={handleFileInput}
       style={{ display: "none" }}
       accept={accept}

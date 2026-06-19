@@ -12,23 +12,16 @@ public class Negation extends Formula {
     }
 
     @Override
-    public <T> T accept(FormulaVisitor<T> visitor) {
+    public <T> T accept(FormulaValueVisitor<T> visitor) {
         return visitor.visitNegation(this);
+    }
+
+    @Override
+    public void accept(FormulaVoidVisitor listener) {
+        listener.visitNegation(this);
     }
 
     public Formula getFormula() {
         return formula;
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        if (other == null) {
-            return false;
-        } if (other == this) {
-            return true;
-        } else if (other instanceof Negation n) {
-            return this.formula.equals(n.formula);
-        }
-        return false;
     }
 }

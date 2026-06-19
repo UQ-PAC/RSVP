@@ -1,13 +1,12 @@
-/* eslint-disable no-var */
 import { fireEvent, render, screen } from "@testing-library/react";
 
-import { ExpansionState } from "../../lib/context/FocusContext";
+import { ExpansionStatus } from "../../lib/context/ExpansionContext";
 import { VerifyButton } from "./VerifyButton";
 
-var uploadDrawer = ExpansionState.Expanded;
-var reportsDrawer = ExpansionState.Expanded;
+var uploadDrawer = ExpansionStatus.Expanded;
+var reportsDrawer = ExpansionStatus.Expanded;
 var analysisGroupValidationResult = { error: false };
-var focusDispatch = jest.fn();
+var expansionDispatch = jest.fn();
 var verificationDispatch = jest.fn();
 
 jest.mock("next/font/google", () => ({
@@ -24,9 +23,9 @@ jest.mock("@fortawesome/free-solid-svg-icons", () => ({
   faFileShield: "faFileShield",
 }));
 
-jest.mock("../../lib/context/FocusContext", () => ({
-  ...jest.requireActual("../../lib/context/FocusContext"),
-  useFocus: () => ({
+jest.mock("../../lib/context/ExpansionContext", () => ({
+  ...jest.requireActual("../../lib/context/ExpansionContext"),
+  useExpansion: () => ({
     drawer: {
       expansions: {
         left: uploadDrawer,
@@ -34,7 +33,7 @@ jest.mock("../../lib/context/FocusContext", () => ({
       },
     },
   }),
-  useFocusDispatch: () => focusDispatch,
+  useExpansionDispatch: () => expansionDispatch,
 }));
 
 jest.mock("../../lib/context/VerificationContext", () => ({
@@ -47,7 +46,7 @@ jest.mock("../../lib/util", () => ({
 }));
 
 beforeEach(() => {
-  focusDispatch.mockClear();
+  expansionDispatch.mockClear();
   verificationDispatch.mockClear();
 });
 
@@ -64,11 +63,8 @@ test("triggers verification", () => {
   expect(button).toBeInTheDocument();
 
   fireEvent.click(button);
-  expect(verificationDispatch).toHaveBeenCalledTimes(2);
-  expect(verificationDispatch).toHaveBeenNthCalledWith(1, {
-    type: "pre-verify",
-  });
-  expect(verificationDispatch).toHaveBeenNthCalledWith(2, { type: "verify" });
+  expect(verificationDispatch).toHaveBeenCalledTimes(1);
+  expect(verificationDispatch).toHaveBeenCalledWith({ type: "verify" });
 });
 
 test("doesn't trigger verification on error", () => {
@@ -86,30 +82,32 @@ test("expands reports drawer on valid request", () => {
   analysisGroupValidationResult = { error: false };
 
   // Don't trigger expansion if already expanded
-  reportsDrawer = ExpansionState.Expanded;
+  reportsDrawer = ExpansionStatus.Expanded;
   const { rerender } = render(<VerifyButton />);
 
   const button = screen.getByTestId("verify-button");
   expect(button).toBeInTheDocument();
   fireEvent.click(button);
 
-  expect(focusDispatch).toHaveBeenCalledTimes(0);
+  expect(expansionDispatch).toHaveBeenCalledTimes(0);
 
   // Trigger expansion if reports drawer is collapsed
-  reportsDrawer = ExpansionState.Collapsed;
+  reportsDrawer = ExpansionStatus.Collapsed;
   rerender(<VerifyButton />);
 
   fireEvent.click(button);
-  expect(focusDispatch).toHaveBeenCalledTimes(2);
-  expect(focusDispatch).toHaveBeenNthCalledWith(1, {
-    type: "focus",
-    target: "drawer",
-    focus: { key: "left", value: ExpansionState.Collapsed },
+  expect(expansionDispatch).toHaveBeenCalledTimes(2);
+  expect(expansionDispatch).toHaveBeenNthCalledWith(1, {
+    type: "toggle",
+    group: "drawer",
+    id: "left",
+    status: ExpansionStatus.Collapsed,
   });
-  expect(focusDispatch).toHaveBeenNthCalledWith(2, {
-    type: "focus",
-    target: "drawer",
-    focus: { key: "right", value: ExpansionState.Expanded },
+  expect(expansionDispatch).toHaveBeenNthCalledWith(2, {
+    type: "toggle",
+    group: "drawer",
+    id: "right",
+    status: ExpansionStatus.Expanded,
   });
 });
 
@@ -117,29 +115,31 @@ test("expands upload drawer on error", () => {
   analysisGroupValidationResult = { error: true };
 
   // Don't trigger expansion if already expanded
-  uploadDrawer = ExpansionState.Expanded;
+  uploadDrawer = ExpansionStatus.Expanded;
   const { rerender } = render(<VerifyButton />);
 
   const button = screen.getByTestId("verify-button");
   expect(button).toBeInTheDocument();
   fireEvent.click(button);
 
-  expect(focusDispatch).toHaveBeenCalledTimes(0);
+  expect(expansionDispatch).toHaveBeenCalledTimes(0);
 
   // Trigger expansion if upload drawer is collapsed
-  uploadDrawer = ExpansionState.Collapsed;
+  uploadDrawer = ExpansionStatus.Collapsed;
   rerender(<VerifyButton />);
 
   fireEvent.click(button);
-  expect(focusDispatch).toHaveBeenCalledTimes(2);
-  expect(focusDispatch).toHaveBeenNthCalledWith(1, {
-    type: "focus",
-    target: "drawer",
-    focus: { key: "right", value: ExpansionState.Collapsed },
+  expect(expansionDispatch).toHaveBeenCalledTimes(2);
+  expect(expansionDispatch).toHaveBeenNthCalledWith(1, {
+    type: "toggle",
+    group: "drawer",
+    id: "right",
+    status: ExpansionStatus.Collapsed,
   });
-  expect(focusDispatch).toHaveBeenNthCalledWith(2, {
-    type: "focus",
-    target: "drawer",
-    focus: { key: "left", value: ExpansionState.Expanded },
+  expect(expansionDispatch).toHaveBeenNthCalledWith(2, {
+    type: "toggle",
+    group: "drawer",
+    id: "left",
+    status: ExpansionStatus.Expanded,
   });
 });

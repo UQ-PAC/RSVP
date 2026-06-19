@@ -1,0 +1,12 @@
+entity Role enum [ "User", "Admin" ];
+
+entity Account {
+    role: Role
+};
+
+entity Album;
+
+action removeAlbum appliesTo {
+    principal: Account,
+    resource: Album
+};

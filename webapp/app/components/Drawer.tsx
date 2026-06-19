@@ -4,10 +4,10 @@ import { faCaretLeft, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import cx from "classnames";
 import {
-  ExpansionState,
-  useFocus,
-  useFocusDispatch,
-} from "../lib/context/FocusContext";
+  ExpansionStatus,
+  useExpansion,
+  useExpansionDispatch,
+} from "../lib/context/ExpansionContext";
 
 import "./drawer.css";
 
@@ -18,8 +18,8 @@ interface DrawerProps {
 }
 
 export function Drawer({ title, side, children }: DrawerProps) {
-  const { drawer } = useFocus();
-  const dispatch = useFocusDispatch();
+  const { drawer } = useExpansion();
+  const dispatch = useExpansionDispatch();
 
   const expanded = !drawer.expansions[side];
 
@@ -37,14 +37,12 @@ export function Drawer({ title, side, children }: DrawerProps) {
         data-testid="drawer-tab"
         onClick={() =>
           dispatch({
-            type: "focus",
-            target: "drawer",
-            focus: {
-              key: side,
-              value: expanded
-                ? ExpansionState.Collapsed
-                : ExpansionState.Expanded,
-            },
+            type: "toggle",
+            group: "drawer",
+            id: side,
+            status: expanded
+              ? ExpansionStatus.Collapsed
+              : ExpansionStatus.Expanded,
           })
         }
       >

@@ -1,12 +1,4 @@
 import {
-  IconDefinition,
-  faBarsStaggered,
-  faCheckDouble,
-  faDatabase,
-  faFileLines,
-  faLock,
-} from "@fortawesome/free-solid-svg-icons";
-import {
   FileType,
   Report,
   SourceLoc,
@@ -86,19 +78,4 @@ export function checkAnalysisGroup(files: VersionedFileList): {
   const error = !hasPolicy || !hasSchema || !hasEntities;
 
   return { hasPolicy, hasSchema, hasEntities, error };
-}
-
-export function getFileIcon(filetype: FileType | undefined): IconDefinition {
-  switch (filetype) {
-    case "cedar":
-      return faLock;
-    case "cedarschema":
-      return faBarsStaggered;
-    case "entities":
-      return faDatabase;
-    case "invariant":
-      return faCheckDouble;
-    default:
-      return faFileLines;
-  }
 }

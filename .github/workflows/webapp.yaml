@@ -1,4 +1,4 @@
-name: Build Web Application
+name: React Application
 
 on:
   push:
@@ -7,26 +7,53 @@ on:
       - ".github/workflows/webapp.yaml"
   workflow_dispatch:
 
+defaults:
+  run:
+    working-directory: ./webapp
+
 jobs:
   build:
+    name: Build & Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
         with:
           package_json_file: ./webapp/package.json
           run_install: |
             - cwd: ./webapp
-      - name: Build & Test
-        run: pnpm test
-        working-directory: ./webapp
-      - name: Upload test coverage
-        if: success()
-        uses: actions/upload-artifact@v4
+
+      - name: Build
+        run: pnpm build
+
+      - name: Unit test
+        id: unit-test
+        run: pnpm test:unit
+
+      - name: Upload unit test coverage
+        uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() && steps.unit-test.outcome != 'skipped'}}
         with:
           name: coverage-report
           path: ./webapp/coverage/
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install
+
+      - name: End-to-end test
+        id: e2e-test
+        run: pnpm test:e2e
+
+      - name: Upload end-to-end test results
+        if: ${{ !cancelled() && steps.e2e-test.outcome != 'skipped'}}
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-test-report
+          path: ./webapp/playwright-report/
           if-no-files-found: error
           retention-days: 7

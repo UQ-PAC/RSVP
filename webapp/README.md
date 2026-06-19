@@ -4,38 +4,45 @@
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
 ## Environment setup
 
-This project requires Node.js, npm and pnpm to be installed. Install Node.js and npm by following
-the relevant instructions in the [npm documentation](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
+This project requires Node.js, npm, pnpm to be installed.
 
-Then install pnpm using npm:
+Install Node.js 24:
 
 ```
-npm install -g pnpm@latest-10
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.5/install.sh | bash
+nvm install 24
 ```
 
-Before building the project for the first time you will need to install the required dependencies by running the following:
+More detailed instructions can be found in the [npm documentation](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
+
+Enable pnpm:
+
+```
+corepack enable pnpm
+```
+
+Before building the project for the first time you will need to install the required dependencies:
 
 ```
 pnpm install
 ```
 
-If you ever delete the `node_modules` directory or `pnpm-lock.yaml`, or if you encounter conflicts in `pnpm-lock.yaml` when rebasing, you will need to re-run `pnpm install`. Conflicts will be automatically resolved as part of this step.
+> [!NOTE]
+> If you ever delete the `node_modules` directory or `pnpm-lock.yaml`, or if you encounter conflicts in `pnpm-lock.yaml` when rebasing, you will need to re-run `pnpm install`. Conflicts will be automatically resolved as part of this step.
+
+In order to run the end-to-end tests, install Playwright headless browsers:
+
+```
+pnpm exec playwright install
+```
 
 ## Local development
 
-- Run tests:
-
-  ```
-  pnpm test
-  ```
-
-- Run a single test file
-
-  ```
-  pnpm test app/util.test.ts
-  ```
+The React client interacts with a Spring Boot backend to execute policy verification, the server code is located in a submodule of [../rsvp](https://github.com/UQ-PAC/RSVP/tree/main/rsvp) and can be executed from that directory by running `./gradlew :webserver:bootRun`.
 
 - Start the development server:
 
@@ -43,12 +50,60 @@ If you ever delete the `node_modules` directory or `pnpm-lock.yaml`, or if you e
   pnpm dev
   ```
 
-  Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-  The page auto-updates as you edit files.
+  Open [http://localhost:3000](http://localhost:3000) with your browser to see the result. The page auto-updates as you edit files.
 
-  This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Build and start the production server:
 
-  **Note**: The React client interacts with a Spring Boot web server to execute policy verification, the server code is located in a submodule of [../rsvp](https://github.com/UQ-PAC/RSVP/tree/main/rsvp) and can be executed from that directory by running `./gradlew :webserver:bootRun`.
+  ```
+  pnpm build
+  pnpm start
+  ```
+
+- Run tests:
+
+  ```
+  pnpm test
+  ```
+
+- Run only unit tests:
+
+  ```
+  pnpm test:unit
+  ```
+
+  A detailed test coverage report can be found in `./coverage/lcov-report/index.html`.
+
+- Run a single unit test file:
+
+  ```
+  pnpm test:unit app/page.test.ts
+  ```
+
+- Run a single unit test:
+
+  ```
+  pnpm test:unit -t "test description"
+  ```
+
+- Run only end-to-end tests:
+
+  ```
+  pnpm test:e2e
+  ```
+
+  A detailed report can be found in `./playwright-report/index.html`.
+
+- Run a single end-to-end test file:
+
+  ```
+  pnpm test:e2e tests/page.test.ts
+  ```
+
+- Run a single end-to-end test:
+
+  ```
+  pnpm test:e2e -g "test description"
+  ```
 
 ## Learn More
 

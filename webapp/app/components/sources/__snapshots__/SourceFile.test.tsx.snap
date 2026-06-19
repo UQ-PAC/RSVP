@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <div
+    data-file="single-file.txt"
+    data-testid="source-file-fallback"
+  />
+</DocumentFragment>
+`;
+
+exports[`renders 2`] = `
+<DocumentFragment>
+  <div
+    data-file="single-file.txt"
+    data-reports="["report!","another report"]"
+    data-testid="single-source-file"
+    data-uploaded="123"
+  />
+</DocumentFragment>
+`;
+
+exports[`renders 3`] = `
+<DocumentFragment>
+  <div
+    data-reports="["report!","another report"]"
+    data-testid="versioned-source-file"
+  >
+    <div
+      data-file="versioned-file.txt"
+      data-testid="source-file-version"
+      data-uploaded="123"
+    />
+    <div
+      data-file="versioned-file.txt"
+      data-testid="source-file-version"
+      data-uploaded="456"
+    />
+    <div
+      data-file="versioned-file.txt"
+      data-testid="source-file-version"
+      data-uploaded="789"
+    />
+  </div>
+</DocumentFragment>
+`;

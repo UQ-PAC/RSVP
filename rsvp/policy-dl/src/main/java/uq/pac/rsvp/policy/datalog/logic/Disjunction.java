@@ -11,7 +11,12 @@ public class Disjunction extends LogicalOperator {
     }
 
     @Override
-    public <T> T accept(FormulaVisitor<T> visitor) {
+    public <T> T accept(FormulaValueVisitor<T> visitor) {
         return visitor.visitDisjunction(this);
+    }
+
+    @Override
+    public void accept(FormulaVoidVisitor listener) {
+        listener.visitDisjunction(this);
     }
 }

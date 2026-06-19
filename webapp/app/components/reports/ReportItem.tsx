@@ -9,9 +9,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import cx from "classnames";
 import { useEffect, useRef } from "react";
 import {
-  ExpansionState,
-  useFocusDispatch,
-} from "../../lib/context/FocusContext";
+  ExpansionStatus,
+  useExpansionDispatch,
+} from "../../lib/context/ExpansionContext";
 import {
   useSelection,
   useSelectionDispatch,
@@ -26,7 +26,7 @@ interface ReportItemParams {
 export function ReportItem({ report }: ReportItemParams) {
   const { selected, hovered, scroll, loc } = useSelection();
   const selectionDispatch = useSelectionDispatch();
-  const focusDispatch = useFocusDispatch();
+  const expansionDispatch = useExpansionDispatch();
 
   const element = useRef<HTMLDivElement>(null);
 
@@ -66,10 +66,11 @@ export function ReportItem({ report }: ReportItemParams) {
 
   const clickLoc = (e, report: Report, loc: SourceLoc) => {
     e.stopPropagation();
-    focusDispatch({
-      type: "focus",
-      target: "source-file",
-      focus: { key: loc.file, value: ExpansionState.Expanded },
+    expansionDispatch({
+      type: "toggle",
+      group: "source-file",
+      id: loc.file,
+      status: ExpansionStatus.Expanded,
     });
     selectionDispatch({
       scroll: "source",
@@ -97,13 +98,11 @@ export function ReportItem({ report }: ReportItemParams) {
         if (!isSelected) {
           const target = report.sourceLocations[0];
           if (target?.location) {
-            focusDispatch({
-              type: "focus",
-              target: "source-file",
-              focus: {
-                key: target.location.file,
-                value: ExpansionState.Expanded,
-              },
+            expansionDispatch({
+              type: "toggle",
+              group: "source-file",
+              id: target.location.file,
+              status: ExpansionStatus.Expanded,
             });
           }
           selectionDispatch({
@@ -188,7 +187,7 @@ export function ReportItem({ report }: ReportItemParams) {
               >
                 <span className="location">
                   {(location.file !== report.sourceLocations[0].location.file
-                    ? location.source?.filename + ": "
+                    ? (location.source?.filename ?? "Unknown file") + ": "
                     : "") + getSourceStr(location)}
                 </span>
 

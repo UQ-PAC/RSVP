@@ -11,7 +11,12 @@ public class Conjunction extends LogicalOperator {
     }
 
     @Override
-    public <T> T accept(FormulaVisitor<T> visitor) {
+    public <T> T accept(FormulaValueVisitor<T> visitor) {
         return visitor.visitConjunction(this);
+    }
+
+    @Override
+    public void accept(FormulaVoidVisitor listener) {
+        listener.visitConjunction(this);
     }
 }

@@ -15,23 +15,20 @@ public class Literal extends Formula {
     }
 
     @Override
-    public <T> T accept(FormulaVisitor<T> visitor) {
+    public <T> T accept(FormulaValueVisitor<T> visitor) {
         return visitor.visitLiteral(this);
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (other == null) {
-            return false;
-        } if (other == this) {
-            return true;
-        } else if (other instanceof Literal lit) {
-            return this.value == lit.value;
-        }
-        return false;
+    public void accept(FormulaVoidVisitor listener) {
+        listener.visitLiteral(this);
     }
 
     public boolean asBoolean() {
         return value;
+    }
+
+    public static Literal get(boolean value) {
+        return value ? TRUE : FALSE;
     }
 }

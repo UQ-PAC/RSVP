@@ -33,10 +33,7 @@ export function NewGroupForm({
   }, []);
 
   return (
-    <form
-      className="create-analysis-group-form"
-      onSubmit={(e) => e.preventDefault()}
-    >
+    <form className="create-analysis-group-form">
       <input
         ref={inputRef}
         className={cx("create-analysis-group-text-input", invalid && "invalid")}

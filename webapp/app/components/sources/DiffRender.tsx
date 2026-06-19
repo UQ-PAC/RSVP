@@ -14,9 +14,9 @@ import {
   useAnalysisGroupDispatch,
 } from "../../lib/context/AnalysisGroupContext";
 import {
-  ExpansionState,
-  useFocusDispatch,
-} from "../../lib/context/FocusContext";
+  ExpansionStatus,
+  useExpansionDispatch,
+} from "../../lib/context/ExpansionContext";
 import { useSelectionDispatch } from "../../lib/context/SelectionContext";
 import { diff as getDiff, impact as getImpact } from "../../lib/requests";
 import { ChangeImpact, SourceLoc, VerificationFile } from "../../lib/types";
@@ -52,21 +52,21 @@ export function DiffRender({
   originalId,
   updatedId,
 }: DiffRenderProps) {
-  const { diffs, impacts, verifyPending, verifyCompleted } = useAnalysisGroup();
+  const { diffs, impacts, verifyPending, verifyComplete } = useAnalysisGroup();
+
   const analysisGroupDispatch = useAnalysisGroupDispatch();
   const selectionDispatch = useSelectionDispatch();
-  const focusDispatch = useFocusDispatch();
+  const expansionDispatch = useExpansionDispatch();
 
   const diffRef = useRef<HTMLDivElement>(null);
 
   const [diff, setDiff] = useState<string>();
   const [impact, setImpact] = useState<ChangeImpact>();
 
-  const [inProgress, setInProgress] = useState(verifyPending);
+  const [inProgress, setInProgress] = useState(false);
 
   useEffect(() => {
     const existing = diffs[originalId]?.[updatedId];
-
     if (existing) {
       existing.then((existingDiff) => setDiff(existingDiff));
     } else {
@@ -93,30 +93,28 @@ export function DiffRender({
 
     if (existing) {
       existing.then((existingImpact) => setImpact(existingImpact));
-    } else if (verifyCompleted) {
+    } else if (verifyComplete) {
       // Verification has been executed but no impact exists yet
-      verifyCompleted.then((result) => {
-        if (result) {
-          setInProgress(true);
+      setInProgress(true);
 
-          const result = getImpact(originalId, updatedId);
+      const result = getImpact(originalId, updatedId);
 
-          analysisGroupDispatch({
-            type: "impact",
-            originalId,
-            updatedId,
-            impact: result,
-          });
-
-          result.then((newImpact) => {
-            setImpact(newImpact);
-            setInProgress(false);
-          });
-        }
+      analysisGroupDispatch({
+        type: "impact",
+        originalId,
+        updatedId,
+        impact: result,
       });
+
+      result.then((newImpact) => {
+        setImpact(newImpact);
+        setInProgress(false);
+      });
+    } else {
+      setImpact(undefined);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [verifyCompleted, originalId, updatedId]);
+  }, [verifyComplete, originalId, updatedId]);
 
   // Re-render when diff is updated
   useEffect(() => {
@@ -132,10 +130,11 @@ export function DiffRender({
   }, [diff]);
 
   const clickRequest = (loc: SourceLoc) => {
-    focusDispatch({
-      type: "focus",
-      target: "source-file",
-      focus: { key: loc.file, value: ExpansionState.Expanded },
+    expansionDispatch({
+      type: "toggle",
+      group: "source-file",
+      id: loc.file,
+      status: ExpansionStatus.Expanded,
     });
     selectionDispatch({
       scroll: "source",

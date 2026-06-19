@@ -2,20 +2,21 @@ import { faCodeCompare, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { JSX } from "react";
 import {
-  ExpansionState,
-  useFocusDispatch,
-} from "../../lib/context/FocusContext";
+  ExpansionStatus,
+  useExpansionDispatch,
+} from "../../lib/context/ExpansionContext";
 import { useSelectionDispatch } from "../../lib/context/SelectionContext";
-import { VerificationFile } from "../../lib/types";
-import { getFileIcon } from "../../lib/util";
+import { getFileIcon } from "../../lib/fa-util";
+import { VerificationFile, VersionedFile } from "../../lib/types";
 
 interface UploadedFileProps {
   file: VerificationFile;
   remove: (file: VerificationFile) => void;
   children?: JSX.Element | JSX.Element[];
-  addChild?: (file: VerificationFile) => void;
+  addChild?: (file: VersionedFile) => void;
   icon?: boolean;
   version?: number;
+  original?: VersionedFile;
 }
 
 export function UploadedFile({
@@ -25,8 +26,9 @@ export function UploadedFile({
   addChild,
   icon = false,
   version,
+  original,
 }: UploadedFileProps) {
-  const focusDispatch = useFocusDispatch();
+  const expansionDispatch = useExpansionDispatch();
   const selectionDispatch = useSelectionDispatch();
 
   return (
@@ -36,10 +38,11 @@ export function UploadedFile({
           className="uploaded-file-name"
           onClick={() => {
             file.resolved.then(({ serverId }) => {
-              focusDispatch({
-                type: "focus",
-                target: "source-file",
-                focus: { key: serverId, value: ExpansionState.Expanded },
+              expansionDispatch({
+                type: "toggle",
+                group: "source-file",
+                id: serverId,
+                status: ExpansionStatus.Expanded,
               });
               selectionDispatch({
                 scroll: "file",
@@ -59,11 +62,11 @@ export function UploadedFile({
           )}
           {file.filename}
         </span>
-        {addChild && (
+        {addChild && original && (
           <div className="action-icon uploaded-file-version-icon">
             <FontAwesomeIcon
               icon={faCodeCompare}
-              onClick={() => addChild(file)}
+              onClick={() => addChild(original)}
             />
           </div>
         )}

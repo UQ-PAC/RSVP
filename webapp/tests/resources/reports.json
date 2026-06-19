@@ -1,0 +1,148 @@
+[
+  {
+    "id": "8a0568b650c9760cf7003c1e7c9b29ee91c605a571c748b7b6be84f5b080c60e",
+    "message": "Unused Policy",
+    "messageDetail": "Policy does not actually permit anything.",
+    "severity": "warn",
+    "sourceLocations": [
+      {
+        "location": {
+          "empty": false,
+          "endLoc": { "line": 4, "column": 23 },
+          "file": "policy(2).cedar",
+          "len": 95,
+          "offset": 0,
+          "startLoc": { "line": 1, "column": 1 }
+        },
+        "message": ""
+      }
+    ]
+  },
+  {
+    "id": "33bd60e890d9951b99c504fbbf49405d92283ce1f00ac9fa5b31349a8b0d5546",
+    "message": "(Mystery): Ugly implementation",
+    "messageDetail": "",
+    "severity": "info",
+    "sourceLocations": []
+  },
+  {
+    "id": "e0dcbaddd55b8fb528c40c882dcb42cea4e6f83213d3570a97bbdfb38dedb28a",
+    "message": "(Mystery): Ugly implementation",
+    "messageDetail": "This is a very detailed report. Look at all of the details that are included here. So many details that need to be included in the report so that you can fully understand it.",
+    "severity": "warn",
+    "sourceLocations": []
+  },
+  {
+    "id": "2ff16467f152251cf1e6b61931be09011268108a607d6d31d2620bc9b3e1d1e4",
+    "message": "(TypeReference): Who thought this was a good idea?",
+    "messageDetail": "This is a very detailed report. Look at all of the details that are included here. So many details that need to be included in the report so that you can fully understand it.",
+    "severity": "warn",
+    "sourceLocations": [
+      {
+        "location": {
+          "empty": false,
+          "endLoc": { "line": 10, "column": 22 },
+          "file": "schema.cedarschema",
+          "len": 7,
+          "offset": 136,
+          "startLoc": { "line": 10, "column": 16 }
+        },
+        "message": "Prime location"
+      }
+    ]
+  },
+  {
+    "id": "87b57c36c9ff14cf929a070cbeac2edadccdfb0979a5f20df398b6e96a18350f",
+    "message": "(EntityReference): Who thought this was a good idea?",
+    "messageDetail": "",
+    "severity": "info",
+    "sourceLocations": [
+      {
+        "location": {
+          "empty": false,
+          "endLoc": { "line": 3, "column": 43 },
+          "file": "entities.json",
+          "len": 32,
+          "offset": 17,
+          "startLoc": { "line": 3, "column": 12 }
+        },
+        "message": "Prime location"
+      }
+    ]
+  },
+  {
+    "id": "ac15e0ee42011d0c702c5600d588bad8167ad2b2fe00616ac2db9946cf304098",
+    "message": "(Entity): Who thought this was a good idea?",
+    "messageDetail": "",
+    "severity": "warn",
+    "sourceLocations": [
+      {
+        "location": {
+          "empty": false,
+          "endLoc": { "line": 11, "column": 3 },
+          "file": "entities.json",
+          "len": 86,
+          "offset": 93,
+          "startLoc": { "line": 7, "column": 3 }
+        },
+        "message": "Prime location"
+      }
+    ]
+  },
+  {
+    "id": "2f43f1a7021d5ad344419d65d808bf18fb18fcdeb6bb5fc4c3792188a7ad71e7",
+    "message": "(RecordEntityTypeDefinition): Who thought this was a good idea?",
+    "messageDetail": "",
+    "severity": "info",
+    "sourceLocations": [
+      {
+        "location": {
+          "empty": false,
+          "endLoc": { "line": 5, "column": 2 },
+          "file": "schema.cedarschema",
+          "len": 34,
+          "offset": 39,
+          "startLoc": { "line": 3, "column": 1 }
+        },
+        "message": "Prime location"
+      },
+      {
+        "location": {
+          "empty": false,
+          "endLoc": { "line": 1, "column": 37 },
+          "file": "schema.cedarschema",
+          "len": 37,
+          "offset": 0,
+          "startLoc": { "line": 1, "column": 1 }
+        },
+        "message": "Spectacular location"
+      }
+    ]
+  },
+  {
+    "id": "34477a6799cb9a361fb10714f510ac777cad1882bcda6965c83ad0f06f7d5314",
+    "message": "(ActionDefinition): Fantastic. Great move. Well done Angus.",
+    "messageDetail": "",
+    "severity": "err",
+    "sourceLocations": [
+      {
+        "location": {
+          "empty": false,
+          "endLoc": { "line": 12, "column": 2 },
+          "file": "schema.cedarschema",
+          "len": 77,
+          "offset": 90,
+          "startLoc": { "line": 9, "column": 1 }
+        },
+        "message": "Prime location"
+      }
+    ]
+  },
+  {
+    "id": "1abbf5c6828ed5c73ac955e0b6c610c2fecacc8eecb612657e4e2e98883da6c0",
+    "message": "(Mystery): Who thought this was a good idea?",
+    "messageDetail": "",
+    "severity": "warn",
+    "sourceLocations": []
+  }
+]

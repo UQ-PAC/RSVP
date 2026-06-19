@@ -1,16 +1,15 @@
-"use client";
-
 import cx from "classnames";
 import { Roboto_Mono } from "next/font/google";
 
 import { Report, VerificationFile } from "../../lib/types";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   useSelection,
   useSelectionDispatch,
 } from "../../lib/context/SelectionContext";
-import { sortReportsBySourceLine } from "../../lib/sources/util";
+import { ReportLineDict } from "../../lib/sources/types";
+import { groupReportsBySourceLine } from "../../lib/sources/util";
 import "./CodeHighlight";
 import { CodeLine } from "./CodeLine";
 import { HighlightedCodeLine } from "./HighlightedCodeLine";
@@ -20,22 +19,35 @@ const robotoMono = Roboto_Mono({
 });
 interface CodeRenderParams {
   file: VerificationFile;
-  content: string;
+  content: Promise<string>;
   reports?: Report[];
 }
 
 type HighlightFunc = (line: number) => boolean;
 
 export function CodeRender({ file, content, reports }: CodeRenderParams) {
-  const { lines, reportsByLine } = sortReportsBySourceLine(
-    file,
-    content,
-    reports,
-  );
+  const timeoutRef = useRef<NodeJS.Timeout>(null);
 
   const { scroll, highlighted } = useSelection();
   const selectionDispatch = useSelectionDispatch();
 
+  // Line rendering
+  const [lines, setLines] = useState<string[]>([]);
+  const [reportsByLine, setReportsByLine] = useState<ReportLineDict>({});
+
+  useEffect(() => {
+    content.then((code) => {
+      const { lines, reportsByLine } = groupReportsBySourceLine(
+        file,
+        code,
+        reports,
+      );
+      setLines(lines);
+      setReportsByLine(reportsByLine);
+    });
+  }, [file, content, reports]);
+
+  // Animated highlight rendering
   const [temporaryHighlight, setTemporaryHighlight] = useState<HighlightFunc>(
     () => () => false,
   );
@@ -51,7 +63,11 @@ export function CodeRender({ file, content, reports }: CodeRenderParams) {
                 () => (n: number) =>
                   n >= highlighted.start && n <= highlighted.end,
               );
-              setTimeout(() => {
+              // Clear any existing timeout
+              if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+              }
+              timeoutRef.current = setTimeout(() => {
                 setTemporaryHighlight(() => () => false);
                 selectionDispatch({
                   scroll: "none",
@@ -64,6 +80,15 @@ export function CodeRender({ file, content, reports }: CodeRenderParams) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [file, highlighted, scroll]);
+
+  // Clear any timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const id = file.resolved.then(({ serverId }) => serverId);
 
@@ -84,20 +109,22 @@ export function CodeRender({ file, content, reports }: CodeRenderParams) {
               <HighlightedCodeLine
                 key={n}
                 n={n}
-                line={line}
                 syntax={file.filetype}
                 reports={reports}
                 temporaryHighlight={temporaryHighlight}
-              />
+              >
+                {line}
+              </HighlightedCodeLine>
             ) : (
               <CodeLine
                 key={n}
                 n={n}
                 file={id}
-                line={line}
                 syntax={file.filetype}
                 temporaryHighlight={temporaryHighlight}
-              />
+              >
+                {line}
+              </CodeLine>
             ),
           )}
       </pre>

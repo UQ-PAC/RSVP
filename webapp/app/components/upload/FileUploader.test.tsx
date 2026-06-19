@@ -1,13 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-var */
 import { act, render } from "@testing-library/react";
 import { FileUploader } from "./FileUploader";
 
 var verificationDispatch = jest.fn();
 var basicVerification = {
-  "group one": {},
-  "group two": {},
-  "group three": {},
+  "group one": { name: "group one" },
+  "group two": { name: "group two" },
+  "group three": { name: "group three" },
 } as any;
 var verification = basicVerification;
 
@@ -39,7 +37,7 @@ jest.mock("../../lib/context/VerificationContext", () => ({
 jest.mock("../providers/AnalysisGroupProvider", () => ({
   AnalysisGroupProvider: jest.fn(({ group, children }) => {
     return (
-      <div data-testid="analysis-group-provider" data-group={group}>
+      <div data-testid="analysis-group-provider" data-group={group.name}>
         {children}
       </div>
     );

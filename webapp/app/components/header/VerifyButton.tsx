@@ -4,14 +4,15 @@ import { faFileShield } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Lexend_Deca } from "next/font/google";
 import {
-  ExpansionState,
-  useFocus,
-  useFocusDispatch,
-} from "../../lib/context/FocusContext";
+  ExpansionStatus,
+  useExpansion,
+  useExpansionDispatch,
+} from "../../lib/context/ExpansionContext";
 import {
   useVerification,
   useVerificationDispatch,
 } from "../../lib/context/VerificationContext";
+import { publish } from "../../lib/events";
 import { checkAnalysisGroup } from "../../lib/util";
 
 const lexendDeca = Lexend_Deca({
@@ -24,10 +25,12 @@ export function VerifyButton() {
 
   const {
     drawer: { expansions },
-  } = useFocus();
-  const focusDispatch = useFocusDispatch();
+  } = useExpansion();
+  const expansionDispatch = useExpansionDispatch();
 
   const onclick = () => {
+    publish("verificationRequested");
+
     const error = Object.values(verification)
       .map(({ files }) => checkAnalysisGroup(files))
       .some(({ error }) => error);
@@ -35,21 +38,22 @@ export function VerifyButton() {
     const toOpen = error ? "left" : "right";
     const toClose = error ? "right" : "left";
 
-    if (expansions[toOpen] === ExpansionState.Collapsed) {
-      focusDispatch({
-        type: "focus",
-        target: "drawer",
-        focus: { key: toClose, value: ExpansionState.Collapsed },
+    if (expansions[toOpen] === ExpansionStatus.Collapsed) {
+      expansionDispatch({
+        type: "toggle",
+        group: "drawer",
+        id: toClose,
+        status: ExpansionStatus.Collapsed,
       });
-      focusDispatch({
-        type: "focus",
-        target: "drawer",
-        focus: { key: toOpen, value: ExpansionState.Expanded },
+      expansionDispatch({
+        type: "toggle",
+        group: "drawer",
+        id: toOpen,
+        status: ExpansionStatus.Expanded,
       });
     }
 
     if (!error) {
-      verificationDispatch({ type: "pre-verify" });
       verificationDispatch({ type: "verify" });
     }
   };

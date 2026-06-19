@@ -7,6 +7,7 @@ import uq.pac.rsvp.policy.datalog.translation.InvariantResult;
 import uq.pac.rsvp.policy.datalog.translation.Request;
 import uq.pac.rsvp.policy.datalog.translation.RequestSet;
 import uq.pac.rsvp.support.reporting.Report;
+import uq.pac.rsvp.support.reporting.Report.Severity;
 import uq.pac.rsvp.verification.RequestResult;
 
 import java.util.HashMap;
@@ -31,7 +32,8 @@ public class PolicyAnalysis {
         Set<Policy> subsumers;
     }
 
-    public static Set<Report> checkPolicies(Map<Policy, RequestSet> policyResults, Map<Request, RequestResult> requestPolicyMap) {
+    public static Set<Report> checkPolicies(RequestSet allRequests,
+            Map<Policy, RequestSet> policyResults, Map<Request, RequestResult> requestPolicyMap) {
 
         Set<Report> reports = new HashSet<>();
 
@@ -138,6 +140,19 @@ public class PolicyAnalysis {
                 reports.add(new PolicyReport.SubsumedPolicy(p));
             }
         });
+
+        // Determine request coverage; report (as information) if coverage isn't complete
+        Set<Request> uncoveredRequests = new HashSet<>();
+        for (Request r : allRequests.getRequests()) {
+            if (!requestPolicyMap.containsKey(r)) {
+                uncoveredRequests.add(r);
+            }
+        }
+        if (!uncoveredRequests.isEmpty()) {
+            reports.add(new Report(Severity.Info, "Not all requests are covered by policy",
+                    "" + uncoveredRequests.size() + " out of the " + allRequests.size()
+                    + " possible requests are not matched by any policy. \nExample:" + uncoveredRequests.iterator().next().toHumanReadableString()));
+        }
 
         return reports;
     }

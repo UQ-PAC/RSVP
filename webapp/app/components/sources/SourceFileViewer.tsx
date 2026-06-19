@@ -9,13 +9,13 @@ import "./sources.css";
 
 export function SourceFileViewer() {
   const verificationContext = useVerification();
-  const groups = Object.keys(verificationContext);
+  const groups = Object.values(verificationContext);
 
   return (
     <div className="source-files-container">
       {groups.map((group) => {
         return (
-          <AnalysisGroupProvider key={group} group={group}>
+          <AnalysisGroupProvider key={group.name} group={group}>
             <AnalysisGroup />
           </AnalysisGroupProvider>
         );

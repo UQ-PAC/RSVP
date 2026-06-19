@@ -1,0 +1,55 @@
+.tabs {
+  display: inline-flex;
+  gap: 0;
+  overflow-x: scroll;
+  overflow-y: clip;
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  overscroll-behavior: none;
+  margin-bottom: -1px;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tabs > .tab {
+  background-color: var(--color-gray-200);
+  line-height: 2rem;
+  padding: 0.2rem 1.2rem 0 0;
+  background-color: var(--color-gray-200);
+  display: flex;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-gray-600);
+  text-wrap: nowrap;
+  align-items: center;
+  width: fit-content;
+  border-right: 1px solid var(--color-gray-300);
+}
+
+.tabs > .tab:not(.selected) {
+  cursor: pointer;
+  margin-bottom: 1px;
+}
+
+.tabs > .tab.light.selected,
+.tabs > .tab.light:hover {
+  background-color: var(--color-gray-100);
+}
+
+.tabs > .tab.light.selected {
+  border-bottom: 1px solid var(--color-gray-100);
+}
+
+.tabs > .tab.dark.selected,
+.tabs > .tab.dark:hover {
+  background-color: var(--color-gray-300);
+  color: var(--color-gray-600);
+}
+
+.tabs > .tab.dark.selected {
+  border-bottom: 1px solid var(--color-gray-300);
+}

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { fireEvent, render, screen } from "@testing-library/react";
 import { UploadedFile } from "./UploadedFile";
 
@@ -17,13 +16,17 @@ jest.mock("@fortawesome/free-solid-svg-icons", () => ({
   faXmark: "faXmark",
 }));
 
+jest.mock("../../lib/context/ExpansionContext", () => ({
+  ...jest.requireActual("../../lib/context/ExpansionContext"),
+  useExpansionDispatch: jest.fn(() => jest.fn()),
+}));
+
 jest.mock("../../lib/context/SelectionContext", () => ({
   useSelectionDispatch: jest.fn(() => jest.fn()),
 }));
 
-jest.mock("../../lib/context/FocusContext", () => ({
-  ...jest.requireActual("../../lib/context/FocusContext"),
-  useFocusDispatch: jest.fn(() => jest.fn()),
+jest.mock("../../lib/fa-util", () => ({
+  getFileIcon: jest.fn(() => "file-icon"),
 }));
 
 const file = { filename: "test-file" } as any;
@@ -35,19 +38,34 @@ test("renders", () => {
   expect(asFragment()).toMatchSnapshot();
 
   rerender(
-    <UploadedFile file={file} addChild={jest.fn()} remove={jest.fn()} />,
+    <UploadedFile
+      file={file}
+      original={{} as any}
+      addChild={jest.fn()}
+      remove={jest.fn()}
+    />,
   );
   expect(asFragment()).toMatchSnapshot();
 
   rerender(
-    <UploadedFile file={file} addChild={jest.fn()} remove={jest.fn()}>
+    <UploadedFile
+      file={file}
+      original={{} as any}
+      addChild={jest.fn()}
+      remove={jest.fn()}
+    >
       <div key="1" data-testid="nested-file" />
     </UploadedFile>,
   );
   expect(asFragment()).toMatchSnapshot();
 
   rerender(
-    <UploadedFile file={file} addChild={jest.fn()} remove={jest.fn()}>
+    <UploadedFile
+      file={file}
+      original={{} as any}
+      addChild={jest.fn()}
+      remove={jest.fn()}
+    >
       <div key="1" data-testid="nested-file-one" />
       <div key="2" data-testid="nested-file-two" />
     </UploadedFile>,
@@ -56,14 +74,22 @@ test("renders", () => {
 });
 
 test("adds child", () => {
+  const original = {} as any;
   const addChild = jest.fn();
-  render(<UploadedFile file={file} addChild={addChild} remove={jest.fn()} />);
+  render(
+    <UploadedFile
+      file={file}
+      original={original}
+      addChild={addChild}
+      remove={jest.fn()}
+    />,
+  );
   const button = screen.getByTestId("font-awesome-icon-faCodeCompare");
   expect(button).toBeInTheDocument();
 
   fireEvent.click(button);
   expect(addChild).toHaveBeenCalledTimes(1);
-  expect(addChild).toHaveBeenCalledWith(file);
+  expect(addChild).toHaveBeenCalledWith(original);
 
   fireEvent.click(button);
   expect(addChild).toHaveBeenCalledTimes(2);

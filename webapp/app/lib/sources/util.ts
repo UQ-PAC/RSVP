@@ -4,23 +4,26 @@ import { Report, SourceLoc, VerificationFile } from "../../lib/types";
 
 export function sortReportLinesByPrecedence(reports: ReportLine[]): {
   reportsByPrecedence: ReportLine[];
-  mostSevere: ReportLine;
+  mostSevere?: ReportLine;
   mostRelevant?: ReportLine;
 } {
-  const reportsByPrecedence = reports?.sort(compareReportLinesByPrecedence);
+  const reportsByPrecedence = [...reports].sort(compareReportLinesByPrecedence);
 
-  const mostSevere = reports?.reduce((result, current) => {
-    switch (result.report.severity) {
-      case "err":
-        return result;
-      case "warn":
-        return current.report.severity === "err" ? current : result;
-      case "info":
-        return current;
-    }
-  });
+  const mostSevere = reports.reduce<ReportLine | undefined>(
+    (result, current) => {
+      switch (result?.report.severity) {
+        case "err":
+          return result;
+        case "warn":
+          return current.report.severity === "err" ? current : result;
+        default:
+          return current;
+      }
+    },
+    undefined,
+  );
 
-  const mostRelevant = reportsByPrecedence?.at(0);
+  const mostRelevant = reportsByPrecedence.at(0);
 
   return { reportsByPrecedence, mostSevere, mostRelevant };
 }
@@ -33,7 +36,7 @@ function compareReportLinesByPrecedence(a: ReportLine, b: ReportLine): number {
   return b.loc.offset - a.loc.offset;
 }
 
-export function sortReportsBySourceLine(
+export function groupReportsBySourceLine(
   file: VerificationFile,
   content: string,
   reports?: Report[],
@@ -70,11 +73,12 @@ function processReportLinesForSourceLoc(
 
   const reportLines = lines.slice(loc.startLoc.line - 1, loc.endLoc.line);
 
+  if (!reportLines.length) return;
+
   // Check whether the report location covers the entire line
   // so that it can be rendered as a block
   const startOffset =
-    !!`${reportLines.at(0)?.substring(0, loc.startLoc.column - 1)}`.trim()
-      .length;
+    !!`${reportLines[0].substring(0, loc.startLoc.column - 1)}`.trim().length;
   const endOffset =
     loc.offset + loc.len < content.length &&
     content.charAt(loc.offset + loc.len) !== "\n" &&
@@ -111,7 +115,7 @@ function processReportLinesForSourceLoc(
       if (line === loc.endLoc.line) {
         end = loc.offset + loc.len - offset;
       } else {
-        end = start + lineContent.length;
+        end = lineContent.length;
       }
     }
 

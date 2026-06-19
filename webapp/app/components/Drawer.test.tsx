@@ -1,12 +1,11 @@
-/* eslint-disable no-var */
 import { fireEvent, render, screen } from "@testing-library/react";
 
-import { ExpansionState } from "../lib/context/FocusContext";
+import { ExpansionStatus } from "../lib/context/ExpansionContext";
 import { Drawer } from "./Drawer";
 
-var right = ExpansionState.Expanded;
-var left = ExpansionState.Expanded;
-var focusDispatch = jest.fn();
+var right = ExpansionStatus.Expanded;
+var left = ExpansionStatus.Expanded;
+var expansionDispatch = jest.fn();
 
 jest.mock("@fortawesome/react-fontawesome", () => ({
   FontAwesomeIcon: jest.fn(({ icon }) => (
@@ -19,9 +18,9 @@ jest.mock("@fortawesome/free-solid-svg-icons", () => ({
   faCaretRight: "faCaretRight",
 }));
 
-jest.mock("../lib/context/FocusContext", () => ({
-  ...jest.requireActual("../lib/context/FocusContext"),
-  useFocus: () => ({
+jest.mock("../lib/context/ExpansionContext", () => ({
+  ...jest.requireActual("../lib/context/ExpansionContext"),
+  useExpansion: () => ({
     drawer: {
       expansions: {
         right,
@@ -29,18 +28,18 @@ jest.mock("../lib/context/FocusContext", () => ({
       },
     },
   }),
-  useFocusDispatch: () => focusDispatch,
+  useExpansionDispatch: () => expansionDispatch,
 }));
 
 beforeEach(() => {
-  focusDispatch.mockClear();
+  expansionDispatch.mockClear();
 });
 
 const children = [<div key="one" />, <div key="two" />];
 
 describe("renders left", () => {
   test("expanded", () => {
-    left = ExpansionState.Expanded;
+    left = ExpansionStatus.Expanded;
     const { asFragment } = render(
       <Drawer title="Left" side="left">
         {children}
@@ -50,7 +49,7 @@ describe("renders left", () => {
   });
 
   test("collapsed", () => {
-    left = ExpansionState.Collapsed;
+    left = ExpansionStatus.Collapsed;
     const { asFragment } = render(
       <Drawer title="Left" side="left">
         {children}
@@ -62,7 +61,7 @@ describe("renders left", () => {
 
 describe("renders right", () => {
   test("expanded", () => {
-    right = ExpansionState.Expanded;
+    right = ExpansionStatus.Expanded;
     const { asFragment } = render(
       <Drawer title="Right" side="right">
         {children}
@@ -72,7 +71,7 @@ describe("renders right", () => {
   });
 
   test("collapsed", () => {
-    right = ExpansionState.Collapsed;
+    right = ExpansionStatus.Collapsed;
     const { asFragment } = render(
       <Drawer title="Right" side="right">
         {children}
@@ -83,13 +82,13 @@ describe("renders right", () => {
 });
 
 test("handles no children", () => {
-  right = ExpansionState.Expanded;
+  right = ExpansionStatus.Expanded;
   const { asFragment } = render(<Drawer title="Empty" side="right" />);
   expect(asFragment()).toMatchSnapshot();
 });
 
 test("triggers expansion", () => {
-  left = ExpansionState.Collapsed;
+  left = ExpansionStatus.Collapsed;
   const { asFragment } = render(
     <Drawer title="Expand Me" side="left">
       {children}
@@ -101,19 +100,17 @@ test("triggers expansion", () => {
   expect(tab).toBeInTheDocument();
 
   fireEvent.click(tab);
-  expect(focusDispatch).toHaveBeenCalledTimes(1);
-  expect(focusDispatch).toHaveBeenCalledWith({
-    type: "focus",
-    target: "drawer",
-    focus: {
-      key: "left",
-      value: ExpansionState.Expanded,
-    },
+  expect(expansionDispatch).toHaveBeenCalledTimes(1);
+  expect(expansionDispatch).toHaveBeenCalledWith({
+    type: "toggle",
+    group: "drawer",
+    id: "left",
+    status: ExpansionStatus.Expanded,
   });
 });
 
 test("triggers collapse", () => {
-  left = ExpansionState.Expanded;
+  left = ExpansionStatus.Expanded;
   const { asFragment } = render(
     <Drawer title="Collapse Me" side="left">
       {children}
@@ -125,13 +122,11 @@ test("triggers collapse", () => {
   expect(tab).toBeInTheDocument();
 
   fireEvent.click(tab);
-  expect(focusDispatch).toHaveBeenCalledTimes(1);
-  expect(focusDispatch).toHaveBeenCalledWith({
-    type: "focus",
-    target: "drawer",
-    focus: {
-      key: "left",
-      value: ExpansionState.Collapsed,
-    },
+  expect(expansionDispatch).toHaveBeenCalledTimes(1);
+  expect(expansionDispatch).toHaveBeenCalledWith({
+    type: "toggle",
+    group: "drawer",
+    id: "left",
+    status: ExpansionStatus.Collapsed,
   });
 });

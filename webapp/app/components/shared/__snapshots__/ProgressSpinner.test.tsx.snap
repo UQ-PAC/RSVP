@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renders 1`] = `
+<DocumentFragment>
+  <div
+    class="progress-spinner"
+  >
+    <div
+      data-icon="faSpinner"
+      data-testid="font-awesome-icon"
+    />
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders 2`] = `
+<DocumentFragment>
+  <div
+    class="progress-spinner"
+  >
+    <div
+      data-icon="faSpinner"
+      data-testid="font-awesome-icon"
+    />
+    <p
+      class="progress-spinner-text"
+    >
+      Testing in progress...
+    </p>
+  </div>
+</DocumentFragment>
+`;

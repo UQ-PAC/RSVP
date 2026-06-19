@@ -1,6 +1,6 @@
 import { Drawer } from "./components/Drawer";
 import { Header } from "./components/header/Header";
-import { ContextProvider } from "./components/providers/ContextProvider";
+import { ApplicationStateProvider } from "./components/providers/ApplicationStateProvider";
 import { ReportViewer } from "./components/reports/ReportViewer";
 import { SourceFileViewer } from "./components/sources/SourceFileViewer";
 import { FileUploader } from "./components/upload/FileUploader";
@@ -8,7 +8,7 @@ import { FileUploader } from "./components/upload/FileUploader";
 export default function Home() {
   return (
     <div className="app">
-      <ContextProvider>
+      <ApplicationStateProvider>
         <Header heading="RSVP" subheading="Policy Verification" />
         <div className="app-content">
           <Drawer title="Policies" side="left">
@@ -19,7 +19,7 @@ export default function Home() {
             <ReportViewer />
           </Drawer>
         </div>
-      </ContextProvider>
+      </ApplicationStateProvider>
     </div>
   );
 }

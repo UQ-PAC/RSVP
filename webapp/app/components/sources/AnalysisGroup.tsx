@@ -5,21 +5,20 @@ import { SourceFile } from "./SourceFile";
 
 import { useEffect, useRef } from "react";
 import { useAnalysisGroup } from "../../lib/context/AnalysisGroupContext";
-import {
-  ExpansionState,
-  useFocusDispatch,
-} from "../../lib/context/FocusContext";
+import { ExpansionStatus } from "../../lib/context/ExpansionContext";
 import { useSelection } from "../../lib/context/SelectionContext";
 import { ToggleAll } from "../shared/ToggleAll";
 import "./sources.css";
 
+interface ExpansionToggleMap {
+  [index: string]: (status: ExpansionStatus) => void;
+}
+
 export function AnalysisGroup() {
   const { name, files, reports } = useAnalysisGroup();
-
-  const focusDispatch = useFocusDispatch();
   const { scroll, group: selectedGroup } = useSelection();
 
-  const focusState = useRef<{ [index: string]: string }>({});
+  const expansionFunctions = useRef<ExpansionToggleMap>({});
   const container = useRef<HTMLDivElement>(null);
 
   // Scroll selected policy into view if relevant
@@ -33,18 +32,19 @@ export function AnalysisGroup() {
     }
   }, [scroll, selectedGroup, name]);
 
-  const toggleAll = (expand: ExpansionState) => {
-    Object.values(focusState.current).forEach((id) => {
-      focusDispatch({
-        type: "focus",
-        target: "source-file",
-        focus: { key: id, value: expand },
-      });
-    });
+  // Invoke all expansion callbacks from children
+  const toggleAll = (status: ExpansionStatus) => {
+    Object.values(expansionFunctions.current).forEach((toggle) =>
+      toggle(status),
+    );
   };
 
   return (
-    <div ref={container} className="source-files-analysis-group">
+    <div
+      ref={container}
+      className="source-files-analysis-group"
+      data-testid="source-analysis-group"
+    >
       {files.length > 0 && (
         <span className="source-files-analysis-group-header">
           <h2 className="source-files-analysis-group-title">{name}</h2>
@@ -64,9 +64,9 @@ export function AnalysisGroup() {
             key={key}
             source={source}
             reports={reports ?? Promise.resolve([])}
-            setFocus={(original, updated) => {
-              focusState.current[key] = updated ? original + updated : original;
-            }}
+            setExpansionCallback={(toggle: (status: ExpansionStatus) => void) =>
+              (expansionFunctions.current[key] = toggle)
+            }
           />
         );
       })}

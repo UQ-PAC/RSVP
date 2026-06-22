@@ -300,4 +300,11 @@ public class Schema {
         }
         return new Schema(resolved);
     }
+
+    /**
+     * Return {@code true} if this schema has no unresolved types
+     */
+    public boolean isResolved() {
+        return types().findAny().isEmpty();
+    }
 }

@@ -49,8 +49,7 @@ public class DNFTransformer implements FormulaValueVisitor<Formula> {
 
             @Override
             public void visitNegation(Negation negation) {
-                require(negation.getFormula() instanceof Literal ||
-                        negation.getFormula() instanceof Term<?>);
+                require(negation.isScalar());
                 result.add(negation);
             }
 
@@ -87,8 +86,7 @@ public class DNFTransformer implements FormulaValueVisitor<Formula> {
 
             @Override
             public void visitNegation(Negation negation) {
-                require(negation.getFormula() instanceof Literal ||
-                        negation.getFormula() instanceof Term<?>);
+                require(negation.isScalar());
                 result.add(negation);
             }
 

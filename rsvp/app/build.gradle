@@ -22,9 +22,9 @@ application {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            groupId "uq.pac.rsvp"
-            artifactId "rsvp"
-            version "1.0.1-SNAPSHOT"
+            groupId = "uq.pac.rsvp"
+            artifactId = "rsvp"
+            version = "1.0.1-SNAPSHOT"
             from components.java
         }
     }

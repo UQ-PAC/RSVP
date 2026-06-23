@@ -7,9 +7,9 @@ dependencies {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            groupId "uq.pac.rsvp"
-            artifactId "verification"
-            version "1.0.0-SNAPSHOT"
+            groupId = "uq.pac.rsvp"
+            artifactId = "verification"
+            version = "1.0.0-SNAPSHOT"
             from components.java
         }
     }

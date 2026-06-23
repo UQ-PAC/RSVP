@@ -30,9 +30,9 @@ compileJava {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            groupId "uq.pac.rsvp"
-            artifactId "policy-ast"
-            version "3.0.2-SNAPSHOT"
+            groupId = "uq.pac.rsvp"
+            artifactId = "policy-ast"
+            version = "3.0.2-SNAPSHOT"
             from components.java
         }
     }

@@ -1,3 +1,8 @@
+/**
+ * Copyright (C) 2026 University of Queensland. All rights reserved.
+ * Licensed under the Apache License, Version 2.0.
+*/
+
 package uq.pac.rsvp.web.service;
 
 import com.google.common.hash.Hashing;
@@ -24,7 +29,7 @@ public class FileService {
 
     @Autowired
     VerificationSession session;
-    
+
     public String createTempFile(MultipartFile file) throws IOException {
         String filename = file.getOriginalFilename();
 

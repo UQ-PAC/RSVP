@@ -1,3 +1,8 @@
+/**
+ * Copyright (C) 2026 University of Queensland. All rights reserved.
+ * Licensed under the Apache License, Version 2.0.
+*/
+
 package uq.pac.rsvp.support;
 
 import org.junit.jupiter.api.Test;
@@ -7,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SourceLocTest {
 
     private final static String FILENAME = "test.txt";
-    private final static String SOURCE = """        
+    private final static String SOURCE = """
         The quick brown
          fox jumps
           over the

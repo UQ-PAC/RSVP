@@ -1,3 +1,8 @@
+/**
+ * Copyright (C) 2026 University of Queensland. All rights reserved.
+ * Licensed under the Apache License, Version 2.0.
+*/
+
 package uq.pac.rsvp.policy.ast.policy.expr;
 
 import uq.pac.rsvp.support.SourceLoc;
@@ -14,7 +19,7 @@ public abstract class EuidExpression extends Expression {
 
     /**
      * Get the type of this entity in the format {@code Namespace::Type}.
-     * 
+     *
      * @return the qualified type of this entity
      */
     public final String getType() {
@@ -23,7 +28,7 @@ public abstract class EuidExpression extends Expression {
 
     /**
      * Get the unquoted, unqualified EID of this entity.
-     * 
+     *
      * @return the EID of this entity
      */
     public final String getName() {
@@ -33,7 +38,7 @@ public abstract class EuidExpression extends Expression {
     /**
      * Return the fully qualified name of this entity in the format
      * {@code Namespace::Type::"entityName"}
-     * 
+     *
      * @return The fully qualified name of this entity
      */
     public final String getQualifiedName() {

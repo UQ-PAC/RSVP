@@ -1,3 +1,8 @@
+/**
+ * Copyright (C) 2026 University of Queensland. All rights reserved.
+ * Licensed under the Apache License, Version 2.0.
+*/
+
 package uq.pac.rsvp.policy.datalog.ast;
 
 import org.junit.jupiter.api.Test;
@@ -29,7 +34,7 @@ public class DLProgramTest {
         path(x, y) :-
             path(x, z),
             path(z, y).
-        
+
         // Output
         .output path""";
 

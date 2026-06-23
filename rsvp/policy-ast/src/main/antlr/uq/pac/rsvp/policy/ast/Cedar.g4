@@ -1,3 +1,8 @@
+/**
+ * Copyright (C) 2026 University of Queensland. All rights reserved.
+ * Licensed under the Apache License, Version 2.0.
+*/
+
 grammar Cedar;
 
 // Reserved Keywords
@@ -64,7 +69,7 @@ property: variable ('.' variable )*;
 // Entity or action type, such as App::Account
 type: ID ('::' ID)*;
 
-// function names 
+// function names
 functionName: type;
 
 // Literal entity, such as App::Account::"Alice"

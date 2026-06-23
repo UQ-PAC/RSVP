@@ -1,8 +1,13 @@
+/**
+ * Copyright (C) 2026 University of Queensland. All rights reserved.
+ * Licensed under the Apache License, Version 2.0.
+*/
+
 package uq.pac.rsvp.verification;
 
 public class ConfigurationException extends Exception {
 
-    
+
     public ConfigurationException() {
         super("Invalid configuration");
     }

@@ -1,3 +1,7 @@
 + support for literal sets
 + type checking for cedar policies
 + extend invariant with type inference and multiple types
++ adopt more test cases from cedar examples
++ add support for context
++ add support for extended types
++ add support for like operator

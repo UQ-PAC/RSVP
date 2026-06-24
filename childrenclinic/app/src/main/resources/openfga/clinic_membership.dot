@@ -1,0 +1,133 @@
+strict digraph {
+  rankdir="TB"
+  graph [fontname="DejaVu Sans" fontsize=11 bgcolor="transparent" pad=0.4 nodesep=0.35 ranksep=0.6]
+  node [shape=box style="filled,rounded" fontname="DejaVu Sans" fontsize=10 margin="0.12,0.06"]
+  edge [fontname="DejaVu Sans" fontsize=8 color="#555555" fontcolor="#333333"]
+  subgraph "cluster_clinic" {
+    label=<<B>clinic</B>>
+    style="rounded,filled" fillcolor="#8dd3c740" color="#8dd3c7" penwidth=1.5
+    fontname="DejaVu Sans" fontsize=11
+    "clinic:A" [label="A" fillcolor="#8dd3c7" style="filled,rounded"]
+    "clinic:B" [label="B" fillcolor="#8dd3c7" style="filled,rounded"]
+  }
+  subgraph "cluster_employee" {
+    label=<<B>employee</B>>
+    style="rounded,filled" fillcolor="#ffffb340" color="#ffffb3" penwidth=1.5
+    fontname="DejaVu Sans" fontsize=11
+    "employee:*" [label="✱ (any employee)" fillcolor="#ffffb3" style="filled,rounded,dashed"]
+    "employee:alice" [label="alice" fillcolor="#ffffb3" style="filled,rounded"]
+    "employee:bob_buchanan" [label="bob_buchanan" fillcolor="#ffffb3" style="filled,rounded"]
+    "employee:carl_bradford" [label="carl_bradford" fillcolor="#ffffb3" style="filled,rounded"]
+    "employee:james_carter" [label="james_carter" fillcolor="#ffffb3" style="filled,rounded"]
+    "employee:jestine_teixeira" [label="jestine_teixeira" fillcolor="#ffffb3" style="filled,rounded"]
+    "employee:kathaleen_tramonte" [label="kathaleen_tramonte" fillcolor="#ffffb3" style="filled,rounded"]
+    "employee:linda_douglas" [label="linda_douglas" fillcolor="#ffffb3" style="filled,rounded"]
+    "employee:sharon_jenkins" [label="sharon_jenkins" fillcolor="#ffffb3" style="filled,rounded"]
+  }
+  subgraph "cluster_employee_role" {
+    label=<<B>employee_role</B>>
+    style="rounded,filled" fillcolor="#bebada40" color="#bebada" penwidth=1.5
+    fontname="DejaVu Sans" fontsize=11
+    "employee_role:administrator" [label="administrator" fillcolor="#bebada" style="filled,rounded"]
+    "employee_role:doctor" [label="doctor" fillcolor="#bebada" style="filled,rounded"]
+    "employee_role:receptionist" [label="receptionist" fillcolor="#bebada" style="filled,rounded"]
+  }
+  subgraph "cluster_guest" {
+    label=<<B>guest</B>>
+    style="rounded,filled" fillcolor="#fb807240" color="#fb8072" penwidth=1.5
+    fontname="DejaVu Sans" fontsize=11
+    "guest:*" [label="✱ (any guest)" fillcolor="#fb8072" style="filled,rounded,dashed"]
+    "guest:unknown" [label="unknown" fillcolor="#fb8072" style="filled,rounded"]
+  }
+  subgraph "cluster_professional_level" {
+    label=<<B>professional_level</B>>
+    style="rounded,filled" fillcolor="#80b1d340" color="#80b1d3" penwidth=1.5
+    fontname="DejaVu Sans" fontsize=11
+    "professional_level:intern" [label="intern" fillcolor="#80b1d3" style="filled,rounded"]
+    "professional_level:registrar" [label="registrar" fillcolor="#80b1d3" style="filled,rounded"]
+    "professional_level:resident" [label="resident" fillcolor="#80b1d3" style="filled,rounded"]
+    "professional_level:senior" [label="senior" fillcolor="#80b1d3" style="filled,rounded"]
+    "professional_level:specialist" [label="specialist" fillcolor="#80b1d3" style="filled,rounded"]
+    "professional_level:staff" [label="staff" fillcolor="#80b1d3" style="filled,rounded"]
+  }
+  "clinic:A" -> "employee:james_carter" [label=" member"]
+  "clinic:A" -> "employee:linda_douglas" [label=" member"]
+  "clinic:A" -> "employee:sharon_jenkins" [label=" member"]
+  "clinic:A" -> "employee:kathaleen_tramonte" [label=" member"]
+  "clinic:A" -> "employee:alice" [label=" member"]
+  "clinic:A" -> "employee:bob_buchanan" [label=" member"]
+  "clinic:A" -> "employee:james_carter" [label=" doctor"]
+  "clinic:A" -> "employee:linda_douglas" [label=" doctor"]
+  "clinic:A" -> "employee:sharon_jenkins" [label=" doctor"]
+  "clinic:A" -> "employee:kathaleen_tramonte" [label=" doctor"]
+  "clinic:A" -> "employee:james_carter" [label=" senior_or_specialist_doctor"]
+  "clinic:A" -> "employee:linda_douglas" [label=" senior_or_specialist_doctor"]
+  "clinic:A" -> "employee:alice" [label=" administrator"]
+  "clinic:A" -> "employee:bob_buchanan" [label=" receptionist"]
+  "clinic:B" -> "employee:james_carter" [label=" member"]
+  "clinic:B" -> "employee:jestine_teixeira" [label=" member"]
+  "clinic:B" -> "employee:alice" [label=" member"]
+  "clinic:B" -> "employee:bob_buchanan" [label=" member"]
+  "clinic:B" -> "employee:carl_bradford" [label=" member"]
+  "clinic:B" -> "employee:james_carter" [label=" doctor"]
+  "clinic:B" -> "employee:jestine_teixeira" [label=" doctor"]
+  "clinic:B" -> "employee:jestine_teixeira" [label=" intern_doctor"]
+  "clinic:B" -> "employee:james_carter" [label=" senior_or_specialist_doctor"]
+  "clinic:B" -> "employee:alice" [label=" administrator"]
+  "clinic:B" -> "employee:bob_buchanan" [label=" receptionist"]
+  "clinic:B" -> "employee:carl_bradford" [label=" receptionist"]
+  "employee:james_carter" -> "employee:james_carter" [label=" identity"]
+  "employee:james_carter" -> "clinic:A" [label=" clinic"]
+  "employee:james_carter" -> "clinic:B" [label=" clinic"]
+  "employee:james_carter" -> "employee_role:doctor" [label=" role"]
+  "employee:james_carter" -> "professional_level:senior" [label=" level"]
+  "employee:james_carter" -> "employee:*" [label=" is_public_viewable" style="dashed"]
+  "employee:james_carter" -> "guest:*" [label=" is_public_viewable" style="dashed"]
+  "employee:linda_douglas" -> "employee:linda_douglas" [label=" identity"]
+  "employee:linda_douglas" -> "clinic:A" [label=" clinic"]
+  "employee:linda_douglas" -> "employee_role:doctor" [label=" role"]
+  "employee:linda_douglas" -> "professional_level:specialist" [label=" level"]
+  "employee:linda_douglas" -> "employee:*" [label=" is_public_viewable" style="dashed"]
+  "employee:linda_douglas" -> "guest:*" [label=" is_public_viewable" style="dashed"]
+  "employee:sharon_jenkins" -> "employee:sharon_jenkins" [label=" identity"]
+  "employee:sharon_jenkins" -> "clinic:A" [label=" clinic"]
+  "employee:sharon_jenkins" -> "employee_role:doctor" [label=" role"]
+  "employee:sharon_jenkins" -> "professional_level:resident" [label=" level"]
+  "employee:sharon_jenkins" -> "employee:*" [label=" is_public_viewable" style="dashed"]
+  "employee:sharon_jenkins" -> "guest:*" [label=" is_public_viewable" style="dashed"]
+  "employee:jestine_teixeira" -> "employee:jestine_teixeira" [label=" identity"]
+  "employee:jestine_teixeira" -> "clinic:B" [label=" clinic"]
+  "employee:jestine_teixeira" -> "employee_role:doctor" [label=" role"]
+  "employee:jestine_teixeira" -> "professional_level:intern" [label=" level"]
+  "employee:jestine_teixeira" -> "employee:james_carter" [label=" manager"]
+  "employee:jestine_teixeira" -> "employee:*" [label=" is_public_viewable" style="dashed"]
+  "employee:jestine_teixeira" -> "guest:*" [label=" is_public_viewable" style="dashed"]
+  "employee:kathaleen_tramonte" -> "employee:kathaleen_tramonte" [label=" identity"]
+  "employee:kathaleen_tramonte" -> "clinic:A" [label=" clinic"]
+  "employee:kathaleen_tramonte" -> "employee_role:doctor" [label=" role"]
+  "employee:kathaleen_tramonte" -> "professional_level:registrar" [label=" level"]
+  "employee:kathaleen_tramonte" -> "employee:linda_douglas" [label=" manager"]
+  "employee:kathaleen_tramonte" -> "employee:*" [label=" is_public_viewable" style="dashed"]
+  "employee:kathaleen_tramonte" -> "guest:*" [label=" is_public_viewable" style="dashed"]
+  "employee:alice" -> "employee:alice" [label=" identity"]
+  "employee:alice" -> "clinic:A" [label=" clinic"]
+  "employee:alice" -> "clinic:B" [label=" clinic"]
+  "employee:alice" -> "employee_role:administrator" [label=" role"]
+  "employee:alice" -> "professional_level:senior" [label=" level"]
+  "employee:alice" -> "employee:*" [label=" is_administrator" style="dashed"]
+  "employee:bob_buchanan" -> "employee:bob_buchanan" [label=" identity"]
+  "employee:bob_buchanan" -> "clinic:A" [label=" clinic"]
+  "employee:bob_buchanan" -> "clinic:B" [label=" clinic"]
+  "employee:bob_buchanan" -> "employee_role:receptionist" [label=" role"]
+  "employee:bob_buchanan" -> "professional_level:staff" [label=" level"]
+  "employee:bob_buchanan" -> "employee:*" [label=" is_public_viewable" style="dashed"]
+  "employee:bob_buchanan" -> "guest:*" [label=" is_public_viewable" style="dashed"]
+  "employee:carl_bradford" -> "employee:carl_bradford" [label=" identity"]
+  "employee:carl_bradford" -> "clinic:B" [label=" clinic"]
+  "employee:carl_bradford" -> "employee_role:receptionist" [label=" role"]
+  "employee:carl_bradford" -> "professional_level:intern" [label=" level"]
+  "employee:carl_bradford" -> "employee:bob_buchanan" [label=" manager"]
+  "employee:carl_bradford" -> "employee:*" [label=" is_public_viewable" style="dashed"]
+  "employee:carl_bradford" -> "guest:*" [label=" is_public_viewable" style="dashed"]
+  "guest:unknown" -> "guest:unknown" [label=" identity"]
+}

@@ -65,6 +65,7 @@ There is no build profile for Gradle to compile the CSS.
 |Properties Files | [application.properties](app/src/main/resources/application.properties) |
 |Caching | [CacheConfiguration](app/src/main/java/uq/pac/childrenclinic/system/CacheConfiguration.java) |
 |Cedar Authorization Files README | [README](app/src/main/resources/cedar/README.md) |
+|OpenFGA Authorization Files README | [README](app/src/main/resources/openfga/README.md) |
 
 ## License
 

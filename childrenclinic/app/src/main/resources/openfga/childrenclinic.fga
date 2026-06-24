@@ -1,0 +1,178 @@
+# Copyright 2026 Gabriel Henrique Lopes Gomes Alves Nunes.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+model
+  schema 1.1
+
+type employee_role
+type professional_level
+type confidentiality
+type guardian_authority
+type guest
+  relations
+    define identity: [guest]
+
+type clinic
+  relations
+    # Facts: Who is at this Clinic and in what role.
+    define member: [employee]
+    define receptionist: [employee]
+    define doctor: [employee]
+    define intern_doctor: [employee]
+    define senior_or_specialist_doctor: [employee]
+    define administrator: [employee]
+
+    # Permissions.
+    # Policy 0: Anyone can list employees.
+    define can_list_employees: [employee:*, guest:*]
+    # Policy 1: Every employee can list Patients and Guardians at any Clinic.
+    define can_list_patients: [employee:*]
+    define can_list_guardians: [employee:*]
+    # Policy 4 and 14: Clinic members and Administrators.
+    define can_view: member or administrator
+    # Policy 4, 6, and 8: Administrators, Receptionists, and non-Intern Doctors at this Clinic.
+    define can_add_patient: receptionist or (doctor but not intern_doctor) or administrator
+    define can_add_guardian: receptionist or (doctor but not intern_doctor) or administrator
+    # Policy 4: Administrators only.
+    define can_add_employee: administrator
+
+type employee
+  relations
+    # Facts.
+    define clinic: [clinic]
+    define identity: [employee]
+    define role: [employee_role]
+    define level: [professional_level]
+    define manager: [employee]
+    define is_public_viewable: [employee:*, guest:*]
+    define is_administrator: [employee:*]
+
+    # From Employee's Clinics.
+    define receptionist_in_clinic: receptionist from clinic
+    define administrator_in_clinic: administrator from clinic
+
+    # Permissions.
+    # Policy 2: Anyone can view Doctor or Receptionist Employees.
+    # Policy 4: Administrators.
+    # Policy 5: Receptionists in the same Clinic can view and edit, unless target is Administrator.
+    # Policy 10: Self view and edit.
+    # Policy 13: Cross-Clinic isolation.
+
+    # Policy 2, 4, 5, 10, 13.
+    define can_view: is_public_viewable or identity or (receptionist_in_clinic but not is_administrator) or administrator_in_clinic
+
+    # Policy 4, 5, 10, 13.
+    define can_edit: identity or (receptionist_in_clinic but not is_administrator) or administrator_in_clinic
+
+    # Policy 4.
+    define can_delete: administrator_in_clinic
+
+type guardian
+  relations
+    # Facts.
+    define clinic: [clinic]
+
+    # From Guardian's Clinics.
+    define receptionist_in_clinic: receptionist from clinic
+    define doctor_in_clinic: doctor from clinic
+    define administrator_in_clinic: administrator from clinic
+
+    # Permissions.
+    # Policy 4: Administrators.
+    # Policy 5: Receptionists in the same Clinic can view and edit.
+    # Policy 15: Doctors in the same Clinic can view.
+
+    # Policy 4, 5, and 15.
+    define can_view: doctor_in_clinic or receptionist_in_clinic or administrator_in_clinic
+
+    # Policy 4 and 5.
+    define can_edit: receptionist_in_clinic or administrator_in_clinic
+
+    # Policy 4.
+    define can_delete: administrator_in_clinic
+
+type patient
+  relations
+    # Facts.
+    define clinic: [clinic]
+    define assigned_doctor: [employee]
+    define intern_assigned_doctor: [employee]
+    define senior_or_specialist_assigned_doctor: [employee]
+
+    # From Patient's Clinics.
+    define receptionist_in_clinic: receptionist from clinic
+    define administrator_in_clinic: administrator from clinic
+    define senior_or_specialist_in_clinic: senior_or_specialist_doctor from clinic
+
+    # Permissions.
+    # Policy 4: Administrators.
+    # Policy 5: Receptionists in the same Clinic can view and edit.
+    # Policy 7: Assigned Doctors can view and edit.
+    # Policy 9: Assigned Intern Doctors cannot edit.
+    # Policy 11: Senior or Specialist Doctors in same Clinic can delete.
+    # Policy 12: Senior or Specialist Doctors in same Clinic can view broadly.
+    # Policy 15: Doctors in the same Clinic can view.
+
+    # Policy 4, 5, 7, 9, and 12.
+    define can_view: assigned_doctor or receptionist_in_clinic or administrator_in_clinic or senior_or_specialist_in_clinic
+    define can_edit: (assigned_doctor but not intern_assigned_doctor) or receptionist_in_clinic or administrator_in_clinic
+    
+    # Policy 4 and 11.
+    define can_delete: senior_or_specialist_assigned_doctor or administrator_in_clinic
+
+    # can_list_visits mirrors can_view: if you can see the patient, you can list their visits.
+    # Policy 4, 5, and 15.
+    define can_list_visits: can_view
+
+    # Policy 4, 5, 7, and 9.
+    define can_add_visit: (assigned_doctor but not intern_assigned_doctor) or administrator_in_clinic
+
+# Patient-Guardian junction.
+type patient_guardian
+  relations
+    define patient: [patient]
+    define guardian: [guardian]
+    define authority: [guardian_authority]
+
+type visit
+  relations
+    # Facts.
+    define clinic: [clinic]
+    define confidentiality: [confidentiality]
+    define confidentiality_protected: [employee:*]
+    define assigned_doctor: [employee]
+    define intern_assigned_doctor: [employee]
+    define senior_or_specialist_assigned_doctor: [employee]
+
+    # From Visit's Clinics.
+    define receptionist_in_clinic: receptionist from clinic
+    define administrator_in_clinic: administrator from clinic
+    define senior_or_specialist_in_clinic: senior_or_specialist_doctor from clinic
+
+    # Permissions.
+    # Policy 4: Administrators.
+    # Policy 5: Receptionists in the same Clinic can view and edit.
+    # Policy 7: Assigned Doctors can view and edit.
+    # Policy 9: Assigned Intern Doctors cannot edit.
+    # Policy 11: Senior or Specialist Doctors in same Clinic can delete.
+    # Policy 12: Senior or Specialist Doctors in same Clinic can view broadly.
+
+    # Policy 4, 5, 7, and 12.
+    define can_view: assigned_doctor or receptionist_in_clinic or administrator_in_clinic or (senior_or_specialist_in_clinic but not confidentiality_protected)
+
+    # Policy 4, 5, 7, and 9.
+    define can_edit: (assigned_doctor but not intern_assigned_doctor) or receptionist_in_clinic or administrator_in_clinic
+
+    # Policy 4 and 11.
+    define can_delete: senior_or_specialist_assigned_doctor or administrator_in_clinic

@@ -1,0 +1,1666 @@
+# Copyright 2026 Gabriel Henrique Lopes Gomes Alves Nunes.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+model_file: ./childrenclinic.fga
+
+tuples:
+
+  # Clinics.
+
+  # Clinic A.
+  - user: employee:*
+    relation: can_list_employees
+    object: clinic:A
+  - user: guest:*
+    relation: can_list_employees
+    object: clinic:A
+  - user: employee:*
+    relation: can_list_patients
+    object: clinic:A
+  - user: employee:*
+    relation: can_list_guardians
+    object: clinic:A
+  - user: employee:james_carter
+    relation: member
+    object: clinic:A
+  - user: employee:linda_douglas
+    relation: member
+    object: clinic:A
+  - user: employee:sharon_jenkins
+    relation: member
+    object: clinic:A
+  - user: employee:kathaleen_tramonte
+    relation: member
+    object: clinic:A
+  - user: employee:alice
+    relation: member
+    object: clinic:A
+  - user: employee:bob_buchanan
+    relation: member
+    object: clinic:A
+  - user: employee:james_carter
+    relation: doctor
+    object: clinic:A
+  - user: employee:linda_douglas
+    relation: doctor
+    object: clinic:A
+  - user: employee:sharon_jenkins
+    relation: doctor
+    object: clinic:A
+  - user: employee:kathaleen_tramonte
+    relation: doctor
+    object: clinic:A
+  - user: employee:james_carter
+    relation: senior_or_specialist_doctor
+    object: clinic:A
+  - user: employee:linda_douglas
+    relation: senior_or_specialist_doctor
+    object: clinic:A
+  - user: employee:alice
+    relation: administrator
+    object: clinic:A
+  - user: employee:bob_buchanan
+    relation: receptionist
+    object: clinic:A
+
+  # Clinic B.
+  - user: employee:*
+    relation: can_list_employees
+    object: clinic:B
+  - user: guest:*
+    relation: can_list_employees
+    object: clinic:B
+  - user: employee:*
+    relation: can_list_patients
+    object: clinic:B
+  - user: employee:*
+    relation: can_list_guardians
+    object: clinic:B
+  - user: employee:james_carter
+    relation: member
+    object: clinic:B
+  - user: employee:jestine_teixeira
+    relation: member
+    object: clinic:B
+  - user: employee:alice
+    relation: member
+    object: clinic:B
+  - user: employee:bob_buchanan
+    relation: member
+    object: clinic:B
+  - user: employee:carl_bradford
+    relation: member
+    object: clinic:B
+  - user: employee:james_carter
+    relation: doctor
+    object: clinic:B
+  - user: employee:jestine_teixeira
+    relation: doctor
+    object: clinic:B
+  - user: employee:jestine_teixeira
+    relation: intern_doctor
+    object: clinic:B
+  - user: employee:james_carter
+    relation: senior_or_specialist_doctor
+    object: clinic:B
+  - user: employee:alice
+    relation: administrator
+    object: clinic:B
+  - user: employee:bob_buchanan
+    relation: receptionist
+    object: clinic:B
+  - user: employee:carl_bradford
+    relation: receptionist
+    object: clinic:B
+
+  # Employees.
+
+  # James Carter (Doctor, Senior, Clinics A and B).
+  - user: employee:james_carter
+    relation: identity
+    object: employee:james_carter
+  - user: clinic:A
+    relation: clinic
+    object: employee:james_carter
+  - user: clinic:B
+    relation: clinic
+    object: employee:james_carter
+  - user: employee_role:doctor
+    relation: role
+    object: employee:james_carter
+  - user: professional_level:senior
+    relation: level
+    object: employee:james_carter
+  - user: employee:*
+    relation: is_public_viewable
+    object: employee:james_carter
+  - user: guest:*
+    relation: is_public_viewable
+    object: employee:james_carter
+
+  # Linda Douglas (Doctor, Specialist, Clinic A).
+  - user: employee:linda_douglas
+    relation: identity
+    object: employee:linda_douglas
+  - user: clinic:A
+    relation: clinic
+    object: employee:linda_douglas
+  - user: employee_role:doctor
+    relation: role
+    object: employee:linda_douglas
+  - user: professional_level:specialist
+    relation: level
+    object: employee:linda_douglas
+  - user: employee:*
+    relation: is_public_viewable
+    object: employee:linda_douglas
+  - user: guest:*
+    relation: is_public_viewable
+    object: employee:linda_douglas
+
+  # Sharon Jenkins (Doctor, Resident, Clinic A).
+  - user: employee:sharon_jenkins
+    relation: identity
+    object: employee:sharon_jenkins
+  - user: clinic:A
+    relation: clinic
+    object: employee:sharon_jenkins
+  - user: employee_role:doctor
+    relation: role
+    object: employee:sharon_jenkins
+  - user: professional_level:resident
+    relation: level
+    object: employee:sharon_jenkins
+  - user: employee:*
+    relation: is_public_viewable
+    object: employee:sharon_jenkins
+  - user: guest:*
+    relation: is_public_viewable
+    object: employee:sharon_jenkins
+
+  # Jestine Teixeira (Doctor, Intern, Clinic B) [Manager: James Carter].
+  - user: employee:jestine_teixeira
+    relation: identity
+    object: employee:jestine_teixeira
+  - user: clinic:B
+    relation: clinic
+    object: employee:jestine_teixeira
+  - user: employee_role:doctor
+    relation: role
+    object: employee:jestine_teixeira
+  - user: professional_level:intern
+    relation: level
+    object: employee:jestine_teixeira
+  - user: employee:james_carter
+    relation: manager
+    object: employee:jestine_teixeira
+  - user: employee:*
+    relation: is_public_viewable
+    object: employee:jestine_teixeira
+  - user: guest:*
+    relation: is_public_viewable
+    object: employee:jestine_teixeira
+
+  # Kathaleen Tramonte (Doctor, Registrar, Clinic A) [Manager: Linda Douglas].
+  - user: employee:kathaleen_tramonte
+    relation: identity
+    object: employee:kathaleen_tramonte
+  - user: clinic:A
+    relation: clinic
+    object: employee:kathaleen_tramonte
+  - user: employee_role:doctor
+    relation: role
+    object: employee:kathaleen_tramonte
+  - user: professional_level:registrar
+    relation: level
+    object: employee:kathaleen_tramonte
+  - user: employee:linda_douglas
+    relation: manager
+    object: employee:kathaleen_tramonte
+  - user: employee:*
+    relation: is_public_viewable
+    object: employee:kathaleen_tramonte
+  - user: guest:*
+    relation: is_public_viewable
+    object: employee:kathaleen_tramonte
+
+  # Alice (Administrator, Senior, Clinics A and B).
+  - user: employee:alice
+    relation: identity
+    object: employee:alice
+  - user: clinic:A
+    relation: clinic
+    object: employee:alice
+  - user: clinic:B
+    relation: clinic
+    object: employee:alice
+  - user: employee_role:administrator
+    relation: role
+    object: employee:alice
+  - user: professional_level:senior
+    relation: level
+    object: employee:alice
+  - user: employee:*
+    relation: is_administrator
+    object: employee:alice
+
+  # Bob Buchanan (Receptionist, Staff, Clinics A and B).
+  - user: employee:bob_buchanan
+    relation: identity
+    object: employee:bob_buchanan
+  - user: clinic:A
+    relation: clinic
+    object: employee:bob_buchanan
+  - user: clinic:B
+    relation: clinic
+    object: employee:bob_buchanan
+  - user: employee_role:receptionist
+    relation: role
+    object: employee:bob_buchanan
+  - user: professional_level:staff
+    relation: level
+    object: employee:bob_buchanan
+  - user: employee:*
+    relation: is_public_viewable
+    object: employee:bob_buchanan
+  - user: guest:*
+    relation: is_public_viewable
+    object: employee:bob_buchanan
+
+  # Carl Bradford (Receptionist, Intern, Clinic B) [Manager: Bob Buchanan].
+  - user: employee:carl_bradford
+    relation: identity
+    object: employee:carl_bradford
+  - user: clinic:B
+    relation: clinic
+    object: employee:carl_bradford
+  - user: employee_role:receptionist
+    relation: role
+    object: employee:carl_bradford
+  - user: professional_level:intern
+    relation: level
+    object: employee:carl_bradford
+  - user: employee:bob_buchanan
+    relation: manager
+    object: employee:carl_bradford
+  - user: employee:*
+    relation: is_public_viewable
+    object: employee:carl_bradford
+  - user: guest:*
+    relation: is_public_viewable
+    object: employee:carl_bradford
+
+  # Guardians.
+
+  # George Franklin (Clinics A and B).
+  - user: clinic:A
+    relation: clinic
+    object: guardian:george_franklin
+  - user: clinic:B
+    relation: clinic
+    object: guardian:george_franklin
+
+  # Betty Davis (Clinic A).
+  - user: clinic:A
+    relation: clinic
+    object: guardian:betty_davis
+
+  # Eduardo Rodriquez (Clinic B).
+  - user: clinic:B
+    relation: clinic
+    object: guardian:eduardo_rodriquez
+
+  # Jean Coleman (Clinic A).
+  - user: clinic:A
+    relation: clinic
+    object: guardian:jean_coleman
+
+  # Carlos Estaban (Clinic A).
+  - user: clinic:A
+    relation: clinic
+    object: guardian:carlos_estaban
+
+  # Clara Higgins (Clinic A).
+  - user: clinic:A
+    relation: clinic
+    object: guardian:clara_higgins
+
+  # Patients.
+
+  # Leo Franklin (Clinics A and B, Doctors: James Carter).
+  - user: clinic:A
+    relation: clinic
+    object: patient:leo_franklin
+  - user: clinic:B
+    relation: clinic
+    object: patient:leo_franklin
+  - user: employee:james_carter
+    relation: assigned_doctor
+    object: patient:leo_franklin
+  - user: employee:james_carter
+    relation: senior_or_specialist_assigned_doctor
+    object: patient:leo_franklin
+
+  # Basil Davis (Clinic A, Doctors: James Carter).
+  - user: clinic:A
+    relation: clinic
+    object: patient:basil_davis
+  - user: employee:james_carter
+    relation: assigned_doctor
+    object: patient:basil_davis
+  - user: employee:james_carter
+    relation: senior_or_specialist_assigned_doctor
+    object: patient:basil_davis
+
+  # Rosy Rodriquez (Clinic B, Doctors: James Carter, Jestine Teixeira).
+  - user: clinic:B
+    relation: clinic
+    object: patient:rosy_rodriquez
+  - user: employee:james_carter
+    relation: assigned_doctor
+    object: patient:rosy_rodriquez
+  - user: employee:jestine_teixeira
+    relation: assigned_doctor
+    object: patient:rosy_rodriquez
+  - user: employee:james_carter
+    relation: senior_or_specialist_assigned_doctor
+    object: patient:rosy_rodriquez
+  - user: employee:jestine_teixeira
+    relation: intern_assigned_doctor
+    object: patient:rosy_rodriquez
+
+  # Jewel Rodriquez (Clinic B, Doctors: James Carter, Jestine Teixeira).
+  - user: clinic:B
+    relation: clinic
+    object: patient:jewel_rodriquez
+  - user: employee:james_carter
+    relation: assigned_doctor
+    object: patient:jewel_rodriquez
+  - user: employee:jestine_teixeira
+    relation: assigned_doctor
+    object: patient:jewel_rodriquez
+  - user: employee:james_carter
+    relation: senior_or_specialist_assigned_doctor
+    object: patient:jewel_rodriquez
+  - user: employee:jestine_teixeira
+    relation: intern_assigned_doctor
+    object: patient:jewel_rodriquez
+
+  # Samantha Coleman (Clinic A, Doctors: Sharon Jenkins, Linda Douglas, Kathaleen Tramonte).
+  - user: clinic:A
+    relation: clinic
+    object: patient:samantha_coleman
+  - user: employee:sharon_jenkins
+    relation: assigned_doctor
+    object: patient:samantha_coleman
+  - user: employee:linda_douglas
+    relation: assigned_doctor
+    object: patient:samantha_coleman
+  - user: employee:kathaleen_tramonte
+    relation: assigned_doctor
+    object: patient:samantha_coleman
+  - user: employee:linda_douglas
+    relation: senior_or_specialist_assigned_doctor
+    object: patient:samantha_coleman
+
+  # Max Coleman (Clinic A, Doctors: Sharon Jenkins, Linda Douglas, Kathaleen Tramonte).
+  - user: clinic:A
+    relation: clinic
+    object: patient:max_coleman
+  - user: employee:sharon_jenkins
+    relation: assigned_doctor
+    object: patient:max_coleman
+  - user: employee:linda_douglas
+    relation: assigned_doctor
+    object: patient:max_coleman
+  - user: employee:kathaleen_tramonte
+    relation: assigned_doctor
+    object: patient:max_coleman
+  - user: employee:linda_douglas
+    relation: senior_or_specialist_assigned_doctor
+    object: patient:max_coleman
+
+  # Lucky Estaban (Clinic A, Doctors: James Carter).
+  - user: clinic:A
+    relation: clinic
+    object: patient:lucky_estaban
+  - user: employee:james_carter
+    relation: assigned_doctor
+    object: patient:lucky_estaban
+  - user: employee:james_carter
+    relation: senior_or_specialist_assigned_doctor
+    object: patient:lucky_estaban
+
+  # Sly Estaban (Clinic A, Doctors: James Carter).
+  - user: clinic:A
+    relation: clinic
+    object: patient:sly_estaban
+  - user: employee:james_carter
+    relation: assigned_doctor
+    object: patient:sly_estaban
+  - user: employee:james_carter
+    relation: senior_or_specialist_assigned_doctor
+    object: patient:sly_estaban
+
+  # Patient-Guardian junctions.
+
+  # Leo Franklin: George Franklin (Parent).
+  - user: patient:leo_franklin
+    relation: patient
+    object: patient_guardian:leo_franklin__george_franklin
+  - user: guardian:george_franklin
+    relation: guardian
+    object: patient_guardian:leo_franklin__george_franklin
+  - user: guardian_authority:parent
+    relation: authority
+    object: patient_guardian:leo_franklin__george_franklin
+
+  # Leo Franklin: Clara Higgins (Authorised Adult).
+  - user: patient:leo_franklin
+    relation: patient
+    object: patient_guardian:leo_franklin__clara_higgins
+  - user: guardian:clara_higgins
+    relation: guardian
+    object: patient_guardian:leo_franklin__clara_higgins
+  - user: guardian_authority:authorised_adult
+    relation: authority
+    object: patient_guardian:leo_franklin__clara_higgins
+
+  # Basil Davis: Betty Davis (Parent).
+  - user: patient:basil_davis
+    relation: patient
+    object: patient_guardian:basil_davis__betty_davis
+  - user: guardian:betty_davis
+    relation: guardian
+    object: patient_guardian:basil_davis__betty_davis
+  - user: guardian_authority:parent
+    relation: authority
+    object: patient_guardian:basil_davis__betty_davis
+
+  # Rosy Rodriquez: Eduardo Rodriquez (Parent).
+  - user: patient:rosy_rodriquez
+    relation: patient
+    object: patient_guardian:rosy_rodriquez__eduardo_rodriquez
+  - user: guardian:eduardo_rodriquez
+    relation: guardian
+    object: patient_guardian:rosy_rodriquez__eduardo_rodriquez
+  - user: guardian_authority:parent
+    relation: authority
+    object: patient_guardian:rosy_rodriquez__eduardo_rodriquez
+
+  # Jewel Rodriquez: Eduardo Rodriquez (Parent).
+  - user: patient:jewel_rodriquez
+    relation: patient
+    object: patient_guardian:jewel_rodriquez__eduardo_rodriquez
+  - user: guardian:eduardo_rodriquez
+    relation: guardian
+    object: patient_guardian:jewel_rodriquez__eduardo_rodriquez
+  - user: guardian_authority:parent
+    relation: authority
+    object: patient_guardian:jewel_rodriquez__eduardo_rodriquez
+
+  # Samantha Coleman: Jean Coleman (Parent).
+  - user: patient:samantha_coleman
+    relation: patient
+    object: patient_guardian:samantha_coleman__jean_coleman
+  - user: guardian:jean_coleman
+    relation: guardian
+    object: patient_guardian:samantha_coleman__jean_coleman
+  - user: guardian_authority:parent
+    relation: authority
+    object: patient_guardian:samantha_coleman__jean_coleman
+
+  # Max Coleman: Jean Coleman (Parent).
+  - user: patient:max_coleman
+    relation: patient
+    object: patient_guardian:max_coleman__jean_coleman
+  - user: guardian:jean_coleman
+    relation: guardian
+    object: patient_guardian:max_coleman__jean_coleman
+  - user: guardian_authority:parent
+    relation: authority
+    object: patient_guardian:max_coleman__jean_coleman
+
+  # Lucky Estaban: Carlos Estaban (Parent).
+  - user: patient:lucky_estaban
+    relation: patient
+    object: patient_guardian:lucky_estaban__carlos_estaban
+  - user: guardian:carlos_estaban
+    relation: guardian
+    object: patient_guardian:lucky_estaban__carlos_estaban
+  - user: guardian_authority:parent
+    relation: authority
+    object: patient_guardian:lucky_estaban__carlos_estaban
+
+  # Sly Estaban: Carlos Estaban (Parent).
+  - user: patient:sly_estaban
+    relation: patient
+    object: patient_guardian:sly_estaban__carlos_estaban
+  - user: guardian:carlos_estaban
+    relation: guardian
+    object: patient_guardian:sly_estaban__carlos_estaban
+  - user: guardian_authority:parent
+    relation: authority
+    object: patient_guardian:sly_estaban__carlos_estaban
+
+  # Visits.
+
+  # Samantha Coleman 1 (Clinic A, Doctors: Sharon Jenkins, Confidentiality: Official).
+  - user: clinic:A
+    relation: clinic
+    object: visit:samantha_coleman_1
+  - user: employee:sharon_jenkins
+    relation: assigned_doctor
+    object: visit:samantha_coleman_1
+  - user: confidentiality:official
+    relation: confidentiality
+    object: visit:samantha_coleman_1
+
+  # Max Coleman 1 (Clinic A, Doctors: Sharon Jenkins, Confidentiality: Official).
+  - user: clinic:A
+    relation: clinic
+    object: visit:max_coleman_1
+  - user: employee:sharon_jenkins
+    relation: assigned_doctor
+    object: visit:max_coleman_1
+  - user: confidentiality:official
+    relation: confidentiality
+    object: visit:max_coleman_1
+
+  # Max Coleman 2 (Clinic A, Doctors: Sharon Jenkins, Linda Douglas, Kathaleen Tramonte, Confidentiality: Sensitive).
+  - user: clinic:A
+    relation: clinic
+    object: visit:max_coleman_2
+  - user: employee:sharon_jenkins
+    relation: assigned_doctor
+    object: visit:max_coleman_2
+  - user: employee:linda_douglas
+    relation: assigned_doctor
+    object: visit:max_coleman_2
+  - user: employee:kathaleen_tramonte
+    relation: assigned_doctor
+    object: visit:max_coleman_2
+  - user: employee:linda_douglas
+    relation: senior_or_specialist_assigned_doctor
+    object: visit:max_coleman_2
+  - user: confidentiality:sensitive
+    relation: confidentiality
+    object: visit:max_coleman_2
+
+  # Samantha Coleman 2 (Clinic A, Doctors: Sharon Jenkins, Linda Douglas, Kathaleen Tramonte, Confidentiality: Sensitive).
+  - user: clinic:A
+    relation: clinic
+    object: visit:samantha_coleman_2
+  - user: employee:sharon_jenkins
+    relation: assigned_doctor
+    object: visit:samantha_coleman_2
+  - user: employee:linda_douglas
+    relation: assigned_doctor
+    object: visit:samantha_coleman_2
+  - user: employee:kathaleen_tramonte
+    relation: assigned_doctor
+    object: visit:samantha_coleman_2
+  - user: employee:linda_douglas
+    relation: senior_or_specialist_assigned_doctor
+    object: visit:samantha_coleman_2
+  - user: confidentiality:sensitive
+    relation: confidentiality
+    object: visit:samantha_coleman_2
+
+  # Rosy Rodriquez 1 (Clinic B, Doctors: James Carter, Jestine Teixeira, Confidentiality: Official).
+  - user: clinic:B
+    relation: clinic
+    object: visit:rosy_rodriquez_1
+  - user: employee:james_carter
+    relation: assigned_doctor
+    object: visit:rosy_rodriquez_1
+  - user: employee:jestine_teixeira
+    relation: assigned_doctor
+    object: visit:rosy_rodriquez_1
+  - user: employee:james_carter
+    relation: senior_or_specialist_assigned_doctor
+    object: visit:rosy_rodriquez_1
+  - user: employee:jestine_teixeira
+    relation: intern_assigned_doctor
+    object: visit:rosy_rodriquez_1
+  - user: confidentiality:official
+    relation: confidentiality
+    object: visit:rosy_rodriquez_1
+
+  # Jewel Rodriquez 1 (Clinic B, Doctors: James Carter, Jestine Teixeira, Confidentiality: Official).
+  - user: clinic:B
+    relation: clinic
+    object: visit:jewel_rodriquez_1
+  - user: employee:james_carter
+    relation: assigned_doctor
+    object: visit:jewel_rodriquez_1
+  - user: employee:jestine_teixeira
+    relation: assigned_doctor
+    object: visit:jewel_rodriquez_1
+  - user: employee:james_carter
+    relation: senior_or_specialist_assigned_doctor
+    object: visit:jewel_rodriquez_1
+  - user: employee:jestine_teixeira
+    relation: intern_assigned_doctor
+    object: visit:jewel_rodriquez_1
+  - user: confidentiality:official
+    relation: confidentiality
+    object: visit:jewel_rodriquez_1
+
+  # Lucky Estaban 1 (Clinic A, Doctors: James Carter, Confidentiality: Official).
+  - user: clinic:A
+    relation: clinic
+    object: visit:lucky_estaban_1
+  - user: employee:james_carter
+    relation: assigned_doctor
+    object: visit:lucky_estaban_1
+  - user: employee:james_carter
+    relation: senior_or_specialist_assigned_doctor
+    object: visit:lucky_estaban_1
+  - user: confidentiality:official
+    relation: confidentiality
+    object: visit:lucky_estaban_1
+
+  # Sly Estaban 1 (Clinic A, Doctors: James Carter, Confidentiality: Official).
+  - user: clinic:A
+    relation: clinic
+    object: visit:sly_estaban_1
+  - user: employee:james_carter
+    relation: assigned_doctor
+    object: visit:sly_estaban_1
+  - user: employee:james_carter
+    relation: senior_or_specialist_assigned_doctor
+    object: visit:sly_estaban_1
+  - user: confidentiality:official
+    relation: confidentiality
+    object: visit:sly_estaban_1
+
+  # Basil Davis 1 (Clinic A, Doctors: James Carter, Confidentiality: Protected).
+  - user: clinic:A
+    relation: clinic
+    object: visit:basil_davis_1
+  - user: employee:james_carter
+    relation: assigned_doctor
+    object: visit:basil_davis_1
+  - user: employee:james_carter
+    relation: senior_or_specialist_assigned_doctor
+    object: visit:basil_davis_1
+  - user: confidentiality:protected
+    relation: confidentiality
+    object: visit:basil_davis_1
+  - user: employee:*
+    relation: confidentiality_protected
+    object: visit:basil_davis_1
+
+  # Leo Franklin 1 (Clinic A, Doctors: James Carter, Confidentiality: Official).
+  - user: clinic:A
+    relation: clinic
+    object: visit:leo_franklin_1
+  - user: employee:james_carter
+    relation: assigned_doctor
+    object: visit:leo_franklin_1
+  - user: employee:james_carter
+    relation: senior_or_specialist_assigned_doctor
+    object: visit:leo_franklin_1
+  - user: confidentiality:official
+    relation: confidentiality
+    object: visit:leo_franklin_1
+
+  # Leo Franklin 2 (Clinic A, Doctors: James Carter, Confidentiality: Official).
+  - user: clinic:A
+    relation: clinic
+    object: visit:leo_franklin_2
+  - user: employee:james_carter
+    relation: assigned_doctor
+    object: visit:leo_franklin_2
+  - user: employee:james_carter
+    relation: senior_or_specialist_assigned_doctor
+    object: visit:leo_franklin_2
+  - user: confidentiality:official
+    relation: confidentiality
+    object: visit:leo_franklin_2
+
+  # Basil Davis 2 (Clinic A, Doctors: Sharon Jenkins, Confidentiality: Official).
+  - user: clinic:A
+    relation: clinic
+    object: visit:basil_davis_2
+  - user: employee:sharon_jenkins
+    relation: assigned_doctor
+    object: visit:basil_davis_2
+  - user: confidentiality:official
+    relation: confidentiality
+    object: visit:basil_davis_2
+
+  # Rosy Rodriquez 2 (Clinic B, Doctors: Jestine Teixeira, Confidentiality: Official).
+  - user: clinic:B
+    relation: clinic
+    object: visit:rosy_rodriquez_2
+  - user: employee:jestine_teixeira
+    relation: assigned_doctor
+    object: visit:rosy_rodriquez_2
+  - user: employee:jestine_teixeira
+    relation: intern_assigned_doctor
+    object: visit:rosy_rodriquez_2
+  - user: confidentiality:official
+    relation: confidentiality
+    object: visit:rosy_rodriquez_2
+
+  # Jewel Rodriquez 2 (Clinic B, Doctors: Jestine Teixeira, Confidentiality: Official).
+  - user: clinic:B
+    relation: clinic
+    object: visit:jewel_rodriquez_2
+  - user: employee:jestine_teixeira
+    relation: assigned_doctor
+    object: visit:jewel_rodriquez_2
+  - user: employee:jestine_teixeira
+    relation: intern_assigned_doctor
+    object: visit:jewel_rodriquez_2
+  - user: confidentiality:official
+    relation: confidentiality
+    object: visit:jewel_rodriquez_2
+
+  # Samantha Coleman 3 (Clinic A, Doctors: Linda Douglas, Confidentiality: Sensitive).
+  - user: clinic:A
+    relation: clinic
+    object: visit:samantha_coleman_3
+  - user: employee:linda_douglas
+    relation: assigned_doctor
+    object: visit:samantha_coleman_3
+  - user: employee:linda_douglas
+    relation: senior_or_specialist_assigned_doctor
+    object: visit:samantha_coleman_3
+  - user: confidentiality:sensitive
+    relation: confidentiality
+    object: visit:samantha_coleman_3
+
+  # Max Coleman 3 (Clinic A, Doctors: Linda Douglas, Confidentiality: Sensitive).
+  - user: clinic:A
+    relation: clinic
+    object: visit:max_coleman_3
+  - user: employee:linda_douglas
+    relation: assigned_doctor
+    object: visit:max_coleman_3
+  - user: employee:linda_douglas
+    relation: senior_or_specialist_assigned_doctor
+    object: visit:max_coleman_3
+  - user: confidentiality:sensitive
+    relation: confidentiality
+    object: visit:max_coleman_3
+
+  # Lucky Estaban 2 (Clinic B, Doctors: James Carter, Confidentiality: Official).
+  - user: clinic:B
+    relation: clinic
+    object: visit:lucky_estaban_2
+  - user: employee:james_carter
+    relation: assigned_doctor
+    object: visit:lucky_estaban_2
+  - user: employee:james_carter
+    relation: senior_or_specialist_assigned_doctor
+    object: visit:lucky_estaban_2
+  - user: confidentiality:official
+    relation: confidentiality
+    object: visit:lucky_estaban_2
+
+  # Sly Estaban 2 (Clinic B, Doctors: James Carter, Confidentiality: Official).
+  - user: clinic:B
+    relation: clinic
+    object: visit:sly_estaban_2
+  - user: employee:james_carter
+    relation: assigned_doctor
+    object: visit:sly_estaban_2
+  - user: employee:james_carter
+    relation: senior_or_specialist_assigned_doctor
+    object: visit:sly_estaban_2
+  - user: confidentiality:official
+    relation: confidentiality
+    object: visit:sly_estaban_2
+
+  # Leo Franklin 3 (Clinic A, Doctors: Sharon Jenkins, Confidentiality: Official).
+  - user: clinic:A
+    relation: clinic
+    object: visit:leo_franklin_3
+  - user: employee:sharon_jenkins
+    relation: assigned_doctor
+    object: visit:leo_franklin_3
+  - user: confidentiality:official
+    relation: confidentiality
+    object: visit:leo_franklin_3
+
+  # Basil Davis 3 (Clinic A, Doctors: Sharon Jenkins, Confidentiality: Protected).
+  - user: clinic:A
+    relation: clinic
+    object: visit:basil_davis_3
+  - user: employee:sharon_jenkins
+    relation: assigned_doctor
+    object: visit:basil_davis_3
+  - user: confidentiality:protected
+    relation: confidentiality
+    object: visit:basil_davis_3
+  - user: employee:*
+    relation: confidentiality_protected
+    object: visit:basil_davis_3
+
+  # Guest User (for tests).
+  - user: guest:unknown
+    relation: identity
+    object: guest:unknown
+
+tests:
+
+  # Access grants (permit policies).
+
+  - name: "Administrator: unrestricted access."
+    check:
+      # All Clinic permissions.
+      - user: employee:alice
+        object: clinic:A
+        assertions:
+          can_view: true
+          can_list_employees: true
+          can_list_patients: true
+          can_list_guardians: true
+          can_add_patient: true
+          can_add_guardian: true
+          can_add_employee: true
+      # Second Clinic.
+      - user: employee:alice
+        object: clinic:B
+        assertions:
+          can_view: true
+          can_add_patient: true
+          can_add_employee: true
+      # Full Employee access.
+      - user: employee:alice
+        object: employee:james_carter
+        assertions:
+          can_view: true
+          can_edit: true
+          can_delete: true
+      # Full Patient access including Visit operations.
+      - user: employee:alice
+        object: patient:leo_franklin
+        assertions:
+          can_view: true
+          can_edit: true
+          can_delete: true
+          can_list_visits: true
+          can_add_visit: true
+      # Full Guardian access.
+      - user: employee:alice
+        object: guardian:george_franklin
+        assertions:
+          can_view: true
+          can_edit: true
+          can_delete: true
+      # Full Visit access (Protected, but Administrator bypasses).
+      - user: employee:alice
+        object: visit:basil_davis_1
+        assertions:
+          can_view: true
+          can_edit: true
+          can_delete: true
+
+  - name: "Anyone can list Employees at any Clinic."
+    check:
+      # Employee at own Clinic.
+      - user: employee:james_carter
+        object: clinic:A
+        assertions:
+          can_list_employees: true
+      # Employee at other Clinic.
+      - user: employee:james_carter
+        object: clinic:B
+        assertions:
+          can_list_employees: true
+      # Guest at any Clinic.
+      - user: guest:unknown
+        object: clinic:B
+        assertions:
+          can_list_employees: true
+
+  - name: "Public visibility: Doctors and Receptionists."
+    check:
+      - user: employee:bob_buchanan
+        object: employee:james_carter
+        assertions:
+          can_view: true
+      # Guest can view a Doctor.
+      - user: guest:unknown
+        object: employee:james_carter
+        assertions:
+          can_view: true
+      # Guest can view a Receptionist.
+      - user: guest:unknown
+        object: employee:bob_buchanan
+        assertions:
+          can_view: true
+      # Guest cannot view an Administrator.
+      - user: guest:unknown
+        object: employee:alice
+        assertions:
+          can_view: false
+
+  - name: "Employee self-view and self-edit."
+    check:
+      # Doctor views and edits own record.
+      - user: employee:james_carter
+        object: employee:james_carter
+        assertions:
+          can_view: true
+          can_edit: true
+      # Receptionist views and edits own record.
+      - user: employee:bob_buchanan
+        object: employee:bob_buchanan
+        assertions:
+          can_view: true
+          can_edit: true
+      # Doctor cannot edit another Doctor (not self, not Receptionist).
+      - user: employee:james_carter
+        object: employee:sharon_jenkins
+        assertions:
+          can_view: true
+          can_edit: false
+
+  - name: "Employee can view assigned Clinics only."
+    check:
+      # Linda at Clinic A: allowed.
+      - user: employee:linda_douglas
+        object: clinic:A
+        assertions:
+          can_view: true
+      # Linda not at Clinic B: denied.
+      - user: employee:linda_douglas
+        object: clinic:B
+        assertions:
+          can_view: false
+      # Jestine at Clinic B: allowed.
+      - user: employee:jestine_teixeira
+        object: clinic:B
+        assertions:
+          can_view: true
+      # Jestine not at Clinic A: denied.
+      - user: employee:jestine_teixeira
+        object: clinic:A
+        assertions:
+          can_view: false
+
+  - name: "Every Employee can list Patients and Guardians at any Clinic."
+    check:
+      # Jestine (Clinic B) can list at Clinic A.
+      - user: employee:jestine_teixeira
+        object: clinic:A
+        assertions:
+          can_list_patients: true
+          can_list_guardians: true
+      # Linda (Clinic A) can list at Clinic B.
+      - user: employee:linda_douglas
+        object: clinic:B
+        assertions:
+          can_list_patients: true
+          can_list_guardians: true
+
+  - name: "Receptionist: view and edit in same Clinic."
+    check:
+      # Receptionist at Clinic A: Patient access.
+      - user: employee:bob_buchanan
+        object: patient:basil_davis
+        assertions:
+          can_edit: true
+          can_delete: false
+      # Receptionist at Clinic A: Guardian access.
+      - user: employee:bob_buchanan
+        object: guardian:betty_davis
+        assertions:
+          can_view: true
+          can_edit: true
+          can_delete: false
+      # Receptionist: Employee view and edit (non-Administrator).
+      - user: employee:bob_buchanan
+        object: employee:james_carter
+        assertions:
+          can_edit: true
+      # Receptionist: Visit access.
+      - user: employee:bob_buchanan
+        object: visit:basil_davis_2
+        assertions:
+          can_view: true
+          can_edit: true
+          can_delete: false
+      - user: employee:carl_bradford
+        object: patient:basil_davis
+        assertions:
+          can_view: false
+          can_edit: false
+
+  - name: "Receptionist: add Patients and Guardians to their Clinics."
+    check:
+      # Bob at Clinic A: allowed.
+      - user: employee:bob_buchanan
+        object: clinic:A
+        assertions:
+          can_add_patient: true
+          can_add_guardian: true
+      # Bob at Clinic B: allowed.
+      - user: employee:bob_buchanan
+        object: clinic:B
+        assertions:
+          can_add_patient: true
+          can_add_guardian: true
+      # Carl not at Clinic A: denied.
+      - user: employee:carl_bradford
+        object: clinic:A
+        assertions:
+          can_add_patient: false
+          can_add_guardian: false
+      # Carl at Clinic B: allowed.
+      - user: employee:carl_bradford
+        object: clinic:B
+        assertions:
+          can_add_patient: true
+          can_add_guardian: true
+
+  - name: "Assigned Doctor: view and edit Patients and Visits."
+    check:
+      # James assigned to Leo: full access.
+      - user: employee:james_carter
+        object: patient:leo_franklin
+        assertions:
+          can_view: true
+          can_edit: true
+      # James assigned to Leo's Visit: full access.
+      - user: employee:james_carter
+        object: visit:leo_franklin_1
+        assertions:
+          can_view: true
+          can_edit: true
+      - user: employee:sharon_jenkins
+        object: patient:samantha_coleman
+        assertions:
+          can_view: true
+          can_edit: true
+      # Sharon not assigned to Leo: denied.
+      - user: employee:sharon_jenkins
+        object: patient:leo_franklin
+        assertions:
+          can_view: false
+
+  - name: "Senior or Specialist Doctor: broad Patient visibility."
+    check:
+      # James (Senior) views unassigned Patient at own Clinic.
+      - user: employee:james_carter
+        object: patient:samantha_coleman
+        assertions:
+          can_view: true
+      # Linda (Specialist) views unassigned Patient at Clinic A.
+      - user: employee:linda_douglas
+        object: patient:basil_davis
+        assertions:
+          can_view: true
+      # Linda cannot view Patient at Clinic B (cross-clinic).
+      - user: employee:linda_douglas
+        object: patient:rosy_rodriquez
+        assertions:
+          can_view: false
+      # Sharon (Resident) has no broad view.
+      - user: employee:sharon_jenkins
+        object: patient:basil_davis
+        assertions:
+          can_view: false
+
+  - name: "Senior or Specialist Doctor: broad Visit visibility with confidentiality restriction."
+    check:
+      # James (Senior) views unassigned Official Visit.
+      - user: employee:james_carter
+        object: visit:samantha_coleman_1
+        assertions:
+          can_view: true
+      # Linda (Specialist) views unassigned Official Visit at Clinic A.
+      - user: employee:linda_douglas
+        object: visit:leo_franklin_1
+        assertions:
+          can_view: true
+      # Linda cannot view Visit at Clinic B (cross-clinic).
+      - user: employee:linda_douglas
+        object: visit:rosy_rodriquez_1
+        assertions:
+          can_view: false
+      # James views Protected Visit (assigned Doctor).
+      - user: employee:james_carter
+        object: visit:basil_davis_1
+        assertions:
+          can_view: true
+      # Linda blocked from Protected Visit (not assigned).
+      - user: employee:linda_douglas
+        object: visit:basil_davis_1
+        assertions:
+          can_view: false
+      # Linda blocked from second Protected Visit.
+      - user: employee:linda_douglas
+        object: visit:basil_davis_3
+        assertions:
+          can_view: false
+
+  - name: "Senior or Specialist Doctor: delete assigned Patients and Visits."
+    check:
+      # James (Senior) can delete assigned Patient.
+      - user: employee:james_carter
+        object: patient:leo_franklin
+        assertions:
+          can_delete: true
+      # James can delete assigned Visit.
+      - user: employee:james_carter
+        object: visit:leo_franklin_1
+        assertions:
+          can_delete: true
+      # Sharon (Resident) cannot delete.
+      - user: employee:sharon_jenkins
+        object: patient:samantha_coleman
+        assertions:
+          can_delete: false
+      - user: employee:sharon_jenkins
+        object: visit:samantha_coleman_1
+        assertions:
+          can_delete: false
+      # Linda (Specialist) can delete assigned Patient.
+      - user: employee:linda_douglas
+        object: patient:samantha_coleman
+        assertions:
+          can_delete: true
+      # Linda can delete assigned Visit.
+      - user: employee:linda_douglas
+        object: visit:samantha_coleman_3
+        assertions:
+          can_delete: true
+
+  - name: "Doctor: view Guardians in their Clinics."
+    check:
+      # James (Clinics A and B): Guardian at Clinics A and B.
+      - user: employee:james_carter
+        object: guardian:george_franklin
+        assertions:
+          can_view: true
+      # James: Guardian at Clinic B.
+      - user: employee:james_carter
+        object: guardian:eduardo_rodriquez
+        assertions:
+          can_view: true
+      # Linda (Clinic A): Guardian at Clinic A.
+      - user: employee:linda_douglas
+        object: guardian:betty_davis
+        assertions:
+          can_view: true
+      # Jestine (Clinic B): Guardian at Clinic B.
+      - user: employee:jestine_teixeira
+        object: guardian:eduardo_rodriquez
+        assertions:
+          can_view: true
+      # Jestine cannot view Guardian at Clinic A.
+      - user: employee:jestine_teixeira
+        object: guardian:betty_davis
+        assertions:
+          can_view: false
+
+  # Access denials (forbid policies).
+
+  - name: "Guest: denied Patient operations."
+    check:
+      # Guest can list Employees but nothing else on Clinic.
+      - user: guest:unknown
+        object: clinic:A
+        assertions:
+          can_list_employees: true
+          can_list_patients: false
+          can_list_guardians: false
+          can_view: false
+          can_add_patient: false
+      # Guest denied all Patient permissions.
+      - user: guest:unknown
+        object: patient:leo_franklin
+        assertions:
+          can_view: false
+          can_edit: false
+          can_delete: false
+          can_list_visits: false
+          can_add_visit: false
+      # Guest denied Guardian view.
+      - user: guest:unknown
+        object: guardian:george_franklin
+        assertions:
+          can_view: false
+      # Guest denied Visit view.
+      - user: guest:unknown
+        object: visit:leo_franklin_1
+        assertions:
+          can_view: false
+
+  - name: "Guest: comprehensive denial of remaining permissions."
+    check:
+      # Guest denied Clinic add operations.
+      - user: guest:unknown
+        object: clinic:A
+        assertions:
+          can_add_employee: false
+          can_add_guardian: false
+      # Guest denied Employee edit and delete.
+      - user: guest:unknown
+        object: employee:james_carter
+        assertions:
+          can_edit: false
+          can_delete: false
+      # Guest denied Visit edit and delete.
+      - user: guest:unknown
+        object: visit:leo_franklin_1
+        assertions:
+          can_edit: false
+          can_delete: false
+
+  - name: "Intern Doctor: cannot edit assigned Patients or Visits."
+    check:
+      # Intern Doctor can view but not edit assigned Patient.
+      - user: employee:jestine_teixeira
+        object: patient:rosy_rodriquez
+        assertions:
+          can_view: true
+          can_edit: false
+      # Same for second Patient.
+      - user: employee:jestine_teixeira
+        object: patient:jewel_rodriquez
+        assertions:
+          can_view: true
+          can_edit: false
+      # Intern Doctor can view but not edit assigned Visit.
+      - user: employee:jestine_teixeira
+        object: visit:rosy_rodriquez_1
+        assertions:
+          can_view: true
+          can_edit: false
+      # Same for second Visit.
+      - user: employee:jestine_teixeira
+        object: visit:rosy_rodriquez_2
+        assertions:
+          can_view: true
+          can_edit: false
+
+  - name: "Intern Doctor: cannot add Patients or Guardians to Clinics."
+    check:
+      # Jestine (Intern) denied add at own Clinic.
+      - user: employee:jestine_teixeira
+        object: clinic:B
+        assertions:
+          can_add_patient: false
+          can_add_guardian: false
+      # James (Senior, non-Intern) allowed.
+      - user: employee:james_carter
+        object: clinic:A
+        assertions:
+          can_add_patient: true
+          can_add_guardian: true
+
+  - name: "Cross-Clinic isolation."
+    check:
+      - user: employee:bob_buchanan
+        object: patient:basil_davis
+        assertions:
+          can_view: true
+      # Sharon (Clinic A) denied Patient view and edit at Clinic B.
+      - user: employee:sharon_jenkins
+        object: patient:rosy_rodriquez
+        assertions:
+          can_view: false
+          can_edit: false
+      # Linda (Clinic A) denied Guardian view at Clinic B.
+      - user: employee:linda_douglas
+        object: guardian:eduardo_rodriquez
+        assertions:
+          can_view: false
+      # Jestine (Clinic B) denied Patient view at Clinic A.
+      - user: employee:jestine_teixeira
+        object: patient:basil_davis
+        assertions:
+          can_view: false
+
+  - name: "Receptionist: cannot add or delete Employees."
+    check:
+      # Receptionist denied add Employee.
+      - user: employee:bob_buchanan
+        object: clinic:A
+        assertions:
+          can_add_employee: false
+      # Receptionist denied delete Employee.
+      - user: employee:bob_buchanan
+        object: employee:james_carter
+        assertions:
+          can_delete: false
+
+  - name: "Receptionist: cannot view or edit Administrators."
+    check:
+      # Bob cannot view and edit Alice (Administrator).
+      - user: employee:bob_buchanan
+        object: employee:alice
+        assertions:
+          can_view: false
+          can_edit: false
+      # Carl cannot view and edit Alice (Administrator).
+      - user: employee:carl_bradford
+        object: employee:alice
+        assertions:
+          can_view: false
+          can_edit: false
+
+  # Visit operations (Patient-scoped).
+
+  - name: "ListVisits and AddVisit: Patient-scoped operations."
+    check:
+      # Assigned Senior Doctor: list and add.
+      - user: employee:james_carter
+        object: patient:leo_franklin
+        assertions:
+          can_list_visits: true
+          can_add_visit: true
+      # Intern Doctor: can list but not add.
+      - user: employee:jestine_teixeira
+        object: patient:rosy_rodriquez
+        assertions:
+          can_list_visits: true
+          can_add_visit: false
+      # Receptionist: can list but not add.
+      - user: employee:bob_buchanan
+        object: patient:basil_davis
+        assertions:
+          can_list_visits: true
+          can_add_visit: false
+      # Senior or Specialist Doctor broad view: list but not add.
+      - user: employee:james_carter
+        object: patient:samantha_coleman
+        assertions:
+          can_list_visits: true
+          can_add_visit: false
+      # Cross-Clinic Doctor: denied both.
+      - user: employee:sharon_jenkins
+        object: patient:rosy_rodriquez
+        assertions:
+          can_list_visits: false
+          can_add_visit: false
+      # Guest: denied both.
+      - user: guest:unknown
+        object: patient:basil_davis
+        assertions:
+          can_list_visits: false
+          can_add_visit: false
+
+  - name: "AddVisit: assigned non-Intern Doctors and Administrators only."
+    check:
+      # Registrar Doctor assigned: allowed.
+      - user: employee:kathaleen_tramonte
+        object: patient:max_coleman
+        assertions:
+          can_add_visit: true
+      # Resident Doctor assigned: allowed.
+      - user: employee:sharon_jenkins
+        object: patient:max_coleman
+        assertions:
+          can_add_visit: true
+      # Specialist Doctor unassigned (broad view): list allowed, add denied.
+      - user: employee:linda_douglas
+        object: patient:basil_davis
+        assertions:
+          can_list_visits: true
+          can_add_visit: false
+      # Administrator: allowed.
+      - user: employee:alice
+        object: patient:rosy_rodriquez
+        assertions:
+          can_add_visit: true
+
+  # Per-Employee tests.
+
+  - name: "Kathaleen Tramonte: Registrar Doctor at Clinic A."
+    check:
+      # Own Clinic operations.
+      - user: employee:kathaleen_tramonte
+        object: clinic:A
+        assertions:
+          can_list_employees: true
+          can_list_patients: true
+          can_list_guardians: true
+          can_view: true
+          can_add_patient: true
+          can_add_guardian: true
+          can_add_employee: false
+      # Cross-Clinic operations (Clinic B).
+      - user: employee:kathaleen_tramonte
+        object: clinic:B
+        assertions:
+          can_view: false
+      # Self view and edit.
+      - user: employee:kathaleen_tramonte
+        object: employee:kathaleen_tramonte
+        assertions:
+          can_view: true
+          can_edit: true
+          can_delete: false
+      # Public Doctor view only.
+      - user: employee:kathaleen_tramonte
+        object: employee:james_carter
+        assertions:
+          can_view: true
+          can_edit: false
+      # Assigned Patient: view and edit allowed, delete denied.
+      - user: employee:kathaleen_tramonte
+        object: patient:samantha_coleman
+        assertions:
+          can_view: true
+          can_edit: true
+          can_delete: false
+          can_list_visits: true
+          can_add_visit: true
+      # Cross-Clinic Patient: denied.
+      - user: employee:kathaleen_tramonte
+        object: patient:rosy_rodriquez
+        assertions:
+          can_view: false
+      # Unassigned same-Clinic: denied (not Senior or Specialist Doctor).
+      - user: employee:kathaleen_tramonte
+        object: patient:basil_davis
+        assertions:
+          can_view: false
+      # Guardian at own Clinic: view only.
+      - user: employee:kathaleen_tramonte
+        object: guardian:jean_coleman
+        assertions:
+          can_view: true
+          can_edit: false
+          can_delete: false
+      # Assigned Visit: view and edit allowed, delete denied.
+      - user: employee:kathaleen_tramonte
+        object: visit:samantha_coleman_2
+        assertions:
+          can_view: true
+          can_edit: true
+          can_delete: false
+      # Non-assigned Visit: denied.
+      - user: employee:kathaleen_tramonte
+        object: visit:samantha_coleman_1
+        assertions:
+          can_view: false
+
+  - name: "Sharon Jenkins: Resident Doctor at Clinic A."
+    check:
+      # Own Clinic operations.
+      - user: employee:sharon_jenkins
+        object: clinic:A
+        assertions:
+          can_list_employees: true
+          can_list_patients: true
+          can_list_guardians: true
+          can_view: true
+          can_add_patient: true
+          can_add_guardian: true
+          can_add_employee: false
+      # Self view and edit.
+      - user: employee:sharon_jenkins
+        object: employee:sharon_jenkins
+        assertions:
+          can_view: true
+          can_edit: true
+          can_delete: false
+      # Public Doctor view only.
+      - user: employee:sharon_jenkins
+        object: employee:linda_douglas
+        assertions:
+          can_view: true
+          can_edit: false
+      # Assigned Patient: add Visit allowed.
+      - user: employee:sharon_jenkins
+        object: patient:samantha_coleman
+        assertions:
+          can_add_visit: true
+      # Guardian at own Clinic: view only.
+      - user: employee:sharon_jenkins
+        object: guardian:jean_coleman
+        assertions:
+          can_view: true
+          can_edit: false
+          can_delete: false
+      # Assigned Visit: view and edit allowed.
+      - user: employee:sharon_jenkins
+        object: visit:samantha_coleman_1
+        assertions:
+          can_view: true
+          can_edit: true
+
+  - name: "Carl Bradford: Receptionist at Clinic B only."
+    check:
+      # Own Clinic operations.
+      - user: employee:carl_bradford
+        object: clinic:B
+        assertions:
+          can_list_employees: true
+          can_list_patients: true
+          can_list_guardians: true
+          can_view: true
+          can_add_employee: false
+      # Cross-Clinic operations (Clinic A).
+      - user: employee:carl_bradford
+        object: clinic:A
+        assertions:
+          can_view: false
+      # Patient at Clinic B: view and edit allowed, add visit denied.
+      - user: employee:carl_bradford
+        object: patient:rosy_rodriquez
+        assertions:
+          can_view: true
+          can_edit: true
+          can_delete: false
+          can_list_visits: true
+          can_add_visit: false
+      # Guardian at Clinic B: view and edit allowed.
+      - user: employee:carl_bradford
+        object: guardian:eduardo_rodriquez
+        assertions:
+          can_view: true
+          can_edit: true
+          can_delete: false
+      # Guardian at Clinic A: denied.
+      - user: employee:carl_bradford
+        object: guardian:betty_davis
+        assertions:
+          can_view: false
+      # Visit at Clinic B: view and edit allowed.
+      - user: employee:carl_bradford
+        object: visit:rosy_rodriquez_1
+        assertions:
+          can_view: true
+          can_edit: true
+          can_delete: false
+      # Employee at Clinic B: view and edit allowed (non-Administrators).
+      - user: employee:carl_bradford
+        object: employee:jestine_teixeira
+        assertions:
+          can_view: true
+          can_edit: true
+          can_delete: false
+      # Self view.
+      - user: employee:carl_bradford
+        object: employee:carl_bradford
+        assertions:
+          can_view: true
+          can_delete: false
+
+  # Edge cases.
+
+  - name: "Guardian: edit and delete permissions across roles."
+    check:
+      # Doctor cannot edit Guardians (view only).
+      - user: employee:james_carter
+        object: guardian:betty_davis
+        assertions:
+          can_edit: false
+          can_delete: false
+      # Intern Doctor: same.
+      - user: employee:jestine_teixeira
+        object: guardian:eduardo_rodriquez
+        assertions:
+          can_edit: false
+          can_delete: false
+      # Admin can edit and delete.
+      - user: employee:alice
+        object: guardian:betty_davis
+        assertions:
+          can_edit: true
+          can_delete: true
+      # Guest denied.
+      - user: guest:unknown
+        object: guardian:betty_davis
+        assertions:
+          can_edit: false
+          can_delete: false
+
+  - name: "Visit: delete permissions across roles."
+    check:
+      # Intern Doctor cannot delete.
+      - user: employee:jestine_teixeira
+        object: visit:rosy_rodriquez_1
+        assertions:
+          can_delete: false
+      - user: employee:alice
+        object: visit:basil_davis_3
+        assertions:
+          can_delete: true
+
+  - name: "Administrator: access to Protected Visits."
+    check:
+      # Administrator can view and edit Protected Visits.
+      - user: employee:alice
+        object: visit:basil_davis_3
+        assertions:
+          can_view: true
+          can_edit: true
+
+  - name: "Receptionist: access to Protected Visits (no confidentiality restriction)."
+    check:
+      # Receptionist can view and edit Protected Visit (first).
+      - user: employee:bob_buchanan
+        object: visit:basil_davis_1
+        assertions:
+          can_view: true
+          can_edit: true
+          can_delete: false
+      # Receptionist can view and edit Protected Visit (second).
+      - user: employee:bob_buchanan
+        object: visit:basil_davis_3
+        assertions:
+          can_view: true
+          can_edit: true
+          can_delete: false

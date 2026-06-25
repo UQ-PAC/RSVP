@@ -5,9 +5,10 @@
 
 package uq.pac.rsvp.policy.datalog.validation;
 
+import uq.pac.rsvp.policy.ast.policy.expr.CallExpression;
 import uq.pac.rsvp.policy.ast.schema.type.BuiltinType;
 import uq.pac.rsvp.policy.ast.schema.type.SetType;
-import uq.pac.rsvp.support.error.ValidationError;
+import uq.pac.rsvp.support.error.TranslationError;
 
 import java.util.*;
 
@@ -19,57 +20,52 @@ import static uq.pac.rsvp.policy.datalog.validation.InvariantValidator.*;
  */
 public class InvariantFunctionValidator {
 
-    private static final Map<String, FunctionValidator> REGISTRY;
-    static {
-        REGISTRY = new HashMap<>();
-        REGISTRY.put("allow", new PolicyFunctionValidator("allow"));
-        REGISTRY.put("deny", new PolicyFunctionValidator("deny"));
-        REGISTRY.put("isEmpty", new SetIsEmptyFunctionValidator("isEmpty"));
-        REGISTRY.put("contains", new SetContainsFunctionValidator("contains"));
-        REGISTRY.put("containsAll", new SetContainsSetFunctionValidator("containsAll"));
-        REGISTRY.put("containsAny", new SetContainsSetFunctionValidator("containsAny"));
-    }
-
-    public static FunctionValidator getValidator(String validator) {
-        return REGISTRY.get(validator);
+    public static FunctionValidator getValidator(CallExpression call) {
+        return switch (call.getFunc()) {
+            case "allow", "deny" -> new PolicyFunctionValidator(call);
+            case "isEmpty" -> new SetIsEmptyFunctionValidator(call);
+            case "contains" -> new SetContainsFunctionValidator(call);
+            case "containsAll", "containsAny" -> new SetContainsSetFunctionValidator(call);
+            default -> null;
+        };
     }
 
     public abstract static class FunctionValidator {
-        protected final String name;
+        protected final CallExpression call;
         protected final List<TypeTest> self;
         protected final List<List<TypeTest>> arguments;
         protected final BuiltinType returnType;
 
-        FunctionValidator(String name, List<TypeTest> self, List<List<TypeTest>> arguments, BuiltinType returnType) {
-            this.name = name;
+        FunctionValidator(CallExpression call, List<TypeTest> self, List<List<TypeTest>> arguments, BuiltinType returnType) {
+            this.call = call;
             this.self = self == null ? List.of() : self;
             this.arguments = List.copyOf(arguments);
             this.returnType = returnType;
         }
 
         String getName() {
-            return name;
+            return call.getFunc();
         }
 
         void post(BuiltinType actualSelf, List<BuiltinType> actualArguments) { }
 
         BuiltinType validate(BuiltinType actualSelf, List<BuiltinType> actualArguments) {
             if (actualSelf != null && self.isEmpty()) {
-                throw new ValidationError("Function %s requires no object application".formatted(getName()));
+                throw new TranslationError("Function %s requires no object application".formatted(getName()), call.getSourceLoc());
             } else if (actualSelf == null && !self.isEmpty()) {
-                throw new ValidationError("Function %s requires object application".formatted(getName()));
+                throw new TranslationError("Function %s requires object application".formatted(getName()), call.getSourceLoc());
             } else if (actualSelf != null) {
-                InvariantValidator.expect(actualSelf, self);
+                InvariantValidator.expect(call, actualSelf, self);
             }
 
             require(arguments != null);
             if (arguments.size() != actualArguments.size()) {
-                throw new ValidationError("Function %s expects %d arguments, got %d"
-                        .formatted(getName(), arguments.size(), actualArguments.size()));
+                throw new TranslationError("Function %s expects %d arguments, got %d"
+                        .formatted(getName(), arguments.size(), actualArguments.size()), call.getSourceLoc());
             }
 
             for (int i = 0; i < actualArguments.size(); i++) {
-                InvariantValidator.expect(actualArguments.get(i), arguments.get(i));
+                InvariantValidator.expect(call, actualArguments.get(i), arguments.get(i));
             }
             post(actualSelf, actualArguments);
             return returnType;
@@ -81,14 +77,14 @@ public class InvariantFunctionValidator {
     }
 
     static class SetIsEmptyFunctionValidator extends FunctionValidator {
-        SetIsEmptyFunctionValidator(String name) {
-            super(name, List.of(TSet), List.of(), BooleanType);
+        SetIsEmptyFunctionValidator(CallExpression call) {
+            super(call, List.of(TSet), List.of(), BooleanType);
         }
     }
 
     static class SetContainsFunctionValidator extends FunctionValidator {
-        SetContainsFunctionValidator(String name) {
-            super(name,
+        SetContainsFunctionValidator(CallExpression call) {
+            super(call,
                     List.of(TSet),
                     List.of(List.of(TBoolean, TLong, TString, TEntity, TAction)),
                     BooleanType);
@@ -101,14 +97,14 @@ public class InvariantFunctionValidator {
             require(arguments.size() == 1);
 
             BuiltinType element = ((SetType) actualSelf).getElementType();
-            InvariantValidator.expectCompatible(element, actualArguments.getFirst());
-            InvariantValidator.expect(element, this.arguments.getFirst());
+            InvariantValidator.expectCompatible(call,element, actualArguments.getFirst());
+            InvariantValidator.expect(call, element, this.arguments.getFirst());
         }
     }
 
     static class SetContainsSetFunctionValidator extends FunctionValidator {
-        SetContainsSetFunctionValidator(String name) {
-            super(name, List.of(TSet), List.of(List.of(TSet)), BooleanType);
+        SetContainsSetFunctionValidator(CallExpression call) {
+            super(call, List.of(TSet), List.of(List.of(TSet)), BooleanType);
         }
 
         @Override
@@ -121,14 +117,14 @@ public class InvariantFunctionValidator {
             BuiltinType selfElement = ((SetType) actualSelf).getElementType();
             BuiltinType argElement = ((SetType) actualArguments.getFirst()).getElementType();
 
-            InvariantValidator.expectCompatible(selfElement, argElement);
-            InvariantValidator.expect(selfElement, getValidator("contains").arguments.getFirst());
+            InvariantValidator.expectCompatible(call,selfElement, argElement);
+            InvariantValidator.expect(call,selfElement, List.of(TBoolean, TLong, TString, TEntity, TAction));
         }
     }
 
     static class PolicyFunctionValidator extends FunctionValidator {
-        PolicyFunctionValidator(String name) {
-            super(name,
+        PolicyFunctionValidator(CallExpression call) {
+            super(call,
                     List.of(),
                     List.of(List.of(TEntity),
                             List.of(TEntity),

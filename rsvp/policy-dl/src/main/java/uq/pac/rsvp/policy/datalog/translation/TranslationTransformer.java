@@ -69,7 +69,7 @@ public class TranslationTransformer implements PolicyComputationVisitor<Expressi
                 }
                 if (e instanceof CallExpression call) {
                     InvariantFunctionValidator.FunctionValidator val =
-                            InvariantFunctionValidator.getValidator(call.getFunc());
+                            InvariantFunctionValidator.getValidator(call);
                     return val != null && val.getReturnType() instanceof BooleanType;
                 }
                 return false;

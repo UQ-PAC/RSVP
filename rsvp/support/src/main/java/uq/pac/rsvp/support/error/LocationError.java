@@ -15,11 +15,13 @@ import uq.pac.rsvp.support.SourceLoc;
 public abstract class LocationError extends RuntimeException {
     private final SourceLoc location;
     private final String title;
+    private final String error;
 
-    public LocationError(String msg, String title, SourceLoc location) {
-        super(msg + " at: " + location.toString());
+    public LocationError(String error, String title, SourceLoc location) {
+        super(error + " at: " + location.toString());
         this.location = location;
         this.title = title;
+        this.error = error;
     }
 
     public SourceLoc getLocation() {
@@ -28,5 +30,12 @@ public abstract class LocationError extends RuntimeException {
 
     public String getTitle() {
         return title;
+    }
+
+    /**
+     * Return the error message without the location information
+     */
+    public String getErrorMessage() {
+        return error;
     }
 }

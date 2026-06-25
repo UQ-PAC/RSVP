@@ -44,9 +44,7 @@ public class PolicyAnalysis {
 
         // Create a map of policy to policy-related analysis results:
         Map<Policy, PolicyAnalysisResult> analysisResults = new HashMap<>();
-        policyResults.keySet().forEach(p -> {
-            analysisResults.put(p, new PolicyAnalysisResult());
-        });
+        policyResults.keySet().forEach(p -> analysisResults.put(p, new PolicyAnalysisResult()));
 
         // Check for and report policies not matching any requests:
         policyResults.forEach((policy, v) -> {
@@ -155,7 +153,7 @@ public class PolicyAnalysis {
         }
         if (!uncoveredRequests.isEmpty()) {
             reports.add(new Report(Severity.Info, "Not all requests are covered by policy",
-                    "" + uncoveredRequests.size() + " out of the " + allRequests.size()
+                    uncoveredRequests.size() + " out of the " + allRequests.size()
                     + " possible requests are not matched by any policy. \nExample:" + uncoveredRequests.iterator().next().toHumanReadableString()));
         }
 

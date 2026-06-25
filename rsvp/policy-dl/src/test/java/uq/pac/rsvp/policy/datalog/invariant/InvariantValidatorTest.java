@@ -14,13 +14,12 @@ import uq.pac.rsvp.policy.datalog.TestUtil;
 import uq.pac.rsvp.policy.datalog.validation.InvariantValidator;
 import uq.pac.rsvp.support.error.TranslationError;
 import uq.pac.rsvp.StdLogger;
-import uq.pac.rsvp.support.error.ValidationError;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
 import static org.fusesource.jansi.Ansi.Color.*;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class InvariantValidatorTest {
     StdLogger logger = new StdLogger();
@@ -280,9 +279,11 @@ public class InvariantValidatorTest {
                 throw new TranslationError("Unexpected test pass for invariant: " + invariantText);
             }
 
-        } catch (ValidationError error) {
+        } catch (TranslationError error) {
             if (!pass) {
-                logger.info(MAGENTA, "    Expected error: " + error.getMessage());
+                logger.info(MAGENTA, "    Expected error: " + error.getErrorMessage());
+                // Make sure the location is set
+                assertFalse(error.getLocation().isEmpty());
             } else {
                 throw error;
             }

@@ -5,6 +5,7 @@
 
 package uq.pac.rsvp.policy.datalog.validation;
 
+import uq.pac.rsvp.policy.ast.AstNode;
 import uq.pac.rsvp.policy.ast.policy.expr.*;
 import uq.pac.rsvp.policy.ast.policy.visitor.PolicyPayloadVisitor;
 import uq.pac.rsvp.policy.ast.schema.Schema;
@@ -14,7 +15,6 @@ import uq.pac.rsvp.policy.ast.schema.statement.EnumEntityTypeDefinition;
 import uq.pac.rsvp.policy.ast.schema.type.*;
 import uq.pac.rsvp.policy.ast.policy.Invariant;
 import uq.pac.rsvp.support.error.TranslationError;
-import uq.pac.rsvp.support.error.ValidationError;
 
 import java.util.*;
 import java.util.function.Function;
@@ -58,24 +58,23 @@ public class InvariantValidator implements PolicyPayloadVisitor<BuiltinType, Pay
         return type instanceof TypeReference ref && !ref.getBaseName().equals("Action");
     }
 
-    static void expect(BuiltinType actual, TypeTest ...tests) {
+    static void expect(AstNode expr, BuiltinType actual, TypeTest ...tests) {
         for (TypeTest test : tests) {
             if (test.test().apply(actual)) {
                 return;
             }
         }
         String expected = Stream.of(tests).map(TypeTest::expected).toList().toString();
-        throw new ValidationError("Expected one of %s, got %s".formatted(expected, actual.toString()));
+        throw new TranslationError("Expected one of %s, got %s".formatted(expected, actual.toString()), expr.getSourceLoc());
     }
 
-
-    static void expect(BuiltinType actual, List<TypeTest> tests) {
-        expect(actual, tests.toArray(new TypeTest[0]));
+    static void expect(AstNode expr, BuiltinType actual, List<TypeTest> tests) {
+        expect(expr, actual, tests.toArray(new TypeTest[0]));
     }
 
-    static void expectCompatible(BuiltinType one, BuiltinType another) {
+    static void expectCompatible(AstNode expr, BuiltinType one, BuiltinType another) {
         if (!one.equals(another)) {
-            throw new ValidationError("Incompatible types: %s <> %s".formatted(one, another));
+            throw new TranslationError("Incompatible types: %s <> %s".formatted(one, another), expr.getSourceLoc());
         }
     }
 
@@ -111,14 +110,14 @@ public class InvariantValidator implements PolicyPayloadVisitor<BuiltinType, Pay
 
             // Check for duplicate variables
             if (variables.containsKey(varName)) {
-                throw new ValidationError(
-                        "duplicate variable name: %s in quantifier: %s".formatted(varName, invariant.getQuantifier()));
+                throw new TranslationError(
+                        "duplicate variable name: %s in quantifier: %s".formatted(varName, invariant.getQuantifier()), invariant.getSourceLoc());
             }
 
             // Ensure types exist
             if (!types.contains(typeRef)) {
-                throw new ValidationError("invalid type: %s in quantifier: %s. Available types: %s".formatted(
-                        var.type(), invariant.getQuantifier(), types));
+                throw new TranslationError("invalid type: %s in quantifier: %s. Available types: %s".formatted(
+                        var.type(), invariant.getQuantifier(), types), invariant.getSourceLoc());
             }
 
             variables.put(varName, typeRef);
@@ -143,7 +142,7 @@ public class InvariantValidator implements PolicyPayloadVisitor<BuiltinType, Pay
 
     @Override
     public BuiltinType visitInvariant(Invariant invariant, Payload payload) {
-        expect(collect(invariant.getExpression(), payload), TBoolean);
+        expect(invariant, collect(invariant.getExpression(), payload), TBoolean);
         return BooleanType;
     }
 
@@ -154,47 +153,47 @@ public class InvariantValidator implements PolicyPayloadVisitor<BuiltinType, Pay
 
         return switch (expr.getOperator()) {
             case Add, Sub, Mul -> {
-                expect(lhs, TLong);
-                expect(rhs, TLong);
+                expect(expr, lhs, TLong);
+                expect(expr, rhs, TLong);
                 yield LongType;
             }
             case Less, LessEq, Greater, GreaterEq -> {
-                expect(lhs, TLong);
-                expect(rhs, TLong);
+                expect(expr, lhs, TLong);
+                expect(expr, rhs, TLong);
                 yield BooleanType;
             }
             case Eq, Neq -> {
-                expectCompatible(lhs, rhs);
+                expectCompatible(expr, lhs, rhs);
                 yield BooleanType;
             }
             case Or, And -> {
-                expect(lhs, TBoolean);
-                expect(rhs, TBoolean);
+                expect(expr, lhs, TBoolean);
+                expect(expr, rhs, TBoolean);
                 yield BooleanType;
             }
             case In -> {
-                expectCompatible(lhs, rhs);
-                expect(lhs, TEntity, TAction);
+                expectCompatible(expr, lhs, rhs);
+                expect(expr, lhs, TEntity, TAction);
                 yield BooleanType;
             }
-            default -> throw new TranslationError("Unsupported");
+            default -> throw new TranslationError("Unsupported", expr.getSourceLoc());
         };
     }
 
     @Override
     public BuiltinType visitIsExpr(IsExpression expr, Payload payload) {
-        expect(collect(expr.getExpression(), payload), TEntity, TAction);
+        expect(expr, collect(expr.getExpression(), payload), TEntity, TAction);
         TypeReference ref = TypeReference.parse(expr.getTypeExpression().getValue());
         if (!types.contains(ref)) {
-            throw new ValidationError("invalid type: %s in type expression: %s. Available types: %s"
-                    .formatted(ref, expr, types));
+            throw new TranslationError("invalid type: %s in type expression: %s. Available types: %s"
+                    .formatted(ref, expr, types), expr.getSourceLoc());
         }
         return BooleanType;
     }
 
     @Override
     public BuiltinType visitHasExpr(HasExpression expr, Payload payload) {
-        expect(collect(expr.getExpression(), payload), TEntity, TAction, TRecord);
+        expect(expr, collect(expr.getExpression(), payload), TEntity, TAction, TRecord);
         return BooleanType;
     }
 
@@ -214,8 +213,8 @@ public class InvariantValidator implements PolicyPayloadVisitor<BuiltinType, Pay
                 return attrType;
             }
         }
-        throw new ValidationError("Invalid property access: %s [%s: %s]"
-                .formatted(expr, expr.getObject(), objectType.toString()));
+        throw new TranslationError("Invalid property access: %s [%s: %s]"
+                .formatted(expr, expr.getObject(), objectType.toString()), expr.getSourceLoc());
     }
 
     @Override
@@ -223,11 +222,11 @@ public class InvariantValidator implements PolicyPayloadVisitor<BuiltinType, Pay
         BuiltinType type = collect(expr.getExpression(), payload);
         return switch (expr.getOperator()) {
             case Not -> {
-                expect(type, TBoolean);
+                expect(expr, type, TBoolean);
                 yield BooleanType;
             }
             case Neg -> {
-                expect(type, TLong);
+                expect(expr, type, TLong);
                 yield LongType;
             }
         };
@@ -244,7 +243,7 @@ public class InvariantValidator implements PolicyPayloadVisitor<BuiltinType, Pay
         if (payload.containsKey(ref)) {
             return payload.get(ref);
         }
-        throw new ValidationError("Ungrounded variable: " + ref);
+        throw new TranslationError("Ungrounded variable: " + ref, expr.getSourceLoc());
     }
 
     @Override
@@ -265,35 +264,35 @@ public class InvariantValidator implements PolicyPayloadVisitor<BuiltinType, Pay
         // We do not check specific entities, but since enum
         // entities are specified by the schema we check if they exist
         if (enumType != null && !enumType.getEnumNames().contains(expr.getName())) {
-            throw new ValidationError("invalid enum entity reference: " + expr.getQualifiedName());
+            throw new TranslationError("invalid enum entity reference: " + expr.getQualifiedName(), expr.getSourceLoc());
         }
 
         if (types.contains(ref)) {
             return ref;
         }
-        throw new ValidationError("invalid type reference: " + expr.getQualifiedName());
+        throw new TranslationError("invalid type reference: " + expr.getQualifiedName(), expr.getSourceLoc());
     }
 
     @Override
     public BuiltinType visitActionExpr(ActionExpression expr, Payload payload) {
         TypeReference action = TypeReference.parse(expr.getQualifiedName());
         if (schema.getAction(action) == null) {
-            throw new ValidationError("invalid action: " + action);
+            throw new TranslationError("invalid action: " + action, expr.getSourceLoc());
         }
         TypeReference ref = TypeReference.parse(expr.getType());
         if (types.contains(ref)) {
             return ref;
         }
-        throw new ValidationError("invalid type reference: " + ref);
+        throw new TranslationError("invalid type reference: " + ref, expr.getSourceLoc());
     }
 
     @Override
     public BuiltinType visitCallExpr(CallExpression expr, Payload payload) {
         String name = expr.getFunc();
         InvariantFunctionValidator.FunctionValidator validator =
-                InvariantFunctionValidator.getValidator(name);
+                InvariantFunctionValidator.getValidator(expr);
         if (validator == null) {
-            throw new ValidationError("Function: " + name + " not registered");
+            throw new TranslationError("Function: " + name + " not registered", expr.getSourceLoc());
         }
         BuiltinType self = expr.getSelf() == null ? null : collect(expr.getSelf(), payload);
         return validator.validate(self, collect(expr.getArgs(), payload));
@@ -302,10 +301,10 @@ public class InvariantValidator implements PolicyPayloadVisitor<BuiltinType, Pay
     @Override
     public BuiltinType visitConditionalExpr(ConditionalExpression expr, Payload payload) {
         BuiltinType condition = collect(expr.getCondition(), payload);
-        expect(condition, TBoolean);
+        expect(expr, condition, TBoolean);
         BuiltinType then = collect(expr.getThen(), payload),
                 els = collect(expr.getElse(), payload);
-        expectCompatible(then, els);
+        expectCompatible(expr, then, els);
         return then;
     }
 
@@ -315,10 +314,10 @@ public class InvariantValidator implements PolicyPayloadVisitor<BuiltinType, Pay
         List<BuiltinType> types = collect(expr.getElements(), payload);
         // Empty set literals are forbidden in Cedar
         if (types.isEmpty()) {
-            throw new ValidationError("Empty set literals are forbidden im policies");
+            throw new TranslationError("Empty set literals are forbidden im policies", expr.getSourceLoc());
         }
         BuiltinType type = types.removeLast();
-        types.forEach(t -> expectCompatible(type, t));
+        types.forEach(t -> expectCompatible(expr, type, t));
         return new SetType(type);
     }
 

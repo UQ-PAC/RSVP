@@ -35,7 +35,7 @@ public class EntityValidationTest {
         }
     }
 
-    void testFile(Path entityFile) throws IOException, IllegalAccessException {
+    void testFile(Path entityFile) throws IOException {
 
         String expectedMessage = null;
         // We allow multiple locations for rare cases of non-deterministic element processing,
@@ -100,7 +100,7 @@ public class EntityValidationTest {
     }
 
     @Test
-    void locationTest() throws IOException, IllegalAccessException {
+    void locationTest() {
         String json = """
         [{
             "uid": { "type": "Directory", "id": "/etc" },

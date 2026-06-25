@@ -13,7 +13,6 @@ import org.junit.jupiter.api.TestFactory;
 import uq.pac.rsvp.policy.ast.entity.*;
 import uq.pac.rsvp.policy.datalog.TestUtil;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,12 +36,12 @@ public class EntitySetTest {
     }
 
     // Take all the entities from the translation sets and compare them with what Cedar gets
-    void buildTest(Path path) throws IOException, IllegalAccessException {
+    void buildTest(Path path) throws IOException {
         EntitySet es = EntitySet.parse(path);
         List<Entity> rsvpEntities = es.stream().toList();
 
         // Here we are testing 2 sources, entities from file and entities from
-        // re-translation of the entity set to Json
+        // re-translation of the entity set to JSON
         for (String json : List.of(Files.readString(path), es.toJson().toString())) {
             // Cedar entities from file
             Entities cedarEntities = Entities.parse(json);

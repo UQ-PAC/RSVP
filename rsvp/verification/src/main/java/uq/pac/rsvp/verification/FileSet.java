@@ -66,7 +66,7 @@ public class FileSet {
         invariants = new HashMap<>();
     }
 
-    public FileSet loadFiles() throws IOException, IllegalAccessException {
+    public FileSet loadFiles() throws IOException {
         // Load policies
         for (List<Pair<String, Path>> versionedPolicy : policyFiles) {
             for (Pair<String, Path> policyFile : versionedPolicy) {

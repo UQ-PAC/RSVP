@@ -76,7 +76,7 @@ public class Verification {
         return new VerificationResult(reports, cache);
     }
 
-    public static ChangeImpact getImpact(String original, String updated, VerificationCache cache) throws IOException, InterruptedException {
+    public static ChangeImpact getImpact(String original, String updated, VerificationCache cache) throws IOException {
         ChangeImpact changeImpact = cache.getImpact(original, updated);
 
         if (changeImpact == null) {

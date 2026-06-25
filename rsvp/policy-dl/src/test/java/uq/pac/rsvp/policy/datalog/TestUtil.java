@@ -5,7 +5,6 @@
 
 package uq.pac.rsvp.policy.datalog;
 
-import org.junit.jupiter.api.Test;
 import uq.pac.rsvp.support.error.TranslationError;
 
 import java.io.IOException;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static uq.pac.rsvp.Assertion.require;
 
 public class TestUtil {

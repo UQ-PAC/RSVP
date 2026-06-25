@@ -8,7 +8,6 @@ package uq.pac.rsvp.policy.ast.policy.visitor;
 import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.policy.expr.*;
 import uq.pac.rsvp.policy.ast.policy.Invariant;
-import uq.pac.rsvp.policy.ast.policy.Quantifier;
 
 // Basic visitor implementation. Visits each expression tree in a policy set.
 // Subclasses can override some or all methods.

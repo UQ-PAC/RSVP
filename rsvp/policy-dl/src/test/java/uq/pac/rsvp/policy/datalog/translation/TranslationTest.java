@@ -144,7 +144,7 @@ public class TranslationTest {
      * Differential test for Cedar and RSVP.
      * The test runs both, RSVP and Cedar authorisation engines and compares the results that should agree
      */
-    void differentialTest(TestInput test) throws IOException, AuthException, IllegalAccessException {
+    void differentialTest(TestInput test) throws IOException, AuthException {
         logger.info(YELLOW, "Policy: " + test.policy)
                 .info(MAGENTA, "Datalog specification: " + test.datalogDir + "/" + TranslationConstants.ProgramName)
                 .fine(CYAN, Files.readString(test.policy));

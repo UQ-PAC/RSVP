@@ -5,7 +5,6 @@
 
 package uq.pac.rsvp.verification;
 
-import uq.pac.rsvp.RsvpException;
 import uq.pac.rsvp.policy.ast.entity.EntitySet;
 import uq.pac.rsvp.policy.ast.policy.Policy;
 import uq.pac.rsvp.policy.ast.policy.PolicyProgram;
@@ -33,7 +32,7 @@ public class Verification {
 
     static final boolean TESTING = false;
 
-    public static VerificationResult verifyPolicies(FileSet fileset) throws RsvpException, IOException, ConfigurationException, InterruptedException, IllegalAccessException {
+    public static VerificationResult verifyPolicies(FileSet fileset) throws IOException, ConfigurationException, InterruptedException, IllegalAccessException {
 
         if (TESTING) {
             Set<Report> reports = RandomReportGenerator.generateRandomReports(fileset);

@@ -25,50 +25,55 @@ import java.util.Set;
  */
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         FileSet fileset = new FileSet();
 
         // Parse each command line arg as a policy ast file
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
-            if (arg.equals("--schema") || arg.equals("-s")) {
-                i++;
-                if (i == args.length) {
-                    System.err.println("Error: --schema/-s requires an argument");
-                    System.exit(1);
+            switch (arg) {
+                case "--schema", "-s" -> {
+                    i++;
+                    if (i == args.length) {
+                        System.err.println("Error: --schema/-s requires an argument");
+                        System.exit(1);
+                    }
+                    Path schemaPath = Path.of(args[i]).toAbsolutePath();
+                    fileset.addSchema(schemaPath);
                 }
-                Path schemaPath = Path.of(args[i]).toAbsolutePath();
-                fileset.addSchema(schemaPath);
-            } else if (arg.equals("--policies") || arg.equals("-p")) {
-                if (i == args.length - 1) {
-                    System.err.println("Error: --policies/-p requires an argument");
-                    System.exit(1);
-                }
+                case "--policies", "-p" -> {
+                    if (i == args.length - 1) {
+                        System.err.println("Error: --policies/-p requires an argument");
+                        System.exit(1);
+                    }
 
-                List<Path> versions = new ArrayList<>();
+                    List<Path> versions = new ArrayList<>();
 
-                // If more than one, treat them as versions of the same file:
-                while (i < args.length - 1 && !args[i + 1].startsWith("-")) {
-                    versions.add(Path.of(args[++i]).toAbsolutePath());
-                }
+                    // If more than one, treat them as versions of the same file:
+                    while (i < args.length - 1 && !args[i + 1].startsWith("-")) {
+                        versions.add(Path.of(args[++i]).toAbsolutePath());
+                    }
 
-                fileset.addPolicies(versions.toArray(new Path[0]));
-            } else if (arg.equals("--entities") || arg.equals("-e")) {
-                i++;
-                if (i == args.length) {
-                    System.err.println("Error: --entities/-e requires an argument");
-                    System.exit(1);
+                    fileset.addPolicies(versions.toArray(new Path[0]));
                 }
-                Path entitiesPath = Path.of(args[i]).toAbsolutePath();
-                fileset.addEntities(entitiesPath);
-            } else if (arg.equals("--invariants") || arg.equals("-i")) {
-                i++;
-                if (i == args.length) {
-                    System.err.println("Error: --invariants/-i requires an argument");
-                    System.exit(1);
+                case "--entities", "-e" -> {
+                    i++;
+                    if (i == args.length) {
+                        System.err.println("Error: --entities/-e requires an argument");
+                        System.exit(1);
+                    }
+                    Path entitiesPath = Path.of(args[i]).toAbsolutePath();
+                    fileset.addEntities(entitiesPath);
                 }
-                Path invariantsPath = Path.of(args[i]).toAbsolutePath();
-                fileset.addInvariants(invariantsPath);
+                case "--invariants", "-i" -> {
+                    i++;
+                    if (i == args.length) {
+                        System.err.println("Error: --invariants/-i requires an argument");
+                        System.exit(1);
+                    }
+                    Path invariantsPath = Path.of(args[i]).toAbsolutePath();
+                    fileset.addInvariants(invariantsPath);
+                }
             }
         }
 
@@ -104,8 +109,8 @@ public class Main {
         } catch (ConfigurationException ce) {
             System.err.println("Configuration issue: " + ce.getMessage());
             System.exit(1);
-        } catch (RsvpException | IllegalAccessException rsvpe) {
-            rsvpe.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
             System.exit(1);
         }
     }

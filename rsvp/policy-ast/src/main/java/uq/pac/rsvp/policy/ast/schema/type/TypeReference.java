@@ -21,7 +21,7 @@ import java.util.Objects;
  */
 public class TypeReference extends BuiltinType {
 
-    public static String TYPE_REFERENCE_DELIMITER = "::";
+    public final static String TYPE_REFERENCE_DELIMITER = "::";
 
     private final String name;
     private final String namespace;

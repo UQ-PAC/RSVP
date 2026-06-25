@@ -40,7 +40,7 @@ import java.util.concurrent.CompletableFuture;
 @EnableAsync
 public class RsvpController {
 
-    Logger logger = LoggerFactory.getLogger(RsvpController.class);
+    final Logger logger = LoggerFactory.getLogger(RsvpController.class);
 
     @Autowired
     FileService fileService;

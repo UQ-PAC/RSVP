@@ -22,7 +22,7 @@ import static org.fusesource.jansi.Ansi.Color.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class InvariantValidatorTest {
-    StdLogger logger = new StdLogger();
+    final StdLogger logger = new StdLogger();
 
     private final InvariantValidator validator;
 

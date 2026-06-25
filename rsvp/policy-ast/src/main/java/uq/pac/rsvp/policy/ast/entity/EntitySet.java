@@ -19,11 +19,11 @@ public class EntitySet {
         this.entities = Set.copyOf(entities);
     }
 
-    public static EntitySet parse(Path json) throws IOException, IllegalAccessException {
+    public static EntitySet parse(Path json) throws IOException {
         return EntitySetParser.parse(json);
     }
 
-    public static EntitySet parse(String filename, String json) throws IOException, IllegalAccessException {
+    public static EntitySet parse(String filename, String json) {
         return EntitySetParser.parse(filename, json);
     }
 

@@ -28,8 +28,7 @@ import static uq.pac.rsvp.policy.ast.policy.expr.UnaryExpression.Operator.Not;
  */
 public class NFConverter implements PolicyComputationVisitor<Formula> {
 
-    private NFConverter() {
-    }
+    private NFConverter() {}
 
     @Override
     public Formula visitBinaryExpr(BinaryExpression expr) {

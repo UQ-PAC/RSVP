@@ -12,5 +12,5 @@ import java.util.Set;
 
 public class RequestResult {
     public boolean permitted;
-    public Set<Policy> policies = new HashSet<>();
+    public final Set<Policy> policies = new HashSet<>();
 }

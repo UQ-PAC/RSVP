@@ -44,10 +44,6 @@ public class DLAtom extends DLRuleExpr {
         return terms;
     }
 
-    public DLTerm getTerm(int index) {
-        return terms.get(index);
-    }
-
     public int arity() {
         return terms.size();
     }
@@ -67,6 +63,6 @@ public class DLAtom extends DLRuleExpr {
     @Override
     protected String stringify() {
         return (isNegated() ? "!" : "") +  decl.getName() +
-                "(" + String.join(", ", terms.stream().map(DLTerm::toString).toList()) + ")";
+                "(" + String.join(", ", getTerms().stream().map(DLTerm::toString).toList()) + ")";
     }
 }

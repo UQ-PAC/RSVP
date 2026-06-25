@@ -57,7 +57,7 @@ class PolicyStatementVisitor extends CedarSourceVisitor<PolicyStatement> {
                         TypeExpression type = (TypeExpression) expressions.visitType(tv.type());
                         return new Quantifier.Variable(var, type);
                     }).toList();
-            quantifier = new Quantifier(scope, variables, location(ctx.quantifier()));
+            quantifier = new Quantifier(scope, variables);
         }
         return new Invariant(quantifier, expr, location(ctx));
     }

@@ -18,7 +18,7 @@ import java.util.List;
 
 public class Report {
 
-    public static enum Severity {
+    public enum Severity {
 
         @SerializedName("info")
         Info("info"),

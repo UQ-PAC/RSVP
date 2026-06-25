@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ParserTest {
 
-    StdLogger logger = new StdLogger();
+    final StdLogger logger = new StdLogger();
 
     private static final String INPUT = """
         // Literal

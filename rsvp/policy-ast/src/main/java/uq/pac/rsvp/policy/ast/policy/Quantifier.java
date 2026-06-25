@@ -7,10 +7,6 @@ package uq.pac.rsvp.policy.ast.policy;
 
 import uq.pac.rsvp.policy.ast.policy.expr.TypeExpression;
 import uq.pac.rsvp.policy.ast.policy.expr.VariableExpression;
-import uq.pac.rsvp.policy.ast.policy.visitor.PolicyComputationVisitor;
-import uq.pac.rsvp.policy.ast.policy.visitor.PolicyPayloadVisitor;
-import uq.pac.rsvp.policy.ast.policy.visitor.PolicyVisitor;
-import uq.pac.rsvp.support.SourceLoc;
 
 import java.util.Collections;
 import java.util.List;
@@ -43,13 +39,9 @@ public class Quantifier {
     private final List<Variable> variables;
     private final Scope scope;
 
-    public Quantifier(Scope scope, List<Variable> variables, SourceLoc location) {
+    public Quantifier(Scope scope, List<Variable> variables) {
         this.variables = List.copyOf(variables);
         this.scope = scope;
-    }
-
-    public Quantifier(Scope scope, List<Variable> variables) {
-        this(scope, variables, SourceLoc.MISSING);
     }
 
     public Quantifier() {

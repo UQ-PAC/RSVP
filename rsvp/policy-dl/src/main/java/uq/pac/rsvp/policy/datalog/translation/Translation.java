@@ -75,7 +75,7 @@ public class Translation {
         try {
             this.schema = schema;
             this.entities = EntityValidator.validate(schema, entities);
-            PolicyProgramValidator.validate(schema, program);
+            program = PolicyProgramValidator.validate(schema, program);
             this.policies = program.getPolicies();
             this.invariants = program.getInvariants();
 

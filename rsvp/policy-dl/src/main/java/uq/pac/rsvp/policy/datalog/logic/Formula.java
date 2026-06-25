@@ -21,7 +21,7 @@ public abstract class Formula {
 
     @Override
     public final boolean equals(Object other) {
-        if (other instanceof Formula f) {
+        if (other instanceof Formula) {
             return this.toString().equals(other.toString());
         }
         return false;
